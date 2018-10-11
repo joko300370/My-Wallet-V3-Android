@@ -219,5 +219,25 @@
             app:layout_constraintStart_toStartOf="@+id/pie_chart"
             app:layout_constraintTop_toTopOf="@+id/pie_chart" />
 
+        <TextView
+            android:id="@+id/text_view_lockbox_disclaimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/dashboard_lockbox_disclaimer"
+            android:theme="@style/PlainTheme"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/non_spendable_pane"
+            tools:visibility="visible" />
+
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>
