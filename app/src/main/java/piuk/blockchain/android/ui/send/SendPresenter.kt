@@ -949,7 +949,7 @@ class SendPresenter @Inject constructor(
     internal fun updateFiatTextField(editable: Editable, editText: EditText) {
         val crypto = EditTextFormatUtil.formatEditable(
             editable,
-            currencyFormatManager.getSelectedCoinMaxFractionDigits(),
+            currencyState.cryptoCurrency.dp,
             editText,
             getDefaultDecimalSeparator()
         ).toString()

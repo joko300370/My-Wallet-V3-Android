@@ -35,42 +35,6 @@ class CurrencyFormatManagerTest {
 
     // region Current selected crypto currency state methods
     @Test
-    fun `getCryptoMaxDecimalLength BTC`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
-
-        // Act
-        val result = subject.getSelectedCoinMaxFractionDigits()
-
-        // Assert
-        assertEquals(8, result)
-    }
-
-    @Test
-    fun `getCryptoMaxDecimalLength BCH`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
-
-        // Act
-        val result = subject.getSelectedCoinMaxFractionDigits()
-
-        // Assert
-        assertEquals(8, result)
-    }
-
-    @Test
-    fun `getCryptoMaxDecimalLength ETH`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
-
-        // Act
-        val result = subject.getSelectedCoinMaxFractionDigits()
-
-        // Assert
-        assertEquals(18, result)
-    }
-
-    @Test
     fun `getCryptoUnit BTC`() {
         // Arrange
         whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)

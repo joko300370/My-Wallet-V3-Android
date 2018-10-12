@@ -55,7 +55,7 @@ class ReceivePresenter @Inject internal constructor(
     @VisibleForTesting
     internal var selectedBchAccount: GenericMetadataAccount? = null
 
-    fun getMaxCryptoDecimalLength() = currencyFormatManager.getSelectedCoinMaxFractionDigits()
+    fun getMaxCryptoDecimalLength() = currencyState.cryptoCurrency.dp
 
     fun getCryptoUnit() = currencyFormatManager.getSelectedCoinUnit()
     fun getFiatUnit() = currencyFormatManager.fiatCountryCode
