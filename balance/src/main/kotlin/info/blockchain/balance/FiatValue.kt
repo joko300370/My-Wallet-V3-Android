@@ -86,7 +86,7 @@ data class FiatValue private constructor(
                 )
             )
 
-        fun fromMajor(currencyCode: String, major: String, locale: Locale = Locale.getDefault()) =
+        fun fromMajorOrZero(currencyCode: String, major: String, locale: Locale = Locale.getDefault()) =
             fromMajor(
                 currencyCode,
                 major.tryParseBigDecimal(locale) ?: BigDecimal.ZERO

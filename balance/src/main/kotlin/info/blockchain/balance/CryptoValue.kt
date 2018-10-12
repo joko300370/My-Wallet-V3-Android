@@ -101,5 +101,5 @@ private fun ensureComparable(a: CryptoCurrency, b: CryptoCurrency) {
 
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)
 
-fun CryptoCurrency.withMajorValue(majorValue: String, locale: Locale = Locale.getDefault()) =
+fun CryptoCurrency.withMajorValueOrZero(majorValue: String, locale: Locale = Locale.getDefault()) =
     CryptoValue.fromMajor(this, majorValue.tryParseBigDecimal(locale) ?: BigDecimal.ZERO)
