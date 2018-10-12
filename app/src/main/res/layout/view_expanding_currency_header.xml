@@ -59,6 +59,12 @@
                 android:text="@string/bitcoin_cash"
                 tools:drawableLeft="@drawable/vector_bitcoin_cash" />
 
+            <TextView
+                android:id="@+id/textview_lumens"
+                style="@style/CryptoCurrencySelectorTextView"
+                android:text="@string/lumens"
+                tools:drawableLeft="@drawable/vector_stellar_rocket" />
+
         </LinearLayout>
     </FrameLayout>
 </RelativeLayout>
