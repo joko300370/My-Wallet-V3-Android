@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.receive
 
 import android.support.annotation.VisibleForTesting
+import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.formatWithUnit
@@ -10,6 +11,8 @@ import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
 import org.bitcoinj.uri.BitcoinURI
@@ -42,6 +45,7 @@ class ReceivePresenter @Inject internal constructor(
     private val payloadDataManager: PayloadDataManager,
     private val ethDataStore: EthDataStore,
     private val bchDataManager: BchDataManager,
+    private val xlmDataManager: XlmDataManager,
     private val environmentSettings: EnvironmentConfig,
     private val currencyState: CurrencyState,
     private val fiatExchangeRates: FiatExchangeRates
@@ -195,17 +199,20 @@ class ReceivePresenter @Inject internal constructor(
         view.setSelectedCurrency(currencyState.cryptoCurrency)
         selectedAccount = null
         selectedBchAccount = null
-        // This can be null at this stage for some reason - TODO investigate thoroughly
-        val account: String? = ethDataStore.ethAddressResponse?.getAddressResponse()?.account
-        if (account != null) {
-            account.let {
-                selectedAddress = it
-                view.updateReceiveAddress(it)
-                generateQrCode(it)
-            }
-        } else {
-            view.finishPage()
-        }
+        xlmDataManager.defaultAccount()
+            .addToCompositeDisposable(this)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { account ->
+                    account.let {
+                        selectedAddress = it.accountId
+                        view.updateReceiveAddress(it.accountId)
+                        generateQrCode(it.accountId)
+                    }
+                },
+                onError = {
+                    view.finishPage()
+                })
     }
 
     internal fun onSelectBchDefault() {

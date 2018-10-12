@@ -7,6 +7,7 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager;
 import com.blockchain.kycui.settings.KycStatusHelper;
 import com.blockchain.network.EnvironmentUrls;
 import com.blockchain.notifications.NotificationTokenManager;
+import com.blockchain.sunriver.XlmDataManager;
 import dagger.Module;
 import dagger.Provides;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -211,5 +212,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     FiatExchangeRates provideFiatExchangeRates() {
         return get(FiatExchangeRates.class);
+    }
+
+    @Provides
+    XlmDataManager provideXlmDataManager() {
+        return get(XlmDataManager.class);
     }
 }
