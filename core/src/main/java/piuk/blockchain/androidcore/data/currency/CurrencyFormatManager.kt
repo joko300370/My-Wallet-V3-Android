@@ -51,13 +51,6 @@ class CurrencyFormatManager @Inject constructor(
 
     // region Selected Coin methods based on CurrencyState.currencyState
 
-    /**
-     * Crypto unit based on current crypto currency state.
-     *
-     * @return BTC, BCH or ETH.
-     */
-    fun getSelectedCoinUnit() = currencyState.cryptoCurrency.symbol
-
     @VisibleForTesting
     fun getConvertedCoinValue(
         coinValue: BigDecimal,

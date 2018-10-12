@@ -34,40 +34,6 @@ class CurrencyFormatManagerTest {
     }
 
     // region Current selected crypto currency state methods
-    @Test
-    fun `getCryptoUnit BTC`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
-
-        // Act
-        val result = subject.getSelectedCoinUnit()
-
-        // Assert
-        assertEquals("BTC", result)
-    }
-
-    @Test
-    fun `getCryptoUnit BCH`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BCH)
-        // Act
-        val result = subject.getSelectedCoinUnit()
-
-        // Assert
-        assertEquals("BCH", result)
-    }
-
-    @Test
-    fun `getCryptoUnit ETH`() {
-        // Arrange
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
-
-        // Act
-        val result = subject.getSelectedCoinUnit()
-
-        // Assert
-        assertEquals("ETH", result)
-    }
 
     @Test
     fun `getConvertedCoinValue BTC default satoshi denomination`() {
