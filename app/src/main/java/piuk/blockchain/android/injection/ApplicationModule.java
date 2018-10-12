@@ -25,6 +25,7 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager;
 import piuk.blockchain.androidcore.data.currency.CurrencyState;
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager;
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates;
 import piuk.blockchain.androidcore.data.fees.FeeDataManager;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -205,5 +206,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     SwipeToReceiveHelper provideSwipeToReceiveHelper() {
         return get(SwipeToReceiveHelper.class);
+    }
+
+    @Provides
+    FiatExchangeRates provideFiatExchangeRates() {
+        return get(FiatExchangeRates.class);
     }
 }

@@ -1,6 +1,10 @@
 package piuk.blockchain.android.ui.receive
 
 import android.support.annotation.VisibleForTesting
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
+import info.blockchain.balance.formatWithUnit
+import info.blockchain.balance.withMajorValueOrZero
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.payload.data.Account
@@ -10,28 +14,23 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
-import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.withMajorValue
-import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.toSafeLong
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
+import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
-import java.math.BigDecimal
 import java.math.BigInteger
-import java.text.DecimalFormat
 import java.util.Locale
 import javax.inject.Inject
 
@@ -45,7 +44,6 @@ class ReceivePresenter @Inject internal constructor(
     private val bchDataManager: BchDataManager,
     private val environmentSettings: EnvironmentConfig,
     private val currencyState: CurrencyState,
-    private val currencyFormatManager: CurrencyFormatManager,
     private val fiatExchangeRates: FiatExchangeRates
 ) : BasePresenter<ReceiveView>() {
 
@@ -61,7 +59,7 @@ class ReceivePresenter @Inject internal constructor(
     fun getMaxCryptoDecimalLength() = currencyState.cryptoCurrency.dp
 
     fun getCryptoUnit() = currencyState.cryptoCurrency.symbol
-    fun getFiatUnit() = currencyFormatManager.fiatCountryCode
+    fun getFiatUnit() = fiatExchangeRates.fiatUnit
 
     override fun onViewReady() {
         if (view.isContactsEnabled) {
@@ -299,18 +297,15 @@ class ReceivePresenter @Inject internal constructor(
 
         val fiatUnit = prefsUtil.getValue(PrefsUtil.KEY_SELECTED_FIAT, PrefsUtil.DEFAULT_CURRENCY)
 
-        val satoshis = getSatoshisFromText(view.getBtcAmount())
+        val crypto = currencyState.cryptoCurrency.withMajorValueOrZero(view.getBtcAmount())
+        val fiat = crypto.toFiat(fiatExchangeRates)
 
-        cryptoAmount = getTextFromSatoshis(satoshis.toLong())
-        this.cryptoUnit = CryptoCurrency.BTC.name
+        cryptoAmount = crypto.toStringWithoutSymbol()
+        this.cryptoUnit = crypto.currency.name
         this.fiatUnit = fiatUnit
 
-        fiatAmount = currencyFormatManager.getFormattedFiatValueFromSelectedCoinValue(
-            coinValue = satoshis.toBigDecimal(),
-            convertBtcDenomination = BTCDenomination.SATOSHI
-        )
-
-        fiatSymbol = currencyFormatManager.getFiatSymbol(fiatUnit, view.locale)
+        fiatAmount = fiat.toStringWithoutSymbol()
+        fiatSymbol = fiat.symbol()
     }
 
     internal fun onShowBottomSheetSelected() {
@@ -331,7 +326,7 @@ class ReceivePresenter @Inject internal constructor(
 
     internal fun updateFiatTextField(bitcoin: String) {
         view.updateFiatTextField(
-            currencyState.cryptoCurrency.withMajorValue(bitcoin)
+            currencyState.cryptoCurrency.withMajorValueOrZero(bitcoin)
                 .toFiat(fiatExchangeRates)
                 .toStringWithSymbol()
         )
@@ -339,9 +334,9 @@ class ReceivePresenter @Inject internal constructor(
 
     internal fun updateBtcTextField(fiat: String) {
         view.updateBtcTextField(
-            currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(
-                fiat
-            )
+            FiatValue.fromMajorOrZero(fiatExchangeRates.fiatUnit, fiat)
+                .toCrypto(fiatExchangeRates, currencyState.cryptoCurrency)
+                .formatWithUnit()
         )
     }
 
@@ -372,56 +367,6 @@ class ReceivePresenter @Inject internal constructor(
             .subscribe(
                 { view.showQrCode(it) },
                 { view.showQrCode(null) })
-    }
-
-    /**
-     * Returns BTC amount from satoshis.
-     *
-     * @return BTC, mBTC or bits relative to what is set in [CurrencyFormatManager]
-     */
-    private fun getTextFromSatoshis(satoshis: Long): String {
-        var displayAmount = currencyFormatManager.getFormattedSelectedCoinValue(satoshis.toBigInteger())
-        displayAmount = displayAmount.replace(".", getDefaultDecimalSeparator())
-        return displayAmount
-    }
-
-    /**
-     * Gets device's specified locale decimal separator
-     *
-     * @return decimal separator
-     */
-    private fun getDefaultDecimalSeparator(): String {
-        val format = DecimalFormat.getInstance(Locale.getDefault()) as DecimalFormat
-        val symbols = format.decimalFormatSymbols
-        return Character.toString(symbols.decimalSeparator)
-    }
-
-    /**
-     * Returns amount of satoshis from btc amount. This could be btc, mbtc or bits.
-     *
-     * @return satoshis
-     */
-    private fun getSatoshisFromText(text: String?): BigInteger {
-        if (text.isNullOrEmpty()) return BigInteger.ZERO
-
-        val amountToSend = stripSeparator(text!!)
-
-        val amount = try {
-            amountToSend.toDouble()
-        } catch (nfe: NumberFormatException) {
-            Timber.e(nfe)
-            0.0
-        }
-
-        return BigDecimal.valueOf(amount)
-            .multiply(BigDecimal.valueOf(100000000))
-            .toBigInteger()
-    }
-
-    private fun stripSeparator(text: String): String {
-        return text.trim { it <= ' ' }
-            .replace(" ", "")
-            .replace(getDefaultDecimalSeparator(), ".")
     }
 
     private fun shouldWarnWatchOnly() = prefsUtil.getValue(KEY_WARN_WATCH_ONLY_SPEND, true)
