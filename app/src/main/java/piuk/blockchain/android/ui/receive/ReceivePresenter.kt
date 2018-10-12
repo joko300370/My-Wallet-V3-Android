@@ -80,7 +80,7 @@ class ReceivePresenter @Inject internal constructor(
             CryptoCurrency.BTC -> onSelectDefault(defaultAccountPosition)
             CryptoCurrency.ETHER -> onEthSelected()
             CryptoCurrency.BCH -> onSelectBchDefault()
-            CryptoCurrency.XLM -> TODO("AND-1541")
+            CryptoCurrency.XLM -> onLumensSelected()
             else -> throw IllegalArgumentException("${currencyState.cryptoCurrency.unit} is not currently supported")
         }
     }
@@ -171,6 +171,25 @@ class ReceivePresenter @Inject internal constructor(
 
     internal fun onEthSelected() {
         currencyState.cryptoCurrency = CryptoCurrency.ETHER
+        compositeDisposable.clear()
+        view.setSelectedCurrency(currencyState.cryptoCurrency)
+        selectedAccount = null
+        selectedBchAccount = null
+        // This can be null at this stage for some reason - TODO investigate thoroughly
+        val account: String? = ethDataStore.ethAddressResponse?.getAddressResponse()?.account
+        if (account != null) {
+            account.let {
+                selectedAddress = it
+                view.updateReceiveAddress(it)
+                generateQrCode(it)
+            }
+        } else {
+            view.finishPage()
+        }
+    }
+
+    internal fun onLumensSelected() {
+        currencyState.cryptoCurrency = CryptoCurrency.XLM
         compositeDisposable.clear()
         view.setSelectedCurrency(currencyState.cryptoCurrency)
         selectedAccount = null

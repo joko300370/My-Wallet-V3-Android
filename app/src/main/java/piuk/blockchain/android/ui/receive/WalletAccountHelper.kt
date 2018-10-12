@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.receive
 
+import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.coin.GenericMetadataAccount
@@ -27,6 +28,7 @@ class WalletAccountHelper(
     private val currencyState: CurrencyState,
     private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
+    //private val xlmDataManager: XlmDataManager,
     private val environmentSettings: EnvironmentConfig,
     private val currencyFormatManager: CurrencyFormatManager
 ) {
@@ -41,7 +43,7 @@ class WalletAccountHelper(
         CryptoCurrency.BTC -> getHdAccounts() + getLegacyAddresses()
         CryptoCurrency.BCH -> getHdBchAccounts() + getLegacyBchAddresses()
         CryptoCurrency.ETHER -> getEthAccount()
-        CryptoCurrency.XLM -> TODO("AND-1535")
+        CryptoCurrency.XLM -> getEthAccount()
     }
 
     /**
@@ -191,6 +193,9 @@ class WalletAccountHelper(
 
     fun getEthAccount() =
         listOf(getDefaultEthAccount())
+
+//    fun getXlmAccount() =
+//        listOf(getDefaultXlmAccount())
 
     /**
      * Returns the balance of an [Account] in Satoshis (BTC)
@@ -375,6 +380,25 @@ class WalletAccountHelper(
             ethAccount?.address!!
         )
     }
+
+//    private fun getDefaultXlmAccount(): ItemAccount {
+//        val account = xlmDataManager.defaultAccount()
+//        val ethModel = ethDataManager.getEthResponseModel()
+//        val ethAccount = ethDataManager.getEthWallet()!!.account
+//        val balance = ethModel?.getTotalBalance() ?: BigInteger.ZERO
+//
+//        return ItemAccount(
+//            ethAccount?.label,
+//            getEthBalanceString(
+//                currencyState.isDisplayingCryptoCurrency,
+//                BigDecimal(balance)
+//            ),
+//            null,
+//            0,
+//            ethAccount,
+//            ethAccount?.address!!
+//        )
+//    }
 
     /**
      * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]

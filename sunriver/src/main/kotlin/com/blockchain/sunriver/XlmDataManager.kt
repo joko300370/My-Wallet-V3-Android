@@ -17,4 +17,7 @@ class XlmDataManager internal constructor(
         metaDataInitializer.initWallet("Alan's Xlm wallet")
             .map { it.accounts!![it.defaultAccountIndex] }
             .flatMap { getBalance(AccountReference.Xlm(it.label ?: "", it.publicKey)) }
+
+//    fun defaultAccount(): Any {
+//    }
 }

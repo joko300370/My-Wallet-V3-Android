@@ -171,6 +171,7 @@ class ReceiveFragment : BaseFragment<ReceiveView, ReceivePresenter>(), ReceiveVi
                 CryptoCurrency.BTC -> presenter?.onSelectDefault(selectedAccountPosition)
                 CryptoCurrency.ETHER -> presenter?.onEthSelected()
                 CryptoCurrency.BCH -> presenter?.onSelectBchDefault()
+                CryptoCurrency.XLM -> presenter?.onLumensSelected()
             }
         }
     }
