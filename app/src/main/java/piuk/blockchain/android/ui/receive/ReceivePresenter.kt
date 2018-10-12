@@ -17,11 +17,13 @@ import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.withMajorValue
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.currency.toSafeLong
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
+import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
@@ -43,7 +45,8 @@ class ReceivePresenter @Inject internal constructor(
     private val bchDataManager: BchDataManager,
     private val environmentSettings: EnvironmentConfig,
     private val currencyState: CurrencyState,
-    private val currencyFormatManager: CurrencyFormatManager
+    private val currencyFormatManager: CurrencyFormatManager,
+    private val fiatExchangeRates: FiatExchangeRates
 ) : BasePresenter<ReceiveView>() {
 
     @VisibleForTesting
@@ -327,23 +330,11 @@ class ReceivePresenter @Inject internal constructor(
     }
 
     internal fun updateFiatTextField(bitcoin: String) {
-
-        when (currencyState.cryptoCurrency) {
-            CryptoCurrency.ETHER ->
-                view.updateFiatTextField(
-                    currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                        coinInputText = bitcoin,
-                        convertEthDenomination = ETHDenomination.ETH
-                    )
-                )
-            else ->
-                view.updateFiatTextField(
-                    currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                        coinInputText = bitcoin,
-                        convertBtcDenomination = BTCDenomination.BTC
-                    )
-                )
-        }
+        view.updateFiatTextField(
+            currencyState.cryptoCurrency.withMajorValue(bitcoin)
+                .toFiat(fiatExchangeRates)
+                .toStringWithSymbol()
+        )
     }
 
     internal fun updateBtcTextField(fiat: String) {
