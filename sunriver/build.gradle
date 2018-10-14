@@ -25,10 +25,8 @@ dependencies {
     implementation Libraries.moshiKotlin
 
     // Derivation
-    implementation 'com.github.orogvany:BIP32-Ed25519-java:81fa6ecc877ab1f20178279c0e28d515d0a05938'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
-    implementation Libraries.slf4j
-    implementation files('../wallet/libs/bitcoinj-core-0.15-SNAPSHOT.jar')
+    implementation project(':sunriver:ed25519')
+    testImplementation 'io.github.novacrypto:BIP39:2018.10.06'
 
     // Testing
     testImplementation Libraries.junit
