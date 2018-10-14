@@ -2,7 +2,6 @@ package com.blockchain.sunriver.ed25519
 
 import org.amshove.kluent.`should equal`
 import org.junit.Test
-import java.nio.charset.StandardCharsets
 
 /**
  * Test cases from SLIP-0010 https://github.com/satoshilabs/slips/blob/master/slip-0010.md
@@ -126,10 +125,7 @@ class SLIP0010TestCase2 {
     }
 }
 
-private fun Int.hard() = this or -0x80000000
-
-fun Int.isHardened() = this and -0x80000000 != 0
-
-private fun String.deriveHardenedIndexes(vararg indexes: Int): String {
-    return hexToBytes().derivePrivateKey(*(indexes.map { it.hard() }.toIntArray())).toHex()
-}
+private fun String.deriveHardenedIndexes(vararg indexes: Int) =
+    hexToBytes()
+        .deriveEd25519PrivateKey(*indexes)
+        .toHex()

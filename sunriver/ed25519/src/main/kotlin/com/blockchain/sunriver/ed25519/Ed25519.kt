@@ -3,8 +3,19 @@ package com.blockchain.sunriver.ed25519
 import java.nio.charset.StandardCharsets
 import java.util.Arrays
 
+/**
+ * Ed25519 derivation according to SLIP-0010
+ * https://github.com/satoshilabs/slips/blob/master/slip-0010.md
+ *
+ *  - Only hardened key derivation is possible with ED25519, for this reason, this function hardens indexes for you.
+ *  - For Ed25519 every 256-bit number (even 0) is a valid private key, so there are no hard to find and test edge
+ *  cases, such as "parse256(IL) ≥ n or parse256(IL) + kpar (mod n) = 0" with secp256k1.
+ *
+ * @indexes These ints can be hardened or not, if they are not, they will be hardened by this function.
+ */
 @Suppress("LocalVariableName")
-fun ByteArray.derivePrivateKey(vararg indexes: Int): ByteArray {
+fun ByteArray.deriveEd25519PrivateKey(vararg indexes: Int): ByteArray {
+
     var I = hmacSha512("ed25519 seed".toByteArray(StandardCharsets.UTF_8), this)
 
     val Il = ByteArray(32)
@@ -14,10 +25,11 @@ fun ByteArray.derivePrivateKey(vararg indexes: Int): ByteArray {
     I putHead32Into Il
 
     indexes.forEach { index ->
+
         I putTail32Into Ir
 
         Il put32BytesIntoOffset1 data
-        index put4BytesIntoOffset33 data
+        index.hard() put4BytesIntoOffset33 data
 
         I.clear()
         I = hmacSha512(Ir, data)
@@ -26,6 +38,7 @@ fun ByteArray.derivePrivateKey(vararg indexes: Int): ByteArray {
         I putHead32Into Il
     }
 
+    I.clear()
     return Il
 }
 
@@ -46,3 +59,5 @@ private infix fun Int.put4BytesIntoOffset33(into: ByteArray) = into.ser32(this, 
 private infix fun ByteArray.putTail32Into(into: ByteArray) = System.arraycopy(this, 32, into, 0, 32)
 
 private fun ByteArray.clear() = Arrays.fill(this, 0)
+
+private fun Int.hard() = this or -0x80000000
