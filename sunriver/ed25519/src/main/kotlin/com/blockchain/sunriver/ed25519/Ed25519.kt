@@ -1,6 +1,6 @@
 package com.blockchain.sunriver.ed25519
 
-import java.nio.charset.StandardCharsets
+import java.nio.charset.Charset
 import java.util.Arrays
 
 /**
@@ -14,9 +14,9 @@ import java.util.Arrays
  * @indexes These ints can be hardened or not, if they are not, they will be hardened by this function.
  */
 @Suppress("LocalVariableName")
-fun ByteArray.deriveEd25519PrivateKey(vararg indexes: Int): ByteArray {
+fun deriveEd25519PrivateKey(seed: ByteArray, vararg indexes: Int): ByteArray {
 
-    var I = hmacSha512("ed25519 seed".toByteArray(StandardCharsets.UTF_8), this)
+    var I = hmacSha512("ed25519 seed".toByteArray(Charset.forName("UTF-8")), seed)
 
     val Il = ByteArray(32)
     val Ir = ByteArray(32)

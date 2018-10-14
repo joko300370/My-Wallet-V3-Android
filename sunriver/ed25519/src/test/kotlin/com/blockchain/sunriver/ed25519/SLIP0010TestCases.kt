@@ -126,6 +126,7 @@ class SLIP0010TestCase2 {
 }
 
 private fun String.deriveHardenedIndexes(vararg indexes: Int) =
-    hexToBytes()
-        .deriveEd25519PrivateKey(*indexes)
-        .toHex()
+    deriveEd25519PrivateKey(
+        seed = hexToBytes(),
+        indexes = *indexes
+    ).toHex()
