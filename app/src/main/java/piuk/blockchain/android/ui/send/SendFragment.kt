@@ -64,6 +64,7 @@ import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListen
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.send.external.NewInstanceArguments
 import piuk.blockchain.android.ui.send.external.SendFragmentX
+import piuk.blockchain.android.ui.send.external.SendPresenterX
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -87,8 +88,13 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Suppress("MemberVisibilityCanBePrivate")
-class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
+/**
+ * Wrapper for Koin
+ */
+class SendPresenterXSendView(val presenter: SendPresenterX<SendView>)
+
+class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
+    SendView,
     NumericKeyboardCallback,
     SendFragmentX {
 
@@ -96,14 +102,16 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override val locale: Locale = Locale.getDefault()
 
-    @Inject
-    lateinit var sendPresenter: SendPresenter
+    private val sendPresenter: SendPresenterXSendView by inject()
+
     @Inject
     lateinit var appUtil: AppUtil
 
     private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
 
     private val currencyState: CurrencyState by inject()
+
+    private val accessState: AccessState by inject()
 
     private var backPressed: Long = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -182,6 +190,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override fun onResume() {
         super.onResume()
 
+        setSelectedCurrency(currencyState.cryptoCurrency)
+
         if (!handlingActivityResult) presenter.onResume()
 
         handlingActivityResult = false
@@ -199,7 +209,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         currency_header?.close()
     }
 
-    override fun createPresenter() = sendPresenter
+    override fun createPresenter() = sendPresenter.presenter
 
     override fun getMvpView() = this
 
@@ -273,11 +283,12 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         ViewUtils.hideKeyboard(activity)
         closeKeypad()
         currency_header.setSelectionListener { currency ->
-            when (currency) {
-                CryptoCurrency.BTC -> presenter?.onBitcoinChosen()
-                CryptoCurrency.ETHER -> presenter?.onEtherChosen()
-                CryptoCurrency.BCH -> presenter?.onBitcoinCashChosen()
-            }
+            presenter?.onCurrencySelected(currency)
+//            when (currency) {
+//                CryptoCurrency.BTC -> presenter?.onBitcoinChosen()
+//                CryptoCurrency.ETHER -> presenter?.onEtherChosen()
+//                CryptoCurrency.BCH -> presenter?.onBitcoinCashChosen()
+//            }
         }
     }
 
@@ -313,10 +324,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         when (requestCode) {
             MainActivity.SCAN_URI -> presenter.handleURIScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
             SCAN_PRIVX -> presenter.handlePrivxScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
-            REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccountBtc(data)
-            REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccountBtc(data)
-            REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccountBch(data)
-            REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccountBch(data)
+            REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccount(data, CryptoCurrency.BTC)
+            REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BTC)
+            REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccount(data, CryptoCurrency.BCH)
+            REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BCH)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -536,7 +547,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             currency_header.isOpen() -> currency_header.close()
             else -> {
                 if (backPressed + COOL_DOWN_MILLIS > System.currentTimeMillis()) {
-                    AccessState.getInstance().logout(context)
+                    accessState.logout(context)
                     return
                 } else {
                     toast(R.string.exit_confirm)
@@ -876,8 +887,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
                 presenter.onNoSecondPassword()
             }
 
-            override fun onSecondPasswordValidated(validateSecondPassword: String) {
-                presenter.onSecondPasswordValidated(validateSecondPassword)
+            override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                presenter.onSecondPasswordValidated(validatedSecondPassword)
             }
         })
     }
@@ -1056,7 +1067,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
         const val SCAN_PRIVX = 2011
         const val ARGUMENT_SCAN_DATA = "scan_data"
-        const val ARGUMENT_SELECTED_ACCOUNT_POSITION = "selected_account_position"
+        private const val ARGUMENT_SELECTED_ACCOUNT_POSITION = "selected_account_position"
 
         private const val COOL_DOWN_MILLIS = 2 * 1000
         private const val ARGUMENT_CONTACT_ID = "contact_id"

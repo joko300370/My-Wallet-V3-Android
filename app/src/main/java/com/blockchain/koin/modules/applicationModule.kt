@@ -8,11 +8,18 @@ import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
+import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
+import piuk.blockchain.android.ui.send.SendPresenter
+import piuk.blockchain.android.ui.send.SendPresenterXSendView
+import piuk.blockchain.android.ui.send.SendView
+import piuk.blockchain.android.ui.send.external.DuelSendPresenterX
 import piuk.blockchain.android.ui.send.external.SendFragmentXFactory
+import piuk.blockchain.android.ui.send.external.SendPresenterX
+import piuk.blockchain.android.ui.send.send2.SendPresenter2
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.StringUtils
@@ -65,6 +72,20 @@ val applicationModule = applicationContext {
 
         factory { TransactionListDataManager(get(), get(), get(), get(), get(), get()) }
             .bind(TotalBalance::class)
+
+        factory {
+            val old: SendPresenterX<SendView> = SendPresenter(
+                get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+            )
+            val new: SendPresenterX<SendView> = SendPresenter2()
+            SendPresenterXSendView(
+                DuelSendPresenterX(
+                    old,
+                    new,
+                    get()
+                )
+            )
+        }
     }
 
     factory { DateUtil(get()) }
@@ -74,4 +95,6 @@ val applicationModule = applicationContext {
     factory { PrivateKeyFactory() }
 
     factory { SendFragmentXFactory() }
+
+    bean { DynamicFeeCache() }
 }

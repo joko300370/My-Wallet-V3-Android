@@ -5,10 +5,10 @@ import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.android.ui.send.external.ViewX
 import java.util.Locale
 
-interface SendView : View {
+interface SendView : ViewX {
 
     val locale: Locale
 
@@ -37,8 +37,6 @@ interface SendView : View {
 
     // Set property
     fun setCryptoMaxLength(length: Int)
-
-    fun setSelectedCurrency(cryptoCurrency: CryptoCurrency)
 
     fun setFeePrioritySelection(index: Int)
 
