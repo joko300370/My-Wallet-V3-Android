@@ -376,12 +376,12 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         amountContainer.currencyFiat.text = currency
     }
 
-    override fun disableCryptoTextChangeListener() {
+    private fun disableCryptoTextChangeListener() {
         amountContainer.amountCrypto.removeTextChangedListener(cryptoTextWatcher)
     }
 
     @SuppressLint("NewApi")
-    override fun enableCryptoTextChangeListener() {
+    private fun enableCryptoTextChangeListener() {
         amountContainer.amountCrypto.addTextChangedListener(cryptoTextWatcher)
         try {
             // This method is hidden but accessible on <API21, but here we catch exceptions just in case
@@ -395,12 +395,18 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         amountContainer.amountCrypto.setText(amountString)
     }
 
-    override fun disableFiatTextChangeListener() {
+    override fun updateCryptoAmountWithoutTriggeringListener(amountString: String?) {
+        disableCryptoTextChangeListener()
+        updateCryptoAmount(amountString)
+        enableCryptoTextChangeListener()
+    }
+
+    private fun disableFiatTextChangeListener() {
         amountContainer.amountFiat.removeTextChangedListener(fiatTextWatcher)
     }
 
     @SuppressLint("NewApi")
-    override fun enableFiatTextChangeListener() {
+    private fun enableFiatTextChangeListener() {
         amountContainer.amountFiat.addTextChangedListener(fiatTextWatcher)
         try {
             // This method is hidden but accessible on <API21, but here we catch exceptions just in case
@@ -412,6 +418,12 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
 
     override fun updateFiatAmount(amountString: String?) {
         amountContainer.amountFiat.setText(amountString)
+    }
+
+    override fun updateFiatAmountWithoutTriggeringListener(amountString: String?) {
+        disableFiatTextChangeListener()
+        updateFiatAmount(amountString)
+        enableFiatTextChangeListener()
     }
 
     // BTC Field

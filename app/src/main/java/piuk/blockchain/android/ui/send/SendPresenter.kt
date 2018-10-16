@@ -924,9 +924,7 @@ class SendPresenter(
             amountString = currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat)
         }
 
-        view.disableCryptoTextChangeListener()
-        view.updateCryptoAmount(amountString)
-        view.enableCryptoTextChangeListener()
+        view.updateCryptoAmountWithoutTriggeringListener(amountString)
     }
 
     override fun updateFiatTextField(editable: Editable, editText: EditText) {
@@ -958,9 +956,7 @@ class SendPresenter(
             }
         }
 
-        view.disableFiatTextChangeListener()
-        view.updateFiatAmount(amountString)
-        view.enableFiatTextChangeListener()
+        view.updateFiatAmountWithoutTriggeringListener(amountString)
     }
 
     /**
