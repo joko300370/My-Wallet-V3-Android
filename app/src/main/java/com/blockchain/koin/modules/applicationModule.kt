@@ -12,6 +12,7 @@ import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
+import piuk.blockchain.android.ui.send.external.SendFragmentXFactory
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.StringUtils
@@ -71,4 +72,6 @@ val applicationModule = applicationContext {
     bean { PrngHelper(get(), get()) as PrngFixer }
 
     factory { PrivateKeyFactory() }
+
+    factory { SendFragmentXFactory() }
 }

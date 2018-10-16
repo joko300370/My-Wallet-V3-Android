@@ -17,6 +17,7 @@ import info.blockchain.wallet.util.PrivateKeyFactory;
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager;
 import piuk.blockchain.android.ui.dashboard.DashboardPresenter;
 import piuk.blockchain.android.ui.receive.WalletAccountHelper;
+import piuk.blockchain.android.ui.send.external.SendFragmentXFactory;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager;
 import piuk.blockchain.androidbuysell.services.BuyConditions;
@@ -223,5 +224,10 @@ public class ApplicationModule extends KoinDaggerModule {
     @Provides
     XlmDataManager provideXlmDataManager() {
         return get(XlmDataManager.class);
+    }
+
+    @Provides
+    SendFragmentXFactory provideSendFragmentXFactory() {
+        return get(SendFragmentXFactory.class);
     }
 }

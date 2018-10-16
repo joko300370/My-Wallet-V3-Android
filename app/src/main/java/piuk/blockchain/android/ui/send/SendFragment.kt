@@ -16,6 +16,7 @@ import android.support.annotation.ColorRes
 import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -61,6 +62,8 @@ import piuk.blockchain.android.ui.balance.BalanceFragment
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.send.external.NewInstanceArguments
+import piuk.blockchain.android.ui.send.external.SendFragmentX
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -86,7 +89,10 @@ import javax.inject.Inject
 
 @Suppress("MemberVisibilityCanBePrivate")
 class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
-    NumericKeyboardCallback {
+    NumericKeyboardCallback,
+    SendFragmentX {
+
+    override val fragment: Fragment = this
 
     override val locale: Locale = Locale.getDefault()
 
@@ -103,7 +109,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     private var progressDialog: MaterialProgressDialog? = null
     private var confirmPaymentDialog: ConfirmPaymentDialog? = null
     private var transactionSuccessDialog: AlertDialog? = null
-    private var listener: OnSendFragmentInteractionListener? = null
+    private var listener: SendFragmentX.OnSendFragmentInteractionListener? = null
     private var handlingActivityResult = false
 
     private val dialogHandler = Handler()
@@ -494,7 +500,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         )
     }
 
-    fun onChangeFeeClicked() {
+    override fun onChangeFeeClicked() {
         confirmPaymentDialog?.dismiss()
     }
 
@@ -506,13 +512,13 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         }
     }
 
-    fun onSendClicked() {
+    override fun onSendClicked() {
         presenter.submitPayment()
     }
 
     override fun getReceivingAddress() = toContainer.toAddressEditTextView.getTextString()
 
-    fun onBackPressed() {
+    override fun onBackPressed() {
         if (isKeyboardVisible()) {
             closeKeypad()
         } else {
@@ -1016,13 +1022,9 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         dialogHandler.postDelayed(dialogRunnable, (10 * 1000).toLong())
     }
 
-    interface OnSendFragmentInteractionListener {
-        fun onSendFragmentClose()
-    }
-
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is OnSendFragmentInteractionListener) {
+        if (context is SendFragmentX.OnSendFragmentInteractionListener) {
             listener = context
         } else {
             throw RuntimeException(context!!.toString() + " must implement OnSendFragmentInteractionListener")
@@ -1065,8 +1067,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         private const val REQUEST_CODE_BCH_RECEIVING = 913
         private const val REQUEST_CODE_BCH_SENDING = 914
 
-        @JvmStatic
-        fun newInstance(scanData: String?, selectedAccountPosition: Int): SendFragment {
+        private fun newInstance(scanData: String?, selectedAccountPosition: Int): SendFragment {
             val fragment = SendFragment()
             val args = Bundle()
             args.putString(ARGUMENT_SCAN_DATA, scanData)
@@ -1075,8 +1076,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             return fragment
         }
 
-        @JvmStatic
-        fun newInstance(
+        private fun newInstance(
             uri: String,
             contactId: String,
             contactMdid: String,
@@ -1090,6 +1090,21 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             args.putString(ARGUMENT_FCTX_ID, fctxId)
             fragment.arguments = args
             return fragment
+        }
+
+        fun newInstance(newInstanceArguments: NewInstanceArguments): SendFragment {
+            return when (newInstanceArguments) {
+                is NewInstanceArguments.AccountPosition -> newInstance(
+                    newInstanceArguments.uri,
+                    newInstanceArguments.selectedAccountPosition
+                )
+                is NewInstanceArguments.Contact -> newInstance(
+                    newInstanceArguments.nonNullUri,
+                    newInstanceArguments.contactId,
+                    newInstanceArguments.contactMdid,
+                    newInstanceArguments.fctxId
+                )
+            }
         }
     }
 }
