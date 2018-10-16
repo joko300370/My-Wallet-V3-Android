@@ -64,6 +64,7 @@ import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListen
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.send.external.NewInstanceArguments
 import piuk.blockchain.android.ui.send.external.SendFragmentX
+import piuk.blockchain.android.ui.send.external.SendPresenterXD
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -87,8 +88,13 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Suppress("MemberVisibilityCanBePrivate")
-class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
+/**
+ * Wrapper for Koin
+ */
+class SendPresenterXSendView(val presenter: SendPresenterXD<SendView>)
+
+class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
+    SendView,
     NumericKeyboardCallback,
     SendFragmentX {
 
@@ -96,14 +102,16 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override val locale: Locale = Locale.getDefault()
 
-    @Inject
-    lateinit var sendPresenter: SendPresenter
+    private val sendPresenter: SendPresenterXSendView by inject()
+
     @Inject
     lateinit var appUtil: AppUtil
 
     private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
 
     private val currencyState: CurrencyState by inject()
+
+    private val accessState: AccessState by inject()
 
     private var backPressed: Long = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -182,6 +190,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
     override fun onResume() {
         super.onResume()
 
+        setSelectedCurrency(currencyState.cryptoCurrency)
+
         if (!handlingActivityResult) presenter.onResume()
 
         handlingActivityResult = false
@@ -199,7 +209,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         currency_header?.close()
     }
 
-    override fun createPresenter() = sendPresenter
+    override fun createPresenter() = sendPresenter.presenter
 
     override fun getMvpView() = this
 
@@ -273,11 +283,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         ViewUtils.hideKeyboard(activity)
         closeKeypad()
         currency_header.setSelectionListener { currency ->
-            when (currency) {
-                CryptoCurrency.BTC -> presenter?.onBitcoinChosen()
-                CryptoCurrency.ETHER -> presenter?.onEtherChosen()
-                CryptoCurrency.BCH -> presenter?.onBitcoinCashChosen()
-            }
+            currencyState.cryptoCurrency = currency
+            listener!!.onSelectCurrency(currency)
         }
     }
 
@@ -313,10 +320,10 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         when (requestCode) {
             MainActivity.SCAN_URI -> presenter.handleURIScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
             SCAN_PRIVX -> presenter.handlePrivxScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
-            REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccountBtc(data)
-            REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccountBtc(data)
-            REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccountBch(data)
-            REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccountBch(data)
+            REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccount(data, CryptoCurrency.BTC)
+            REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BTC)
+            REQUEST_CODE_BCH_SENDING -> presenter.selectSendingAccount(data, CryptoCurrency.BCH)
+            REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccount(data, CryptoCurrency.BCH)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
@@ -349,7 +356,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             val currency = currencyState.cryptoCurrency
             AccountChooserActivity.startForResult(
                 this,
-                if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
+                if (currency == CryptoCurrency.BTC) {
                     AccountMode.Bitcoin
                 } else {
                     AccountMode.BitcoinCash
@@ -364,20 +371,16 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         }
     }
 
-    override fun updateCryptoCurrency(currency: String) {
-        amountContainer.currencyCrypto.text = currency
-    }
-
     override fun updateFiatCurrency(currency: String) {
         amountContainer.currencyFiat.text = currency
     }
 
-    override fun disableCryptoTextChangeListener() {
+    private fun disableCryptoTextChangeListener() {
         amountContainer.amountCrypto.removeTextChangedListener(cryptoTextWatcher)
     }
 
     @SuppressLint("NewApi")
-    override fun enableCryptoTextChangeListener() {
+    private fun enableCryptoTextChangeListener() {
         amountContainer.amountCrypto.addTextChangedListener(cryptoTextWatcher)
         try {
             // This method is hidden but accessible on <API21, but here we catch exceptions just in case
@@ -391,12 +394,18 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         amountContainer.amountCrypto.setText(amountString)
     }
 
-    override fun disableFiatTextChangeListener() {
+    override fun updateCryptoAmountWithoutTriggeringListener(amountString: String?) {
+        disableCryptoTextChangeListener()
+        updateCryptoAmount(amountString)
+        enableCryptoTextChangeListener()
+    }
+
+    private fun disableFiatTextChangeListener() {
         amountContainer.amountFiat.removeTextChangedListener(fiatTextWatcher)
     }
 
     @SuppressLint("NewApi")
-    override fun enableFiatTextChangeListener() {
+    private fun enableFiatTextChangeListener() {
         amountContainer.amountFiat.addTextChangedListener(fiatTextWatcher)
         try {
             // This method is hidden but accessible on <API21, but here we catch exceptions just in case
@@ -408,6 +417,12 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override fun updateFiatAmount(amountString: String?) {
         amountContainer.amountFiat.setText(amountString)
+    }
+
+    override fun updateFiatAmountWithoutTriggeringListener(amountString: String?) {
+        disableFiatTextChangeListener()
+        updateFiatAmount(amountString)
+        enableFiatTextChangeListener()
     }
 
     // BTC Field
@@ -478,7 +493,29 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         fromContainer.fromAddressTextView.text = label
     }
 
-    override fun updateReceivingHint(hint: Int) {
+    override fun updateReceivingHintAndAccountDropDowns(currency: CryptoCurrency, listSize: Int) {
+        if (listSize == 1) {
+            hideReceivingDropdown()
+            hideSendingFieldDropdown()
+        } else {
+            showSendingFieldDropdown()
+            showReceivingDropdown()
+        }
+        val hint: Int = if (listSize > 1) {
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrency.BTC -> R.string.to_field_helper
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper
+                CryptoCurrency.XLM -> R.string.xlm_to_field_helper
+            }
+        } else {
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
+                CryptoCurrency.XLM -> R.string.xlm_to_field_helper_no_dropdown
+            }
+        }
         toContainer.toAddressEditTextView.setHint(hint)
     }
 
@@ -486,7 +523,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         val currency = currencyState.cryptoCurrency
         AccountChooserActivity.startForResult(
             this,
-            if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
+            if (currency == CryptoCurrency.BTC) {
                 AccountMode.Bitcoin
             } else {
                 AccountMode.BitcoinCashSend
@@ -528,6 +565,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
     override fun setSelectedCurrency(cryptoCurrency: CryptoCurrency) {
         currency_header.setCurrentlySelectedCurrency(cryptoCurrency)
+        amountContainer.currencyCrypto.text = cryptoCurrency.symbol
     }
 
     private fun handleBackPressed() {
@@ -536,7 +574,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
             currency_header.isOpen() -> currency_header.close()
             else -> {
                 if (backPressed + COOL_DOWN_MILLIS > System.currentTimeMillis()) {
-                    AccessState.getInstance().logout(context)
+                    accessState.logout(context)
                     return
                 } else {
                     toast(R.string.exit_confirm)
@@ -595,22 +633,22 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
         }
     }
 
-    override fun showSendingFieldDropdown() {
+    private fun showSendingFieldDropdown() {
         fromContainer.fromArrowImage.visible()
         fromContainer.fromAddressTextView.isClickable = true
     }
 
-    override fun hideSendingFieldDropdown() {
+    private fun hideSendingFieldDropdown() {
         fromContainer.fromArrowImage.gone()
         fromContainer.fromAddressTextView.isClickable = false
     }
 
-    override fun showReceivingDropdown() {
+    private fun showReceivingDropdown() {
         toContainer.toArrow.visible()
         toContainer.toAddressEditTextView.isClickable = true
     }
 
-    override fun hideReceivingDropdown() {
+    private fun hideReceivingDropdown() {
         toContainer.toArrow.gone()
         toContainer.toAddressEditTextView.isClickable = false
     }
@@ -876,8 +914,8 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
                 presenter.onNoSecondPassword()
             }
 
-            override fun onSecondPasswordValidated(validateSecondPassword: String) {
-                presenter.onSecondPasswordValidated(validateSecondPassword)
+            override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                presenter.onSecondPasswordValidated(validatedSecondPassword)
             }
         })
     }
@@ -1056,7 +1094,7 @@ class SendFragment : BaseFragment<SendView, SendPresenter>(), SendView,
 
         const val SCAN_PRIVX = 2011
         const val ARGUMENT_SCAN_DATA = "scan_data"
-        const val ARGUMENT_SELECTED_ACCOUNT_POSITION = "selected_account_position"
+        private const val ARGUMENT_SELECTED_ACCOUNT_POSITION = "selected_account_position"
 
         private const val COOL_DOWN_MILLIS = 2 * 1000
         private const val ARGUMENT_CONTACT_ID = "contact_id"
