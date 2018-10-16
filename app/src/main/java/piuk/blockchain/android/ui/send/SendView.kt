@@ -5,6 +5,8 @@ import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.ui.send.external.ViewX
 import java.util.Locale
 
@@ -15,9 +17,9 @@ interface SendView : ViewX {
     // Update field
     fun updateSendingAddress(label: String)
 
-    fun updateCryptoAmount(amountString: String?)
+    fun updateCryptoAmount(cryptoValue: CryptoValue)
 
-    fun updateFiatAmount(amountString: String?)
+    fun updateFiatAmount(fiatValue: FiatValue)
 
     fun updateWarning(message: String)
 

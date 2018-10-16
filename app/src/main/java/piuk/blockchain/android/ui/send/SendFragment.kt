@@ -44,6 +44,8 @@ import com.karumi.dexter.listener.single.BasePermissionListener
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
@@ -390,13 +392,13 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         }
     }
 
-    override fun updateCryptoAmount(amountString: String?) {
-        amountContainer.amountCrypto.setText(amountString)
+    override fun updateCryptoAmount(cryptoValue: CryptoValue) {
+        amountContainer.amountCrypto.setText(cryptoValue.toStringWithoutSymbol())
     }
 
-    override fun updateCryptoAmountWithoutTriggeringListener(amountString: String?) {
+    override fun updateCryptoAmountWithoutTriggeringListener(cryptoValue: CryptoValue) {
         disableCryptoTextChangeListener()
-        updateCryptoAmount(amountString)
+        updateCryptoAmount(cryptoValue)
         enableCryptoTextChangeListener()
     }
 
@@ -415,13 +417,13 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         }
     }
 
-    override fun updateFiatAmount(amountString: String?) {
-        amountContainer.amountFiat.setText(amountString)
+    override fun updateFiatAmount(fiatValue: FiatValue) {
+        amountContainer.amountFiat.setText(fiatValue.toStringWithoutSymbol())
     }
 
-    override fun updateFiatAmountWithoutTriggeringListener(amountString: String?) {
+    override fun updateFiatAmountWithoutTriggeringListener(fiatValue: FiatValue) {
         disableFiatTextChangeListener()
-        updateFiatAmount(amountString)
+        updateFiatAmount(fiatValue)
         enableFiatTextChangeListener()
     }
 

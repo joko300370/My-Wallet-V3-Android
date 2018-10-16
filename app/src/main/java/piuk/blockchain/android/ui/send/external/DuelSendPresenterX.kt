@@ -86,7 +86,7 @@ internal class DuelSendPresenterX<View : ViewX>(
         val fiatValue = FiatValue.fromMajorOrZero(exchangeRates.fiatUnit, fiat)
         val cryptoValue = fiatValue.toCrypto(exchangeRates, currencyState.cryptoCurrency)
 
-        view.updateCryptoAmountWithoutTriggeringListener(cryptoValue.toStringWithoutSymbol())
+        view.updateCryptoAmountWithoutTriggeringListener(cryptoValue)
     }
 
     override fun updateFiatTextField(editable: Editable, amountCrypto: EditText) {
@@ -100,7 +100,7 @@ internal class DuelSendPresenterX<View : ViewX>(
         val cryptoValue = currencyState.cryptoCurrency.withMajorValueOrZero(crypto)
         val fiatValue = cryptoValue.toFiat(exchangeRates)
 
-        view.updateFiatAmountWithoutTriggeringListener(fiatValue.toStringWithoutSymbol())
+        view.updateFiatAmountWithoutTriggeringListener(fiatValue)
     }
 
     override fun selectDefaultOrFirstFundedSendingAccount() = presenter().selectDefaultOrFirstFundedSendingAccount()
