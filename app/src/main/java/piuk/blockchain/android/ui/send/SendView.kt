@@ -15,8 +15,6 @@ interface SendView : ViewX {
     // Update field
     fun updateSendingAddress(label: String)
 
-    fun updateReceivingHint(hint: Int)
-
     fun updateCryptoAmount(amountString: String?)
 
     fun updateFiatAmount(amountString: String?)
@@ -39,14 +37,6 @@ interface SendView : ViewX {
     fun clearWarning()
 
     // Hide / Show
-    fun hideReceivingDropdown()
-
-    fun showReceivingDropdown()
-
-    fun hideSendingFieldDropdown()
-
-    fun showSendingFieldDropdown()
-
     fun showMaxAvailable()
 
     fun hideMaxAvailable()

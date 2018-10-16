@@ -482,7 +482,29 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         fromContainer.fromAddressTextView.text = label
     }
 
-    override fun updateReceivingHint(hint: Int) {
+    override fun updateReceivingHintAndAccountDropDowns(currency: CryptoCurrency, listSize: Int) {
+        if (listSize == 1) {
+            hideReceivingDropdown()
+            hideSendingFieldDropdown()
+        } else {
+            showSendingFieldDropdown()
+            showReceivingDropdown()
+        }
+        val hint: Int = if (listSize > 1) {
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrency.BTC -> R.string.to_field_helper
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper
+                CryptoCurrency.XLM -> R.string.xlm_to_field_helper
+            }
+        } else {
+            when (currencyState.cryptoCurrency) {
+                CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
+                CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
+                CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
+                CryptoCurrency.XLM -> R.string.xlm_to_field_helper_no_dropdown
+            }
+        }
         toContainer.toAddressEditTextView.setHint(hint)
     }
 
@@ -600,22 +622,22 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
         }
     }
 
-    override fun showSendingFieldDropdown() {
+    private fun showSendingFieldDropdown() {
         fromContainer.fromArrowImage.visible()
         fromContainer.fromAddressTextView.isClickable = true
     }
 
-    override fun hideSendingFieldDropdown() {
+    private fun hideSendingFieldDropdown() {
         fromContainer.fromArrowImage.gone()
         fromContainer.fromAddressTextView.isClickable = false
     }
 
-    override fun showReceivingDropdown() {
+    private fun showReceivingDropdown() {
         toContainer.toArrow.visible()
         toContainer.toAddressEditTextView.isClickable = true
     }
 
-    override fun hideReceivingDropdown() {
+    private fun hideReceivingDropdown() {
         toContainer.toArrow.gone()
         toContainer.toAddressEditTextView.isClickable = false
     }

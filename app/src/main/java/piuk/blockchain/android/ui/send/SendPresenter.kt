@@ -883,16 +883,7 @@ class SendPresenter(
     }
 
     private fun resetAccountList() {
-        val list = getAddressList()
-        if (list.size == 1) {
-            view.hideReceivingDropdown()
-            view.hideSendingFieldDropdown()
-            setReceiveHint(list.size)
-        } else {
-            view.showSendingFieldDropdown()
-            view.showReceivingDropdown()
-            setReceiveHint(list.size)
-        }
+        setReceiveHint(getAddressList().size)
     }
 
     private fun clearReceivingAddress() {
@@ -910,23 +901,7 @@ class SendPresenter(
     private fun getAddressList(): List<ItemAccount> = walletAccountHelper.getAccountItems(currencyState.cryptoCurrency)
 
     private fun setReceiveHint(accountsCount: Int) {
-        val hint: Int = if (accountsCount > 1) {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.BTC -> R.string.to_field_helper
-                CryptoCurrency.ETHER -> R.string.eth_to_field_helper
-                CryptoCurrency.BCH -> R.string.bch_to_field_helper
-                CryptoCurrency.XLM -> TODO("AND-1539")
-            }
-        } else {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
-                CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
-                CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
-                CryptoCurrency.XLM -> TODO("AND-1539")
-            }
-        }
-
-        view.updateReceivingHint(hint)
+        view.updateReceivingHintAndAccountDropDowns(currencyState.cryptoCurrency, accountsCount)
     }
 
     override fun selectDefaultOrFirstFundedSendingAccount() {

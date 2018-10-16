@@ -98,6 +98,7 @@ internal class DuelSendPresenterX<View : ViewX>(
     override fun onViewReady() {
         onCurrencySelected(currencyState.cryptoCurrency)
         view?.updateFiatCurrency(currencyState.fiatUnit)
+        view?.updateReceivingHintAndAccountDropDowns(currencyState.cryptoCurrency, 1)
         presenter().onViewReady()
     }
 
