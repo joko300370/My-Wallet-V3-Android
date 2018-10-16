@@ -77,14 +77,18 @@ data class FiatValue private constructor(
             )
 
         @JvmStatic
-        fun fromMajor(currencyCode: String, major: BigDecimal) =
-            FiatValue(
+        fun fromMajor(currencyCode: String, major: BigDecimal): FiatValue {
+
+            val x = currencyCode.equals(currencyCode, true)
+
+            return FiatValue(
                 currencyCode,
                 major.setScale(
                     maxDecimalPlaces(currencyCode),
                     RoundingMode.HALF_UP
                 )
             )
+        }
 
         fun fromMajorOrZero(currencyCode: String, major: String, locale: Locale = Locale.getDefault()) =
             fromMajor(

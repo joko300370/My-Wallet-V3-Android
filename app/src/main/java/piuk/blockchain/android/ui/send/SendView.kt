@@ -17,10 +17,6 @@ interface SendView : ViewX {
 
     fun updateReceivingHint(hint: Int)
 
-    fun updateCryptoCurrency(currency: String)
-
-    fun updateFiatCurrency(currency: String)
-
     fun updateCryptoAmount(amountString: String?)
 
     fun updateFiatAmount(amountString: String?)

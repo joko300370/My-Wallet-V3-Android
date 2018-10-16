@@ -4,12 +4,18 @@ import android.content.Intent
 import android.text.Editable
 import android.widget.EditText
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.withMajorValueOrZero
 import info.blockchain.wallet.api.data.FeeOptions
-import piuk.blockchain.android.ui.send.DisplayFeeOptions
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.external.SendPresenterX
+import piuk.blockchain.androidcore.data.currency.CurrencyState
 
-class SendPresenter2 : SendPresenterX<SendView>() {
+class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() {
+
+    private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
+    private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
 
     override fun onContinueClicked() {
         TODO("not implemented")
@@ -24,7 +30,6 @@ class SendPresenter2 : SendPresenterX<SendView>() {
     }
 
     override fun onResume() {
-        TODO("not implemented")
     }
 
     override fun onCurrencySelected(currency: CryptoCurrency) {
@@ -70,14 +75,10 @@ class SendPresenter2 : SendPresenterX<SendView>() {
     }
 
     override fun selectDefaultOrFirstFundedSendingAccount() {
-        TODO("not implemented")
+        // Nothing to do, we have just one account on XLM
     }
 
     override fun submitPayment() {
-        TODO("not implemented")
-    }
-
-    override fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
         TODO("not implemented")
     }
 
@@ -86,7 +87,7 @@ class SendPresenter2 : SendPresenterX<SendView>() {
     }
 
     override fun onCryptoTextChange(cryptoText: String) {
-        TODO("not implemented")
+        cryptoTextSubject.onNext(currency.withMajorValueOrZero(cryptoText))
     }
 
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
@@ -114,6 +115,5 @@ class SendPresenter2 : SendPresenterX<SendView>() {
     }
 
     override fun onViewReady() {
-        TODO("not implemented")
     }
 }

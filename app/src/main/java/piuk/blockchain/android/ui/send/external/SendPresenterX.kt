@@ -9,6 +9,11 @@ import piuk.blockchain.android.ui.send.DisplayFeeOptions
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import java.text.DecimalFormatSymbols
 
+abstract class SendPresenterXD<View : piuk.blockchain.androidcoreui.ui.base.View> : SendPresenterX<View>() {
+
+    abstract fun getFeeOptionsForDropDown(): List<DisplayFeeOptions>
+}
+
 abstract class SendPresenterX<View : piuk.blockchain.androidcoreui.ui.base.View> : BasePresenter<View>() {
 
     abstract fun onContinueClicked()
@@ -38,8 +43,6 @@ abstract class SendPresenterX<View : piuk.blockchain.androidcoreui.ui.base.View>
     abstract fun selectDefaultOrFirstFundedSendingAccount()
 
     abstract fun submitPayment()
-
-    abstract fun getFeeOptionsForDropDown(): List<DisplayFeeOptions>
 
     abstract fun shouldShowAdvancedFeeWarning(): Boolean
 

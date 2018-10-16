@@ -4,13 +4,33 @@ import android.content.Intent
 import android.text.Editable
 import android.widget.EditText
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.send.DisplayFeeOptions
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 
 internal class DuelSendPresenterX<View : ViewX>(
     private val old: SendPresenterX<View>,
     private val new: SendPresenterX<View>,
-    private val currencyState: CurrencyState
-) : SendPresenterX<View>() {
+    private val currencyState: CurrencyState,
+    private val stringUtils: StringUtils
+) : SendPresenterXD<View>() {
+
+    override fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
+        val regular = DisplayFeeOptions(
+            stringUtils.getString(R.string.fee_options_regular),
+            stringUtils.getString(R.string.fee_options_regular_time)
+        )
+        val priority = DisplayFeeOptions(
+            stringUtils.getString(R.string.fee_options_priority),
+            stringUtils.getString(R.string.fee_options_priority_time)
+        )
+        val custom = DisplayFeeOptions(
+            stringUtils.getString(R.string.fee_options_custom),
+            stringUtils.getString(R.string.fee_options_custom_warning)
+        )
+        return listOf(regular, priority, custom)
+    }
 
     private fun presenter(): SendPresenterX<View> =
         when (currencyState.cryptoCurrency) {
@@ -26,11 +46,12 @@ internal class DuelSendPresenterX<View : ViewX>(
 
     override fun onBroadcastReceived() = presenter().onBroadcastReceived()
 
-    override fun onResume() = presenter().onResume()
+    override fun onResume() {
+        presenter().onResume()
+    }
 
     override fun onCurrencySelected(currency: CryptoCurrency) {
-        currencyState.cryptoCurrency = currency
-        view?.setSelectedCurrency(currencyState.cryptoCurrency)
+        view?.setSelectedCurrency(currency)
         presenter().onCurrencySelected(currency)
     }
 
@@ -56,8 +77,6 @@ internal class DuelSendPresenterX<View : ViewX>(
 
     override fun submitPayment() = presenter().submitPayment()
 
-    override fun getFeeOptionsForDropDown() = presenter().getFeeOptionsForDropDown()
-
     override fun shouldShowAdvancedFeeWarning() = presenter().shouldShowAdvancedFeeWarning()
 
     override fun onCryptoTextChange(cryptoText: String) = presenter().onCryptoTextChange(cryptoText)
@@ -76,7 +95,11 @@ internal class DuelSendPresenterX<View : ViewX>(
 
     override fun getBitcoinFeeOptions() = presenter().getBitcoinFeeOptions()
 
-    override fun onViewReady() = presenter().onViewReady()
+    override fun onViewReady() {
+        onCurrencySelected(currencyState.cryptoCurrency)
+        view?.updateFiatCurrency(currencyState.fiatUnit)
+        presenter().onViewReady()
+    }
 
     override fun initView(view: View?) {
         super.initView(view)

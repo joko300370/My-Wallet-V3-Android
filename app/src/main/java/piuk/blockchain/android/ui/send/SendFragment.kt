@@ -64,7 +64,7 @@ import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListen
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.send.external.NewInstanceArguments
 import piuk.blockchain.android.ui.send.external.SendFragmentX
-import piuk.blockchain.android.ui.send.external.SendPresenterX
+import piuk.blockchain.android.ui.send.external.SendPresenterXD
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -91,9 +91,9 @@ import javax.inject.Inject
 /**
  * Wrapper for Koin
  */
-class SendPresenterXSendView(val presenter: SendPresenterX<SendView>)
+class SendPresenterXSendView(val presenter: SendPresenterXD<SendView>)
 
-class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
+class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
     SendView,
     NumericKeyboardCallback,
     SendFragmentX {
@@ -283,12 +283,9 @@ class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
         ViewUtils.hideKeyboard(activity)
         closeKeypad()
         currency_header.setSelectionListener { currency ->
-            presenter?.onCurrencySelected(currency)
-//            when (currency) {
-//                CryptoCurrency.BTC -> presenter?.onBitcoinChosen()
-//                CryptoCurrency.ETHER -> presenter?.onEtherChosen()
-//                CryptoCurrency.BCH -> presenter?.onBitcoinCashChosen()
-//            }
+            currencyState.cryptoCurrency = currency
+            listener!!.onSelectCurrency(currency)
+            //presenter?.onCurrencySelected(currency)
         }
     }
 
@@ -360,7 +357,7 @@ class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
             val currency = currencyState.cryptoCurrency
             AccountChooserActivity.startForResult(
                 this,
-                if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
+                if (currency == CryptoCurrency.BTC) {
                     AccountMode.Bitcoin
                 } else {
                     AccountMode.BitcoinCash
@@ -373,10 +370,6 @@ class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
                 getString(R.string.to)
             )
         }
-    }
-
-    override fun updateCryptoCurrency(currency: String) {
-        amountContainer.currencyCrypto.text = currency
     }
 
     override fun updateFiatCurrency(currency: String) {
@@ -497,7 +490,7 @@ class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
         val currency = currencyState.cryptoCurrency
         AccountChooserActivity.startForResult(
             this,
-            if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
+            if (currency == CryptoCurrency.BTC) {
                 AccountMode.Bitcoin
             } else {
                 AccountMode.BitcoinCashSend
@@ -539,6 +532,7 @@ class SendFragment : BaseFragment<SendView, SendPresenterX<SendView>>(),
 
     override fun setSelectedCurrency(cryptoCurrency: CryptoCurrency) {
         currency_header.setCurrentlySelectedCurrency(cryptoCurrency)
+        amountContainer.currencyCrypto.text = cryptoCurrency.symbol
     }
 
     private fun handleBackPressed() {

@@ -133,7 +133,6 @@ class SendPresenter(
         resetAccountList()
         setupTextChangeSubject()
         updateTicker()
-        updateCurrencyUnits()
 
         if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrency.BTC
@@ -189,7 +188,6 @@ class SendPresenter(
         view.hideMaxAvailable()
         clearCryptoAmount()
         clearReceivingAddress()
-        updateCurrencyUnits()
     }
 
     override fun onContinueClicked() {
@@ -931,11 +929,6 @@ class SendPresenter(
         view.updateReceivingHint(hint)
     }
 
-    private fun updateCurrencyUnits() {
-        view.updateFiatCurrency(currencyFormatManager.fiatCountryCode)
-        view.updateCryptoCurrency(currencyState.cryptoCurrency.symbol)
-    }
-
     override fun selectDefaultOrFirstFundedSendingAccount() {
         val accountItem = walletAccountHelper.getDefaultOrFirstFundedAccount()
         view.updateSendingAddress(accountItem.label ?: accountItem.address!!)
@@ -1030,22 +1023,6 @@ class SendPresenter(
     }
 
     override fun getBitcoinFeeOptions(): FeeOptions? = dynamicFeeCache.btcFeeOptions
-
-    override fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
-        val regular = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_regular),
-            stringUtils.getString(R.string.fee_options_regular_time)
-        )
-        val priority = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_priority),
-            stringUtils.getString(R.string.fee_options_priority_time)
-        )
-        val custom = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_custom),
-            stringUtils.getString(R.string.fee_options_custom_warning)
-        )
-        return listOf(regular, priority, custom)
-    }
 
     private fun getFeePerKbFromPriority(@FeeType.FeePriorityDef feePriorityTemp: Int): BigInteger {
         getSuggestedFee()
