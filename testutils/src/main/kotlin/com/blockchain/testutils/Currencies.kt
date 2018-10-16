@@ -12,6 +12,7 @@ fun Number.cad() = FiatValue.fromMajor("CAD", numberToBigDecimal())
 
 private fun Number.numberToBigDecimal(): BigDecimal =
     when (this) {
+        is BigDecimal -> this
         is Double -> toBigDecimal()
         is Int -> toBigDecimal()
         is Long -> toBigDecimal()

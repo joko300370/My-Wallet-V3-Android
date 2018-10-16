@@ -1045,4 +1045,8 @@ public class MainActivity extends BaseMvpActivity<MainView, MainPresenter> imple
         return super.dispatchTouchEvent(ev);
     }
 
+    @Override
+    public void onSelectCurrency(@NotNull CryptoCurrency cryptoCurrency) {
+        startSendFragment(null);
+    }
 }

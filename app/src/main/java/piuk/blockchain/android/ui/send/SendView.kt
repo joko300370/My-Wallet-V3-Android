@@ -5,21 +5,15 @@ import android.support.annotation.Nullable
 import android.support.annotation.StringRes
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.androidcoreui.ui.base.View
+import piuk.blockchain.android.ui.send.external.ViewX
 import java.util.Locale
 
-interface SendView : View {
+interface SendView : ViewX {
 
     val locale: Locale
 
     // Update field
     fun updateSendingAddress(label: String)
-
-    fun updateReceivingHint(hint: Int)
-
-    fun updateCryptoCurrency(currency: String)
-
-    fun updateFiatCurrency(currency: String)
 
     fun updateCryptoAmount(amountString: String?)
 
@@ -38,21 +32,11 @@ interface SendView : View {
     // Set property
     fun setCryptoMaxLength(length: Int)
 
-    fun setSelectedCurrency(cryptoCurrency: CryptoCurrency)
-
     fun setFeePrioritySelection(index: Int)
 
     fun clearWarning()
 
     // Hide / Show
-    fun hideReceivingDropdown()
-
-    fun showReceivingDropdown()
-
-    fun hideSendingFieldDropdown()
-
-    fun showSendingFieldDropdown()
-
     fun showMaxAvailable()
 
     fun hideMaxAvailable()
@@ -62,14 +46,6 @@ interface SendView : View {
     fun hideFeePriority()
 
     // Enable / Disable
-    fun disableCryptoTextChangeListener()
-
-    fun enableCryptoTextChangeListener()
-
-    fun disableFiatTextChangeListener()
-
-    fun enableFiatTextChangeListener()
-
     fun enableFeeDropdown()
 
     fun disableFeeDropdown()

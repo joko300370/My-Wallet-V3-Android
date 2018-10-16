@@ -2,8 +2,7 @@ package piuk.blockchain.android.ui.send
 
 import android.content.Intent
 import android.support.design.widget.Snackbar
-import android.text.Editable
-import android.widget.EditText
+import com.blockchain.ui.chooser.AccountChooserActivity
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -28,32 +27,31 @@ import org.bitcoinj.core.ECKey
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.cache.DynamicFeeCache
-import piuk.blockchain.androidcore.data.fees.FeeDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import com.blockchain.ui.chooser.AccountChooserActivity
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.util.EditTextFormatUtil
+import piuk.blockchain.android.ui.send.external.SendPresenterX
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
+import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.PaymentSentEvent
 import timber.log.Timber
@@ -62,12 +60,10 @@ import java.io.UnsupportedEncodingException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
-import java.text.DecimalFormatSymbols
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class SendPresenter @Inject constructor(
+class SendPresenter(
     private val walletAccountHelper: WalletAccountHelper,
     private val payloadDataManager: PayloadDataManager,
     private val currencyState: CurrencyState,
@@ -82,8 +78,35 @@ class SendPresenter @Inject constructor(
     private val environmentSettings: EnvironmentConfig,
     private val bchDataManager: BchDataManager,
     private val currencyFormatManager: CurrencyFormatManager,
+    private val exchangeRates: FiatExchangeRates,
     environmentConfig: EnvironmentConfig
-) : BasePresenter<SendView>() {
+) : SendPresenterX<SendView>() {
+
+    override fun onCurrencySelected(currency: CryptoCurrency) {
+        currencyState.cryptoCurrency = currency
+        when (currency) {
+            CryptoCurrency.BTC -> onBitcoinChosen()
+            CryptoCurrency.ETHER -> onEtherChosen()
+            CryptoCurrency.BCH -> onBitcoinCashChosen()
+            else -> throw IllegalArgumentException("This send presenter is not for $currency")
+        }
+    }
+
+    override fun selectSendingAccount(data: Intent?, currency: CryptoCurrency) {
+        when (currency) {
+            CryptoCurrency.BTC -> selectSendingAccountBtc(data)
+            CryptoCurrency.BCH -> selectSendingAccountBch(data)
+            else -> throw IllegalArgumentException("Sending account is not for $currency")
+        }
+    }
+
+    override fun selectReceivingAccount(data: Intent?, currency: CryptoCurrency) {
+        when (currency) {
+            CryptoCurrency.BTC -> selectReceivingAccountBtc(data)
+            CryptoCurrency.BCH -> selectReceivingAccountBch(data)
+            else -> throw IllegalArgumentException("Receiving account is not for $currency")
+        }
+    }
 
     private val pendingTransaction by unsafeLazy { PendingTransaction() }
     private val unspentApiResponsesBtc by unsafeLazy { HashMap<String, UnspentOutputs>() }
@@ -100,7 +123,7 @@ class SendPresenter @Inject constructor(
      * External changes.
      * Possible currency change, Account/address archive, Balance change
      */
-    internal fun onBroadcastReceived() {
+    override fun onBroadcastReceived() {
         updateTicker()
         resetAccountList()
     }
@@ -109,7 +132,6 @@ class SendPresenter @Inject constructor(
         resetAccountList()
         setupTextChangeSubject()
         updateTicker()
-        updateCurrencyUnits()
 
         if (environmentSettings.environment == Environment.TESTNET) {
             currencyState.cryptoCurrency = CryptoCurrency.BTC
@@ -117,7 +139,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun onResume() {
+    override fun onResume() {
         when (currencyState.cryptoCurrency) {
             CryptoCurrency.BTC -> onBitcoinChosen()
             CryptoCurrency.ETHER -> onEtherChosen()
@@ -126,10 +148,8 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun onBitcoinChosen() {
+    private fun onBitcoinChosen() {
         view.showFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrency.BTC
-        view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.enableFeeDropdown()
         view.setCryptoMaxLength(17)
         resetState()
@@ -137,21 +157,17 @@ class SendPresenter @Inject constructor(
         view.enableInput()
     }
 
-    internal fun onEtherChosen() {
+    private fun onEtherChosen() {
         view.hideFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrency.ETHER
         view.setFeePrioritySelection(0)
-        view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.disableFeeDropdown()
         view.setCryptoMaxLength(30)
         resetState()
     }
 
-    internal fun onBitcoinCashChosen() {
+    private fun onBitcoinCashChosen() {
         view.hideFeePriority()
-        currencyState.cryptoCurrency = CryptoCurrency.BCH
         view.setFeePrioritySelection(0)
-        view.setSelectedCurrency(currencyState.cryptoCurrency)
         view.disableFeeDropdown()
         view.setCryptoMaxLength(17)
         resetState()
@@ -171,10 +187,9 @@ class SendPresenter @Inject constructor(
         view.hideMaxAvailable()
         clearCryptoAmount()
         clearReceivingAddress()
-        updateCurrencyUnits()
     }
 
-    internal fun onContinueClicked() {
+    override fun onContinueClicked() {
         view?.showProgressDialog(R.string.app_name)
 
         checkManualAddressInput()
@@ -269,7 +284,7 @@ class SendPresenter @Inject constructor(
     /**
      * Executes transaction
      */
-    internal fun submitPayment() {
+    override fun submitPayment() {
         when (currencyState.cryptoCurrency) {
             CryptoCurrency.BTC -> submitBitcoinTransaction()
             CryptoCurrency.ETHER -> submitEthTransaction()
@@ -685,11 +700,11 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun onNoSecondPassword() {
+    override fun onNoSecondPassword() {
         showPaymentReview()
     }
 
-    internal fun onSecondPasswordValidated(secondPassword: String) {
+    override fun onSecondPasswordValidated(secondPassword: String) {
         verifiedSecondPassword = secondPassword
         showPaymentReview()
     }
@@ -757,7 +772,7 @@ class SendPresenter @Inject constructor(
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
         details.cryptoUnit = currencyState.cryptoCurrency.symbol
-        details.fiatUnit = currencyFormatManager.fiatCountryCode
+        details.fiatUnit = exchangeRates.fiatUnit
         details.fiatSymbol = currencyFormatManager.getFiatSymbol(
             currencyFormatManager.fiatCountryCode,
             view.locale
@@ -867,23 +882,14 @@ class SendPresenter @Inject constructor(
     }
 
     private fun resetAccountList() {
-        val list = getAddressList()
-        if (list.size == 1) {
-            view.hideReceivingDropdown()
-            view.hideSendingFieldDropdown()
-            setReceiveHint(list.size)
-        } else {
-            view.showSendingFieldDropdown()
-            view.showReceivingDropdown()
-            setReceiveHint(list.size)
-        }
+        setReceiveHint(getAddressList().size)
     }
 
     private fun clearReceivingAddress() {
         view.updateReceivingAddress("")
     }
 
-    internal fun clearReceivingObject() {
+    override fun clearReceivingObject() {
         pendingTransaction.receivingObject = null
     }
 
@@ -894,90 +900,13 @@ class SendPresenter @Inject constructor(
     private fun getAddressList(): List<ItemAccount> = walletAccountHelper.getAccountItems(currencyState.cryptoCurrency)
 
     private fun setReceiveHint(accountsCount: Int) {
-        val hint: Int = if (accountsCount > 1) {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.BTC -> R.string.to_field_helper
-                CryptoCurrency.ETHER -> R.string.eth_to_field_helper
-                CryptoCurrency.BCH -> R.string.bch_to_field_helper
-                CryptoCurrency.XLM -> TODO("AND-1539")
-            }
-        } else {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.BTC -> R.string.to_field_helper_no_dropdown
-                CryptoCurrency.ETHER -> R.string.eth_to_field_helper_no_dropdown
-                CryptoCurrency.BCH -> R.string.bch_to_field_helper_no_dropdown
-                CryptoCurrency.XLM -> TODO("AND-1539")
-            }
-        }
-
-        view.updateReceivingHint(hint)
+        view.updateReceivingHintAndAccountDropDowns(currencyState.cryptoCurrency, accountsCount)
     }
 
-    private fun updateCurrencyUnits() {
-        view.updateFiatCurrency(currencyFormatManager.fiatCountryCode)
-        view.updateCryptoCurrency(currencyState.cryptoCurrency.symbol)
-    }
-
-    fun selectDefaultOrFirstFundedSendingAccount() {
+    override fun selectDefaultOrFirstFundedSendingAccount() {
         val accountItem = walletAccountHelper.getDefaultOrFirstFundedAccount()
         view.updateSendingAddress(accountItem.label ?: accountItem.address!!)
         pendingTransaction.sendingObject = accountItem
-    }
-
-    internal fun getDefaultDecimalSeparator(): String =
-        DecimalFormatSymbols.getInstance().decimalSeparator.toString()
-
-    internal fun updateCryptoTextField(editable: Editable, editText: EditText) {
-        val maxLength = 2
-        val fiat = EditTextFormatUtil.formatEditable(
-            editable,
-            maxLength,
-            editText,
-            getDefaultDecimalSeparator()
-        ).toString()
-        var amountString = ""
-
-        if (!fiat.isEmpty()) {
-            amountString = currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat)
-        }
-
-        view.disableCryptoTextChangeListener()
-        view.updateCryptoAmount(amountString)
-        view.enableCryptoTextChangeListener()
-    }
-
-    internal fun updateFiatTextField(editable: Editable, editText: EditText) {
-        val crypto = EditTextFormatUtil.formatEditable(
-            editable,
-            currencyState.cryptoCurrency.dp,
-            editText,
-            getDefaultDecimalSeparator()
-        ).toString()
-
-        var amountString = ""
-
-        if (!crypto.isEmpty()) {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.ETHER -> {
-                    amountString =
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = crypto,
-                            convertEthDenomination = ETHDenomination.ETH
-                        )
-                }
-                else -> {
-                    amountString =
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = crypto,
-                            convertBtcDenomination = BTCDenomination.BTC
-                        )
-                }
-            }
-        }
-
-        view.disableFiatTextChangeListener()
-        view.updateFiatAmount(amountString)
-        view.enableFiatTextChangeListener()
     }
 
     /**
@@ -1014,23 +943,7 @@ class SendPresenter @Inject constructor(
             )
     }
 
-    internal fun getBitcoinFeeOptions(): FeeOptions? = dynamicFeeCache.btcFeeOptions
-
-    internal fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
-        val regular = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_regular),
-            stringUtils.getString(R.string.fee_options_regular_time)
-        )
-        val priority = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_priority),
-            stringUtils.getString(R.string.fee_options_priority_time)
-        )
-        val custom = DisplayFeeOptions(
-            stringUtils.getString(R.string.fee_options_custom),
-            stringUtils.getString(R.string.fee_options_custom_warning)
-        )
-        return listOf(regular, priority, custom)
-    }
+    override fun getBitcoinFeeOptions(): FeeOptions? = dynamicFeeCache.btcFeeOptions
 
     private fun getFeePerKbFromPriority(@FeeType.FeePriorityDef feePriorityTemp: Int): BigInteger {
         getSuggestedFee()
@@ -1147,7 +1060,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun onCryptoTextChange(cryptoText: String) {
+    override fun onCryptoTextChange(cryptoText: String) {
         textChangeSubject.onNext(cryptoText)
     }
 
@@ -1164,7 +1077,7 @@ class SendPresenter @Inject constructor(
             .emptySubscribe()
     }
 
-    internal fun onSpendMaxClicked() {
+    override fun onSpendMaxClicked() {
         calculateSpendableAmounts(spendAll = true, amountToSendText = null)
     }
 
@@ -1390,7 +1303,7 @@ class SendPresenter @Inject constructor(
     }
 
     @Suppress("CascadeIf")
-    internal fun handleURIScan(untrimmedscanData: String?) {
+    override fun handleURIScan(untrimmedscanData: String?) {
         if (untrimmedscanData == null) return
 
         var scanData = untrimmedscanData.trim { it <= ' ' }
@@ -1465,7 +1378,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun handlePrivxScan(scanData: String?) {
+    override fun handlePrivxScan(scanData: String?) {
         if (scanData == null) return
 
         val format = privateKeyFactory.getFormat(scanData)
@@ -1492,7 +1405,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
+    override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
         sendDataManager.getEcKeyFromBip38(
             pw,
             scanData,
@@ -1686,7 +1599,7 @@ class SendPresenter @Inject constructor(
     private fun shouldWarnWatchOnly(): Boolean =
         prefsUtil.getValue(PREF_WARN_WATCH_ONLY_SPEND, true)
 
-    internal fun setWarnWatchOnlySpend(warn: Boolean) {
+    override fun setWarnWatchOnlySpend(warn: Boolean) {
         prefsUtil.setValue(PREF_WARN_WATCH_ONLY_SPEND, warn)
     }
 
@@ -1745,7 +1658,7 @@ class SendPresenter @Inject constructor(
             )
     }
 
-    internal fun selectSendingAccountBtc(data: Intent?) {
+    private fun selectSendingAccountBtc(data: Intent?) {
         try {
             val type: Class<*> =
                 Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
@@ -1768,7 +1681,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun selectSendingAccountBch(data: Intent?) {
+    private fun selectSendingAccountBch(data: Intent?) {
         try {
             val type: Class<*> =
                 Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
@@ -1791,7 +1704,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun selectReceivingAccountBtc(data: Intent?) {
+    private fun selectReceivingAccountBtc(data: Intent?) {
         try {
             val type: Class<*> =
                 Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
@@ -1812,7 +1725,7 @@ class SendPresenter @Inject constructor(
         }
     }
 
-    internal fun selectReceivingAccountBch(data: Intent?) {
+    private fun selectReceivingAccountBch(data: Intent?) {
         try {
             val type: Class<*> =
                 Class.forName(data?.getStringExtra(AccountChooserActivity.EXTRA_SELECTED_OBJECT_TYPE))
@@ -2031,11 +1944,11 @@ class SendPresenter @Inject constructor(
             relativeFee > SendModel.LARGE_TX_PERCENTAGE
     }
 
-    internal fun disableAdvancedFeeWarning() {
+    override fun disableAdvancedFeeWarning() {
         prefsUtil.setValue(PrefsUtil.KEY_WARN_ADVANCED_FEE, false)
     }
 
-    internal fun shouldShowAdvancedFeeWarning(): Boolean {
+    override fun shouldShowAdvancedFeeWarning(): Boolean {
         return prefsUtil.getValue(PrefsUtil.KEY_WARN_ADVANCED_FEE, true)
     }
 
