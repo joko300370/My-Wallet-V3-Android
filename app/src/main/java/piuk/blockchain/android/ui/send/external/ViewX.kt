@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.send.external
 
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 
 interface ViewX : piuk.blockchain.androidcoreui.ui.base.View {
 
@@ -10,7 +12,7 @@ interface ViewX : piuk.blockchain.androidcoreui.ui.base.View {
 
     fun updateReceivingHintAndAccountDropDowns(currency: CryptoCurrency, listSize: Int)
 
-    fun updateCryptoAmountWithoutTriggeringListener(amountString: String?)
+    fun updateCryptoAmountWithoutTriggeringListener(cryptoValue: CryptoValue)
 
-    fun updateFiatAmountWithoutTriggeringListener(amountString: String?)
+    fun updateFiatAmountWithoutTriggeringListener(fiatValue: FiatValue)
 }

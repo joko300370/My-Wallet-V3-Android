@@ -218,25 +218,6 @@ class CurrencyFormatManager @Inject constructor(
     }
 
     /**
-     * Returns a formatted fiat string based on the input text and last known exchange rate.
-     * If the input text can't be cast to a double this will return 0.0
-     *
-     * @return Formatted String of fiat amount from coin amount.
-     */
-    fun getFormattedFiatValueFromCoinValueInputText(
-        coinInputText: String,
-        convertEthDenomination: ETHDenomination? = null,
-        convertBtcDenomination: BTCDenomination? = null
-    ): String {
-        val cryptoAmount = coinInputText.toSafeDouble(locale).toBigDecimal()
-        return getFormattedFiatValueFromSelectedCoinValue(
-            cryptoAmount,
-            convertEthDenomination,
-            convertBtcDenomination
-        )
-    }
-
-    /**
      * Accepts a [Double] value in fiat currency and returns a [String] formatted to the region
      * with the correct currency symbol. For example, 1.2345 with country code "USD" and locale
      * [Locale.UK] would return "US$1.23".
@@ -417,7 +398,7 @@ class CurrencyFormatManager @Inject constructor(
         return Convert.toWei(amountToSend, Convert.Unit.ETHER).toBigInteger()
     }
 
-    fun stripSeparator(text: String, decimalSeparator: String): String = text.trim { it <= ' ' }
+    private fun stripSeparator(text: String, decimalSeparator: String): String = text.trim { it <= ' ' }
         .replace(" ", "")
         .replace(decimalSeparator, ".")
     // endregion

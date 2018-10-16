@@ -36,7 +36,6 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.currency.BTCDenomination
 import piuk.blockchain.androidcore.data.currency.CurrencyFormatManager
 import piuk.blockchain.androidcore.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.currency.ETHDenomination
@@ -894,7 +893,7 @@ class SendPresenter(
     }
 
     private fun clearCryptoAmount() {
-        view.updateCryptoAmount("")
+        view.updateCryptoAmount(CryptoValue.zero(currencyState.cryptoCurrency))
     }
 
     private fun getAddressList(): List<ItemAccount> = walletAccountHelper.getAccountItems(currencyState.cryptoCurrency)
@@ -1211,12 +1210,7 @@ class SendPresenter(
 
         if (spendAll) {
             amount = sweepableAmount
-            view?.updateCryptoAmount(
-                currencyFormatManager.getTextFromSatoshis(
-                    sweepableAmount,
-                    getDefaultDecimalSeparator()
-                )
-            )
+            view?.updateCryptoAmount(CryptoValue(currencyState.cryptoCurrency, sweepableAmount))
         }
 
         val unspentOutputBundle = sendDataManager.getSpendableCoins(coins, amount, feePerKb)
@@ -1261,12 +1255,7 @@ class SendPresenter(
 
         val availableEth = Convert.fromWei(maxAvailable.toString(), Convert.Unit.ETHER)
         if (spendAll) {
-            view?.updateCryptoAmount(
-                currencyFormatManager.getFormattedEthValue(
-                    availableEth ?: BigDecimal.ZERO,
-                    ETHDenomination.ETH
-                )
-            )
+            view?.updateCryptoAmount(CryptoValue.etherFromMajor(availableEth ?: BigDecimal.ZERO))
             pendingTransaction.bigIntAmount = availableEth.toBigInteger()
         } else {
             pendingTransaction.bigIntAmount =
@@ -1332,31 +1321,17 @@ class SendPresenter(
 
             // Convert to correct units
             try {
-                amount = currencyFormatManager.getFormattedSelectedCoinValue(amount.toBigInteger())
-                view?.updateCryptoAmount(amount)
-
-                val fiat = when (currencyState.cryptoCurrency) {
-                    CryptoCurrency.ETHER -> {
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = amount,
-                            convertEthDenomination = ETHDenomination.ETH
-                        )
-                    }
-                    else -> {
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = amount,
-                            convertBtcDenomination = BTCDenomination.BTC
-                        )
-                    }
-                }
-                view?.updateFiatAmount(fiat)
+                val cryptoValue = CryptoValue(currencyState.cryptoCurrency, amount.toBigInteger())
+                val fiatValue = cryptoValue.toFiat(exchangeRates)
+                view?.updateCryptoAmount(cryptoValue)
+                view?.updateFiatAmount(fiatValue)
             } catch (e: Exception) {
                 // ignore
             }
         } else if (FormatsUtil.isValidEthereumAddress(scanData)) {
             onEtherChosen()
             address = scanData
-            view?.updateCryptoAmount("")
+            view?.updateCryptoAmount(CryptoValue.zero(currencyState.cryptoCurrency))
         } else if (FormatsUtil.isValidBitcoinAddress(scanData)) {
             if (currencyState.cryptoCurrency == CryptoCurrency.BTC) {
                 onBitcoinChosen()
