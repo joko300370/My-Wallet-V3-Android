@@ -12,6 +12,10 @@ import java.text.DecimalFormatSymbols
 abstract class SendPresenterXD<View : piuk.blockchain.androidcoreui.ui.base.View> : SendPresenterX<View>() {
 
     abstract fun getFeeOptionsForDropDown(): List<DisplayFeeOptions>
+
+    abstract fun updateFiatTextField(editable: Editable, amountCrypto: EditText)
+
+    abstract fun updateCryptoTextField(editable: Editable, amountFiat: EditText)
 }
 
 abstract class SendPresenterX<View : piuk.blockchain.androidcoreui.ui.base.View> : BasePresenter<View>() {
@@ -32,13 +36,9 @@ abstract class SendPresenterX<View : piuk.blockchain.androidcoreui.ui.base.View>
 
     abstract fun clearReceivingObject()
 
-    abstract fun updateFiatTextField(editable: Editable, amountCrypto: EditText)
-
     abstract fun selectSendingAccount(data: Intent?, currency: CryptoCurrency)
 
     abstract fun selectReceivingAccount(data: Intent?, currency: CryptoCurrency)
-
-    abstract fun updateCryptoTextField(editable: Editable, amountFiat: EditText)
 
     abstract fun selectDefaultOrFirstFundedSendingAccount()
 

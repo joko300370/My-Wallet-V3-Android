@@ -75,13 +75,14 @@ val applicationModule = applicationContext {
 
         factory {
             val old: SendPresenterX<SendView> = SendPresenter(
-                get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
+                get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()
             )
             val new: SendPresenterX<SendView> = SendPresenter2(get())
             SendPresenterXSendView(
                 DuelSendPresenterX(
                     old,
                     new,
+                    get(),
                     get(),
                     get()
                 )

@@ -9,4 +9,8 @@ interface ViewX : piuk.blockchain.androidcoreui.ui.base.View {
     fun updateFiatCurrency(currency: String)
 
     fun updateReceivingHintAndAccountDropDowns(currency: CryptoCurrency, listSize: Int)
+
+    fun updateCryptoAmountWithoutTriggeringListener(amountString: String?)
+
+    fun updateFiatAmountWithoutTriggeringListener(amountString: String?)
 }

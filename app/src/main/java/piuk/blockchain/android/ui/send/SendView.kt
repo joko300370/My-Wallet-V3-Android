@@ -17,11 +17,7 @@ interface SendView : ViewX {
 
     fun updateCryptoAmount(amountString: String?)
 
-    fun updateCryptoAmountWithoutTriggeringListener(amountString: String?)
-
     fun updateFiatAmount(amountString: String?)
-
-    fun updateFiatAmountWithoutTriggeringListener(amountString: String?)
 
     fun updateWarning(message: String)
 

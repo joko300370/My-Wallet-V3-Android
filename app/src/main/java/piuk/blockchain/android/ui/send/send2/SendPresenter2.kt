@@ -18,15 +18,15 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
 
     override fun onContinueClicked() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onSpendMaxClicked() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onBroadcastReceived() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onResume() {
@@ -47,31 +47,23 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun handleURIScan(untrimmedscanData: String?) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun handlePrivxScan(scanData: String?) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun clearReceivingObject() {
-        TODO("not implemented")
-    }
-
-    override fun updateFiatTextField(editable: Editable, amountCrypto: EditText) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun selectSendingAccount(data: Intent?, currency: CryptoCurrency) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun selectReceivingAccount(data: Intent?, currency: CryptoCurrency) {
-        TODO("not implemented")
-    }
-
-    override fun updateCryptoTextField(editable: Editable, amountFiat: EditText) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun selectDefaultOrFirstFundedSendingAccount() {
@@ -79,11 +71,11 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun submitPayment() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun shouldShowAdvancedFeeWarning(): Boolean {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onCryptoTextChange(cryptoText: String) {
@@ -91,27 +83,27 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun spendFromWatchOnlyBIP38(pw: String, scanData: String) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun setWarnWatchOnlySpend(warn: Boolean) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onNoSecondPassword() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onSecondPasswordValidated(validateSecondPassword: String) {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun disableAdvancedFeeWarning() {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun getBitcoinFeeOptions(): FeeOptions? {
-        TODO("not implemented")
+        TODO("AND-1535")
     }
 
     override fun onViewReady() {

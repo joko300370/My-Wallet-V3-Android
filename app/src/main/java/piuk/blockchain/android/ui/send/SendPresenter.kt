@@ -2,8 +2,6 @@ package piuk.blockchain.android.ui.send
 
 import android.content.Intent
 import android.support.design.widget.Snackbar
-import android.text.Editable
-import android.widget.EditText
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.api.data.UnspentOutputs
@@ -34,7 +32,6 @@ import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.send.external.SendPresenterX
-import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -46,6 +43,7 @@ import piuk.blockchain.androidcore.data.currency.ETHDenomination
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.FiatExchangeRates
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -80,6 +78,7 @@ class SendPresenter(
     private val environmentSettings: EnvironmentConfig,
     private val bchDataManager: BchDataManager,
     private val currencyFormatManager: CurrencyFormatManager,
+    private val exchangeRates: FiatExchangeRates,
     environmentConfig: EnvironmentConfig
 ) : SendPresenterX<SendView>() {
 
@@ -773,7 +772,7 @@ class SendPresenter(
         details.toLabel = pendingTransaction.displayableReceivingLabel.removeBchUri()
 
         details.cryptoUnit = currencyState.cryptoCurrency.symbol
-        details.fiatUnit = currencyFormatManager.fiatCountryCode
+        details.fiatUnit = exchangeRates.fiatUnit
         details.fiatSymbol = currencyFormatManager.getFiatSymbol(
             currencyFormatManager.fiatCountryCode,
             view.locale
@@ -908,55 +907,6 @@ class SendPresenter(
         val accountItem = walletAccountHelper.getDefaultOrFirstFundedAccount()
         view.updateSendingAddress(accountItem.label ?: accountItem.address!!)
         pendingTransaction.sendingObject = accountItem
-    }
-
-    override fun updateCryptoTextField(editable: Editable, editText: EditText) {
-        val maxLength = 2
-        val fiat = EditTextFormatUtil.formatEditable(
-            editable,
-            maxLength,
-            editText,
-            getDefaultDecimalSeparator()
-        ).toString()
-        var amountString = ""
-
-        if (!fiat.isEmpty()) {
-            amountString = currencyFormatManager.getFormattedSelectedCoinValueFromFiatString(fiat)
-        }
-
-        view.updateCryptoAmountWithoutTriggeringListener(amountString)
-    }
-
-    override fun updateFiatTextField(editable: Editable, editText: EditText) {
-        val crypto = EditTextFormatUtil.formatEditable(
-            editable,
-            currencyState.cryptoCurrency.dp,
-            editText,
-            getDefaultDecimalSeparator()
-        ).toString()
-
-        var amountString = ""
-
-        if (!crypto.isEmpty()) {
-            when (currencyState.cryptoCurrency) {
-                CryptoCurrency.ETHER -> {
-                    amountString =
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = crypto,
-                            convertEthDenomination = ETHDenomination.ETH
-                        )
-                }
-                else -> {
-                    amountString =
-                        currencyFormatManager.getFormattedFiatValueFromCoinValueInputText(
-                            coinInputText = crypto,
-                            convertBtcDenomination = BTCDenomination.BTC
-                        )
-                }
-            }
-        }
-
-        view.updateFiatAmountWithoutTriggeringListener(amountString)
     }
 
     /**
