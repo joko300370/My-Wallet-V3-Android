@@ -4,9 +4,14 @@ import android.content.Context
 import com.blockchain.balance.TotalBalance
 import com.blockchain.koin.getActivity
 import com.blockchain.kycui.settings.KycStatusHelper
+import com.blockchain.sunriver.XlmTransactionSender
 import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.formatWithUnit
 import info.blockchain.wallet.util.PrivateKeyFactory
+import io.reactivex.Completable
+import io.reactivex.Single
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
@@ -19,7 +24,7 @@ import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.external.DuelSendPresenterX
 import piuk.blockchain.android.ui.send.external.SendFragmentXFactory
 import piuk.blockchain.android.ui.send.external.SendPresenterX
-import piuk.blockchain.android.ui.send.send2.SendPresenter2
+import piuk.blockchain.android.ui.send.send2.XlmSendPresenterStrategy
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.StringUtils
@@ -28,7 +33,9 @@ import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.utils.DateUtil
+import timber.log.Timber
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 val applicationModule = applicationContext {
 
@@ -92,7 +99,7 @@ val applicationModule = applicationContext {
                 get(),
                 get()
             )
-            val new: SendPresenterX<SendView> = SendPresenter2(get())
+            val new: SendPresenterX<SendView> = XlmSendPresenterStrategy(get(), get(), get())
             SendPresenterXSendView(
                 DuelSendPresenterX(
                     old,
@@ -102,6 +109,23 @@ val applicationModule = applicationContext {
                     get()
                 )
             )
+        }
+
+        factory {
+
+            object : XlmTransactionSender {
+
+                override fun sendFunds(value: CryptoValue, toAccountId: String): Completable {
+
+                    return Completable.timer(4, TimeUnit.SECONDS)
+                        .doOnSubscribe {
+                            Timber.d("Simulating: Sending ${value.formatWithUnit()} to $toAccountId")
+                        }
+                        .doOnComplete {
+                            Timber.d("Simulating: Sent ${value.formatWithUnit()} to $toAccountId")
+                        }
+                }
+            } as XlmTransactionSender
         }
     }
 

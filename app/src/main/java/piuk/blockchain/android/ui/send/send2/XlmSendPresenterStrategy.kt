@@ -1,22 +1,37 @@
 package piuk.blockchain.android.ui.send.send2
 
 import android.content.Intent
+import com.blockchain.sunriver.HorizonKeyPair
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.XlmTransactionSender
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.withMajorValueOrZero
 import info.blockchain.wallet.api.data.FeeOptions
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
+import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.external.SendPresenterX
+import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.currency.CurrencyState
+import timber.log.Timber
 
-class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() {
+class XlmSendPresenterStrategy(
+    currencyState: CurrencyState,
+    private val xlmDataManager: XlmDataManager,
+    private val xlmTransactionSender: XlmTransactionSender
+) : SendPresenterX<SendView>() {
 
     private val currency: CryptoCurrency by lazy { currencyState.cryptoCurrency }
     private var cryptoTextSubject = PublishSubject.create<CryptoValue>()
+    private var continueClick = PublishSubject.create<Unit>()
+
+    private val send = cryptoTextSubject.sample(continueClick)
 
     override fun onContinueClicked() {
-        TODO("AND-1535")
+        continueClick.onNext(Unit)
     }
 
     override fun onSpendMaxClicked() {
@@ -53,7 +68,6 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun clearReceivingObject() {
-        TODO("AND-1535")
     }
 
     override fun selectSendingAccount(data: Intent?, currency: CryptoCurrency) {
@@ -65,7 +79,12 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun selectDefaultOrFirstFundedSendingAccount() {
-        // Nothing to do, we have just one account on XLM
+        xlmDataManager.defaultAccount()
+            .addToCompositeDisposable(this)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { Timber.e(it) }) {
+                view.updateSendingAddress(it.label)
+            }
     }
 
     override fun submitPayment() {
@@ -105,5 +124,20 @@ class SendPresenter2(currencyState: CurrencyState) : SendPresenterX<SendView>() 
     }
 
     override fun onViewReady() {
+        send
+            .addToCompositeDisposable(this)
+            .observeOn(AndroidSchedulers.mainThread())
+            .flatMapCompletable { value ->
+                val toAddress = HorizonKeyPair.createValidatedPublic(view.getReceivingAddress() ?: "")
+                xlmTransactionSender.sendFunds(
+                    value,
+                    toAddress.accountId
+                ).doOnSubscribe {
+                    view.showProgressDialog(R.string.app_name)
+                }.doOnTerminate {
+                    view.dismissProgressDialog()
+                }
+            }
+            .subscribeBy(onError = { Timber.e(it) })
     }
 }
