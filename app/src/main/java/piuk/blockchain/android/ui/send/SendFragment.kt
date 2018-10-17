@@ -65,6 +65,7 @@ import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.send.external.NewInstanceArguments
+import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.android.ui.send.external.SendFragmentX
 import piuk.blockchain.android.ui.send.external.SendPresenterXD
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -920,6 +921,14 @@ class SendFragment : BaseFragment<SendView, SendPresenterXD<SendView>>(),
                 presenter.onSecondPasswordValidated(validatedSecondPassword)
             }
         })
+    }
+
+    override fun showPaymentDetails(confirmationDetails: SendConfirmationDetails) {
+        showPaymentDetails(
+            confirmationDetails = confirmationDetails.toPaymentConfirmationDetails(),
+            note = null,
+            allowFeeChange = false
+        )
     }
 
     override fun showPaymentDetails(
