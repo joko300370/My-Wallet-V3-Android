@@ -7,6 +7,7 @@ import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import piuk.blockchain.android.ui.send.external.SendConfirmationDetails
 import piuk.blockchain.android.ui.send.external.ViewX
 import java.util.Locale
 
@@ -90,6 +91,8 @@ interface SendView : ViewX {
         allowFeeChange: Boolean
     )
 
+    fun showPaymentDetails(confirmationDetails: SendConfirmationDetails)
+
     fun showLargeTransactionWarning()
 
     fun showTransactionSuccess(
@@ -105,4 +108,22 @@ interface SendView : ViewX {
     fun finishPage()
 
     fun hideCurrencyHeader()
+}
+
+internal fun SendConfirmationDetails.toPaymentConfirmationDetails(): PaymentConfirmationDetails {
+    return PaymentConfirmationDetails().also {
+        it.fromLabel = from.label
+        it.toLabel = to
+
+        it.cryptoUnit = amount.symbol()
+        it.cryptoAmount = amount.toStringWithoutSymbol()
+        it.cryptoFee = fees.toStringWithoutSymbol()
+        it.cryptoTotal = total.toStringWithoutSymbol()
+
+        it.fiatUnit = fiatAmount.currencyCode
+        it.fiatSymbol = fiatAmount.symbol()
+        it.fiatAmount = fiatAmount.toStringWithoutSymbol()
+        it.fiatFee = fiatFees.toStringWithoutSymbol()
+        it.fiatTotal = fiatTotal.toStringWithoutSymbol()
+    }
 }
