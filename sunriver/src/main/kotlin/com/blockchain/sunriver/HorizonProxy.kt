@@ -2,6 +2,7 @@ package com.blockchain.sunriver
 
 import info.blockchain.balance.CryptoValue
 import org.stellar.sdk.KeyPair
+import org.stellar.sdk.Network
 import org.stellar.sdk.Server
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.AccountResponse
@@ -10,6 +11,14 @@ import org.stellar.sdk.responses.operations.OperationResponse
 internal class HorizonProxy(url: String) {
 
     private val server = Server(url)
+
+    init {
+        if (url.contains("test")) {
+            Network.useTestNetwork()
+        } else {
+            Network.usePublicNetwork()
+        }
+    }
 
     fun accountExists(accountId: String) = findAccount(accountId) != null
 

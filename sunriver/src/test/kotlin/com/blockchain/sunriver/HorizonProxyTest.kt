@@ -8,6 +8,7 @@ import io.fabric8.mockwebserver.DefaultMockServer
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
+import org.amshove.kluent.`should not equal`
 import org.amshove.kluent.`should throw`
 import org.junit.Before
 import org.junit.Rule
@@ -15,6 +16,7 @@ import org.junit.Test
 import org.koin.standalone.StandAloneContext
 import org.koin.standalone.get
 import org.koin.test.AutoCloseKoinTest
+import org.stellar.sdk.Network
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.PaymentOperationResponse
@@ -181,5 +183,19 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         {
             proxy.accountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         } `should throw` ErrorResponse::class
+    }
+
+    @Test
+    fun `Uses test net if url contains the word test`() {
+        HorizonProxy("test_net")
+
+        Network.current().networkPassphrase `should equal` "Test SDF Network ; September 2015"
+    }
+
+    @Test
+    fun `Uses the public network if url does not contains the word test`() {
+        HorizonProxy("te_st_net")
+
+        Network.current().networkPassphrase `should equal` "Public Global Stellar Network ; September 2015"
     }
 }
