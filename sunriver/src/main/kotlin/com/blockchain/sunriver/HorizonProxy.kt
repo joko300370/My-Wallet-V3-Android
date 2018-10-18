@@ -11,22 +11,27 @@ internal class HorizonProxy(url: String) {
 
     private val server = Server(url)
 
+    fun accountExists(accountId: String) = findAccount(accountId) != null
+
     fun getBalance(accountId: String): CryptoValue {
+        val account = findAccount(accountId)
+        return account?.balances?.firstOrNull {
+            it.assetType == "native" && it.assetCode == null
+        }?.balance?.let { CryptoValue.lumensFromMajor(it.toBigDecimal()) }
+            ?: CryptoValue.ZeroXlm
+    }
+
+    private fun findAccount(accountId: String): AccountResponse? {
         val accounts = server.accounts()
-        val account: AccountResponse
-        try {
-            account = accounts.account(KeyPair.fromAccountId(accountId))
+        return try {
+            accounts.account(KeyPair.fromAccountId(accountId))
         } catch (e: ErrorResponse) {
             if (e.code == 404) {
-                return CryptoValue.ZeroXlm
+                null
             } else {
                 throw e
             }
         }
-        return account.balances.firstOrNull {
-            it.assetType == "native" && it.assetCode == null
-        }?.balance?.let { CryptoValue.lumensFromMajor(it.toBigDecimal()) }
-            ?: CryptoValue.ZeroXlm
     }
 
     fun getTransactionList(accountId: String): List<OperationResponse> = try {

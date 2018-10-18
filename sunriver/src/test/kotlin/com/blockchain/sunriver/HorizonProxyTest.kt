@@ -6,6 +6,7 @@ import com.blockchain.testutils.getStringFromResource
 import com.blockchain.testutils.lumens
 import io.fabric8.mockwebserver.DefaultMockServer
 import org.amshove.kluent.`should be instance of`
+import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw`
 import org.junit.Before
@@ -135,6 +136,50 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         {
             proxy.getTransactionList("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        } `should throw` ErrorResponse::class
+    }
+
+    @Test
+    fun `accountExists - get account existence`() {
+        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .andReturn(
+                200,
+                getStringFromResource("accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.accountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4") `should be` true
+    }
+
+    @Test
+    fun `accountExists - get account non-existence`() {
+        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .andReturn(
+                404,
+                getStringFromResource("accounts/not_found.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.accountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4") `should be` false
+    }
+
+    @Test
+    fun `accountExists - on any other kind of server error, bubble up exception`() {
+        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+            .andReturn(
+                301,
+                getStringFromResource("accounts/not_found.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>();
+
+        {
+            proxy.accountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         } `should throw` ErrorResponse::class
     }
 }
