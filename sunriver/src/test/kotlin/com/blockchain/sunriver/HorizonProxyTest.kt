@@ -2,13 +2,14 @@ package com.blockchain.sunriver
 
 import com.blockchain.koin.sunriverModule
 import com.blockchain.network.initRule
+import com.blockchain.testutils.after
+import com.blockchain.testutils.before
 import com.blockchain.testutils.getStringFromResource
 import com.blockchain.testutils.lumens
 import io.fabric8.mockwebserver.DefaultMockServer
 import org.amshove.kluent.`should be instance of`
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
-import org.amshove.kluent.`should not equal`
 import org.amshove.kluent.`should throw`
 import org.junit.Before
 import org.junit.Rule
@@ -16,10 +17,14 @@ import org.junit.Test
 import org.koin.standalone.StandAloneContext
 import org.koin.standalone.get
 import org.koin.test.AutoCloseKoinTest
+import org.stellar.sdk.CreateAccountOperation
+import org.stellar.sdk.KeyPair
 import org.stellar.sdk.Network
+import org.stellar.sdk.PaymentOperation
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.PaymentOperationResponse
+import java.util.Locale
 
 class HorizonProxyTest : AutoCloseKoinTest() {
 
@@ -27,6 +32,13 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @get:Rule
     private val initMockServer = server.initRule()
+
+    @get:Rule
+    private val ensureNoLocalization = before {
+        Locale.setDefault(Locale.FRANCE)
+    } after {
+        Locale.setDefault(Locale.US)
+    }
 
     @Before
     fun startKoin() {
@@ -143,12 +155,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `accountExists - get account existence`() {
-        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
-            .andReturn(
-                200,
-                getStringFromResource("accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4.json")
-            )
-            .once()
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 
         val proxy = get<HorizonProxy>()
 
@@ -157,12 +164,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `accountExists - get account non-existence`() {
-        server.expect().get().withPath("/accounts/GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
-            .andReturn(
-                404,
-                getStringFromResource("accounts/not_found.json")
-            )
-            .once()
+        server.givenAccountDoesNotExist("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 
         val proxy = get<HorizonProxy>()
 
@@ -198,4 +200,112 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         Network.current().networkPassphrase `should equal` "Public Global Stellar Network ; September 2015"
     }
+
+    @Test
+    fun `can send transaction to an account that exists`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+
+        server.expect().post().withPath("/transactions")
+            .andReturn(
+                200,
+                getStringFromResource("transactions/post_success.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        proxy.sendTransaction(
+            source,
+            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            123.456789.lumens().toBigDecimal()
+        ).apply {
+            success `should be` true
+            success `should be` true
+            transaction.operations.single().apply {
+                this `should be instance of` PaymentOperation::class
+                (this as PaymentOperation).apply {
+                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    amount `should equal` "123.456789"
+                }
+            }
+            transaction.fee `should equal` 100
+        }
+    }
+
+    @Test
+    fun `insufficient funds during transaction send`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+
+        server.expect().post().withPath("/transactions")
+            .andReturn(
+                400,
+                getStringFromResource("transactions/post_fail_insufficient_funds.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        proxy.sendTransaction(
+            KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"),
+            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            123.456789.lumens().toBigDecimal()
+        ).success `should be` false
+    }
+
+    @Test
+    fun `if destination account does not exist, it will do a create operation`() {
+        server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
+        server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+
+        server.expect().post().withPath("/transactions")
+            .andReturn(
+                200,
+                getStringFromResource("transactions/post_success.json")
+            )
+            .once()
+
+        val proxy = get<HorizonProxy>()
+
+        val source = KeyPair.fromSecretSeed("SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I")
+        source.accountId `should equal` "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        proxy.sendTransaction(
+            source,
+            KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
+            "1.23E+4".toBigDecimal()
+        ).apply {
+            success `should be` true
+            transaction.operations.single().apply {
+                this `should be instance of` CreateAccountOperation::class
+                (this as CreateAccountOperation).apply {
+                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    startingBalance `should equal` "12300"
+                }
+            }
+            transaction.fee `should equal` 100
+        }
+    }
+}
+
+private fun DefaultMockServer.givenAccountExists(accountId: String) {
+    expect().get().withPath("/accounts/$accountId")
+        .andReturn(
+            200,
+            getStringFromResource("accounts/$accountId.json")
+        )
+        .once()
+}
+
+private fun DefaultMockServer.givenAccountDoesNotExist(accountId: String) {
+    expect().get().withPath("/accounts/$accountId")
+        .andReturn(
+            404,
+            getStringFromResource("accounts/not_found.json")
+        )
+        .once()
 }
