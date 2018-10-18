@@ -40,7 +40,7 @@ class XlmSendPresenterStrategy(
         Observables.combineLatest(
             cryptoTextSubject.sample(continueClick).map { value ->
                 val toAddress = HorizonKeyPair.createValidatedPublic(view.getReceivingAddress() ?: "")
-                val fees = CryptoValue.lumensFromStroop(100.toBigInteger())
+                val fees = CryptoValue.lumensFromStroop(100.toBigInteger()) // TODO("AND-1535")
                 SendConfirmationDetails(
                     from = AccountReference.Xlm("No account", ""),
                     to = toAddress.accountId,
