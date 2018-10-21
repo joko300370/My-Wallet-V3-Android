@@ -9,6 +9,8 @@ interface SeedAccess {
      * If a second password is required and not supplied, then it will be empty.
      */
     val seed: Maybe<Seed>
+
+    val seedPromptIfRequired: Maybe<Seed>
 }
 
 class Seed(

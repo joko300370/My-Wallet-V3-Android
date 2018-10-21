@@ -74,7 +74,7 @@ class XlmDataManager internal constructor(
         }
 
     private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue): Completable {
-        return seedAccess.seed
+        return seedAccess.seedPromptIfRequired
             .map {
                 deriveXlmAccountKeyPair(it.hdSeed, 0)
             }

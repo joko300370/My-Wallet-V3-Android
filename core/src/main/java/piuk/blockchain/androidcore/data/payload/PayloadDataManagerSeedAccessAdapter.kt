@@ -23,8 +23,16 @@ internal class PayloadDataManagerSeedAccessAdapter(
             ).firstElement()
         }
 
+    override val seedPromptIfRequired: Maybe<Seed>
+        get() {
+            return Maybe.concat(
+                getSeedWithoutPassword(),
+                getSeedWithPassword()
+            ).firstElement()
+        }
+
     private fun getSeedWithPassword(): Maybe<Seed> =
-        secondPassword()
+        Maybe.defer { secondPassword() }
             .subscribeOn(AndroidSchedulers.mainThread())
             .flatMap { getSeedGivenPassword(it) }
 
