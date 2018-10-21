@@ -36,7 +36,7 @@ import android.widget.LinearLayout
 import com.blockchain.koin.injectActivity
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.PermissionGrantedResponse

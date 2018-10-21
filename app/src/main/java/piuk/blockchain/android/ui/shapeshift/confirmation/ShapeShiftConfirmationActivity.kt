@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_confirmation_shapeshift.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import piuk.blockchain.android.ui.shapeshift.inprogress.TradeInProgressActivity
 import piuk.blockchain.android.ui.shapeshift.models.ShapeShiftData
 import piuk.blockchain.androidcore.utils.helperfunctions.consume

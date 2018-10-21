@@ -20,7 +20,7 @@ import com.blockchain.morph.ui.homebrew.exchange.host.HomebrewHostActivityListen
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedActivity
 import com.blockchain.morph.ui.homebrew.exchange.locked.ExchangeLockedModel
 import com.blockchain.ui.extensions.throttledClicks
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue

@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.fragment_backup_start.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import com.blockchain.koin.injectActivity
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate

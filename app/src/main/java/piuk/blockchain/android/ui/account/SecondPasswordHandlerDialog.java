@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.account;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
@@ -10,7 +11,7 @@ import info.blockchain.wallet.payload.PayloadManager;
 import io.reactivex.Observable;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import com.blockchain.ui.password.SecondPasswordHandler;
+import piuk.blockchain.androidcore.data.SecondPasswordHandler;
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
@@ -32,7 +33,6 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
         if (!payloadManager.getPayload().isDoubleEncryption()) {
             listener.onNoSecondPassword();
         } else {
-
             final AppCompatEditText passwordField = new AppCompatEditText(context);
             passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
             passwordField.setHint(R.string.password);

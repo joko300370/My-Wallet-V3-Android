@@ -5,7 +5,7 @@ import com.blockchain.balance.TotalBalance
 import com.blockchain.koin.getActivity
 import com.blockchain.kycui.settings.KycStatusHelper
 import com.blockchain.ui.chooser.AccountListing
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.data.cache.DynamicFeeCache

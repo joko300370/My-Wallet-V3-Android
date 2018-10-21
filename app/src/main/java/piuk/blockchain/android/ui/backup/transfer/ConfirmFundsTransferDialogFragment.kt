@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.dialog_transfer_funds.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.injection.Injector
 import com.blockchain.koin.injectActivity
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import piuk.blockchain.android.ui.balance.BalanceFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
 import piuk.blockchain.androidcoreui.ui.customviews.MaterialProgressDialog

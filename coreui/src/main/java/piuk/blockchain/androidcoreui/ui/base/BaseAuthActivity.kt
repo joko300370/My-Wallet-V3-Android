@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.view.WindowManager
 import com.blockchain.koin.injectActivity
-import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.utils.PrefsUtil

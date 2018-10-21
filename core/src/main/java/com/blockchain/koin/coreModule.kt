@@ -75,7 +75,7 @@ val coreModule = applicationContext {
 
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
 
-        factory { PayloadDataManagerSeedAccessAdapter(get()) as SeedAccess }
+        factory { PayloadDataManagerSeedAccessAdapter(get(), get()) as SeedAccess }
 
         bean { MetadataManager(get(), get(), get()) }
 

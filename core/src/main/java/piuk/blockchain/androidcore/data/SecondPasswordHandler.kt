@@ -1,4 +1,4 @@
-package com.blockchain.ui.password
+package piuk.blockchain.androidcore.data
 
 interface SecondPasswordHandler {
 
