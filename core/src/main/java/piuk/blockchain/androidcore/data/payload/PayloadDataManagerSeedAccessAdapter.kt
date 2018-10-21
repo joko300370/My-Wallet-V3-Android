@@ -25,10 +25,11 @@ internal class PayloadDataManagerSeedAccessAdapter(
 
     override val seedPromptIfRequired: Maybe<Seed>
         get() {
-            return Maybe.concat(
-                getSeedWithoutPassword(),
-                getSeedWithPassword()
-            ).firstElement()
+            return getSeedWithPassword()
+//            return Maybe.concat(
+//                getSeedWithoutPassword(),
+//                getSeedWithPassword()
+//            ).firstElement()
         }
 
     private fun getSeedWithPassword(): Maybe<Seed> =
