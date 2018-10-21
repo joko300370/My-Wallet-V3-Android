@@ -6,6 +6,7 @@ import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
 import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.NoSeedException
+import com.blockchain.wallet.Seed
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -28,8 +29,8 @@ internal class XlmMetaDataInitializer(
     internal fun initWalletMaybe(): Maybe<XlmMetaData> =
         Maybe.concat(
             load(),
-            createAndSave()
-            // TODO("AND-1611") createAndSaveUsingSecondPassword
+            createAndSave(),
+            createAndSaveUsingSecondPassword()
         ).firstElement()
 
     private fun load(): Maybe<XlmMetaData> =
@@ -51,13 +52,11 @@ internal class XlmMetaDataInitializer(
 
     private fun createAndSave(): Maybe<XlmMetaData> =
         newXlmMetaData(defaultLabels[CryptoCurrency.XLM])
-            .flatMap { newData ->
-                repository.saveMetadata(
-                    newData,
-                    XlmMetaData::class.java,
-                    XlmMetaData.MetaDataType
-                ).andThen(Maybe.just(newData))
-            }
+            .saveSideEffect()
+
+    private fun createAndSaveUsingSecondPassword(): Maybe<XlmMetaData> =
+        newXlmMetaDataWithPromptIfRequired(defaultLabels[CryptoCurrency.XLM])
+            .saveSideEffect()
 
     /**
      * Logs any discrepancies between the expected first account, and the loaded first account.
@@ -74,7 +73,15 @@ internal class XlmMetaDataInitializer(
     }
 
     private fun newXlmMetaData(defaultLabel: String): Maybe<XlmMetaData> =
-        seedAccess.seed.map { seed ->
+        seedAccess.seed
+            .toNewXlmMetaData(defaultLabel)
+
+    private fun newXlmMetaDataWithPromptIfRequired(defaultLabel: String): Maybe<XlmMetaData> =
+        seedAccess.seedPromptIfRequired
+            .toNewXlmMetaData(defaultLabel)
+
+    private fun Maybe<Seed>.toNewXlmMetaData(defaultLabel: String): Maybe<XlmMetaData> =
+        map { seed ->
             val derived = deriveXlmAccountKeyPair(seed.hdSeed, 0)
             XlmMetaData(
                 defaultAccountIndex = 0,
@@ -88,6 +95,15 @@ internal class XlmMetaDataInitializer(
                 ),
                 transactionNotes = emptyMap()
             )
+        }
+
+    private fun Maybe<XlmMetaData>.saveSideEffect(): Maybe<XlmMetaData> =
+        flatMap { newData ->
+            repository.saveMetadata(
+                newData,
+                XlmMetaData::class.java,
+                XlmMetaData.MetaDataType
+            ).andThen(Maybe.just(newData))
         }
 }
 

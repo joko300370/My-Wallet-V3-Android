@@ -75,9 +75,11 @@ class XlmDataManager internal constructor(
 
     private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue): Completable {
         return seedAccess.seedPromptIfRequired
+            .observeOn(Schedulers.computation())
             .map {
                 deriveXlmAccountKeyPair(it.hdSeed, 0)
             }
+            .observeOn(Schedulers.io())
             .map {
                 horizonProxy.sendTransaction(
                     it.toKeyPair(),
@@ -91,7 +93,6 @@ class XlmDataManager internal constructor(
             }
             .toSingle()
             .toCompletable()
-            .subscribeOn(Schedulers.io())
     }
 }
 
