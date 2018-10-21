@@ -1,18 +1,17 @@
 package piuk.blockchain.androidcore.data.payload
 
-import com.blockchain.koin.KoinDaggerModule
-import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.Seed
+import com.blockchain.wallet.SeedAccess
 import info.blockchain.wallet.exceptions.HDWalletException
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.androidcore.data.SecondPasswordHandler
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import timber.log.Timber
 
 internal class PayloadDataManagerSeedAccessAdapter(
     private val environmentConfig: EnvironmentConfig,
+    private val secondPasswordHandler: SecondPasswordHandler,
     private val payloadDataManager: PayloadDataManager
 ) : SeedAccess {
 
@@ -59,8 +58,6 @@ internal class PayloadDataManagerSeedAccessAdapter(
     }
 
     private fun secondPassword(): Maybe<String> {
-        val secondPasswordHandler = secondPasswordHandler() ?: return Maybe.empty()
-
         val password = PublishSubject.create<String>()
 
         secondPasswordHandler.validate(
@@ -77,15 +74,4 @@ internal class PayloadDataManagerSeedAccessAdapter(
 
         return password.firstElement()
     }
-
-    private fun secondPasswordHandler(): SecondPasswordHandler? {
-        return try {
-            KoinCheat().get(SecondPasswordHandler::class)
-        } catch (e: Exception) {
-            Timber.e(e)
-            null
-        }
-    }
 }
-
-private class KoinCheat : KoinDaggerModule()

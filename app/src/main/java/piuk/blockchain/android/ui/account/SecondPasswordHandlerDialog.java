@@ -1,7 +1,5 @@
 package piuk.blockchain.android.ui.account;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
@@ -18,13 +16,13 @@ import piuk.blockchain.androidcoreui.utils.ViewUtils;
 
 public final class SecondPasswordHandlerDialog implements SecondPasswordHandler {
 
-    private final Context context;
+    private final CurrentContextAccess contextAccess;
     private final PayloadManager payloadManager;
 
     private MaterialProgressDialog materialProgressDialog;
 
-    public SecondPasswordHandlerDialog(Activity activity, PayloadManager payloadManager) {
-        this.context = activity;
+    public SecondPasswordHandlerDialog(CurrentContextAccess contextAccess, PayloadManager payloadManager) {
+        this.contextAccess = contextAccess;
         this.payloadManager = payloadManager;
     }
 
@@ -33,6 +31,7 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
         if (!payloadManager.getPayload().isDoubleEncryption()) {
             listener.onNoSecondPassword();
         } else {
+            Context context = contextAccess.getContext();
             final AppCompatEditText passwordField = new AppCompatEditText(context);
             passwordField.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
             passwordField.setHint(R.string.password);
@@ -67,6 +66,7 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
     }
 
     private void showErrorToast() {
+        Context context = contextAccess.getContext();
         ToastCustom.makeText(
                 context,
                 context.getString(R.string.double_encryption_password_error),
@@ -79,6 +79,7 @@ public final class SecondPasswordHandlerDialog implements SecondPasswordHandler 
     }
 
     private void showProgressDialog(@StringRes int messageId) {
+        Context context = contextAccess.getContext();
         dismissProgressDialog();
         materialProgressDialog = new MaterialProgressDialog(context);
         materialProgressDialog.setCancelable(false);

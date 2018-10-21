@@ -1,8 +1,10 @@
 package piuk.blockchain.android;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.multidex.MultiDex;
 import android.support.v7.app.AppCompatDelegate;
@@ -22,6 +24,7 @@ import io.reactivex.plugins.RxJavaPlugins;
 import org.bitcoinj.core.NetworkParameters;
 import piuk.blockchain.android.data.connectivity.ConnectivityManager;
 import piuk.blockchain.android.injection.Injector;
+import piuk.blockchain.android.ui.account.CurrentContextAccess;
 import piuk.blockchain.android.ui.auth.LogoutActivity;
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity;
 import piuk.blockchain.android.util.PrngHelper;
@@ -66,6 +69,8 @@ public class BlockchainApplication extends Application implements FrameworkInter
     EnvironmentConfig environmentSettings;
     @Inject
     PrngHelper prngHelper;
+    @Inject
+    CurrentContextAccess currentContextAccess;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -123,6 +128,43 @@ public class BlockchainApplication extends Application implements FrameworkInter
             @Override
             public void onBecameBackground() {
                 // No-op
+            }
+        });
+
+        this.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                currentContextAccess.setContext(activity);
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
             }
         });
 

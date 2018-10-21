@@ -10,6 +10,7 @@ import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
+import piuk.blockchain.android.ui.account.CurrentContextAccess
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
@@ -37,6 +38,8 @@ val applicationModule = applicationContext {
 
     factory { Locale.getDefault() }
 
+    bean { CurrentContextAccess() }
+
     context("Payload") {
 
         factory {
@@ -60,11 +63,8 @@ val applicationModule = applicationContext {
         factory { WalletAccountHelperAccountListingAdapter(get()) }
             .bind(AccountListing::class)
 
-        factory { params ->
-            SecondPasswordHandlerDialog(
-                params.getActivity(),
-                get()
-            ) as SecondPasswordHandler
+        factory {
+            SecondPasswordHandlerDialog(get(), get()) as SecondPasswordHandler
         }
 
         factory { KycStatusHelper(get(), get(), get()) }
