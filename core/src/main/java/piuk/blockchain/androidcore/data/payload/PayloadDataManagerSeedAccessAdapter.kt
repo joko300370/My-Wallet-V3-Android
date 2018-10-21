@@ -17,10 +17,16 @@ internal class PayloadDataManagerSeedAccessAdapter(
 
     override val seed: Maybe<Seed>
         get() {
-            return Maybe.concat(
-                getSeedWithoutPassword(),
-                getSeedWithPassword()
-            ).firstElement()
+            return getSeedWithoutPassword()
+//            val seedWithoutPassword = getSeedWithoutPassword().cache()
+//            return seedWithoutPassword.isEmpty
+//                .flatMapMaybe {
+//                    if (it) {
+//                        getSeedWithPassword()
+//                    } else {
+//                        seedWithoutPassword
+//                    }
+//                }
         }
 
     override val seedPromptIfRequired: Maybe<Seed>
@@ -33,7 +39,7 @@ internal class PayloadDataManagerSeedAccessAdapter(
         }
 
     private fun getSeedWithPassword(): Maybe<Seed> =
-       secondPassword()
+        secondPassword()
             .subscribeOn(AndroidSchedulers.mainThread())
             .flatMap { getSeedGivenPassword(it) }
 
@@ -69,8 +75,8 @@ internal class PayloadDataManagerSeedAccessAdapter(
     private fun secondPassword(): Maybe<String> {
         val password = PublishSubject.create<String>()
 
-        return Maybe.just(Unit)
-            .doOnSuccess {
+        return Maybe.fromCallable { Unit }
+            .flatMap {
                 secondPasswordHandler.validate(
                     object : SecondPasswordHandler.ResultListener {
                         override fun onNoSecondPassword() {
@@ -82,8 +88,6 @@ internal class PayloadDataManagerSeedAccessAdapter(
                         }
                     }
                 )
-            }
-            .flatMap {
                 password.firstElement()
             }
     }
