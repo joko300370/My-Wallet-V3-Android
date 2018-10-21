@@ -2,7 +2,9 @@ package com.blockchain.sunriver
 
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
+import com.blockchain.sunriver.derivation.deriveXlmAccountKeyPair
 import com.blockchain.transactions.TransactionSender
+import com.blockchain.wallet.SeedAccess
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
@@ -15,7 +17,8 @@ import org.stellar.sdk.responses.operations.PaymentOperationResponse
 
 class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
-    metaDataInitializer: XlmMetaDataInitializer
+    metaDataInitializer: XlmMetaDataInitializer,
+    private val seedAccess: SeedAccess
 ) : TransactionSender {
 
     override fun sendFunds(
@@ -70,19 +73,26 @@ class XlmDataManager internal constructor(
                 ?: throw XlmSendException("Account not found in meta data")
         }
 
-    private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue) =
-        map {
-            horizonProxy.sendTransaction(
-                KeyPair.fromSecretSeed(it.secret),
-                destination.toKeyPair(),
-                value
-            )
-        }.doOnSuccess {
-            if (!it.success) {
-                throw XlmSendException("Send failed")
+    private fun Single<XlmAccount>.send(destination: HorizonKeyPair.Public, value: CryptoValue): Completable {
+        return seedAccess.seed
+            .map {
+                deriveXlmAccountKeyPair(it.hdSeed, 0)
             }
-        }.toCompletable()
+            .map {
+                horizonProxy.sendTransaction(
+                    it.toKeyPair(),
+                    destination.toKeyPair(),
+                    value
+                )
+            }.doOnSuccess {
+                if (!it.success) {
+                    throw XlmSendException("Send failed")
+                }
+            }
+            .toSingle()
+            .toCompletable()
             .subscribeOn(Schedulers.io())
+    }
 }
 
 class XlmSendException(message: String) : RuntimeException(message)
