@@ -33,7 +33,7 @@ internal class PayloadDataManagerSeedAccessAdapter(
         }
 
     private fun getSeedWithPassword(): Maybe<Seed> =
-        Maybe.defer { secondPassword() }
+       secondPassword()
             .subscribeOn(AndroidSchedulers.mainThread())
             .flatMap { getSeedGivenPassword(it) }
 
@@ -69,18 +69,22 @@ internal class PayloadDataManagerSeedAccessAdapter(
     private fun secondPassword(): Maybe<String> {
         val password = PublishSubject.create<String>()
 
-        secondPasswordHandler.validate(
-            object : SecondPasswordHandler.ResultListener {
-                override fun onNoSecondPassword() {
-                    password.onComplete()
-                }
+        return Maybe.just(Unit)
+            .doOnSuccess {
+                secondPasswordHandler.validate(
+                    object : SecondPasswordHandler.ResultListener {
+                        override fun onNoSecondPassword() {
+                            password.onComplete()
+                        }
 
-                override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                    password.onNext(validatedSecondPassword)
-                }
+                        override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                            password.onNext(validatedSecondPassword)
+                        }
+                    }
+                )
             }
-        )
-
-        return password.firstElement()
+            .flatMap {
+                password.firstElement()
+            }
     }
 }
