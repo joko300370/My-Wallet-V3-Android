@@ -148,7 +148,6 @@ android {
         exclude 'solidity/**'
         exclude 'org.bitcoin.test.checkpoints.txt'
         exclude 'org.bitcoin.production.checkpoints.txt'
-        exclude 'lib/**/libjingle*.so'
     }
     dataBinding.enabled true
 

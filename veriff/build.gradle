@@ -39,39 +39,19 @@ android {
 }
 
 dependencies {
-//    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation Libraries.appCompat
-//    implementation 'com.android.support:design:28.0.0'
-    implementation Libraries.design
-    testImplementation Libraries.junit
-//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
     api project(':veriffLibrary')
-
-    implementation Libraries.timber
-//    implementation "com.google.firebase:firebase-core:16.0.6"
-    implementation Libraries.firebaseCore
-//    implementation "com.google.firebase:firebase-messaging:17.3.4"
-    implementation Libraries.firebaseMessaging
-//    implementation "com.google.android.gms:play-services-gcm:16.0.0"
-    implementation Libraries.googleGcm
-//    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation Libraries.appCompat
     implementation Libraries.constraintLayout
-//    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation(Libraries.retrofit) { exclude module: 'okhttp' }
-//    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation Libraries.retrofitGsonConverter
-//    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation Libraries.okHttp
-//    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
-    implementation Libraries.okHttpInterceptor
-    implementation 'com.jaredrummler:android-device-names:1.0.7'
-    implementation 'com.koushikdutta.ion:ion:2.2.1'
-    implementation 'com.twilio:video-android:1.3.4'
+    implementation Libraries.design
     implementation 'io.probity.sdk:collector:1.0.0'
     implementation 'io.jsonwebtoken:jjwt:0.9.0'
-    implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation Libraries.timber
+    implementation(Libraries.retrofit) { exclude module: 'okhttp' }
+    implementation Libraries.retrofitGsonConverter
+    implementation Libraries.okHttp
+    implementation Libraries.okHttpInterceptor
+
 }
 
 apply plugin: 'com.google.gms.google-services'
