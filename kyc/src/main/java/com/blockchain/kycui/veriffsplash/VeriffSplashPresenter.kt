@@ -18,24 +18,19 @@ class VeriffSplashPresenter(
     override fun onViewReady() {
         compositeDisposable +=
             view.uiState
-                .flatMapSingle { countryCode ->
+                .flatMapSingle {
                     fetchOfflineToken
                         .flatMap { token ->
                             nabuDataManager.getVeriffToken(token)
-                                .flatMap { apiKey ->
-                                    nabuDataManager.getSupportedDocuments(token, countryCode)
-                                        .subscribeOn(Schedulers.io())
-                                        .map { Pair(it, apiKey) }
-                                }
                         }
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnSubscribe { view.showProgressDialog(true) }
                         .doOnEvent { _, _ -> view.dismissProgressDialog() }
-                        .doOnSuccess { (supportedDocuments, applicant) ->
-                            view.continueToVeriff(applicant, supportedDocuments)
+                        .doOnSuccess { applicant ->
+                            view.continueToVeriff(applicant)
                         }
-                        .doOnError {
-                            Timber.e(it)
+                        .doOnError { e ->
+                            Timber.e(e)
                             view.showErrorToast(R.string.kyc_onfido_splash_verification_error)
                         }
                 }
