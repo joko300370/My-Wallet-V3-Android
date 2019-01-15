@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.blockchain.kyc.dev"
         targetSdkVersion Versions.targetSdk
-        minSdkVersion 19
+        minSdkVersion Versions.minSdk
         versionCode Versions.versionCode
         versionName Versions.versionName
         multiDexEnabled true

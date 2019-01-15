@@ -104,6 +104,8 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
             if (resultCode == RESULT_OK) {
                 presenter.submitVerification()
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
