@@ -53,5 +53,3 @@ dependencies {
     implementation Libraries.okHttpInterceptor
 
 }
-
-apply plugin: 'com.google.gms.google-services'

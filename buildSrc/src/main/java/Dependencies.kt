@@ -140,7 +140,6 @@ object Libraries {
     const val googlePlayServicesBase =
         "com.google.android.gms:play-services-base:${Versions.googleServices}"
     const val googlePlaces = "com.google.android.gms:play-services-places:${Versions.googleServices}"
-    const val googleGcm = "com.google.android.gms:play-services-gcm:${Versions.googleServices}"
 
     // Networking, RxJava
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
