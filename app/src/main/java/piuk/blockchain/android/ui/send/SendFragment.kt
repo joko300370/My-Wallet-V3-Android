@@ -397,10 +397,6 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
         if (resultCode != Activity.RESULT_OK) return
         resetPitAddressState()
         when (requestCode) {
-//            MainActivity.SCAN_URI -> {
-//                val scanData = data?.getStringExtra(CaptureActivity.SCAN_RESULT) ?: return
-//                presenter.handleURIScan(scanData, currencyState.cryptoCurrency)
-//            }
             SCAN_PRIVX -> presenter.handlePrivxScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
             REQUEST_CODE_BTC_SENDING -> presenter.selectSendingAccount(unpackAccountResult(data))
             REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccount(unpackAccountResult(data))
