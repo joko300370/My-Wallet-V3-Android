@@ -120,4 +120,26 @@
             android:layout_marginBottom="8dp"
             android:theme="@style/LightBlueButtonTheme"/>
 
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Firebase Token:"/>
+
+    <TextView
+            android:id="@+id/firebase_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:textIsSelectable="true"
+            android:gravity="center"
+            android:textColor="@color/blue_800"/>
+
 </LinearLayout>
