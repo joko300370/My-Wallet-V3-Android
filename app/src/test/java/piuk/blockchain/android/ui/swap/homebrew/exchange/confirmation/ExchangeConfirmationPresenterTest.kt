@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
+import com.blockchain.logging.CrashLogger
 import com.blockchain.morph.exchange.mvi.ExchangeViewState
 import com.blockchain.morph.exchange.mvi.Fix
 import com.blockchain.morph.exchange.mvi.Quote
@@ -50,6 +51,7 @@ class ExchangeConfirmationPresenterTest {
     private val payloadDecrypt: PayloadDecrypt = mock()
     private val analytics: Analytics = mock()
     private val view: ExchangeConfirmationView = mock()
+    private val crashLogger: CrashLogger = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -68,7 +70,8 @@ class ExchangeConfirmationPresenterTest {
                 on { getFormattedString(any(), any()) } `it returns` ""
             },
             Locale.ENGLISH,
-            analytics
+            analytics,
+            crashLogger
         )
         subject.initView(view)
 
@@ -91,7 +94,7 @@ class ExchangeConfirmationPresenterTest {
         })
         // Assert
         verify(view).showSecondPasswordDialog()
-        verify(transactionExecutor, never()).executeTransaction(any(), any(), any(), any())
+        verify(transactionExecutor, never()).executeTransaction(any(), any(), any(), any(), any())
         verify(tradeExecutionService, never()).executeTrade(any(), any(), any())
         verify(view, never()).onTradeSubmitted(any(), any())
     }
@@ -125,8 +128,10 @@ class ExchangeConfirmationPresenterTest {
                 accountReference
             )
         ).thenReturn(Single.error { Throwable() })
+
         // Act
         subject.updateFee(1.0.bitcoin(), accountReference)
+
         // Assert
         verify(view).showToast(any(), eq(ToastCustom.TYPE_ERROR))
     }
@@ -141,18 +146,22 @@ class ExchangeConfirmationPresenterTest {
                 1.bitcoin(),
                 "SERVER_DEPOSIT_ADDRESS",
                 fromAccount,
-                Memo("MEMO_BODY", "text")
+                Memo("MEMO_BODY", "text"),
+                subject.diagnostics
             )
         ).thenReturn(Single.just("TX_HASH"))
+
         subject.onViewReady()
+
         exchangeViewSubject.onNext(mock {
             on { latestQuote } `it returns` quote
             on { this.fromAccount } `it returns` fromAccount
             on { this.toAccount } `it returns` toAccount
         })
+
         verify(transactionExecutor).getReceiveAddress(fromAccount)
         verify(transactionExecutor).getReceiveAddress(toAccount)
-        verify(transactionExecutor).executeTransaction(any(), any(), any(), any())
+        verify(transactionExecutor).executeTransaction(any(), any(), any(), any(), any())
         verifyNoMoreInteractions(transactionExecutor)
         verify(tradeExecutionService).executeTrade(any(), any(), any())
         verifyNoMoreInteractions(tradeExecutionService)
@@ -170,7 +179,8 @@ class ExchangeConfirmationPresenterTest {
                 1.bitcoin(),
                 "SERVER_DEPOSIT_ADDRESS",
                 fromAccount,
-                Memo("MEMO_BODY", "text")
+                Memo("MEMO_BODY", "text"),
+                subject.diagnostics
             )
         ).thenReturn(Single.error<String>(TransactionHashApiException("The transaction failed",
             "TX_HASH")))
@@ -184,7 +194,7 @@ class ExchangeConfirmationPresenterTest {
         })
         verify(transactionExecutor).getReceiveAddress(fromAccount)
         verify(transactionExecutor).getReceiveAddress(toAccount)
-        verify(transactionExecutor).executeTransaction(any(), any(), any(), any())
+        verify(transactionExecutor).executeTransaction(any(), any(), any(), any(), any())
         verifyNoMoreInteractions(transactionExecutor)
         verify(tradeExecutionService).executeTrade(any(), any(), any())
         verify(tradeExecutionService).putTradeFailureReason(tradeTransaction,
@@ -206,7 +216,8 @@ class ExchangeConfirmationPresenterTest {
                 1.lumens(),
                 "SERVER_DEPOSIT_ADDRESS",
                 fromAccount,
-                memo
+                memo,
+                subject.diagnostics
             )
         ).thenReturn(
             Single.error(
@@ -237,7 +248,7 @@ class ExchangeConfirmationPresenterTest {
         })
         verify(transactionExecutor).getReceiveAddress(fromAccount)
         verify(transactionExecutor).getReceiveAddress(toAccount)
-        verify(transactionExecutor).executeTransaction(any(), any(), any(), any())
+        verify(transactionExecutor).executeTransaction(any(), any(), any(), any(), any())
         verifyNoMoreInteractions(transactionExecutor)
         verify(tradeExecutionService).executeTrade(any(), any(), any())
         verify(tradeExecutionService).putTradeFailureReason(

@@ -75,7 +75,7 @@ public class TransferFundsDataManager {
                         .compareTo(BigInteger.ZERO) > 0) {
 
                     UnspentOutputs unspentOutputs =
-                            sendDataManager.getUnspentOutputs(legacyAddress.getAddress())
+                            sendDataManager.getUnspentBtcOutputs(legacyAddress.getAddress())
                                     .blockingFirst();
 
                     Boolean newCoinSelectionEnabled =

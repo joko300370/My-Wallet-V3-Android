@@ -7,6 +7,7 @@ import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.datamanagers.fees.feeForType
 import com.blockchain.fees.FeeType
+import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.transactions.Memo
 import com.blockchain.transactions.SendDetails
@@ -20,6 +21,7 @@ import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
+import info.blockchain.wallet.payment.sum
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
@@ -54,14 +56,16 @@ internal class TransactionExecutorViaDataManagers(
         sourceAccount: AccountReference,
         fees: NetworkFees,
         feeType: FeeType,
-        memo: Memo?
+        memo: Memo?,
+        diagnostics: SwapDiagnostics?
     ): Single<String> =
         when (amount.currency) {
             CryptoCurrency.BTC -> sendBtcTransaction(
                 amount,
                 destination,
                 sourceAccount.toJsonAccount(),
-                (fees as BitcoinLikeFees).feeForType(feeType)
+                (fees as BitcoinLikeFees).feeForType(feeType),
+                diagnostics
             )
             CryptoCurrency.ETHER -> sendEthTransaction(
                 amount,
@@ -74,7 +78,8 @@ internal class TransactionExecutorViaDataManagers(
                 amount,
                 destination,
                 sourceAccount.toJsonAccount(),
-                (fees as BitcoinLikeFees).feeForType(feeType)
+                (fees as BitcoinLikeFees).feeForType(feeType),
+                diagnostics
             )
             CryptoCurrency.XLM -> xlmSender.sendFundsOrThrow(
                 SendDetails(
@@ -236,26 +241,30 @@ internal class TransactionExecutorViaDataManagers(
         amount: CryptoValue,
         destination: String,
         account: Account,
-        feePerKb: BigInteger
+        feePerKb: BigInteger,
+        diagnostics: SwapDiagnostics?
     ): Single<String> = sendBitcoinStyleTransaction(
         amount,
         destination,
         account,
         feePerKb,
-        addressResolver.getChangeAddress(account)
+        addressResolver.getChangeAddress(account),
+        diagnostics
     )
 
     private fun sendBchTransaction(
         amount: CryptoValue,
         destination: String,
         account: GenericMetadataAccount,
-        feePerKb: BigInteger
+        feePerKb: BigInteger,
+        diagnostics: SwapDiagnostics?
     ): Single<String> = sendBitcoinStyleTransaction(
         amount,
         destination,
         account.getHdAccount(),
         feePerKb,
-        addressResolver.getChangeAddress(account)
+        addressResolver.getChangeAddress(account),
+        diagnostics
     )
 
     private fun sendBitcoinStyleTransaction(
@@ -263,9 +272,11 @@ internal class TransactionExecutorViaDataManagers(
         destination: String,
         account: Account,
         feePerKb: BigInteger,
-        changeAddress: Single<String>
+        changeAddress: Single<String>,
+        diagnostics: SwapDiagnostics?
     ): Single<String> = getSpendableCoins(account.xpub, amount, feePerKb)
         .flatMap { spendable ->
+            diagnostics?.accountBalance = CryptoValue(amount.currency, spendable.spendableOutputs.sum())
             getSigningKeys(account, spendable)
                 .flatMap { signingKeys ->
                     changeAddress
@@ -338,7 +349,7 @@ internal class TransactionExecutorViaDataManagers(
         currency: CryptoCurrency
     ): Single<UnspentOutputs> =
         when (currency) {
-            CryptoCurrency.BTC -> sendDataManager.getUnspentOutputs(address)
+            CryptoCurrency.BTC -> sendDataManager.getUnspentBtcOutputs(address)
             CryptoCurrency.BCH -> sendDataManager.getUnspentBchOutputs(address)
             CryptoCurrency.ETHER -> throw IllegalArgumentException("Ether does not have unspent outputs")
             CryptoCurrency.XLM -> throw IllegalArgumentException("Xlm does not have unspent outputs")

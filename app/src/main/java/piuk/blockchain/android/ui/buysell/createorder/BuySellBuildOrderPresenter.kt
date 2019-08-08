@@ -873,7 +873,7 @@ class BuySellBuildOrderPresenter constructor(
 
     private fun getUnspentApiResponseBtc(address: String): Observable<UnspentOutputs> {
         return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
-            sendDataManager.getUnspentOutputs(address)
+            sendDataManager.getUnspentBtcOutputs(address)
         } else {
             Observable.error(Throwable("No funds - skipping call to unspent API"))
         }

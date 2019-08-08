@@ -210,7 +210,7 @@ class TransactionExecutorViaDataManagersTest {
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(sendDataManager.getSpendableCoins(any(), any(), any(), any()))
             .thenReturn(SpendableUnspentOutputs())
@@ -240,7 +240,7 @@ class TransactionExecutorViaDataManagersTest {
         val account = Account().apply { xpub = "XPUB" }
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)).thenReturn(account)
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(sendDataManager.getSpendableCoins(any(), any(), any(), any()))
             .thenReturn(SpendableUnspentOutputs())
@@ -275,7 +275,7 @@ class TransactionExecutorViaDataManagersTest {
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val account = Account().apply { xpub = "XPUB" }
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         val spendable = SpendableUnspentOutputs().apply { absoluteFee = BigInteger.TEN }
         whenever(sendDataManager.getSpendableCoins(any(), any(), any(), any()))
@@ -519,7 +519,7 @@ class TransactionExecutorViaDataManagersTest {
         // Arrange
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getMaximumAvailable(
@@ -560,7 +560,7 @@ class TransactionExecutorViaDataManagersTest {
         // Arrange
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getMaximumAvailable(
@@ -585,7 +585,7 @@ class TransactionExecutorViaDataManagersTest {
     fun `get maximum spendable BTC should return zero on error`() {
         // Arrange
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.error { Throwable() })
         // Act
         val testObserver =
@@ -712,7 +712,7 @@ class TransactionExecutorViaDataManagersTest {
         val amount = 1.23.bitcoin()
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(sendDataManager.getSpendableCoins(any(), any(), any(), any()))
             .thenReturn(SpendableUnspentOutputs().apply { absoluteFee = 500.toBigInteger() })
@@ -730,7 +730,7 @@ class TransactionExecutorViaDataManagersTest {
         val amount = 1.23.bitcoin()
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getSpendableCoins(
@@ -754,7 +754,7 @@ class TransactionExecutorViaDataManagersTest {
         val amount = 1.23.bitcoin()
         val account = AccountReference.BitcoinLike(CryptoCurrency.BTC, "", "XPUB")
         val unspentOutputs = UnspentOutputs()
-        whenever(sendDataManager.getUnspentOutputs("XPUB"))
+        whenever(sendDataManager.getUnspentBtcOutputs("XPUB"))
             .thenReturn(Observable.just(unspentOutputs))
         whenever(
             sendDataManager.getSpendableCoins(

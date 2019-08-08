@@ -138,7 +138,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 ToastCustom.TYPE_GENERAL)
 
             binding?.buttonSettings?.visibility = View.VISIBLE
-            binding?.buttonSettings?.setOnClickListener { view ->
+            binding?.buttonSettings?.setOnClickListener {
                 if (activity != null) {
                     DebugOptionsBottomDialog.show(requireFragmentManager())
                 }

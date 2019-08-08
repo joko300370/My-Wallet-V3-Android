@@ -186,7 +186,7 @@ class AccountEditPresenterTest {
         whenever(payloadDataManager.defaultAccount).thenReturn(mock())
         whenever(payloadDataManager.getNextReceiveAddress(any(Account::class)))
             .thenReturn(Observable.just("address"))
-        whenever(sendDataManager.getUnspentOutputs(legacyAddress.address))
+        whenever(sendDataManager.getUnspentBtcOutputs(legacyAddress.address))
             .thenReturn(Observable.just(mock()))
         whenever(
             sendDataManager.getMaximumAvailable(
@@ -242,7 +242,7 @@ class AccountEditPresenterTest {
         whenever(payloadDataManager.defaultAccount).thenReturn(mock())
         whenever(payloadDataManager.getNextReceiveAddress(any(Account::class)))
             .thenReturn(Observable.just("address"))
-        whenever(sendDataManager.getUnspentOutputs(legacyAddress.address))
+        whenever(sendDataManager.getUnspentBtcOutputs(legacyAddress.address))
             .thenReturn(Observable.just(mock()))
         whenever(
             sendDataManager.getMaximumAvailable(
@@ -279,7 +279,7 @@ class AccountEditPresenterTest {
         legacyAddress.address = ""
         legacyAddress.label = ""
         subject.legacyAddress = legacyAddress
-        whenever(sendDataManager.getUnspentOutputs(legacyAddress.address))
+        whenever(sendDataManager.getUnspentBtcOutputs(legacyAddress.address))
             .thenReturn(Observable.error(Throwable()))
         // Act
         subject.onClickTransferFunds()

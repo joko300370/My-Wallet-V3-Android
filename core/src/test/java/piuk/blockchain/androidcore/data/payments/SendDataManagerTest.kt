@@ -54,7 +54,7 @@ class SendDataManagerTest {
         val mockAmount: BigInteger = mock()
         val txHash = "TX_HASH"
         whenever(
-            mockPaymentService.submitPayment(
+            mockPaymentService.submitBtcPayment(
                 mockOutputBundle,
                 mockKeys,
                 toAddress,
@@ -77,7 +77,7 @@ class SendDataManagerTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual txHash
-        verify(mockPaymentService).submitPayment(
+        verify(mockPaymentService).submitBtcPayment(
             mockOutputBundle,
             mockKeys,
             toAddress,
@@ -99,7 +99,7 @@ class SendDataManagerTest {
         val mockAmount: BigInteger = mock()
         val txHash = "TX_HASH"
         whenever(
-            mockPaymentService.submitPayment(
+            mockPaymentService.submitBtcPayment(
                 mockOutputBundle,
                 mockKeys,
                 toAddress,
@@ -122,7 +122,7 @@ class SendDataManagerTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual txHash
-        verify(mockPaymentService).submitPayment(
+        verify(mockPaymentService).submitBtcPayment(
             mockOutputBundle,
             mockKeys,
             toAddress,
@@ -203,15 +203,15 @@ class SendDataManagerTest {
         // Arrange
         val address = "ADDRESS"
         val mockUnspentOutputs: UnspentOutputs = mock()
-        whenever(mockPaymentService.getUnspentOutputs(address))
+        whenever(mockPaymentService.getUnspentBtcOutputs(address))
             .thenReturn(Observable.just(mockUnspentOutputs))
         // Act
-        val testObserver = subject.getUnspentOutputs(address).test()
+        val testObserver = subject.getUnspentBtcOutputs(address).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual mockUnspentOutputs
-        verify(mockPaymentService).getUnspentOutputs(address)
+        verify(mockPaymentService).getUnspentBtcOutputs(address)
         verifyNoMoreInteractions(mockPaymentService)
     }
 

@@ -434,7 +434,7 @@ class ReceiveFragment : HomeFragment<ReceiveView, ReceivePresenter>(),
         AccountChooserActivity.unpackAccountResult(intent)
 
     override fun showShareBottomSheet(uri: String) {
-        receiveIntentHelper.getIntentDataList(uri, getQrBitmap(), currencyState.cryptoCurrency)?.let {
+        receiveIntentHelper.getIntentDataList(uri, getQrBitmap(), currencyState.cryptoCurrency).let {
             val adapter = ShareReceiveIntentAdapter(it).apply {
                 itemClickedListener = { bottomSheetDialog?.dismiss() }
             }

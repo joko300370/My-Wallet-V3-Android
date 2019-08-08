@@ -1,8 +1,10 @@
 package piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation
 
-import android.annotation.SuppressLint
+import android.support.annotation.VisibleForTesting
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
+import com.blockchain.logging.CrashLogger
 import com.blockchain.morph.CoinPair
+import com.blockchain.morph.exchange.SwapFailureDiagnostics
 import com.blockchain.morph.exchange.mvi.Quote
 import com.blockchain.morph.exchange.service.TradeExecutionService
 import com.blockchain.morph.exchange.service.TradeTransaction
@@ -36,14 +38,12 @@ import piuk.blockchain.android.ui.swap.homebrew.exchange.model.SwapErrorResponse
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.SwapErrorType
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.Trade
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.dlg.ErrorBottomDialog
 import retrofit2.HttpException
 import timber.log.Timber
-import java.math.BigInteger
 import java.util.Locale
 
 class ExchangeConfirmationPresenter internal constructor(
@@ -52,7 +52,8 @@ class ExchangeConfirmationPresenter internal constructor(
     private val payloadDecrypt: PayloadDecrypt,
     private val stringUtils: StringUtils,
     private val locale: Locale,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val crashLogger: CrashLogger
 ) : BasePresenter<ExchangeConfirmationView>() {
 
     private var showPaxAirdropBottomDialog: Boolean = false
@@ -60,6 +61,9 @@ class ExchangeConfirmationPresenter internal constructor(
     private var maxSpendableFiatValue: FiatValue? = null
     private var maxSpendable: CryptoValue? = null
     private var executeTradeSingle: Single<TradeTransaction>? = null
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val diagnostics = SwapFailureDiagnostics()
 
     override fun onViewReady() {
         // Ensure user hasn't got a double encrypted wallet
@@ -76,6 +80,8 @@ class ExchangeConfirmationPresenter internal constructor(
                     maxSpendableFiatValue = state.maxTradeLimit
                     minSpendableFiatValue = state.minTradeLimit
                     maxSpendable = state.maxSpendable
+
+                    diagnostics.maxSpendable = maxSpendable
 
                     showPaxAirdropBottomDialog = state.isPowerPaxTagged
                     if (!payloadDecrypt.isDoubleEncrypted) {
@@ -99,7 +105,10 @@ class ExchangeConfirmationPresenter internal constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onSuccess = { view.updateFee(it) },
+                    onSuccess = {
+                        diagnostics.fee = it
+                        view.updateFee(it)
+                    },
                     onError = {
                         Timber.e(it)
                         view.showToast(R.string.homebrew_confirmation_error_fetching_fee, ToastCustom.TYPE_ERROR)
@@ -112,39 +121,23 @@ class ExchangeConfirmationPresenter internal constructor(
         sendingAccount: AccountReference,
         receivingAccount: AccountReference
     ): Single<TradeTransaction> {
+
+        diagnostics.quote = quote
+
         return deriveAddressPair(sendingAccount, receivingAccount)
             .subscribeOn(Schedulers.io())
             .flatMap { (destination, refund) ->
                 tradeExecutionService.executeTrade(quote, destination, refund)
                     .subscribeOn(Schedulers.io())
                     .flatMap { transaction ->
-                        sendFundsForTrade(transaction, sendingAccount)
+                        sendFundsForTrade(transaction, sendingAccount, diagnostics)
                             .subscribeOn(Schedulers.io())
                     }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.showProgressDialog() }
             .doOnEvent { _, _ -> view.dismissProgressDialog() }
-            .doOnError {
-                Timber.e(it)
-                if (it is TransactionInProgressException) {
-                    view.displayErrorBottomDialog(SwapErrorType.CONFIRMATION_ETH_PENDING.toContent(
-                        minSpendableFiatValue,
-                        maxSpendableFiatValue,
-                        maxSpendable))
-                } else {
-                    val rawError = (it as?HttpException)?.response()?.errorBody()?.string()
-                    rawError?.takeIf { !it.isBlank() }?.let { error ->
-                        val swapErrorResponse = SwapErrorResponse::class.fromMoshiJson(error)
-                        val errorType = swapErrorResponse.toErrorType()
-                        view.displayErrorBottomDialog(errorType.toContent(minSpendableFiatValue,
-                            maxSpendableFiatValue,
-                            maxSpendable))
-                    } ?: view.displayErrorBottomDialog(SwapErrorType.UNKNOWN.toContent(minSpendableFiatValue,
-                        maxSpendableFiatValue,
-                        maxSpendable))
-                }
-            }
+            .doOnError { onExecuteTradeFailed(it) }
             .doOnSuccess {
                 view.onTradeSubmitted(it.toTrade(locale),
                     showPaxAirdropBottomDialog && receivingAccount.cryptoCurrency == CryptoCurrency.PAX
@@ -152,22 +145,56 @@ class ExchangeConfirmationPresenter internal constructor(
             }
     }
 
+    private fun onExecuteTradeFailed(t: Throwable) {
+        Timber.e(t)
+        if (t is TransactionInProgressException) {
+            view.displayErrorBottomDialog(
+                SwapErrorType.CONFIRMATION_ETH_PENDING.toContent(
+                    minSpendableFiatValue,
+                    maxSpendableFiatValue
+                )
+            )
+        } else {
+            val rawError = (t as?HttpException)?.response()?.errorBody()?.string()
+            rawError?.takeIf { !it.isBlank() }?.let { error ->
+                val swapErrorResponse = SwapErrorResponse::class.fromMoshiJson(error)
+                val errorType = swapErrorResponse.toErrorType()
+                view.displayErrorBottomDialog(
+                    errorType.toContent(
+                        minSpendableFiatValue,
+                        maxSpendableFiatValue
+                    )
+                )
+            } ?: view.displayErrorBottomDialog(
+                SwapErrorType.UNKNOWN.toContent(
+                    minSpendableFiatValue,
+                    maxSpendableFiatValue
+                )
+            )
+        }
+    }
+
     private fun sendFundsForTrade(
         transaction: TradeTransaction,
-        sendingAccount: AccountReference
+        sendingAccount: AccountReference,
+        diagnostics: SwapFailureDiagnostics
     ): Single<TradeTransaction> {
-        updateDiagnostics()
+
         return transactionExecutor.executeTransaction(
             transaction.deposit,
             transaction.depositAddress,
             sendingAccount,
-            memo = transaction.memo()
+            memo = transaction.memo(),
+            diagnostics = diagnostics
         ).flatMap {
             Single.just(transaction)
         }.onErrorResumeNext {
             Timber.e(it, "Transaction execution error, telling nabu")
             analytics.logEvent(AnalyticsEvents.ExchangeExecutionError)
             val hash = (it as? TransactionHashApiException)?.hashString ?: (it as? SendException)?.hash
+
+            crashLogger.logException(diagnostics.toLoggable())
+
             tradeExecutionService.putTradeFailureReason(transaction, hash, it.message)
                 .andThen(Single.error(it))
         }.doOnSuccess { triggerPaxTradeEvent(it) }
@@ -177,20 +204,6 @@ class ExchangeConfirmationPresenter internal constructor(
         if (transaction.isPaxTrade()) {
             analytics.logEvent(PaxTradeEvent())
         }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun updateDiagnostics() {
-        view.exchangeViewState
-            .observeOn(AndroidSchedulers.mainThread())
-            .addToCompositeDisposable(this)
-            .subscribeBy(onNext = {
-                tradeExecutionService.updateDiagnotics(
-                    maxAvailable = it.maxSpendable?.amount ?: BigInteger.valueOf(-1),
-                    tradeValueCrypto = it.fromCrypto.amount,
-                    tradeValueFiat = it.fromFiat.toBigDecimal()
-                )
-            })
     }
 
     private fun TradeTransaction.memo() = depositTextMemo?.let { Memo(value = it, type = "text") }
@@ -233,8 +246,7 @@ class ExchangeConfirmationPresenter internal constructor(
 
     private fun SwapErrorType.toContent(
         minAmountFiat: FiatValue?,
-        maxAmountFiat: FiatValue?,
-        maxSpendeable: CryptoValue?
+        maxAmountFiat: FiatValue?
     ): SwapErrorDialogContent =
         when (this) {
             SwapErrorType.ORDER_BELOW_MIN_LIMIT -> SwapErrorDialogContent(ErrorBottomDialog.Content(

@@ -9,6 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.StringUtils
@@ -81,8 +82,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
         val bankAccountId = view.bankAccountId
         val account = payloadDataManager.accounts[displayModel.accountIndex]
 
-        tokenSingle
-            .addToCompositeDisposable(this)
+        compositeDisposable += tokenSingle
             .applySchedulers()
             .flatMap {
                 coinifyDataManager.createNewTrade(
@@ -92,7 +92,7 @@ class CoinifySellConfirmationPresenter @Inject constructor(
             }
             .flatMapObservable { trade ->
                 Observables.zip(
-                    sendDataManager.getUnspentOutputs(account.xpub),
+                    sendDataManager.getUnspentBtcOutputs(account.xpub),
                     coinSelectionRemoteConfig.enabled.toObservable()
                 )
                     .map { (unspentOutputs, newCoinSelectionEnabled) ->

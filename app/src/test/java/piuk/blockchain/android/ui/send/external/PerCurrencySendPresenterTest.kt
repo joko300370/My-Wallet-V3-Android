@@ -44,7 +44,7 @@ class PerCurrencySendPresenterTest {
             pitLinkingFeatureFlag = mock()
         ).apply {
             initView(view)
-            handleURIScan("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
+            handleURIScan("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4", CryptoCurrency.BTC)
         }
 
         verify(xlmStrategy).processURIScanAddress("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
@@ -78,7 +78,7 @@ class PerCurrencySendPresenterTest {
             pitLinkingFeatureFlag = mock()
         ).apply {
             initView(view)
-            handleURIScan("1FBPzxps6kGyk2exqLvz7cRMi2odtLEVQ")
+            handleURIScan("1FBPzxps6kGyk2exqLvz7cRMi2odtLEVQ", CryptoCurrency.BTC)
         }
 
         verify(btcStrategy).processURIScanAddress("1FBPzxps6kGyk2exqLvz7cRMi2odtLEVQ")
@@ -116,7 +116,7 @@ class PerCurrencySendPresenterTest {
             pitLinkingFeatureFlag = mock()
         ).apply {
             initView(view)
-            handleURIScan("nope_nope_nope")
+            handleURIScan("nope_nope_nope", CryptoCurrency.BTC)
         }
 
         verify(btcStrategy, never()).processURIScanAddress(any())

@@ -2,6 +2,7 @@ package com.blockchain.datamanagers
 
 import com.blockchain.datamanagers.fees.NetworkFees
 import com.blockchain.fees.FeeType
+import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.transactions.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -35,7 +36,8 @@ interface TransactionExecutor : TransactionExecutorAddresses {
         sourceAccount: AccountReference,
         fees: NetworkFees,
         feeType: FeeType = FeeType.Regular,
-        memo: Memo? = null
+        memo: Memo? = null,
+        diagnostics: SwapDiagnostics? = null
     ): Single<String>
 
     fun getMaximumSpendable(
@@ -66,6 +68,7 @@ interface TransactionExecutorWithoutFees : TransactionExecutorAddresses, Maximum
         amount: CryptoValue,
         destination: String,
         sourceAccount: AccountReference,
-        memo: Memo? = null
+        memo: Memo? = null,
+        diagnostics: SwapDiagnostics? = null
     ): Single<String>
 }

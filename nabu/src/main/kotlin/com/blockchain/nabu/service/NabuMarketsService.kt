@@ -9,7 +9,6 @@ import com.blockchain.nabu.api.FailureReasonJson
 import com.blockchain.nabu.api.NabuMarkets
 import com.blockchain.nabu.api.NabuTransaction
 import com.blockchain.nabu.api.PeriodicLimit
-import com.blockchain.nabu.api.TradeDiagnostics
 import com.blockchain.nabu.api.TradeFailureJson
 import com.blockchain.nabu.api.TradeJson
 import com.blockchain.nabu.api.TradeRequest
@@ -71,16 +70,14 @@ class NabuMarketsService internal constructor(
     fun putTradeFailureReason(
         tradeRequestId: String,
         txHash: String?,
-        message: String?,
-        diagnostics: TradeDiagnostics? = null
+        message: String?
     ): Completable {
         return authenticator.authenticateCompletable {
             nabuMarkets.putTradeFailureReason(
                 tradeRequestId,
                 TradeFailureJson(
                     txHash = txHash,
-                    failureReason = message?.let(::FailureReasonJson),
-                    diagnostics = diagnostics
+                    failureReason = message?.let(::FailureReasonJson)
                 ),
                 it.authHeader
             )

@@ -507,7 +507,7 @@ class BitcoinSendStrategy(
             return if (unspentApiResponsesBtc.containsKey(address)) {
                 Observable.just(unspentApiResponsesBtc[address])
             } else {
-                sendDataManager.getUnspentOutputs(address)
+                sendDataManager.getUnspentBtcOutputs(address)
             }
         } else {
             Observable.error(Throwable("No funds - skipping call to unspent API"))

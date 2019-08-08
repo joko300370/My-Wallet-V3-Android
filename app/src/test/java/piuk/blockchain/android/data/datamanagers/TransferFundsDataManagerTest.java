@@ -1,6 +1,5 @@
 package piuk.blockchain.android.data.datamanagers;
 
-import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig;
 
 import info.blockchain.api.data.UnspentOutputs;
@@ -68,7 +67,7 @@ public class TransferFundsDataManagerTest extends RxTest {
         when(coinSelectionRemoteConfig.getEnabled()).thenReturn(Single.just(useNewCoinSelection));
         UnspentOutputs unspentOutputs = mock(UnspentOutputs.class);
         when(unspentOutputs.getNotice()).thenReturn(null);
-        when(sendDataManager.getUnspentOutputs(anyString())).thenReturn(Observable.just(unspentOutputs));
+        when(sendDataManager.getUnspentBtcOutputs(anyString())).thenReturn(Observable.just(unspentOutputs));
         SpendableUnspentOutputs spendableUnspentOutputs = new SpendableUnspentOutputs();
         spendableUnspentOutputs.setAbsoluteFee(BigInteger.TEN);
         when(sendDataManager.getSpendableCoins(any(UnspentOutputs.class), any(CryptoValue.class), any(BigInteger.class), any(boolean.class)))

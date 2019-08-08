@@ -35,7 +35,7 @@ class PaymentService(
      * @return An [Observable] wrapping a [String] where the String is the transaction hash
      */
     @WebRequest
-    internal fun submitPayment(
+    internal fun submitBtcPayment(
         unspentOutputBundle: SpendableUnspentOutputs,
         keys: List<ECKey>,
         toAddress: String,
@@ -117,7 +117,7 @@ class PaymentService(
      * @return An [Observable] wrapping an [UnspentOutputs] object
      */
     @WebRequest
-    internal fun getUnspentOutputs(address: String): Observable<UnspentOutputs> {
+    internal fun getUnspentBtcOutputs(address: String): Observable<UnspentOutputs> {
         return Observable.fromCallable {
             val response = payment.getUnspentCoins(listOf(address)).execute()
             when {

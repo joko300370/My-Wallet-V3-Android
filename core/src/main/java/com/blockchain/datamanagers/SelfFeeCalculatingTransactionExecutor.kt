@@ -2,6 +2,7 @@ package com.blockchain.datamanagers
 
 import com.blockchain.datamanagers.fees.getFeeOptions
 import com.blockchain.fees.FeeType
+import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.transactions.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -48,7 +49,8 @@ internal class SelfFeeCalculatingTransactionExecutor(
         amount: CryptoValue,
         destination: String,
         sourceAccount: AccountReference,
-        memo: Memo?
+        memo: Memo?,
+        diagnostics: SwapDiagnostics?
     ): Single<String> {
         return feeDataManager.getFeeOptions(amount.currency)
             .flatMap { fees ->
@@ -58,7 +60,8 @@ internal class SelfFeeCalculatingTransactionExecutor(
                     sourceAccount,
                     fees,
                     feeType,
-                    memo
+                    memo,
+                    diagnostics
                 )
             }
     }

@@ -860,7 +860,7 @@ class AccountEditPresenter @Inject internal constructor(
         val pendingTransaction = PendingTransaction()
 
         return Observables.zip(
-            sendDataManager.getUnspentOutputs(legacyAddress!!.address),
+            sendDataManager.getUnspentBtcOutputs(legacyAddress!!.address),
             coinSelectionRemoteConfig.enabled.toObservable()
         )
             .flatMap { (unspentOutputs, newCoinSelectionEnabled) ->

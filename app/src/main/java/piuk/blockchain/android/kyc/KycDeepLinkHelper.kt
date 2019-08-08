@@ -29,8 +29,8 @@ class KycDeepLinkHelper(
         return when (name) {
             "verification" -> KycLinkState.Resubmit
             "email_verified" -> {
-                val name = uriWithoutFragment.getQueryParameter("context")?.toLowerCase()
-                return if (KYC_CONTEXT.equals(name)) KycLinkState.EmailVerified else KycLinkState.NoUri
+                val ctx = uriWithoutFragment.getQueryParameter("context")?.toLowerCase()
+                return if (KYC_CONTEXT == ctx) KycLinkState.EmailVerified else KycLinkState.NoUri
             }
             "kyc" -> {
                 val campaign = uriWithoutFragment.getQueryParameter("campaign")

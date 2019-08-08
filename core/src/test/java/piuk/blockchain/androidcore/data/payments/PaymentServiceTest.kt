@@ -96,7 +96,7 @@ class PaymentServiceTest {
         whenever(mockCall.execute()).thenReturn(response)
         whenever(payment.publishSimpleTransaction(mockTx)).thenReturn(mockCall)
         // Act
-        val testObserver = subject.submitPayment(
+        val testObserver = subject.submitBtcPayment(
             mockOutputBundle,
             mockEcKeys,
             toAddress,
@@ -159,7 +159,7 @@ class PaymentServiceTest {
         whenever(mockCall.execute()).thenReturn(response)
         whenever(payment.publishSimpleTransaction(mockTx)).thenReturn(mockCall)
         // Act
-        val testObserver = subject.submitPayment(
+        val testObserver = subject.submitBtcPayment(
             mockOutputBundle,
             mockEcKeys,
             toAddress,
@@ -222,7 +222,7 @@ class PaymentServiceTest {
             )
         ).thenThrow(InsufficientMoneyException(BigInteger("1")))
         // Act
-        val testObserver = subject.submitPayment(
+        val testObserver = subject.submitBtcPayment(
             mockOutputBundle,
             mockEcKeys,
             toAddress,
@@ -453,7 +453,7 @@ class PaymentServiceTest {
         whenever(mockCall.execute()).thenReturn(response)
         whenever(payment.getUnspentCoins(listOf(address))).thenReturn(mockCall)
         // Act
-        val testObserver = subject.getUnspentOutputs(address).test()
+        val testObserver = subject.getUnspentBtcOutputs(address).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -471,7 +471,7 @@ class PaymentServiceTest {
         whenever(mockCall.execute()).thenReturn(response)
         whenever(payment.getUnspentCoins(listOf(address))).thenReturn(mockCall)
         // Act
-        val testObserver = subject.getUnspentOutputs(address).test()
+        val testObserver = subject.getUnspentBtcOutputs(address).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -489,7 +489,7 @@ class PaymentServiceTest {
         whenever(mockCall.execute()).thenReturn(response)
         whenever(payment.getUnspentCoins(listOf(address))).thenReturn(mockCall)
         // Act
-        val testObserver = subject.getUnspentOutputs(address).test()
+        val testObserver = subject.getUnspentBtcOutputs(address).test()
         // Assert
         testObserver.assertNotComplete()
         testObserver.assertTerminated()

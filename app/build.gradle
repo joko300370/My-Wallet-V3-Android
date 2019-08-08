@@ -66,11 +66,9 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             multiDexEnabled true
-            buildConfigBoolean "USE_CRASHLYTICS", true
         }
         debug {
             multiDexEnabled true
-            buildConfigBoolean "USE_CRASHLYTICS", false
         }
     }
     bundle {
