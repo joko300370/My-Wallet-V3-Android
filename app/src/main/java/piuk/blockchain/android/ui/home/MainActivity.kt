@@ -317,6 +317,7 @@ class MainActivity : BaseMvpActivity<MainView, MainPresenter>(), HomeNavigator, 
     private fun doScanInput(strResult: String) {
         when {
             strResult.isBTCorBCHAddress() -> disambiguateBTCandBCHQrScans(strResult)
+            strResult.isETHAddress() -> disambiguateETHQrScans(strResult)
             strResult.isHttpUri() -> presenter.handlePossibleDeepLink(strResult)
             else -> startSendFragment(strResult)
         }
@@ -339,8 +340,26 @@ class MainActivity : BaseMvpActivity<MainView, MainPresenter>(), HomeNavigator, 
             .show()
     }
 
+    private fun disambiguateETHQrScans(uri: String) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+            .setTitle(R.string.confirm_currency)
+            .setMessage(R.string.confirm_currency_message)
+            .setCancelable(true)
+            .setPositiveButton(R.string.ether) { _, _ ->
+                presenter.setCryptoCurrency(CryptoCurrency.ETHER)
+                startSendFragment(uri)
+            }
+            .setNegativeButton(R.string.usd_pax) { _, _ ->
+                presenter.setCryptoCurrency(CryptoCurrency.PAX)
+                startSendFragment(uri)
+            }
+            .create()
+            .show()
+    }
+
     private fun String.isHttpUri(): Boolean = startsWith("http")
     private fun String.isBTCorBCHAddress(): Boolean = FormatsUtil.isValidBitcoinAddress(this)
+    private fun String.isETHAddress(): Boolean = FormatsUtil.isValidEthereumAddress(this)
 
     private fun selectDrawerItem(menuItem: MenuItem) {
         when (menuItem.itemId) {

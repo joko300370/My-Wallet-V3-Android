@@ -30,7 +30,7 @@ abstract class SendPresenterStrategy<View : piuk.blockchain.androidcoreui.ui.bas
 
     abstract fun onCurrencySelected(currency: CryptoCurrency)
 
-    abstract fun handleURIScan(untrimmedscanData: String?)
+    abstract fun handleURIScan(untrimmedscanData: String, defaultCurrency: CryptoCurrency)
 
     abstract fun handlePrivxScan(scanData: String?)
 
@@ -50,7 +50,7 @@ abstract class SendPresenterStrategy<View : piuk.blockchain.androidcoreui.ui.bas
 
     abstract fun onMemoChange(memoText: String)
 
-    abstract fun onMemoTypeChanged(memoType: Int)
+    abstract fun onMemoTypeChanged(memo: Int)
 
     abstract fun onCryptoTextChange(cryptoText: String)
 
