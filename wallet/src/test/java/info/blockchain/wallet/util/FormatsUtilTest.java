@@ -125,6 +125,15 @@ public final class FormatsUtilTest {
     }
 
     @Test
+    public void getPaymentRequestUrl() {
+        assertEquals("", FormatsUtil.getPaymentRequestUrl(null));
+        assertEquals("", FormatsUtil.getPaymentRequestUrl(""));
+        assertEquals("", FormatsUtil.getPaymentRequestUrl("Satoshi Nakamoto"));
+        assertEquals("", FormatsUtil.getPaymentRequestUrl("bitcoin:12A1MyfXbW6RhdRAZEqofac5jCQQjwEPBu"));
+        assertEquals("https://bitpay.com/i/AX146S9yK1ftUPmZGoNr9B", FormatsUtil.getPaymentRequestUrl("bitcoin:?r=https://bitpay.com/i/AX146S9yK1ftUPmZGoNr9B"));
+    }
+
+    @Test
     public void getBitcoinAmount() {
 
         assertEquals("0.0000", FormatsUtil.getBitcoinAmount(null));

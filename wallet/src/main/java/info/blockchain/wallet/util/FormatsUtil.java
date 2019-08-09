@@ -90,6 +90,26 @@ public class FormatsUtil {
         return ret;
     }
 
+    public static String getPaymentRequestUrl(final String s) {
+        if (s == null) return "";
+
+        String ret;
+        BitcoinURI uri;
+
+        try {
+            uri = new BitcoinURI(s);
+            if (uri.getPaymentRequestUrl() != null) {
+                ret = uri.getPaymentRequestUrl();
+            } else {
+                ret = "";
+            }
+        } catch (BitcoinURIParseException bupe) {
+            ret = "";
+        }
+
+        return ret;
+    }
+
     @Nonnull
     public static String getBitcoinAmount(final String s) {
         if (s == null) return "0.0000";
@@ -111,7 +131,8 @@ public class FormatsUtil {
         return ret;
     }
 
-    /** Use isValidBitcoinAddress(NetworkParameters networkParameters, final String address)
+    /**
+     * Use isValidBitcoinAddress(NetworkParameters networkParameters, final String address)
      * instead.
      */
     @Deprecated
@@ -335,7 +356,6 @@ public class FormatsUtil {
             }
         }
     }
-
 
 
     private static Boolean validateChecksumEthereumAddress(String address) {

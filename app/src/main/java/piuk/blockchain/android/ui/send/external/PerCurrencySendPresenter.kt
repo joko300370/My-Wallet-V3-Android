@@ -17,8 +17,12 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
+import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
+import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.ui.send.DisplayFeeOptions
 import piuk.blockchain.android.ui.send.SendView
+import piuk.blockchain.android.ui.send.strategy.BitPayProtocol
 import piuk.blockchain.android.ui.send.strategy.SendStrategy
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.android.util.StringUtils
@@ -30,6 +34,7 @@ import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import timber.log.Timber
+import java.util.regex.Pattern
 
 /**
  * Does some of the basic work, using the [BaseSendView] interface.
@@ -46,7 +51,8 @@ internal class PerCurrencySendPresenter<View : SendView>(
     private val stringUtils: StringUtils,
     private val exchangeRateFactory: ExchangeRateDataManager,
     private val prefs: PersistentPrefs,
-    private val pitLinkingFeatureFlag: FeatureFlag
+    private val pitLinkingFeatureFlag: FeatureFlag,
+    private val bitpayDataManager: BitPayDataManager
 ) : SendPresenter<View>() {
 
     override fun onPitAddressSelected() {
@@ -59,6 +65,7 @@ internal class PerCurrencySendPresenter<View : SendView>(
 
     private var selectedMemoType: Int = MEMO_TEXT_NONE
     private var selectedCrypto: CryptoCurrency = CryptoCurrency.BTC
+    private val merchantPattern: Pattern = Pattern.compile("for merchant ")
 
     override fun getFeeOptionsForDropDown(): List<DisplayFeeOptions> {
         val regular = DisplayFeeOptions(
@@ -153,20 +160,43 @@ internal class PerCurrencySendPresenter<View : SendView>(
                     address = FormatsUtil.getBitcoinAddress(scanData)
 
                     val amount: String = FormatsUtil.getBitcoinAmount(scanData)
+                    val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(scanData)
+                    val bitpayInvoiceUrl = BITPAY_LIVE_BASE + PATH_BITPAY_INVOICE + "/"
 
-                    if (address.isEmpty() && amount == "0.0000" && scanData.contains("bitpay")) {
-                        view.showSnackbar(R.string.error_bitpay_not_supported, Snackbar.LENGTH_LONG)
-                        return
-                    }
+                    if (address.isEmpty() && amount == "0.0000" &&
+                        paymentRequestUrl.contains(bitpayInvoiceUrl)) {
+                        // get payment protocol request data from bitpay
+                        val invoiceId = paymentRequestUrl.replace(bitpayInvoiceUrl, "")
+                        bitpayDataManager.getRawPaymentRequest(invoiceId = invoiceId)
+                            .doOnSuccess {
+                                val cryptoValue = CryptoValue(selectedCrypto, it.outputs[0].amount)
+                                val merchant = it.memo.split(merchantPattern)[1]
+                                val bitpayProtocol: BitPayProtocol? = delegate as? BitPayProtocol
 
-                    // Convert to correct units
-                    try {
-                        val cryptoValue = CryptoValue(selectedCrypto, amount.toBigInteger())
-                        val fiatValue = cryptoValue.toFiat(exchangeRates)
-                        view?.updateCryptoAmount(cryptoValue)
-                        view?.updateFiatAmount(fiatValue)
-                    } catch (e: Exception) {
-                        // ignore
+                                bitpayProtocol?.setbitpayReceivingAddress(it.outputs[0].address)
+                                bitpayProtocol?.setbitpayMerchant(merchant)
+                                bitpayProtocol?.setIsBitpayPaymentRequest(true)
+                                view?.let { view ->
+                                    view.disableInput()
+                                    view.showBitPayTimerAndMerchantInfo(it.expires, merchant)
+                                    view.updateCryptoAmount(cryptoValue)
+                                    view.updateReceivingAddress("bitcoin:?r=" + it.paymentUrl)
+                                    view.setFeePrioritySelection(1)
+                                    view.disableFeeDropdown()
+                                }
+                            }.doOnError {
+                                Timber.e(it)
+                            }.subscribe()
+                    } else {
+                        // Convert to correct units
+                        try {
+                            val cryptoValue = CryptoValue(selectedCrypto, amount.toBigInteger())
+                            val fiatValue = cryptoValue.toFiat(exchangeRates)
+                            view?.updateCryptoAmount(cryptoValue)
+                            view?.updateFiatAmount(fiatValue)
+                        } catch (e: Exception) {
+                            // ignore
+                        }
                     }
                 }
                 FormatsUtil.isValidBitcoinAddress(envSettings.bitcoinNetworkParameters, scanData) -> {

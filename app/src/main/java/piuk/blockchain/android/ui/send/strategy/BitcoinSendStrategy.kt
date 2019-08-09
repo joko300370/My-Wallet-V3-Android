@@ -57,6 +57,14 @@ import java.math.BigInteger
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
+interface BitPayProtocol {
+    fun setbitpayMerchant(merchant: String)
+
+    fun setbitpayReceivingAddress(address: String)
+
+    fun setIsBitpayPaymentRequest(isBitPay: Boolean)
+}
+
 class BitcoinSendStrategy(
     private val walletAccountHelper: WalletAccountHelper,
     private val payloadDataManager: PayloadDataManager,
@@ -75,9 +83,10 @@ class BitcoinSendStrategy(
     private val nabuDataManager: NabuDataManager,
     private val nabuToken: NabuToken,
     currencyState: CurrencyState
-) : SendStrategy<SendView>(currencyState) {
+) : SendStrategy<SendView>(currencyState), BitPayProtocol {
 
     private var pitAccount: PitAccount? = null
+    private var isBitpayPaymentRequest: Boolean = false
 
     override fun onPitAddressSelected() {
         pitAccount?.let {
@@ -142,6 +151,18 @@ class BitcoinSendStrategy(
         pendingTransaction.receivingObject = null
         pendingTransaction.receivingAddress = address
         view.updateReceivingAddress(address)
+    }
+
+    override fun setbitpayMerchant(merchant: String) {
+        pendingTransaction.bitpayMerchant = "BitPay[$merchant]"
+    }
+
+    override fun setbitpayReceivingAddress(address: String) {
+        pendingTransaction.receivingAddress = address
+    }
+
+    override fun setIsBitpayPaymentRequest(isBitPay: Boolean) {
+        isBitpayPaymentRequest = isBitPay
     }
 
     override fun onViewReady() {
@@ -355,7 +376,10 @@ class BitcoinSendStrategy(
         if (paymentDetails.isLargeTransaction) {
             view.showLargeTransactionWarning()
         }
-        view.showPaymentDetails(getConfirmationDetails(), null, null, true)
+
+        val shouldAllowFeeChange = !isBitpayPaymentRequest
+
+        view.showPaymentDetails(getConfirmationDetails(), null, null, shouldAllowFeeChange)
     }
 
     private fun checkManualAddressInput() {

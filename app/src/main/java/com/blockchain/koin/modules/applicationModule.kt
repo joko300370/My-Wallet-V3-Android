@@ -16,6 +16,8 @@ import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
+import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.datamanagers.PromptManager
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
@@ -285,7 +287,8 @@ val applicationModule = applicationContext {
                 stringUtils = get(),
                 envSettings = get(),
                 exchangeRateFactory = get(),
-                pitLinkingFeatureFlag = get("ff_pit_linking")
+                pitLinkingFeatureFlag = get("ff_pit_linking"),
+                bitpayDataManager = get()
             )
         }
 
@@ -565,6 +568,20 @@ val applicationModule = applicationContext {
                 xlmDataManager = get()
             )
         }.bind(PitLinking::class)
+
+        factory {
+            BitPayDataManager(
+                bitPayService = get()
+            )
+        }
+
+        factory {
+            BitPayService(
+                environmentConfig = get(),
+                retrofit = get("kotlin"),
+                rxBus = get()
+            )
+        }
 
         factory {
             PitPermissionsPresenter(

@@ -39,6 +39,7 @@ import android.widget.Spinner
 import com.blockchain.annotations.CommonCode
 import com.blockchain.balance.errorIcon
 import com.blockchain.koin.injectActivity
+import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.sunriver.ui.MinBalanceExplanationDialog
 import com.blockchain.transactions.Memo
@@ -57,6 +58,7 @@ import info.blockchain.balance.CryptoCurrency.Companion.MULTI_WALLET
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.compareTo
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
@@ -91,8 +93,10 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.dlg.ErrorBottomDialog
 import piuk.blockchain.androidcoreui.utils.AppUtil
 import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -100,6 +104,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 import java.lang.NullPointerException
+import java.util.Calendar
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
@@ -115,15 +121,23 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
     private var progressDialog: MaterialProgressDialog? = null
     private var confirmPaymentDialog: ConfirmPaymentDialog? = null
     private var transactionSuccessDialog: AlertDialog? = null
+    private var bitpayInvoiceExpiredDialog: AlertDialog? = null
 
     private var handlingActivityResult = false
     private var pitEnabled = false
     private var pitAddressState: PitAddressFieldState = PitAddressFieldState.CLEARED
 
+    private var isBitpayPayPro = false
+
     private val dialogHandler = Handler()
     private val dialogRunnable = Runnable {
         transactionSuccessDialog?.apply {
             if (isShowing && activity != null && !activity!!.isFinishing) {
+                dismiss()
+            }
+        }
+        bitpayInvoiceExpiredDialog?.apply {
+            if (isShowing && activity?.isFinishing == false) {
                 dismiss()
             }
         }
@@ -828,6 +842,7 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
     override fun showMaxAvailable() {
         max.visible()
         progressBarMaxAvailable.invisible()
+        max.goneIf(isBitpayPayPro)
     }
 
     override fun hideMaxAvailable() {
@@ -1121,6 +1136,95 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
         spinnerPriority.setSelection(index)
     }
 
+    fun setExpiryColorFiveMinute() {
+        bitpayTimeRemaining.setTextColor(getResolvedColor(R.color.secondary_yellow_medium))
+    }
+
+    fun setExpiryColorOneMinute() {
+        bitpayTimeRemaining.setTextColor(getResolvedColor(R.color.secondary_red_light))
+    }
+
+    override fun showBitPayTimerAndMerchantInfo(expiry: String, merchantName: String) {
+        bitpayMerchantText.visible()
+        bitpayTimeRemaining.visible()
+        bitpayDivider.visible()
+        bitpayMerchantText.text = merchantName
+        isBitpayPayPro = true
+        val expiryDateGmt = expiry.fromIso8601ToUtc()
+        if (expiryDateGmt != null) {
+            startBitPayTimer(expiryDateGmt)
+        }
+    }
+
+    private fun startCountdown(endTime: Long) {
+        val timeRemainingText = stringUtils.getString(R.string.bitpay_remaining_time)
+        var remaining = (endTime - System.currentTimeMillis()) / 1000
+        var spaceChar = " "
+        if (remaining <= 2) {
+            // Finish page with error
+            showbitpayInvoiceExpiredDialog()
+        } else {
+            Observable.interval(1, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnEach { remaining-- }
+                .map { remaining }
+                .doOnNext {
+                    if (spaceChar != "" && it < 10 * 60) {
+                        spaceChar = ""
+                    }
+                    val readableTime = String.format(
+                        "%2d:%02d",
+                        TimeUnit.SECONDS.toMinutes(it),
+                        TimeUnit.SECONDS.toSeconds(it) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(it))
+                    )
+                    val timerText = timeRemainingText + spaceChar + readableTime
+                    bitpayTimeRemaining.text = timerText
+                    bitpayTimeRemaining.setTextColor(getResolvedColor(R.color.primary_grey_light))
+                }
+                .doOnNext { if (it < 5 * 60) setExpiryColorFiveMinute() }
+                .doOnNext { if (it < 60) setExpiryColorOneMinute() }
+                .takeUntil { it <= 2 }
+                .doOnComplete { showbitpayInvoiceExpiredDialog() }
+                .subscribe()
+        }
+    }
+
+    private fun startBitPayTimer(expiryDateGmt: Date) {
+        val calendar = Calendar.getInstance()
+        val timeZone = calendar.timeZone
+        val offset = timeZone.getOffset(expiryDateGmt.time)
+
+        startCountdown(expiryDateGmt.time + offset)
+    }
+
+    private fun showbitpayInvoiceExpiredDialog() {
+
+        val appRate = AppRate(activity)
+            .setMinTransactionsUntilPrompt(3)
+            .incrementTransactionCount()
+
+        activity?.run {
+            val dialogBuilder = AlertDialog.Builder(this)
+            val dialogView = View.inflate(activity, R.layout.modal_transaction_failed, null)
+            bitpayInvoiceExpiredDialog = dialogBuilder.setView(dialogView)
+                .setMessage(R.string.bitpay_invoice_expired_message)
+                .setTitle(R.string.bitpay_invoice_expired)
+                .setPositiveButton(getString(R.string.btn_ok), null)
+                .create()
+
+            bitpayInvoiceExpiredDialog?.apply {
+                setOnDismissListener {
+                    confirmPaymentDialog?.dismiss()
+                    finishPage()
+                }
+                if (!isFinishing) show()
+            }
+        }
+
+        dialogHandler.postDelayed(dialogRunnable, (10 * 1000).toLong())
+    }
+
     @SuppressLint("CheckResult")
     internal fun displayCustomFeeField() {
         textviewFeeAbsolute.gone()
@@ -1236,6 +1340,8 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
         amountCrypto.isEnabled = true
         amountFiat.isEnabled = true
         max.isEnabled = true
+        max.visible()
+        edittextCustomFee.isEnabled = true
     }
 
     override fun disableInput() {
@@ -1244,6 +1350,7 @@ class SendFragment : HomeFragment<SendView, SendPresenter<SendView>>(),
         amountCrypto.isEnabled = false
         amountFiat.isEnabled = false
         max.isEnabled = false
+        edittextCustomFee.isEnabled = false
     }
 
     companion object {

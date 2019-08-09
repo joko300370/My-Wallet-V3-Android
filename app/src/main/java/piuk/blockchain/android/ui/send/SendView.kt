@@ -76,6 +76,8 @@ interface SendView : BaseSendView {
 
     fun disableInput()
 
+    fun showBitPayTimerAndMerchantInfo(expiry: String, merchantName: String)
+
     fun enableInput()
 
     // Fetch value

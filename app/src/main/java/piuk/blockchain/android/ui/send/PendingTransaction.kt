@@ -28,6 +28,8 @@ class PendingTransaction {
     var warningText: String = ""
     var warningSubText: String = ""
 
+    var bitpayMerchant: String? = null
+
     val total: BigInteger
         @JsonIgnore
         get() = bigIntAmount.add(bigIntFee)
@@ -49,6 +51,8 @@ class PendingTransaction {
         @JsonIgnore
         get() = if (receivingObject != null && !receivingObject!!.label.isNullOrEmpty()) {
             receivingObject!!.label
+        } else if (bitpayMerchant != null) {
+            bitpayMerchant
         } else {
             receivingAddress
         }
