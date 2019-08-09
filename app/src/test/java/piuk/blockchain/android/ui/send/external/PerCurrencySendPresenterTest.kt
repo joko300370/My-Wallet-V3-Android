@@ -134,7 +134,7 @@ class PerCurrencySendPresenterTest {
             }
         ).apply {
             initView(view)
-            handleURIScan(bitpayBitcoinURI)
+            handleURIScan(bitpayBitcoinURI, CryptoCurrency.BTC)
         }
 
         verify(view).disableInput()
