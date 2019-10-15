@@ -149,7 +149,7 @@ class CoinsWebSocketStrategyTest {
                 "058a004dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"co" +
                 "ntractAddress\":\"0x\",\"value\":\"6047410000000000\",\"nonce\":171,\"gasPrice\":\"4000000000\",\"ga" +
                 "sLimit\":21000,\"gasUsed\":21000,\"data\":\"\",\"transactionIndex\":59,\"success\":true,\"err" +
-                "or\":\"\",\"firstSeen\":0,\"timestamp\":1566220763,\"state\":\"CONFIRMED\"}}"
+                "or\":\"\",\"firstSeen\":0,\"timestamp\":1566220763,\"state\":\"confirmed\"}}"
     private val pendingEthTransaction =
         "{\"coin\":\"eth\",\"entity\":\"account\",\"address\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"txHa" +
                 "sh\":\"0xe1ff1e0ea7023c80308302d809684f90d1c094f969a13343e6081197f3552c97\",\"transaction\"" +
@@ -159,7 +159,7 @@ class CoinsWebSocketStrategyTest {
                 "dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"contract" +
                 "Address\":\"0x\",\"value\":\"6047410000000000\",\"nonce\":171,\"gasPrice\":\"4000000000\",\"gasLi" +
                 "mit\":21000,\"gasUsed\":21000,\"data\":\"\",\"transactionIndex\":59,\"success\":true,\"error\":" +
-                "\"\",\"firstSeen\":0,\"timestamp\":1566220763,\"state\":\"PENDING\"}}"
+                "\"\",\"firstSeen\":0,\"timestamp\":1566220763,\"state\":\"pending\"}}"
 
     private val paxTransaction =
         "{\"coin\":\"eth\",\"entity\":\"token_account\",\"param\":{\"accountAddress\":\"0x4058a004dd718babab47e14dd0" +
