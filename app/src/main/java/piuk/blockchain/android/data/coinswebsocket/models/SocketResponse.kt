@@ -1,5 +1,6 @@
 package piuk.blockchain.android.data.coinswebsocket.models
 
+import com.google.gson.annotations.SerializedName
 import java.math.BigInteger
 
 data class SocketResponse(
@@ -53,7 +54,10 @@ data class TokenAccountKey(
 )
 
 enum class TransactionState {
+    @SerializedName("pending")
     PENDING,
+    @SerializedName("replaced")
     REPLACED,
+    @SerializedName("confirmed")
     CONFIRMED
 }
