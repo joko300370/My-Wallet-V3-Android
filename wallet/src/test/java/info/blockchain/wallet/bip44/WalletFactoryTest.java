@@ -1,6 +1,7 @@
 package info.blockchain.wallet.bip44;
 
 import info.blockchain.wallet.bip44.HDWalletFactory.Language;
+
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.crypto.MnemonicException;
 import org.bitcoinj.params.BitcoinMainNetParams;
@@ -21,7 +22,7 @@ public class WalletFactoryTest {
         String path = "M/44H";
 
         HDWallet wallet = HDWalletFactory
-            .createWallet(BitcoinMainNetParams.get(), Language.US, mnemonicLength, passphrase, 1);
+                .createWallet(BitcoinMainNetParams.get(), Language.US, mnemonicLength, passphrase, 1);
 
         Assert.assertEquals(mnemonicLength, wallet.getMnemonicOld().split(" ").length);
         Assert.assertEquals(passphrase, wallet.getPassphrase());
@@ -40,8 +41,8 @@ public class WalletFactoryTest {
 
         try {
             wallet = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US, mnemonic, passphrase,
-                    accountListSize);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US, mnemonic, passphrase,
+                            accountListSize);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,14 +68,33 @@ public class WalletFactoryTest {
     }
 
     @Test
+    public void testSTXAddressDerivationFromHDWallet() {
+        String mnemonic = "one remember hint unlock finger reform utility acid speed cushion split client bitter myself protect actor frame forward rather better mercy clay card awesome";
+        HDWallet wallet = null;
+
+        try {
+            wallet = HDWalletFactory
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US, mnemonic, "",
+                            1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals("1LJepqGsKKLPxFumnzFndsWTWsaCfkSDTp",
+                wallet.getSTXAccount().getBitcoinSerializedBase58Address());
+        Assert.assertEquals("M/44H/5757H/0H/0/0",
+                wallet.getSTXAccount().getAddress().getPath());
+    }
+
+    @Test
     public void testRestoreWallet_badMnemonic_fail() {
 
         HDWallet wallet = null;
 
         try {
             wallet = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US,
-                    "all all all all all all all all all all all all bogus", null, 1);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US,
+                            "all all all all all all all all all all all all bogus", null, 1);
         } catch (Exception e) {
             ;
         } finally {
@@ -93,8 +113,8 @@ public class WalletFactoryTest {
 
         try {
             wallet = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US, hexSeed, passphrase,
-                    accountListSize);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US, hexSeed, passphrase,
+                            accountListSize);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -115,22 +135,22 @@ public class WalletFactoryTest {
 
         try {
             restoredWallet1 = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US,
-                    "all all all all all all all all all all all all", passphrase1, 1);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US,
+                            "all all all all all all all all all all all all", passphrase1, 1);
             restoredWallet2 = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US,
-                    "all all all all all all all all all all all all", passphrase1, 1);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US,
+                            "all all all all all all all all all all all all", passphrase1, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Assert.assertEquals(
-            restoredWallet2.getAccount(0).getReceive().getAddressAt(0).getAddressString(),
-            restoredWallet1.getAccount(0).getReceive().getAddressAt(0).getAddressString());
+                restoredWallet2.getAccount(0).getReceive().getAddressAt(0).getAddressString(),
+                restoredWallet1.getAccount(0).getReceive().getAddressAt(0).getAddressString());
 
         Assert.assertEquals(
-            restoredWallet2.getAccount(0).getChange().getAddressAt(0).getAddressString(),
-            restoredWallet1.getAccount(0).getChange().getAddressAt(0).getAddressString());
+                restoredWallet2.getAccount(0).getChange().getAddressAt(0).getAddressString(),
+                restoredWallet1.getAccount(0).getChange().getAddressAt(0).getAddressString());
     }
 
     @Test
@@ -144,39 +164,39 @@ public class WalletFactoryTest {
 
         try {
             wallet1 = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US,
-                    "all all all all all all all all all all all all", passphrase1, 1);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US,
+                            "all all all all all all all all all all all all", passphrase1, 1);
             wallet2 = HDWalletFactory
-                .restoreWallet(BitcoinMainNetParams.get(), Language.US,
-                    "all all all all all all all all all all all all", passphrase2, 1);
+                    .restoreWallet(BitcoinMainNetParams.get(), Language.US,
+                            "all all all all all all all all all all all all", passphrase2, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Assert.assertNotEquals(
-            wallet2.getAccount(0).getReceive().getAddressAt(0).getAddressString(),
-            wallet1.getAccount(0).getReceive().getAddressAt(0).getAddressString());
+                wallet2.getAccount(0).getReceive().getAddressAt(0).getAddressString(),
+                wallet1.getAccount(0).getReceive().getAddressAt(0).getAddressString());
 
         Assert.assertNotEquals(
-            wallet2.getAccount(0).getChange().getAddressAt(0).getAddressString(),
-            wallet1.getAccount(0).getChange().getAddressAt(0).getAddressString());
+                wallet2.getAccount(0).getChange().getAddressAt(0).getAddressString(),
+                wallet1.getAccount(0).getChange().getAddressAt(0).getAddressString());
     }
 
     @Test
     public void testAccount() throws AddressFormatException {
         HDAccount account = new HDAccount(BitcoinMainNetParams.get(),
-            "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
-            1);
+                "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
+                1);
         Assert.assertEquals(
-            "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
-            account.getXpub());
+                "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
+                account.getXpub());
         Assert.assertEquals(1, account.getId());
 
         account = new HDAccount(BitcoinMainNetParams.get(),
-            "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV");
+                "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV");
         Assert.assertEquals(
-            "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
-            account.getXpub());
+                "xpub6CbTPgFYkRqMQZiX2WYEiVHWGJUjAsZAvSvMq3z52KczYQrZPQ9DjKwHQBmAMJVY3kLeBQ4T818MBf2cTiGkJSkmS8CDT1Wp7Dw4vFMygEV",
+                account.getXpub());
         Assert.assertEquals(0, account.getId());
     }
 }

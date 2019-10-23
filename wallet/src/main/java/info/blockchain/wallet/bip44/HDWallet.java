@@ -1,6 +1,7 @@
 package info.blockchain.wallet.bip44;
 
 import com.google.common.base.Joiner;
+
 import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
@@ -8,6 +9,8 @@ import org.bitcoinj.crypto.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import info.blockchain.wallet.stx.STXAccount;
 
 /**
  * HDWallet.java : BIP44 wallet
@@ -25,6 +28,7 @@ public class HDWallet {
     private ArrayList<HDAccount> accounts;
 
     private String strPath = null;
+    private STXAccount stxAccount = null;
 
     private NetworkParameters params;
 
@@ -51,6 +55,8 @@ public class HDWallet {
         for (int i = 0; i < nbAccounts; i++) {
             accounts.add(new HDAccount(params, dkRoot, i));
         }
+
+        stxAccount = new STXAccount(params, dKey);
 
         strPath = dKey.getPathAsString();
     }
@@ -150,6 +156,10 @@ public class HDWallet {
      */
     public String getPath() {
         return strPath;
+    }
+
+    public STXAccount getSTXAccount() {
+        return stxAccount;
     }
 
 
