@@ -8,11 +8,14 @@ import org.bitcoinj.crypto.HDKeyDerivation
 
 class STXAccount(params: NetworkParameters, wKey: DeterministicKey) {
 
+    private val coinDerivationKey =
+        HDKeyDerivation.deriveChildKey(wKey, 5757 or ChildNumber.HARDENED_BIT)
+    private val accountDerivationKey =
+        HDKeyDerivation.deriveChildKey(coinDerivationKey, 0 or ChildNumber.HARDENED_BIT)
+    private val addressDerivationKey =
+        HDKeyDerivation.deriveChildKey(accountDerivationKey, 0)
 
-    private val aKey = HDKeyDerivation.deriveChildKey(wKey, 5757 or ChildNumber.HARDENED_BIT)
-    private val bKey = HDKeyDerivation.deriveChildKey(aKey, 0 or ChildNumber.HARDENED_BIT)
-    private val cKey = HDKeyDerivation.deriveChildKey(bKey, 0)
-    val address = HDAddress(params, cKey, 0)
+    val address = HDAddress(params, addressDerivationKey, 0)
 
     val bitcoinSerializedBase58Address
         get() = address.addressBase58
