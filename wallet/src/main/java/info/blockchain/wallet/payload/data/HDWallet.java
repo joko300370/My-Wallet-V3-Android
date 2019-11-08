@@ -22,6 +22,7 @@ import info.blockchain.wallet.bip44.HDWalletFactory.Language;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.payment.SpendableUnspentOutputs;
+import info.blockchain.wallet.stx.STXAccount;
 import info.blockchain.wallet.util.DoubleEncryptionFactory;
 import info.blockchain.wallet.util.PrivateKeyFactory;
 import org.apache.commons.codec.DecoderException;
@@ -102,7 +103,7 @@ public class HDWallet {
         }
     }
 
-    public void instantiateBip44Wallet(NetworkParameters networkParameters) throws HDWalletException {
+    void instantiateBip44Wallet(NetworkParameters networkParameters) throws HDWalletException {
         try{
             int walletSize = DEFAULT_NEW_WALLET_SIZE;
             if (accounts != null) walletSize = accounts.size();
@@ -508,5 +509,9 @@ public class HDWallet {
         }
 
         return null;
+    }
+
+    public STXAccount getSTXAccount() {
+        return HD.getSTXAccount();
     }
 }

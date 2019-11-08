@@ -35,7 +35,6 @@ import android.widget.TextView
 
 import com.blockchain.kyc.models.nabu.Kyc2TierState
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.crashlytics.android.answers.ContentViewEvent
@@ -63,6 +62,7 @@ import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R.string.success
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference

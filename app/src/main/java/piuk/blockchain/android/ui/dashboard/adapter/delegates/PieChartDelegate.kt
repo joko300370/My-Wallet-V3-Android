@@ -298,6 +298,7 @@ class PieChartDelegate<in T>(
                 CryptoCurrency.BCH -> itemView.textview_value_bitcoin_cash
                 CryptoCurrency.XLM -> itemView.textview_value_lumens
                 CryptoCurrency.PAX -> itemView.textview_value_usd_pax
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
 
         internal fun amountTextView(cryptoCurrency: CryptoCurrency) =
@@ -307,6 +308,7 @@ class PieChartDelegate<in T>(
                 CryptoCurrency.BCH -> itemView.textview_amount_bitcoin_cash
                 CryptoCurrency.XLM -> itemView.textview_amount_lumens
                 CryptoCurrency.PAX -> itemView.textview_amount_usd_pax
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
 
         // Lockbox
@@ -356,11 +358,12 @@ class PieChartDelegate<in T>(
 }
 
 @StringRes
-private fun CryptoCurrency.label() =
+private fun CryptoCurrency.label(): Int =
     when (this) {
         CryptoCurrency.BTC -> R.string.bitcoin
         CryptoCurrency.ETHER -> R.string.ether
         CryptoCurrency.BCH -> R.string.bitcoin_cash
         CryptoCurrency.XLM -> R.string.lumens
         CryptoCurrency.PAX -> R.string.usd_pax
+        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     }

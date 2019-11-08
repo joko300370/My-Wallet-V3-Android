@@ -8,7 +8,6 @@ import androidx.navigation.NavDirections
 import com.blockchain.activities.StartOnboarding
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.swap.nabu.StartBuySell
@@ -24,6 +23,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import com.blockchain.ui.dialog.MaterialProgressDialog
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -61,6 +61,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         logEvent(
             when (campaignType) {
                 CampaignType.BuySell,
+                CampaignType.Blockstack,
                 CampaignType.Swap -> AnalyticsEvents.KycWelcome
                 CampaignType.Sunriver -> AnalyticsEvents.KycSunriverStart
                 CampaignType.Resubmission -> AnalyticsEvents.KycResubmission
@@ -70,6 +71,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         val title = when (progressListener.campaignType) {
             CampaignType.BuySell,
             CampaignType.Sunriver,
+            CampaignType.Blockstack,
             CampaignType.Resubmission -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
         }

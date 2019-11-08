@@ -114,6 +114,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
             CryptoCurrency.ETHER -> false
             CryptoCurrency.XLM -> false
             CryptoCurrency.PAX -> false
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -346,7 +347,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(), Accoun
             .setCancelable(false)
             .setPositiveButton(R.string.save_name) { _, _ ->
                 val label = editText.getTextString()
-                if (!label.trim { it <= ' ' }.isEmpty()) {
+                if (label.trim { it <= ' ' }.isNotEmpty()) {
                     address.label = label
                 }
 

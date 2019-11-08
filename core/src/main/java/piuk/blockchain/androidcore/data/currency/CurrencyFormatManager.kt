@@ -118,6 +118,7 @@ class CurrencyFormatManager(
                     throw IllegalArgumentException("${currencyState.cryptoCurrency} denomination not supported.")
                 CryptoCurrency.XLM -> throw IllegalArgumentException("XLM formatting should be done via CryptoValue.")
                 CryptoCurrency.PAX -> throw IllegalArgumentException("PAX formatting should be done via CryptoValue.")
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
         }
     }

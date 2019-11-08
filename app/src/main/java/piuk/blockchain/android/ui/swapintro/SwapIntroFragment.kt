@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import kotlinx.android.synthetic.main.fragment_swap_intro.*
 import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.home.HomeFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity

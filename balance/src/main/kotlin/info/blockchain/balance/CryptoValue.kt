@@ -48,6 +48,7 @@ data class CryptoValue(
             CryptoCurrency.ETHER -> ZeroEth
             CryptoCurrency.XLM -> ZeroXlm
             CryptoCurrency.PAX -> ZeroPax
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
         fun bitcoinFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())

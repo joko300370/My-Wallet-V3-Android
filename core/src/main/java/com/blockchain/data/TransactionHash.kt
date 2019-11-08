@@ -15,5 +15,6 @@ data class TransactionHash(
             CryptoCurrency.BCH -> "https://www.blockchain.com/bch/tx/"
             CryptoCurrency.XLM -> "https://stellarchain.io/tx/"
             CryptoCurrency.PAX -> "https://www.blockchain.com/eth/tx/" // TODO: AND_2003: Check this is correct
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 }

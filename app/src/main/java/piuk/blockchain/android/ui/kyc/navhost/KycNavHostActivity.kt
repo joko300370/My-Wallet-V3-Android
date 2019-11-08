@@ -12,7 +12,6 @@ import android.view.animation.DecelerateInterpolator
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.splash.KycSplashFragment
 import com.blockchain.swap.nabu.StartKyc
@@ -20,6 +19,7 @@ import com.blockchain.swap.nabu.StartKycForBuySell
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -71,6 +71,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
             CampaignType.BuySell -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
+            CampaignType.Blockstack,
             CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)

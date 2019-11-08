@@ -67,6 +67,7 @@ class AccountPresenter internal constructor(
             CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
             CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     override fun onViewReady() {
@@ -95,7 +96,7 @@ class AccountPresenter internal constructor(
             .doOnError { Timber.e(it) }
             .subscribe(
                 { triple ->
-                    if (payloadDataManager.wallet!!.isUpgraded && !triple.left.isEmpty()) {
+                    if (payloadDataManager.wallet!!.isUpgraded && triple.left.isNotEmpty()) {
                         view.onSetTransferLegacyFundsMenuItemVisible(true)
 
                         if ((prefs.getValue(KEY_WARN_TRANSFER_ALL, true) ||
@@ -358,6 +359,7 @@ class AccountPresenter internal constructor(
             CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
             CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
     }
 

@@ -8,25 +8,28 @@ import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.services.nabu.TierUpdater
 import piuk.blockchain.android.ui.kyc.logging.KycResumedEvent
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecision
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.sunriver.SunriverCampaignSignUp
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.BlockstackCampaignRegistration
+import piuk.blockchain.android.campaign.CampaignRegistration
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 
 class KycNavHostPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val sunriverCampaignSignUp: SunriverCampaignSignUp,
+    private val sunriverCampaign: SunriverCampaignRegistration,
+    private val blockstackCampaign: BlockstackCampaignRegistration,
     private val reentryDecision: ReentryDecision,
     private val kycNavigator: KycNavigator,
     private val tierUpdater: TierUpdater
@@ -41,7 +44,7 @@ class KycNavHostPresenter(
                 .doOnSubscribe { view.displayLoading(true) }
                 .subscribeBy(
                     onSuccess = {
-                        registerForCampaignIfNeeded()
+                        registerForCampaignsIfNeeded()
                         updateTier2SelectedTierIfNeeded()
                         redirectUserFlow(it)
                     },
@@ -58,20 +61,25 @@ class KycNavHostPresenter(
     }
 
     /**
-     * Registers the user to the sunriver campaign if they are not yet registered and the view campaignType is Sunriver
+     * Registers the user to the various campaigns if they are not yet registered with them, on completion of Gold
      */
-    private fun registerForCampaignIfNeeded() {
-        // Check if Sunriver campaign
-        if (view.campaignType != CampaignType.Sunriver) {
-            return
+    private fun registerForCampaignsIfNeeded() {
+
+        if (view.campaignType == CampaignType.Sunriver) {
+            checkAndRegisterForCampaign(sunriverCampaign)
         }
 
-        compositeDisposable += sunriverCampaignSignUp.userIsInSunRiverCampaign()
+        // Attempt to register for the Blockstack airdrop campaign
+        checkAndRegisterForCampaign(blockstackCampaign)
+    }
+
+    private fun checkAndRegisterForCampaign(campaign: CampaignRegistration) {
+        compositeDisposable += campaign.userIsInCampaign()
             .flatMapCompletable { isInCampaign ->
                 if (isInCampaign) {
                     Completable.complete()
                 } else {
-                    sunriverCampaignSignUp.registerSunRiverCampaign()
+                    campaign.registerCampaign()
                 }
             }
             .subscribeOn(Schedulers.io())

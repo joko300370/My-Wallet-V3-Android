@@ -6,13 +6,13 @@ import com.blockchain.kyc.models.nabu.Scope
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
 import piuk.blockchain.android.ui.kyc.countryselection.util.toDisplayList
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidbuysell.services.BuyConditions
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter

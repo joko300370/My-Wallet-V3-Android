@@ -22,6 +22,7 @@ class EnvironmentSettings : EnvironmentConfig {
             CryptoCurrency.BCH -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
             CryptoCurrency.XLM -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     override fun shouldShowDebugMenu(): Boolean = BuildConfig.FLAVOR != "envProd"

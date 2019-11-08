@@ -69,6 +69,7 @@ class ExchangeRateDataStore(
             CryptoCurrency.BCH -> bchTickerData
             CryptoCurrency.XLM -> xlmTickerData
             CryptoCurrency.PAX -> paxTickerData
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     fun getHistoricPrice(

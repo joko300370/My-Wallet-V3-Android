@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog
 import com.blockchain.activities.StartSwap
 import com.blockchain.extensions.px
 import com.blockchain.kyc.models.nabu.KycState
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
 import org.koin.android.ext.android.inject
@@ -17,6 +16,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import com.blockchain.ui.dialog.MaterialProgressDialog
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
@@ -48,6 +48,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.BuySell -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
+            CampaignType.Blockstack,
             CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
@@ -87,6 +88,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         textViewStatus.setText(R.string.kyc_status_title_in_progress)
         displayNotificationButton()
         val message = when (campaignType) {
+            CampaignType.Blockstack,
             CampaignType.BuySell,
             CampaignType.Swap,
             CampaignType.Resubmission -> R.string.kyc_status_message_in_progress

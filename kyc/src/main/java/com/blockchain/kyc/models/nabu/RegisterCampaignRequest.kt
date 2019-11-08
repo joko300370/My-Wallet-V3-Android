@@ -18,5 +18,15 @@ data class RegisterCampaignRequest(
             ),
             newUser
         )
+
+        fun registerBlockstack(
+            address: String,
+            newUser: Boolean
+        ) = RegisterCampaignRequest(
+            mapOf(
+                "x-campaign-address" to address
+            ),
+            newUser
+        )
     }
 }

@@ -52,6 +52,7 @@ class WalletAccountHelper(
                 CryptoCurrency.ETHER -> getEthAccount()
                 CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
                 CryptoCurrency.PAX -> getPaxAccount()
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
         } catch (t: Throwable) {
             crashLogger.logException(t)
@@ -71,6 +72,7 @@ class WalletAccountHelper(
             CryptoCurrency.ETHER -> Single.just(getEthAccount())
             CryptoCurrency.XLM -> getXlmAccount()
             CryptoCurrency.PAX -> Single.just(getPaxAccount())
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     private fun allBtcAccountItems() = getHdAccounts() + getLegacyAddresses()
@@ -220,6 +222,7 @@ class WalletAccountHelper(
             CryptoCurrency.ETHER -> getDefaultEthAccount()
             CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
             CryptoCurrency.PAX -> getDefaultPaxAccount()
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     fun getEthAccount() =
@@ -400,6 +403,7 @@ class WalletAccountHelper(
             CryptoCurrency.ETHER -> Single.just(getEthOverviewList())
             CryptoCurrency.XLM -> getDefaultXlmAccountItem().map { listOf(it) }
             CryptoCurrency.PAX -> Single.just(getPaxOverviewList())
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()
@@ -529,5 +533,6 @@ class WalletAccountHelper(
             CryptoCurrency.BCH -> allBchAccountItems().size
             CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
             CryptoCurrency.PAX -> getEthAccount().size
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         } > 1
 }

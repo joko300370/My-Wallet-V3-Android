@@ -72,6 +72,7 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.BCH -> CoinPair.BTC_TO_BCH
             CryptoCurrency.XLM -> CoinPair.BTC_TO_XLM
             CryptoCurrency.PAX -> CoinPair.BTC_TO_PAX
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
         CryptoCurrency.ETHER -> when (other) {
             CryptoCurrency.ETHER -> CoinPair.ETH_TO_ETH
@@ -79,6 +80,7 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.BCH -> CoinPair.ETH_TO_BCH
             CryptoCurrency.XLM -> CoinPair.ETH_TO_XLM
             CryptoCurrency.PAX -> CoinPair.ETH_TO_PAX
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
         CryptoCurrency.BCH -> when (other) {
             CryptoCurrency.BCH -> CoinPair.BCH_TO_BCH
@@ -86,6 +88,7 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.ETHER -> CoinPair.BCH_TO_ETH
             CryptoCurrency.XLM -> CoinPair.BCH_TO_XLM
             CryptoCurrency.PAX -> CoinPair.BCH_TO_PAX
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
         CryptoCurrency.XLM -> when (other) {
             CryptoCurrency.XLM -> CoinPair.XLM_TO_XLM
@@ -93,6 +96,7 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.ETHER -> CoinPair.XLM_TO_ETH
             CryptoCurrency.BCH -> CoinPair.XLM_TO_BCH
             CryptoCurrency.PAX -> CoinPair.XLM_TO_PAX
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
         CryptoCurrency.PAX -> when (other) {
             CryptoCurrency.PAX -> CoinPair.PAX_TO_PAX
@@ -100,5 +104,7 @@ infix fun CryptoCurrency.to(other: CryptoCurrency) =
             CryptoCurrency.ETHER -> CoinPair.PAX_TO_ETH
             CryptoCurrency.BCH -> CoinPair.PAX_TO_BCH
             CryptoCurrency.XLM -> CoinPair.PAX_TO_XLM
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
+        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     }

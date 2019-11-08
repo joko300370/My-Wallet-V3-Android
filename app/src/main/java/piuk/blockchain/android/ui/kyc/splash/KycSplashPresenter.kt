@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.kyc.splash
 import piuk.blockchain.android.ui.kyc.BaseKycPresenter
 import com.blockchain.kyc.models.nabu.Kyc2TierState
 import com.blockchain.kyc.services.nabu.NabuCoinifyAccountCreator
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.swap.nabu.NabuToken
@@ -14,6 +13,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 import timber.log.Timber

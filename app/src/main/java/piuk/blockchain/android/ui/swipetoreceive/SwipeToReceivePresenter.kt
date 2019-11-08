@@ -126,6 +126,7 @@ class SwipeToReceivePresenter(
                 nextAddress = paxAddress,
                 hasAddresses = swipeToReceiveHelper.getPaxReceiveAddress().isNotEmpty()
             )
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     companion object {

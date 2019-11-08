@@ -6,6 +6,7 @@ import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.max
 
 enum class FormatPrecision {
     /**
@@ -71,6 +72,7 @@ class CryptoCurrencyFormatter(locale: Locale) {
             FormatPrecision.Short -> paxShortFormat
             FormatPrecision.Full -> paxFormat
         }
+        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     }
 
     private fun DecimalFormat.formatWithUnit(value: BigDecimal, symbol: String) =
@@ -82,7 +84,7 @@ class CryptoCurrencyFormatter(locale: Locale) {
 
 private fun BigDecimal.toPositiveDouble() = this.toDouble().toPositiveDouble()
 
-private fun Double.toPositiveDouble() = Math.max(this, 0.0)
+private fun Double.toPositiveDouble() = max(this, 0.0)
 
 /**
  * Replace 0.0 with 0 to match web

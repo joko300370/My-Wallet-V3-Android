@@ -163,6 +163,7 @@ class ChartsDataManager(private val historicPriceApi: PriceApi, rxBus: RxBus) {
             CryptoCurrency.BCH -> FIRST_BCH_ENTRY_TIME
             CryptoCurrency.XLM -> FIRST_XLM_ENTRY_TIME
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
     }
 }

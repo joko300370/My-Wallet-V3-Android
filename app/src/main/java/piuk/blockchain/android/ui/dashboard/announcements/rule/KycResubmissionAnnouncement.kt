@@ -2,9 +2,9 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.status.KycTiersQueries
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule

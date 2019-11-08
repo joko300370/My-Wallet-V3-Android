@@ -5,7 +5,6 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.Scope
 import com.blockchain.kyc.services.nabu.NabuCoinifyAccountCreator
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import com.blockchain.swap.nabu.NabuToken
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -16,6 +15,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber

@@ -40,6 +40,7 @@ sealed class PieChartsState {
                 CryptoCurrency.BCH -> bitcoinCash
                 CryptoCurrency.XLM -> lumen
                 CryptoCurrency.PAX -> usdPax
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
 
         private val totalValue =

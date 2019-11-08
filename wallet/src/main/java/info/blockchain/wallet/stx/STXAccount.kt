@@ -17,6 +17,6 @@ class STXAccount(params: NetworkParameters, wKey: DeterministicKey) {
 
     val address = HDAddress(params, addressDerivationKey, 0)
 
-    val bitcoinSerializedBase58Address
+    val bitcoinSerializedBase58Address: String
         get() = address.addressBase58
 }

@@ -16,6 +16,7 @@ internal class AllAccountsImplementation(
             CryptoCurrency.BCH -> bchAccountList
             CryptoCurrency.XLM -> throw IllegalArgumentException("XLM default account access requires RX")
             CryptoCurrency.PAX -> paxAccountList
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
     }
 }

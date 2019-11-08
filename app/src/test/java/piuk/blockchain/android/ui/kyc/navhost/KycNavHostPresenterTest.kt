@@ -24,7 +24,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.KycNavXmlDirections
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecision
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecisionKycNavigator
 import piuk.blockchain.android.ui.kyc.reentry.ReentryPoint

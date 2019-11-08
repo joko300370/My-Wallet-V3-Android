@@ -15,5 +15,6 @@ internal class ResourceDefaultLabels(
             CryptoCurrency.BCH -> resources.getString(R.string.bch_default_account_label)
             CryptoCurrency.XLM -> resources.getString(R.string.xlm_default_account_label)
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 }

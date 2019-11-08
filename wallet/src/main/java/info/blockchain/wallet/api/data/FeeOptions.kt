@@ -97,6 +97,7 @@ class FeeOptions constructor(
                 CryptoCurrency.BCH -> defaultForBch()
                 CryptoCurrency.XLM -> defaultForXlm()
                 CryptoCurrency.PAX -> defaultForErc20()
+                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             }
         }
 

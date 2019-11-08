@@ -5,7 +5,6 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorStatusCodes
 import com.blockchain.kyc.util.toISO8601DateString
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.swap.nabu.NabuToken
@@ -28,6 +27,7 @@ import java.util.Locale
 import kotlin.properties.Delegates
 import com.google.common.base.Optional
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 

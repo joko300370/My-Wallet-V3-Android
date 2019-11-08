@@ -52,6 +52,7 @@ internal class AddressResolver(
                 val address = account.address
                 Single.just(AddressPair(address, address))
             }
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     private fun getReceiveAddress(account: Account): Single<String> =

@@ -25,6 +25,11 @@ sealed class AccountReference(
         val ethAddress: String,
         val apiCode: String
     ) : AccountReference(CryptoCurrency.PAX, _label)
+
+    data class Stx(
+        private val _label: String,
+        val address: String
+    ) : AccountReference(CryptoCurrency.STX, _label)
 }
 
 enum class AccountType {

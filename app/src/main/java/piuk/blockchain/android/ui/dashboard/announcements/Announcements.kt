@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
 import android.support.annotation.VisibleForTesting
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -10,6 +9,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.campaign.CampaignType
 import timber.log.Timber
 
 interface AnnouncementHost {

@@ -335,6 +335,7 @@ private fun CryptoCurrency.getDecimalPlaces(): Int =
         CryptoCurrency.BCH -> 2
         CryptoCurrency.XLM -> 4
         CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
+        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     }
 
 interface TimeSpanUpdateListener {

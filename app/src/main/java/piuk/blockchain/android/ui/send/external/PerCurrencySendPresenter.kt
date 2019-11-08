@@ -130,6 +130,7 @@ internal class PerCurrencySendPresenter<View : SendView>(
             CryptoCurrency.BCH -> bchStrategy
             CryptoCurrency.XLM -> xlmStrategy
             CryptoCurrency.PAX -> paxStrategy
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
         selectedCrypto = currency

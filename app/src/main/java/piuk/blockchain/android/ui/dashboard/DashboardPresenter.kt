@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.support.annotation.DrawableRes
 import android.support.annotation.VisibleForTesting
 import com.blockchain.balance.drawableResFilled
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.swap.nabu.CurrentTier
 import info.blockchain.balance.CryptoCurrency
@@ -18,6 +17,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.charts.models.ArbitraryPrecisionFiatValue
 import piuk.blockchain.android.ui.charts.models.toStringWithSymbol

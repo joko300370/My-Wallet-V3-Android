@@ -175,6 +175,7 @@ class BalancePresenter(
             CryptoCurrency.BCH -> bchDataManager.updateAllBalances()
             CryptoCurrency.XLM -> Completable.complete()
             CryptoCurrency.PAX -> paxAccount.fetchAddressCompletable()
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     /**

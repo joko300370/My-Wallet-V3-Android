@@ -18,7 +18,6 @@ import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.androidbuysell.services.BuyConditions
 
 class KycCountrySelectionPresenterTest {

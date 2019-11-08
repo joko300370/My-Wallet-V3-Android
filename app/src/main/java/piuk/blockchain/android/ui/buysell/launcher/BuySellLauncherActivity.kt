@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.buysell.launcher
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import com.blockchain.swap.nabu.StartBuySell
 import com.blockchain.swap.nabu.StartKycForBuySell
@@ -15,6 +14,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.buysell.overview.CoinifyOverviewActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import com.blockchain.ui.dialog.MaterialProgressDialog
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 

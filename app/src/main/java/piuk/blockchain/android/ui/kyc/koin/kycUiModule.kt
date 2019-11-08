@@ -92,7 +92,7 @@ val kycUiModule = applicationContext {
 
         factory { KycStatusPresenter(get(), get(), get()) }
 
-        factory { KycNavHostPresenter(get(), get(), get(), get(), get(), get()) }
+        factory { KycNavHostPresenter(get(), get(), get(), get(), get(), get(), get()) }
 
         factory { KycInvalidCountryPresenter(get(), get()) }
     }

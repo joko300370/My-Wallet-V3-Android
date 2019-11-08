@@ -54,6 +54,7 @@ class TransactionListDataManager(
             CryptoCurrency.BCH -> fetchBchTransactions(itemAccount, limit, offset)
             CryptoCurrency.XLM -> fetchXlmTransactions()
             CryptoCurrency.PAX -> getPaxTransactions().onErrorReturn { emptyList() }
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
         return observable.doOnNext { insertTransactionList(it.toMutableList()) }
@@ -324,6 +325,7 @@ class TransactionListDataManager(
             CryptoCurrency.ETHER -> ethDataManager.toAsyncBalanceReporter()
             CryptoCurrency.XLM -> xlmDataManager.toAsyncBalanceReporter()
             CryptoCurrency.PAX -> paxAccount.toAsyncBalanceReporter()
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
     }
 }

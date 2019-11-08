@@ -6,7 +6,6 @@ import com.blockchain.kyc.models.nabu.CampaignData
 import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.kyc.sunriver.SunriverCampaignHelper
 import piuk.blockchain.android.ui.kyc.sunriver.SunriverCardType
@@ -55,6 +54,7 @@ import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import com.blockchain.swap.shapeshift.ShapeShiftDataManager
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter

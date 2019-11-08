@@ -29,7 +29,6 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.annotations.ButWhy
 import com.blockchain.annotations.CommonCode
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.kyc.navhost.models.CampaignType
 import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
@@ -69,6 +68,7 @@ import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidbuysell.models.WebViewLoginDetails
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import com.blockchain.ui.dialog.MaterialProgressDialog
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.tour.BuySellTourFragment

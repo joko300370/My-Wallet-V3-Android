@@ -55,6 +55,16 @@ enum class CryptoCurrency(
         requiredConfirmations = 12, // Same as ETHER
         featureFlags =
             0L
+    ),
+    STX(
+        symbol = "STX",
+        unit = "Stacks",
+        // TODO: These are all stub values, until we implement the token fully
+        dp = 18,
+        userDp = 8,
+        requiredConfirmations = 12,
+        featureFlags =
+            CryptoCurrency.STUB_ASSET
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))
@@ -69,5 +79,6 @@ enum class CryptoCurrency(
 
         const val PRICE_CHARTING = 0x00000001L
         const val MULTI_WALLET = 0x00000002L
+        const val STUB_ASSET = 0x10000000L
     }
 }
