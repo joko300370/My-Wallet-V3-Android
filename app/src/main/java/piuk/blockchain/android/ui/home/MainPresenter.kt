@@ -7,8 +7,8 @@ import com.blockchain.kyc.models.nabu.KycState
 import com.blockchain.kyc.models.nabu.NabuApiException
 import com.blockchain.kyc.models.nabu.NabuErrorCodes
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCampaignHelper
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCardType
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
+import piuk.blockchain.android.campaign.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.remoteconfig.ABTestExperiment
@@ -87,7 +87,7 @@ class MainPresenter internal constructor(
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
     private val deepLinkProcessor: DeepLinkProcessor,
-    private val sunriverCampaignHelper: SunriverCampaignHelper,
+    private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
     private val paxAccount: Erc20Account,
     private val pitFeatureFlag: FeatureFlag,
@@ -248,8 +248,10 @@ class MainPresenter internal constructor(
 
     private fun handleSunriverDeepLink(linkState: LinkState.SunriverDeepLink) {
         when (linkState.link) {
-            is CampaignLinkState.WrongUri -> view.displayDialog(R.string.sunriver_invalid_url_title,
-                R.string.sunriver_invalid_url_message)
+            is CampaignLinkState.WrongUri -> view.displayDialog(
+                R.string.sunriver_invalid_url_title,
+                R.string.sunriver_invalid_url_message
+            )
             is CampaignLinkState.Data -> registerForCampaign(linkState.link.campaignData)
         }
     }
@@ -282,9 +284,9 @@ class MainPresenter internal constructor(
     private fun registerForCampaign(data: CampaignData) {
         compositeDisposable +=
             xlmDataManager.defaultAccount()
-                .flatMapCompletable { account ->
-                    sunriverCampaignHelper
-                        .registerCampaignAndSignUpIfNeeded(account, data)
+                .flatMapCompletable {
+                    sunriverCampaignRegistration
+                        .registerCampaign(data)
                 }
                 .andThen(kycStatusHelper.getKycStatus())
                 .subscribeOn(Schedulers.io())

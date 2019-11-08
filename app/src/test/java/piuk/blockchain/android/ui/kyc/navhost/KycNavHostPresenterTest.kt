@@ -11,7 +11,6 @@ import com.blockchain.kyc.models.nabu.Tiers
 import com.blockchain.kyc.models.nabu.UserState
 import com.blockchain.kyc.services.nabu.TierUpdater
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.sunriver.SunriverCampaignSignUp
 import piuk.blockchain.android.ui.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
@@ -24,6 +23,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.KycNavXmlDirections
+import piuk.blockchain.android.campaign.BlockstackCampaignRegistration
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecision
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecisionKycNavigator
 import piuk.blockchain.android.ui.kyc.reentry.ReentryPoint
@@ -32,7 +34,8 @@ class KycNavHostPresenterTest {
 
     private lateinit var subject: KycNavHostPresenter
     private val view: KycNavHostView = mock()
-    private val sunriverSignUpCampaign: SunriverCampaignSignUp = mock()
+    private val sunriverCampaign: SunriverCampaignRegistration = mock()
+    private val blockstackCampaign: BlockstackCampaignRegistration = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
     private val reentryDecision: ReentryDecision = mock()
@@ -50,7 +53,8 @@ class KycNavHostPresenterTest {
         subject = KycNavHostPresenter(
             nabuToken,
             nabuDataManager,
-            sunriverSignUpCampaign,
+            sunriverCampaign,
+            blockstackCampaign,
             reentryDecision,
             ReentryDecisionKycNavigator(mock(), mock(), mock()),
             tierUpdater
@@ -138,7 +142,7 @@ class KycNavHostPresenterTest {
     fun `register for sunriver campaign if campaign type is sunriver but not registered yet`() {
         // Arrange
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
-        whenever(sunriverSignUpCampaign.registerSunRiverCampaign()).thenReturn(Completable.complete())
+        whenever(sunriverCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
@@ -146,7 +150,7 @@ class KycNavHostPresenterTest {
             tierUpdater.setUserTier(2)
         ).thenReturn(Completable.complete())
         whenever(
-            sunriverSignUpCampaign.userIsInSunRiverCampaign()
+            sunriverCampaign.registerCampaign()
         ).thenReturn(Single.just(false))
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
@@ -171,7 +175,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(sunriverSignUpCampaign).registerSunRiverCampaign()
+        verify(sunriverCampaign).registerCampaign()
         verify(view).displayLoading(false)
     }
 
@@ -186,7 +190,7 @@ class KycNavHostPresenterTest {
             tierUpdater.setUserTier(2)
         ).thenReturn(Completable.complete())
         whenever(
-            sunriverSignUpCampaign.userIsInSunRiverCampaign()
+            sunriverCampaign.registerCampaign()
         ).thenReturn(Single.just(true))
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
@@ -211,7 +215,7 @@ class KycNavHostPresenterTest {
         subject.onViewReady()
         // Assert
         verify(view).displayLoading(true)
-        verify(sunriverSignUpCampaign, never()).registerSunRiverCampaign()
+        verify(sunriverCampaign, never()).registerCampaign()
         verify(view).displayLoading(false)
     }
 
@@ -227,7 +231,7 @@ class KycNavHostPresenterTest {
             tierUpdater.setUserTier(2)
         ).thenReturn(Completable.complete())
         whenever(
-            sunriverSignUpCampaign.userIsInSunRiverCampaign()
+            sunriverCampaign.registerCampaign()
         ).thenReturn(Single.just(true))
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(

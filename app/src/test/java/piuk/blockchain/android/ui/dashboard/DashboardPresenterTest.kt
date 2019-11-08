@@ -28,6 +28,8 @@ import org.amshove.kluent.`it returns`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.campaign.BlockstackCampaignRegistration
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.data.datamanagers.TransactionListDataManager
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
@@ -68,6 +70,7 @@ class DashboardPresenterTest {
     private val lockboxDataManager: LockboxDataManager = mock()
 
     private val announcementList: AnnouncementList = mock()
+    private val stxRegistration: BlockstackCampaignRegistration = mock()
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -96,7 +99,8 @@ class DashboardPresenterTest {
             lockboxDataManager,
             currentTier,
             pitLinking,
-            announcementList
+            announcementList,
+            stxRegistration
         )
 
         subject.initView(view)

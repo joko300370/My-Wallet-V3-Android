@@ -17,6 +17,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.BlockstackCampaignRegistration
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.charts.models.ArbitraryPrecisionFiatValue
@@ -32,6 +33,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.BalanceLoadedEvent
@@ -48,7 +50,8 @@ class DashboardPresenter(
     private val lockboxDataManager: LockboxDataManager,
     private val currentTier: CurrentTier,
     private val pitLinking: PitLinking,
-    private val announcements: AnnouncementList
+    private val announcements: AnnouncementList,
+    private val stxRegistration: BlockstackCampaignRegistration
 ) : BasePresenter<DashboardView>(), AnnouncementHost {
 
     private val currencies = DashboardConfig.currencies
@@ -100,10 +103,15 @@ class DashboardPresenter(
             .doOnSuccess { updateAllBalances() }
             .doOnSuccess { storeSwipeToReceiveAddresses() }
             .doOnSuccess { updatePitAddressesForThePit() }
+            .doOnSuccess { registerForSTXAirdrop() }
             .subscribe(
                 { /* No-op */ },
                 { Timber.e(it) }
             )
+    }
+
+    private fun registerForSTXAirdrop() {
+        compositeDisposable += stxRegistration.registerCampaign().emptySubscribe()
     }
 
     override fun onViewResumed() {

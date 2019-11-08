@@ -27,6 +27,8 @@ import org.koin.android.ext.android.startKoin
 import org.koin.log.Logger
 import org.koin.standalone.StandAloneContext
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.campaign.campaignModule
+import piuk.blockchain.android.coincore.coincoreModule
 import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncementsModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
@@ -48,6 +50,8 @@ object KoinStarter {
                 appBuySellModule,
                 applicationModule,
                 buySellModule,
+                campaignModule,
+                coincoreModule,
                 coreModule,
                 coreUiModule,
                 dashboardAnnouncementsModule,

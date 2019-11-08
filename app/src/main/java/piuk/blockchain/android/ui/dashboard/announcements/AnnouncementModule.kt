@@ -59,7 +59,7 @@ val dashboardAnnouncementsModule = applicationContext {
         factory {
             KycIncompleteAnnouncement(
                 kycTiersQueries = get(),
-                sunriverCampaignHelper = get(),
+                sunriverCampaignRegistration = get(),
                 dismissRecorder = get(),
                 mainScheduler = AndroidSchedulers.mainThread()
             )

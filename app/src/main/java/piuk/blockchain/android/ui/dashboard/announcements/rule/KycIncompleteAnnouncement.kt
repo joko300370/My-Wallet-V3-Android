@@ -2,14 +2,14 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import android.support.annotation.VisibleForTesting
 import com.blockchain.kyc.status.KycTiersQueries
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCampaignHelper
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCardType
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
+import piuk.blockchain.android.campaign.SunriverCardType
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
@@ -19,7 +19,7 @@ import timber.log.Timber
 
 internal class KycIncompleteAnnouncement(
     private val kycTiersQueries: KycTiersQueries,
-    private val sunriverCampaignHelper: SunriverCampaignHelper,
+    private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val mainScheduler: Scheduler,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
@@ -35,7 +35,7 @@ internal class KycIncompleteAnnouncement(
     }
 
     override fun show(host: AnnouncementHost) {
-        host.disposables += sunriverCampaignHelper.getCampaignCardType()
+        host.disposables += sunriverCampaignRegistration.getCampaignCardType()
             .observeOn(mainScheduler)
             .subscribeBy(
                 onSuccess = { campaignCard ->
