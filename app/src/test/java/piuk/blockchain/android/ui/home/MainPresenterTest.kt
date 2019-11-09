@@ -5,7 +5,7 @@ import com.blockchain.kyc.datamanagers.nabu.NabuDataManager
 import com.blockchain.kyc.models.nabu.NabuUser
 import com.blockchain.kyc.models.nabu.Tiers
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCampaignHelper
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.remoteconfig.ABTestExperiment
@@ -77,7 +77,7 @@ class MainPresenterTest {
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
     private val deepLinkProcessor: DeepLinkProcessor = mock()
-    private val sunriverCampaignHelper: SunriverCampaignHelper = mock()
+    private val sunriverCampaignRegistration: SunriverCampaignRegistration = mock()
     private val xlmDataManager: XlmDataManager = mock()
     private val pitLinking: PitLinking = mock()
     private val featureFlag: FeatureFlag = mock()
@@ -132,7 +132,7 @@ class MainPresenterTest {
             kycStatusHelper,
             lockboxDataManager,
             deepLinkProcessor,
-            sunriverCampaignHelper,
+            sunriverCampaignRegistration,
             xlmDataManager,
             paxAccount,
             featureFlag,

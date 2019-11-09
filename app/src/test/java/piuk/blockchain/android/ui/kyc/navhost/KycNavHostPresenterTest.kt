@@ -65,9 +65,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady exception thrown`() {
         // Arrange
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.error { Throwable() })
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.error { Throwable() })
         // Act
         subject.onViewReady()
         // Assert
@@ -78,9 +76,8 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady no metadata found`() {
         // Arrange
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.error { MetadataNotFoundException("") })
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.error { MetadataNotFoundException("") })
+
         // Act
         subject.onViewReady()
         // Assert
@@ -91,11 +88,10 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady metadata found, empty user object`() {
         // Arrange
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser()))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuDataManager.getUser(validOfflineToken)).thenReturn(Single.just(getBlankNabuUser()))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         // Act
         subject.onViewReady()
         // Assert
@@ -108,9 +104,9 @@ class KycNavHostPresenterTest {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Swap)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -143,15 +139,11 @@ class KycNavHostPresenterTest {
         // Arrange
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
         whenever(sunriverCampaign.registerCampaign()).thenReturn(Completable.complete())
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            tierUpdater.setUserTier(2)
-        ).thenReturn(Completable.complete())
-        whenever(
-            sunriverCampaign.registerCampaign()
-        ).thenReturn(Single.just(false))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(tierUpdater.setUserTier(2)).thenReturn(Completable.complete())
+        whenever(sunriverCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -183,15 +175,11 @@ class KycNavHostPresenterTest {
     fun `not register for sunriver campaign if campaign type is sunriver and user is registered`() {
         // Arrange
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            tierUpdater.setUserTier(2)
-        ).thenReturn(Completable.complete())
-        whenever(
-            sunriverCampaign.registerCampaign()
-        ).thenReturn(Single.just(true))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(tierUpdater.setUserTier(2)).thenReturn(Completable.complete())
+        whenever(sunriverCampaign.userIsInCampaign()).thenReturn(Single.just(true))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -224,15 +212,11 @@ class KycNavHostPresenterTest {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Sunriver)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            tierUpdater.setUserTier(2)
-        ).thenReturn(Completable.complete())
-        whenever(
-            sunriverCampaign.registerCampaign()
-        ).thenReturn(Single.just(true))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(tierUpdater.setUserTier(2)).thenReturn(Completable.complete())
+        whenever(sunriverCampaign.userIsInCampaign()).thenReturn(Single.just(true))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -265,9 +249,9 @@ class KycNavHostPresenterTest {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Resubmission)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -300,9 +284,9 @@ class KycNavHostPresenterTest {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.Swap)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -336,9 +320,9 @@ class KycNavHostPresenterTest {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
         whenever(view.campaignType).thenReturn(CampaignType.BuySell)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
                 Single.just(
@@ -371,9 +355,9 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to address`() {
         // Arrange
         givenReentryDecision(ReentryPoint.Address)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -388,8 +372,8 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(nabuUser))
+        whenever(nabuDataManager.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
+
         // Act
         subject.onViewReady()
         // Assert
@@ -404,9 +388,9 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to phone entry`() {
         // Arrange
         givenReentryDecision(ReentryPoint.MobileEntry)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -435,9 +419,9 @@ class KycNavHostPresenterTest {
     fun `onViewReady, when user is a tier 1, should not redirect to phone entry`() {
         // Arrange
         givenReentryDecision(ReentryPoint.MobileEntry)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -453,8 +437,7 @@ class KycNavHostPresenterTest {
             updatedAt = null,
             tiers = Tiers(current = 1, next = 2, selected = 2)
         )
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(nabuUser))
+        whenever(nabuDataManager.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
         // Act
         subject.onViewReady()
         // Assert
@@ -467,9 +450,9 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to Onfido`() {
         // Arrange
         givenReentryDecision(ReentryPoint.Onfido)
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -497,9 +480,7 @@ class KycNavHostPresenterTest {
     @Test
     fun `onViewReady, should redirect to KYC status page`() {
         // Arrange
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
+        whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
         val nabuUser = NabuUser(
             firstName = "firstName",
             lastName = "lastName",
@@ -514,8 +495,10 @@ class KycNavHostPresenterTest {
             insertedAt = null,
             updatedAt = null
         )
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(nabuUser))
+        whenever(nabuDataManager.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
+        whenever(blockstackCampaign.userIsInCampaign()).thenReturn(Single.just(false))
+        whenever(blockstackCampaign.registerCampaign()).thenReturn(Completable.complete())
+
         // Act
         subject.onViewReady()
         // Assert

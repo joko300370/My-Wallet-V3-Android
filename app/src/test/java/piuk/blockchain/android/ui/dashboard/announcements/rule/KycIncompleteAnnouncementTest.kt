@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.blockchain.kyc.status.KycTiersQueries
-import piuk.blockchain.android.ui.kyc.sunriver.SunriverCampaignHelper
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -15,7 +15,7 @@ class KycIncompleteAnnouncementTest {
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val kycQueries: KycTiersQueries = mock()
-    private val campaignHelper: SunriverCampaignHelper = mock()
+    private val campaignRegistration: SunriverCampaignRegistration = mock()
     private lateinit var subject: KycIncompleteAnnouncement
 
     @Before
@@ -27,7 +27,7 @@ class KycIncompleteAnnouncementTest {
 
         subject = KycIncompleteAnnouncement(
             kycTiersQueries = kycQueries,
-            sunriverCampaignHelper = campaignHelper,
+            sunriverCampaignRegistration = campaignRegistration,
             mainScheduler = Schedulers.trampoline(),
             dismissRecorder = dismissRecorder
         )
