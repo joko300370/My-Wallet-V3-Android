@@ -72,7 +72,7 @@ class WebSocketService : Service() {
                 for (i in 0 until nbAccounts) {
                     val xPub = payloadDataManager.wallet!!.hdWallets[0].accounts[i].xpub
                     if (xPub != null && xPub.isNotEmpty()) {
-                        xpubs[i] = xPub
+                        xpubs.add(xPub)
                     }
                 }
                 return xpubs
@@ -90,7 +90,7 @@ class WebSocketService : Service() {
                     for (i in 0 until nbLegacy) {
                         val address = payloadDataManager.wallet?.legacyAddressList?.get(i)?.address
                         if (address.isNullOrEmpty().not()) {
-                            addresses[i] = address!!
+                            addresses.add(address!!)
                         }
                     }
                     return addresses
@@ -98,9 +98,9 @@ class WebSocketService : Service() {
                 swipeToReceiveHelper.getBitcoinReceiveAddresses().isNotEmpty() -> {
                     val addresses = mutableListOf<String>()
                     val receiveAddresses =
-                        swipeToReceiveHelper?.getBitcoinReceiveAddresses()
+                        swipeToReceiveHelper.getBitcoinReceiveAddresses()
                     for (i in receiveAddresses.indices) {
-                        addresses[i] = receiveAddresses[i]
+                        addresses.add(receiveAddresses[i])
                     }
                     return addresses
                 }
@@ -117,7 +117,7 @@ class WebSocketService : Service() {
                 for (i in 0 until nbAccounts) {
                     val xPub = bchDataManager.getActiveXpubs()[i]
                     if (xPub.isNotEmpty()) {
-                        xpubs[i] = xPub
+                        xpubs.add(xPub)
                     }
                 }
                 xpubs
@@ -135,7 +135,7 @@ class WebSocketService : Service() {
                     for (i in 0 until nbLegacy) {
                         val address = bchDataManager.getLegacyAddressStringList().get(i)
                         if (address.isNotEmpty()) {
-                            addrs[i] = address
+                            addrs.add(address)
                         }
                     }
 
@@ -147,7 +147,7 @@ class WebSocketService : Service() {
                         swipeToReceiveHelper.getBitcoinCashReceiveAddresses()
                     for (i in receiveAddresses.indices) {
                         val address = receiveAddresses[i]
-                        addrs[i] = address
+                        addrs.add(address)
                     }
                     return addrs
                 }
