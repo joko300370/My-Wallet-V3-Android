@@ -57,12 +57,12 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         LayoutInflater.from(getContext()).inflate(R.layout.view_expanding_currency_header, this, true)
         CryptoCurrency.values().filter { !it.hasFeature(CryptoCurrency.STUB_ASSET) }
             .forEach { currency ->
-            textView(currency).apply {
-                // Add compound drawables manually to avoid inflation errors on <21
-                setRightDrawable(currency.coinIconWhite())
-                setOnClickListener { closeLayout(currency) }
+                textView(currency)?.apply {
+                    // Add compound drawables manually to avoid inflation errors on <21
+                    setRightDrawable(currency.coinIconWhite())
+                    setOnClickListener { closeLayout(currency) }
+                }
             }
-        }
         textview_selected_currency.apply {
             // Hide selector on first load
             invisible()
@@ -118,17 +118,17 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
     fun getCurrentlySelectedCurrency() = selectedCurrency
 
     fun hide(cryptoCurrency: CryptoCurrency) {
-        textView(cryptoCurrency).gone()
+        textView(cryptoCurrency)?.gone()
     }
 
-    private fun textView(cryptoCurrency: CryptoCurrency): TextView =
+    private fun textView(cryptoCurrency: CryptoCurrency): TextView? =
         when (cryptoCurrency) {
             CryptoCurrency.BTC -> textview_bitcoin
             CryptoCurrency.ETHER -> textview_ethereum
             CryptoCurrency.BCH -> textview_bitcoin_cash
             CryptoCurrency.XLM -> textview_lumens
             CryptoCurrency.PAX -> textview_pax
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.STX -> null
         }
 
     fun isOpen() = expanded
