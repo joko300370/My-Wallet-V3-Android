@@ -10,23 +10,27 @@ import com.blockchain.swap.nabu.models.tokenresponse.mapToMetadata
 import com.blockchain.rx.maybeCache
 import io.reactivex.Maybe
 import io.reactivex.Single
+import piuk.blockchain.androidcore.data.metadata.MetadataManager
 
 internal class MetadataRepositoryNabuTokenAdapter(
     private val metadataRepository: MetadataRepository,
-    private val createNabuToken: CreateNabuToken
+    private val createNabuToken: CreateNabuToken,
+    private val metadataManager: MetadataManager
 ) : NabuToken {
 
-    private val createMetaData = Maybe.defer {
+    private fun createMetaData() = Maybe.defer {
         createNabuToken.createNabuOfflineToken()
             .map {
                 it.mapToMetadata()
             }
             .flatMapMaybe {
-                metadataRepository.saveMetadata(
-                    it,
-                    NabuCredentialsMetadata::class.java,
-                    NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
-                ).andThen(Maybe.just(it))
+                metadataManager.attemptMetadataSetup()
+                    .andThen(metadataRepository.saveMetadata(
+                        it,
+                        NabuCredentialsMetadata::class.java,
+                        NabuCredentialsMetadata.USER_CREDENTIALS_METADATA_NODE
+                    ))
+                    .andThen(Maybe.just(it))
             }
     }
 
@@ -36,13 +40,15 @@ internal class MetadataRepositoryNabuTokenAdapter(
             NabuCredentialsMetadata::class.java
         )
     }.maybeCache()
+        .onErrorReturn { NabuCredentialsMetadata.invalid() }
         .filter { it.isValid() }
-        .switchIfEmpty(createMetaData)
-        .map { metadata ->
-            if (!metadata.isValid()) throw MetadataNotFoundException("Nabu Token is empty")
-            metadata.mapFromMetadata()
-        }
-        .toSingle()
 
-    override fun fetchNabuToken(): Single<NabuOfflineTokenResponse> = defer
+    override fun fetchNabuToken(): Single<NabuOfflineTokenResponse> {
+        return defer.switchIfEmpty(createMetaData())
+            .map { metadata ->
+                if (!metadata.isValid()) throw MetadataNotFoundException("Nabu Token is empty")
+                metadata.mapFromMetadata()
+            }
+            .toSingle()
+    }
 }

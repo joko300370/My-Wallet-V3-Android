@@ -18,5 +18,6 @@ data class NabuCredentialsMetadata(
 
     companion object {
         const val USER_CREDENTIALS_METADATA_NODE = 10
+        fun invalid(): NabuCredentialsMetadata = NabuCredentialsMetadata("", "")
     }
 }
