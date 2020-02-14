@@ -16,7 +16,6 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import timber.log.Timber
@@ -25,8 +24,6 @@ class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     override val presenter: LoginPresenter by inject()
     override val view: LoginView = this
-
-    private val appUtil: AppUtil by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

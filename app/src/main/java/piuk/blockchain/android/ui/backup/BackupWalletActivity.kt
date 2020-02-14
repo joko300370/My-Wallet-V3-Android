@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.backup
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -45,10 +46,11 @@ class BackupWalletActivity : BaseAuthActivity() {
     }
 
     override fun onBackPressed() {
-        if (fragmentManager.backStackEntryCount <= 1) {
+        if (supportFragmentManager.backStackEntryCount <= 1) {
+            setResult(if (isBackedUp()) RESULT_OK else Activity.RESULT_CANCELED)
             finish()
         } else {
-            fragmentManager.popBackStack()
+            supportFragmentManager.popBackStack()
         }
     }
 
@@ -63,6 +65,13 @@ class BackupWalletActivity : BaseAuthActivity() {
         fun start(context: Context) {
             val starter = Intent(context, BackupWalletActivity::class.java)
             context.startActivity(starter)
+        }
+
+        fun startForResult(fragment: Fragment, requestCode: Int) {
+            fragment.startActivityForResult(
+                Intent(fragment.context, BackupWalletActivity::class.java),
+                requestCode
+            )
         }
     }
 }

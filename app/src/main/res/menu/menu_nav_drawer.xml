@@ -7,39 +7,46 @@
             android:id="@+id/nav_buy"
             android:icon="@drawable/ic_nav_buy_sell"
             android:title="@string/item_buy_sell"
-            app:contentDescription="@string/item_buy_sell"
-            android:visible="false" />
+            android:visible="false"
+            app:contentDescription="@string/item_buy_sell" />
+
+        <item
+            android:id="@+id/nav_simple_buy"
+            android:icon="@drawable/ic_nav_buy_sell"
+            android:title="@string/item_buy"
+            android:visible="false"
+            app:contentDescription="@string/item_simple_buy" />
 
         <item
             android:id="@+id/nav_backup"
             android:icon="@drawable/ic_nav_backup"
-            app:contentDescription="@string/item_backup"
-            android:title="@string/item_backup" />
+            android:title="@string/item_backup"
+            app:contentDescription="@string/item_backup" />
 
         <item
             android:id="@+id/nav_addresses"
             android:icon="@drawable/ic_nav_wallet"
-            app:contentDescription="@string/drawer_addresses"
-            android:title="@string/drawer_addresses" />
+            android:title="@string/drawer_addresses"
+            app:contentDescription="@string/drawer_addresses" />
 
         <item
             android:id="@+id/nav_the_exchange"
             android:icon="@drawable/ic_nav_the_exchange"
-            app:contentDescription="@string/item_the_exchange"
-            android:title="@string/item_the_exchange"/>
+            android:title="@string/item_the_exchange"
+            app:contentDescription="@string/item_the_exchange" />
 
         <item
             android:id="@+id/nav_airdrops"
             android:icon="@drawable/ic_nav_airdrops"
-            app:contentDescription="@string/item_airdrops"
-            android:title="@string/item_airdrops"/>
+            android:title="@string/item_airdrops"
+            app:contentDescription="@string/item_airdrops" />
 
         <item
             android:id="@+id/nav_lockbox"
             android:icon="@drawable/ic_nav_hardware"
-            app:contentDescription="@string/item_lockbox"
             android:title="@string/item_lockbox"
-            android:visible="false" />
+            android:visible="false"
+            app:contentDescription="@string/item_lockbox" />
 
     </group>
 
@@ -47,26 +54,26 @@
         <item
             android:id="@+id/login_web_wallet"
             android:icon="@drawable/ic_nav_web_login"
-            app:contentDescription="@string/pairing_code_log_in"
-            android:title="@string/pairing_code_log_in" />
+            android:title="@string/pairing_code_log_in"
+            app:contentDescription="@string/pairing_code_log_in" />
 
         <item
-            app:contentDescription="@string/action_settings"
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_nav_settings"
-            android:title="@string/action_settings" />
+            android:title="@string/action_settings"
+            app:contentDescription="@string/action_settings" />
 
         <item
-            app:contentDescription="@string/support"
             android:id="@+id/nav_support"
             android:icon="@drawable/ic_nav_support"
-            android:title="@string/support" />
+            android:title="@string/support"
+            app:contentDescription="@string/support" />
 
         <item
-            app:contentDescription="@string/logout"
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_nav_logout"
-            android:title="@string/logout" />
+            android:title="@string/logout"
+            app:contentDescription="@string/logout" />
 
         <item
             android:id="@+id/nav_debug_swap"

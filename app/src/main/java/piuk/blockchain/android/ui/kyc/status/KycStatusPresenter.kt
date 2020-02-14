@@ -37,12 +37,14 @@ class KycStatusPresenter(
         when (this) {
             Kyc2TierState.Hidden -> KycState.None
             Kyc2TierState.Locked -> KycState.None
-            Kyc2TierState.Tier1InReview -> KycState.Pending
+            Kyc2TierState.Tier1Pending -> KycState.Pending
             Kyc2TierState.Tier1Approved -> KycState.Verified
             Kyc2TierState.Tier1Failed -> KycState.Rejected
-            Kyc2TierState.Tier2InReview -> KycState.Pending
+            Kyc2TierState.Tier2InPending -> KycState.Pending
             Kyc2TierState.Tier2Approved -> KycState.Verified
             Kyc2TierState.Tier2Failed -> KycState.Rejected
+            Kyc2TierState.Tier2InReview -> KycState.UnderReview
+            Kyc2TierState.Tier1InReview -> KycState.UnderReview
         }
 
     internal fun onClickNotifyUser() {

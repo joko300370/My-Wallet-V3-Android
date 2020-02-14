@@ -188,12 +188,12 @@ public class SettingsPresenterTest extends RxTest {
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier1_review() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier1InReview);
+        assertClickLaunchesKyc(Kyc2TierState.Tier1Pending);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier2_review() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier2InReview);
+        assertClickLaunchesKyc(Kyc2TierState.Tier2InPending);
     }
 
     @Test

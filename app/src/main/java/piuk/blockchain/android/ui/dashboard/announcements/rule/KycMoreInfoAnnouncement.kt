@@ -44,7 +44,7 @@ internal class KycMoreInfoAnnouncement(
     private fun didNotStartGoldLevelKyc(): Single<Boolean> =
         tierService.tiers().map {
             it.combinedState !in listOf(
-                Kyc2TierState.Tier2InReview,
+                Kyc2TierState.Tier2InPending,
                 Kyc2TierState.Tier2Approved,
                 Kyc2TierState.Tier2Failed
             )

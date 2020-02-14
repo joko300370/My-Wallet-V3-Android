@@ -102,8 +102,8 @@ class BitcoinSendStrategy(
     currencyState: CurrencyState
 ) : SendStrategy<SendView>(currencyState), BitPayProtocol {
 
-    override fun onViewAttached() { }
-    override fun onViewDetached() { }
+    override fun onViewAttached() {}
+    override fun onViewDetached() {}
 
     override val alwaysDisableScreenshots = false
     override val enableLogoutTimer = false

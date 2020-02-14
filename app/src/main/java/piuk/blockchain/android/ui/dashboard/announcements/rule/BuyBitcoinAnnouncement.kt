@@ -3,7 +3,9 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 import androidx.annotation.VisibleForTesting
 import com.blockchain.preferences.WalletStatus
 import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
@@ -14,7 +16,8 @@ import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 class BuyBitcoinAnnouncement(
     dismissRecorder: DismissRecorder,
     private val walletStatus: WalletStatus,
-    private val buyDataManager: BuyDataManager
+    private val buyDataManager: BuyDataManager,
+    private val simpleBuyAvailability: SimpleBuyAvailability
 ) : AnnouncementRule(dismissRecorder) {
 
     override val dismissKey = DISMISS_KEY
@@ -24,9 +27,10 @@ class BuyBitcoinAnnouncement(
             return Single.just(false)
         }
 
-        return buyDataManager.canBuy
-            .map { it && !walletStatus.isWalletFunded }
-            .singleOrError()
+        return buyDataManager.canBuy.zipWith(simpleBuyAvailability.isAvailable())
+            .map { (canBuy, simpleBuyAvailable) ->
+                canBuy && !simpleBuyAvailable && !walletStatus.isWalletFunded
+            }
     }
 
     override fun show(host: AnnouncementHost) {

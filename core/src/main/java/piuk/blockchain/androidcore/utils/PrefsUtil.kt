@@ -3,6 +3,9 @@ package piuk.blockchain.androidcore.utils
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import java.util.Currency
+import java.util.Locale
 
 interface UUIDGenerator {
     fun generateUUID(): String
@@ -45,6 +48,10 @@ class PrefsUtil(
         get() = getValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, false)
         set(completed) = setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, completed)
 
+    override var isCustodialIntroSeen: Boolean
+        get() = getValue(KEY_CUSTODIAL_INTRO_SEEN, false)
+        set(seen) = setValue(KEY_CUSTODIAL_INTRO_SEEN, seen)
+
     override val isLoggedOut: Boolean
         get() = getValue(KEY_LOGGED_OUT, true)
 
@@ -69,8 +76,12 @@ class PrefsUtil(
 
     // From CurrencyPrefs
     override var selectedFiatCurrency: String
-        get() = getValue(KEY_SELECTED_FIAT, DEFAULT_FIAT_CURRENCY)
+        get() = getValue(KEY_SELECTED_FIAT, defaultCurrency())
         set(fiat) = setValue(KEY_SELECTED_FIAT, fiat)
+
+    private fun defaultCurrency(): String =
+        if (UNIT_FIAT.contains(Currency.getInstance(Locale.getDefault()).currencyCode))
+            Currency.getInstance(Locale.getDefault()).currencyCode else DEFAULT_FIAT_CURRENCY
 
     override var selectedCryptoCurrency: CryptoCurrency
         get() =
@@ -90,6 +101,25 @@ class PrefsUtil(
     override fun clearPitToWalletLinkId() {
         removeValue(KEY_PIT_LINKING_LINK_ID)
     }
+
+    override fun simpleBuyState(): String? {
+        return getValue(KEY_SIMPLE_BUY_STATE, "").takeIf { it != "" }
+    }
+
+    override fun updateSimpleBuyState(simpleBuyState: String) {
+        setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
+    }
+
+    override fun clearState() {
+        removeValue(KEY_SIMPLE_BUY_STATE)
+    }
+
+    override fun setFlowStartedAtLeastOnce() {
+        setValue(KEY_SIMPLE_BUY_FLOW_STARTED, true)
+    }
+
+    override fun flowStartedAtLeastOnce(): Boolean =
+        getValue(KEY_SIMPLE_BUY_FLOW_STARTED, false)
 
     // From Onboarding
     override var swapIntroCompleted: Boolean
@@ -233,10 +263,12 @@ class PrefsUtil(
         const val KEY_SELECTED_CRYPTO = "KEY_CURRENCY_CRYPTO_STATE"
 
         private const val KEY_PIT_LINKING_LINK_ID = "pit_wallet_link_id"
-
+        private const val KEY_SIMPLE_BUY_STATE = "key_simple_buy_state"
+        private const val KEY_SIMPLE_BUY_FLOW_STARTED = "key_simple_buy_flow"
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"
         private const val KEY_INTRO_TOUR_CURRENT_STAGE = "key_intro_tour_current_stage"
+        private const val KEY_CUSTODIAL_INTRO_SEEN = "key_custodial_balance_intro_seen"
 
         private const val BACKUP_DATE_KEY = "BACKUP_DATE_KEY"
         private const val SWAP_DATE_KEY = "SWAP_DATE_KEY"

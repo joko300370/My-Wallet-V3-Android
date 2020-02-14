@@ -18,6 +18,7 @@ import com.squareup.moshi.Moshi
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
 import com.blockchain.android.testutils.rxInit
+import io.reactivex.Maybe
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
@@ -140,6 +141,10 @@ private class FakeAuthenticator(private val token: String) : Authenticator {
                 updatedAt = ""
             )
         ).flatMap { singleFunction(it) }
+
+    override fun <T> authenticateMaybe(maybeFunction: (NabuSessionTokenResponse) -> Maybe<T>): Maybe<T> {
+        throw Exception("Not expected")
+    }
 
     override fun <T> authenticateSingle(singleFunction: (Single<NabuSessionTokenResponse>) -> Single<T>): Single<T> {
         throw Exception("Not expected")

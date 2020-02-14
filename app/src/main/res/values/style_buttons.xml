@@ -3,31 +3,54 @@
     <style name="CtaButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textSize">16sp</item>
         <item name="android:layout_gravity">center</item>
-        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
-        <item name="android:layout_marginRight">@dimen/standard_margin</item>
         <item name="android:padding">12dp</item>
         <item name="textAllCaps">false</item>
-        <item name="fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter_medium</item>
     </style>
 
     <style name="CtaButton.Red">
         <item name="android:background">@drawable/bkgd_button_red_selector</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
+        <item name="android:layout_marginRight">@dimen/standard_margin</item>
     </style>
 
     <style name="CtaButton.Blue">
         <item name="android:background">@drawable/bkgd_button_blue_selector</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
+        <item name="android:layout_marginRight">@dimen/standard_margin</item>
     </style>
 
     <style name="CtaButton.White">
         <item name="android:background">@drawable/bkgd_button_white_selector</item>
         <item name="android:textColor">@color/blue_600</item>
+        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
+        <item name="android:layout_marginRight">@dimen/standard_margin</item>
     </style>
 
     <style name="CtaButton.Black">
         <item name="android:background">@drawable/bkgd_button_black_selector</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
+        <item name="android:layout_marginRight">@dimen/standard_margin</item>
+    </style>
+
+    <style name="CtaButton.NoMargin"/>
+
+    <style name="CtaButton.NoMargin.Blue">
+        <item name="android:background">@drawable/bkgd_button_blue_selector</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="CtaButton.NoMargin.Black">
+        <item name="android:background">@drawable/bkgd_button_black_selector</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="CtaButton.NoMargin.White">
+        <item name="android:background">@drawable/bkgd_button_white_selector</item>
+        <item name="android:textColor">@color/blue_600</item>
     </style>
 
 </resources>

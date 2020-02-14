@@ -19,14 +19,27 @@ import com.blockchain.swap.nabu.models.nabu.TiersJson
 import com.blockchain.swap.nabu.models.nabu.UpdateCoinifyTraderIdRequest
 import com.blockchain.swap.nabu.models.nabu.VeriffToken
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
+import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
+import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
+import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
 import io.reactivex.Completable
 import io.reactivex.Single
+import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -36,7 +49,9 @@ internal interface Nabu {
 
     @POST(NABU_INITIAL_AUTH)
     fun getAuthToken(
-        @Body jwt: NabuOfflineTokenRequest
+        @Body jwt: NabuOfflineTokenRequest,
+        @Query("fiatCurrency") currency: String? = null,
+        @Query("action") action: String? = null
     ): Single<NabuOfflineTokenResponse>
 
     @POST(NABU_SESSION_TOKEN)
@@ -170,4 +185,66 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Body currency: SendToMercuryAddressRequest
     ): Single<SendToMercuryAddressResponse>
+
+    @GET(NABU_SIMPLE_BUY_PAIRS)
+    fun getSupportedSimpleBuyPairs(): Single<SimpleBuyPairsResp>
+
+    @GET(NABU_SIMPLE_BUY_AMOUNTS)
+    fun getPredefinedAmounts(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String
+    ): Single<List<Map<String, List<Long>>>>
+
+    @GET(NABU_SIMPLE_QUOTE)
+    fun getSimpleBuyQuote(
+        @Header("authorization") authorization: String,
+        @Query("currencyPair") currencyPair: String,
+        @Query("action") action: String,
+        @Query("amount") amount: String
+    ): Single<SimpleBuyQuoteResponse>
+
+    @PUT(NABU_SIMPLE_BUY_ACCOUNT_DETAILS)
+    fun getSimpleBuyBankAccountDetails(
+        @Header("authorization") authorization: String,
+        @Body currency: SimpleBuyCurrency
+    ): Single<BankAccountResponse>
+
+    @GET(NABU_SIMPLE_BUY_ELIGIBILITY)
+    fun isEligibleForSimpleBuy(@Header("authorization") authorization: String): Single<SimpleBuyEligibility>
+
+    @POST(NABU_SIMPLE_BUY_ORDERS)
+    fun createOrder(
+        @Header("authorization") authorization: String,
+        @Body order: CustodialWalletOrder
+    ): Single<BuyOrderResponse>
+
+    @GET(NABU_SIMPLE_BUY_ORDERS)
+    fun getOutstandingBuyOrders(
+        @Header("authorization") authorization: String
+    ): Single<BuyOrderListResponse>
+
+    @DELETE("$NABU_SIMPLE_BUY_ORDERS/{orderId}")
+    fun deleteBuyOrder(
+        @Header("authorization") authorization: String,
+        @Path("orderId") orderId: String
+    ): Completable
+
+    @GET("$NABU_SIMPLE_BUY_ORDERS/{userId}")
+    fun getBuyOrder(
+        @Header("authorization") authHeader: String,
+        @Path("orderId") orderId: String
+    ): Single<BuyOrderResponse>
+
+    @GET(NABU_SIMPLE_BUY_ASSET_BALANCE)
+    fun getBalanceForAsset(
+        @Header("authorization") authorization: String,
+        @Query("ccy") cryptoSymbol: String
+    ): Single<Response<SimpleBuyBalanceResponse>>
+
+    @Headers("blockchain-origin: simplebuy")
+    @POST(NABU_SIMPLE_BUY_BALANCE_TRANSFER)
+    fun transferFunds(
+        @Header("authorization") authorization: String,
+        @Body request: TransferRequest
+    ): Completable
 }

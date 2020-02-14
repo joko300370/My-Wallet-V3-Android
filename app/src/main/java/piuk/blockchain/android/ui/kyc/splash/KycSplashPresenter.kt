@@ -41,7 +41,7 @@ class KycSplashPresenter(
             .flatMap {
                 if (
                     it == Kyc2TierState.Tier2Approved ||
-                    it == Kyc2TierState.Tier1InReview ||
+                    it == Kyc2TierState.Tier1Pending ||
                     it == Kyc2TierState.Tier1Approved
                 ) {
                     nabuCoinifyAccountCreator.createCoinifyAccountIfNeeded()

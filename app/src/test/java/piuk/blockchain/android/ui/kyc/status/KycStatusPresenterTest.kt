@@ -63,7 +63,7 @@ class KycStatusPresenterTest {
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
         whenever(kycStatusHelper.getKyc2TierStatus())
-            .thenReturn(Single.just(Kyc2TierState.Tier2InReview))
+            .thenReturn(Single.just(Kyc2TierState.Tier2InPending))
         // Act
         subject.onViewReady()
         // Assert

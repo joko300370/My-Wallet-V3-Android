@@ -14,16 +14,17 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.campaign.PromoBottomSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
 import java.text.DateFormat
 import kotlin.math.max
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet as AirdropStatusSheet
 
 class AirdropCentreActivity : MvpActivity<AirdropCentreView, AirdropCentrePresenter>(),
     AirdropCentreView,
-    PromoBottomSheet.Host {
+    SlidingModalBottomDialog.Host {
 
     override val presenter: AirdropCentrePresenter by inject()
     override val view: AirdropCentreView = this
@@ -85,13 +86,12 @@ class HeadingViewHolder(itemView: View) : AirdropViewHolder<ListItem.HeaderItem>
 
 class StatusViewHolder(itemView: View) : AirdropViewHolder<ListItem.AirdropItem>(itemView) {
 
-    private var lastClick = 0L
-
     fun bind(item: ListItem.AirdropItem, onClick: (String) -> Unit) {
         with(itemView) {
             icon.setCoinIcon(item.airdrop.currency)
             currency.text = item.airdrop.currency.symbol
             val formatted = DateFormat.getDateInstance(DateFormat.SHORT).format(item.airdrop.date)
+            setOnClickListenerDebounced { onClick(item.airdrop.name) }
             date.text = resources.getString(
                 if (item.airdrop.isActive) {
                     R.string.airdrop_status_date_active
@@ -100,19 +100,7 @@ class StatusViewHolder(itemView: View) : AirdropViewHolder<ListItem.AirdropItem>
                 },
                 formatted
             )
-
-            setOnClickListener {
-                val now = System.currentTimeMillis()
-                if (now > lastClick + DEBOUNCE_TIMEOUT) {
-                    lastClick = now
-                    onClick(item.airdrop.name)
-                }
-            }
         }
-    }
-
-    companion object {
-        private const val DEBOUNCE_TIMEOUT = 500L
     }
 }
 

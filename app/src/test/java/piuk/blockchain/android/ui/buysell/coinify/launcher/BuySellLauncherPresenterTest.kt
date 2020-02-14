@@ -72,7 +72,7 @@ class BuySellLauncherPresenterTest : RxTest() {
     @Test
     fun `onViewReady has coinify user KYC not approved`() {
         // Assemble
-        whenever(kycStatusHelper.getKyc2TierStatus()).thenReturn(Single.just(Kyc2TierState.Tier2InReview))
+        whenever(kycStatusHelper.getKyc2TierStatus()).thenReturn(Single.just(Kyc2TierState.Tier2InPending))
         whenever(exchangeService.getCoinifyData()).thenReturn(Maybe.just(CoinifyData(123, "asdf")))
         // Act
         subject.onViewReady()

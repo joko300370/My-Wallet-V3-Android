@@ -62,6 +62,12 @@ class ExchangeRateDataStore(
         return lastPrice ?: lastKnown
     }
 
+    fun getFiatLastPrice(targetCurrency: String, sourceCurrency: String): Double {
+        val targetCurrencyPrice = CryptoCurrency.BTC.tickerData()?.get(targetCurrency)?.price ?: return 0.0
+        val sourceCurrencyPrice = CryptoCurrency.BTC.tickerData()?.get(sourceCurrency)?.price ?: return 0.0
+        return targetCurrencyPrice.div(sourceCurrencyPrice)
+    }
+
     private fun CryptoCurrency.tickerData() =
         when (this) {
             CryptoCurrency.BTC -> btcTickerData

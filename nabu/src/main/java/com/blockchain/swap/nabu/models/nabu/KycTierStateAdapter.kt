@@ -14,6 +14,7 @@ internal class KycTierStateAdapter {
             REJECTED -> KycTierState.Rejected
             PENDING -> KycTierState.Pending
             VERIFIED -> KycTierState.Verified
+            UNDER_REVIEW -> KycTierState.Under_Review
             else -> throw JsonDataException("Unknown KYC Tier State: $input, unsupported data type")
         }
 
@@ -23,6 +24,7 @@ internal class KycTierStateAdapter {
             KycTierState.None -> NONE
             KycTierState.Rejected -> REJECTED
             KycTierState.Pending -> PENDING
+            KycTierState.Under_Review -> UNDER_REVIEW
             KycTierState.Verified -> VERIFIED
         }
 
@@ -31,5 +33,6 @@ internal class KycTierStateAdapter {
         private const val REJECTED = "REJECTED"
         private const val PENDING = "PENDING"
         private const val VERIFIED = "VERIFIED"
+        private const val UNDER_REVIEW = "UNDER_REVIEW"
     }
 }

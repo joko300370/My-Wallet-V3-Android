@@ -5,66 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/asset_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:importantForAccessibility="no"
-        app:srcCompat="@drawable/vector_bitcoin_colored"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_name"
-        style="@style/Text.Semibold.Centered.20"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Bitcoin"
-        app:layout_constraintStart_toEndOf="@id/asset_icon"
-        app:layout_constraintTop_toTopOf="@id/asset_icon" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/balance_for_asset"
-        style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/asset_name"
-        app:layout_constraintTop_toBottomOf="@+id/asset_name"
-        tools:text="Your BTC Balance" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_balance_fiat"
-        style="@style/Text.Semibold.16"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/asset_name"
-        tools:text="$15,879.90" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_balance_crypto"
-        style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/asset_name"
-        tools:text="1.638192 BTC" />
-
-    <include
-        android:id="@+id/send_request_tabs"
-        layout="@layout/layout_send_request_tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/asset_balance_crypto" />
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/current_price_title"
         style="@style/Text.Light.14"
@@ -72,10 +12,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/current_price"
+        tools:text="Current BTC Price"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/send_request_tabs" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/current_price"
@@ -96,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
-        android:text="+$158.45 (1.56%)"
+        tools:text="+$158.45 (1.56%)"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/price_change_period"
         app:layout_constraintTop_toBottomOf="@+id/current_price"
@@ -108,16 +48,41 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:text="last 24hrs"
+        tools:text="last 24hrs"
         app:layout_constraintTop_toBottomOf="@+id/current_price"
         app:layout_constraintStart_toEndOf="@id/price_change"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/price_change_period"
+        tools:ignore="RtlHardcoded,RtlSymmetry" />
+
+    <ProgressBar
+            android:id="@+id/prices_loading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue_600"
+            android:indeterminateTintMode="src_in"
+            app:layout_constraintBottom_toBottomOf="@+id/chart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/chart" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/chart_price_periods"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/price_change"
+        app:layout_constraintTop_toBottomOf="@+id/chart"
         app:tabIndicatorColor="@color/dashboard_chart_indicator_color">
 
         <com.google.android.material.tabs.TabItem
@@ -156,41 +121,13 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/asset_list"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/chart_price_periods"
-        tools:ignore="RtlHardcoded,RtlSymmetry" />
-
-    <ProgressBar
-        android:id="@+id/prices_loading"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="35dp"
-        android:layout_marginEnd="35dp"
-        android:indeterminate="true"
-        android:indeterminateTint="@color/blue_600"
-        android:indeterminateTintMode="src_in"
-        app:layout_constraintBottom_toBottomOf="@+id/chart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chart" />
-
-    <include
-        android:id="@+id/buy_swap_tabs"
-        layout="@layout/layout_buy_swap_tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chart"
-        app:layout_constraintVertical_bias="0" />
+        android:layout_marginBottom="@dimen/standard_margin"
+        tools:listitem="@layout/dialog_dashboard_asset_detail_item"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

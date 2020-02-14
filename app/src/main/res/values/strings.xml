@@ -17,9 +17,11 @@
     <string name="all_accounts">All Wallets</string>
     <string name="please_wait">Please wait</string>
     <string name="item_buy_sell">Buy &amp; Sell</string>
+    <string name="item_buy">Buy Crypto</string>
     <string name="item_backup">Backup funds</string>
     <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Exchange</string>
+    <string name="item_simple_buy">Simple buy</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="item_debug_homebrew" translatable="false">Debug Homebrew</string>
 
@@ -28,6 +30,7 @@
     <string name="toolbar_cmd_send">Send</string>
     <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
+    <string name="toolbar_cmd_view_activity">View Activity</string>
     <string name="toolbar_cmd_swap">Swap</string>
 
     <string name="cancel">Cancel</string>
@@ -807,7 +810,6 @@
 
     <!-- DASHBOARD -->
     <string name="dashboard_title">Dashboard</string>
-    <string name="current_price">Current price</string>
 
     <string name="dashboard_time_span_last_day">Last day</string>
     <string name="dashboard_time_span_last_month">Last month</string>
@@ -820,9 +822,13 @@
     <string name="kyc_more_info_cta">Update Now</string>
 
     <string name="metadata_load_failure">Error loading full wallet functionality. Service might temporarily be unavailable.</string>
-    <string name="dashboard_balance_for_asset">Your %1$s Balance</string>
+    <string name="dashboard_price_for_asset">Current %1$s Price</string>
     <string name="dashboard_buy_for_asset">Buy %1$s</string>
     <string name="dashboard_asset_error">Could not load %1$s at this time</string>
+
+    <string name="dashboard_asset_balance_total">Total Balance</string>
+    <string name="dashboard_asset_balance_wallet">Wallet Balance</string>
+    <string name="dashboard_asset_balance_custodial">Custody Balance</string>
 
     <string name="more">More</string>
 
@@ -1080,6 +1086,16 @@
     <string name="recovery_card_body">You control your crypto. Write down your recovery phrase to restore all your funds in case you lose your password.</string>
     <string name="recovery_card_cta">Backup Phrase</string>
 
+    <!-- Simple buy finish signup -->
+    <string name="simple_buy_finish_signup_card_title">Finish Signing Up. Buy Crypto.</string>
+    <string name="simple_buy_finish_signup_card_body">You’re almost done signing up for your Blockchain.com Wallet. Once you finish and get approved, start buying crypto.</string>
+    <string name="simple_buy_finish_signup_card_cta">Continue</string>
+
+    <!-- Simple buy pending buy -->
+    <string name="simple_buy_pending_buy_card_title">Pending Crypto Purchase</string>
+    <string name="simple_buy_pending_buy_card_body">Once we receive your bank transfer, your crypto purchase order will be completed.</string>
+    <string name="simple_buy_pending_buy_card_cta">View Bank Transfer Details</string>
+
     <!-- Enrole fingerprints announcement -->
     <string name="register_fingerprint_card_title">Fingerprint Log in</string>
     <string name="register_fingerprint_card_body">Enable fingerprint to quickly log into your wallet instead of using your PIN.</string>
@@ -1110,6 +1126,33 @@
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Where are my stacks?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Stacks (STX) are stored in your Blockchain Wallet. Please note the balance is currently non-transferable.</string>
     <string name="airdrop_sheet_xlm_title" translatable="false">Stellar (XLM)</string>
+
+    <!-- custody wallet intro sheet -->
+    <string name="custody_intro_title">Your Custody Wallet.</string>
+    <string name="custody_intro_body_1">When you buy bitcoin from your Blockchain.com Wallet, your bitcoin will be kept on your Custody Balance. You can keep it safely in there or transfer your funds to your Wallet.</string>
+    <string name="custody_intro_body_2">If you want to swap or send these funds you need to transfer them to your bitcoin Wallet.</string>
+
+    <!-- force backup before send sheet -->
+    <string name="backup_before_send_title">Backup Your Wallet</string>
+    <string name="backup_before_send_body">Before you can send from your Custody Wallet, secure your crypto with your Backup Phrase. Please write these 12 words down, in order, and keep them somewhere safe. These 12 words allow you to always access your funds.</string>
+    <string name="backup_before_send_cta">Backup Now</string>
+
+    <!-- basic transfer to wallet -->
+    <string name="basic_transfer_title">Send to %1s</string>
+    <string name="basic_transfer_body">Blockchain.com only allows sending your Wallet\'s total amount at this time.</string>
+    <string name="basic_transfer_cta">Send</string>
+
+    <!-- basic transfer complete -->
+    <string name="basic_transfer_complete_title">Success! %1s Sent.</string>
+    <string name="basic_transfer_complete_body">It may take up to 60 minutes for a transaction to be validated by the blockchain network.</string>
+    <string name="basic_transfer_complete_cta">OK</string>
+
+    <!-- basic transfer error -->
+    <string name="basic_transfer_error_title">Oops!</string>
+    <string name="basic_transfer_error_body">Something went wrong. Please go back and try again.</string>
+
+    <string name="basic_transfer_error_in_progress_title">Send In Progress</string>
+    <string name="basic_transfer_error_in_progress_body">There is a transaction in progress. We’ll let you know once the funds reach your wallet.</string>
 
     <string name="airdrop_status_date_active">Drops on %1s</string>
     <string name="airdrop_status_date_inactive">Ended on %1s</string>
@@ -1710,4 +1753,67 @@
         <item>@string/xlm_memo_return</item>
     </string-array>
 
+    <!--Simple buy-->
+    <string name="simple_buy_intro_title">Welcome to Blockchain</string>
+    <string name="simple_buy_buy_crypto">Buy Crypto</string>
+    <string name="simple_buy_instructions_to_buy">We can help you buy in just a few simple steps.</string>
+    <string name="simple_buy_intro_main_button_action">Buy Crypto Now</string>
+    <string name="simple_buy_deposit_my_crypto">Tour the Wallet</string>
+    <string name="simple_buy_skip_text">Explore your new Blockchain Wallet.</string>
+    <string name="simple_buy_get_started">Get Started</string>
+    <string name="simple_buy_what_you_want_to_buy">What would you like to buy?</string>
+    <string name="simple_buy_enter_amount">Enter amount</string>
+    <string name="simple_buy_buy_crypto_title">Buy Crypto</string>
+    <string name="simple_buy_verify_email_instruction">We sent an email to %1$s with a verification link. Didn’t get it? Check your spam folder.</string>
+    <string name="simple_buy_error_fetching_price">Error fetching latest price.</string>
+    <string name="simple_buy_up_to_amount">Up to %1$s</string>
+    <string name="use_max">Use MAX</string>
+    <string name="too_high">Too high</string>
+    <string name="use_min">Use MIN</string>
+    <string name="too_low">Too low</string>
+    <string name="checkout">Checkout</string>
+    <string name="checkout_subtitle">Please review and confirm your %1$s buy.</string>
+    <string name="total_cost">Total Cost</string>
+    <string name="date">Date</string>
+    <string name="purchase_note">Once we receive your funds, we’ll start your %1$s buy order. Note, your final amount might change to due market activity. Fees may apply.</string>
+    <string name="buy_crypto">Buy %1$s</string>
+    <string name="kyc_pending_title">KYC Done - Pending</string>
+    <string name="kyc_manual_review_title">KYC Done - Manual Review</string>
+    <string name="kyc_pending_subtitle">User goes through the GOLD KYC flow</string>
+    <string name="kyc_verifying_info">Verifying your information</string>
+    <string name="kyc_verifying_time_info">Usually takes less than a minute.</string>
+    <string name="kyc_verifying_manual_review_required_info">You’ve successfully submitted your application. A Blockchain Support Member will review your information.</string>
+    <string name="kyc_manual_review_required">Manual Review Required</string>
+    <string name="kyc_pending_review">Pending Review</string>
+    <string name="kyc_veriff_but_not_eligible_review">Successful Application</string>
+    <string name="kyc_veriff_but_not_eligible_review_info">Your identity has been successfully verified. You’re now Gold Level and can trade up to $25000 a day. \n\n Buy is not available in your region yet, we’ll let you know as soon as this happens.</string>
+    <string name="kyc_undecided_text">Copy for undecided state</string>
+    <string name="continue_to_wallet">Continue to wallet</string>
+    <string name="simple_buy_securely_transfer">Securely transfer %1$s from your bank account to Blockchain. Depending on the transfer method and availability of funds, this may take up to 1 business day.</string>
+    <string name="simple_buy_bank_account_sheet_instructions">Please transfer %1$s from your bank account to Blockchain.com. Once we receive the funds, we\'ll create your %2$s buy order.</string>
+    <string name="simple_buy_amount_to_send">Amount to send</string>
+    <string name="simple_buy_pending_buy_sheet_title">Pending %1s Buy</string>
+    <string name="recipient_name_must_match_eur">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.</string>
+    <string name="recipient_name_must_match_gbp">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.\n\nBy depositing funds to this account, you agree to <annotation link="modular_terms_and_conditions">Terms &amp; Conditions of Modulr</annotation>, our banking partner.</string>
+    <string name="recipient_name_must_match">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
+    <string name="simple_buy_no_currencies_available_title">No currencies available</string>
+    <string name="simple_buy_no_currencies_available">Unfortunately, currently there are no currencies that you can trade :( </string>
+    <string name="cancel_order">Cancel order</string>
+    <string name="are_ypu_sure">Are you sure?</string>
+    <string name="go_back">Go Back</string>
+    <string name="cancel_token_instruction">This will remove your %1$s Buy order.</string>
+    <string name="transfer_details">Transfer Details</string>
+    <string name="ops">Oops!</string>
+    <string name="something_went_wrong_try_again">Something went wrong. Please try again.</string>
+    <string name="simple_buy_token">Buy %1s</string>
+    <string name="simple_buy_copied_to_clipboard">%1s is on your clipboard</string>
+    <string name="account_number">Account Number</string>
+    <string name="bank_code_swift_bic">Bank Code (SWIFT/BIC)</string>
+    <string name="recipient_name">Recipient</string>
+    <string name="sort_code">Sort Code</string>
+    <string name="bank_name">Bank Name</string>
+    <string name="bank_country">Bank Country</string>
+    <string name="iban">IBAN</string>
+    <string name="estonia">Estonia</string>
+    <string name="lets_setup_wallet">Let’s get your wallet set up. You can quickly buy crypto now or do this later.</string>
 </resources>

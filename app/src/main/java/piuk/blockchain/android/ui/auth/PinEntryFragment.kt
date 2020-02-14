@@ -62,6 +62,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     private val pinEntryPresenter: PinEntryPresenter by inject()
     private val environmentConfig: EnvironmentConfig by inject()
+    private val appUtil: AppUtil by inject()
 
     private val _pinBoxList = mutableListOf<ImageView>()
     override val pinBoxList: List<ImageView>
@@ -80,6 +81,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         get() = presenter.isForValidatingPinForResult
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val isAfterWalletCreation: Boolean by lazy {
+        arguments?.getBoolean(KEY_IS_AFTER_WALLET_CREATION, false) ?: false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -560,6 +565,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         }
     }
 
+    override fun restartAppWithVerifiedPin() {
+        appUtil.restartAppWithVerifiedPin(LauncherActivity::class.java, isAfterWalletCreation)
+    }
+
     override val locale: Locale
         get() = Locale.getDefault()
 
@@ -577,11 +586,13 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     companion object {
         private const val KEY_SHOW_SWIPE_HINT = "show_swipe_hint"
+        private const val KEY_IS_AFTER_WALLET_CREATION = "is_after_wallet_creation"
         private val HANDLER = Handler()
 
-        fun newInstance(showSwipeHint: Boolean): PinEntryFragment {
+        fun newInstance(showSwipeHint: Boolean, isAfterCreateWallet: Boolean): PinEntryFragment {
             val args = Bundle()
             args.putBoolean(KEY_SHOW_SWIPE_HINT, showSwipeHint)
+            args.putBoolean(KEY_IS_AFTER_WALLET_CREATION, isAfterCreateWallet)
             val fragment = PinEntryFragment()
             fragment.arguments = args
             return fragment

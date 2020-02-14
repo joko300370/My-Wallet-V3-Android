@@ -10,7 +10,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.tour_guide_overlay.view.*
 import android.widget.FrameLayout
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.OnBoardingPrefs
+import com.blockchain.preferences.DashboardPrefs
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 import piuk.blockchain.android.R
@@ -41,7 +41,7 @@ class TourGuide @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), KoinComponent {
 
-    private val prefs: OnBoardingPrefs by inject()
+    private val prefs: DashboardPrefs by inject()
     private val analytics: Analytics by inject()
 
     private var host: IntroTourHost? = null

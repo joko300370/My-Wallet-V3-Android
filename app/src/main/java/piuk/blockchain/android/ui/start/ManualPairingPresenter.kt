@@ -51,7 +51,7 @@ class ManualPairingPresenter(
     private val analytics: Analytics
 ) : MvpPresenter<ManualPairingView>() {
 
-    val authCompositeDispossable = CompositeDisposable()
+    private val authCompositeDispossable = CompositeDisposable()
 
     override fun onViewAttached() { /* no-op */
     }

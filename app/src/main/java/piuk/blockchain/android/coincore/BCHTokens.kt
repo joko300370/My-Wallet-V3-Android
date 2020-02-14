@@ -2,12 +2,15 @@ package piuk.blockchain.android.coincore
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.wallet.toAccountReference
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.StringUtils
@@ -27,17 +30,23 @@ class BCHTokens(
     private val currencyPrefs: CurrencyPrefs,
     private val stringUtils: StringUtils,
     private val crashLogger: CrashLogger,
+    private val custodialWalletManager: CustodialWalletManager,
     rxBus: RxBus
 ) : BitcoinLikeTokens(rxBus) {
 
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
 
-    override fun defaultAccount(): Single<AccountReference> {
-        TODO("not implemented")
-    }
+    override fun defaultAccount(): Single<AccountReference> =
+        with(bchDataManager) {
+            val a = getAccountMetadataList()[getDefaultAccountPosition()]
+            Single.just(a.toAccountReference())
+        }
 
-    override fun totalBalance(filter: BalanceFilter): Single<CryptoValue> =
+    override fun custodialBalanceMaybe(): Maybe<CryptoValue> =
+        custodialWalletManager.getBalanceForAsset(CryptoCurrency.BCH)
+
+    override fun noncustodialBalance(): Single<CryptoValue> =
         walletInitialiser()
             .andThen(Completable.defer { updater() })
             .toCryptoSingle(CryptoCurrency.BCH) { bchDataManager.getWalletBalance() }

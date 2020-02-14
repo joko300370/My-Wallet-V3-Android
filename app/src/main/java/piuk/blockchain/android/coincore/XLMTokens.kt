@@ -2,33 +2,40 @@ package piuk.blockchain.android.coincore
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.lang.IllegalArgumentException
 
 class XLMTokens(
+    rxBus: RxBus,
     private val xlmDataManager: XlmDataManager,
     private val exchangeRates: ExchangeRateDataManager,
     private val historicRates: ChartsDataManager,
-    private val currencyPrefs: CurrencyPrefs
-) : AssetTokens {
+    private val currencyPrefs: CurrencyPrefs,
+    private val custodialWalletManager: CustodialWalletManager
+) : AssetTokensBase(rxBus) {
 
     override val asset: CryptoCurrency
         get() = CryptoCurrency.XLM
 
-    override fun defaultAccount(): Single<AccountReference> {
-        TODO("not implemented")
-    }
+    override fun defaultAccount(): Single<AccountReference> =
+        xlmDataManager.defaultAccountReference()
 
-    override fun totalBalance(filter: BalanceFilter): Single<CryptoValue> =
+    override fun custodialBalanceMaybe(): Maybe<CryptoValue> =
+        custodialWalletManager.getBalanceForAsset(CryptoCurrency.XLM)
+
+    override fun noncustodialBalance(): Single<CryptoValue> =
         xlmDataManager.getBalance()
 
     override fun balance(account: AccountReference): Single<CryptoValue> {

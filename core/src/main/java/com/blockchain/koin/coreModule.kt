@@ -27,8 +27,9 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.NotificationPrefs
-import com.blockchain.preferences.OnBoardingPrefs
+import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.SecurityPrefs
+import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmHorizonUrlFetcher
@@ -266,9 +267,10 @@ val coreModule = applicationContext {
     }.bind(PersistentPrefs::class)
         .bind(CurrencyPrefs::class)
         .bind(NotificationPrefs::class)
-        .bind(OnBoardingPrefs::class)
+        .bind(DashboardPrefs::class)
         .bind(SecurityPrefs::class)
         .bind(ThePitLinkingPrefs::class)
+        .bind(SimpleBuyPrefs::class)
         .bind(WalletStatus::class)
 
     factory { CurrencyFormatUtil() }

@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 // Uses sparkline lib from here: https://github.com/robinhood/spark
@@ -83,7 +84,7 @@ private class AssetCardViewHolder(
     private fun renderLoaded(state: AssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
         with(itemView) {
             cardLayout.isEnabled = true
-            setOnClickListener { onCardClicked(state.currency) }
+            setOnClickListenerDebounced { onCardClicked(state.currency) }
 
             showContent()
 

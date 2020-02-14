@@ -49,24 +49,32 @@
     </RelativeLayout>
 
     <TextView
-        style="@style/TextAppearance.AppCompat.Small"
+        style="@style/Text.Standard.Centered.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/huge_margin"
         android:text="@string/backup_complete_message" />
 
     <TextView
+        style="@style/Text.Standard.Centered.12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/backup_lost_mnemonic"
-        android:textColor="@color/primary_grey_dark"
-        android:textSize="12sp" />
+        android:layout_marginTop="@dimen/huge_margin"
+        android:text="@string/backup_lost_mnemonic"/>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_backup_again"
+        android:id="@+id/button_backup_done"
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/huge_margin"
+        android:text="@string/done" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_backup_again"
+        style="@style/CtaButton.White"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_margin"
         android:text="@string/backup_again" />
 </LinearLayout>

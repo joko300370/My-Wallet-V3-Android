@@ -32,6 +32,9 @@ class ExchangeRateDataManager(
     fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
         exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
 
+    fun getLastPriceOfFiat(targetCurrency: String, sourceCurrency: String) =
+        exchangeRateDataStore.getFiatLastPrice(targetCurrency = targetCurrency, sourceCurrency = sourceCurrency)
+
     fun getHistoricPrice(value: CryptoValue, fiat: String, timeInSeconds: Long): Single<FiatValue> =
         exchangeRateDataStore.getHistoricPrice(value.currency, fiat, timeInSeconds)
             .map { FiatValue.fromMajor(fiat, it * value.toBigDecimal()) }
@@ -64,6 +67,13 @@ fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUni
     FiatValue.fromMajor(
         fiatUnit,
         exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toBigDecimal()
+    )
+
+fun FiatValue.toFiatWithCurrency(exchangeRateDataManager: ExchangeRateDataManager, targetCurrency: String) =
+    FiatValue.fromMajor(targetCurrency,
+        exchangeRateDataManager.getLastPriceOfFiat(sourceCurrency =
+        this.currencyCode, targetCurrency = targetCurrency
+        ).toBigDecimal() * toBigDecimal()
     )
 
 fun FiatValue.toCrypto(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =

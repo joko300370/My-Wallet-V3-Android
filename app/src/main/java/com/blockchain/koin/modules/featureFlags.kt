@@ -17,6 +17,10 @@ val featureFlagsModule = applicationContext {
         get<RemoteConfig>().featureFlag("coinify_enabled")
     }
 
+    factory("ff_simple_buy") {
+        get<RemoteConfig>().featureFlag("simple_buy_enabled")
+    }
+
     factory("ff_pit_announcement") {
         get<RemoteConfig>().featureFlag("pit_show_announcement")
     }

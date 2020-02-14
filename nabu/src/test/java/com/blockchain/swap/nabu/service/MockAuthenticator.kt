@@ -2,6 +2,7 @@ package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 class MockAuthenticator(val token: String) : Authenticator {
@@ -15,6 +16,9 @@ class MockAuthenticator(val token: String) : Authenticator {
 
     override fun <T> authenticate(singleFunction: (NabuSessionTokenResponse) -> Single<T>): Single<T> =
         singleSessionTokenResponse().flatMap { singleFunction(it) }
+
+    override fun <T> authenticateMaybe(maybeFunction: (NabuSessionTokenResponse) -> Maybe<T>): Maybe<T> =
+        singleSessionTokenResponse().flatMapMaybe { maybeFunction(it) }
 
     private fun singleSessionTokenResponse(): Single<NabuSessionTokenResponse> =
         Single.just(

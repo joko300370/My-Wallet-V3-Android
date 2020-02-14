@@ -21,8 +21,9 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -32,6 +33,8 @@ import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
+import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
+import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.launcher.LauncherActivity
@@ -69,6 +72,7 @@ interface MainView : MvpView, HomeNavigator {
     fun showMetadataNodeFailure()
     fun setBuySellEnabled(enabled: Boolean, useWebView: Boolean)
     fun setPitEnabled(enabled: Boolean)
+    fun setSimpleBuyEnabled(enabled: Boolean)
     fun showTradeCompleteMsg(txHash: String)
     fun setWebViewLoginDetails(loginDetails: WebViewLoginDetails)
     fun showSecondPasswordDialog()
@@ -79,7 +83,6 @@ interface MainView : MvpView, HomeNavigator {
     fun showTestnetWarning()
     fun launchSwapIntro()
     fun launchPendingVerificationScreen(campaignType: CampaignType)
-    fun refreshDashboard()
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
 }
@@ -104,9 +107,11 @@ class MainPresenter internal constructor(
     private val xlmDataManager: XlmDataManager,
     private val pitFeatureFlag: FeatureFlag,
     private val pitLinking: PitLinking,
-    private val nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val crashLogger: CrashLogger
+    private val simpleBuySync: SimpleBuySyncFactory,
+    private val crashLogger: CrashLogger,
+    private val simpleBuyAvailability: SimpleBuyAvailability,
+    nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
 
     override val alwaysDisableScreenshots: Boolean = false
@@ -114,6 +119,12 @@ class MainPresenter internal constructor(
 
     internal val defaultCurrency: String
         get() = prefs.selectedFiatCurrency
+
+    private val nabuUser = nabuToken
+        .fetchNabuToken()
+        .flatMap {
+            nabuDataManager.getUser(it)
+        }
 
     override fun onViewAttached() {
         if (!accessState.isLoggedIn) {
@@ -131,6 +142,21 @@ class MainPresenter internal constructor(
 
             checkPitAvailability()
         }
+    }
+
+    private fun initSimpleBuyState() {
+        compositeDisposable +=
+            simpleBuyAvailability.isAvailable()
+                .doOnSubscribe { view?.setSimpleBuyEnabled(false) }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        view?.setSimpleBuyEnabled(it)
+                        if (it) {
+                            view?.setBuySellEnabled(enabled = false, useWebView = false)
+                        }
+                    }
+                )
     }
 
     override fun onViewDetached() {}
@@ -181,6 +207,13 @@ class MainPresenter internal constructor(
 
     internal fun initMetadataElements() {
         compositeDisposable += metadataLoader.loader()
+            .flatMapCompletable { firstLoad ->
+                if (firstLoad) {
+                    simpleBuySync.performSync()
+                } else {
+                    Completable.complete()
+                }
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 view?.showProgressDialog(R.string.please_wait)
@@ -199,7 +232,7 @@ class MainPresenter internal constructor(
                     checkKycStatus()
                     setDebugExchangeVisibility()
                     initBuyService()
-
+                    initSimpleBuyState()
                     checkForPendingLinks()
                 },
                 onError = { throwable ->
@@ -299,8 +332,6 @@ class MainPresenter internal constructor(
                     prefs.setValue(SunriverCardType.JoinWaitList.javaClass.simpleName, true)
                     if (status != KycState.Verified) {
                         view?.launchKyc(CampaignType.Sunriver)
-                    } else {
-                        view?.refreshDashboard()
                     }
                 }, { throwable ->
                     Timber.e(throwable)
@@ -349,10 +380,11 @@ class MainPresenter internal constructor(
 
     private fun initBuyService() {
         compositeDisposable +=
-            Observables.zip(buyDataManager.canBuy,
-                buyDataManager.isCoinifyAllowed).subscribe(
-                { (isEnabled, isCoinifyAllowed) ->
-                    view?.setBuySellEnabled(isEnabled, isCoinifyAllowed)
+            Singles.zip(buyDataManager.canBuy,
+                simpleBuyAvailability.isAvailable(),
+                buyDataManager.isCoinifyAllowed).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                { (isEnabled, available, isCoinifyAllowed) ->
+                    view?.setBuySellEnabled(isEnabled && !available, isCoinifyAllowed)
                     if (isEnabled && !isCoinifyAllowed) {
                         compositeDisposable += buyDataManager.watchPendingTrades()
                             .applySchedulers()
@@ -360,7 +392,7 @@ class MainPresenter internal constructor(
 
                         compositeDisposable += buyDataManager.webViewLoginDetails
                             .subscribe({ view?.setWebViewLoginDetails(it) }, { it.printStackTrace() })
-                    } else if (isEnabled && isCoinifyAllowed) {
+                    } else if (isEnabled && isCoinifyAllowed && !available) {
                         notifyCompletedCoinifyTrades()
                     }
                 }, { throwable ->
@@ -402,7 +434,7 @@ class MainPresenter internal constructor(
     internal fun routeToBuySell() {
         compositeDisposable += buyDataManager.isCoinifyAllowed
             .subscribeBy(onError = { it.printStackTrace() },
-                onNext = { coinifyAllowed ->
+                onSuccess = { coinifyAllowed ->
                     if (coinifyAllowed)
                         view?.launchBuySell()
                 })
@@ -413,9 +445,6 @@ class MainPresenter internal constructor(
     }
 
     internal fun startSwapOrKyc(toCurrency: CryptoCurrency?, fromCurrency: CryptoCurrency?) {
-        val nabuUser = nabuToken.fetchNabuToken().flatMap {
-            nabuDataManager.getUser(it)
-        }
         compositeDisposable += nabuUser
             .subscribeBy(onError = { it.printStackTrace() }, onSuccess = { nabuUser ->
                 if (nabuUser.tiers?.current ?: 0 > 0) {

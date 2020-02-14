@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.api.nabu.Nabu
+import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
@@ -18,12 +19,23 @@ import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
 import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
+import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
+import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.veriff.VeriffApplicantAndToken
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
+import retrofit2.HttpException
 import retrofit2.Retrofit
 
 class NabuService(retrofit: Retrofit) {
@@ -31,9 +43,11 @@ class NabuService(retrofit: Retrofit) {
     private val service: Nabu = retrofit.create(Nabu::class.java)
 
     internal fun getAuthToken(
-        jwt: String
+        jwt: String,
+        currency: String? = null,
+        action: String? = null
     ): Single<NabuOfflineTokenResponse> = service.getAuthToken(
-        NabuOfflineTokenRequest(jwt)
+        jwt = NabuOfflineTokenRequest(jwt), currency = currency, action = action
     ).wrapErrorMessage()
 
     internal fun getSessionToken(
@@ -205,6 +219,114 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader,
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
+
+    internal fun getSupportCurrencies(): Single<SimpleBuyPairsResp> = service.getSupportedSimpleBuyPairs()
+        .wrapErrorMessage()
+
+    fun getSimpleBuyBankAccountDetails(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ): Single<BankAccountResponse> =
+        service.getSimpleBuyBankAccountDetails(
+            sessionToken.authHeader, SimpleBuyCurrency(currency)
+        ).wrapErrorMessage()
+
+    internal fun getSimpleBuyQuote(
+        sessionToken: NabuSessionTokenResponse,
+        action: String,
+        currencyPair: String,
+        amount: String
+    ): Single<SimpleBuyQuoteResponse> = service.getSimpleBuyQuote(
+        authorization = sessionToken.authHeader,
+        action = action,
+        currencyPair = currencyPair,
+        amount = amount
+    )
+
+    internal fun getPredefinedAmounts(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ): Single<List<Map<String, List<Long>>>> = service.getPredefinedAmounts(
+        sessionToken.authHeader,
+        currency
+    ).wrapErrorMessage()
+
+    internal fun isEligibleForSimpleBuy(
+        sessionToken: NabuSessionTokenResponse
+    ): Single<SimpleBuyEligibility> = service.isEligibleForSimpleBuy(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    internal fun createOrder(
+        sessionToken: NabuSessionTokenResponse,
+        order: CustodialWalletOrder
+    ) = service.createOrder(
+        sessionToken.authHeader, order
+    ).onErrorResumeNext {
+        if (it is HttpException && it.code() == 409) {
+            Single.error(SimpleBuyError.OrderLimitReached)
+        } else {
+            Single.error(it)
+        }
+    }.wrapErrorMessage()
+
+    internal fun getOutstandingBuyOrders(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getOutstandingBuyOrders(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    internal fun deleteBuyOrder(
+        sessionToken: NabuSessionTokenResponse,
+        orderId: String
+    ) = service.deleteBuyOrder(
+        sessionToken.authHeader, orderId
+    ).onErrorResumeNext {
+        if (it is HttpException && it.code() == 409) {
+            Completable.error(SimpleBuyError.OrderNotCancelable)
+        } else {
+            Completable.error(it)
+        }
+    }.wrapErrorMessage()
+
+    fun getBuyOrder(
+        sessionToken: NabuSessionTokenResponse,
+        orderId: String
+    ) = service.getBuyOrder(
+        sessionToken.authHeader, orderId
+    ).wrapErrorMessage()
+
+    @Suppress("MoveLambdaOutsideParentheses")
+    fun getBalanceForAsset(
+        sessionToken: NabuSessionTokenResponse,
+        cryptoCurrency: CryptoCurrency
+    ): Maybe<SimpleBuyBalanceResponse> = service.getBalanceForAsset(
+        sessionToken.authHeader, cryptoCurrency.symbol
+    ).flatMapMaybe {
+        when (it.code()) {
+            200 -> Maybe.just(it.body())
+            204 -> Maybe.empty()
+            else -> Maybe.error(HttpException(it))
+        }
+    }
+
+    fun transferFunds(
+        sessionToken: NabuSessionTokenResponse,
+        request: TransferRequest
+    ): Completable = service.transferFunds(
+        sessionToken.authHeader,
+        request
+    ).onErrorResumeNext {
+        if (it is HttpException) {
+            when (it.code()) {
+                403 -> Completable.error(SimpleBuyError.WithdrawlAlreadyPending)
+                409 -> Completable.error(SimpleBuyError.WithdrawlInsufficientFunds)
+                else -> Completable.error(it)
+            }
+        } else {
+            Completable.error(it)
+        }
+    }.wrapErrorMessage()
 
     companion object {
         internal const val CLIENT_TYPE = "APP"

@@ -194,7 +194,7 @@ class PinEntryPresenter(
             userEnteredPin = ""
             view.setTitleString(R.string.confirm_pin)
             clearPinBoxes()
-        } else if (userEnteredConfirmationPin == userEnteredPin) {
+    } else if (userEnteredConfirmationPin == userEnteredPin) {
             // End of Confirm - Pin is confirmed
             createNewPin(userEnteredPin)
         } else {
@@ -250,7 +250,7 @@ class PinEntryPresenter(
         if (!wallet.isUpgraded) {
             view.goToUpgradeWalletActivity()
         } else {
-            appUtil.restartAppWithVerifiedPin(LauncherActivity::class.java)
+            view.restartAppWithVerifiedPin()
         }
     }
 

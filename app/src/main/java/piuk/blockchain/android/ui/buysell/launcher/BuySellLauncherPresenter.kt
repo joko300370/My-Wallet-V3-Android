@@ -46,14 +46,14 @@ class BuySellLauncherPresenter(
                                     view.onStartCoinifyOptIn()
                                 }
                             }
-                            Kyc2TierState.Tier1InReview,
+                            Kyc2TierState.Tier1Pending,
                             Kyc2TierState.Tier1Failed,
                             Kyc2TierState.Tier1Approved -> {
                                 view.onStartCoinifyOptIn()
                             }
                             Kyc2TierState.Hidden,
                             Kyc2TierState.Locked -> view.onStartCoinifySignUp()
-                            Kyc2TierState.Tier2InReview,
+                            Kyc2TierState.Tier2InPending,
                             Kyc2TierState.Tier2Failed -> view.showPendingVerificationView()
                         }
                     }

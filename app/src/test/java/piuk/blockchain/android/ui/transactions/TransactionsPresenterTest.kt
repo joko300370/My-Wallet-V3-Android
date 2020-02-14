@@ -228,7 +228,7 @@ class TransactionsPresenterTest {
     @Test
     fun `onGetBitcoinClicked canBuy returns true`() {
         // Arrange
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(true))
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(true))
         // Act
         subject.onGetBitcoinClicked()
         // Assert
@@ -241,7 +241,7 @@ class TransactionsPresenterTest {
     @Test
     fun `onGetBitcoinClicked canBuy returns false`() {
         // Arrange
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(false))
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(false))
         // Act
         subject.onGetBitcoinClicked()
         // Assert

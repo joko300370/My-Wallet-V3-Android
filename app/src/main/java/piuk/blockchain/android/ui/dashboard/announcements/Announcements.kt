@@ -11,6 +11,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 
 interface AnnouncementHost {
     val disposables: CompositeDisposable
@@ -20,6 +21,7 @@ interface AnnouncementHost {
 
     // Actions
     fun startKyc(campaignType: CampaignType)
+
     fun startSwap(swapTarget: CryptoCurrency = CryptoCurrency.ETHER)
     fun startBuySell()
     fun startPitLinking()
@@ -31,6 +33,8 @@ interface AnnouncementHost {
     fun startTransferCrypto()
 
     fun startStxReceivedDetail()
+    fun startSimpleBuyPaymentDetail()
+    fun finishSimpleBuySignup()
 }
 
 abstract class AnnouncementRule(private val dismissRecorder: DismissRecorder) {
@@ -51,17 +55,30 @@ class AnnouncementList(
     private val availableAnnouncements: List<AnnouncementRule>,
     private val dismissRecorder: DismissRecorder
 ) {
+    // Hack to block announcements until metadate/simple buy etc is initialised.
+    // TODO: Refactor app startup so we can avoid nonsense like this
+    private var isEnabled = AtomicBoolean(false)
+
+    fun enable(): Boolean {
+        if (!isEnabled.get()) {
+            isEnabled.set(true)
+            return true
+        }
+        return false
+    }
+
     fun checkLatest(host: AnnouncementHost, disposables: CompositeDisposable) {
         host.dismissAnnouncementCard()
 
-        disposables += showNextAnnouncement(host)
-            .subscribeBy(onError = Timber::e)
+        if (isEnabled.get()) {
+            disposables += showNextAnnouncement(host)
+                .subscribeBy(onError = Timber::e)
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun buildAnnouncementList(order: List<String>): List<AnnouncementRule> {
-        val r = order.mapNotNull { availableAnnouncements.find(it) }
-        return r
+        return order.mapNotNull { availableAnnouncements.find(it) }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

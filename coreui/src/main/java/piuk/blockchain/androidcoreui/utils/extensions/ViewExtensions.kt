@@ -40,9 +40,9 @@ fun View?.gone() {
 /**
  * Sets the visibility of a [View] to [View.VISIBLE] depending on a value
  */
-fun View?.visibleIf(value: Boolean) {
+fun View?.visibleIf(func: () -> Boolean) {
     if (this != null) {
-        visibility = if (value) View.VISIBLE else View.GONE
+        visibility = if (func()) View.VISIBLE else View.GONE
     }
 }
 
@@ -144,3 +144,26 @@ fun View.createSpringAnimation(
         this.dampingRatio = dampingRatio
     }
 }
+
+/**
+ * Debounced onClickListener
+ *
+ * Filter out fast double taps
+ */
+private class DebouncingOnClickListener(private val onClickListener: (View?) -> Unit) : View.OnClickListener {
+    private var lastClick = 0L
+    override fun onClick(v: View?) {
+        val now = System.currentTimeMillis()
+        if (now > lastClick + DEBOUNCE_TIMEOUT) {
+            lastClick = now
+            onClickListener(v)
+        }
+    }
+
+    companion object {
+        private const val DEBOUNCE_TIMEOUT = 500L
+    }
+}
+
+fun View.setOnClickListenerDebounced(onClickListener: (View?) -> Unit) =
+    this.setOnClickListener(DebouncingOnClickListener(onClickListener = onClickListener))

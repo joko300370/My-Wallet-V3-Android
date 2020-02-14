@@ -24,7 +24,7 @@ class RegisterFingerprintsAnnouncement(
 
         return Single.just(
             fingerprints.isHardwareDetected() &&
-            !fingerprints.isFingerprintUnlockEnabled()
+                    !fingerprints.isFingerprintUnlockEnabled()
         )
     }
 

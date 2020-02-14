@@ -1,13 +1,12 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.appcompat.widget.AppCompatTextView
 import android.view.View
-import piuk.blockchain.android.util.currencyName
-import piuk.blockchain.android.util.setCoinIcon
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.extensions.exhaustive
 import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -24,10 +23,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
-import kotlinx.android.synthetic.main.layout_buy_swap_tabs.view.*
-import kotlinx.android.synthetic.main.layout_send_request_tabs.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetTokenLookup
 import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -35,7 +34,6 @@ import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
@@ -53,19 +51,18 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     val compositeDisposable = CompositeDisposable()
 
     private val currencyPrefs: CurrencyPrefs by inject()
-    private val assetDetailsViewModel: AssetDetailsViewModel by inject()
+    private val assetDetailsViewModel: AssetDetailsCalculator by inject()
     private val locale: Locale by inject()
 
-    interface Host {
-        fun gotoSendFor(cryptoCurrency: CryptoCurrency)
-        fun goToReceiveFor(cryptoCurrency: CryptoCurrency)
-        fun onSheetClosed()
-        fun goToBuy()
-        fun gotoSwapWithCurrencies(fromCryptoCurrency: CryptoCurrency, toCryptoCurrency: CryptoCurrency)
+    interface Host : SlidingModalBottomDialog.Host {
+        fun gotoSendFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
+        fun goToReceiveFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
+        fun gotoActivityFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
+        fun gotoSwap(fromCryptoCurrency: CryptoCurrency, filter: AssetFilter)
     }
 
-    private val host: Host by lazy {
-        parentFragment as? Host ?: throw IllegalStateException("Host fragment is not a AssetDetailSheet.Host")
+    override val host: Host by lazy {
+        super.host as? Host ?: throw IllegalStateException("Host fragment is not a AssetDetailSheet.Host")
     }
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -83,34 +80,6 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
 
     override fun initControls(view: View) {
         with(view) {
-            asset_name.text = getString(cryptoCurrency.currencyName())
-            balance_for_asset.text = getString(R.string.dashboard_balance_for_asset, cryptoCurrency.symbol)
-            asset_icon.setCoinIcon(cryptoCurrency)
-
-            buy_swap_tabs.buy_button.text = getString(R.string.dashboard_buy_for_asset, cryptoCurrency.symbol)
-
-            send_request_tabs.request_btn.setOnClickListener {
-                dismiss()
-                host.goToReceiveFor(cryptoCurrency)
-            }
-
-            send_request_tabs.send_btn.setOnClickListener {
-                dismiss()
-                host.gotoSendFor(cryptoCurrency)
-            }
-
-            buy_swap_tabs.swap_btn.setOnClickListener {
-                dismiss()
-                host.gotoSwapWithCurrencies(
-                    fromCryptoCurrency = cryptoCurrency,
-                    toCryptoCurrency = cryptoCurrency.defaultSwapTo
-                )
-            }
-
-            buy_swap_tabs.buy_button.setOnClickListener {
-                dismiss()
-                host.goToBuy()
-            }
 
             configureChart(chart,
                 getFiatSymbol(currencyPrefs.selectedFiatCurrency),
@@ -119,13 +88,16 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             configureTabs(view.chart_price_periods)
 
             assetDetailsViewModel.token.accept(token)
+            current_price_title.text = getString(R.string.dashboard_price_for_asset, cryptoCurrency.symbol)
 
-            compositeDisposable += assetDetailsViewModel.balance
+            compositeDisposable += assetDetailsViewModel.balanceMap
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { (cryptoBalance, fiatBalance) ->
-                    asset_balance_crypto.text = cryptoBalance
-                    asset_balance_fiat.text = fiatBalance
-                }
+                .subscribeBy(
+                    onError = { },
+                    onNext = { map ->
+                        onGotBalances(view, map)
+                    }
+                )
 
             compositeDisposable += assetDetailsViewModel.exchangeRate
                 .observeOn(AndroidSchedulers.mainThread())
@@ -136,14 +108,6 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
 
             compositeDisposable += assetDetailsViewModel.timeSpan.subscribeBy {
                 configureUiForSelection(view, it)
-            }
-
-            compositeDisposable += assetDetailsViewModel.userCanBuy.doOnSubscribe {
-                view.buy_swap_tabs.buy_button.gone()
-                view.buy_swap_tabs.separator.gone()
-            }.subscribeBy { canBuy ->
-                view.buy_swap_tabs.buy_button.goneIf(!canBuy)
-                view.buy_swap_tabs.separator.goneIf(!canBuy)
             }
 
             compositeDisposable += assetDetailsViewModel
@@ -167,6 +131,41 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
                     updatePriceChange(view.price_change, data)
                 }
         }
+    }
+
+    private fun onGotBalances(view: View, balanceMap: BalanceMap) {
+        with(view) {
+
+            asset_list.layoutManager = LinearLayoutManager(requireContext())
+
+            val itemList = mutableListOf<AssetDetailItem>()
+
+            balanceMap[AssetFilter.Wallet]?.let {
+                itemList.add(
+                    AssetDetailItem(AssetFilter.Wallet, token, it.first, it.second)
+                )
+            }
+
+            balanceMap[AssetFilter.Custodial]?.let {
+                if (!it.first.isZero) {
+                    itemList.add(
+                        AssetDetailItem(AssetFilter.Custodial, token, it.first, it.second)
+                    )
+                }
+            }
+
+            asset_list.adapter = AssetDetailAdapter(itemList, ::onAssetActionSelected)
+        }
+    }
+
+    private fun onAssetActionSelected(action: AssetAction, assetFilter: AssetFilter) {
+        dismiss()
+        when (action) {
+            AssetAction.ViewActivity -> host.gotoActivityFor(cryptoCurrency, assetFilter)
+            AssetAction.Send -> host.gotoSendFor(cryptoCurrency, assetFilter)
+            AssetAction.Receive -> host.goToReceiveFor(cryptoCurrency, assetFilter)
+            AssetAction.Swap -> host.gotoSwap(cryptoCurrency, assetFilter)
+        }.exhaustive
     }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {
@@ -359,16 +358,6 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             CryptoCurrency.PAX -> 2
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
-
-    override fun onSheetHidden() {
-        host.onSheetClosed()
-        super.onSheetHidden()
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        host.onSheetClosed()
-        super.onCancel(dialog)
-    }
 
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto"

@@ -69,6 +69,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
                 CampaignType.Sunriver -> AnalyticsEvents.KycSunriverStart
                 CampaignType.Resubmission -> AnalyticsEvents.KycResubmission
                 CampaignType.Blockstack -> AnalyticsEvents.KycBlockstackStart
+                CampaignType.SimpleBuy -> AnalyticsEvents.KycSimpleBuyStart
             }
         )
 
@@ -76,6 +77,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
             CampaignType.BuySell,
             CampaignType.Sunriver,
             CampaignType.Blockstack,
+            CampaignType.SimpleBuy,
             CampaignType.Resubmission -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
         }

@@ -97,7 +97,7 @@ class KycNavHostPresenter(
             view.navigateToKycSplash()
         } else if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
             view.navigateToResubmissionSplash()
-        } else if (view.campaignType == CampaignType.Blockstack) {
+        } else if (view.campaignType == CampaignType.Blockstack || view.campaignType == CampaignType.SimpleBuy) {
             compositeDisposable += kycNavigator.findNextStep()
                 .subscribeBy(
                     onError = { Timber.e(it) },

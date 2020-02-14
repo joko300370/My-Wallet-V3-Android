@@ -828,7 +828,7 @@ public class PinEntryPresenterTest {
         verify(activity).showProgressDialog(anyInt(), isNull());
         verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
         verify(appUtil).setSharedKey(anyString());
-        verify(appUtil).restartAppWithVerifiedPin(LauncherActivity.class);
+        verify(activity).restartAppWithVerifiedPin();
         verify(activity).dismissProgressDialog();
         assertTrue(subject.getCanShowFingerprintDialog());
     }

@@ -14,16 +14,18 @@ data class TiersJson(
             return if (tier2State == KycTierState.None) {
                 when (tiers[1].state) {
                     KycTierState.None -> Kyc2TierState.Locked
-                    KycTierState.Pending -> Kyc2TierState.Tier1InReview
+                    KycTierState.Pending -> Kyc2TierState.Tier1Pending
                     KycTierState.Rejected -> Kyc2TierState.Tier1Failed
                     KycTierState.Verified -> Kyc2TierState.Tier1Approved
+                    KycTierState.Under_Review -> Kyc2TierState.Tier1InReview
                 }
             } else {
                 when (tier2State) {
                     KycTierState.None -> Kyc2TierState.Locked
-                    KycTierState.Pending -> Kyc2TierState.Tier2InReview
+                    KycTierState.Pending -> Kyc2TierState.Tier2InPending
                     KycTierState.Rejected -> Kyc2TierState.Tier2Failed
                     KycTierState.Verified -> Kyc2TierState.Tier2Approved
+                    KycTierState.Under_Review -> Kyc2TierState.Tier2InReview
                 }
             }
         }
@@ -51,22 +53,25 @@ enum class KycTierState {
     None,
     Rejected,
     Pending,
-    Verified
+    Verified,
+    Under_Review,
 }
 
 enum class Kyc2TierState {
     Hidden,
     Locked,
-    Tier1InReview,
+    Tier1Pending,
     Tier1Approved,
     Tier1Failed,
-    Tier2InReview,
+    Tier1InReview,
+    Tier2InPending,
     Tier2Approved,
-    Tier2Failed
+    Tier2Failed,
+    Tier2InReview;
 }
 
 val goldTierComplete = listOf(
-    Kyc2TierState.Tier2InReview,
+    Kyc2TierState.Tier2InPending,
     Kyc2TierState.Tier2Approved,
     Kyc2TierState.Tier2Failed
 )

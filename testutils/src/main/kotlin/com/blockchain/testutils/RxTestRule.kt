@@ -22,7 +22,7 @@ open class RxInit {
     }
 
     fun io(scheduler: Scheduler) {
-        RxJavaPlugins.setIoSchedulerHandler { _ -> scheduler }
+        RxJavaPlugins.setIoSchedulerHandler { scheduler }
     }
 
     fun ioTrampoline() {
@@ -30,7 +30,7 @@ open class RxInit {
     }
 
     fun newThread(scheduler: Scheduler) {
-        RxJavaPlugins.setNewThreadSchedulerHandler { _ -> scheduler }
+        RxJavaPlugins.setNewThreadSchedulerHandler { scheduler }
     }
 
     fun newThreadTrampoline() {
@@ -38,7 +38,7 @@ open class RxInit {
     }
 
     fun single(scheduler: Scheduler) {
-        RxJavaPlugins.setSingleSchedulerHandler { _ -> scheduler }
+        RxJavaPlugins.setSingleSchedulerHandler { scheduler }
     }
 
     fun singleTrampoline() {

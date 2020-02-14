@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.backup.completed
 
+import android.app.Activity
 import androidx.fragment.app.FragmentManager
 import android.content.DialogInterface
 import android.os.Bundle
@@ -16,6 +17,7 @@ import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferDialogFrag
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -35,7 +37,8 @@ class BackupWalletCompletedFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_backup_again.setOnClickListener { onBackupAgainRequested() }
+        button_backup_done.setOnClickListenerDebounced { onBackupDone() }
+        button_backup_again.setOnClickListenerDebounced { onBackupAgainRequested() }
 
         if (arguments?.getBoolean(KEY_CHECK_TRANSFER) == true) {
             presenter.checkTransferableFunds()
@@ -84,6 +87,13 @@ class BackupWalletCompletedFragment :
         }
     }
 
+    private fun onBackupDone() {
+        activity?.apply {
+            setResult(Activity.RESULT_OK)
+            finish()
+        }
+    }
+
     private fun showTransferFundsConfirmationDialog() {
         activity?.let {
             val fragment = ConfirmFundsTransferDialogFragment.newInstance()
@@ -94,7 +104,7 @@ class BackupWalletCompletedFragment :
     companion object {
 
         const val TAG = "BackupWalletCompletedFragment"
-        private val KEY_CHECK_TRANSFER = "check_transfer"
+        private const val KEY_CHECK_TRANSFER = "check_transfer"
 
         fun newInstance(checkTransfer: Boolean): BackupWalletCompletedFragment {
             val fragment = BackupWalletCompletedFragment()

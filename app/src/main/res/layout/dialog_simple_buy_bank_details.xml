@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/title"
+            style="@style/Text.Standard.20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            tools:text="Pending [crypto] Buy" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/transfer_msg"
+            style="@style/Text.Light.14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/small_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            tools:text="@string/simple_buy_bank_account_sheet_instructions" />
+
+        <piuk.blockchain.android.simplebuy.BankDetailsContainer
+            android:id="@+id/bank_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:background="@drawable/rounded_box"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/small_margin" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/Text.Light.12"
+            android:layout_width="match_parent"
+            android:id="@+id/bank_deposit_instruction"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/small_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="@string/recipient_name_must_match" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/small_margin">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/cta_button_cancel"
+                style="@style/CtaButton.NoMargin.White"
+                android:layout_marginStart="@dimen/standard_margin"
+                android:layout_marginEnd="@dimen/tiny_margin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/cancel_order"
+                android:textColor="@color/red_600" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/cta_button_ok"
+                style="@style/CtaButton.NoMargin.Blue"
+                android:layout_marginStart="@dimen/tiny_margin"
+                android:layout_marginEnd="@dimen/standard_margin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/btn_ok" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

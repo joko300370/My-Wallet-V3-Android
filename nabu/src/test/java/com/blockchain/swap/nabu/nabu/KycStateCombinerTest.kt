@@ -13,17 +13,17 @@ class KycStateCombinerTest {
     @Test
     fun `combinedState when tier 2 is None`() {
         tiers(KycTierState.None, KycTierState.None).combinedState `should be` Kyc2TierState.Locked
-        tiers(KycTierState.Pending, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1InReview
+        tiers(KycTierState.Pending, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Pending
         tiers(KycTierState.Verified, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Approved
         tiers(KycTierState.Rejected, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Failed
     }
 
     @Test
     fun `combinedState when tier 2 is Pending`() {
-        tiers(KycTierState.None, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InReview
-        tiers(KycTierState.Pending, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InReview
-        tiers(KycTierState.Verified, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InReview
-        tiers(KycTierState.Rejected, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InReview
+        tiers(KycTierState.None, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
+        tiers(KycTierState.Pending, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
+        tiers(KycTierState.Verified, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
+        tiers(KycTierState.Rejected, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
     }
 
     @Test

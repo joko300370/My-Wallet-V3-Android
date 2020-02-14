@@ -4,11 +4,15 @@ import android.annotation.SuppressLint
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.notifications.NotificationTokenManager
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.remoteconfig.FeatureFlag
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -29,7 +33,10 @@ class LauncherPresenter(
     private val accessState: AccessState,
     private val settingsDataManager: SettingsDataManager,
     private val notificationTokenManager: NotificationTokenManager,
-    private val envSettings: EnvironmentConfig
+    private val envSettings: EnvironmentConfig,
+    private val featureFlag: FeatureFlag,
+    private val currencyPrefs: CurrencyPrefs,
+    private val custodialWalletManager: CustodialWalletManager
 ) : BasePresenter<LauncherView>() {
 
     override fun onViewReady() {
@@ -111,29 +118,49 @@ class LauncherPresenter(
             } else {
                 settingsDataManager.updateFiatUnit(fiatUnitForFreshAccount())
             }
+        }.flatMapSingle { settings ->
+            custodialWalletManager.isCurrencySupportedForSimpleBuy(settings.currency).zipWith(featureFlag.enabled)
+                .map { (currencySupported, simpleBuyFeatureFlagEnabled) ->
+                    val simpleBuyFlowCanBeLaunched =
+                        currencySupported && simpleBuyFeatureFlagEnabled && accessState.isNewlyCreated
+                    settings to simpleBuyFlowCanBeLaunched
+                }
         }
             .doOnComplete { accessState.isLoggedIn = true }
             .doOnNext { notificationTokenManager.registerAuthEvent() }
-            .subscribe({ settings ->
-                startMainActivity()
-                setCurrencyUnits(settings)
-            }, {
-                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                view.onRequestPin()
-            })
+            .subscribe(
+                { (settings, simpleBuyEnabled) ->
+                    setCurrencyUnits(settings)
+                    if (simpleBuyEnabled &&
+                        view?.getPageIntent()?.getBooleanExtra(AppUtil.INTENT_EXTRA_IS_AFTER_WALLET_CREATION,
+                            false) == true
+                    ) {
+                        startSimpleBuy()
+                    } else
+                        startMainActivity()
+                }, {
+                    view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                    view.onRequestPin()
+                })
     }
 
     private fun startMainActivity() {
         view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
     }
 
+    private fun startSimpleBuy() {
+        view.startSimpleBuy()
+    }
+
     private fun fiatUnitForFreshAccount() =
-        if (UNIT_FIAT.contains(Currency.getInstance(Locale.getDefault()).currencyCode))
-            Currency.getInstance(Locale.getDefault()).currencyCode else "USD"
+        currencyPrefs.selectedFiatCurrency
 
     private fun setCurrencyUnits(settings: Settings) {
         prefs.selectedFiatCurrency = settings.currency
     }
+
+    private fun Settings.isSimpleBuyAllowed(): Boolean =
+        listOf("EUR", "GBP").contains(currency)
 
     companion object {
         const val INTENT_EXTRA_VERIFIED = "verified"

@@ -45,3 +45,6 @@ const val URL_SUPPORTED_COUNTRIES =
 
 const val STX_STACKS_LEARN_MORE =
     "https://support.blockchain.com/hc/en-us/articles/360038745191"
+
+const val MODULAR_TERMS_AND_CONDITIONS =
+    "https://exchange.blockchain.com/legal#modulr"

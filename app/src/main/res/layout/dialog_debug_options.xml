@@ -1,135 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Debug and Test Menu"
-        android:layout_gravity="center"
-        android:textColor="@color/toast_info_text"
-        android:textSize="18sp"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:id="@+id/device_currency"
+        android:layout_marginBottom="2dp"
+        android:gravity="center"
+        android:text="Device Currency" />
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/radio_usd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="USD" />
+
+        <RadioButton
+            android:id="@+id/radio_eur"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EUR" />
+
+        <RadioButton
+            android:id="@+id/radio_gbp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GBP" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/clear_simple_buy_state"
+        style="@style/CtaButton.Blue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:text="Clear SB order" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
         android:gravity="center"
-        android:text="Randomise device ID per installation, to avoid pre-IDV banning of test devices"/>
+        android:text="Randomise device ID per installation, to avoid pre-IDV banning of test devices" />
 
     <Button
         android:id="@+id/btn_rnd_device_id"
-        android:text="Randomise Device Id"
+        style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/CtaButton.Blue"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:text="Randomise Device Id" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
         android:gravity="center"
-        android:text="Log out and completely reset this app."/>
+        android:text="Log out and completely reset this app." />
 
     <Button
         android:id="@+id/btn_reset_wallet"
         style="@style/CtaButton.Blue"
-        android:text="Reset Wallet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:text="Reset Wallet" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
         android:gravity="center"
-        android:text="Reset all announcement cards and tour popups to unshown state"/>
+        android:text="Reset all announcement cards and tour popups to unshown state" />
 
     <Button
         android:id="@+id/btn_reset_announce"
         style="@style/CtaButton.Blue"
-        android:text="Reset Announcements"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:text="Reset Announcements" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
         android:gravity="center"
-        android:text="Reset various device timers and saved states, such as warning dialogs, onboarding etc"/>
+        android:text="Reset various device timers and saved states, such as warning dialogs, onboarding etc" />
 
     <Button
         android:id="@+id/btn_reset_prefs"
         style="@style/CtaButton.Blue"
-        android:text="Reset Preferences"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:text="Reset Preferences" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="2dp"
         android:gravity="center"
-        android:text="Persist a pit to wallet link ID for pit linking testing"/>
+        android:text="Persist a pit to wallet link ID for pit linking testing" />
 
     <Button
         android:id="@+id/btn_store_linkId"
         style="@style/CtaButton.Blue"
-        android:text="StoreLinkId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:text="StoreLinkId" />
+
 
     <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="2dp"
-            android:gravity="center"
-            android:text="Firebase Token:"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="2dp"
+        android:gravity="center"
+        android:text="Firebase Token:" />
 
     <TextView
-            android:id="@+id/firebase_token"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:textIsSelectable="true"
-            android:gravity="center"
-            android:textColor="@color/blue_800"/>
+        android:id="@+id/firebase_token"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:textColor="@color/blue_800"
+        android:textIsSelectable="true" />
+
 
 </LinearLayout>

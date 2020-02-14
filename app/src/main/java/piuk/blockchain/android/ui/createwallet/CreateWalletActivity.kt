@@ -211,7 +211,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     override fun startPinEntryActivity() {
         ViewUtils.hideKeyboard(this)
-        this.startActivity(Intent(this, PinEntryActivity::class.java))
+        PinEntryActivity.startAfterWalletCreation(this)
     }
 
     override fun showProgressDialog(message: Int) {

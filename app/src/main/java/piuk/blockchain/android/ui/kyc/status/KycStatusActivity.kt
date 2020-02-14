@@ -49,6 +49,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
             CampaignType.Blockstack,
+            CampaignType.SimpleBuy,
             CampaignType.Resubmission -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
@@ -92,6 +93,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Swap,
             CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
             CampaignType.Blockstack,
+            CampaignType.SimpleBuy,
             CampaignType.Sunriver -> R.string.sunriver_status_message
         }
         textViewMessage.setText(message)

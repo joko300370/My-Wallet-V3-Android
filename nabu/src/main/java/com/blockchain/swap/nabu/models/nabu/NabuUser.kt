@@ -73,6 +73,9 @@ data class NabuUser(
 
     val isStxAirdropRegistered: Boolean
         get() = tags?.get("BLOCKSTACK") != null
+
+    val isSimpleBuyTagged: Boolean
+        get() = tags?.get("SIMPLE_BUY") != null
 }
 
 data class Tiers(

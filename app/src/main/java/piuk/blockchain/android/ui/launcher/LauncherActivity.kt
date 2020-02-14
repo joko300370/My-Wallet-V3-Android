@@ -7,6 +7,7 @@ import android.os.Handler
 import androidx.appcompat.app.AlertDialog
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.home.MainActivity
@@ -59,6 +60,13 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
 
     override fun onStartMainActivity(uri: Uri?) {
         startSingleActivity(MainActivity::class.java, null, uri)
+    }
+
+    override fun startSimpleBuy() {
+        val intent = Intent(this, SimpleBuyActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(intent)
     }
 
     override fun onReEnterPassword() {

@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.OnBoardingPrefs
+import com.blockchain.preferences.DashboardPrefs
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -14,7 +14,7 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 
 class IntroTourAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val prefs: OnBoardingPrefs,
+    private val prefs: DashboardPrefs,
     private val analytics: Analytics
 ) : AnnouncementRule(dismissRecorder) {
 

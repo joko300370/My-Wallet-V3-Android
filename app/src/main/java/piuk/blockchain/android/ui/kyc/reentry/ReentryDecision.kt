@@ -34,7 +34,7 @@ class ReentryDecisionKycNavigator(
     override fun findNextStep(): Single<NavDirections> =
         token.fetchNabuToken()
             .flatMap(dataManager::getUser)
-            .flatMap { Single.just(findNextStep(it)) }
+            .map { findNextStep(it) }
 
     override fun findNextStep(user: NabuUser) =
         userAndReentryPointToDirections(user, reentryDecision.findReentryPoint(user))

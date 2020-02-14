@@ -69,6 +69,6 @@ abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> :
     fun updateProgressDialog(msg: String) = activity.updateProgressDialog(msg)
 
     @UiThread
-    fun showBottomSheet(bottomSheet: BottomSheetDialogFragment) =
-        bottomSheet.show(childFragmentManager, "BOTTOM_SHEET")
+    fun showBottomSheet(bottomSheet: BottomSheetDialogFragment?) =
+        bottomSheet?.show(childFragmentManager, "BOTTOM_SHEET")
 }

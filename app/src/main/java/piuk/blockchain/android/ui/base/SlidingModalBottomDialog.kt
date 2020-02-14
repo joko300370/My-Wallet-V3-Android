@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.base
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -9,6 +10,16 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
+
+    interface Host {
+        fun onSheetClosed()
+    }
+
+    protected open val host: Host by lazy {
+        parentFragment as? Host
+            ?: activity as? Host
+            ?: throw IllegalStateException("Host is not a SlidingModalBottomDialog.Host")
+    }
 
     protected lateinit var dialogView: View
 
@@ -47,14 +58,27 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     }
 
     @CallSuper
+    protected open fun onSheetHidden() {
+        host.onSheetClosed()
+        dismiss()
+    }
+
+    @CallSuper
     protected open fun onSheetExpanded() { }
 
     @CallSuper
     protected open fun onSheetCollapsed() { }
 
-    @CallSuper
-    protected open fun onSheetHidden() { dismiss() }
-
     protected abstract val layoutResource: Int
     protected abstract fun initControls(view: View)
+
+    override fun onCancel(dialog: DialogInterface) {
+        host.onSheetClosed()
+        super.onCancel(dialog)
+    }
+
+    override fun dismiss() {
+        host.onSheetClosed()
+        super.dismiss()
+    }
 }

@@ -13,5 +13,5 @@ interface CreateNabuToken {
      * This is the same as creating a nabu user.
      * After this, the rest of nabu endpoints are usable.
      */
-    fun createNabuOfflineToken(): Single<NabuOfflineTokenResponse>
+    fun createNabuOfflineToken(currency: String? = null, action: String? = null): Single<NabuOfflineTokenResponse>
 }

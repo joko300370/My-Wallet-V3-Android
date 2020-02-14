@@ -5,18 +5,21 @@ import com.blockchain.swap.nabu.models.nabu.Scope
 import com.blockchain.swap.nabu.models.nabu.goldTierComplete
 import com.blockchain.swap.nabu.models.nabu.kycVerified
 import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.models.nabu.UserCampaignState
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
 class AnnouncementQueries(
     private val nabuToken: NabuToken,
     private val settings: SettingsDataManager,
     private val nabu: NabuDataManager,
-    private val tierService: TierService
+    private val tierService: TierService,
+    private val sbStateFactory: SimpleBuySyncFactory
 ) {
     // Attempt to figure out if KYC/swap etc is allowed based on location...
     fun canKyc(): Single<Boolean> {
@@ -58,5 +61,19 @@ class AnnouncementQueries(
         return nabuToken.fetchNabuToken()
             .flatMap { token -> nabu.getAirdropCampaignStatus(token) }
             .map { it[blockstackCampaignName]?.userState == UserCampaignState.RewardReceived }
+    }
+
+    fun isSimpleBuyKycInProgress(): Single<Boolean> {
+        // If we have a local simple buy in progress and it has the kyc unfinished state set
+        val state = sbStateFactory.currentState()
+
+        return state?.let {
+            Single.just(it.kycStartedButNotCompleted)
+        } ?: Single.just(false)
+    }
+
+    fun isSimpleBuyTransactionPending(): Single<Boolean> {
+        val state = sbStateFactory.currentState()
+        return Single.just((state != null) && (state.order.orderState == OrderState.AWAITING_FUNDS))
     }
 }

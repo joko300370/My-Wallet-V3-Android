@@ -18,7 +18,7 @@ class HideAssetDetailsTest {
                 CryptoCurrency.XLM to initialXlmState
             ),
             showAssetSheetFor = null,
-            showPromoSheet = null,
+            showDashboardSheet = null,
             announcement = testAnnouncementCard_1
         )
 
@@ -36,7 +36,7 @@ class HideAssetDetailsTest {
                 CryptoCurrency.XLM to initialXlmState
             ),
             showAssetSheetFor = CryptoCurrency.ETHER,
-            showPromoSheet = null,
+            showDashboardSheet = null,
             announcement = testAnnouncementCard_1
         )
 
@@ -44,7 +44,7 @@ class HideAssetDetailsTest {
 
         assertEquals(result.assets, initialState.assets)
         assertNull(result.showAssetSheetFor)
-        assertNull(result.showPromoSheet)
+        assertNull(result.showDashboardSheet)
         assertEquals(result.announcement, initialState.announcement)
     }
 
@@ -58,7 +58,7 @@ class HideAssetDetailsTest {
                 CryptoCurrency.XLM to initialXlmState
             ),
             showAssetSheetFor = null,
-            showPromoSheet = PromoSheet.PROMO_STX_AIRDROP_COMPLETE,
+            showDashboardSheet = DashboardSheet.STX_AIRDROP_COMPLETE,
             announcement = testAnnouncementCard_1
         )
 
@@ -66,7 +66,7 @@ class HideAssetDetailsTest {
 
         assertEquals(result.assets, initialState.assets)
         assertNull(result.showAssetSheetFor)
-        assertNull(result.showPromoSheet)
+        assertNull(result.showDashboardSheet)
         assertEquals(result.announcement, initialState.announcement)
     }
 }

@@ -20,6 +20,8 @@ android {
         versionCode Versions.versionCode
         versionName Versions.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigBoolean "USE_MOCK_SIMPLE_BUY_BACKEND", false
     }
 
     compileOptions {

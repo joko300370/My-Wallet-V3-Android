@@ -56,4 +56,6 @@ interface PinEntryView : View {
     fun appNeedsUpgrade(isForced: Boolean)
 
     fun showTestnetWarning()
+
+    fun restartAppWithVerifiedPin()
 }

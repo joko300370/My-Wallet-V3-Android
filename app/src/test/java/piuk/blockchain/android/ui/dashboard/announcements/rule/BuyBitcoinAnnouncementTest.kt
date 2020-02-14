@@ -3,9 +3,10 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
 
@@ -15,6 +16,7 @@ class BuyBitcoinAnnouncementTest {
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val walletStatus: WalletStatus = mock()
     private val buyDataManager: BuyDataManager = mock()
+    private val simpleBuyAvailability: SimpleBuyAvailability = mock()
 
     private lateinit var subject: BuyBitcoinAnnouncement
 
@@ -22,12 +24,14 @@ class BuyBitcoinAnnouncementTest {
     fun setUp() {
         whenever(dismissRecorder[BuyBitcoinAnnouncement.DISMISS_KEY]).thenReturn(dismissEntry)
         whenever(dismissEntry.prefsKey).thenReturn(BuyBitcoinAnnouncement.DISMISS_KEY)
+        whenever(simpleBuyAvailability.isAvailable()).thenReturn(Single.just(false))
 
         subject =
             BuyBitcoinAnnouncement(
                 dismissRecorder = dismissRecorder,
                 walletStatus = walletStatus,
-                buyDataManager = buyDataManager
+                buyDataManager = buyDataManager,
+                simpleBuyAvailability = simpleBuyAvailability
             )
     }
 
@@ -48,7 +52,7 @@ class BuyBitcoinAnnouncementTest {
         whenever(walletStatus.isWalletFunded).thenReturn(true)
 
         whenever(walletStatus.isWalletFunded).thenReturn(false)
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(true))
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(true))
 
         subject.shouldShow()
             .test()
@@ -63,7 +67,7 @@ class BuyBitcoinAnnouncementTest {
         whenever(walletStatus.isWalletFunded).thenReturn(true)
 
         whenever(walletStatus.isWalletFunded).thenReturn(true)
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(true))
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(true))
 
         subject.shouldShow()
             .test()
@@ -78,7 +82,23 @@ class BuyBitcoinAnnouncementTest {
         whenever(walletStatus.isWalletFunded).thenReturn(true)
 
         whenever(walletStatus.isWalletFunded).thenReturn(false)
-        whenever(buyDataManager.canBuy).thenReturn(Observable.just(false))
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(false))
+
+        subject.shouldShow()
+            .test()
+            .assertValue { !it }
+            .assertValueCount(1)
+            .assertComplete()
+    }
+
+    @Test
+    fun `should not show, when simplebuy available`() {
+        whenever(dismissEntry.isDismissed).thenReturn(false)
+        whenever(walletStatus.isWalletFunded).thenReturn(true)
+
+        whenever(walletStatus.isWalletFunded).thenReturn(false)
+        whenever(buyDataManager.canBuy).thenReturn(Single.just(true))
+        whenever(simpleBuyAvailability.isAvailable()).thenReturn(Single.just(true))
 
         subject.shouldShow()
             .test()

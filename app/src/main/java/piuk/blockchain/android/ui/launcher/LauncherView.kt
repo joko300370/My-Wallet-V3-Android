@@ -20,6 +20,8 @@ interface LauncherView : View {
 
     fun onStartMainActivity(uri: Uri?)
 
+    fun startSimpleBuy()
+
     fun onReEnterPassword()
 
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)

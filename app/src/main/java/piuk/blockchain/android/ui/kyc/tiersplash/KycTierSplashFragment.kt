@@ -70,6 +70,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             CampaignType.BuySell -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
+            CampaignType.SimpleBuy,
             CampaignType.Blockstack,
             CampaignType.Resubmission -> R.string.sunriver_splash_title
         }

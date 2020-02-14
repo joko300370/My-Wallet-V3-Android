@@ -8,8 +8,10 @@ val coincoreModule = applicationContext {
 
         bean {
             STXTokens(
+                rxBus = get(),
                 payloadManager = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -20,7 +22,8 @@ val coincoreModule = applicationContext {
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadDataManager = get(),
-                rxBus = get()
+                rxBus = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -32,16 +35,19 @@ val coincoreModule = applicationContext {
                 currencyPrefs = get(),
                 rxBus = get(),
                 crashLogger = get(),
-                stringUtils = get()
+                stringUtils = get(),
+                custodialWalletManager = get()
             )
         }
 
         bean {
             XLMTokens(
+                rxBus = get(),
                 xlmDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -53,15 +59,19 @@ val coincoreModule = applicationContext {
                 currencyPrefs = get(),
                 rxBus = get(),
                 crashLogger = get(),
-                stringUtils = get()
+                stringUtils = get(),
+                custodialWalletManager = get()
             )
         }
 
         bean {
             PAXTokens(
+                rxBus = get(),
                 erc20Account = get(),
                 exchangeRates = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                custodialWalletManager = get(),
+                stringUtils = get()
             )
         }
 
