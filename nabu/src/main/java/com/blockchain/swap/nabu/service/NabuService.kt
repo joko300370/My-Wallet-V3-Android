@@ -220,8 +220,10 @@ class NabuService(retrofit: Retrofit) {
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
 
-    internal fun getSupportCurrencies(): Single<SimpleBuyPairsResp> = service.getSupportedSimpleBuyPairs()
-        .wrapErrorMessage()
+    internal fun getSupportedCurrencies(
+        fiatCurrency: String
+    ): Single<SimpleBuyPairsResp> =
+        service.getSupportedSimpleBuyPairs(fiatCurrency).wrapErrorMessage()
 
     fun getSimpleBuyBankAccountDetails(
         sessionToken: NabuSessionTokenResponse,

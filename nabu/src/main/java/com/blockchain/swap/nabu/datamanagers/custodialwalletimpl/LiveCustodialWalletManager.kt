@@ -72,10 +72,10 @@ class LiveCustodialWalletManager(
 
     override fun getBuyLimitsAndSupportedCryptoCurrencies(
         nabuOfflineTokenResponse: NabuOfflineTokenResponse,
-        currency: String
+        fiatCurrency: String
     ): Single<SimpleBuyPairs> =
         authenticator.authenticate {
-            nabuService.getSupportCurrencies()
+            nabuService.getSupportedCurrencies(fiatCurrency)
         }.map {
             SimpleBuyPairs(it.pairs.map { responsePair ->
                 SimpleBuyPair(
@@ -115,9 +115,9 @@ class LiveCustodialWalletManager(
             false
         }
 
-    override fun isCurrencySupportedForSimpleBuy(currency: String): Single<Boolean> =
-        nabuService.getSupportCurrencies().map {
-            it.pairs.firstOrNull { it.pair.split("-")[1] == currency } != null
+    override fun isCurrencySupportedForSimpleBuy(fiatCurrency: String): Single<Boolean> =
+        nabuService.getSupportedCurrencies(fiatCurrency).map {
+            it.pairs.firstOrNull { it.pair.split("-")[1] == fiatCurrency } != null
         }.onErrorReturn { false }
 
     override fun getOutstandingBuyOrders(): Single<BuyOrderList> =

@@ -187,7 +187,9 @@ internal interface Nabu {
     ): Single<SendToMercuryAddressResponse>
 
     @GET(NABU_SIMPLE_BUY_PAIRS)
-    fun getSupportedSimpleBuyPairs(): Single<SimpleBuyPairsResp>
+    fun getSupportedSimpleBuyPairs(
+        @Query("fiatCurrency") fiatCurrency: String
+    ): Single<SimpleBuyPairsResp>
 
     @GET(NABU_SIMPLE_BUY_AMOUNTS)
     fun getPredefinedAmounts(
