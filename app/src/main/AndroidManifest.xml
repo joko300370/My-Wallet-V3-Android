@@ -12,11 +12,13 @@
 
     <application
         android:name=".BlockchainApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
+        android:backupAgent="piuk.blockchain.android.util.BackupManager"
         tools:replace="android:allowBackup">
 
         <activity
@@ -225,6 +227,10 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIhXRjyyUl4PR4n06nfiO7FvBnkTGUs6pwo8ZlcQ" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
