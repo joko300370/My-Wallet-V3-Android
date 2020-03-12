@@ -26,6 +26,9 @@ public class AESUtil {
 
 //    private static Logger mLogger = LoggerFactory.getLogger(AESUtil.class);
 
+    // The encryption mode that we use (AES CBC) is not particularly well suited to
+    // encrypt different values with the same key. To provide some additional defense
+    // we should use different amount of iterations for the different secrets.
     public static final int PIN_PBKDF2_ITERATIONS = 5000;
     public static final int PIN_PBKDF2_ITERATIONS_GUID = 5001;
     public static final int PIN_PBKDF2_ITERATIONS_SHAREDKEY = 5002;
