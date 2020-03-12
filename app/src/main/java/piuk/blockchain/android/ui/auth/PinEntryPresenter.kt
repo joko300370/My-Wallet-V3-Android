@@ -194,7 +194,7 @@ class PinEntryPresenter(
             userEnteredPin = ""
             view.setTitleString(R.string.confirm_pin)
             clearPinBoxes()
-    } else if (userEnteredConfirmationPin == userEnteredPin) {
+        } else if (userEnteredConfirmationPin == userEnteredPin) {
             // End of Confirm - Pin is confirmed
             createNewPin(userEnteredPin)
         } else {
