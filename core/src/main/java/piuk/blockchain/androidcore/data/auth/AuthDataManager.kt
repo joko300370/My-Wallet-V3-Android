@@ -204,11 +204,11 @@ class AuthDataManager(
             prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, aesUtilWrapper.decrypt(
                     prefs.backupEncryptedGuid,
                     decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS))
+                    AESUtil.PIN_PBKDF2_ITERATIONS_GUID))
             prefs.setValue(PersistentPrefs.KEY_SHARED_KEY, aesUtilWrapper.decrypt(
                     prefs.backupEncryptedSharedKey,
                     decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS))
+                    AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY))
         } else {
             // Make sure to update the backup with up-to-date values.
             prefs.backupPinIdentifier = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
@@ -217,11 +217,11 @@ class AuthDataManager(
             prefs.backupEncryptedGuid = aesUtilWrapper.encrypt(
                     prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
                     decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS)
+                    AESUtil.PIN_PBKDF2_ITERATIONS_GUID)
             prefs.backupEncryptedSharedKey = aesUtilWrapper.encrypt(
                     prefs.getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
                     decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS)
+                    AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY)
         }
     }
 
