@@ -1,12 +1,6 @@
 package piuk.blockchain.androidcore.utils
 
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.NotificationPrefs
-import com.blockchain.preferences.DashboardPrefs
-import com.blockchain.preferences.SecurityPrefs
-import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.preferences.ThePitLinkingPrefs
-import com.blockchain.preferences.WalletStatus
+import com.blockchain.preferences.*
 
 interface PersistentPrefs :
     CurrencyPrefs,
@@ -15,7 +9,8 @@ interface PersistentPrefs :
     SecurityPrefs,
     ThePitLinkingPrefs,
     SimpleBuyPrefs,
-    WalletStatus {
+    WalletStatus,
+    EncryptedPrefs {
 
     val isLoggedOut: Boolean
 

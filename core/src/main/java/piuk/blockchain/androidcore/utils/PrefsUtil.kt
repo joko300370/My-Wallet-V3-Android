@@ -14,6 +14,7 @@ interface UUIDGenerator {
 
 class PrefsUtil(
     private val store: SharedPreferences,
+    private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
     private val uuidGenerator: UUIDGenerator
 ) : PersistentPrefs {
@@ -186,6 +187,26 @@ class PrefsUtil(
         get() = getValue(KEY_FIREBASE_TOKEN, "")
         set(v) = setValue(KEY_FIREBASE_TOKEN, v)
 
+    // Encrypted prefs from backup
+    override var backupEncryptedPassword: String?
+        get() = backupStore.getString(KEY_ENCRYPTED_PASSWORD, null)
+        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_PASSWORD, value).apply() }
+    override var backupEncryptedSharedKey: String?
+        get() = backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, null)
+        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_SHARED_KEY, value).apply() }
+    override var backupEncryptedGuid: String?
+        get() = backupStore.getString(KEY_ENCRYPTED_GUID, null)
+        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_GUID, value).apply() }
+    override var backupPinIdentifier: String?
+        get() = backupStore.getString(KEY_ENCRYPTED_PIN_KEY, null)
+        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_PIN_KEY, value).apply() }
+    override val hasBackup: Boolean
+        get() = backupPinIdentifier != null && backupEncryptedPassword != null && backupEncryptedGuid != null && backupEncryptedSharedKey != null
+
+    override fun clearBackup() {
+        backupStore.edit().clear().apply()
+    }
+
     // Raw accessors
     override fun getValue(name: String): String? =
         store.getString(name, null)
@@ -230,6 +251,8 @@ class PrefsUtil(
 
     override fun clear() {
         store.edit().clear().apply()
+        // TODO should this clear the backup or not? Seems like there are quite a few entry points
+        clearBackup()
     }
 
     /**
@@ -287,5 +310,10 @@ class PrefsUtil(
 
         private const val KEY_FIREBASE_TOKEN = "firebase_token"
         private const val KEY_PUSH_NOTIFICATION_ENABLED = "push_notification_enabled"
+
+        private const val KEY_ENCRYPTED_PIN_KEY = "backup_pin_key"
+        private const val KEY_ENCRYPTED_GUID = "backup_encrypted_guid"
+        private const val KEY_ENCRYPTED_SHARED_KEY = "backup_encrypted_shared_key"
+        private const val KEY_ENCRYPTED_PASSWORD = "backup_encrypted_password"
     }
 }

@@ -2,6 +2,9 @@
 
 package com.blockchain.koin
 
+import android.app.backup.BackupManager
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.preference.PreferenceManager
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
@@ -217,6 +220,9 @@ val coreModule = applicationContext {
     bean {
         PrefsUtil(
             store = PreferenceManager.getDefaultSharedPreferences(/* context = */ get()),
+                // TODO where should the constant shared pref name go?
+                // TODO how to get the preference object in a cleaner way?
+            backupStore = (get() as Context).getSharedPreferences("shared_pref_backup", MODE_PRIVATE),
             idGenerator = get(),
             uuidGenerator = get()
         )

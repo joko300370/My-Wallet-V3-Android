@@ -20,7 +20,7 @@ class PrefsUtilTest {
     private val idGenerator: DeviceIdGenerator = mock()
     private val uuidGenerator: UUIDGenerator = mock()
 
-    private val subject: PrefsUtil = PrefsUtil(store, idGenerator, uuidGenerator)
+    private val subject: PrefsUtil = PrefsUtil(store, store, idGenerator, uuidGenerator)
 
     @Before
     fun setUpSharedPrefs() {
