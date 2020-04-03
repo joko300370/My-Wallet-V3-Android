@@ -584,6 +584,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         swipeToReceiveHelper.clearStoredData();
     }
 
+    void updateCloudData(boolean newValue) {
+        if(newValue) {
+            swipeToReceiveHelper.clearStoredData();
+        }
+        prefs.setBackupEnabled(newValue);
+    }
+
     boolean arePushNotificationEnabled() {
         return prefs.getArePushNotificationsEnabled();
     }

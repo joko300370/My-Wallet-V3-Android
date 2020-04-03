@@ -200,8 +200,11 @@ class PrefsUtil(
     override var backupPinIdentifier: String?
         get() = backupStore.getString(KEY_ENCRYPTED_PIN_KEY, null)
         set(value) { backupStore.edit().putString(KEY_ENCRYPTED_PIN_KEY, value).apply() }
+    override var backupEnabled: Boolean
+        get() = backupStore.getBoolean(KEY_CLOUD_BACKUP_ENABLED, true)
+        set(value) { backupStore.edit().putBoolean(KEY_CLOUD_BACKUP_ENABLED, value).apply() }
     override val hasBackup: Boolean
-        get() = backupPinIdentifier != null && backupEncryptedPassword != null && backupEncryptedGuid != null && backupEncryptedSharedKey != null
+        get() = backupPinIdentifier != null && backupEncryptedPassword != null && backupEncryptedGuid != null && backupEncryptedSharedKey != null && backupEnabled
 
     override fun clearBackup() {
         backupStore.edit().clear().apply()
@@ -315,5 +318,6 @@ class PrefsUtil(
         private const val KEY_ENCRYPTED_GUID = "backup_encrypted_guid"
         private const val KEY_ENCRYPTED_SHARED_KEY = "backup_encrypted_shared_key"
         private const val KEY_ENCRYPTED_PASSWORD = "backup_encrypted_password"
+        private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
     }
 }

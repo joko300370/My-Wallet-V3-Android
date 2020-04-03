@@ -118,6 +118,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
     }
+    private val cloudBackupPref by lazy {
+        findPreference<SwitchPreferenceCompat>("cloud_backup")
+    }
 
     private val settingsPresenter: SettingsPresenter by inject()
     private val analytics: Analytics by inject()
@@ -223,6 +226,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
                     .setCancelable(false)
                     .show()
             }
+            analytics.logEvent(SettingsAnalyticsEvents.SwipeToReceiveSwitch)
+            true
+        }
+
+        cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
+            settingsPresenter.updateCloudData(newValue as Boolean)
             analytics.logEvent(SettingsAnalyticsEvents.SwipeToReceiveSwitch)
             true
         }

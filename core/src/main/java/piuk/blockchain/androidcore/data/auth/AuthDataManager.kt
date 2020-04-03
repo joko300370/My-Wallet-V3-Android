@@ -196,6 +196,13 @@ class AuthDataManager(
     the automatic backup, and also decrypts the values when necessary into local storage.
      */
     private fun handleBackup(decryptionKey: String) {
+        if(!prefs.backupEnabled) {
+            // Just to make sure, if the user specifically opted out out of cloud backups,
+            // always clear the backup over here. 
+            prefs.clearBackup()
+            return
+        }
+
         if(prefs.hasBackup && prefs.getValue(PersistentPrefs.KEY_WALLET_GUID) == null) {
             // Pull in the values from the backup, we don't have local state
             // TODO add restore metric here

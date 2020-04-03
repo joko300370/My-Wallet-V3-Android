@@ -508,6 +508,10 @@
         network. The Tor network is frequently used by hackers attempting to access Blockchain
         user\'s wallets.
     </string>
+    <string name="enable_cloud_backup">Enable Cloud Backups</string>
+    <string name="enable_cloud_backup_summary">Store the encrypted backup in your Google Drive account,
+        if available. This allows you to restore your wallet after losing this device.
+    </string>
     <string name="enable_screenshots">Enable Screenshots</string>
     <string name="enable_screenshots_summary">Some screens within the application can display
         sensitive data. Other applications will be able to access these screenshots.
