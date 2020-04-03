@@ -2,7 +2,6 @@
 
 package com.blockchain.koin
 
-import android.app.backup.BackupManager
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.preference.PreferenceManager

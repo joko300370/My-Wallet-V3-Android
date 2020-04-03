@@ -91,7 +91,7 @@ class LauncherPresenter(
         // The PIN identifier is stored in plaintext in the backup. We can restore it here straight
         // away, which means we don't need to adjust all the other places where we access it.
         val value = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
-        if(prefs.hasBackup && value.isEmpty()) {
+        if (prefs.hasBackup && value.isEmpty()) {
             prefs.setValue(PersistentPrefs.KEY_PIN_IDENTIFIER, prefs.backupPinIdentifier!!)
         }
 

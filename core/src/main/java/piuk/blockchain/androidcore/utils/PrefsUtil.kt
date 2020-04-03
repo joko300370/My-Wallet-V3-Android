@@ -204,7 +204,8 @@ class PrefsUtil(
         get() = backupStore.getBoolean(KEY_CLOUD_BACKUP_ENABLED, true)
         set(value) { backupStore.edit().putBoolean(KEY_CLOUD_BACKUP_ENABLED, value).apply() }
     override val hasBackup: Boolean
-        get() = backupPinIdentifier != null && backupEncryptedPassword != null && backupEncryptedGuid != null && backupEncryptedSharedKey != null && backupEnabled
+        get() = backupPinIdentifier != null && backupEncryptedPassword != null &&
+                backupEncryptedGuid != null && backupEncryptedSharedKey != null && backupEnabled
 
     override fun clearBackup() {
         backupStore.edit().clear().apply()
