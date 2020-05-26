@@ -243,12 +243,12 @@ class PayloadServiceTest {
             Pair("address_three", Balance())
         )
         val linkedMap = LinkedHashMap(map)
-        whenever(mockPayloadManager.getBalanceOfAddresses(addresses))
+        whenever(mockPayloadManager.getBalanceOfBtcAddresses(addresses))
             .thenReturn(linkedMap)
         // Act
-        val testObserver = subject.getBalanceOfAddresses(addresses).test()
+        val testObserver = subject.getBalanceOfBtcAddresses(addresses).test()
         // Assert
-        verify(mockPayloadManager).getBalanceOfAddresses(addresses)
+        verify(mockPayloadManager).getBalanceOfBtcAddresses(addresses)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(linkedMap)

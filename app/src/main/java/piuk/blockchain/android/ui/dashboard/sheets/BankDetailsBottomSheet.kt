@@ -91,11 +91,13 @@ class BankDetailsBottomSheet : SlidingModalBottomDialog() {
             val amount = state.order.amount
             if (amount != null) {
 
-                transfer_msg.text = getString(
-                    R.string.simple_buy_bank_account_sheet_instructions,
-                    amount.currencyCode,
-                    state.selectedCryptoCurrency
-                )
+                transfer_msg.text = state.selectedCryptoCurrency?.let {
+                    getString(
+                        R.string.simple_buy_bank_account_sheet_instructions,
+                        amount.currencyCode,
+                        it.displayTicker
+                    ) ?: ""
+                }
 
                 if (state.bankAccount != null) {
                     bank_details.initWithBankDetailsAndAmount(
@@ -123,9 +125,16 @@ class BankDetailsBottomSheet : SlidingModalBottomDialog() {
                 closeBecauseError("Invalid amount in SB state")
             }
 
-            title.text = getString(R.string.simple_buy_pending_buy_sheet_title, state.selectedCryptoCurrency!!)
+            title.text = state.selectedCryptoCurrency?.let {
+                getString(R.string.simple_buy_pending_buy_sheet_title, it.displayTicker)
+            } ?: ""
+
             cta_button_ok.setOnClickListenerDebounced { onCtaOKClick() }
-            cta_button_cancel.setOnClickListenerDebounced { onCtaCancelClick(state.id!!) }
+            cta_button_cancel.setOnClickListenerDebounced {
+                state.id?.let {
+                    onCtaCancelClick(it)
+                }
+            }
         }
     }
 

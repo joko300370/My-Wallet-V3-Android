@@ -2,6 +2,7 @@ package com.blockchain.notifications.analytics
 
 interface Analytics {
     fun logEvent(analyticsEvent: AnalyticsEvent)
+    fun logEventOnce(analyticsEvent: AnalyticsEvent)
 }
 
 interface UserAnalytics {
@@ -24,6 +25,13 @@ interface AnalyticsEvent {
     val event: String
     val params: Map<String, String>
 }
+
+sealed class NotificationAnalytics(
+    override val event: String,
+    override val params: Map<String, String> = mapOf()
+) : AnalyticsEvent
+object NotificationReceived : NotificationAnalytics("pn_notification_received")
+object NotificationAppOpened : NotificationAnalytics("pn_app_opened")
 
 data class UserProperty(val property: String, val value: String) {
     companion object {

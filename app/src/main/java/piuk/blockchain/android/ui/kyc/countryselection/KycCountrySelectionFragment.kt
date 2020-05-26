@@ -45,7 +45,7 @@ internal class KycCountrySelectionFragment :
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val countryCodeAdapter = CountryCodeAdapter {
-        presenter.onRegionSelected(it, progressListener.campaignType)
+        presenter.onRegionSelected(it)
     }
     private var countryList = ReplaySubject.create<List<CountryDisplayModel>>(1)
     private var progressDialog: MaterialProgressDialog? = null

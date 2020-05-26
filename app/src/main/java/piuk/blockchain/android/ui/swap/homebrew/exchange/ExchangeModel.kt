@@ -170,7 +170,7 @@ class ExchangeModel(
 
         dialogDisposable += Observable.interval(1, TimeUnit.MINUTES)
             .startWith(0L)
-            .flatMap {
+            .flatMapSingle {
                 ethDataManager.isLastTxPending()
             }
             .subscribeBy {

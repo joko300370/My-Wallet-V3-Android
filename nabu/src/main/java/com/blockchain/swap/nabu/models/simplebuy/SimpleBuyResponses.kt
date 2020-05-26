@@ -2,6 +2,8 @@ package com.blockchain.swap.nabu.models.simplebuy
 
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
+import com.blockchain.swap.nabu.datamanagers.Partner
+import com.blockchain.swap.nabu.models.nabu.Address
 
 import java.util.Date
 
@@ -35,16 +37,6 @@ data class BankAgentResponse(
     val routingNumber: String?
 )
 
-enum class OrderStateResponse {
-    PENDING_DEPOSIT,
-    PENDING_EXECUTION,
-    DEPOSIT_MATCHED,
-    FINISHED,
-    CANCELED,
-    FAILED,
-    EXPIRED
-}
-
 data class SimpleBuyBalanceResponse(
     val available: String
 )
@@ -53,7 +45,8 @@ data class CustodialWalletOrder(
     private val pair: String,
     private val action: String,
     private val input: OrderInput,
-    private val output: OrderOutput
+    private val output: OrderOutput,
+    private val paymentMethodId: String?
 )
 
 data class BuyOrderResponse(
@@ -63,14 +56,72 @@ data class BuyOrderResponse(
     val inputQuantity: String,
     val outputCurrency: String,
     val outputQuantity: String,
-    val state: OrderStateResponse,
-    val expiresAt: Date
-)
+    val paymentMethodId: String?,
+    val state: String,
+    val insertedAt: String,
+    val price: String?,
+    val fee: String?,
+    val attributes: CardPaymentAttributes?,
+    val expiresAt: String,
+    val updatedAt: String
+) {
+    companion object {
+        const val PENDING_DEPOSIT = "PENDING_DEPOSIT"
+        const val PENDING_EXECUTION = "PENDING_EXECUTION"
+        const val PENDING_CONFIRMATION = "PENDING_CONFIRMATION"
+        const val DEPOSIT_MATCHED = "DEPOSIT_MATCHED"
+        const val FINISHED = "FINISHED"
+        const val CANCELED = "CANCELED"
+        const val FAILED = "FAILED"
+        const val EXPIRED = "EXPIRED"
+    }
+}
 
 data class TransferRequest(
     val address: String,
     val currency: String,
     val amount: String
 )
+
+data class AddNewCardBodyRequest(private val currency: String, private val address: Address)
+
+data class AddNewCardResponse(
+    val id: String,
+    val partner: Partner
+)
+
+data class ActivateCardResponse(
+    val everypay: EveryPayCardCredentialsResponse?
+)
+
+data class EveryPayCardCredentialsResponse(
+    val apiUsername: String,
+    val mobileToken: String,
+    val paymentLink: String
+)
+
+data class CardPaymentAttributes(
+    val everypay: EverypayPaymentAttrs?
+)
+
+data class EverypayPaymentAttrs(
+    val paymentLink: String,
+    val paymentState: String
+) {
+    companion object {
+        const val WAITING_3DS = "WAITING_FOR_3DS_RESPONSE"
+    }
+}
+
+data class ConfirmOrderRequestBody(
+    private val action: String = "confirm",
+    private val attributes: CardPartnerAttributes?
+)
+
+data class CardPartnerAttributes(
+    private val everypay: EveryPayAttrs?
+)
+
+data class EveryPayAttrs(private val customerUrl: String)
 
 typealias BuyOrderListResponse = List<BuyOrderResponse>

@@ -16,10 +16,8 @@ internal class NabuTierService(
 
     override fun tiers(): Single<TiersJson> =
         authenticator.authenticate {
-            endpoint.getTiers(it.authHeader)
-        }
-        .subscribeOn(Schedulers.io())
-        .wrapErrorMessage()
+            endpoint.getTiers(it.authHeader).wrapErrorMessage()
+        }.subscribeOn(Schedulers.io())
 
     override fun setUserTier(tier: Int): Completable =
         authenticator.authenticate {

@@ -5,139 +5,142 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/crypto_icon"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:layout_marginTop="@dimen/standard_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/vector_bitcoin_colored" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/crypto_text"
-        style="@style/Text.Semibold.16"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:textColor="@color/grey_600"
-        app:layout_constraintBottom_toBottomOf="@+id/crypto_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/crypto_icon"
-        app:layout_constraintTop_toTopOf="@+id/crypto_icon"
-        tools:text="Bitcoin" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/crypto_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/crypto_text"
-        app:srcCompat="@drawable/ic_arrow_down" />
-
-    <View
-        android:id="@+id/separator"
-        style="@style/Separator"
-        android:layout_marginTop="10dp"
+        android:background="@color/blue_800"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/crypto_icon" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/coin_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/tiny_margin"
+            android:layout_marginEnd="@dimen/tiny_margin"
+            android:layout_marginBottom="@dimen/tiny_margin"
+            android:background="@drawable/simple_buy_coin_selector_background">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount"
-        style="@style/Text.Standard.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:text="@string/amount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/separator" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/crypto_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_margin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/vector_bitcoin_colored" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/up_to_amount"
-        style="@style/Text.Standard.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginEnd="5dp"
-        android:text="@string/amount"
-        android:textColor="@color/grey_600"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/amount"
-        tools:text="Up tp $25,000"
-        tools:visibility="visible" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/crypto_text"
+                style="@style/Text.Semibold.16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginTop="@dimen/tiny_margin"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toTopOf="@+id/guideline"
+                app:layout_constraintStart_toEndOf="@+id/crypto_icon"
+                app:layout_constraintVertical_bias="1.0"
+                tools:text="Bitcoin" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/error_action"
-        style="@style/Text.Standard.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:textColor="@color/blue_600"
-        app:layout_constraintBottom_toBottomOf="@+id/up_to_amount"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/up_to_amount"
-        tools:text="12354"
-        tools:visibility="visible" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/crypto_exchange_rate"
+                style="@style/Text.Standard.14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginBottom="@dimen/tiny_margin"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/crypto_icon"
+                app:layout_constraintTop_toBottomOf="@+id/guideline"
+                tools:text="1 BTC = $6,389.31 USD" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_arrow_down"
+                app:tint="@color/white" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/fiat_currency_symbol"
-        style="@style/Text.Semibold.16"
+        style="@style/Text.Semibold.32"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:text="€"
         android:textColor="@color/grey_400"
-        android:textSize="32sp"
         app:layout_constraintBottom_toBottomOf="@+id/input_amount"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input_amount"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintTop_toTopOf="@+id/input_amount" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/input_amount"
-        style="@style/Text.Semibold.16"
+        style="@style/Text.Semibold.32"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/small_margin"
         android:hint="0.00"
         android:inputType="numberDecimal"
-        android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/fiat_currency_symbol"
-        app:layout_constraintTop_toBottomOf="@+id/amount" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/error_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/input_amount"
-        app:layout_constraintStart_toEndOf="@+id/input_amount"
-        app:layout_constraintTop_toTopOf="@+id/input_amount"
-        app:srcCompat="@drawable/ic_simple_buy_invalid_amount"
-        tools:visibility="visible" />
-
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_goneMarginEnd="@dimen/small_margin" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/predefined_amount_1"
-        style="@style/Text.Standard.16"
+        android:id="@+id/error_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="8dp"
+        android:background="@drawable/simple_buy_enter_amount_error_message_background"
+        android:textColor="@color/red_400"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_amount"
+        tools:text="$20,000 Maximum buy" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/error_fix_action"
+        style="@style/Text.Semibold.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:background="@drawable/fix_error_action_background"
+        android:textColor="@color/blue_600"
+        app:layout_constraintBottom_toBottomOf="@+id/fiat_currency"
+        app:layout_constraintEnd_toStartOf="@+id/fiat_currency"
+        app:layout_constraintTop_toTopOf="@+id/fiat_currency"
+        tools:text="Buy Max" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/predefined_amount_1"
+        style="@style/Text.Semibold.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/grey_800"
+        android:textColor="@color/blue_600"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_amount"
         tools:text="$4" />
@@ -145,14 +148,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/predefined_amount_2"
-        style="@style/Text.Standard.16"
+        style="@style/Text.Semibold.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/tiny_margin"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/grey_800"
+        android:textColor="@color/blue_600"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/predefined_amount_1"
         app:layout_constraintTop_toBottomOf="@+id/input_amount"
@@ -160,38 +163,133 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/predefined_amount_3"
-        style="@style/Text.Standard.16"
+        style="@style/Text.Semibold.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/grey_800"
+        android:textColor="@color/blue_600"
         app:layout_constraintStart_toEndOf="@+id/predefined_amount_2"
         app:layout_constraintTop_toBottomOf="@+id/input_amount"
         tools:text="$4" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/predefined_amount_4"
-        style="@style/Text.Standard.16"
+        style="@style/Text.Semibold.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/tiny_margin"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/grey_800"
+        android:textColor="@color/blue_600"
         app:layout_constraintStart_toEndOf="@+id/predefined_amount_3"
         app:layout_constraintTop_toBottomOf="@+id/input_amount"
         tools:text="$4" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/payment_method_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="75dp"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:background="@drawable/payment_method_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_amount">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/payment_method_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/small_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_add_payment_method" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/undefined_payment_text"
+            style="@style/Text.Semibold.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_margin"
+            android:text="@string/select_payment_method"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/payment_guideline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/payment_method_title"
+            style="@style/Text.Semibold.16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:ellipsize="end"
+            android:singleLine="true"
+            app:layout_constraintBottom_toTopOf="@+id/payment_guideline"
+            app:layout_constraintEnd_toStartOf="@+id/payment_method_arrow"
+            app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+            tools:text="Chase Saphire 8291" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/payment_method_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_arrow_down"
+            app:tint="@color/grey_600" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/payment_method_limit"
+            style="@style/Text.Light.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_margin"
+            app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+            app:layout_constraintTop_toBottomOf="@+id/payment_guideline"
+            tools:text="$5,000 USD Limit" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/fiat_currency"
+        style="@style/Text.Standard.Centered.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:background="@drawable/simple_buy_currency_indicator_background"
+        android:paddingStart="6dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="6dp"
+        android:textColor="@color/blue_600"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_amount"
+        tools:text="USD" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_continue"
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_margin="@dimen/standard_margin"
         android:text="@string/btn_continue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

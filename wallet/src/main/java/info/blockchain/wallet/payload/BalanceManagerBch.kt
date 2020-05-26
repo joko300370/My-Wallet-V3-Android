@@ -14,7 +14,6 @@ class BalanceManagerBch(
     blockExplorer,
     CryptoCurrency.BCH
 ) {
-
     override fun getBalanceOfAddresses(addresses: List<String>): Call<HashMap<String, Balance>> {
         return blockExplorer.getBalance("bch", addresses, FilterType.RemoveUnspendable)
     }

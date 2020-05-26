@@ -49,6 +49,17 @@ fun CryptoCurrency.coinIconWhite(): Int =
         CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     }
 
+@DrawableRes
+fun CryptoCurrency.maskedAsset(): Int =
+    when (this) {
+        CryptoCurrency.BTC -> R.drawable.ic_btc_circled_mask
+        CryptoCurrency.XLM -> R.drawable.ic_xlm_circled_mask
+        CryptoCurrency.ETHER -> R.drawable.ic_eth_circled_mask
+        CryptoCurrency.PAX -> R.drawable.ic_usdd_circled_mask
+        CryptoCurrency.BCH -> R.drawable.ic_bch_circled_mask
+        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+    }
+
 fun ImageView.setImageDrawable(@DrawableRes res: Int) {
     setImageDrawable(AppCompatResources.getDrawable(context, res))
 }
@@ -102,4 +113,10 @@ internal class ResourceDefaultLabels(
 
     override fun getAssetMasterWalletLabel(cryptoCurrency: CryptoCurrency): String =
         resources.getString(cryptoCurrency.assetName())
+
+    override fun getAllWalletLabel(): String =
+        resources.getString(R.string.default_label_all_wallets)
+
+    override fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String =
+        resources.getString(R.string.default_label_interest_wallet)
 }

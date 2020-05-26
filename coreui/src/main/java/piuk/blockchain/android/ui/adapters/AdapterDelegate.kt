@@ -39,7 +39,6 @@ interface AdapterDelegate<in T> {
     fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     )
 }

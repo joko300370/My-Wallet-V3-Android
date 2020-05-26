@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.home
 import androidx.fragment.app.Fragment
 import piuk.blockchain.android.campaign.CampaignType
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
@@ -38,13 +39,13 @@ interface HomeNavigator {
     fun launchSetup2Fa()
     fun launchVerifyEmail()
     fun launchSetupFingerprintLogin()
-    fun launchBuySell()
     fun launchTransfer()
     fun launchIntroTour()
 
     fun gotoSendFor(cryptoCurrency: CryptoCurrency)
     fun gotoReceiveFor(cryptoCurrency: CryptoCurrency)
-    fun gotoTransactionsFor(cryptoCurrency: CryptoCurrency)
+    fun gotoActivityFor(account: CryptoAccount)
+
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy()
 }

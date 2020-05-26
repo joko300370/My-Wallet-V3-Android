@@ -2,9 +2,10 @@ package piuk.blockchain.android.coincore
 
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.coincore.bch.BchTokens
-import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
 import piuk.blockchain.android.coincore.eth.EthTokens
+import piuk.blockchain.android.coincore.impl.AssetActivityRepo
+import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
 
@@ -16,8 +17,10 @@ val coincoreModule = applicationContext {
             StxTokens(
                 rxBus = get(),
                 payloadManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
                 currencyPrefs = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 crashLogger = get(),
                 labels = get()
             )
@@ -25,13 +28,12 @@ val coincoreModule = applicationContext {
 
         bean {
             BtcTokens(
-                payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadDataManager = get(),
                 rxBus = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 crashLogger = get(),
                 labels = get()
             )
@@ -46,7 +48,7 @@ val coincoreModule = applicationContext {
                 rxBus = get(),
                 crashLogger = get(),
                 stringUtils = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 environmentSettings = get(),
                 labels = get()
             )
@@ -59,7 +61,7 @@ val coincoreModule = applicationContext {
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 crashLogger = get(),
                 labels = get()
             )
@@ -74,7 +76,7 @@ val coincoreModule = applicationContext {
                 rxBus = get(),
                 crashLogger = get(),
                 stringUtils = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 labels = get()
             )
         }
@@ -84,8 +86,9 @@ val coincoreModule = applicationContext {
                 rxBus = get(),
                 paxAccount = get(),
                 exchangeRates = get(),
+                historicRates = get(),
                 currencyPrefs = get(),
-                custodialWalletManager = get(),
+                custodialManager = get(),
                 stringUtils = get(),
                 crashLogger = get(),
                 labels = get()
@@ -99,7 +102,15 @@ val coincoreModule = applicationContext {
                 ethTokens = get(),
                 xlmTokens = get(),
                 paxTokens = get(),
-                stxTokens = get()
+                stxTokens = get(),
+                defaultLabels = get()
+            )
+        }
+
+        bean {
+            AssetActivityRepo(
+                coincore = get(),
+                rxBus = get()
             )
         }
     }

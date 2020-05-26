@@ -29,8 +29,7 @@ class StdAnnouncementDelegate<in T>(private val analytics: Analytics) : AdapterD
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     ) {
         val announcement = items[position] as StandardAnnouncementCard
 
@@ -153,7 +152,11 @@ class MiniAnnouncementDelegate<in T>(private val analytics: Analytics) : Adapter
             parent.inflate(R.layout.item_announcement_mini)
         )
 
-    override fun onBindViewHolder(items: List<T>, position: Int, holder: RecyclerView.ViewHolder, payloads: List<*>) {
+    override fun onBindViewHolder(
+        items: List<T>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) {
         val announcement = items[position] as MiniAnnouncementCard
         (holder as AnnouncementViewHolder).apply {
             if (announcement.titleText != 0) {

@@ -44,7 +44,19 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     BANK_DETAILS_CANCEL_PROMPT("sb_cancel_order_prompt"),
     BANK_DETAILS_CANCEL_CONFIRMED("sb_cancel_order_confirmed"),
     BANK_DETAILS_CANCEL_GO_BACK("sb_cancel_order_go_back"),
-    BANK_DETAILS_CANCEL_ERROR("sb_cancel_order_error")
+    BANK_DETAILS_CANCEL_ERROR("sb_cancel_order_error"),
+
+    SELECT_YOUR_CURRENCY_SHOWN("sb_currency_select_screen"),
+    CURRENCY_NOT_SUPPORTED_SHOWN("sb_currency_unsupported"),
+    CURRENCY_NOT_SUPPORTED_CHANGE("sb_unsupported_change_currency"),
+    CURRENCY_NOT_SUPPORTED_SKIP("sb_unsupported_view_home"),
+
+    ADD_CARD("sb_add_card_screen_shown"),
+    CARD_INFO_SET("sb_card_info_set"),
+    CARD_BILLING_ADDRESS_SET("sb_billing_address_set"),
+    CARD_3DS_COMPLETED("sb_three_d_secure_complete"),
+    PAYMENT_METHODS_SHOWN("sb_payment_method_shown"),
+    REMOVE_CARD("sb_remove_card")
 }
 
 fun buyConfirmClicked(amount: String, fiatCurrency: String): AnalyticsEvent = object : AnalyticsEvent {
@@ -101,6 +113,20 @@ class WithdrawScreenShown(cryptoCurrency: CryptoCurrency) : AnalyticsEvent {
     override val event: String = "sb_withdrawal_screen_shown"
     override val params: Map<String, String> = mapOf(
         "asset" to cryptoCurrency.networkTicker
+    )
+}
+
+class CurrencySelected(fiatCurrency: String) : AnalyticsEvent {
+    override val event: String = "sb_currency_selected"
+    override val params: Map<String, String> = mapOf(
+        "currency" to fiatCurrency
+    )
+}
+
+class CurrencyChangedFromBuyForm(fiatCurrency: String) : AnalyticsEvent {
+    override val event: String = "sb_buy_form_fiat_changed"
+    override val params: Map<String, String> = mapOf(
+        "currency" to fiatCurrency
     )
 }
 

@@ -4,14 +4,14 @@ import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.MockedResponseTest;
 import info.blockchain.wallet.ethereum.data.EthAddressResponse;
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap;
-import info.blockchain.wallet.ethereum.data.EthLatestBlock;
+import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber;
 import info.blockchain.wallet.ethereum.data.EthTransaction;
-import info.blockchain.wallet.ethereum.data.EthTxDetails;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class EthAccountApiTest extends MockedResponseTest {
         assertEquals("0x879dbfde84b0239feb355f55f81fb29f898c778c", ethAccount.getAccount());
         assertEquals(3, ethAccount.getTransactions().size());
         final EthTransaction transaction = ethAccount.getTransactions().get(1);
-        assertEquals(1503130094L, ((long) transaction.getTimeStamp()));
+        assertEquals(1503130094L, transaction.getTimestamp());
         assertEquals("0x879dbfde84b0239feb355f55f81fb29f898c778c", transaction.getFrom());
         assertEquals("0x0297a2a4cf8117a27b4ad684e43c34e21e600753", transaction.getTo());
     }
@@ -95,12 +95,12 @@ public class EthAccountApiTest extends MockedResponseTest {
         responses.add(Pair.of(200, LATEST_BLOCK_RESPONSE));
         mockInterceptor.setResponseList(responses);
         // Act
-        final TestObserver<EthLatestBlock> response = subject.getLatestBlock().test();
+        final TestObserver<EthLatestBlockNumber> response = subject.getLatestBlockNumber().test();
         // Assert
         response.assertComplete();
         response.assertNoErrors();
-        final EthLatestBlock latestBlock = response.values().get(0);
-        assertEquals(4272693L, ((long) latestBlock.getBlockHeight()));
+        final EthLatestBlockNumber latestBlock = response.values().get(0);
+        assertEquals(new BigInteger("4272693"), latestBlock.getNumber());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class EthAccountApiTest extends MockedResponseTest {
             "\t\t\"txns\": [\n" +
             "\t\t\t{\n" +
             "\t\t\t\t\"blockNumber\": 4213188,\n" +
-            "\t\t\t\t\"timeStamp\": 1503932683,\n" +
+            "\t\t\t\t\"timestamp\": 1503932683,\n" +
             "\t\t\t\t\"hash\": \"0x99c14ac55e4d8066c2ca743eee586bf7e2c9a70cc0faa63c62f0ec20205f956d\",\n" +
             "\t\t\t\t\"failFlag\": false,\n" +
             "\t\t\t\t\"errorDescription\": null,\n" +
@@ -183,7 +183,7 @@ public class EthAccountApiTest extends MockedResponseTest {
             "\t\t\t},\n" +
             "\t\t\t{\n" +
             "\t\t\t\t\"blockNumber\": 4176736,\n" +
-            "\t\t\t\t\"timeStamp\": 1503130094,\n" +
+            "\t\t\t\t\"timestamp\": 1503130094,\n" +
             "\t\t\t\t\"hash\": \"0xcc6952c8f5c6e90d1addcaf3717b6df251982637f0cafc32c7f6348018dd2a7b\",\n" +
             "\t\t\t\t\"failFlag\": false,\n" +
             "\t\t\t\t\"errorDescription\": null,\n" +
@@ -202,7 +202,7 @@ public class EthAccountApiTest extends MockedResponseTest {
             "\t\t\t},\n" +
             "\t\t\t{\n" +
             "\t\t\t\t\"blockNumber\": 4173545,\n" +
-            "\t\t\t\t\"timeStamp\": 1503064376,\n" +
+            "\t\t\t\t\"timestamp\": 1503064376,\n" +
             "\t\t\t\t\"hash\": \"0x982a1349b446b2613b911e8c0247cb209bfa6b5746581dc9025efbedc7b67996\",\n" +
             "\t\t\t\t\"failFlag\": false,\n" +
             "\t\t\t\t\"errorDescription\": null,\n" +

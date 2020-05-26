@@ -7,6 +7,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.exceptions.DecryptionException
@@ -112,7 +113,7 @@ class AccountPresenterTest {
         whenever(bchDataManager.getAccountMetadataList()).thenReturn(listOf(bchAccount))
         whenever(payloadDataManager.defaultAccountIndex).thenReturn(0)
         whenever(bchDataManager.getDefaultAccountPosition()).thenReturn(0)
-        whenever(payloadDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
+        whenever(payloadDataManager.getAddressBalance(any())).thenReturn(CryptoValue.ZeroBtc)
         whenever(bchDataManager.getAddressBalance(any())).thenReturn(BigInteger.ZERO)
     }
 

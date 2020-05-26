@@ -119,10 +119,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.ReceiveQrWindow" />
         <activity
-            android:name=".ui.transactions.TransactionDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
@@ -130,51 +126,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.ssl.SSLVerifyActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.coinify.signup.CoinifySignUpActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.launcher.BuySellLauncherActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.overview.CoinifyOverviewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.details.trade.CoinifyTransactionDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.details.awaitingtransfer.CoinifyAwaitingBankTransferActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.createorder.BuySellBuildOrderActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.coinify.signup.kyc.CoinifyKycActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.confirmation.buy.CoinifyBuyConfirmationActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.payment.card.ISignThisActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.payment.complete.CoinifyPaymentCompleteActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.payment.bank.addaccount.AddBankAccountActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.payment.bank.addaddress.AddAddressActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.payment.bank.accountoverview.BankAccountSelectionActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.confirmation.sell.CoinifySellConfirmationActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.buysell.details.recurring.RecurringTradeDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.swap.detail.TradeDetailActivity"
@@ -206,7 +157,14 @@
             android:name="piuk.blockchain.android.simplebuy.SimpleBuyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
-
+        <activity
+            android:name="piuk.blockchain.android.cards.CardDetailsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name="piuk.blockchain.android.cards.CardAuthoriseWebViewActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
         <service
             android:name=".data.coinswebsocket.service.CoinsWebSocketService"
             android:stopWithTask="true" />

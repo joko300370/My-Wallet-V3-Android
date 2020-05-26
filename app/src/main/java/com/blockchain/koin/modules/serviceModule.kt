@@ -12,6 +12,7 @@ import info.blockchain.wallet.settings.SettingsManager
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth
 import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl
+import piuk.blockchain.android.everypay.service.EveryPayService
 import retrofit2.Retrofit
 
 val serviceModule = applicationContext {
@@ -21,6 +22,8 @@ val serviceModule = applicationContext {
     bean { get<Retrofit>("explorer").create(WalletExplorerEndpoints::class.java) }
 
     bean { get<Retrofit>("api").create(FeeEndpoints::class.java) }
+
+    bean { get<Retrofit>("everypay").create(EveryPayService::class.java) }
 
     factory { WalletApi(get(), get()) }
 

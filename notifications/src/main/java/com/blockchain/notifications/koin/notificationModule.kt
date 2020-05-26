@@ -18,7 +18,6 @@ import org.koin.dsl.module.applicationContext
 val notificationModule = applicationContext {
 
     context("Payload") {
-
         bean { NotificationTokenManager(get(), get(), get(), get(), get()) }
     }
 
@@ -34,8 +33,11 @@ val notificationModule = applicationContext {
 
     factory { DynamicLinkHandler(get()) as PendingLink }
 
-    factory { AnalyticsImpl(get()) }
-        .bind(Analytics::class)
+    factory {
+        AnalyticsImpl(
+            firebaseAnalytics = get(),
+            store = get())
+    }.bind(Analytics::class)
 
     factory { UserAnalyticsImpl(get()) }
         .bind(UserAnalytics::class)

@@ -29,7 +29,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/icon_blockchain"
-        style="@style/Text.Standard.Centered.24"/>
+        style="@style/Text.Semibold.Centered.20"/>
 
     <TextView
         android:id="@+id/text_body"

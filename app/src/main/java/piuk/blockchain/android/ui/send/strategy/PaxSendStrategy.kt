@@ -18,6 +18,7 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.data.Erc20AddressResponse
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -308,7 +309,7 @@ class PaxSendStrategy(
             cryptoFee = ethFeeValue.toString(),
             fiatFee = fiatFeeValue.toStringWithoutSymbol(),
             showCryptoTotal = false,
-            fiatTotal = (fiatFeeValue + fiatValue).toStringWithoutSymbol()
+            fiatTotal = (fiatFeeValue + fiatValue).toStringWithSymbol()
         ).apply {
             cryptoFeeUnit = CryptoCurrency.ETHER.displayTicker
         }
@@ -398,8 +399,7 @@ class PaxSendStrategy(
         // Check if any pending ether txs exist and warn user
         compositeDisposable += isLastTxPending()
             .subscribeBy(
-                onNext = { /* No-op */ },
-                onComplete = { /* No-op */ },
+                onSuccess = { /* No-op */ },
                 onError = { Timber.e(it) }
             )
     }
@@ -511,12 +511,12 @@ class PaxSendStrategy(
                         }
                     }
                     Pair(validated, errorMessage)
-                }.flatMap { errorPair ->
+                }.flatMapSingle { errorPair ->
                     if (errorPair.first) {
                         // Validate address does not have unconfirmed funds
                         isLastTxPending()
                     } else {
-                        Observable.just(errorPair)
+                        Single.just(errorPair)
                     }
                 }
         }

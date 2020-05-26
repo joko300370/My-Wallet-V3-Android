@@ -67,7 +67,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         val showContent = arguments?.getBoolean(KycNavHostActivity.EXTRA_SHOW_TIERS_LIMITS_SPLASH) ?: false
 
         val title = when (progressListener.campaignType) {
-            CampaignType.BuySell -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
             CampaignType.SimpleBuy,

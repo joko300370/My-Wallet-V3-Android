@@ -102,7 +102,14 @@ val coreModule = applicationContext {
             .bind(SeedAccessWithoutPrompt::class)
             .bind(SeedAccess::class)
 
-        bean { MetadataManager(get(), get(), MetadataDerivation(BitcoinMainNetParams.get())) }
+        bean {
+            MetadataManager(
+                payloadDataManager = get(),
+                metadataInteractor = get(),
+                metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get()),
+                crashLogger = get()
+            )
+        }
 
         bean { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
 
@@ -160,7 +167,7 @@ val coreModule = applicationContext {
 
         bean { WalletOptionsState() }
 
-        bean { SettingsDataManager(get(), get(), get()) }
+        bean { SettingsDataManager(get(), get(), get(), get()) }
 
         bean { SettingsService(get()) }
 
@@ -175,7 +182,7 @@ val coreModule = applicationContext {
 
         bean { ExchangeRateDataStore(get(), get()) }
 
-        factory { FeeDataManager(get(), get(), get()) }
+        bean { FeeDataManager(get(), get(), get()) }
 
         factory {
             AuthDataManager(
@@ -218,9 +225,9 @@ val coreModule = applicationContext {
 
     bean {
         PrefsUtil(
-            store = PreferenceManager.getDefaultSharedPreferences(/* context = */ get()),
-                // TODO where should the constant shared pref name go?
-                // TODO how to get the preference object in a cleaner way?
+            store = get(),
+            // TODO where should the constant shared pref name go?
+            // TODO how to get the preference object in a cleaner way?
             backupStore = (get() as Context).getSharedPreferences("shared_pref_backup", MODE_PRIVATE),
             idGenerator = get(),
             uuidGenerator = get()
@@ -235,6 +242,12 @@ val coreModule = applicationContext {
         .bind(WalletStatus::class)
 
     factory { PaymentService(get(), get(), get()) }
+
+    factory {
+        PreferenceManager.getDefaultSharedPreferences(
+            /* context = */ get()
+        )
+    }
 
     bean {
         if (BuildConfig.DEBUG)

@@ -6,8 +6,10 @@ object Versions {
     const val minSdk = 21
     const val targetSdk = 28
     const val compileSdk = 28
-    const val versionCode = 518
-    const val versionName = "6.31.7"
+
+    const val versionCode = 537
+    const val versionName = "6.34.0"
+
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -25,7 +27,7 @@ object Versions {
     const val recyclerview = "1.1.0"
     const val cardview = "1.0.0"
     const val gridlayout = "1.0.0"
-    const val design = "1.0.0"
+    const val design = "1.1.0"
     const val preference = "1.1.0"
     const val dynamicanimation = "1.0.0"
     const val annotations = "1.1.0"
@@ -93,6 +95,7 @@ object Versions {
     // Third Party SDKs
     const val veriff = "2.8.0"
     const val probity = "1.0.0"
+    const val cardForm = "4.2.0"
 
     // Logging
     const val timber = "4.7.1"
@@ -167,6 +170,7 @@ object Libraries {
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
     const val moshi = "com.squareup.moshi:moshi:${Versions.moshi}"
     const val moshiKotlin = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"
+    const val moshiAdapters = "com.squareup.moshi:moshi-adapters:${Versions.moshi}"
     const val jacksonCore = "com.fasterxml.jackson.core:jackson-core:${Versions.jacksonCore}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
@@ -215,6 +219,7 @@ object Libraries {
     // Third Party SDKs
     const val veriff = "com.veriff:veriff-library:${Versions.veriff}"
     const val probity = "io.probity.sdk:collector:${Versions.probity}"
+    const val cardForm = "com.braintreepayments:card-form:${Versions.cardForm}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

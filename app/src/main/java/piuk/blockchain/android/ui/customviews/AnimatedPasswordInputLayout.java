@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.customviews;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+
 import androidx.appcompat.app.AlertDialog;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -35,13 +37,14 @@ public class AnimatedPasswordInputLayout extends TextInputLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        setPasswordVisibilityToggleEnabled(true);
+        setEndIconMode(END_ICON_PASSWORD_TOGGLE);
         initListener();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initListener() {
-        if (isPasswordVisibilityToggleEnabled()) {
-            mToggle = findViewById(R.id.text_input_password_toggle);
+        if (getEndIconMode() == END_ICON_PASSWORD_TOGGLE) {
+            mToggle = findViewById(R.id.text_input_end_icon);
             mToggle.setOnTouchListener((v, event) -> {
                 if (event != null && event.getAction() == MotionEvent.ACTION_UP) {
                     if (!mPasswordWarningSeen

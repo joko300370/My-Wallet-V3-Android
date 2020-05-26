@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.notifications.analytics.Analytics
 import java.lang.IllegalStateException
-import java.util.Locale
 
 abstract class MvpFragment<V : MvpView, P : MvpPresenter<V>> : Fragment() {
 
@@ -50,9 +49,6 @@ abstract class MvpFragment<V : MvpView, P : MvpPresenter<V>> : Fragment() {
 
     protected val analytics: Analytics
         get() = activity.analytics
-
-    protected val locale: Locale
-        get() = activity.locale
 
     @UiThread
     protected fun showAlert(dlg: AlertDialog) = activity.showAlert(dlg)

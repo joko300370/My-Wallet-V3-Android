@@ -273,7 +273,7 @@ class SwipeToReceiveHelperTest {
         map["addr2"] = balance2
         map["addr3"] = balance3
         map["addr4"] = balance4
-        whenever(payloadDataManager.getBalanceOfAddresses(anyList()))
+        whenever(payloadDataManager.getBalanceOfBtcAddresses(anyList()))
             .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES, ""))
             .thenReturn("addr0, addr1, addr2, addr3, addr4")
@@ -299,7 +299,7 @@ class SwipeToReceiveHelperTest {
         map["addr2"] = balance2
         map["addr3"] = balance3
         map["addr4"] = balance4
-        whenever(payloadDataManager.getBalanceOfAddresses(anyList()))
+        whenever(payloadDataManager.getBalanceOfBtcAddresses(anyList()))
             .thenReturn(Observable.just(map))
         whenever(prefsUtil.getValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES, ""))
             .thenReturn("addr0, addr1, addr2, addr3, addr4")

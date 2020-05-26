@@ -6,10 +6,13 @@ import com.blockchain.swap.nabu.models.nabu.goldTierComplete
 import com.blockchain.swap.nabu.models.nabu.kycVerified
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.swap.nabu.models.nabu.UserCampaignState
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -74,8 +77,24 @@ class AnnouncementQueries(
     }
 
     fun isSimpleBuyTransactionPending(): Single<Boolean> {
-        return Single.just(sbStateFactory.currentState()?.order?.orderState == OrderState.AWAITING_FUNDS)
+        return Single.just(
+            sbStateFactory.currentState()?.order?.orderState == OrderState.AWAITING_FUNDS &&
+                    sbStateFactory.currentState()?.selectedPaymentMethod?.isBank() == true
+        )
     }
+
+    private fun hasSelectedToAddNewCard(): Single<Boolean> =
+        Single.defer {
+            sbStateFactory.currentState()?.let {
+                Single.just(it.selectedPaymentMethod?.id == PaymentMethod.UNDEFINED_CARD_PAYMENT_ID)
+            } ?: Single.just(false)
+        }
+
+    fun isKycGoldVerifiedAndHasPendingCardToAdd(): Single<Boolean> =
+        tierService.tiers().map { it.combinedState == Kyc2TierState.Tier2Approved }.zipWith(
+            hasSelectedToAddNewCard()) { isGold, addNewCard ->
+            isGold && addNewCard
+        }
 }
 
 private fun SimpleBuyState?.kycDataSubmitted(): Boolean =

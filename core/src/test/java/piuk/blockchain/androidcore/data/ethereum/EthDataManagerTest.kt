@@ -13,11 +13,13 @@ import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
-import info.blockchain.wallet.ethereum.data.EthLatestBlock
+import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.`should contain`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
@@ -166,7 +168,6 @@ class EthDataManagerTest {
     @Test
     fun getEthWallet() {
         // Arrange
-
         // Act
         subject.getEthWallet()
         // Assert
@@ -177,228 +178,93 @@ class EthDataManagerTest {
     @Test
     fun `getEthTransactions response found with 3 transactions`() {
         // Arrange
-        val combinedEthModel: CombinedEthModel = mock()
+        val ethAddress = "ADDRESS"
         val ethTransaction: EthTransaction = mock()
-        whenever(ethDataStore.ethAddressResponse).thenReturn(combinedEthModel)
-        whenever(combinedEthModel.getTransactions())
-            .thenReturn(listOf(ethTransaction, ethTransaction, ethTransaction))
+        whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
+        whenever(ethAccountApi.getEthTransactions(any()))
+            .thenReturn(Single.just(listOf(ethTransaction, ethTransaction, ethTransaction)))
         // Act
         val testObserver = subject.getEthTransactions().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         val values = testObserver.values()
-        values `should contain` ethTransaction
-        values.size `should equal to` 3
-        verify(ethDataStore).ethAddressResponse
-        verifyNoMoreInteractions(ethDataStore)
+        values[0] `should contain` ethTransaction
+
+        values.size `should equal to` 1
     }
 
     @Test
     fun `getEthTransactions response not found`() {
         // Arrange
-        whenever(ethDataStore.ethAddressResponse).thenReturn(null)
+        whenever(ethDataStore.ethWallet!!.account.address).thenReturn(null)
         // Act
         val testObserver = subject.getEthTransactions().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertNoValues()
-        verify(ethDataStore).ethAddressResponse
-        verifyNoMoreInteractions(ethDataStore)
+        testObserver.assertValueCount(1)
+        testObserver.assertValueAt(0, emptyList())
     }
 
     @Test
-    fun `isLastTxPending response not found`() {
+    fun `lastTx is pending when there is at least one transaction pending`() {
         // Arrange
-        val ethHash = "HASH"
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
-        whenever(ethDataStore.ethWallet!!.lastTransactionHash).thenReturn(ethHash)
-        whenever(walletOptionsDataManager.getLastEthTransactionFuse()).thenReturn(
-            Observable.just(
-                600
-            )
-        )
-        whenever(ethDataStore.ethWallet!!.lastTransactionTimestamp).thenReturn(0L)
+        whenever(ethDataStore.ethWallet!!.account.address).thenReturn("Address")
 
-        val ethAddress = "ADDRESS"
-        whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
-        whenever(ethAccountApi.getEthAddress(listOf(ethAddress)))
-            .thenReturn(null)
-
-        val ethAddressResponse: EthAddressResponse = mock()
-        val ethAddressResponseMap: EthAddressResponseMap = mock()
-        whenever(ethAddressResponseMap.ethAddressResponseMap)
-            .thenReturn(mutableMapOf(Pair("", ethAddressResponse)))
-
-        val ethTransaction: EthTransaction = mock()
-        whenever(ethTransaction.hash).thenReturn(ethHash)
-        whenever(ethAddressResponse.transactions)
-            .thenReturn(listOf(ethTransaction, ethTransaction, ethTransaction))
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(combinedEthModel.getTransactions()).thenReturn(
-            listOf(
-                ethTransaction,
-                ethTransaction,
-                ethTransaction
-            )
-        )
-        whenever(ethDataStore.ethAddressResponse).thenReturn(combinedEthModel)
-
+        whenever(ethAccountApi.getLastEthTransaction(any()))
+            .thenReturn(Maybe.just(EthTransaction(state = "PENDING")))
         // Act
-        val testObserver = subject.isLastTxPending().test()
+        val result = subject.isLastTxPending().test()
         // Assert
-        testObserver.assertNotComplete()
-        verify(ethDataStore, atLeastOnce()).ethWallet
-        verify(ethDataStore, atLeastOnce()).ethAddressResponse
-        verifyNoMoreInteractions(ethDataStore)
+
+        result.assertValueCount(1)
+        result.assertValueAt(0, true)
     }
 
     @Test
-    fun `isLastTxPending last tx unprocessed, just submitted`() {
-
-        val isProcessed = false
-        val sent = System.currentTimeMillis()
-        val shouldBePending = true
-
-        isLastTxPending(isProcessed, sent, shouldBePending)
-    }
-
-    @Test
-    fun `isLastTxPending last tx processed`() {
-
-        val isProcessed = true
-        val sent = System.currentTimeMillis() // irrelevant
-        val shouldBePending = false
-
-        isLastTxPending(isProcessed, sent, shouldBePending)
-    }
-
-    @Test
-    fun `isLastTxPending last tx unprocessed, legacy processed`() {
-        // legacy txs won't have last_tx_timestamp in metadata
-        val isProcessed = false
-        val sent = 0L // irrelevant
-        val shouldBePending = false
-        isLastTxPending(isProcessed, sent, shouldBePending)
-    }
-
-    @Test
-    fun `isLastTxPending last tx unprocessed, legacy dropped`() {
-        // legacy txs won't have last_tx_timestamp in metadata
-        val isProcessed = false
-        val sent = 0L
-        val shouldBePending = false
-        isLastTxPending(isProcessed, sent, shouldBePending)
-    }
-
-    @Test
-    fun `isLastTxPending last tx unprocessed, 1min before being dropped`() {
-
-        // 23h59m - 1 min before drop time
-        val isProcessed = false
-        val sent = System.currentTimeMillis() - (86340L * 1000)
-        val shouldBePending = true
-
-        isLastTxPending(isProcessed, sent, shouldBePending)
-    }
-
-    /*
-      @Test
-      @Ignore  This is incredibly flakey . Commented out cause of a lint error
-      fun `isLastTxPending last tx unprocessed, just dropped`() {
-
-          // 24h - on drop time
-          val isProcessed = false
-          val sent = System.currentTimeMillis() - (86400L * 1000)
-          val shouldBePending = false
-
-          isLastTxPending(isProcessed, sent, shouldBePending)
-      }
-  */
-    @Test
-    fun `isLastTxPending last tx unprocessed, 1min after being dropped`() {
-
-        // 24h01m - 1 min passed drop time
-        val txProcessed = true
-        val sent = System.currentTimeMillis() - (86460L * 1000)
-        val shouldBePending = false
-
-        isLastTxPending(txProcessed, sent, shouldBePending)
-    }
-
-    private fun isLastTxPending(
-        isProcessed: Boolean,
-        timeLastTxSent: Long,
-        hasPendingTransaction: Boolean
-    ) {
-
+    fun `lastTx is not pending when there is no pending tx`() {
         // Arrange
-        val lastTxHash = "hash1"
-        var existingHash = "hash2"
+        whenever(ethDataStore.ethWallet!!.account.address).thenReturn("Address")
 
-        if (isProcessed) {
-            // Server flagged last tx hash as processed
-            existingHash = lastTxHash
-        }
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
-        whenever(ethDataStore.ethWallet!!.lastTransactionHash).thenReturn(lastTxHash)
-        whenever(walletOptionsDataManager.getLastEthTransactionFuse()).thenReturn(
-            Observable.just(
-                86400L
-            )
-        )
-        whenever(ethDataStore.ethWallet!!.lastTransactionTimestamp).thenReturn(timeLastTxSent)
-
-        val ethAddress = "ADDRESS"
-        whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
-        val ethAddressResponseMap: EthAddressResponseMap = mock()
-        whenever(ethAccountApi.getEthAddress(listOf(ethAddress)))
-            .thenReturn(Observable.just(ethAddressResponseMap))
-
-        val ethAddressResponse: EthAddressResponse = mock()
-        whenever(ethAddressResponseMap.ethAddressResponseMap)
-            .thenReturn(mutableMapOf(Pair("", ethAddressResponse)))
-
-        val ethTransaction: EthTransaction = mock()
-        whenever(ethTransaction.hash).thenReturn(existingHash)
-        whenever(ethAddressResponse.transactions)
-            .thenReturn(listOf(ethTransaction, ethTransaction, ethTransaction))
-
-        val combinedEthModel: CombinedEthModel = mock()
-        whenever(combinedEthModel.getTransactions()).thenReturn(
-            listOf(
-                ethTransaction,
-                ethTransaction,
-                ethTransaction
-            )
-        )
-        whenever(ethDataStore.ethAddressResponse).thenReturn(combinedEthModel)
-
+        whenever(ethAccountApi.getLastEthTransaction(any()))
+            .thenReturn(Maybe.just(EthTransaction(state = "CONFIRMED")))
         // Act
-        val testObserver = subject.isLastTxPending().test()
+        val result = subject.isLastTxPending().test()
         // Assert
-        testObserver.assertComplete()
-        testObserver.assertNoErrors()
-        testObserver.assertValue(hasPendingTransaction)
-        verify(ethDataStore, atLeastOnce()).ethWallet
-        verify(ethAccountApi, atLeastOnce()).getEthAddress(listOf(ethAddress))
-        verifyNoMoreInteractions(ethAccountApi)
+
+        result.assertValueCount(1)
+        result.assertValueAt(0, false)
+    }
+
+    @Test
+    fun `lastTx is not pending when there is no tx`() {
+        // Arrange
+        whenever(ethDataStore.ethWallet!!.account.address).thenReturn("Address")
+
+        whenever(ethAccountApi.getLastEthTransaction(any()))
+            .thenReturn(Maybe.empty())
+        // Act
+        val result = subject.isLastTxPending().test()
+        // Assert
+
+        result.assertValueCount(1)
+        result.assertValueAt(0, false)
     }
 
     @Test
     fun getLatestBlock() {
         // Arrange
-        val latestBlock: EthLatestBlock = mock()
+        val latestBlock = EthLatestBlockNumber()
         whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
-        whenever(ethAccountApi.latestBlock).thenReturn(Observable.just(latestBlock))
+        whenever(ethAccountApi.latestBlockNumber).thenReturn(Single.just(latestBlock))
         // Act
-        val testObserver = subject.getLatestBlock().test()
+        val testObserver = subject.getLatestBlockNumber().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.assertValue(latestBlock)
-        verify(ethAccountApi).latestBlock
+        verify(ethAccountApi).latestBlockNumber
         verifyNoMoreInteractions(ethAccountApi)
     }
 
@@ -407,7 +273,7 @@ class EthDataManagerTest {
         // Arrange
         whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
         // Act
-        val testObserver = subject.getLatestBlock().test()
+        val testObserver = subject.getLatestBlockNumber().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -503,26 +369,6 @@ class EthDataManagerTest {
         testObserver.assertError(IllegalStateException::class.java)
         verify(ethDataStore).ethWallet
         verifyNoMoreInteractions(ethDataStore)
-    }
-
-    // TODO: This is not at all testable
-    @Test
-    fun initEthereumWallet() {
-        // Arrange
-
-        // Act
-
-        // Assert
-    }
-
-    // TODO: This isn't testable either, wrap [RawTransaction] class in interface
-    @Test
-    fun createEthTransaction() {
-        // Arrange
-
-        // Act
-
-        // Assert
     }
 
     @Test

@@ -23,8 +23,7 @@ class CreateWalletDelegate<in T>(
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     ) {
         val headerViewHolder = holder as HeaderViewHolder
         headerViewHolder.bind(items[position] as AccountItem, listener)

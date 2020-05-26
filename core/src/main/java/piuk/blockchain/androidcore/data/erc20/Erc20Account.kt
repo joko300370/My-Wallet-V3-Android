@@ -33,7 +33,7 @@ interface Erc20Account {
 
     fun getTransactions(): Observable<List<Erc20Transfer>>
 
-    fun getAccountHash(): Observable<String>
+    fun getAccountHash(): Single<String>
 
     fun getErc20Model(): Erc20DataModel?
 

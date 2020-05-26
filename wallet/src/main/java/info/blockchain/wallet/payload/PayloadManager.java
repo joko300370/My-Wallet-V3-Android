@@ -1,6 +1,8 @@
 package info.blockchain.wallet.payload;
 
 import info.blockchain.api.data.Balance;
+import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.balance.CryptoValue;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.bip44.HDAccount;
@@ -580,7 +582,7 @@ public class PayloadManager {
      * @throws IOException  Thrown if there are network issues
      * @throws ApiException Thrown if the call isn't successful
      */
-    public LinkedHashMap<String, Balance> getBalanceOfAddresses(List<String> addresses) throws
+    public LinkedHashMap<String, Balance> getBalanceOfBtcAddresses(List<String> addresses) throws
             IOException,
             ApiException {
         LinkedHashMap<String, Balance> map = new LinkedHashMap<>();

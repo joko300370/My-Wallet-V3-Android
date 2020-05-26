@@ -9,7 +9,6 @@ interface EnvironmentConfig : EnvironmentUrls {
     val bitcoinNetworkParameters: NetworkParameters
     val bitcoinCashNetworkParameters: NetworkParameters
 
-    val coinifyUrl: String
     val bitpayUrl: String
 
     fun shouldShowDebugMenu(): Boolean

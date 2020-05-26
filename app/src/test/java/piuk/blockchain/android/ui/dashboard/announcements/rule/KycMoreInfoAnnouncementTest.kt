@@ -7,14 +7,12 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
-import piuk.blockchain.androidbuysell.api.CoinifyWalletService
 
 class KycMoreInfoAnnouncementTest {
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
 
     private val tierService: TierService = mock()
-    private val walletService: CoinifyWalletService = mock()
     private val featureFlag: FeatureFlag = mock()
 
     private lateinit var subject: KycMoreInfoAnnouncement
@@ -28,7 +26,6 @@ class KycMoreInfoAnnouncementTest {
 
         subject = KycMoreInfoAnnouncement(
             tierService = tierService,
-            coinifyWalletService = walletService,
             showPopupFeatureFlag = featureFlag,
             dismissRecorder = dismissRecorder
         )

@@ -18,15 +18,15 @@
     <style name="CtaButton.Blue">
         <item name="android:background">@drawable/bkgd_button_blue_selector</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
-        <item name="android:layout_marginRight">@dimen/standard_margin</item>
+        <item name="android:layout_marginStart">@dimen/standard_margin</item>
+        <item name="android:layout_marginEnd">@dimen/standard_margin</item>
     </style>
 
     <style name="CtaButton.White">
         <item name="android:background">@drawable/bkgd_button_white_selector</item>
         <item name="android:textColor">@color/blue_600</item>
-        <item name="android:layout_marginLeft">@dimen/standard_margin</item>
-        <item name="android:layout_marginRight">@dimen/standard_margin</item>
+        <item name="android:layout_marginStart">@dimen/standard_margin</item>
+        <item name="android:layout_marginEnd">@dimen/standard_margin</item>
     </style>
 
     <style name="CtaButton.Black">

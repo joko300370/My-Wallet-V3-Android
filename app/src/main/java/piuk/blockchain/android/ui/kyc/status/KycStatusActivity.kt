@@ -45,7 +45,6 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         logEvent(AnalyticsEvents.KycComplete)
 
         val title = when (campaignType) {
-            CampaignType.BuySell -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Sunriver,
             CampaignType.Blockstack,
@@ -89,7 +88,6 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         textViewStatus.setText(R.string.kyc_status_title_in_progress)
         displayNotificationButton()
         val message = when (campaignType) {
-            CampaignType.BuySell,
             CampaignType.Swap,
             CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
             CampaignType.Blockstack,

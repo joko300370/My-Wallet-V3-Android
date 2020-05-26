@@ -19,31 +19,48 @@ import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.annotations.ButWhy
-import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.lockbox.ui.LockboxLandingActivity
+import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.NotificationAppOpened
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
+import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toolbar_general.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
+import piuk.blockchain.android.ui.activity.ActivitiesFragment
+import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
-import piuk.blockchain.android.ui.buysell.launcher.BuySellLauncherActivity
+import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
+import piuk.blockchain.android.ui.home.analytics.SideNavEvent
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.receive.ReceiveFragment
 import piuk.blockchain.android.ui.send.SendFragment
@@ -52,28 +69,12 @@ import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewNavHostAct
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
-import piuk.blockchain.android.ui.transactions.TransactionDetailActivity
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
-import piuk.blockchain.androidbuysell.models.WebViewLoginDetails
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.toolbar_general.*
-import org.koin.android.ext.android.inject
-import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
-import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.home.analytics.SideNavEvent
-import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
-import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
-import piuk.blockchain.android.ui.transactions.TransactionsFragment
+import piuk.blockchain.android.ui.zxing.CaptureActivity
+import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
@@ -103,8 +104,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     private var backPressed: Long = 0
 
-    private var webViewLoginDetails: WebViewLoginDetails? = null
-
     // Fragment callbacks for currency header
     private val touchOutsideViews = HashMap<View, OnTouchOutsideViewListener>()
 
@@ -127,7 +126,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         ViewUtils.setElevation(appbar_layout, 4f)
                     }
                     ITEM_ACTIVITY -> {
-                        startBalanceFragment()
+                        startActivitiesFragment()
                         ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
@@ -160,6 +159,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
+            intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)) {
+            analytics.logEvent(NotificationAppOpened)
+        }
 
         drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -281,7 +285,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 drawer_layout.closeDrawers()
                 true
             }
-            f is TransactionsFragment -> f.onBackPressed()
+            f is ActivitiesFragment -> f.onBackPressed()
             f is SendFragment -> f.onBackPressed()
             f is ReceiveFragment -> f.onBackPressed()
             f is DashboardFragment -> f.onBackPressed()
@@ -305,7 +309,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     private fun setTourMenuView() {
-        val item = menu.findItem(R.id.nav_buy)
+        val item = menu.findItem(R.id.nav_simple_buy)
 
         val out = ArrayList<View>()
         drawer_layout.findViewsWithText(out, item.title, FIND_VIEWS_WITH_TEXT)
@@ -394,7 +398,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             R.id.nav_simple_buy -> launchSimpleBuy()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
             R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java), ACCOUNT_EDIT)
-            R.id.nav_buy -> presenter.routeToBuySell()
             R.id.login_web_wallet -> PairingCodeActivity.start(this)
             R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_EDIT)
             R.id.nav_support -> onSupportClicked()
@@ -451,10 +454,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         OnboardingActivity.launchForFingerprints(this)
     }
 
-    override fun launchBuySell() {
-        BuySellLauncherActivity.start(this)
-    }
-
     override fun launchTransfer() {
         bottom_navigation.getViewAtPosition(ITEM_RECEIVE).performClick()
     }
@@ -483,7 +482,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         with(bottom_navigation) {
             when (currentFragment) {
                 is DashboardFragment -> currentItem = ITEM_HOME
-                is TransactionsFragment -> currentItem = ITEM_ACTIVITY
+                is ActivitiesFragment -> currentItem = ITEM_ACTIVITY
                 is SendFragment -> currentItem = ITEM_SEND
                 is ReceiveFragment -> currentItem = ITEM_RECEIVE
             }
@@ -555,26 +554,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         presenter.startSwapOrKyc(toCurrency = targetCurrency, fromCurrency = fromCryptoCurrency)
     }
 
-//    @CommonCode("Move to base")
-//    override fun showProgressDialog(@StringRes message: Int) {
-//        hideProgressDialog()
-//        if (!isFinishing) {
-//            progressDlg = MaterialProgressDialog(this).apply {
-//                setCancelable(false)
-//                setMessage(message)
-//                show()
-//            }
-//        }
-//    }
-//
-//    @CommonCode("Move to base")
-//    override fun hideProgressDialog() {
-//        if (!isFinishing && progressDlg != null) {
-//            progressDlg!!.dismiss()
-//            progressDlg = null
-//        }
-//    }
-
     override fun onHandleInput(strUri: String) {
         handlePredefinedInput(strUri, true)
     }
@@ -583,35 +562,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         return intent
     }
 
-    override fun setBuySellEnabled(enabled: Boolean, useWebView: Boolean) {
-        setBuyBitcoinVisible(enabled)
-    }
-
-    override fun showTradeCompleteMsg(txHash: String) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(getString(R.string.trade_complete))
-            .setMessage(R.string.trade_complete_details)
-            .setCancelable(false)
-            .setPositiveButton(R.string.ok_cap, null)
-            .setNegativeButton(R.string.view_details) { _, _ ->
-                startBalanceFragment()
-                TransactionDetailActivity.start(this, presenter.cryptoCurrency, txHash)
-            }.show()
-    }
-
-    private fun setBuyBitcoinVisible(visible: Boolean) {
-        val menu = menu
-        menu.findItem(R.id.nav_buy).isVisible = visible
-    }
-
     private fun setPitVisible(visible: Boolean) {
         val menu = menu
         menu.findItem(R.id.nav_the_exchange).isVisible = visible
-    }
-
-    override fun setWebViewLoginDetails(loginDetails: WebViewLoginDetails) {
-        Timber.d("setWebViewLoginDetails: called")
-        webViewLoginDetails = loginDetails
     }
 
     override fun clearAllDynamicShortcuts() {
@@ -728,9 +681,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(fragment)
     }
 
-    override fun gotoTransactionsFor(cryptoCurrency: CryptoCurrency) {
-        presenter.cryptoCurrency = cryptoCurrency
-        bottom_navigation.currentItem = ITEM_ACTIVITY
+    override fun gotoActivityFor(account: CryptoAccount) {
+        presenter.cryptoCurrency = account.cryptoCurrencies.first()
+        startActivitiesFragment(account)
     }
 
     override fun resumeSimpleBuyKyc() {
@@ -751,10 +704,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
-    override fun startBalanceFragment() {
-        val fragment = TransactionsFragment.newInstance(true)
+    private fun startActivitiesFragment(account: CryptoAccount? = null) {
+        setCurrentTabItem(ITEM_ACTIVITY)
+        val fragment = ActivitiesFragment.newInstance(account)
         replaceContentFragment(fragment)
         toolbar_general.title = ""
+        analytics.logEvent(activityShown(account?.label ?: "All Wallets"))
     }
 
     override fun refreshAnnouncements() {
@@ -802,7 +757,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     companion object {
 
-        val TAG = MainActivity::class.java.simpleName!!
+        val TAG: String = MainActivity::class.java.simpleName
 
         const val SCAN_URI = 2007
         const val ACCOUNT_EDIT = 2008

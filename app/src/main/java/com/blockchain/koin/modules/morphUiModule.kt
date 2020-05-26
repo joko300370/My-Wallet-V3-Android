@@ -3,8 +3,6 @@ package com.blockchain.koin.modules
 import com.blockchain.datamanagers.BalanceCalculator
 import com.blockchain.datamanagers.BalanceCalculatorImpl
 import com.blockchain.koin.registerDebug
-import com.blockchain.swap.common.trade.MergingMorphTradeDataManager
-import com.blockchain.swap.common.trade.MorphTradeDataHistoryList
 
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeModel
@@ -26,14 +24,7 @@ val morphUiModule = applicationContext {
             )
         }
 
-        factory("merge") {
-            MergingMorphTradeDataManager(
-                get("nabu"),
-                get("shapeshift")
-            )
-        }.bind(MorphTradeDataHistoryList::class)
-
-        factory { TradeHistoryPresenter(get("merge"), get()) }
+        factory { TradeHistoryPresenter(dataManager = get(), dateUtil = get()) }
 
         factory { BalanceCalculatorImpl(get()) }.bind(BalanceCalculator::class)
 

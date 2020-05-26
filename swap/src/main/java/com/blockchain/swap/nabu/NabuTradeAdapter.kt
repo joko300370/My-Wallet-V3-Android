@@ -48,6 +48,12 @@ internal class NabuTradeAdapter(private val trade: NabuTransaction) :
                 get() = trade.fiatValue
         }
 
+    override val withdrawalAddress: String
+        get() = trade.withdrawalAddress
+
+    override val depositAddress: String
+        get() = trade.depositAddress
+
     override fun enoughInfoForDisplay() = true
 }
 

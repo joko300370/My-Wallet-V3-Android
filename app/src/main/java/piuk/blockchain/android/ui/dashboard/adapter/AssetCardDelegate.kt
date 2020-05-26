@@ -39,8 +39,7 @@ class AssetCardDelegate<in T>(
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     ) = (holder as AssetCardViewHolder).bind(
         items[position] as AssetState,
         prefs.selectedFiatCurrency,

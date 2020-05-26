@@ -97,3 +97,13 @@ fun Completable.then(block: () -> Completable): Completable =
 
 fun <T> Completable.thenMaybe(block: () -> Maybe<T>): Maybe<T> =
     andThen(Maybe.defer { block() })
+
+fun <T, R> Observable<List<T>>.mapList(func: (T) -> R): Single<List<R>> =
+    flatMapIterable { list ->
+        list.map { func(it) }
+    }.toList()
+
+fun <T, R> Single<List<T>>.mapList(func: (T) -> R): Single<List<R>> =
+    flattenAsObservable { list ->
+        list.map { func(it) }
+    }.toList()

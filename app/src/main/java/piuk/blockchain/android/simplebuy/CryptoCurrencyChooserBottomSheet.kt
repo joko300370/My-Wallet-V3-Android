@@ -33,7 +33,7 @@ class CryptoCurrencyChooserBottomSheet : SlidingModalBottomDialog() {
                 cryptoCurrencies
                     .map {
                         BottomSheetAdapterItem(it) {
-                            (parentFragment as? CurrencyChangeListener)?.onCurrencyChanged(it)
+                            (parentFragment as? ChangeCurrencyHost)?.onCryptoCurrencyChanged(it)
                             dismiss()
                         }
                     })

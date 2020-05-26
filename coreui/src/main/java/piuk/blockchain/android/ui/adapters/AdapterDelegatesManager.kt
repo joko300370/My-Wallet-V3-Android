@@ -31,15 +31,6 @@ class AdapterDelegatesManager<T> {
     }
 
     /**
-     * Removes an [AdapterDelegate] from the current list of delegates and returns this
-     * [AdapterDelegatesManager].
-     */
-    fun removeAdapterDelegate(delegate: AdapterDelegate<T>) {
-        val index = delegates.indexOfValue(delegate)
-        delegates.removeAt(index)
-    }
-
-    /**
      * Gets the current item's View type by checking against the list of available [AdapterDelegate]
      * objects. If no delegate is found to handle the particular object type, this function will
      * throw a [NullPointerException].
@@ -102,7 +93,7 @@ class AdapterDelegatesManager<T> {
                 "No delegate found for item at position $position for view type  ${viewHolder.itemViewType}"
             )
 
-        delegate.onBindViewHolder(items, position, viewHolder, payloads ?: arrayList)
+        delegate.onBindViewHolder(items, position, viewHolder)
     }
 
     /**
@@ -125,19 +116,4 @@ class AdapterDelegatesManager<T> {
      * @return A suitable [AdapterDelegate] for the View type, or null if not found
      */
     fun getDelegateForViewType(viewType: Int): AdapterDelegate<T>? = delegates.get(viewType)
-
-    /**
-     * Returns the view type for a given [AdapterDelegate]
-     *
-     * @param delegate An [AdapterDelegate]
-     *
-     * @return An [Int] representing the View type, or -1 if not found
-     */
-    fun getViewType(delegate: AdapterDelegate<T>): Int {
-        val index = delegates.indexOfValue(delegate)
-        if (index == -1) {
-            return -1
-        }
-        return delegates.keyAt(index)
-    }
 }

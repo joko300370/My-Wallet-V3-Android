@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.metadata
 
+import com.blockchain.logging.CrashLogger
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.metadata.Metadata
 import info.blockchain.wallet.metadata.MetadataDerivation
@@ -10,6 +11,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 
@@ -30,7 +32,8 @@ import piuk.blockchain.androidcore.utils.extensions.then
 class MetadataManager(
     private val payloadDataManager: PayloadDataManager,
     private val metadataInteractor: MetadataInteractor,
-    private val metadataDerivation: MetadataDerivation
+    private val metadataDerivation: MetadataDerivation,
+    private val crashLogger: CrashLogger
 ) {
     private val credentials: MetadataCredentials
         get() = payloadDataManager.metadataCredentials ?: throw IllegalStateException("Wallet not initialised")
@@ -64,10 +67,22 @@ class MetadataManager(
 
     fun fetchMetadata(metadataType: Int): Maybe<String> =
         metadataNodeFactory.metadataNode?.let {
-            metadataInteractor.loadRemoteMetadata(Metadata.newInstance(metaDataHDNode = it,
-                type = metadataType,
-                metadataDerivation = metadataDerivation))
+            metadataInteractor.loadRemoteMetadata(
+                Metadata.newInstance(
+                    metaDataHDNode = it,
+                    type = metadataType,
+                    metadataDerivation = metadataDerivation
+                )
+            ).doOnError { logPaddingError(it, metadataType) }
         } ?: Maybe.error(IllegalStateException("Metadata node is null"))
+
+    private fun logPaddingError(e: Throwable, metadataType: Int) {
+        if (e is InvalidCipherTextException) {
+            crashLogger.logException(
+                MetadataBadPaddingTracker(metadataType, e)
+            )
+        }
+    }
 
     fun saveToMetadata(data: String, metadataType: Int): Completable =
         metadataNodeFactory.metadataNode?.let {
@@ -134,9 +149,25 @@ class MetadataManager(
                 metadataNodeFactory.initNodes(remoteMetadataNodes)
             }
     }
+}
+
+private class MetadataBadPaddingTracker(metadataType: Int, throwable: Throwable) :
+    Exception("metadataType == $metadataType (${metadataType.metadataType} -- ${throwable.message}", throwable) {
 
     companion object {
-        const val METADATA_TYPE_EXCHANGE = 3
-        const val METADATA_TYPE_SHAPE_SHIFT_EXTERNAL = 6
+        private val Int.metadataType: String
+            get() = when (this) {
+                2 -> "whatsNew"
+                3 -> "buySell" // No longer used
+                4 -> "contacts" // No longer used
+                5 -> "ethereum"
+                6 -> "shapeshift" // No longer used
+                7 -> "bch"
+                8 -> "btc"
+                9 -> "lockbox"
+                10 -> "userCredentials"
+                11 -> "bsv" // No longer used
+                else -> "unknown"
+            }
     }
 }

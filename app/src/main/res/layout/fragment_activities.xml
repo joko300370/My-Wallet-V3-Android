@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/header_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/account_select_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_800">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/size_massive"
+                    android:layout_marginStart="@dimen/tiny_margin"
+                    android:layout_marginEnd="@dimen/tiny_margin"
+                    android:layout_marginBottom="@dimen/tiny_margin"
+                    android:background="@drawable/bkgd_button_blue_menu_select"
+                    android:paddingBottom="@dimen/tiny_margin"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/account_icon"
+                    android:layout_width="@dimen/size_large"
+                    android:layout_height="@dimen/size_large"
+                    android:layout_margin="@dimen/small_margin"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_all_wallets_white"
+                    tools:srcCompat="@drawable/ic_all_wallets_white" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/account_spend_locked"
+                    android:layout_width="@dimen/size_standard"
+                    android:layout_height="@dimen/size_standard"
+                    android:layout_marginStart="23dp"
+                    android:layout_marginTop="21dp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="@id/account_icon"
+                    app:layout_constraintTop_toTopOf="@id/account_icon"
+                    app:srcCompat="@drawable/ic_asset_non_custodial_spend_blue"
+                    tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/account_name"
+                    style="@style/Text.Semibold.16"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:ellipsize="middle"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toStartOf="@id/show_accounts"
+                    app:layout_constraintStart_toEndOf="@id/account_icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="BTC Wallet" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/fiat_balance"
+                    style="@style/Text.Light.14"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toStartOf="@id/show_accounts"
+                    app:layout_constraintStart_toStartOf="@+id/account_name"
+                    app:layout_constraintTop_toBottomOf="@+id/account_name"
+                    tools:text="$10,0198.99" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/show_accounts"
+                    android:layout_width="@dimen/size_medium"
+                    android:layout_height="@dimen/size_medium"
+                    android:layout_marginEnd="22dp"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/vector_expand_more" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/content_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                tools:listitem="@layout/dialog_activities_tx_item"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:padding="@dimen/standard_margin"
+                android:paddingBottom="@dimen/standard_margin"
+                android:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/Text.Standard.Centered.20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/activity_no_activity_title" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    style="@style/Text.Standard.Centered.14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_margin"
+                    android:text="@string/activity_no_activity_text" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/huge_margin"
+                    app:srcCompat="@drawable/ic_wallet_intro_image" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</FrameLayout>

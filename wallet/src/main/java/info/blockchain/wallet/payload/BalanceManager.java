@@ -72,7 +72,7 @@ public abstract class BalanceManager {
     /**
      * @deprecated Use getBalanceQuery
      */
-    @Deprecated
+    @Deprecated // Used only in swipe to receive
     public Call<HashMap<String, Balance>> getBalanceOfAddresses(List<String> addresses) {
         return getBlockExplorer().getBalance("btc", addresses, FilterType.RemoveUnspendable);
     }

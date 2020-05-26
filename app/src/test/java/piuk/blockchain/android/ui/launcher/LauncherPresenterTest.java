@@ -3,8 +3,10 @@ package piuk.blockchain.android.ui.launcher;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.data.Wallet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,18 +15,21 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import piuk.blockchain.android.BlockchainTestApplication;
 import piuk.blockchain.android.R;
 import piuk.blockchain.androidcore.data.access.AccessState;
+
 import com.blockchain.logging.CrashLogger;
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.preferences.CurrencyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
+
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
@@ -32,6 +37,7 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.util.AppUtil;
 import piuk.blockchain.androidcore.utils.PersistentPrefs;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -111,6 +117,9 @@ public class LauncherPresenterTest {
         Mockito.when(featureFlag.getEnabled()).thenReturn(Single.just(false));
         Mockito.when(custodialWalletManager.isCurrencySupportedForSimpleBuy(any()))
                 .thenReturn(Single.just(true));
+        Mockito.when(currencyPrefs.getSelectedFiatCurrency()).thenReturn("USD");
+        Mockito.when(currencyPrefs.getDefaultFiatCurrency()).thenReturn("USD");
+        Mockito.when(settingsDataManager.updateFiatUnit(any())).thenReturn(Observable.just(mock(Settings.class)));
     }
 
     /**

@@ -1,15 +1,10 @@
 package piuk.blockchain.android.simplebuy
 
+import piuk.blockchain.android.ui.base.FlowFragment
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
-interface SimpleBuyScreen : SlidingModalBottomDialog.Host {
+interface SimpleBuyScreen : SlidingModalBottomDialog.Host, FlowFragment {
     fun navigator(): SimpleBuyNavigator
-    // methods for handling back press and navigation back arrow
-    // return true if we want the screen to get popped or handle the back press itself
-    fun onBackPressed(): Boolean
-
-    // return true if we want the screen to handle the back press and not get popped
-    fun backPressedHandled(): Boolean = false
 
     override fun onSheetClosed() {}
 }
@@ -18,9 +13,12 @@ interface SimpleBuyNavigator {
     fun exitSimpleBuyFlow()
     fun goToBuyCryptoScreen(addToBackStack: Boolean = true)
     fun goToCheckOutScreen(addToBackStack: Boolean = true)
+    fun goToCurrencySelection(addToBackStack: Boolean = true)
     fun goToKycVerificationScreen(addToBackStack: Boolean = true)
     fun goToBankDetailsScreen(addToBackStack: Boolean = true)
+    fun goToPendingOrderScreen()
     fun startKyc()
     fun hasMoreThanOneFragmentInTheStack(): Boolean
+    fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()
 }

@@ -29,7 +29,7 @@ class NabuDataManagerAsAuthenticatorTest {
         val token = givenToken("User", "ABC")
 
         val nabuDataManager = mock<NabuDataManager>()
-        val sut = NabuAuthenticator(token, nabuDataManager) as Authenticator
+        val sut = NabuAuthenticator(token, nabuDataManager, mock()) as Authenticator
 
         val theFunction = mock<(NabuSessionTokenResponse) -> Single<Int>>()
         sut.authenticate(theFunction)
@@ -52,7 +52,7 @@ class NabuDataManagerAsAuthenticatorTest {
                 nabuSessionTokenResponse("User", "ABC")
             )
         }
-        val sut = NabuAuthenticator(token, nabuDataManager) as Authenticator
+        val sut = NabuAuthenticator(token, nabuDataManager, mock()) as Authenticator
 
         sut.authenticate()
             .test()

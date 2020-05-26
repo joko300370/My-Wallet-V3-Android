@@ -46,11 +46,11 @@ class PaxAccount(
                 .applySchedulers()
         } ?: Observable.empty()
 
-    override fun getAccountHash(): Observable<String> =
+    override fun getAccountHash(): Single<String> =
         dataStore.erc20DataModel?.let { model ->
-            Observable.just(model.accountHash)
+            Single.just(model.accountHash)
                 .applySchedulers()
-        } ?: Observable.empty()
+        } ?: Single.error(IllegalStateException("erc20 uninititalised"))
 
     /**
      * Returns the user's ERC20 account object if previously fetched.

@@ -1,11 +1,13 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.bch.BchTokens
 import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
 import piuk.blockchain.android.coincore.eth.EthTokens
+import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
 import timber.log.Timber
@@ -16,7 +18,8 @@ class Coincore internal constructor(
     private val ethTokens: EthTokens,
     private val xlmTokens: XlmTokens,
     private val paxTokens: PaxTokens,
-    private val stxTokens: StxTokens
+    private val stxTokens: StxTokens,
+    private val defaultLabels: DefaultLabels
 ) {
     operator fun get(cryptoCurrency: CryptoCurrency): AssetTokens =
         when (cryptoCurrency) {
@@ -41,4 +44,8 @@ class Coincore internal constructor(
         ).doOnError {
             Timber.e("Coincore initialisation failed! $it")
         }
+
+    val allWallets: CryptoAccount by lazy {
+        AllWalletsAccount(this, defaultLabels)
+    }
 }

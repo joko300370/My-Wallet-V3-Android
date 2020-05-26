@@ -1227,7 +1227,7 @@ Veuillez noter que la liste d’attente pour les airdrops Stellar est longue et 
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">Bienvenue sur Swap !</string>
   <string name="swap_intro_title_page_two">Taux de change en temps réel</string>
-  <string name="swap_intro_title_page_three">100 % sur le registre de Blockchain</string>
+  <string name="swap_intro_title_page_three">100%% sur le registre de Blockchain</string>
   <string name="swap_intro_title_page_four">Vous contrôlez votre clé</string>
   <string name="swap_intro_title_page_five">Mieux gérer les risques</string>
   <string name="swap_intro_description_page_one">Le moyen le plus simple d\'échanger une cryptomonnaie contre une autre sans quitter votre portefeuille.</string>

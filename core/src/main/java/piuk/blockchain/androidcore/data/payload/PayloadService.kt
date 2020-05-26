@@ -215,8 +215,8 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * @return A [LinkedHashMap]
      */
     @WebRequest
-    internal fun getBalanceOfAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
-        Observable.fromCallable { payloadManager.getBalanceOfAddresses(addresses) }
+    internal fun getBalanceOfBtcAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
+        Observable.fromCallable { payloadManager.getBalanceOfBtcAddresses(addresses) }
 
     /**
      * Returns a [LinkedHashMap] of [Balance] objects keyed to their Bitcoin cash

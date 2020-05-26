@@ -28,6 +28,14 @@
             app:iconSpaceReserved="false" />
     </piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory>
 
+
+    <piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory
+        android:key="cards"
+        android:title="@string/linked_cards"
+        app:iconSpaceReserved="false">
+
+    </piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory>
+
     <piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory
         android:key="preferences"
         android:title="@string/preferences"

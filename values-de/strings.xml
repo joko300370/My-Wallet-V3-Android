@@ -1230,7 +1230,7 @@ Bitte beachten Sie, dass es eine große Warteliste für Stellar Airdrops gibt un
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">Willkommen bei Swap!</string>
   <string name="swap_intro_title_page_two">Echtzeit-Wechselkurse</string>
-  <string name="swap_intro_title_page_three">100 % in der Blockchain</string>
+  <string name="swap_intro_title_page_three">100%% in der Blockchain</string>
   <string name="swap_intro_title_page_four">Sie kontrollieren Ihren Schlüssel</string>
   <string name="swap_intro_title_page_five">Besseres Risikomanagement</string>
   <string name="swap_intro_description_page_one">Der einfachste Weg, Crypto gegen einen anderen zu tauschen, ohne die Wallet verlassen zu müssen.</string>
@@ -1495,9 +1495,7 @@ Euro / Dollar</string>
   <string name="simple_buy_amount_to_send">Betrag zu senden</string>
   <string name="simple_buy_pending_buy_sheet_title">Ausstehend %1s Kaufen</string>
   <string name="recipient_name_must_match_eur">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.</string>
-  <string name="recipient_name_must_match_gbp"><![CDATA[Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt. 
-
- Durch die <annotation link=\"modular_terms_and_conditions\"> auf dieses Konto stimmen Sie den <annotation link=\"modular_terms_and_conditions\"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.]]></string>
+  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.\n\nDurch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
   <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
   <string name="simple_buy_no_currencies_available_title">Keine Währungen verfügbar</string>
   <string name="simple_buy_no_currencies_available">Leider gibt es derzeit keine Währungen, mit denen Sie handeln können :(</string>

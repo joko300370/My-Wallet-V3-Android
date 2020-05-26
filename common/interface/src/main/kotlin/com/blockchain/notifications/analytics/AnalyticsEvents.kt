@@ -7,7 +7,6 @@ enum class AnalyticsEvents(
 
     AccountsAndAddresses("accounts_and_addresses"),
     Backup("backup"),
-    BuyBitcoin("buy_bitcoin"),
     Dashboard("dashboard"),
     Exchange("exchange"),
     ExchangeCreate("exchange_create"),
@@ -59,7 +58,17 @@ enum class AnalyticsEvents(
     OpenAssetsSelector("asset_selector_open"),
     CloseAssetsSelector("asset_selector_open"),
     CameraSystemPermissionApproved("permission_sys_camera_approve"),
-    CameraSystemPermissionDeclined("permission_sys_camera_decline")
+    CameraSystemPermissionDeclined("permission_sys_camera_decline"),
+
+    WalletSignupOpen("wallet_signup_open"),
+    WalletSignupClickCreate("wallet_signup_create"),
+    WalletSignupClickEmail("wallet_signup_email"),
+    WalletSignupClickPasswordFirst("wallet_signup_password_first"),
+    WalletSignupClickPasswordSecond("wallet_signup_password_second"),
+    WalletSignupCreated("wallet_signup_wallet_created"),
+    WalletSignupPINFirst("wallet_signup_pin_first"),
+    WalletSignupPINSecond("wallet_signup_pin_second"),
+    WalletSignupFirstLogIn("wallet_signup_login")
 }
 
 fun kycTierStart(tier: Int): AnalyticsEvent = object : AnalyticsEvent {

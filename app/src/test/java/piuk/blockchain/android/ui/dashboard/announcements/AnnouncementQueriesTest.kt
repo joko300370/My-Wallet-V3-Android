@@ -7,14 +7,18 @@ import com.blockchain.swap.nabu.models.nabu.TiersJson
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
+import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.simplebuy.KycState
+import piuk.blockchain.android.simplebuy.SelectedPaymentMethod
 import piuk.blockchain.android.simplebuy.SimpleBuyOrder
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -179,8 +183,10 @@ class AnnouncementQueriesTest {
     }
 
     @Test
-    fun `isSimpleBuyTransactionPending - has prefs state and is AWAITING FUNDS should return true`() {
-        val state: SimpleBuyState = mock()
+    fun `isSimpleBuyTransactionPending - has prefs state and is AWAITING FUNDS and payment BANK should return true`() {
+        val state: SimpleBuyState = mock {
+            on { selectedPaymentMethod } `it returns` SelectedPaymentMethod(PaymentMethod.BANK_PAYMENT_ID)
+        }
         val order: SimpleBuyOrder = mock()
 
         whenever(state.id).thenReturn(BUY_ORDER_ID)

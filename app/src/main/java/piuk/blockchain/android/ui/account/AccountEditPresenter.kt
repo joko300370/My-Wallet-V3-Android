@@ -168,7 +168,7 @@ class AccountEditPresenter constructor(
             // Subtract fee
             val balanceAfterFee = payloadDataManager.getAddressBalance(
                 legacyAddress!!.address
-            ).toLong() - sendDataManager.estimatedFee(
+            ).amount.toLong() - sendDataManager.estimatedFee(
                 1, 1,
                 BigInteger.valueOf(dynamicFeeCache.btcFeeOptions!!.regularFee * 1000)
             ).toLong()

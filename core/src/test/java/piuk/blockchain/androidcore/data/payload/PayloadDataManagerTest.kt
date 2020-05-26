@@ -28,6 +28,8 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
@@ -236,12 +238,12 @@ class PayloadDataManagerTest {
         // Arrange
         val address = "ADDRESS"
         val hashMap: LinkedHashMap<String, Balance> = LinkedHashMap(mapOf(Pair(address, Balance())))
-        whenever(payloadService.getBalanceOfAddresses(listOf(address)))
+        whenever(payloadService.getBalanceOfBtcAddresses(listOf(address)))
             .thenReturn(Observable.just(hashMap))
         // Act
-        val testObserver = subject.getBalanceOfAddresses(listOf(address)).test()
+        val testObserver = subject.getBalanceOfBtcAddresses(listOf(address)).test()
         // Assert
-        verify(payloadService).getBalanceOfAddresses(listOf(address))
+        verify(payloadService).getBalanceOfBtcAddresses(listOf(address))
         verifyNoMoreInteractions(payloadService)
         testObserver.assertComplete()
         testObserver.assertValue(hashMap)
@@ -527,12 +529,14 @@ class PayloadDataManagerTest {
         val balance = BigInteger.TEN
         whenever(payloadManager.getAddressBalance(address))
             .thenReturn(balance)
+
         // Act
         val result = subject.getAddressBalance(address)
+
         // Assert
         verify(payloadManager).getAddressBalance(address)
         verifyNoMoreInteractions(payloadManager)
-        result shouldEqual balance
+        result shouldEqual CryptoValue.fromMinor(CryptoCurrency.BTC, balance)
     }
 
     @Test

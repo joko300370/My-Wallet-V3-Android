@@ -17,6 +17,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.PaxAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.PitAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
@@ -74,7 +75,6 @@ val dashboardAnnouncementsModule = applicationContext {
         factory {
             KycMoreInfoAnnouncement(
                 tierService = get(),
-                coinifyWalletService = get(),
                 showPopupFeatureFlag = get("ff_notify_coinify_users_to_kyc"),
                 dismissRecorder = get()
             )
@@ -114,7 +114,7 @@ val dashboardAnnouncementsModule = applicationContext {
 
         factory {
             SwapAnnouncement(
-                dataManager = get("merge"),
+                dataManager = get(),
                 queries = get(),
                 dismissRecorder = get()
             )
@@ -145,8 +145,6 @@ val dashboardAnnouncementsModule = applicationContext {
         factory {
             BuyBitcoinAnnouncement(
                 dismissRecorder = get(),
-                walletStatus = get(),
-                buyDataManager = get(),
                 simpleBuyAvailability = get()
             )
         }.bind(AnnouncementRule::class)
@@ -196,6 +194,14 @@ val dashboardAnnouncementsModule = applicationContext {
 
         factory {
             SimpleBuyPendingBuyAnnouncement(
+                dismissRecorder = get(),
+                analytics = get(),
+                queries = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            SimpleBuyAddCardAnnouncement(
                 dismissRecorder = get(),
                 analytics = get(),
                 queries = get()

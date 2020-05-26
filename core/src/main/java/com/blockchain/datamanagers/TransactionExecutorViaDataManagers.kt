@@ -313,7 +313,6 @@ internal class TransactionExecutorViaDataManagers(
         feeType: FeeType
     ): Single<String> =
         ethDataManager.isLastTxPending()
-            .singleOrError()
             .doOnSuccess {
                 if (it == true)
                     throw TransactionInProgressException("Transaction pending, user cannot send funds at this time")

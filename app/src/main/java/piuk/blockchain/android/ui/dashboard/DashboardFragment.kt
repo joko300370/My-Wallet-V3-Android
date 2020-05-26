@@ -23,6 +23,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
@@ -298,8 +299,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(targetCurrency = swapTarget)
 
-        override fun startBuySell() = navigator().launchBuySell()
-
         override fun startPitLinking() = navigator().launchThePitLinking()
 
         override fun startFundsBackup() = navigator().launchBackupFunds()
@@ -354,6 +353,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             AssetFilter.Total -> throw IllegalStateException("The Send.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoSendFor(cryptoCurrency)
             AssetFilter.Custodial -> model.process(StartCustodialTransfer(cryptoCurrency))
+            AssetFilter.Interest -> throw IllegalStateException("The Send.Interest action is invalid")
         }.exhaustive
     }
 
@@ -362,17 +362,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             AssetFilter.Total -> throw IllegalStateException("The Receive.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoReceiveFor(cryptoCurrency)
             AssetFilter.Custodial -> throw IllegalStateException("The Receive.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException("The Receive.Interest action is invalid")
         }.exhaustive
 
-    override fun gotoActivityFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter) {
-        when (filter) {
-            AssetFilter.Total -> { /* TODO: Hook up the everything activity view, when we have designs */
-            }
-            AssetFilter.Wallet -> navigator().gotoTransactionsFor(cryptoCurrency)
-            AssetFilter.Custodial -> { /* TODO: Hook up the custodial activity, when we have designs */
-            }
-        }.exhaustive
-    }
+    override fun gotoActivityFor(account: CryptoAccount) =
+        navigator().gotoActivityFor(account)
 
     override fun gotoSwap(fromCryptoCurrency: CryptoCurrency, filter: AssetFilter) =
         when (filter) {
@@ -382,6 +376,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 targetCurrency = fromCryptoCurrency.defaultSwapTo
             )
             AssetFilter.Custodial -> throw IllegalStateException("The Swap.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException("The Swap.Interest action is invalid")
         }.exhaustive
 
     override fun startBackupForTransfer() {

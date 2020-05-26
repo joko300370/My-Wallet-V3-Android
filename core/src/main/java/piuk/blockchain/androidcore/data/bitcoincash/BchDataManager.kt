@@ -298,8 +298,8 @@ class BchDataManager(
         payloadDataManager.getBalanceOfBchAddresses(listOf(address))
             .map { it[address]!!.finalBalance }
             .doOnError(Timber::e)
-            .onErrorReturn { BigInteger.ZERO }
             .singleOrError()
+            .onErrorReturn { BigInteger.ZERO }
 
     fun getWalletBalance(): BigInteger =
         bchDataStore.bchWallet?.getWalletBalance() ?: BigInteger.ZERO

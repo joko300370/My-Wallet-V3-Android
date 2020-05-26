@@ -16,7 +16,6 @@ data class SideNavEvent(private val menuItemId: Int) : AnalyticsEvent {
         R.id.nav_the_exchange -> "pit"
         R.id.nav_airdrops -> "airdrops"
         R.id.nav_addresses -> "accounts_and_addresses"
-        R.id.nav_buy -> "buy_bitcoin"
         R.id.login_web_wallet -> "web_login"
         R.id.nav_settings -> "settings"
         R.id.nav_support -> "support"

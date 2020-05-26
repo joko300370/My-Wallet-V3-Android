@@ -6,6 +6,8 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import android.view.View
 import com.blockchain.logging.CrashLogger
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.crashlytics.android.answers.LoginEvent
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.UpdateType
@@ -23,6 +25,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.DialogButtonCallback
+import com.blockchain.notifications.analytics.logEvent
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -40,6 +43,7 @@ import timber.log.Timber
 import java.net.SocketTimeoutException
 
 class PinEntryPresenter(
+    private val analytics: Analytics,
     private val authDataManager: AuthDataManager,
     private val appUtil: AppUtil,
     private val prefs: PersistentPrefs,
@@ -157,6 +161,12 @@ class PinEntryPresenter(
                 return
             }
 
+            if (userEnteredConfirmationPin == null) {
+                analytics.logEventOnce(AnalyticsEvents.WalletSignupPINFirst)
+            } else {
+                analytics.logEventOnce(AnalyticsEvents.WalletSignupPINSecond)
+            }
+
             // Only show warning on first entry and if user is creating a new PIN
             if (isCreatingNewPin && isPinCommon(userEnteredPin) && userEnteredConfirmationPin == null) {
                 view.showCommonPinWarning(object : DialogButtonCallback {
@@ -261,7 +271,7 @@ class PinEntryPresenter(
             is InvalidCredentialsException -> view.goToPasswordRequiredActivity()
             is ServerConnectionException,
             is SocketTimeoutException -> {
-                view.showToast(R.string.check_connectivity_exit, ToastCustom.TYPE_ERROR)
+                view.showToast(R.string.server_unreachable_exit, ToastCustom.TYPE_ERROR)
                 appUtil.restartApp(LauncherActivity::class.java)
             }
             is UnsupportedVersionException -> view.showWalletVersionNotSupportedDialog(t.message)
@@ -318,7 +328,7 @@ class PinEntryPresenter(
     private fun handlePasswordValidatedError(t: Throwable) {
         when (t) {
             is ServerConnectionException,
-            is SocketTimeoutException -> view.showToast(R.string.check_connectivity_exit, ToastCustom.TYPE_ERROR)
+            is SocketTimeoutException -> view.showToast(R.string.server_unreachable_exit, ToastCustom.TYPE_ERROR)
             is PayloadException -> {
                 // This shouldn't happen - Payload retrieved from server couldn't be parsed
                 view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)

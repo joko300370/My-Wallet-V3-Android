@@ -8,6 +8,7 @@ import com.blockchain.annotations.BurnCandidate
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.R
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.models.NotificationPayload
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -24,6 +25,7 @@ class FcmCallbackService : FirebaseMessagingService() {
     private val notificationTokenManager: NotificationTokenManager by inject()
     private val rxBus: RxBus by inject()
     private val accessState: AccessState by inject()
+    private val analytics: Analytics by inject()
 
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
         // Check if message contains a data payload.
@@ -61,6 +63,8 @@ class FcmCallbackService : FirebaseMessagingService() {
      */
     private fun sendBackgroundNotification(payload: NotificationPayload) {
         val notifyIntent = Intent(applicationContext, LauncherActivity::class.java)
+        notifyIntent.putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+
         if (payload.type != null &&
             payload.type == NotificationPayload.NotificationType.CONTACT_REQUEST
         ) {
@@ -86,6 +90,7 @@ class FcmCallbackService : FirebaseMessagingService() {
      */
     private fun sendForegroundNotification(payload: NotificationPayload) {
         val notifyIntent = Intent(applicationContext, MainActivity::class.java)
+        notifyIntent.putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
 
         val intent = PendingIntent.getActivity(
             applicationContext,
@@ -115,7 +120,7 @@ class FcmCallbackService : FirebaseMessagingService() {
         notificationId: Int
     ) {
 
-        NotificationsUtil(applicationContext, notificationManager).triggerNotification(
+        NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
             payload.title ?: "",
             payload.title ?: "",
             payload.body ?: "",

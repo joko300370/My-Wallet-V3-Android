@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.blockchain.notifications.NotificationsUtil
+import com.blockchain.notifications.analytics.Analytics
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
@@ -27,6 +28,7 @@ class CoinsWebSocketService : Service(), MessagesSocketHandler {
     private val coinsWebSocketStrategy: CoinsWebSocketStrategy by inject()
     private val lifecycleInterestedComponent: LifecycleInterestedComponent by inject()
     private val rxBus: RxBus by inject()
+    private val analytics: Analytics by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -53,13 +55,15 @@ class CoinsWebSocketService : Service(), MessagesSocketHandler {
 
     override fun triggerNotification(title: String, marquee: String, text: String) {
         val notifyIntent = Intent(applicationContext, MainActivity::class.java)
+        notifyIntent.putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+
         val pendingIntent = PendingIntent.getActivity(
             this,
             0,
             notifyIntent,
             PendingIntent.FLAG_UPDATE_CURRENT)
 
-        NotificationsUtil(applicationContext, notificationManager).triggerNotification(
+        NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
             title,
             marquee,
             text,

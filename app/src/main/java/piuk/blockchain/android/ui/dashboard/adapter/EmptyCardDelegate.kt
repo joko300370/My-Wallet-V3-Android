@@ -19,8 +19,7 @@ class EmptyCardDelegate<in T> : AdapterDelegate<T> {
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     ) {}
 }
 

@@ -2,7 +2,9 @@ package piuk.blockchain.android.data.datamanagers
 
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.CryptoValue.Companion.bitcoinFromSatoshis
+import info.blockchain.balance.compareTo
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.Payment
 import io.reactivex.Observable
@@ -54,7 +56,7 @@ class TransferFundsDataManager(
 
             for (legacyAddress in legacyAddresses) {
                 if (!legacyAddress.isWatchOnly &&
-                    payloadDataManager.getAddressBalance(legacyAddress.address) > BigInteger.ZERO
+                    payloadDataManager.getAddressBalance(legacyAddress.address) > CryptoValue.Companion.ZeroBtc
                 ) {
                     val unspentOutputs =
                         sendDataManager.getUnspentBtcOutputs(legacyAddress.address)

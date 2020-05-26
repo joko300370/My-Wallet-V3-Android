@@ -25,7 +25,6 @@ import piuk.blockchain.androidcore.data.access.LogoutTimer
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle
 import piuk.blockchain.androidcoreui.R
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
-import java.util.Locale
 
 /**
  * A base Activity for all activities which need auth timeouts & screenshot prevention
@@ -38,7 +37,6 @@ abstract class BlockchainActivity : ToolBarActivity() {
 
     val analytics: Analytics by inject()
     val appUtil: AppUtil by inject()
-    val locale: Locale by inject()
 
     protected val secondPasswordHandler: SecondPasswordHandler by injectActivity()
 
@@ -187,6 +185,31 @@ abstract class BlockchainActivity : ToolBarActivity() {
     @UiThread
     fun showBottomSheet(bottomSheet: BottomSheetDialogFragment) =
         bottomSheet.show(supportFragmentManager, "BOTTOM_DIALOG")
+
+    override fun onBackPressed() {
+        val fragments = supportFragmentManager.fragments
+        for (fragment in fragments) {
+            if (fragment is FlowFragment && backActionShouldBeHandledByFragment(fragment)) {
+                return
+            }
+        }
+        super.onBackPressed()
+    }
+
+    private fun backActionShouldBeHandledByFragment(flowFragment: FlowFragment): Boolean =
+        flowFragment.onBackPressed() && handleByScreenOrPop(flowFragment)
+
+    private fun handleByScreenOrPop(flowFragment: FlowFragment): Boolean =
+        flowFragment.backPressedHandled() || pop()
+
+    private fun pop(): Boolean {
+        val backStackEntryCount = supportFragmentManager.backStackEntryCount
+        if (backStackEntryCount > 1) {
+            supportFragmentManager.popBackStack()
+            return true
+        }
+        return false
+    }
 }
 
 private fun MotionEvent.isObscuredTouch() = (flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0)

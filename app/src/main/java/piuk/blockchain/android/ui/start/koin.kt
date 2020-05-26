@@ -38,9 +38,7 @@ val startupUiModule = applicationContext {
                 appUtil = get(),
                 prefs = get(),
                 authDataManager = get(),
-                payloadDataManager = get(),
-                buyDataManager = get(),
-                coinifyDataManager = get()
+                payloadDataManager = get()
             )
         }
     }

@@ -15,10 +15,10 @@ val swapModule = applicationContext {
 
         factory {
             QuoteWebSocketServiceFactory(
-                get("nabu"),
-                get(),
-                get(),
-                get()
+                nabuWebSocketOptions = get("nabu"),
+                auth = get(),
+                moshi = get(),
+                okHttpClient = get()
             ) as QuoteServiceFactory
         }
 
@@ -26,8 +26,11 @@ val swapModule = applicationContext {
             HomeBrewTradeExecutionService(get()) as TradeExecutionService
         }
 
-        factory("nabu") { NabuDataManagerAdapter(get(), get()) }
-            .bind(MorphTradeDataManager::class)
-            .bind(MorphTradeDataHistoryList::class)
+        factory {
+            NabuDataManagerAdapter(
+                nabuMarketsService = get(),
+                currencyPreference = get()
+            )
+        }.bind(MorphTradeDataManager::class).bind(MorphTradeDataHistoryList::class)
     }
 }

@@ -8,7 +8,6 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
@@ -126,7 +125,6 @@ class AuthDataManager(
         timer = 2 * 60
 
         return Observable.interval(0, 1, TimeUnit.SECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
             .map { timer-- }
             .takeUntil { timer < 0 }
     }

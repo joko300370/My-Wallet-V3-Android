@@ -511,6 +511,7 @@ public class HDWallet {
         return null;
     }
 
+    @Nullable
     public STXAccount getSTXAccount() {
         return HD.getSTXAccount();
     }

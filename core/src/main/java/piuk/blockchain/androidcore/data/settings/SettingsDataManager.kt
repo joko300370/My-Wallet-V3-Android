@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.settings
 
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.settings.SettingsManager
 import io.reactivex.Observable
@@ -12,6 +13,7 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 class SettingsDataManager(
     private val settingsService: SettingsService,
     private val settingsDataStore: SettingsDataStore,
+    private val currencyPrefs: CurrencyPrefs,
     rxBus: RxBus
 ) {
     private val rxPinning: RxPinning = RxPinning(rxBus)
@@ -127,9 +129,9 @@ class SettingsDataManager(
                 .applySchedulers()
         } else if (notifications.size == 1 &&
             (notifications.contains(SettingsManager.NOTIFICATION_TYPE_EMAIL) &&
-                notificationType == SettingsManager.NOTIFICATION_TYPE_SMS ||
-                notifications.contains(SettingsManager.NOTIFICATION_TYPE_SMS) &&
-                notificationType == SettingsManager.NOTIFICATION_TYPE_EMAIL)
+                    notificationType == SettingsManager.NOTIFICATION_TYPE_SMS ||
+                    notifications.contains(SettingsManager.NOTIFICATION_TYPE_SMS) &&
+                    notificationType == SettingsManager.NOTIFICATION_TYPE_EMAIL)
         ) {
             // Contains another type already, send "All"
             rxPinning.call<ResponseBody> { settingsService.enableNotifications(true) }
@@ -211,6 +213,8 @@ class SettingsDataManager(
      */
     fun updateFiatUnit(fiatUnit: String): Observable<Settings> =
         rxPinning.call<ResponseBody> { settingsService.updateFiatUnit(fiatUnit) }
-            .flatMap { fetchSettings() }
+            .flatMap { fetchSettings() }.doOnNext {
+                currencyPrefs.selectedFiatCurrency = fiatUnit
+            }
             .applySchedulers()
 }

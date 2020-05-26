@@ -23,7 +23,7 @@ interface AnnouncementHost {
     fun startKyc(campaignType: CampaignType)
 
     fun startSwap(swapTarget: CryptoCurrency = CryptoCurrency.ETHER)
-    fun startBuySell()
+
     fun startPitLinking()
     fun startFundsBackup()
     fun startSetup2Fa()

@@ -6,7 +6,6 @@ import piuk.blockchain.android.ui.kyc.splash.KycSplashPresenter
 import com.blockchain.swap.nabu.CurrentTier
 import com.blockchain.swap.nabu.EthEligibility
 import com.blockchain.swap.nabu.StartKyc
-import com.blockchain.swap.nabu.StartKycForBuySell
 import org.koin.dsl.module.applicationContext
 import piuk.blockchain.android.ui.kyc.address.CurrentTierAdapter
 import piuk.blockchain.android.ui.kyc.address.EligibilityForFreeEthAdapter
@@ -21,7 +20,6 @@ import piuk.blockchain.android.ui.kyc.mobile.entry.KycMobileEntryPresenter
 import piuk.blockchain.android.ui.kyc.mobile.validation.KycMobileValidationPresenter
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostPresenter
 import piuk.blockchain.android.ui.kyc.navhost.KycStarter
-import piuk.blockchain.android.ui.kyc.navhost.KycStarterBuySell
 import piuk.blockchain.android.ui.kyc.profile.KycProfilePresenter
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
 import piuk.blockchain.android.ui.kyc.reentry.ReentryDecision
@@ -35,13 +33,17 @@ val kycUiModule = applicationContext {
 
     factory { KycStarter() as StartKyc }
 
-    factory { KycStarterBuySell() as StartKycForBuySell }
-
     factory { TiersReentryDecision() as ReentryDecision }
 
     context("Payload") {
 
-        factory { ReentryDecisionKycNavigator(get(), get(), get()) as KycNavigator }
+        factory {
+            ReentryDecisionKycNavigator(
+                token = get(),
+                dataManager = get(),
+                reentryDecision = get()
+            ) as KycNavigator
+        }
 
         factory {
             KycTierSplashPresenter(
@@ -51,9 +53,14 @@ val kycUiModule = applicationContext {
             )
         }
 
-        factory { KycSplashPresenter(get(), get(), get(), get(), get()) }
+        factory {
+            KycSplashPresenter(
+                nabuToken = get(),
+                kycNavigator = get()
+            )
+        }
 
-        factory { KycCountrySelectionPresenter(get(), get()) }
+        factory { KycCountrySelectionPresenter(nabuDataManager = get()) }
 
         factory {
             KycProfilePresenter(nabuToken = get(),
@@ -67,13 +74,19 @@ val kycUiModule = applicationContext {
                 nabuToken = get(),
                 nabuDataManager = get(),
                 tier2Decision = get(),
-                phoneVerificationQuery = get(),
-                nabuCoinifyAccountCreator = get())
+                phoneVerificationQuery = get()
+            )
         }
 
-        factory { KycMobileEntryPresenter(get(), get()) }
+        factory { KycMobileEntryPresenter(phoneNumberUpdater = get(), nabuUserSync = get()) }
 
-        factory { KycMobileValidationPresenter(get(), get(), get()) }
+        factory {
+            KycMobileValidationPresenter(
+                nabuUserSync = get(),
+                phoneNumberUpdater = get(),
+                analytics = get()
+            )
+        }
 
         factory { KycEmailEntryPresenter(get()) }
 

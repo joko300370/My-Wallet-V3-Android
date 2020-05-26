@@ -34,6 +34,9 @@ fun apiServerTestModule(server: DefaultMockServer) = applicationContext {
             override val apiUrl: String
                 get() = server.url("")
 
+            override val everypayHostUrl: String
+                get() = throw NotImplementedError()
+
             override fun websocketUrl(currency: CryptoCurrency): String {
                 throw NotImplementedError()
             }

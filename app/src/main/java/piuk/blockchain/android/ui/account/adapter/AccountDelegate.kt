@@ -25,8 +25,7 @@ class AccountDelegate<in T>(
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
-        holder: RecyclerView.ViewHolder,
-        payloads: List<*>
+        holder: RecyclerView.ViewHolder
     ) {
         val accountViewHolder = holder as AccountViewHolder
         accountViewHolder.bind(items[position] as AccountItem, listener)

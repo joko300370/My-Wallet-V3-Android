@@ -71,7 +71,7 @@ class SimpleBuyPendingBuyAnnouncement(
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        const val DISMISS_KEY = "StableCoinIntroductionCard_DISMISSED"
+        const val DISMISS_KEY = "SimpleBuyPendingBuyAnnouncementCard_DISMISSED"
     }
 
     // Sent when either the card or the popup is selected and shown.

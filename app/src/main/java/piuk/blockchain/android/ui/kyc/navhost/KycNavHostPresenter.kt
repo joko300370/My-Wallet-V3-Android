@@ -82,7 +82,7 @@ class KycNavHostPresenter(
     }
 
     private fun updateTier2SelectedTierIfNeeded() {
-        if (view.campaignType != CampaignType.Sunriver || view.campaignType != CampaignType.BuySell) {
+        if (view.campaignType != CampaignType.Sunriver) {
             return
         }
 
@@ -93,9 +93,7 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (view.campaignType == CampaignType.BuySell) {
-            view.navigateToKycSplash()
-        } else if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
+        if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
             view.navigateToResubmissionSplash()
         } else if (view.campaignType == CampaignType.Blockstack || view.campaignType == CampaignType.SimpleBuy) {
             compositeDisposable += kycNavigator.findNextStep()

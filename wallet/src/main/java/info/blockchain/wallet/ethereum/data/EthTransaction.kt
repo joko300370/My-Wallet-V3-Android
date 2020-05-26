@@ -8,47 +8,65 @@ import java.math.BigInteger
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE,
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
     getterVisibility = JsonAutoDetect.Visibility.NONE,
     setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-class EthTransaction {
+class EthTransaction(
 
     @JsonProperty("blockNumber")
-    var blockNumber: Long? = 0L
-    @JsonProperty("timeStamp")
-    var timeStamp: Long = 0L
-    @JsonProperty("hash")
-    var hash: String = ""
-    @JsonProperty("failFlag")
-    var failFlag: Boolean = false
-    @JsonProperty("errorDescription")
-    var errorDescription: String = ""
-    @JsonProperty("nonce")
-    var nonce: String = ""
-    @JsonProperty("blockHash")
-    var blockHash: String? = ""
-    @JsonProperty("transactionIndex")
-    var transactionIndex: Int = 0
-    @JsonProperty("from")
-    var from: String = ""
-    @JsonProperty("to")
-    var to: String = ""
-    @JsonProperty("value")
-    var value: BigInteger = 0.toBigInteger()
-    @JsonProperty("gas")
-    var gas: BigInteger = 0.toBigInteger()
-    @JsonProperty("gasPrice")
-    var gasPrice: BigInteger = 0.toBigInteger()
-    @JsonProperty("gasUsed")
-    var gasUsed: BigInteger = 0.toBigInteger()
-    @JsonProperty("input")
-    var input: String = ""
-    @JsonProperty("internalFlag")
-    var internalFlag: Boolean = false
+    val blockNumber: Long? = 0L,
 
-    fun getErrorDescription(): Any? {
-        return errorDescription
-    }
+    @JsonProperty("timestamp")
+    val timestamp: Long = 0L,
+
+    @JsonProperty("hash")
+    val hash: String = "",
+
+    @JsonProperty("nonce")
+    val nonce: String = "",
+
+    @JsonProperty("blockHash")
+    val blockHash: String? = "",
+
+    @JsonProperty("transactionIndex")
+    val transactionIndex: Int = 0,
+
+    @JsonProperty("from")
+    val from: String = "",
+
+    @JsonProperty("to")
+    val to: String = "",
+
+    @JsonProperty("value")
+    val value: BigInteger = 0.toBigInteger(),
+
+    @JsonProperty("gasPrice")
+    val gasPrice: BigInteger = 0.toBigInteger(),
+
+    @JsonProperty("gasUsed")
+    val gasUsed: BigInteger = 0.toBigInteger(),
+
+    @JsonProperty("state")
+    val state: String = ""
+)
+
+enum class TransactionState {
+    CONFIRMED,
+    REPLACED,
+    PENDING,
+    UNKNOWN
 }
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY,
+    getterVisibility = JsonAutoDetect.Visibility.NONE,
+    setterVisibility = JsonAutoDetect.Visibility.NONE,
+    creatorVisibility = JsonAutoDetect.Visibility.NONE,
+    isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+class EthTransactionsResponse(
+    @JsonProperty("transactions")
+    val transactions: List<EthTransaction> = emptyList()
+)

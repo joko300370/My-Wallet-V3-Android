@@ -10,8 +10,10 @@ import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.NabuToken
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_simple_buy_intro.*
 import org.koin.android.ext.android.inject
@@ -19,6 +21,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.ErrorDialogData
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -26,9 +29,10 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
 
     private val nabuToken: NabuToken by inject()
-    private val currencyPrefs: CurrencyPrefs by inject()
     private val simpleBuyPrefs: SimpleBuyPrefs by inject()
     private val analytics: Analytics by inject()
+    private val currencyPrefs: CurrencyPrefs by inject()
+    private val settingsDataManager: SettingsDataManager by inject()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -43,21 +47,30 @@ class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
         activity?.setupToolbar(R.string.simple_buy_intro_title)
         skip_simple_buy.setOnClickListener {
             analytics.logEvent(SimpleBuyAnalytics.SKIP_ALREADY_HAVE_CRYPTO)
-            navigator().exitSimpleBuyFlow()
+
+            val updateCurrencyCompletable =
+                if (currencyPrefs.selectedFiatCurrency.isNotEmpty()) {
+                    Completable.complete()
+                } else {
+                    settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency).ignoreElements()
+                }
+
+            compositeDisposable += updateCurrencyCompletable.observeOn(AndroidSchedulers.mainThread()).subscribeBy({}, {
+                navigator().exitSimpleBuyFlow()
+            })
         }
         analytics.logEvent(SimpleBuyAnalytics.INTRO_SCREEN_SHOW)
         buy_crypto_now.setOnClickListener {
             analytics.logEvent(SimpleBuyAnalytics.I_WANT_TO_BUY_CRYPTO_BUTTON_CLICKED)
-            nabuToken.fetchNabuToken(currency = currencyPrefs.selectedFiatCurrency, action = "simplebuy")
+            compositeDisposable += nabuToken.fetchNabuToken()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     showLoadingState()
                 }
                 .subscribeBy(
                     onSuccess = {
-                        simpleBuyPrefs.setFlowStartedAtLeastOnce()
                         simpleBuyPrefs.clearState()
-                        navigator().goToBuyCryptoScreen()
+                        navigator().goToCurrencySelection()
                     },
                     onError = {
                         showError()

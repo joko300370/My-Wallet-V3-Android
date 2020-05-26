@@ -39,6 +39,7 @@ class CreateWalletPresenter(
     }
 
     fun parseExtras(intent: Intent) {
+        analytics.logEventOnce(AnalyticsEvents.WalletSignupClickCreate)
         val mnemonic = intent.getStringExtra(RecoverFundsActivity.RECOVERY_PHRASE)
 
         if (mnemonic != null) recoveryPhrase = mnemonic
@@ -90,6 +91,7 @@ class CreateWalletPresenter(
     }
 
     fun createOrRecoverWallet(email: String, password: String) {
+        analytics.logEventOnce(AnalyticsEvents.WalletSignupCreated)
         when {
             !recoveryPhrase.isEmpty() -> recoverWallet(email, password)
             else -> createWallet(email, password)
@@ -162,4 +164,8 @@ class CreateWalletPresenter(
                 }
             )
     }
+
+    fun logEventEmailClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickEmail)
+    fun logEventPasswordOneClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickPasswordFirst)
+    fun logEventPasswordTwoClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickPasswordSecond)
 }

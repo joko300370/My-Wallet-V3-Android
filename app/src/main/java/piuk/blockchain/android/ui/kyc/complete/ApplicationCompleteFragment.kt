@@ -63,10 +63,6 @@ class ApplicationCompleteFragment : Fragment() {
                 .subscribeBy(
                     onNext = { (_, isTier1OrTier2Verified) ->
                         when (progressListener.campaignType) {
-                            CampaignType.BuySell -> {
-                                activity?.finish()
-                                KycStatusActivity.start(requireContext(), CampaignType.BuySell)
-                            }
                             CampaignType.Swap -> {
                                 activity?.finish()
                                 if (isTier1OrTier2Verified) {

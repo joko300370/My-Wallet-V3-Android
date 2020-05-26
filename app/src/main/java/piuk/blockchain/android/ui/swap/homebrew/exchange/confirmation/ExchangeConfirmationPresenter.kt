@@ -298,7 +298,7 @@ class ExchangeConfirmationPresenter internal constructor(
             SwapErrorType.CONFIRMATION_ETH_PENDING ->
                 SwapErrorDialogContent(
                     ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.ops_something_went_wrong),
+                        R.string.card_error_title),
                         stringUtils.getString(R.string.morph_confirmation_eth_pending),
                         R.string.try_again, 0, 0),
                     { view.goBack() },
@@ -306,7 +306,7 @@ class ExchangeConfirmationPresenter internal constructor(
             SwapErrorType.ALBERT_EXECUTION_ERROR ->
                 SwapErrorDialogContent(
                     ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.ops_something_went_wrong),
+                        R.string.card_error_title),
                         stringUtils.getString(R.string.something_went_wrong_description),
                         R.string.try_again,
                         R.string.more_info,
@@ -316,7 +316,7 @@ class ExchangeConfirmationPresenter internal constructor(
             else ->
                 SwapErrorDialogContent(
                     ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.ops_something_went_wrong),
+                        R.string.card_error_title),
                         stringUtils.getString(R.string.something_went_wrong_description),
                         R.string.try_again, 0, 0),
                     { view?.goBack() },

@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.service.TierService
-import piuk.blockchain.androidbuysell.api.CoinifyWalletService
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -16,7 +15,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 internal class KycMoreInfoAnnouncement(
     private val tierService: TierService,
-    private val coinifyWalletService: CoinifyWalletService,
     private val showPopupFeatureFlag: FeatureFlag,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
@@ -31,15 +29,9 @@ internal class KycMoreInfoAnnouncement(
 
         return Single.merge(
             didNotStartGoldLevelKyc(),
-            isCoinifyTrader(),
             showPopupFeatureFlag.enabled
         ).all { it }
     }
-
-    private fun isCoinifyTrader(): Single<Boolean> =
-        coinifyWalletService.getCoinifyData()
-            .isEmpty
-            .map { !it }
 
     private fun didNotStartGoldLevelKyc(): Single<Boolean> =
         tierService.tiers().map {

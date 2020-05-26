@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.data.settings
 
+import com.blockchain.preferences.CurrencyPrefs
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
@@ -22,11 +23,12 @@ class SettingsDataManagerTest : RxTest() {
     private lateinit var subject: SettingsDataManager
     private val settingsService: SettingsService = mock()
     private val settingsDataStore: SettingsDataStore = mock()
+    private val currencyPrefs: CurrencyPrefs = mock()
     private val rxBus: RxBus = mock()
 
     @Before
     fun setUp() {
-        subject = SettingsDataManager(settingsService, settingsDataStore, rxBus)
+        subject = SettingsDataManager(settingsService, settingsDataStore, currencyPrefs, rxBus)
     }
 
     @Test

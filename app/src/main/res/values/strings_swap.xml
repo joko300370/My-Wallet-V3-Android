@@ -32,7 +32,7 @@
     <string name="more_info">More Info</string>
     <string name="increase_limits">Increase My Limits</string>
     <string name="try_again">Try Again</string>
-    <string name="ops_something_went_wrong">Oops! Something went wrong.</string>
+    <string name="card_error_title">Oops! Something went wrong.</string>
     <string name="something_went_wrong_description">We\'re not sure what happened but we didn\'t receive your order details. Unfortunately, you\'re going to have to enter your order again.</string>
     <string name="dialog_title_receive">What do you want to receive?</string>
 

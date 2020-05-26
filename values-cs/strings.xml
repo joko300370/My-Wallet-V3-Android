@@ -1231,11 +1231,11 @@ Chcete-li pokračovat, pak potvrďte otisk prstu</string>
   <string name="pit_connection_success_description">Svou peněženku Blockchain jste připojili k PIT.</string>
   <string name="pit_default_account_label">Moje adresa PIT %1$s</string>
   <string name="the_pit_title">The Blockchain Exchange</string>
-  <string name="kyc_veriff_splash_country_supported_subheader"><![CDATA[V současné době nejsou podporovány všechny země. Než budete pokračovat, <annotation link=\"country_list\"> se na náš aktuální <annotation link=\"country_list\"> seznam zemí </annotation> .]]></string>
+  <string name="kyc_veriff_splash_country_supported_subheader">současné době nejsou podporovány všechny země. Než budete pokračovat, <annotation link="country_list"> se na náš aktuální </annotation>seznam zemí.></string>
   <string name="swap_intro_title">Zaměnit</string>
   <string name="swap_intro_title_page_one">Vítejte ve službě Swap!</string>
   <string name="swap_intro_title_page_two">Směnné kurzy v reálném čase</string>
-  <string name="swap_intro_title_page_three">100% na řetízku</string>
+  <string name="swap_intro_title_page_three">100%% na řetízku</string>
   <string name="swap_intro_title_page_four">Ovládáte svůj klíč</string>
   <string name="swap_intro_title_page_five">Lepší řízení rizik</string>
   <string name="swap_intro_description_page_one">Nejjednodušší způsob, jak vyměnit jedno kryptografické za druhé, aniž byste opustili peněženku.</string>

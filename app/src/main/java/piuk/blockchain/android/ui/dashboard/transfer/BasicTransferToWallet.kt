@@ -8,7 +8,6 @@ import com.blockchain.notifications.analytics.WithdrawScreenClicked
 import com.blockchain.notifications.analytics.WithdrawScreenShown
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
-import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.toFiat
@@ -17,7 +16,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.dialog_basic_transfer_to_wallet.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -48,10 +46,10 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
     }
 
-    private val assetSelect: Coincore by inject()
+    private val coincore: Coincore by inject()
 
     private val token: AssetTokens by lazy {
-        assetSelect[cryptoCurrency]
+        coincore[cryptoCurrency]
     }
 
     private val custodialWallet: CustodialWalletManager by inject()
@@ -63,7 +61,6 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
     // Hold on to the address and crypto value; we'll need them for the API
     private var valueToSend: CryptoValue? = null
     private var addressToSend: String? = null
-    private var accountRef: AccountReference? = null
 
     override fun initControls(view: View) {
         with(view) {
@@ -80,7 +77,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
             disposables += Singles.zip(
                 token.exchangeRate(),
-                token.totalBalance(AssetFilter.Custodial)
+                token.accounts(AssetFilter.Custodial).flatMap { it.balance }
             ) { fiatPrice, custodialBalance ->
                 val custodialFiat = custodialBalance.toFiat(fiatPrice)
                 Pair(custodialBalance, custodialFiat)
@@ -99,13 +96,16 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                     }
                 )
 
-            disposables += token.receiveAddress().zipWith(token.defaultAccountRef())
+            disposables += token.defaultAccount()
+                .flatMap {
+                    account -> account.receiveAddress
+                        .map { address -> Pair(address, account.label) }
+                }
                 .observeOn(uiScheduler)
                 .subscribeBy(
-                    onSuccess = { (address, account) ->
+                    onSuccess = { (address, label) ->
                         addressToSend = address
-                        accountRef = account
-                        title.text = getString(R.string.basic_transfer_title, account.label)
+                        title.text = getString(R.string.basic_transfer_title, label)
                         checkCtaEnable()
                     },
                     onError = {
@@ -198,10 +198,6 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
         if (v != null && a != null) {
             dialogView.cta_button.isEnabled = true
-
-            if (v.currency != accountRef?.cryptoCurrency) {
-                throw IllegalStateException("Crypto currency mismatch. Aborting!")
-            }
         }
     }
 

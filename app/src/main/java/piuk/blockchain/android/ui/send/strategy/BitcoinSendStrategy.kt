@@ -464,8 +464,8 @@ class BitcoinSendStrategy(
             cryptoTotal = total.toStringWithoutSymbol(),
             cryptoAmount = amount.toStringWithoutSymbol(),
             cryptoFee = fee.toStringWithoutSymbol(),
-            fiatFee = fee.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol(),
-            fiatAmount = amount.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol(),
+            fiatFee = fee.toFiat(exchangeRates, fiatCurrency).toStringWithoutSymbol(),
+            fiatAmount = amount.toFiat(exchangeRates, fiatCurrency).toStringWithoutSymbol(),
             fiatTotal = total.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol(),
             isLargeTransaction = isLargeTransaction(),
             btcSuggestedFee = suggestedFee.toStringWithoutSymbol()
@@ -568,7 +568,7 @@ class BitcoinSendStrategy(
      */
     private fun getUnspentApiResponse(address: String): Observable<UnspentOutputs> {
 
-        return if (payloadDataManager.getAddressBalance(address).toLong() > 0) {
+        return if (payloadDataManager.getAddressBalance(address) > CryptoValue.ZeroBtc) {
             return if (unspentApiResponsesBtc.containsKey(address)) {
                 Observable.just(unspentApiResponsesBtc[address])
             } else {

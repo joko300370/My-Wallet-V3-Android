@@ -19,12 +19,15 @@ import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
 import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
+import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
 import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
+import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -220,7 +223,7 @@ class NabuService(retrofit: Retrofit) {
     ).wrapErrorMessage()
 
     internal fun getSupportedCurrencies(
-        fiatCurrency: String
+        fiatCurrency: String? = null
     ): Single<SimpleBuyPairsResp> =
         service.getSupportedSimpleBuyPairs(fiatCurrency).wrapErrorMessage()
 
@@ -254,17 +257,20 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun isEligibleForSimpleBuy(
         sessionToken: NabuSessionTokenResponse,
-        fiatCurrency: String
+        fiatCurrency: String,
+        methods: String
     ): Single<SimpleBuyEligibility> = service.isEligibleForSimpleBuy(
         sessionToken.authHeader,
-        fiatCurrency
+        fiatCurrency,
+        methods
     ).wrapErrorMessage()
 
     internal fun createOrder(
         sessionToken: NabuSessionTokenResponse,
-        order: CustodialWalletOrder
+        order: CustodialWalletOrder,
+        action: String?
     ) = service.createOrder(
-        sessionToken.authHeader, order
+        authorization = sessionToken.authHeader, action = action, order = order
     ).onErrorResumeNext {
         if (it is HttpException && it.code() == 409) {
             Single.error(SimpleBuyError.OrderLimitReached)
@@ -274,9 +280,11 @@ class NabuService(retrofit: Retrofit) {
     }.wrapErrorMessage()
 
     internal fun getOutstandingBuyOrders(
-        sessionToken: NabuSessionTokenResponse
-    ) = service.getOutstandingBuyOrders(
-        sessionToken.authHeader
+        sessionToken: NabuSessionTokenResponse,
+        pendingOnly: Boolean
+    ) = service.getBuyOrders(
+        sessionToken.authHeader,
+        pendingOnly
     ).wrapErrorMessage()
 
     internal fun deleteBuyOrder(
@@ -297,6 +305,43 @@ class NabuService(retrofit: Retrofit) {
         orderId: String
     ) = service.getBuyOrder(
         sessionToken.authHeader, orderId
+    ).wrapErrorMessage()
+
+    fun deleteCard(
+        sessionToken: NabuSessionTokenResponse,
+        cardId: String
+    ) = service.deleteCard(
+        sessionToken.authHeader, cardId
+    ).wrapErrorMessage()
+
+    fun addNewCard(
+        sessionToken: NabuSessionTokenResponse,
+        addNewCardBodyRequest: AddNewCardBodyRequest
+    ) = service.addNewCard(
+        sessionToken.authHeader, addNewCardBodyRequest
+    ).wrapErrorMessage()
+
+    fun activateCard(
+        sessionToken: NabuSessionTokenResponse,
+        cardId: String,
+        attributes: CardPartnerAttributes
+    ) = service.activateCard(
+        sessionToken.authHeader, cardId, attributes
+    ).wrapErrorMessage()
+
+    fun getCardDetails(
+        sessionToken: NabuSessionTokenResponse,
+        cardId: String
+    ) = service.getCardDetails(
+        sessionToken.authHeader, cardId
+    ).wrapErrorMessage()
+
+    fun confirmOrder(
+        sessionToken: NabuSessionTokenResponse,
+        orderId: String,
+        confirmBody: ConfirmOrderRequestBody
+    ) = service.confirmOrder(
+        sessionToken.authHeader, orderId, confirmBody
     ).wrapErrorMessage()
 
     fun getBalanceForAsset(
@@ -327,6 +372,42 @@ class NabuService(retrofit: Retrofit) {
             }
         } else {
             Completable.error(it)
+        }
+    }.wrapErrorMessage()
+
+    fun getPaymentMethods(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String,
+        checkEligibility: Boolean
+    ) = service.getPaymentMethods(
+        authorization = sessionToken.authHeader,
+        currency = currency,
+        checkEligibility = checkEligibility
+    ).wrapErrorMessage()
+
+    fun getCards(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getCards(
+        authorization = sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    fun getInterestRates(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestRates(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun getInterestAccountBalance(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAccountBalance(
+        authorization = sessionToken.authHeader,
+        cryptoSymbol = currency
+    ).flatMapMaybe {
+        when (it.code()) {
+            200 -> Maybe.just(it.body())
+            204 -> Maybe.empty()
+            else -> Maybe.error(HttpException(it))
         }
     }.wrapErrorMessage()
 

@@ -65,7 +65,7 @@ dependencies {
     implementation project(':common:interface')
     implementation project(':balance')
     implementation project(':wallet')
-    api project(':buysell')
+
     api project(':notifications')
     implementation project(':veriff')
 
@@ -76,6 +76,7 @@ dependencies {
     implementation Libraries.koin
     implementation Libraries.rxKotlin
     implementation Libraries.retrofit
+    implementation Libraries.cardForm
 
     // Testing
     testImplementation project(':testutils')

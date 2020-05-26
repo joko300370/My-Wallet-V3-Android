@@ -22,11 +22,15 @@
     </style>
 
     <style name="Text.Standard.20">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="Text.Standard.24">
         <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="Text.Standard.32">
+        <item name="android:textSize">32sp</item>
     </style>
 
     <style name="Text.Standard.Centered">
@@ -45,6 +49,18 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="Text.VeryLight">
+        <item name="android:textColor">@color/grey_400</item>
+    </style>
+
+    <style name="Text.VeryLight.Semibold">
+        <item name="fontFamily">@font/inter_medium</item>
+    </style>
+
+    <style name="Text.VeryLight.Semibold.16">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="Text.Light">
         <item name="android:textColor">@color/grey_600</item>
     </style>
@@ -59,6 +75,10 @@
 
     <style name="Text.Blue.Semibold">
         <item name="fontFamily">@font/inter_medium</item>
+    </style>
+
+    <style name="Text.Blue.Semibold.12">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="Text.White.Semibold">
@@ -121,6 +141,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="Text.Semibold.32">
+        <item name="android:textSize">32sp</item>
+    </style>
+
     <style name="Text.Semibold.14">
         <item name="android:textSize">14sp</item>
     </style>
@@ -135,6 +159,13 @@
 
     <style name="Text.Semibold.Centered.20">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Text.Semibold.Light">
+        <item name="android:textColor">@color/grey_600</item>
+    </style>
+    <style name="Text.Semibold.Light.14">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Text.Bold">

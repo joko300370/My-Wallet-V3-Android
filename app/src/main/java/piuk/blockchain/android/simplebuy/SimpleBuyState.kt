@@ -2,11 +2,15 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.swap.nabu.datamanagers.BankAccount
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.Partner
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.compareTo
+import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Date
@@ -31,7 +35,18 @@ data class SimpleBuyState(
     val kycVerificationState: KycState? = null,
     val bankAccount: BankAccount? = null,
     val currentScreen: FlowScreen = FlowScreen.INTRO,
+    val selectedPaymentMethod: SelectedPaymentMethod? = null,
+    val orderExchangePrice: FiatValue? = null,
+    val orderValue: CryptoValue? = null,
+    val fee: FiatValue? = null,
+    @Transient val paymentOptions: PaymentOptions = PaymentOptions(emptyList(), false),
+    val supportedFiatCurrencies: List<String> = emptyList(),
     @Transient val errorState: ErrorState? = null,
+    @Transient val exchangePrice: FiatValue? = null,
+    @Transient val isLoading: Boolean = false,
+    @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
+    @Transient val cardPaymentSucceeded: Boolean = false,
+    @Transient val cardPaymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false
 ) : MviState {
@@ -56,6 +71,13 @@ data class SimpleBuyState(
     }
 
     @delegate:Transient
+    val selectedPaymentMethodDetails: PaymentMethod? by unsafeLazy {
+        selectedPaymentMethod?.id?.let { id ->
+            paymentOptions.availablePaymentMethods.firstOrNull { it.id == id }
+        }
+    }
+
+    @delegate:Transient
     private val amount: FiatValue? by unsafeLazy {
         if (enteredAmount.isEmpty() || pattern.matcher(enteredAmount).matches().not()) null else
             FiatValue.fromMajor(fiatCurrency, enteredAmount.toBigDecimal())
@@ -63,15 +85,36 @@ data class SimpleBuyState(
 
     @delegate:Transient
     val maxAmount: FiatValue? by unsafeLazy {
-        supportedPairsAndLimits?.find { it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency }
-            ?.buyLimits?.maxLimit(fiatCurrency)
+        val maxPairBuyLimit = maxPairsLimit() ?: return@unsafeLazy null
+
+        val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
+
+        maxPaymentMethodLimit?.let {
+            FiatValue.fromMinor(fiatCurrency, it.coerceAtMost(maxPairBuyLimit))
+        } ?: FiatValue.fromMinor(fiatCurrency, maxPairBuyLimit)
     }
 
     @delegate:Transient
     val minAmount: FiatValue? by unsafeLazy {
-        supportedPairsAndLimits?.find { it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency }
-            ?.buyLimits?.minLimit(fiatCurrency)
+        val minPairBuyLimit = minPairsLimit() ?: return@unsafeLazy null
+
+        val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
+
+        minPaymentMethodLimit?.let {
+            FiatValue.fromMinor(fiatCurrency, it.coerceAtLeast(minPairBuyLimit))
+        } ?: FiatValue.fromMinor(fiatCurrency, minPairBuyLimit)
     }
+
+    private fun PaymentMethod?.maxLimit(): Long? = this?.limits?.max?.valueMinor
+    private fun PaymentMethod?.minLimit(): Long? = this?.limits?.min?.valueMinor
+
+    private fun maxPairsLimit(): Long? = supportedPairsAndLimits?.find {
+        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
+    }?.buyLimits?.maxLimit(fiatCurrency)?.valueMinor
+
+    private fun minPairsLimit(): Long? = supportedPairsAndLimits?.find {
+        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
+    }?.buyLimits?.minLimit(fiatCurrency)?.valueMinor
 
     fun maxDecimalDigitsForAmount(): Int =
         maxAmount?.userDecimalPlaces ?: 0
@@ -122,7 +165,7 @@ enum class KycState {
 }
 
 enum class FlowScreen {
-    INTRO, ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS
+    INTRO, CURRENCY_SELECTOR, ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
 }
 
 enum class InputError {
@@ -140,3 +183,16 @@ data class SimpleBuyOrder(
     val expirationDate: Date? = null,
     val quote: Quote? = null
 )
+
+data class PaymentOptions(
+    val availablePaymentMethods: List<PaymentMethod>,
+    val canAddCard: Boolean
+)
+
+data class SelectedPaymentMethod(
+    val id: String,
+    val partner: Partner? = null,
+    val label: String? = ""
+) {
+    fun isBank() = id == PaymentMethod.BANK_PAYMENT_ID
+}

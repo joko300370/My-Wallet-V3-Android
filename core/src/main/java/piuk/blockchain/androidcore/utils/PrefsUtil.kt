@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
-import java.lang.IllegalStateException
 import java.util.Currency
 import java.util.Locale
 
@@ -78,18 +77,8 @@ class PrefsUtil(
 
     // From CurrencyPrefs
     override var selectedFiatCurrency: String
-        get() = getValue(KEY_SELECTED_FIAT, defaultCurrency())
+        get() = getValue(KEY_SELECTED_FIAT, "")
         set(fiat) = setValue(KEY_SELECTED_FIAT, fiat)
-
-    private fun defaultCurrency(): String =
-        // Android has been know to return non-ISO3166 locale codes. Esp on cheap Chinese phones (Meizu m5u!)
-        // Fallback to the default DEFAULT_FIAT_CURRENCY in these cases
-        try {
-            val localeFiat = Currency.getInstance(Locale.getDefault()).currencyCode
-            if (UNIT_FIAT.contains(localeFiat)) localeFiat else DEFAULT_FIAT_CURRENCY
-        } catch (e: IllegalStateException) {
-            DEFAULT_FIAT_CURRENCY
-        }
 
     override var selectedCryptoCurrency: CryptoCurrency
         get() =
@@ -100,6 +89,14 @@ class PrefsUtil(
                 DEFAULT_CRYPTO_CURRENCY
             }
         set(crypto) = setValue(KEY_SELECTED_CRYPTO, crypto.name)
+
+    override val defaultFiatCurrency: String
+        get() = try {
+            val localeFiat = Currency.getInstance(Locale.getDefault()).currencyCode
+            if (UNIT_FIAT.contains(localeFiat)) localeFiat else DEFAULT_FIAT_CURRENCY
+        } catch (e: Exception) {
+            DEFAULT_FIAT_CURRENCY
+        }
 
     // From ThePitLinkingPrefs
     override var pitToWalletLinkId: String
@@ -114,6 +111,25 @@ class PrefsUtil(
         return getValue(KEY_SIMPLE_BUY_STATE, "").takeIf { it != "" }
     }
 
+    override fun cardState(): String? {
+        return getValue(KEY_CARD_STATE, "").takeIf { it != "" }
+    }
+
+    override fun updateCardState(cardState: String) {
+        setValue(KEY_CARD_STATE, cardState)
+    }
+
+    override fun clearCardState() {
+        removeValue(KEY_CARD_STATE)
+    }
+
+    override fun updateSupportedCards(cardTypes: String) {
+        setValue(KEY_SUPPORTED_CARDS_STATE, cardTypes)
+    }
+
+    override fun getSupportedCardTypes(): String? =
+        getValue(KEY_SUPPORTED_CARDS_STATE, "").takeIf { it != "" }
+
     override fun updateSimpleBuyState(simpleBuyState: String) {
         setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
     }
@@ -121,13 +137,6 @@ class PrefsUtil(
     override fun clearState() {
         removeValue(KEY_SIMPLE_BUY_STATE)
     }
-
-    override fun setFlowStartedAtLeastOnce() {
-        setValue(KEY_SIMPLE_BUY_FLOW_STARTED, true)
-    }
-
-    override fun flowStartedAtLeastOnce(): Boolean =
-        getValue(KEY_SIMPLE_BUY_FLOW_STARTED, false)
 
     // From Onboarding
     override var swapIntroCompleted: Boolean
@@ -298,7 +307,10 @@ class PrefsUtil(
 
         private const val KEY_PIT_LINKING_LINK_ID = "pit_wallet_link_id"
         private const val KEY_SIMPLE_BUY_STATE = "key_simple_buy_state"
-        private const val KEY_SIMPLE_BUY_FLOW_STARTED = "key_simple_buy_flow"
+        private const val KEY_CARD_STATE = "key_card_state"
+
+        private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
+
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"
         private const val KEY_INTRO_TOUR_CURRENT_STAGE = "key_intro_tour_current_stage"

@@ -5,29 +5,22 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
 import com.blockchain.swap.nabu.models.nabu.NabuStateResponse
 import com.blockchain.swap.nabu.models.nabu.Scope
-import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.api.data.WalletOptions
 import io.reactivex.Single
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.androidbuysell.services.BuyConditions
 
 class KycCountrySelectionPresenterTest {
 
     private lateinit var subject: KycCountrySelectionPresenter
     private val view: KycCountrySelectionView = mock()
     private val nabuDataManager: NabuDataManager = mock()
-    private val buyConditions: BuyConditions = mock()
-    private val mockWalletOptions: WalletOptions = mock(defaultAnswer = RETURNS_DEEP_STUBS)
 
     @Suppress("unused")
     @get:Rule
@@ -38,7 +31,7 @@ class KycCountrySelectionPresenterTest {
 
     @Before
     fun setUp() {
-        subject = KycCountrySelectionPresenter(nabuDataManager, buyConditions)
+        subject = KycCountrySelectionPresenter(nabuDataManager)
         subject.initView(view)
     }
 
@@ -98,45 +91,6 @@ class KycCountrySelectionPresenterTest {
         // Assert
         verify(nabuDataManager).getCountriesList(Scope.None)
         verify(view).requiresStateSelection()
-    }
-
-    @Test
-    fun `onRegionSelected in restricted countries`() {
-        // Arrange
-        whenever(view.regionType).thenReturn(RegionType.Country)
-        val countryList =
-            listOf(NabuCountryResponse("UK", "United Kingdom", listOf("KYC"), emptyList()))
-        whenever(nabuDataManager.getCountriesList(Scope.None))
-            .thenReturn(Single.just(countryList))
-        whenever(buyConditions.buySellCountries()).thenReturn(Single.just(listOf("US")))
-        val countryDisplayModel = CountryDisplayModel(
-            name = "United Kingdom",
-            countryCode = "UK"
-        )
-        // Act
-        subject.onRegionSelected(countryDisplayModel, campaignType = CampaignType.BuySell)
-        // Assert
-        verify(view).invalidCountry(countryDisplayModel)
-    }
-
-    @Test
-    fun `onRegionSelected not in restricted countries`() {
-        // Arrange
-        whenever(view.regionType).thenReturn(RegionType.Country)
-        val countryCode = "UK"
-        val countryList =
-            listOf(NabuCountryResponse("UK", "United Kingdom", listOf("KYC"), emptyList()))
-        whenever(nabuDataManager.getCountriesList(Scope.None))
-            .thenReturn(Single.just(countryList))
-        whenever(buyConditions.buySellCountries()).thenReturn(Single.just(listOf("UK")))
-        val countryDisplayModel = CountryDisplayModel(
-            name = "United Kingdom",
-            countryCode = "UK"
-        )
-        // Act
-        subject.onRegionSelected(countryDisplayModel, campaignType = CampaignType.BuySell)
-        // Assert
-        verify(view).continueFlow(countryCode)
     }
 
     @Test

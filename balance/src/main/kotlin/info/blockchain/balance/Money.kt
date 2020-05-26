@@ -1,9 +1,10 @@
 package info.blockchain.balance
 
+import java.io.Serializable
 import java.math.BigDecimal
 import java.util.Locale
 
-interface Money {
+interface Money : Serializable {
 
     /**
      * Use [symbol] for user display. This can be used by APIs etc.

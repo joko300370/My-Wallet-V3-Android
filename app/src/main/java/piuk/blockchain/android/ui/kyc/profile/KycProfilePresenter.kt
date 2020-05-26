@@ -29,7 +29,6 @@ import kotlin.properties.Delegates
 import com.google.common.base.Optional
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidbuysell.models.coinify.exceptions.CoinifyApiException
 
 class KycProfilePresenter(
     nabuToken: NabuToken,
@@ -85,8 +84,6 @@ class KycProfilePresenter(
                             it.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
                         ) {
                             view.showErrorToast(stringUtils.getString(R.string.kyc_profile_error_conflict))
-                        } else if (it is CoinifyApiException) {
-                            view.showErrorToast(it.getErrorDescription())
                         } else {
                             view.showErrorToast(stringUtils.getString(R.string.kyc_profile_error))
                         }

@@ -8,15 +8,14 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 
@@ -38,10 +37,12 @@ class DashboardInteractor(
         CryptoCurrency.activeCurrencies()
             .filter { it != CryptoCurrency.PAX }
             .forEach {
-                cd += tokens[it].totalBalance(balanceFilter)
+                cd += tokens[it].accounts(balanceFilter)
+                    .flatMap { it.balance }
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
-                            cd += tokens[CryptoCurrency.PAX].totalBalance(balanceFilter)
+                            cd += tokens[CryptoCurrency.PAX].accounts(balanceFilter)
+                                .flatMap { it.balance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
                                         Timber.d("*****> Got balance for PAX")
@@ -100,7 +101,8 @@ class DashboardInteractor(
         )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
-        return tokens[crypto].totalBalance(AssetFilter.Custodial)
+        return tokens[crypto].accounts(AssetFilter.Custodial)
+            .flatMap { it.balance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },
                 onError = { Timber.e(it) }
@@ -115,9 +117,8 @@ class DashboardInteractor(
             )
     }
 
-    fun cancelSimpleBuyOrder(orderId: String?): Disposable? {
-        return orderId?.let {
-            custodialWalletManager.deleteBuyOrder(it)
+    fun cancelSimpleBuyOrder(orderId: String): Disposable? {
+        return custodialWalletManager.deleteBuyOrder(orderId)
                 .subscribeBy(
                     onComplete = { simpleBuyPrefs.clearState() },
                     onError = { error ->
@@ -125,10 +126,6 @@ class DashboardInteractor(
                         Timber.e(error)
                     }
                 )
-        } ?: Completable.complete()
-            .subscribeBy(
-                onComplete = { simpleBuyPrefs.clearState() }
-            )
     }
 
     companion object {

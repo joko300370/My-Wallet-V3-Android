@@ -1,8 +1,12 @@
 package piuk.blockchain.androidcore.data.payload
 
 import info.blockchain.api.data.Balance
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -11,6 +15,7 @@ import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.ECKey
@@ -21,8 +26,10 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.metadata.MetadataCredentials
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import piuk.blockchain.androidcore.utils.RefreshUpdater
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.ArrayList
@@ -79,9 +86,6 @@ class PayloadDataManager(
         set(password) {
             payloadManager.tempPassword = password
         }
-
-    val walletBalance: BigInteger
-        get() = payloadManager.walletBalance
 
     val importedAddressesBalance: BigInteger
         get() = payloadManager.importedAddressesBalance
@@ -246,7 +250,8 @@ class PayloadDataManager(
      * @return A [Completable] object
      * @see IgnorableDefaultObserver
      */
-    fun updateAllBalances(): Completable = rxPinning.call { payloadService.updateAllBalances() }
+    fun updateAllBalances(): Completable =
+        rxPinning.call { payloadService.updateAllBalances() }
         .applySchedulers()
 
     /**
@@ -270,9 +275,9 @@ class PayloadDataManager(
      * @param addresses A List of addresses as Strings
      * @return A [LinkedHashMap]
      */
-    fun getBalanceOfAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
+    fun getBalanceOfBtcAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
         rxPinning.call<LinkedHashMap<String, Balance>> {
-            payloadService.getBalanceOfAddresses(addresses)
+            payloadService.getBalanceOfBtcAddresses(addresses)
         }.applySchedulers()
 
     /**
@@ -454,12 +459,24 @@ class PayloadDataManager(
 
     /**
      * Returns the balance of an address. If the address isn't found in the address map object, the
-     * method will return [BigInteger.ZERO] instead of a null object.
+     * method will return [CryptoValue.ZeroBtc] instead of a null object.
      *
      * @param address The address whose balance you wish to query
-     * @return A [BigInteger] representing the total funds in the address
+     * @return A [CryptoValue] representing the total funds in the address
      */
-    fun getAddressBalance(address: String): BigInteger = payloadManager.getAddressBalance(address)
+    fun getAddressBalance(address: String): CryptoValue =
+        CryptoValue.fromMinor(CryptoCurrency.BTC, payloadManager.getAddressBalance(address))
+
+    // Update if timeout of forceRefresh, get the balance - pull the code from ActivityCache/BtcCoinLikeToken
+    private val balanceUpdater = RefreshUpdater<CryptoValue>(
+        fnRefresh = { Completable.fromCallable { updateAllBalances() } }
+    )
+
+    fun getAddressBalanceRefresh(address: String, forceRefresh: Boolean = false): Single<CryptoValue> =
+        balanceUpdater.get(
+            fnFetch = { getAddressBalance(address) },
+            force = forceRefresh
+        )
 
     /**
      * Allows you to generate a receive address at an arbitrary number of positions on the chain
@@ -552,6 +569,14 @@ class PayloadDataManager(
         return accounts.firstOrNull { it.xpub == xPub }
             ?: throw NullPointerException("Account not found for XPub")
     }
+
+    @Throws(
+        IOException::class,
+        ApiException::class
+    )
+
+    fun getAccountTransactions(xpub: String?, limit: Int, offset: Int): List<TransactionSummary> =
+        payloadManager.getAccountTransactions(xpub, limit, offset)
 
     /**
      * Returns the transaction notes for a given transaction hash. May return null if not found.

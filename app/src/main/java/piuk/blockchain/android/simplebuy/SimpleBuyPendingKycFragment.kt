@@ -1,13 +1,17 @@
 package piuk.blockchain.android.simplebuy
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
@@ -64,7 +68,11 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
         }
 
         if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE) {
-            navigator().goToCheckOutScreen()
+            if (newState.selectedPaymentMethod?.id == PaymentMethod.UNDEFINED_CARD_PAYMENT_ID) {
+                addCard()
+            } else {
+                navigator().goToCheckOutScreen()
+            }
         }
 
         kyc_failed_icon.setImageResource(
@@ -81,6 +89,11 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
         latestKycState = newState.kycVerificationState
     }
 
+    private fun addCard() {
+        val intent = Intent(activity, CardDetailsActivity::class.java)
+        startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
+    }
+
     private fun sendStateAnalytics(state: KycState) {
         when (state) {
             KycState.VERIFIED_BUT_NOT_ELIGIBLE -> analytics.logEvent(SimpleBuyAnalytics.KYC_NOT_ELIGIBLE)
@@ -89,6 +102,20 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             KycState.UNDECIDED -> analytics.logEvent(SimpleBuyAnalytics.KYC_PENDING)
             else -> {
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
+                    PaymentMethod.Card) ?: return
+            val cardId = card.cardId
+            val cardLabel = card.uiLabel()
+            val cardPartner = card.partner
+
+            model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId, cardLabel, cardPartner))
+            navigator().goToCheckOutScreen()
         }
     }
 

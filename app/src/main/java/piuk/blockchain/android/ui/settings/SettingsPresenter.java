@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+
+import io.reactivex.Single;
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 
 import com.blockchain.notifications.NotificationTokenManager;
@@ -9,8 +11,16 @@ import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
 import com.blockchain.remoteconfig.FeatureFlag;
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
+import com.blockchain.swap.nabu.models.nabu.Kyc2TierState;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -53,9 +63,11 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private final NotificationTokenManager notificationTokenManager;
     private final ExchangeRateDataManager exchangeRateDataManager;
     private final KycStatusHelper kycStatusHelper;
+    private final CustodialWalletManager custodialWalletManager;
     @VisibleForTesting
     Settings settings;
     private final PitLinking pitLinking;
+    private final FeatureFlag cardsFeatureFlag;
     private final Analytics analytics;
     private final FeatureFlag featureFlag;
     private PitLinkingState pitLinkState = new PitLinkingState();
@@ -71,13 +83,15 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             StringUtils stringUtils,
             PersistentPrefs prefs,
             AccessState accessState,
+            CustodialWalletManager custodialWalletManager,
             SwipeToReceiveHelper swipeToReceiveHelper,
             NotificationTokenManager notificationTokenManager,
             ExchangeRateDataManager exchangeRateDataManager,
             KycStatusHelper kycStatusHelper,
             PitLinking pitLinking,
             Analytics analytics,
-            FeatureFlag featureFlag) {
+            FeatureFlag featureFlag,
+            FeatureFlag cardsFeatureFlag) {
 
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -95,7 +109,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.pitLinking = pitLinking;
         this.analytics = analytics;
         this.featureFlag = featureFlag;
-
+        this.cardsFeatureFlag = cardsFeatureFlag;
+        this.custodialWalletManager = custodialWalletManager;
     }
 
     @Override
@@ -116,9 +131,30 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                     // Warn error when updating
                                     getView().showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR);
                                 }));
-
-        getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated));
+        updateCards();
+        getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated, throwable -> {
+        }));
         getCompositeDisposable().add(featureFlag.getEnabled().subscribe(this::showPitItem));
+    }
+
+    private void updateCards() {
+        getCompositeDisposable().add(
+                Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycState2Tier(),
+                        (enabled, kycState) -> enabled && kycState == Kyc2TierState.Tier2Approved)
+                        .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
+                        .flatMap(enabled -> {
+                            if (enabled) {
+                                return custodialWalletManager.updateSupportedCardTypes(getFiatUnits(), true).andThen(
+                                        custodialWalletManager.fetchUnawareLimitsCards(
+                                                Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)));
+                            } else {
+                                return Single.just(Collections.<PaymentMethod.Card>emptyList());
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
+                    getView().cardsEnabled(false);
+                    onCardsUpdated(Collections.emptyList());
+                }).subscribe(this::onCardsUpdated));
     }
 
     private void showPitItem(Boolean pitEnabled) {
@@ -128,6 +164,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private void onPitStateUpdated(PitLinkingState state) {
         pitLinkState = state;
         getView().setPitLinkingState(pitLinkState.isLinked());
+    }
+
+    private void onCardsUpdated(List<PaymentMethod.Card> cards) {
+        getView().updateCards(cards);
     }
 
     private void loadKyc2TierState() {

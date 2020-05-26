@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/root_view"
     android:paddingTop="@dimen/small_margin"
     android:paddingBottom="@dimen/small_margin">
 
     <ImageView
-        android:id="@+id/asset_icon"
+        android:id="@+id/icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="@dimen/standard_margin"
@@ -24,11 +25,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         tools:text="Bitcoin"
-        app:layout_constraintStart_toEndOf="@id/asset_icon"
-        app:layout_constraintTop_toTopOf="@id/asset_icon" />
+        app:layout_constraintStart_toEndOf="@id/icon"
+        app:layout_constraintTop_toTopOf="@id/icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_filter_label"
+        android:id="@+id/status_date"
         style="@style/Text.Light.12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,8 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/small_margin"
         app:layout_constraintEnd_toStartOf="@id/action_menu"
-        app:layout_constraintTop_toTopOf="@id/asset_filter_label"
-        app:layout_constraintBottom_toBottomOf="@id/asset_filter_label"
+        app:layout_constraintTop_toTopOf="@id/status_date"
+        app:layout_constraintBottom_toBottomOf="@id/status_date"
         tools:text="1.638192 BTC" />
 
     <ImageView
@@ -73,8 +74,8 @@
         android:layout_height="16dp"
         android:layout_marginStart="23dp"
         android:layout_marginTop="21dp"
-        app:layout_constraintStart_toStartOf="@id/asset_icon"
-        app:layout_constraintTop_toTopOf="@id/asset_icon"
+        app:layout_constraintStart_toStartOf="@id/icon"
+        app:layout_constraintTop_toTopOf="@id/icon"
         app:srcCompat="@drawable/ic_asset_non_custodial_spend"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

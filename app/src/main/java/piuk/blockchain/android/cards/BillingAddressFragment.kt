@@ -1,0 +1,152 @@
+package piuk.blockchain.android.cards
+
+import android.os.Bundle
+import android.text.Editable
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.swap.nabu.datamanagers.BillingAddress
+import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.fragment_billing_address.*
+import org.koin.android.ext.android.inject
+import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.base.mvi.MviFragment
+import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.util.US
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import java.util.Locale
+
+class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
+    PickerItemListener, AddCardFlowFragment {
+
+    private var usSelected = false
+    private val nabuToken: NabuToken by inject()
+    private val nabuDataManager: NabuDataManager by inject()
+
+    private val compositeDisposable = CompositeDisposable()
+    private val nabuUser = nabuToken
+        .fetchNabuToken()
+        .flatMap {
+            nabuDataManager.getUser(it)
+        }
+
+    override val cardDetailsPersistence: CardDetailsPersistence
+        get() = (activity as? CardDetailsPersistence)
+            ?: throw IllegalStateException("Parent must implement CardDetailsPersistence")
+
+    private var countryPickerItem: CountryPickerItem? = null
+    private var statePickerItem: StatePickerItem? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ) = container?.inflate(R.layout.fragment_billing_address)
+
+    private val textWatcher = object : AfterTextChangedWatcher() {
+        override fun afterTextChanged(s: Editable?) {
+            btn_next.isEnabled = addressIsValid()
+        }
+    }
+
+    private fun addressIsValid(): Boolean =
+        full_name.text.isNullOrBlank().not() &&
+                address_line_1.text.isNullOrBlank().not() &&
+                city.text.isNullOrBlank().not() &&
+                (if (usSelected) zip_usa.text.isNullOrBlank().not() && state.text.isNullOrBlank().not() else
+                    postcode.text.isNullOrBlank().not())
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        header.setOnClickListener {
+            SearchPickerItemBottomSheet.newInstance(Locale.getISOCountries().toList().map {
+                CountryPickerItem(it)
+            }).show(childFragmentManager, "BOTTOM_SHEET")
+        }
+        state.setOnClickListener {
+            SearchPickerItemBottomSheet.newInstance(
+                US.values().map {
+                    StatePickerItem(it.ANSIAbbreviation, it.unabbreviated)
+                }
+            ).show(childFragmentManager, "BOTTOM_SHEET")
+        }
+
+        full_name.addTextChangedListener(textWatcher)
+        address_line_1.addTextChangedListener(textWatcher)
+        address_line_2.addTextChangedListener(textWatcher)
+        city.addTextChangedListener(textWatcher)
+        zip_usa.addTextChangedListener(textWatcher)
+        state.addTextChangedListener(textWatcher)
+        postcode.addTextChangedListener(textWatcher)
+
+        compositeDisposable += nabuUser.map { it.address?.countryCode ?: "" }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = {}, onSuccess = { countryCode ->
+                onItemPicked(CountryPickerItem(countryCode))
+                configureUiForCountry(countryCode == "US")
+            })
+
+        btn_next.setOnClickListener {
+            model.process(CardIntent.UpdateBillingAddress(
+                BillingAddress(
+                    countryCode = countryPickerItem?.code
+                        ?: throw java.lang.IllegalStateException("No country selected"),
+                    postCode = (if (usSelected) zip_usa.text else postcode.text).toString(),
+                    state = if (usSelected) state.text.toString() else null,
+                    city = city.text.toString(),
+                    addressLine1 = address_line_1.text.toString(),
+                    addressLine2 = address_line_2.text.toString(),
+                    fullName = full_name.text.toString()
+                )
+            ))
+            model.process(CardIntent.ReadyToAddNewCard)
+
+            navigator.navigateToCardVerification()
+            analytics.logEvent(SimpleBuyAnalytics.CARD_BILLING_ADDRESS_SET)
+        }
+        activity.setupToolbar(R.string.add_card_address_title)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
+    }
+
+    override fun onItemPicked(item: PickerItem) {
+        when (item) {
+            is CountryPickerItem -> {
+                country_text.text = item.label
+                flag_icon.text = item.icon
+                configureUiForCountry(item.code == "US")
+                countryPickerItem = item
+            }
+            is StatePickerItem -> {
+                state.setText(item.code)
+                statePickerItem = item
+            }
+        }
+    }
+
+    private fun configureUiForCountry(usSelected: Boolean) {
+        postcode_input.visibleIf { usSelected.not() }
+        states_fields.visibleIf { usSelected }
+        this.usSelected = usSelected
+    }
+
+    override val model: CardModel by inject()
+    override val navigator: AddCardNavigator
+        get() = (activity as? AddCardNavigator)
+            ?: throw IllegalStateException("Parent must implement AddCardNavigator")
+
+    override fun onBackPressed(): Boolean = true
+
+    override fun render(newState: CardState) {}
+}

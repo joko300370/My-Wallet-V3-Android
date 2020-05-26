@@ -18,6 +18,7 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
@@ -67,8 +68,8 @@ class EtherSendStrategy(
     environmentConfig: EnvironmentConfig
 ) : SendStrategy<SendView>(currencyState, prefs) {
 
-    override fun onViewAttached() { }
-    override fun onViewDetached() { }
+    override fun onViewAttached() {}
+    override fun onViewDetached() {}
 
     override val alwaysDisableScreenshots = false
     override val enableLogoutTimer = false
@@ -262,14 +263,18 @@ class EtherSendStrategy(
         val feeGwei = BigDecimal.valueOf(feeOptions!!.regularFee)
         val feeWei = Convert.toWei(feeGwei, Convert.Unit.GWEI)
 
-        return ethDataManager.fetchEthAddress()
-            .map { ethDataManager.getEthResponseModel()!!.getNonce() }
-            .map {
+        return Observables.zip(ethDataManager.fetchEthAddress()
+            .map { ethDataManager.getEthResponseModel()!!.getNonce() },
+            ethDataManager.getIfContract(pendingTransaction.receivingAddress))
+            .map { (nonce, isContract) ->
                 ethDataManager.createEthTransaction(
-                    nonce = it,
+                    nonce = nonce,
                     to = pendingTransaction.receivingAddress,
                     gasPriceWei = feeWei.toBigInteger(),
-                    gasLimitGwei = BigInteger.valueOf(feeOptions!!.gasLimit),
+                    gasLimitGwei = BigInteger.valueOf(
+                        if (isContract) feeOptions!!.gasLimitContract
+                        else feeOptions!!.gasLimit
+                    ),
                     weiValue = pendingTransaction.bigIntAmount
                 )
             }
@@ -319,8 +324,8 @@ class EtherSendStrategy(
             cryptoAmount = amount.toStringWithoutSymbol(),
             cryptoFee = fee.toStringWithoutSymbol(),
             cryptoTotal = total.toStringWithoutSymbol(),
-            fiatFee = fee.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol(),
-            fiatAmount = amount.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol(),
+            fiatFee = fee.toFiat(exchangeRates, fiatCurrency).toStringWithoutSymbol(),
+            fiatAmount = amount.toFiat(exchangeRates, fiatCurrency).toStringWithoutSymbol(),
             fiatTotal = total.toFiat(exchangeRates, fiatCurrency).toStringWithSymbol()
         )
     }
@@ -448,8 +453,7 @@ class EtherSendStrategy(
         // Check if any pending ether txs exist and warn user
         compositeDisposable += isLastTxPending()
             .subscribeBy(
-                onNext = { /* No-op */ },
-                onComplete = { /* No-op */ },
+                onSuccess = { /* No-op */ },
                 onError = { Timber.e(it) }
             )
     }
@@ -468,43 +472,32 @@ class EtherSendStrategy(
         return if (pendingTransaction.receivingAddress.isEmpty()) {
             Observable.just(Pair(false, R.string.eth_invalid_address))
         } else {
-            ethDataManager.getIfContract(pendingTransaction.receivingAddress)
-                .map { isContract ->
-                    var validated = true
-                    var errorMessage = R.string.unexpected_error
+            var validated = true
+            var errorMessage = R.string.unexpected_error
+            if (!FormatsUtil.isValidEthereumAddress(pendingTransaction.receivingAddress)) {
+                errorMessage = R.string.eth_invalid_address
+                validated = false
+            }
 
-                    // Validate not contract
-                    if (isContract) {
-                        errorMessage = R.string.eth_support_contract_not_allowed
-                        validated = false
-                    } else {
-                        // Validate address
-                        if (!FormatsUtil.isValidEthereumAddress(pendingTransaction.receivingAddress)) {
-                            errorMessage = R.string.eth_invalid_address
-                            validated = false
-                        }
+            // Validate amount
+            if (!isValidAmount(pendingTransaction.bigIntAmount)) {
+                errorMessage = R.string.invalid_amount
+                validated = false
+            }
 
-                        // Validate amount
-                        if (!isValidAmount(pendingTransaction.bigIntAmount)) {
-                            errorMessage = R.string.invalid_amount
-                            validated = false
-                        }
-
-                        // Validate sufficient funds
-                        if (maxAvailable.compareTo(pendingTransaction.bigIntAmount) == -1) {
-                            errorMessage = R.string.insufficient_funds
-                            validated = false
-                        }
-                    }
-                    Pair(validated, errorMessage)
-                }.flatMap { errorPair ->
-                    if (errorPair.first) {
-                        // Validate address does not have unconfirmed funds
-                        isLastTxPending()
-                    } else {
-                        Observable.just(errorPair)
-                    }
-                }
+            // Validate sufficient funds
+            if (maxAvailable.compareTo(pendingTransaction.bigIntAmount) == -1) {
+                errorMessage = R.string.insufficient_funds
+                validated = false
+            }
+            Observable.just(Pair(validated, errorMessage))
+        }.flatMap { errorPair ->
+            if (errorPair.first) {
+                // Validate address does not have unconfirmed funds
+                isLastTxPending().toObservable()
+            } else {
+                Observable.just(errorPair)
+            }
         }
     }
 

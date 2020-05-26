@@ -10,9 +10,7 @@ import com.blockchain.swap.nabu.api.trade.TransactionStateAdapter
 import com.blockchain.swap.nabu.datamanagers.AnalyticsNabuUserReporterImpl
 import com.blockchain.swap.nabu.datamanagers.AnalyticsWalletReporter
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CustodialWalletManagerSwitcher
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.StubCustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
@@ -32,8 +30,6 @@ import com.blockchain.swap.nabu.models.nabu.KycStateAdapter
 import com.blockchain.swap.nabu.models.nabu.KycTierStateAdapter
 import com.blockchain.swap.nabu.models.nabu.UserCampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.UserStateAdapter
-import com.blockchain.swap.nabu.service.NabuCoinifyAccountCreator
-import com.blockchain.swap.nabu.service.NabuCoinifyAccountService
 import com.blockchain.swap.nabu.service.NabuMarketsService
 import com.blockchain.swap.nabu.service.NabuService
 import com.blockchain.swap.nabu.service.NabuTierService
@@ -44,9 +40,6 @@ import com.blockchain.swap.nabu.service.TradeLimitService
 import com.blockchain.swap.nabu.status.KycTiersQueries
 import com.blockchain.swap.nabu.stores.NabuSessionTokenStore
 import org.koin.dsl.module.applicationContext
-import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
-import piuk.blockchain.androidbuysell.repositories.AccessTokenStore
-import piuk.blockchain.androidbuysell.services.CoinifyService
 import retrofit2.Retrofit
 
 val nabuModule = applicationContext {
@@ -81,15 +74,14 @@ val nabuModule = applicationContext {
         }
 
         factory {
-            CustodialWalletManagerSwitcher(
-                mockCustodialWalletManager = StubCustodialWalletManager(),
-                liveCustodialWalletManager = LiveCustodialWalletManager(
-                    nabuService = get(),
-                    authenticator = get(),
-                    paymentAccountMapperMappers = mapOf(
-                        "EUR" to get("EUR"), "GBP" to get("GBP")
-                    )
-                )
+            LiveCustodialWalletManager(
+                nabuService = get(),
+                authenticator = get(),
+                simpleBuyPrefs = get(),
+                paymentAccountMapperMappers = mapOf(
+                    "EUR" to get("EUR"), "GBP" to get("GBP")
+                ),
+                featureFlag = get("ff_card_payments")
             )
         }.bind(CustodialWalletManager::class)
 
@@ -115,20 +107,6 @@ val nabuModule = applicationContext {
         }.bind(WalletReporter::class)
 
         factory {
-            NabuCoinifyAccountService(
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get(),
-                get()
-            ) as NabuCoinifyAccountCreator
-        }
-
-        factory {
             get<Retrofit>("nabu").create(Nabu::class.java)
         }
 
@@ -149,7 +127,13 @@ val nabuModule = applicationContext {
 
     bean { NabuService(get("nabu")) }
 
-    bean { RetailWalletTokenService(get(), getProperty("api-code"), get("kotlin")) }
+    bean {
+        RetailWalletTokenService(
+            environmentConfig = get(),
+            apiCode = getProperty("api-code"),
+            retrofit = get("kotlin")
+        )
+    }
 
     context("Payload") {
 
@@ -172,22 +156,14 @@ val nabuModule = applicationContext {
     }
 }
 
-val coinifyModule = applicationContext {
-
-    context("Payload") {
-
-        bean { AccessTokenStore() }
-
-        factory { CoinifyDataManager(get(), get(), get()) }
-
-        factory { CoinifyService(get(), get("kotlin"), get()) }
-    }
-}
-
 val authenticationModule = applicationContext {
     context("Payload") {
         factory {
-            NabuAuthenticator(get(), get()) as Authenticator
+            NabuAuthenticator(
+                nabuToken = get(),
+                nabuDataManager = get(),
+                crashLogger = get()
+            ) as Authenticator
         }
     }
 }

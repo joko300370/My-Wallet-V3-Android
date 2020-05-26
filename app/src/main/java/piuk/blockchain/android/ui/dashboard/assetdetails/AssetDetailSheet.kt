@@ -2,9 +2,10 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import androidx.appcompat.widget.AppCompatTextView
 import android.view.View
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.extensions.exhaustive
 import com.blockchain.preferences.CurrencyPrefs
@@ -23,12 +24,15 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
+import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.AssetTokens
+import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -57,12 +61,13 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     interface Host : SlidingModalBottomDialog.Host {
         fun gotoSendFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
         fun goToReceiveFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
-        fun gotoActivityFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
+        fun gotoActivityFor(account: CryptoAccount)
         fun gotoSwap(fromCryptoCurrency: CryptoCurrency, filter: AssetFilter)
     }
 
     override val host: Host by lazy {
-        super.host as? Host ?: throw IllegalStateException("Host fragment is not a AssetDetailSheet.Host")
+        super.host as? Host ?: throw IllegalStateException(
+            "Host fragment is not a AssetDetailSheet.Host")
     }
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -88,14 +93,15 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             configureTabs(view.chart_price_periods)
 
             assetDetailsViewModel.token.accept(token)
-            current_price_title.text = getString(R.string.dashboard_price_for_asset, cryptoCurrency.displayTicker)
+            current_price_title.text =
+                getString(R.string.dashboard_price_for_asset, cryptoCurrency.displayTicker)
 
-            compositeDisposable += assetDetailsViewModel.balanceMap
+            compositeDisposable += assetDetailsViewModel.assetDisplayDetails
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onError = { },
                     onNext = { map ->
-                        onGotBalances(view, map)
+                        onGotAssetDetails(view, map)
                     }
                 )
 
@@ -133,25 +139,33 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         }
     }
 
-    private fun onGotBalances(view: View, balanceMap: BalanceMap) {
+    private fun onGotAssetDetails(view: View, assetDetails: AssetDisplayMap) {
         with(view) {
 
             asset_list.layoutManager = LinearLayoutManager(requireContext())
-
+            asset_list.addItemDecoration(
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             val itemList = mutableListOf<AssetDetailItem>()
 
-            balanceMap[AssetFilter.Wallet]?.let {
+            assetDetails[AssetFilter.Wallet]?.let {
                 itemList.add(
-                    AssetDetailItem(AssetFilter.Wallet, token, it.first, it.second)
+                    AssetDetailItem(AssetFilter.Wallet, token, it.cryptoValue, it.fiatValue,
+                        it.actions, it.interestRate)
                 )
             }
 
-            balanceMap[AssetFilter.Custodial]?.let {
-                if (!it.first.isZero) {
-                    itemList.add(
-                        AssetDetailItem(AssetFilter.Custodial, token, it.first, it.second)
-                    )
-                }
+            assetDetails[AssetFilter.Custodial]?.let {
+                itemList.add(
+                    AssetDetailItem(AssetFilter.Custodial, token, it.cryptoValue, it.fiatValue,
+                        it.actions, it.interestRate)
+                )
+            }
+
+            assetDetails[AssetFilter.Interest]?.let {
+                itemList.add(
+                    AssetDetailItem(AssetFilter.Interest, token, it.cryptoValue, it.fiatValue,
+                        it.actions, it.interestRate)
+                )
             }
 
             asset_list.adapter = AssetDetailAdapter(itemList, ::onAssetActionSelected, analytics)
@@ -161,11 +175,30 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private fun onAssetActionSelected(action: AssetAction, assetFilter: AssetFilter) {
         dismiss()
         when (action) {
-            AssetAction.ViewActivity -> host.gotoActivityFor(cryptoCurrency, assetFilter)
+            AssetAction.ViewActivity -> startActivityWithDefaultAccountForAsset(assetFilter)
             AssetAction.Send -> host.gotoSendFor(cryptoCurrency, assetFilter)
             AssetAction.Receive -> host.goToReceiveFor(cryptoCurrency, assetFilter)
             AssetAction.Swap -> host.gotoSwap(cryptoCurrency, assetFilter)
         }.exhaustive
+    }
+
+    // Temp patch fn until coincore and accounts are used throughout: TODO - remove this nonsense
+    private fun startActivityWithDefaultAccountForAsset(assetFilter: AssetFilter) {
+        val coincore: Coincore = get()
+        val asset = coincore[cryptoCurrency]
+
+        compositeDisposable += asset.accounts(assetFilter)
+            .subscribeBy(
+                onSuccess = { group ->
+                    val account = group.accounts
+                        .filterIsInstance<CryptoSingleAccount>()
+                        .firstOrNull { a -> a.isDefault } ?: group.accounts.firstOrNull()
+
+                    account?.let {
+                        host.gotoActivityFor(it)
+                    }
+                }
+            )
     }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {

@@ -516,7 +516,7 @@ class AccountPresenter internal constructor(
         }.toStringWithSymbol()
 
     private fun getBalanceFromBtcAddress(address: String) =
-        CryptoValue.fromMinor(CryptoCurrency.BTC, payloadDataManager.getAddressBalance(address))
+        payloadDataManager.getAddressBalance(address)
 
     private fun getBalanceFromBchAddress(address: String) =
         CryptoValue.fromMinor(CryptoCurrency.BCH, bchDataManager.getAddressBalance(address))

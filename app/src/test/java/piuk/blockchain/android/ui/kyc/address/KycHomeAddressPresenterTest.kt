@@ -8,7 +8,6 @@ import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
 import com.blockchain.swap.nabu.models.nabu.Scope
 import piuk.blockchain.android.ui.validOfflineToken
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.service.NabuCoinifyAccountCreator
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -26,7 +25,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
-import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 
 class KycHomeAddressPresenterTest {
@@ -36,7 +34,7 @@ class KycHomeAddressPresenterTest {
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
     private val phoneVerificationQuery: PhoneVerificationQuery = mock()
-    private val nabuCoinifyAccountCreator: NabuCoinifyAccountCreator = mock()
+
     private val tier2Decision: Tier2Decision = mock {
         on { progressToTier2() } `it returns` Single.just(Tier2Decision.NextStep.Tier2Continue)
     }
@@ -54,8 +52,7 @@ class KycHomeAddressPresenterTest {
             nabuToken,
             nabuDataManager,
             tier2Decision,
-            phoneVerificationQuery,
-            nabuCoinifyAccountCreator
+            phoneVerificationQuery
         )
         subject.initView(view)
     }
@@ -386,84 +383,6 @@ class KycHomeAddressPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).continueToTier2MoreInfoNeeded(countryCode)
-    }
-
-    @Test
-    fun `on continue clicked for BuySell campaign should invoke createCoinifyAccount`() {
-        // Arrange
-        val firstLine = "1"
-        val city = "2"
-        val state = "3"
-        val zipCode = "4"
-        val countryCode = "UK"
-        whenever(view.address)
-            .thenReturn(Observable.just(addressModel(firstLine, city, state, zipCode, countryCode)))
-        whenever(nabuCoinifyAccountCreator.createCoinifyAccountIfNeeded()).thenReturn(Completable.complete())
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            nabuDataManager.addAddress(
-                validOfflineToken,
-                firstLine,
-                null,
-                city,
-                state,
-                zipCode,
-                countryCode
-            )
-        ).thenReturn(Completable.complete())
-        givenPhoneNumberDoesNotNeedToBeVerified()
-        val jwt = "JWT"
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
-            .thenReturn(Single.just(getBlankNabuUser()))
-        // Act
-        subject.onContinueClicked(CampaignType.BuySell)
-        // Assert
-        verify(nabuCoinifyAccountCreator).createCoinifyAccountIfNeeded()
-        verify(view).showProgressDialog()
-        verify(view).dismissProgressDialog()
-        verify(view).continueToOnfidoSplash(countryCode)
-    }
-
-    @Test
-    fun `on continue for BuySell campaign but error on createCoinifyAccount should propagate the error to the view`() {
-        // Arrange
-        val firstLine = "1"
-        val city = "2"
-        val state = "3"
-        val zipCode = "4"
-        val countryCode = "UK"
-        whenever(view.address)
-            .thenReturn(Observable.just(addressModel(firstLine, city, state, zipCode, countryCode)))
-        whenever(nabuCoinifyAccountCreator.createCoinifyAccountIfNeeded()).thenReturn(Completable.error(Throwable()))
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            nabuDataManager.addAddress(
-                validOfflineToken,
-                firstLine,
-                null,
-                city,
-                state,
-                zipCode,
-                countryCode
-            )
-        ).thenReturn(Completable.complete())
-        givenPhoneNumberDoesNotNeedToBeVerified()
-        val jwt = "JWT"
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
-            .thenReturn(Single.just(getBlankNabuUser()))
-        // Act
-        subject.onContinueClicked(CampaignType.BuySell)
-        // Assert
-        verify(nabuCoinifyAccountCreator).createCoinifyAccountIfNeeded()
-        verify(view).showProgressDialog()
-        verify(view).dismissProgressDialog()
-        verify(view).showErrorToast(any())
     }
 
     private fun givenPhoneNumberDoesNotNeedToBeVerified() {

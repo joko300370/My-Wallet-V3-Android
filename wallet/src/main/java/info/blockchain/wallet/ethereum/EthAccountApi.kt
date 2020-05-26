@@ -9,7 +9,9 @@ import info.blockchain.wallet.ethereum.data.EthLatestBlock
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthPushTxRequest
 import info.blockchain.wallet.ethereum.data.EthTransaction
+import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.apache.commons.lang3.StringUtils
 
 class EthAccountApi(private val apiCode: ApiCode) {
@@ -19,13 +21,10 @@ class EthAccountApi(private val apiCode: ApiCode) {
     /**
      * Returns information about the latest block via a [EthLatestBlock] object.
      *
-     * @return An [Observable] wrapping an [EthLatestBlock]
+     * @return An [Single] wrapping an [EthLatestBlock]
      */
-    val latestBlock: Observable<EthLatestBlock>
-        get() = apiInstance.latestBlock
-
-    val latestBlockNumber: Observable<EthLatestBlockNumber>
-        get() = apiInstance.latestBlockNumber
+    val latestBlockNumber: Single<EthLatestBlockNumber>
+        get() = apiInstance.latestBlockNumber()
 
     /**
      * Lazily evaluates an instance of [EthEndpoints].
@@ -43,6 +42,18 @@ class EthAccountApi(private val apiCode: ApiCode) {
      */
     fun getEthAddress(addresses: List<String>): Observable<EthAddressResponseMap> {
         return apiInstance.getEthAccount(StringUtils.join(addresses, ","))
+    }
+
+    fun getEthTransactions(addresses: List<String>): Single<List<EthTransaction>> {
+        return apiInstance.getTransactions(StringUtils.join(addresses, ",")).map { it.transactions }
+    }
+
+    fun getLastEthTransaction(addresses: List<String>): Maybe<EthTransaction> {
+        return apiInstance.getTransactions(StringUtils.join(addresses, ","), 1).flatMapMaybe {
+            if (it.transactions.isNotEmpty())
+                Maybe.just(it.transactions[0])
+            else Maybe.empty()
+        }
     }
 
     /**

@@ -9,9 +9,6 @@ import android.content.pm.ShortcutManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
 import android.text.Editable
 import android.text.Html
 import android.text.SpannableString
@@ -23,54 +20,60 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
-import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.campaign.CampaignType
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.ContextCompat
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.ui.dialog.MaterialProgressDialog
+import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
+import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.crashlytics.android.answers.ContentViewEvent
 import com.mukesh.countrypicker.fragments.CountryPicker
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
-import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
-import piuk.blockchain.android.ui.fingerprint.FingerprintStage
-import piuk.blockchain.android.util.RootUtil
-import piuk.blockchain.androidcore.utils.PersistentPrefs
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.logging.Logging
-import androidx.appcompat.app.AppCompatActivity.RESULT_OK
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
-import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
-import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.R
 import piuk.blockchain.android.R.string.success
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.cards.CardDetailsActivity
+import piuk.blockchain.android.cards.RemoveCardBottomSheet
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
+import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
+import piuk.blockchain.android.ui.fingerprint.FingerprintStage
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
 import piuk.blockchain.android.ui.settings.preferences.ThePitStatusPreference
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
-
+import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
+class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBottomSheet.Host {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -89,6 +92,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
         findPreference<ThePitStatusPreference>("the_pit")
     }
 
+    private val cardsPref by lazy {
+        findPreference<PreferenceCategory>("cards")
+    }
+
     // Preferences
     private val fiatPref by lazy {
         findPreference<Preference>("fiat")
@@ -99,6 +106,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
     private val pushNotificationPref by lazy {
         findPreference<Preference>("push_notifications") as SwitchPreferenceCompat
     }
+
     // Security
     private val fingerprintPref by lazy {
         findPreference<Preference>("fingerprint") as SwitchPreferenceCompat
@@ -151,7 +159,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
 
         guidPref.onClick {
             showDialogGuid()
-            analytics.logEvent(SettingsAnalyticsEvents.WappetIdCopyClicked)
+            analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyClicked)
         }
         emailPref.onClick {
             onUpdateEmailClicked()
@@ -369,6 +377,49 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
         thePit?.setValue(isLinked)
     }
 
+    override fun updateCards(cards: List<PaymentMethod.Card>) {
+
+        val existingCards = prefsExistingCards()
+
+        val newCards = cards.filterNot { existingCards.contains(it.cardId) }
+
+        newCards.forEach { card ->
+            cardsPref?.addPreference(
+                CardPreference(context = requireContext(), card = card).apply {
+                    onClick {
+                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, "BOTTOM_SHEET")
+                    }
+                    key = card.cardId
+                }
+            )
+        }
+
+        cardsPref?.findPreference<CardPreference>(ADD_CARD_KEY)?.let {
+            it.order = it.order + newCards.size + 1
+        } ?: cardsPref?.addPreference(
+            CardPreference(context = requireContext(), card = PaymentMethod.Undefined).apply {
+                onClick {
+                    addNewCard()
+                }
+                key = ADD_CARD_KEY
+            }
+        )
+    }
+
+    private fun prefsExistingCards(): List<String> {
+        val existingCards = mutableListOf<String>()
+
+        for (i in (0 until (cardsPref?.preferenceCount ?: 0))) {
+            existingCards.add(cardsPref?.getPreference(i)?.key.takeIf { it != ADD_CARD_KEY } ?: continue)
+        }
+        return existingCards
+    }
+
+    private fun addNewCard() {
+        val intent = Intent(activity, CardDetailsActivity::class.java)
+        startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
+    }
+
     override fun setScreenshotsEnabled(enabled: Boolean) {
         screenshotPref?.isChecked = enabled
     }
@@ -571,7 +622,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
                 clipboard.primaryClip = clip
                 showCustomToast(R.string.copied_to_clipboard)
-                analytics.logEvent(SettingsAnalyticsEvents.WappetIdCopyCopied)
+                analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
             .setNegativeButton(R.string.no, null)
             .show()
@@ -639,9 +690,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_VALIDATE_PIN && resultCode == RESULT_OK) {
-            settingsPresenter.pinCodeValidatedForChange()
-        }
+        if (resultCode == RESULT_OK)
+            if (requestCode == REQUEST_CODE_VALIDATE_PIN) {
+                settingsPresenter.pinCodeValidatedForChange()
+            } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
+                updateCards(listOf(
+                    (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
+                ))
+            }
     }
 
     private fun showDialogEmailNotifications() {
@@ -912,6 +968,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView {
 
         internal const val EXTRA_SHOW_ADD_EMAIL_DIALOG = "show_add_email_dialog"
         internal const val EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog"
+        private const val ADD_CARD_KEY = "ADD_CARD_KEY"
+    }
+
+    override fun onCardRemoved(cardId: String) {
+        cardsPref?.findPreference<CardPreference>(cardId)?.let {
+            cardsPref?.removePreference(it)
+        }
+    }
+
+    override fun onSheetClosed() {}
+
+    override fun cardsEnabled(enabled: Boolean) {
+        cardsPref?.isVisible = enabled
     }
 }
 

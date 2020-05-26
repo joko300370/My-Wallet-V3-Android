@@ -130,4 +130,13 @@ val apiModule = applicationContext {
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
             .build()
     }
+
+    bean("everypay") {
+        Retrofit.Builder()
+            .baseUrl(get<EnvironmentUrls>().everypayHostUrl)
+            .client(get())
+            .addConverterFactory(get<MoshiConverterFactory>())
+            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .build()
+    }
 }

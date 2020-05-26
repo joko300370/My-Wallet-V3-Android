@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.blockchain.logging.CrashLogger;
+import com.blockchain.notifications.analytics.Analytics;
+
 import info.blockchain.wallet.api.Environment;
 import info.blockchain.wallet.api.data.UpdateType;
 import info.blockchain.wallet.exceptions.AccountLockedException;
@@ -99,6 +101,8 @@ public class PinEntryPresenterTest {
     private MobileNoticeRemoteConfig mobileNoticeRemoteConfig;
     @Mock
     private CrashLogger crashLogger;
+    @Mock
+    private Analytics analytics;
 
     @Before
     public void setUp() {
@@ -109,7 +113,8 @@ public class PinEntryPresenterTest {
                 .thenReturn(Arrays.asList(mockImageView, mockImageView, mockImageView, mockImageView));
         when(stringUtils.getString(anyInt())).thenReturn("string resource");
 
-        subject = new PinEntryPresenter(authDataManager,
+        subject = new PinEntryPresenter(analytics,
+                authDataManager,
                 appUtil,
                 prefsUtil,
                 payloadManager,

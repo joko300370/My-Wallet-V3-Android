@@ -8,16 +8,15 @@ import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.Erc20AddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
-import info.blockchain.wallet.ethereum.data.EthLatestBlock
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
+import info.blockchain.wallet.ethereum.data.TransactionState
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.ECKey
 import org.spongycastle.util.encoders.Hex
@@ -33,7 +32,6 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber
 import java.math.BigInteger
 import java.util.HashMap
-import kotlin.math.max
 
 class EthDataManager(
     private val payloadManager: PayloadManager,
@@ -95,8 +93,6 @@ class EthDataManager(
         }.subscribeOn(Schedulers.io())
     }
 
-    fun fetchEthAddressCompletable(): Completable = Completable.fromObservable(fetchEthAddress())
-
     /**
      * Returns the user's ETH account object if previously fetched.
      *
@@ -121,15 +117,10 @@ class EthDataManager(
      *
      * @return An [Observable] stream of [EthTransaction] objects
      */
-    fun getEthTransactions(): Observable<EthTransaction> {
-        ethDataStore.ethAddressResponse?.let {
-            return Observable.just(it)
-                .flatMapIterable { i -> i.getTransactions() }
-                .applySchedulers()
-        }
-
-        return Observable.empty()
-    }
+    fun getEthTransactions(): Single<List<EthTransaction>> =
+        ethDataStore.ethWallet?.account?.address?.let {
+            ethAccountApi.getEthTransactions(listOf(it)).applySchedulers()
+        } ?: Single.just(emptyList())
 
     /**
      * Returns whether or not the user's ETH account currently has unconfirmed transactions, and
@@ -139,28 +130,12 @@ class EthDataManager(
      *
      * @return An [Observable] wrapping a [Boolean]
      */
-    fun isLastTxPending(): Observable<Boolean> {
-        val lastTxHash = ethDataStore.ethWallet?.lastTransactionHash
-        // default 1 day
-        val lastTxTimestamp = max(ethDataStore.ethWallet?.lastTransactionTimestamp ?: 0L, 86400L)
-
-        // No previous transactions
-        if (lastTxHash == null || ethDataStore.ethAddressResponse?.getTransactions()?.size ?: 0 == 0)
-            return Observable.just(false)
-
-        // If last transaction still hasn't been processed after x amount of time, assume dropped
-        return Observable.zip(
-            hasLastTxBeenProcessed(lastTxHash),
-            isTransactionDropped(lastTxTimestamp),
-            BiFunction { lastTxProcessed: Boolean, isDropped: Boolean ->
-                if (lastTxProcessed) {
-                    false
-                } else {
-                    !isDropped
-                }
-            }
-        )
-    }
+    fun isLastTxPending(): Single<Boolean> =
+        ethDataStore.ethWallet?.account?.address?.let {
+            ethAccountApi.getLastEthTransaction(listOf(it)).map {
+                it.state.toLocalState() == TransactionState.PENDING
+            }.defaultIfEmpty(false).toSingle()
+        } ?: Single.just(false)
 
     /*
     If x time passed and transaction was not successfully mined, the last transaction will be
@@ -177,37 +152,17 @@ class EthDataManager(
             .flatMapObservable { Observable.just(it.size > 0) }
 
     /**
-     * Returns a [EthLatestBlock] object which contains information about the most recently
-     * mined block.
-     *
-     * @return An [Observable] wrapping an [EthLatestBlock]
-     */
-    fun getLatestBlock(): Observable<EthLatestBlock> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.just(EthLatestBlock())
-        } else {
-            rxPinning.call<EthLatestBlock> {
-                ethAccountApi.latestBlock
-                    .applySchedulers()
-            }
-        }
-
-    /**
      * Returns a [Number] representing the most recently
      * mined block.
      *
      * @return An [Observable] wrapping a [Number]
      */
-    fun getLatestBlockNumber(): Observable<EthLatestBlockNumber> =
+    fun getLatestBlockNumber(): Single<EthLatestBlockNumber> =
         if (environmentSettings.environment == Environment.TESTNET) {
             // TODO(eth testnet explorer coming soon)
-            Observable.just(EthLatestBlockNumber())
+            Single.just(EthLatestBlockNumber())
         } else {
-            rxPinning.call<EthLatestBlockNumber> {
-                ethAccountApi.latestBlockNumber
-                    .applySchedulers()
-            }
+            ethAccountApi.latestBlockNumber.applySchedulers()
         }
 
     /**
@@ -227,6 +182,14 @@ class EthDataManager(
                 ethAccountApi.getIfContract(address)
                     .applySchedulers()
             }
+        }
+
+    private fun String.toLocalState() =
+        when (this) {
+            "PENDING" -> TransactionState.PENDING
+            "CONFIRMED" -> TransactionState.CONFIRMED
+            "REPLACED" -> TransactionState.REPLACED
+            else -> TransactionState.UNKNOWN
         }
 
     /**
@@ -292,14 +255,9 @@ class EthDataManager(
     )
 
     fun getTransaction(hash: String): Observable<EthTransaction> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.just(EthTransaction())
-        } else {
-            rxPinning.call<EthTransaction> {
-                ethAccountApi.getTransaction(hash)
-                    .applySchedulers()
-            }
+        rxPinning.call<EthTransaction> {
+            ethAccountApi.getTransaction(hash)
+                .applySchedulers()
         }
 
     fun signEthTransaction(rawTransaction: RawTransaction, ecKey: ECKey): Observable<ByteArray> =

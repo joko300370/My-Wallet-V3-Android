@@ -53,7 +53,8 @@ class MetadataManagerTest {
         subject = MetadataManager(
             payloadDataManager,
             metadataInteractor,
-            metadataDerivation
+            metadataDerivation,
+            mock()
         )
         whenever(payloadDataManager.metadataCredentials).thenReturn(MetadataCredentials("8cdf0e8e-c7b1-4a6" +
                 "f-acb7-f1681d3abf97",

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/standard_margin"
+    android:paddingTop="@dimen/small_margin"
+    android:paddingEnd="@dimen/standard_margin"
+    android:paddingBottom="@dimen/small_margin">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_activity_description_title"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/activity_detail_description_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/item_activity_detail_description"
+        style="@style/Text.VeryLight.Semibold.16"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/miniscule_margin"
+        android:hint="@string/activity_detail_description_action"
+        android:imeOptions="actionDone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_activity_description_title" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

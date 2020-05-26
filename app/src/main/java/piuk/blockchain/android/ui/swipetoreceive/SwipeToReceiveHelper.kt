@@ -245,7 +245,7 @@ class SwipeToReceiveHelper(
         prefs.getValue(PersistentPrefs.KEY_SWIPE_TO_RECEIVE_ENABLED, true)
 
     private fun getBalanceOfBtcAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
-        payloadDataManager.getBalanceOfAddresses(addresses)
+        payloadDataManager.getBalanceOfBtcAddresses(addresses)
             .applySchedulers()
 
     private fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =

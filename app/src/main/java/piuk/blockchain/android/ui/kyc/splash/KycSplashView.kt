@@ -8,8 +8,6 @@ interface KycSplashView : View {
 
     fun goToNextKycStep(direction: NavDirections)
 
-    fun goToBuySellView()
-
     fun showError(message: String)
 
     fun onEmailNotVerified()

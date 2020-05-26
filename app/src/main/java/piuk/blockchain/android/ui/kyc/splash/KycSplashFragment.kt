@@ -12,7 +12,6 @@ import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
-import com.blockchain.swap.nabu.StartBuySell
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
@@ -38,8 +37,6 @@ import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_terms_an
 
 class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), KycSplashView {
 
-    private val startBuySell: StartBuySell by inject()
-
     private val presenter: KycSplashPresenter by inject()
 
     private val settingsDataManager: SettingsDataManager by inject()
@@ -64,7 +61,6 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         val campaignType = progressListener.campaignType
         logEvent(
             when (campaignType) {
-                CampaignType.BuySell,
                 CampaignType.Swap -> AnalyticsEvents.KycWelcome
                 CampaignType.Sunriver -> AnalyticsEvents.KycSunriverStart
                 CampaignType.Resubmission -> AnalyticsEvents.KycResubmission
@@ -74,7 +70,6 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         )
 
         val title = when (progressListener.campaignType) {
-            CampaignType.BuySell,
             CampaignType.Sunriver,
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
@@ -104,7 +99,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
             .subscribeBy(
                 onNext = {
                     analytics.logEvent(KYCAnalyticsEvents.VerifyIdentityStart)
-                    presenter.onCTATapped(progressListener.campaignType)
+                    presenter.onCTATapped()
                 },
                 onError = { Timber.e(it) }
             )
@@ -117,11 +112,6 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
 
     override fun goToNextKycStep(direction: NavDirections) =
         navigate(direction)
-
-    override fun goToBuySellView() {
-        activity?.finish()
-        startBuySell.startBuySellActivity(requireContext())
-    }
 
     override fun displayLoading(isLoading: Boolean) {
         progressDialog = if (isLoading) {

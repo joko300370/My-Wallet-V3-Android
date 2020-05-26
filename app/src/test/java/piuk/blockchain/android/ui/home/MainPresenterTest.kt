@@ -27,14 +27,10 @@ import org.junit.Test
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidbuysell.datamanagers.BuyDataManager
-import piuk.blockchain.androidbuysell.datamanagers.CoinifyDataManager
-import piuk.blockchain.androidbuysell.services.ExchangeService
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 
@@ -47,13 +43,9 @@ class MainPresenterTest {
     private val accessState: AccessState = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val credentialsWiper: CredentialsWiper = mock()
-    private val buyDataManager: BuyDataManager = mock()
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
     private val currencyState: CurrencyState = mock()
-    private val metadataManager: MetadataManager = mock()
     private val environmentSettings: EnvironmentConfig = mock()
-    private val coinifyDataManager: CoinifyDataManager = mock()
-    private val exchangeService: ExchangeService = mock()
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
     private val deepLinkProcessor: DeepLinkProcessor = mock()
@@ -96,13 +88,9 @@ class MainPresenterTest {
             accessState = accessState,
             credentialsWiper = credentialsWiper,
             payloadDataManager = payloadDataManager,
-            buyDataManager = buyDataManager,
             exchangeRateFactory = exchangeRateFactory,
             currencyState = currencyState,
-            metadataManager = metadataManager,
             environmentSettings = environmentSettings,
-            coinifyDataManager = coinifyDataManager,
-            exchangeService = exchangeService,
             kycStatusHelper = kycStatusHelper,
             lockboxDataManager = lockboxDataManager,
             deepLinkProcessor = deepLinkProcessor,
@@ -115,7 +103,8 @@ class MainPresenterTest {
             nabuDataManager = nabuDatamanager,
             crashLogger = crashLogger,
             simpleBuyAvailability = mock(),
-            cacheCredentialsWiper = mock()
+            cacheCredentialsWiper = mock(),
+            analytics = mock()
         )
 
         subject.attachView(view)

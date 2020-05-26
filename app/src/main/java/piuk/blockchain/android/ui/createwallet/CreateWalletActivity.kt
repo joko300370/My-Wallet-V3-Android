@@ -69,6 +69,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         RxTextView.afterTextChangeEvents(wallet_pass)
             .doOnNext {
                 showEntropyContainer()
+                presenter.logEventPasswordOneClicked()
                 presenter.calculateEntropy(it.editable().toString())
                 hideShowCreateButton(
                     it.editable().toString().length,
@@ -79,6 +80,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
         RxTextView.afterTextChangeEvents(wallet_pass_confirm)
             .doOnNext {
+                presenter.logEventPasswordTwoClicked()
                 hideShowCreateButton(
                     wallet_pass.getTextString().length,
                     it.editable().toString().length
@@ -86,6 +88,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             }
             .emptySubscribe()
 
+        email_address.setOnClickListener { presenter.logEventEmailClicked() }
         command_next.setOnClickListener { onNextClicked() }
 
         updateTosAndPrivacyLinks()
