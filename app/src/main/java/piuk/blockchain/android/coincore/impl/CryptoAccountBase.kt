@@ -12,9 +12,11 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccountGroup
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.PendingSend
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -53,7 +55,7 @@ class CustodialTradingAccount(
     val custodialWalletManager: CustodialWalletManager
 ) : CryptoSingleAccountBase() {
 
-    private val isConfigured = AtomicBoolean(false)
+    private val hasSeenFunds = AtomicBoolean(false)
 
     override val cryptoCurrencies = setOf(cryptoCurrency)
 
@@ -62,8 +64,8 @@ class CustodialTradingAccount(
 
     override val balance: Single<CryptoValue>
         get() = custodialWalletManager.getBalanceForAsset(cryptoAsset)
-            .doOnComplete { isConfigured.set(false) }
-            .doOnSuccess { isConfigured.set(true) }
+            .doOnComplete { hasSeenFunds.set(false) }
+            .doOnSuccess { hasSeenFunds.set(true) }
             .switchToSingleIfEmpty { Single.just(CryptoValue.zero(cryptoAsset)) }
             .onErrorReturn {
                 Timber.d("Unable to get non-custodial balance: $it")
@@ -78,9 +80,13 @@ class CustodialTradingAccount(
             .onErrorReturn { emptyList() }
 
     override val isFunded: Boolean
-        get() = isConfigured.get()
+        get() = hasSeenFunds.get()
 
     override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
+
+    override fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend {
+        TODO("Implement me")
+    }
 
     override val actions: AvailableActions
         get() = availableActions
@@ -137,6 +143,10 @@ abstract class CryptoSingleAccountNonCustodialBase : CryptoSingleAccountBase() {
         AssetAction.Receive,
         AssetAction.Swap
     )
+
+    override fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend {
+        TODO("Implement me")
+    }
 }
 
 // Currently only one custodial account is supported for each asset,

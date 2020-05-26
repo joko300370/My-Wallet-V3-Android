@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -31,6 +32,8 @@ interface CryptoSingleAccount : CryptoAccount {
     val receiveAddress: Single<String>
     val isDefault: Boolean
 
+    fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend
+
 //  Later, when we do send:
 //    interface PendingTransaction {
 //      fun computeFees(priority: FeePriority, pending: PendingTransaction): Single<PendingTransaction>
@@ -39,12 +42,27 @@ interface CryptoSingleAccount : CryptoAccount {
 //    }
 }
 
+interface PendingSend {
+    val sendingAccount: CryptoAccount
+    val address: ReceiveAddress
+    val amount: Money
+    val fee: Money
+    val notes: String
+}
+
+interface ReceiveAddress {
+    val label: String
+}
+
+interface CryptoAddress : ReceiveAddress{
+    val address: String
+    val asset: CryptoCurrency
+}
+
 interface CryptoAccountGroup : CryptoAccount {
     val accounts: List<CryptoAccount>
 }
 
-// todo delete
-typealias CryptoAccountsList = List<CryptoAccount>
 typealias CryptoSingleAccountList = List<CryptoSingleAccount>
 
 internal fun CryptoAccount.isCustodial(): Boolean =
