@@ -11,7 +11,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.thepit.PitLinking

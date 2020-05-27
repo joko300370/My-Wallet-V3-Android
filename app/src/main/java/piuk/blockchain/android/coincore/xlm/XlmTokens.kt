@@ -41,7 +41,6 @@ internal class XlmTokens(
     override val asset: CryptoCurrency
         get() = CryptoCurrency.XLM
 
-
     override fun initToken(): Completable =
         Completable.complete()
 

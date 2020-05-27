@@ -6,7 +6,7 @@ interface ReceiveAddress {
     val label: String
 }
 
-interface CryptoAddress : ReceiveAddress{
+interface CryptoAddress : ReceiveAddress {
     val address: String
     val asset: CryptoCurrency
 }
