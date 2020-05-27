@@ -2,8 +2,6 @@
 
 package com.blockchain.koin
 
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.preference.PreferenceManager
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
@@ -21,8 +19,9 @@ import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.EncryptedPrefs
+import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -75,8 +74,8 @@ import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.DeviceIdGenerator
 import piuk.blockchain.androidcore.utils.DeviceIdGeneratorImpl
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.UUIDGenerator
 import java.util.UUID
 
@@ -226,9 +225,6 @@ val coreModule = applicationContext {
     bean {
         PrefsUtil(
             store = get(),
-            // TODO where should the constant shared pref name go?
-            // TODO how to get the preference object in a cleaner way?
-            backupStore = (get() as Context).getSharedPreferences("shared_pref_backup", MODE_PRIVATE),
             idGenerator = get(),
             uuidGenerator = get()
         )
@@ -240,6 +236,7 @@ val coreModule = applicationContext {
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
         .bind(WalletStatus::class)
+        .bind(EncryptedPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 

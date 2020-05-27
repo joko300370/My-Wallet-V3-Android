@@ -518,7 +518,7 @@
         user\'s wallets.
     </string>
     <string name="enable_cloud_backup">Enable Cloud Backups</string>
-    <string name="enable_cloud_backup_summary">Store the encrypted backup in your Google Drive account,
+    <string name="enable_cloud_backup_summary">Store the encrypted backup in your Google account,
         if available. This allows you to restore your wallet after losing this device.
     </string>
     <string name="enable_screenshots">Enable Screenshots</string>

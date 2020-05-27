@@ -13,7 +13,6 @@ interface UUIDGenerator {
 
 class PrefsUtil(
     private val store: SharedPreferences,
-    private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
     private val uuidGenerator: UUIDGenerator
 ) : PersistentPrefs {
@@ -198,26 +197,45 @@ class PrefsUtil(
 
     // Encrypted prefs from backup
     override var backupEncryptedPassword: String?
-        get() = backupStore.getString(KEY_ENCRYPTED_PASSWORD, null)
-        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_PASSWORD, value).apply() }
+        get() = getValue(KEY_ENCRYPTED_PASSWORD)
+        set(value) {
+            value?.let { setValue(KEY_ENCRYPTED_PASSWORD, it) }
+        }
+
     override var backupEncryptedSharedKey: String?
-        get() = backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, null)
-        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_SHARED_KEY, value).apply() }
+        get() = getValue(KEY_ENCRYPTED_SHARED_KEY)
+        set(value) {
+            value?.let { setValue(KEY_ENCRYPTED_SHARED_KEY, it) }
+        }
+
     override var backupEncryptedGuid: String?
-        get() = backupStore.getString(KEY_ENCRYPTED_GUID, null)
-        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_GUID, value).apply() }
+        get() = getValue(KEY_ENCRYPTED_GUID)
+        set(value) {
+            value?.let { setValue(KEY_ENCRYPTED_GUID, value) }
+        }
+
     override var backupPinIdentifier: String?
-        get() = backupStore.getString(KEY_ENCRYPTED_PIN_KEY, null)
-        set(value) { backupStore.edit().putString(KEY_ENCRYPTED_PIN_KEY, value).apply() }
+        get() = getValue(KEY_ENCRYPTED_PIN_KEY)
+        set(value) {
+            value?.let { setValue(KEY_ENCRYPTED_PIN_KEY, value) }
+        }
+
     override var backupEnabled: Boolean
-        get() = backupStore.getBoolean(KEY_CLOUD_BACKUP_ENABLED, true)
-        set(value) { backupStore.edit().putBoolean(KEY_CLOUD_BACKUP_ENABLED, value).apply() }
+        get() = getValue(KEY_CLOUD_BACKUP_ENABLED, true)
+        set(value) {
+            setValue(KEY_CLOUD_BACKUP_ENABLED, value)
+        }
+
     override val hasBackup: Boolean
         get() = backupPinIdentifier != null && backupEncryptedPassword != null &&
-                backupEncryptedGuid != null && backupEncryptedSharedKey != null && backupEnabled
+            backupEncryptedGuid != null && backupEncryptedSharedKey != null && backupEnabled
 
     override fun clearBackup() {
-        backupStore.edit().clear().apply()
+        removeValue(KEY_ENCRYPTED_PASSWORD)
+        removeValue(KEY_ENCRYPTED_SHARED_KEY)
+        removeValue(KEY_ENCRYPTED_GUID)
+        removeValue(KEY_ENCRYPTED_PIN_KEY)
+        removeValue(KEY_CLOUD_BACKUP_ENABLED)
     }
 
     // Raw accessors
@@ -298,10 +316,13 @@ class PrefsUtil(
 
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_SELECTED_FIAT = "ccurrency" // Historical misspelling, don't update
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_PRE_IDV_DEVICE_ID = "pre_idv_device_id"
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_LOGGED_OUT = "logged_out"
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_SELECTED_CRYPTO = "KEY_CURRENCY_CRYPTO_STATE"
 
@@ -320,6 +341,7 @@ class PrefsUtil(
         private const val SWAP_DATE_KEY = "SWAP_DATE_KEY"
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
+
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_IS_DEVICE_ID_RANDOMISED = "random_device_id"
