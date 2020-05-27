@@ -161,6 +161,13 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="Text.Semibold.Light">
+        <item name="android:textColor">@color/grey_600</item>
+    </style>
+    <style name="Text.Semibold.Light.14">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="Text.Bold">
         <item name="fontFamily">@font/inter_bold</item>
     </style>

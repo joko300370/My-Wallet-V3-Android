@@ -8,4 +8,5 @@ interface DefaultLabels {
     fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getAssetMasterWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getAllWalletLabel(): String
+    fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String
 }

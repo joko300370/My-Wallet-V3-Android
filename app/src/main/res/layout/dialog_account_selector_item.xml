@@ -32,7 +32,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/asset_name"
-        style="@style/Text.Light.12"
+        style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@+id/wallet_name"
@@ -51,7 +51,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/wallet_balance_crypto"
-        style="@style/Text.Light.12"
+        style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"

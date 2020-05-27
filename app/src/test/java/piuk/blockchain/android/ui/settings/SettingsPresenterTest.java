@@ -176,7 +176,7 @@ public class SettingsPresenterTest extends RxTest {
         when(pitLinking.getState()).thenReturn(Observable.just(pitLinkState));
         when(featureFlag.getEnabled()).thenReturn(Single.just(false));
         when(cardsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
-        when(custodialWalletManager.updateSupportedCardTypes(any())).thenReturn(Completable.complete());
+        when(custodialWalletManager.updateSupportedCardTypes(anyString(), anyBoolean())).thenReturn(Completable.complete());
         when(custodialWalletManager.fetchUnawareLimitsCards(anyList()))
                 .thenReturn(Single.just(Collections.emptyList()));
 

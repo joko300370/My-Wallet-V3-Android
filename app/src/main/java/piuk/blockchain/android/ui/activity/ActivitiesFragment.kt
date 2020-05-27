@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,8 +45,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
-class ActivitiesFragment
-    : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
+class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
     AccountSelectSheet.Host, ActivityDetailsBottomSheet.Host, BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
@@ -164,7 +162,9 @@ class ActivitiesFragment
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    fiat_balance.text = it.toStringWithSymbol()
+                    fiat_balance.text =
+                        getString(R.string.common_spaced_strings, it.toStringWithSymbol(),
+                            it.currencyCode)
                 },
                 onError = {
                     Timber.e("Unable to get balance for ${account.label}")
@@ -277,7 +277,6 @@ class ActivitiesFragment
     }
 
     override fun onAccountSelected(account: CryptoAccount) {
-        analytics.logEvent(activityShown(account.label))
         model.process(AccountSelectedIntent(account, false))
     }
 

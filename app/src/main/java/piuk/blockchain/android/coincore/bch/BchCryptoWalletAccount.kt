@@ -43,6 +43,7 @@ internal class BchCryptoWalletAccount(
 
     override val activity: Single<ActivitySummaryList>
         get() = bchManager.getAddressTransactions(address, transactionFetchCount, transactionFetchOffset)
+            .onErrorReturn { emptyList() }
             .mapList {
                 BchActivitySummaryItem(
                     it,

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.logging.CrashLogger
+
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
@@ -63,11 +64,30 @@ internal abstract class AssetTokensBase(
                     .doOnSuccess { accounts.addAll(it) }
                     .ignoreElement()
             }
+            .then {
+                loadInterestAccounts(labels)
+                    .doOnSuccess { accounts.addAll(it) }
+                    .ignoreElement()
+            }
             .doOnError { Timber.e("Error loading accounts for ${asset.networkTicker}: $it") }
 
     abstract fun initToken(): Completable
 
     abstract fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList>
+
+    private fun loadInterestAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+        Single.fromCallable {
+            listOf(
+                CryptoInterestAccount(
+                    asset,
+                    labels.getDefaultInterestWalletLabel(asset),
+                    custodialManager,
+                    exchangeRates
+                )
+            )
+        }
+
+    override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
 
     private fun loadCustodialAccount(): Single<CryptoSingleAccountList> =
         Single.fromCallable {

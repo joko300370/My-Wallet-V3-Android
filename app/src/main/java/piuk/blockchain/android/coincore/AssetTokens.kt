@@ -10,7 +10,8 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 enum class AssetFilter {
     Total,
     Wallet,
-    Custodial
+    Custodial,
+    Interest
 }
 
 enum class AssetAction {
@@ -29,6 +30,7 @@ interface AssetTokens {
 
     fun defaultAccount(): Single<CryptoSingleAccount>
     fun accounts(filter: AssetFilter = AssetFilter.Total): Single<CryptoAccountGroup>
+    fun interestRate(): Single<Double>
 
     fun exchangeRate(): Single<FiatValue>
     fun historicRate(epochWhen: Long): Single<FiatValue>

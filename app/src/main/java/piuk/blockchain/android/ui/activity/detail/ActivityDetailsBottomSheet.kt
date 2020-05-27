@@ -166,7 +166,7 @@ class ActivityDetailsBottomSheet :
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PENDING)
                             R.string.activity_details_label_pending_execution
                         }
-                    else -> R.string.activity_details_empty
+                    else -> R.string.activity_details_label_confirming
                 })
                 status.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)

@@ -22,14 +22,17 @@ import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 data class AssetDetailItem(
     val assetFilter: AssetFilter,
     val tokens: AssetTokens,
     val crypto: CryptoValue,
     val fiat: FiatValue,
-    val actions: Set<AssetAction>
+    val actions: Set<AssetAction>,
+    val interestRate: Double
 )
 
 class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,16 +45,26 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         with(itemView) {
             icon.setCoinIcon(item.tokens.asset)
             asset_name.text = resources.getString(item.tokens.asset.assetName())
-            status_date.setText(
-                when (item.assetFilter) {
-                    AssetFilter.Total -> R.string.dashboard_asset_balance_total
-                    AssetFilter.Wallet -> R.string.dashboard_asset_balance_wallet
-                    AssetFilter.Custodial -> R.string.dashboard_asset_balance_custodial
-                }
-            )
-            setOnClickListenerDebounced { doShowMenu(item, onActionSelected, analytics) }
+            status_date.text = when (item.assetFilter) {
+                AssetFilter.Total -> resources.getString(R.string.dashboard_asset_balance_total)
+                AssetFilter.Wallet -> resources.getString(
+                    R.string.dashboard_asset_balance_wallet)
+                AssetFilter.Custodial -> resources.getString(
+                    R.string.dashboard_asset_balance_custodial)
+                AssetFilter.Interest -> resources.getString(
+                    R.string.dashboard_asset_balance_interest, item.interestRate)
+            }
 
-            asset_spend_locked.goneIf { item.assetFilter == AssetFilter.Wallet }
+            if (item.actions.isEmpty()) {
+                action_menu.invisible()
+            } else {
+                action_menu.visible()
+                setOnClickListenerDebounced { doShowMenu(item, onActionSelected, analytics) }
+            }
+
+            asset_spend_locked.goneIf {
+                item.assetFilter == AssetFilter.Wallet || item.assetFilter == AssetFilter.Interest
+            }
 
             asset_balance_crypto.text = item.crypto.toStringWithSymbol()
             asset_balance_fiat.text = item.fiat.toStringWithSymbol()

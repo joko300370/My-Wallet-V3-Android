@@ -36,4 +36,8 @@ val featureFlagsModule = applicationContext {
     factory("sunriver") {
         get<RemoteConfig>().featureFlag("android_sunriver_airdrop_enabled")
     }
+
+    factory("ff_interest_account") {
+        get<RemoteConfig>().featureFlag("interest_account_enabled")
+    }
 }

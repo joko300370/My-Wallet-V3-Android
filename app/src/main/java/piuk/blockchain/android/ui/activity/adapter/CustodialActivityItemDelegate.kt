@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.swap.nabu.datamanagers.OrderState
@@ -47,6 +46,10 @@ private class CustodialActivityItemViewHolder(
     ) {
         with(itemView) {
             icon.setIcon(tx.status)
+            if (tx.status != OrderState.PENDING_EXECUTION) {
+                icon.setAssetTint(tx.cryptoCurrency)
+            }
+
             tx_type.setTxLabel(tx.cryptoCurrency)
 
             status_date.setTxStatus(tx)
@@ -56,7 +59,8 @@ private class CustodialActivityItemViewHolder(
             if (tx.status == OrderState.FINISHED) {
                 asset_balance_crypto.text = tx.cryptoValue.toStringWithSymbol()
             } else {
-                asset_balance_crypto.text = context.getString(R.string.activity_custodial_pending_value)
+                asset_balance_crypto.text =
+                    context.getString(R.string.activity_custodial_pending_value)
             }
             setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, true) }
         }
@@ -66,9 +70,9 @@ private class CustodialActivityItemViewHolder(
         with(itemView) {
             if (txStatus == OrderState.FINISHED) {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
-                status_date.setTextColor(ContextCompat.getColor(context, R.color.black))
+                status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
                 asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.black))
-                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.black))
+                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
             } else {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
                 status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
@@ -79,22 +83,48 @@ private class CustodialActivityItemViewHolder(
     }
 }
 
+private fun ImageView.setAssetTint(cryptoCurrency: CryptoCurrency) {
+    setBackgroundResource(R.drawable.bkgd_tx_circle)
+    when (cryptoCurrency) {
+        CryptoCurrency.BTC -> {
+            background.setTint(ContextCompat.getColor(context, R.color.btc_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.btc))
+        }
+        CryptoCurrency.BCH -> {
+            background.setTint(ContextCompat.getColor(context, R.color.bch_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.bch))
+        }
+        CryptoCurrency.ETHER -> {
+            background.setTint(ContextCompat.getColor(context, R.color.ether_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.eth))
+        }
+        CryptoCurrency.PAX -> {
+            background.setTint(ContextCompat.getColor(context, R.color.pax_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.pax))
+        }
+        CryptoCurrency.XLM -> {
+            background.setTint(ContextCompat.getColor(context, R.color.xlm_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.xlm))
+        }
+        else -> {
+            // STX left, do nothing
+        }
+    }
+}
+
 private fun ImageView.setIcon(status: OrderState) =
-    setImageDrawable(
-        AppCompatResources.getDrawable(
-            context,
-            when (status) {
-                OrderState.FINISHED -> R.drawable.ic_tx_buy
-                OrderState.AWAITING_FUNDS,
-                OrderState.PENDING_CONFIRMATION,
-                OrderState.PENDING_EXECUTION -> R.drawable.ic_tx_confirming
-                OrderState.UNINITIALISED, // should not see these next ones ATM
-                OrderState.INITIALISED,
-                OrderState.UNKNOWN,
-                OrderState.CANCELED,
-                OrderState.FAILED -> R.drawable.ic_tx_buy
-            }
-        )
+    setImageResource(
+        when (status) {
+            OrderState.FINISHED -> R.drawable.ic_tx_buy
+            OrderState.AWAITING_FUNDS,
+            OrderState.PENDING_CONFIRMATION,
+            OrderState.PENDING_EXECUTION -> R.drawable.ic_tx_confirming
+            OrderState.UNINITIALISED, // should not see these next ones ATM
+            OrderState.INITIALISED,
+            OrderState.UNKNOWN,
+            OrderState.CANCELED,
+            OrderState.FAILED -> R.drawable.ic_tx_buy
+        }
     )
 
 private fun TextView.setTxLabel(cryptoCurrency: CryptoCurrency) {

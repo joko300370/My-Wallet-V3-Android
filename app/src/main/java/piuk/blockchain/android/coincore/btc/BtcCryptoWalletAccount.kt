@@ -34,14 +34,14 @@ internal class BtcCryptoWalletAccount(
     override val activity: Single<ActivitySummaryList>
         get() = Single.fromCallable {
             payloadDataManager.getAccountTransactions(address, transactionFetchCount, transactionFetchOffset)
-                    .map {
-                        BtcActivitySummaryItem(
-                            it,
-                            payloadDataManager,
-                            exchangeRates,
-                            this
-                        ) as ActivitySummaryItem
-                }
+                .map {
+                    BtcActivitySummaryItem(
+                        it,
+                        payloadDataManager,
+                        exchangeRates,
+                        this
+                    ) as ActivitySummaryItem
+            }
         }
         .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 

@@ -26,8 +26,8 @@ import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -377,10 +377,12 @@ class NabuService(retrofit: Retrofit) {
 
     fun getPaymentMethods(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
+        currency: String,
+        checkEligibility: Boolean
     ) = service.getPaymentMethods(
         authorization = sessionToken.authHeader,
-        currency = currency
+        currency = currency,
+        checkEligibility = checkEligibility
     ).wrapErrorMessage()
 
     fun getCards(
@@ -388,6 +390,26 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getCards(
         authorization = sessionToken.authHeader
     ).wrapErrorMessage()
+
+    fun getInterestRates(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestRates(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun getInterestAccountBalance(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAccountBalance(
+        authorization = sessionToken.authHeader,
+        cryptoSymbol = currency
+    ).flatMapMaybe {
+        when (it.code()) {
+            200 -> Maybe.just(it.body())
+            204 -> Maybe.empty()
+            else -> Maybe.error(HttpException(it))
+        }
+    }.wrapErrorMessage()
 
     companion object {
         internal const val CLIENT_TYPE = "APP"

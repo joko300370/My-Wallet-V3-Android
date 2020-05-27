@@ -19,6 +19,7 @@
     <color name="red_800">#99180F</color>
     <color name="red_900">#EA1F30</color>
 
+    <color name="orange_000">#FFF2E5</color>
     <color name="orange_100">#FAE4CD</color>
     <color name="orange_300">#FFC994</color>
     <color name="orange_400">#FFB266</color>
@@ -54,6 +55,8 @@
     <color name="blue_900">#0D3578</color>
     <color name="blue_1000">#4C18BA</color>
 
+    <color name="purple_000">#EFECFE</color>
+
     <color name="grey_100_with_opacity">#66DFE3EB</color>
     <color name="grey_800_with_opacity">#66353F52</color>
 
@@ -66,6 +69,12 @@
     <color name="teal_200">#AEE1E6</color>
     <color name="teal_300">#6CD0D9</color>
     <color name="teal_500">#12A5B2</color>
+
+    <color name="bch_bkgd">#E8F3DC</color>
+    <color name="pax_bkgd">#CCDCD5</color>
+    <color name="ether_bkgd">@color/purple_000</color>
+    <color name="btc_bkgd">@color/orange_000</color>
+    <color name="xlm_bkgd">@color/grey_000</color>
 
     <color name="btc">#FF9B22</color>
     <color name="bch">#8DC351</color>

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -82,7 +83,8 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
             }
         }
 
-        compositeDisposable += custodialWalletManager.fetchUnawareLimitsCards(emptyList()).subscribeBy(onSuccess = {
+        compositeDisposable += custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.PENDING,
+            CardStatus.ACTIVE)).subscribeBy(onSuccess = {
             availableCards = it
         })
 

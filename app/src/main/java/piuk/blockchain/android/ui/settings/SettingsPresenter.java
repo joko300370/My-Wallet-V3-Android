@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting;
 
 import io.reactivex.Single;
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
+
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
@@ -143,7 +144,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
                         .flatMap(enabled -> {
                             if (enabled) {
-                                return custodialWalletManager.updateSupportedCardTypes(getFiatUnits()).andThen(
+                                return custodialWalletManager.updateSupportedCardTypes(getFiatUnits(), true).andThen(
                                         custodialWalletManager.fetchUnawareLimitsCards(
                                                 Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)));
                             } else {

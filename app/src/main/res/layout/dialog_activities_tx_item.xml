@@ -25,18 +25,16 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         tools:text="Send BTC"
-        androidtext="Send BTC"
         app:layout_constraintStart_toEndOf="@id/icon"
         app:layout_constraintTop_toTopOf="@id/icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status_date"
-        style="@style/Text.Light.12"
+        style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@+id/tx_type"
         app:layout_constraintTop_toBottomOf="@+id/tx_type"
-        android:text="Confirming"
         tools:text="Confirming" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -47,19 +45,17 @@
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/tx_type"
-        android:text="$15,879.90"
         tools:text="$15,879.90" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/asset_balance_crypto"
-        style="@style/Text.Light.12"
+        style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/status_date"
         app:layout_constraintBottom_toBottomOf="@id/status_date"
-        android:text="1.638192 BTC"
         tools:text="1.638192 BTC" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

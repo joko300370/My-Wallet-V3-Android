@@ -353,6 +353,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             AssetFilter.Total -> throw IllegalStateException("The Send.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoSendFor(cryptoCurrency)
             AssetFilter.Custodial -> model.process(StartCustodialTransfer(cryptoCurrency))
+            AssetFilter.Interest -> throw IllegalStateException("The Send.Interest action is invalid")
         }.exhaustive
     }
 
@@ -361,6 +362,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             AssetFilter.Total -> throw IllegalStateException("The Receive.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoReceiveFor(cryptoCurrency)
             AssetFilter.Custodial -> throw IllegalStateException("The Receive.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException("The Receive.Interest action is invalid")
         }.exhaustive
 
     override fun gotoActivityFor(account: CryptoAccount) =
@@ -374,6 +376,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 targetCurrency = fromCryptoCurrency.defaultSwapTo
             )
             AssetFilter.Custodial -> throw IllegalStateException("The Swap.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException("The Swap.Interest action is invalid")
         }.exhaustive
 
     override fun startBackupForTransfer() {

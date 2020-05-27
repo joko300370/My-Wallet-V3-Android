@@ -80,7 +80,7 @@ class LiveCustodialWalletManager(
                 fee = FiatValue.fromMinor(amount.currencyCode,
                     quoteResponse.fee.times(amountCrypto.amount.toLong())),
                 estimatedAmount = amountCrypto,
-                rate = CryptoValue(crypto, quoteResponse.rate.toBigInteger())
+                rate = FiatValue.fromMinor(amount.currencyCode, quoteResponse.rate)
             )
         }
 
@@ -246,9 +246,9 @@ class LiveCustodialWalletManager(
             .flatMapCompletable { deleteBuyOrder(it.id) }
     }
 
-    override fun updateSupportedCardTypes(fiatCurrency: String): Completable =
+    override fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable =
         authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency).doOnSuccess {
+            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
                 updateSupportedCards(it)
             }
         }.ignoreElement()
@@ -261,12 +261,12 @@ class LiveCustodialWalletManager(
             if (enabled)
                 allPaymentsMethods(fiatCurrency, isTier2Approved)
             else
-                onlyBank(fiatCurrency)
+                onlyBank(fiatCurrency, isTier2Approved)
         }
 
-    private fun onlyBank(fiatCurrency: String) =
+    private fun onlyBank(fiatCurrency: String, tier2Approved: Boolean) =
         authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency).map { response ->
+            nabuService.getPaymentMethods(it, fiatCurrency, tier2Approved).map { response ->
                 response.methods.firstOrNull { it.type == PaymentMethodType.BANK_ACCOUNT }
                     ?.let { paymentMethodResponse ->
                         listOf(PaymentMethod.BankTransfer(
@@ -285,10 +285,13 @@ class LiveCustodialWalletManager(
         simpleBuyPrefs.updateSupportedCards(cardTypes.joinToString())
     }
 
-    private fun allPaymentsMethods(fiatCurrency: String, isTier2Approved: Boolean) = authenticator.authenticate {
+    private fun allPaymentsMethods(
+        fiatCurrency: String,
+        isTier2Approved: Boolean
+    ) = authenticator.authenticate {
         Singles.zip(
             nabuService.getCards(it).onErrorReturn { emptyList() },
-            nabuService.getPaymentMethods(it, fiatCurrency).doOnSuccess {
+            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
                 updateSupportedCards(it)
             }
         )
@@ -386,43 +389,63 @@ class LiveCustodialWalletManager(
             it.toBuyOrder()
         }
 
-    private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
-        PaymentMethod.Card(
-            cardId = id,
-            limits = cardLimits ?: throw java.lang.IllegalStateException(),
-            label = card?.label ?: "",
-            endDigits = card?.number ?: "",
-            partner = partner.toSupportedPartner(),
-            expireDate = card?.let {
-                Calendar.getInstance().apply {
-                    set(it.expireYear,
-                        it.expireMonth,
-                        0)
-                }.time
-            } ?: Date(),
-            cardType = card?.type ?: CardType.UNKNOWN,
-            status = state.toCardStatus()
-        )
-
-    private fun String.isActive(): Boolean =
-        toCardStatus() == CardStatus.ACTIVE
-
-    private fun String.isActiveOrExpired(): Boolean =
-        isActive() || toCardStatus() == CardStatus.EXPIRED
-
-    private fun String.toCardStatus(): CardStatus =
-        when (this) {
-            CardResponse.ACTIVE -> CardStatus.ACTIVE
-            CardResponse.BLOCKED -> CardStatus.BLOCKED
-            CardResponse.PENDING -> CardStatus.PENDING
-            CardResponse.CREATED -> CardStatus.CREATED
-            CardResponse.EXPIRED -> CardStatus.EXPIRED
-            else -> CardStatus.UNKNOWN
+    override fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double> =
+        authenticator.authenticate { sessionToken ->
+            nabuService.getInterestRates(sessionToken, crypto.networkTicker).map {
+                it.body()?.rate ?: 0.0
+            }
         }
 
-    companion object {
-        private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
+    override fun getInterestAccountDetails(
+        crypto: CryptoCurrency
+    ): Maybe<CryptoValue> =
+        authenticator.authenticateMaybe { sessionToken ->
+            nabuService.getInterestAccountBalance(sessionToken, crypto.networkTicker)
+                .map { accountBalanceResponse ->
+                    CryptoValue.fromMinor(
+                        currency = crypto,
+                        minor = accountBalanceResponse.balance.toBigInteger()
+                    )
+                }
+        }
+
+private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
+    PaymentMethod.Card(
+        cardId = id,
+        limits = cardLimits ?: throw java.lang.IllegalStateException(),
+        label = card?.label ?: "",
+        endDigits = card?.number ?: "",
+        partner = partner.toSupportedPartner(),
+        expireDate = card?.let {
+            Calendar.getInstance().apply {
+                set(it.expireYear,
+                    it.expireMonth,
+                    0)
+            }.time
+        } ?: Date(),
+        cardType = card?.type ?: CardType.UNKNOWN,
+        status = state.toCardStatus()
+    )
+
+private fun String.isActive(): Boolean =
+    toCardStatus() == CardStatus.ACTIVE
+
+private fun String.isActiveOrExpired(): Boolean =
+    isActive() || toCardStatus() == CardStatus.EXPIRED
+
+private fun String.toCardStatus(): CardStatus =
+    when (this) {
+        CardResponse.ACTIVE -> CardStatus.ACTIVE
+        CardResponse.BLOCKED -> CardStatus.BLOCKED
+        CardResponse.PENDING -> CardStatus.PENDING
+        CardResponse.CREATED -> CardStatus.CREATED
+        CardResponse.EXPIRED -> CardStatus.EXPIRED
+        else -> CardStatus.UNKNOWN
     }
+
+companion object {
+    private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
+}
 }
 
 private fun String.toSupportedPartner(): Partner =

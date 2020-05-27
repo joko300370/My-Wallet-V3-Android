@@ -85,7 +85,7 @@ interface CustodialWalletManager {
     // For test/dev
     fun cancelAllPendingBuys(): Completable
 
-    fun updateSupportedCardTypes(fiatCurrency: String): Completable
+    fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
@@ -103,6 +103,10 @@ interface CustodialWalletManager {
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
     fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?): Single<BuyOrder>
+
+    fun getInterestAccountDetails(crypto: CryptoCurrency): Maybe<CryptoValue>
+
+    fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
 }
 
 data class BuyOrder(
@@ -144,7 +148,7 @@ data class Quote(
     val date: Date,
     val fee: FiatValue,
     val estimatedAmount: CryptoValue,
-    val rate: CryptoValue
+    val rate: FiatValue
 )
 
 data class BankAccount(val details: List<BankDetail>)

@@ -62,6 +62,7 @@ private class NonCustodialActivityItemViewHolder(
         with(itemView) {
             if (tx.isConfirmed) {
                 icon.setDirectionIcon(tx.direction, tx.isFeeTransaction)
+                icon.setAssetTint(tx.cryptoCurrency)
                 status_date.text = Date(tx.timeStampMs).toFormattedDate()
             } else {
                 icon.setIsConfirming()
@@ -93,9 +94,9 @@ private class NonCustodialActivityItemViewHolder(
         with(itemView) {
             if (isConfirmed) {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
-                status_date.setTextColor(ContextCompat.getColor(context, R.color.black))
+                status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
                 asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.black))
-                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.black))
+                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
             } else {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
                 status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
@@ -106,14 +107,41 @@ private class NonCustodialActivityItemViewHolder(
     }
 }
 
+private fun ImageView.setAssetTint(cryptoCurrency: CryptoCurrency) {
+    setBackgroundResource(R.drawable.bkgd_tx_circle)
+    when (cryptoCurrency) {
+        CryptoCurrency.BTC -> {
+            background.setTint(ContextCompat.getColor(context, R.color.btc_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.btc))
+        }
+        CryptoCurrency.BCH -> {
+            background.setTint(ContextCompat.getColor(context, R.color.bch_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.bch))
+        }
+        CryptoCurrency.ETHER -> {
+            background.setTint(ContextCompat.getColor(context, R.color.ether_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.eth))
+        }
+        CryptoCurrency.PAX -> {
+            background.setTint(ContextCompat.getColor(context, R.color.pax_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.pax))
+        }
+        CryptoCurrency.XLM -> {
+            background.setTint(ContextCompat.getColor(context, R.color.xlm_bkgd))
+            drawable.setTint(ContextCompat.getColor(context, R.color.xlm))
+        }
+        else -> {
+            // STX left, do nothing
+        }
+    }
+}
+
 private fun ImageView.setDirectionIcon(
     direction: TransactionSummary.Direction,
     isFeeTransaction: Boolean
 ) {
-    setImageDrawable(
-        AppCompatResources.getDrawable(
-            context,
-            if (isFeeTransaction) {
+    setImageResource(
+        if (isFeeTransaction) {
                 R.drawable.ic_tx_sent
             } else {
                 when (direction) {
@@ -125,7 +153,6 @@ private fun ImageView.setDirectionIcon(
                     TransactionSummary.Direction.SWAP -> R.drawable.ic_tx_swap
                 }
             }
-        )
     )
 }
 

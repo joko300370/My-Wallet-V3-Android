@@ -2,6 +2,8 @@ package com.blockchain.swap.nabu.api.nabu
 
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
+import com.blockchain.swap.nabu.models.interest.InterestAccountBalanceResponse
+import com.blockchain.swap.nabu.models.interest.InterestResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
@@ -24,17 +26,17 @@ import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
 import com.blockchain.swap.nabu.models.simplebuy.ActivateCardResponse
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardResponse
+import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
-import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -285,7 +287,8 @@ internal interface Nabu {
     @GET(NABU_PAYMENT_METHODS)
     fun getPaymentMethods(
         @Header("authorization") authorization: String,
-        @Query("currency") currency: String
+        @Query("currency") currency: String,
+        @Query("checkEligibility") checkEligibility: Boolean
     ): Single<PaymentMethodsResponse>
 
     @GET(NABU_CARDS)
@@ -305,4 +308,16 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Body request: TransferRequest
     ): Completable
+
+    @GET(NABU_INTEREST_RATES)
+    fun getInterestRates(
+        @Header("authorization") authorization: String,
+        @Query("ccy") currency: String
+    ): Single<Response<InterestResponse>>
+
+    @GET(NABU_INTEREST_ACCOUNT_BALANCE)
+    fun getInterestAccountBalance(
+        @Header("authorization") authorization: String,
+        @Query("ccy") cryptoSymbol: String
+    ): Single<Response<InterestAccountBalanceResponse>>
 }
