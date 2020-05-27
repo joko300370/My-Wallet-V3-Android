@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.testutils.rxInit
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
@@ -34,15 +35,18 @@ class AssetDetailsCalculatorTest {
     private val custodialGroup: CryptoAccountGroup = mock()
     private val interestGroup: CryptoAccountGroup = mock()
     private val interestRate: Double = 5.0
+    private val interestEnabled: Boolean = true
 
     @Before
     fun setUp() {
-        calculator = AssetDetailsCalculator()
+        val featureFlagMock: FeatureFlag = mock()
+        calculator = AssetDetailsCalculator(featureFlagMock)
 
         whenever(token.accounts(AssetFilter.Total)).thenReturn(Single.just(totalGroup))
         whenever(token.accounts(AssetFilter.Wallet)).thenReturn(Single.just(nonCustodialGroup))
         whenever(token.accounts(AssetFilter.Custodial)).thenReturn(Single.just(custodialGroup))
         whenever(token.accounts(AssetFilter.Interest)).thenReturn(Single.just(interestGroup))
+        whenever(featureFlagMock.enabled).thenReturn(Single.just(interestEnabled))
     }
 
     @Test

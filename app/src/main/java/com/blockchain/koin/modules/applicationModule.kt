@@ -202,7 +202,7 @@ val applicationModule = applicationContext {
         }
 
         factory {
-            AssetDetailsCalculator()
+            AssetDetailsCalculator(get("ff_interest_account"))
         }
 
         factory {

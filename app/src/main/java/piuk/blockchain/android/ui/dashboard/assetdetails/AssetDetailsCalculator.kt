@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.remoteconfig.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -28,7 +29,7 @@ data class AssetDisplayInfo(
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
 
-class AssetDetailsCalculator {
+class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
     // input
     val token = BehaviorRelay.create<AssetTokens>()
     val timeSpan = BehaviorRelay.createDefault<TimeSpan>(TimeSpan.MONTH)
@@ -76,8 +77,9 @@ class AssetDetailsCalculator {
             assetTokens.accounts(AssetFilter.Wallet).mapDetails(),
             assetTokens.accounts(AssetFilter.Custodial).mapDetails(),
             assetTokens.accounts(AssetFilter.Interest).mapDetails(),
-            assetTokens.interestRate()
-        ) { fiatPrice, total, nonCustodial, custodial, interest, interestRate ->
+            assetTokens.interestRate(),
+            interestFeatureFlag.enabled
+        ) { fiatPrice, total, nonCustodial, custodial, interest, interestRate, interestEnabled ->
             val totalFiat = total.balance.toFiat(fiatPrice)
             val walletFiat = nonCustodial.balance.toFiat(fiatPrice)
             val custodialFiat = custodial.balance.toFiat(fiatPrice)
@@ -95,7 +97,7 @@ class AssetDetailsCalculator {
                     )
                 }
 
-                if (interest.shouldShow) {
+                if (interest.shouldShow && interestEnabled) {
                     put(AssetFilter.Interest,
                         AssetDisplayInfo(interest.balance, interestFiat, interest.actions,
                             interestRate))
