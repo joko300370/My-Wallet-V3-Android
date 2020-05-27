@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.PendingSend
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -87,7 +88,7 @@ class CustodialTradingAccount(
 
     override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend {
+    override fun createPendingSend(address: ReceiveAddress): PendingSend {
         TODO("Implement me")
     }
 
@@ -164,6 +165,10 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
+    override fun createPendingSend(address: ReceiveAddress): PendingSend {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override val actions: AvailableActions
         get() = availableActions
 
@@ -185,7 +190,7 @@ abstract class CryptoSingleAccountNonCustodialBase : CryptoSingleAccountBase() {
         AssetAction.Swap
     )
 
-    override fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend {
+    override fun createPendingSend(address: ReceiveAddress): PendingSend {
         TODO("Implement me")
     }
 }

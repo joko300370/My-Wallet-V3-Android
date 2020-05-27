@@ -6,6 +6,8 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.PendingSend
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -61,4 +63,8 @@ internal class EthCryptoWalletAccount(
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
+
+    override fun createPendingSend(address: ReceiveAddress): PendingSend {
+        TODO("Implement me")
+    }
 }

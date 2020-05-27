@@ -27,6 +27,7 @@ import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodType
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
+import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
 import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
@@ -409,43 +410,56 @@ class LiveCustodialWalletManager(
                 }
         }
 
-private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
-    PaymentMethod.Card(
-        cardId = id,
-        limits = cardLimits ?: throw java.lang.IllegalStateException(),
-        label = card?.label ?: "",
-        endDigits = card?.number ?: "",
-        partner = partner.toSupportedPartner(),
-        expireDate = card?.let {
-            Calendar.getInstance().apply {
-                set(it.expireYear,
-                    it.expireMonth,
-                    0)
-            }.time
-        } ?: Date(),
-        cardType = card?.type ?: CardType.UNKNOWN,
-        status = state.toCardStatus()
-    )
+    override fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String> =
+        authenticator.authenticateMaybe { sessionToken ->
+            nabuService.fetchPitSendToAddressForCrypto(sessionToken, crypto.networkTicker)
+                .flatMapMaybe { response ->
+                    if (response.state == State.ACTIVE) {
+                        Maybe.just(response.address)
+                    } else {
+                        Maybe.empty()
+                    }
+                }
+                .onErrorComplete()
+        }
 
-private fun String.isActive(): Boolean =
-    toCardStatus() == CardStatus.ACTIVE
+    private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
+        PaymentMethod.Card(
+            cardId = id,
+            limits = cardLimits ?: throw java.lang.IllegalStateException(),
+            label = card?.label ?: "",
+            endDigits = card?.number ?: "",
+            partner = partner.toSupportedPartner(),
+            expireDate = card?.let {
+                Calendar.getInstance().apply {
+                    set(it.expireYear,
+                        it.expireMonth,
+                        0)
+                }.time
+            } ?: Date(),
+            cardType = card?.type ?: CardType.UNKNOWN,
+            status = state.toCardStatus()
+        )
 
-private fun String.isActiveOrExpired(): Boolean =
-    isActive() || toCardStatus() == CardStatus.EXPIRED
+    private fun String.isActive(): Boolean =
+        toCardStatus() == CardStatus.ACTIVE
 
-private fun String.toCardStatus(): CardStatus =
-    when (this) {
-        CardResponse.ACTIVE -> CardStatus.ACTIVE
-        CardResponse.BLOCKED -> CardStatus.BLOCKED
-        CardResponse.PENDING -> CardStatus.PENDING
-        CardResponse.CREATED -> CardStatus.CREATED
-        CardResponse.EXPIRED -> CardStatus.EXPIRED
-        else -> CardStatus.UNKNOWN
+    private fun String.isActiveOrExpired(): Boolean =
+        isActive() || toCardStatus() == CardStatus.EXPIRED
+
+    private fun String.toCardStatus(): CardStatus =
+        when (this) {
+            CardResponse.ACTIVE -> CardStatus.ACTIVE
+            CardResponse.BLOCKED -> CardStatus.BLOCKED
+            CardResponse.PENDING -> CardStatus.PENDING
+            CardResponse.CREATED -> CardStatus.CREATED
+            CardResponse.EXPIRED -> CardStatus.EXPIRED
+            else -> CardStatus.UNKNOWN
+        }
+
+    companion object {
+        private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
     }
-
-companion object {
-    private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
-}
 }
 
 private fun String.toSupportedPartner(): Partner =

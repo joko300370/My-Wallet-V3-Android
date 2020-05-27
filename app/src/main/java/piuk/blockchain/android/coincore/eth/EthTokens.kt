@@ -8,8 +8,13 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AddressList
+import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
@@ -25,6 +30,7 @@ internal class EthTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
+    pitLinking: PitLinking,
     crashLogger: CrashLogger,
     rxBus: RxBus
 ) : AssetTokensBase(
@@ -33,6 +39,7 @@ internal class EthTokens(
     currencyPrefs,
     labels,
     custodialManager,
+    pitLinking,
     crashLogger,
     rxBus
 ) {
@@ -61,5 +68,18 @@ internal class EthTokens(
         if (event != AuthEvent.LOGIN) {
             ethDataManager.clearEthAccountDetails()
         }
+    }
+
+    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> {
+        require(account.cryptoCurrencies.contains(CryptoCurrency.ETHER))
+
+        // ETH Only supports transfer between non-custodial and exchange account at this time
+        if (account.isCustodial()) {
+            return Single.just(emptyList())
+        }
+
+        return getPitLinkingAddress()
+            .map { listOf(it) }
+            .toSingle(emptyList())
     }
 }

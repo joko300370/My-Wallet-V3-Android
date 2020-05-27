@@ -32,7 +32,7 @@ interface CryptoSingleAccount : CryptoAccount {
     val receiveAddress: Single<String>
     val isDefault: Boolean
 
-    fun createPendingSend(amount: CryptoValue, address: CryptoAddress): PendingSend
+    fun createPendingSend(address: ReceiveAddress): PendingSend
 
 //  Later, when we do send:
 //    interface PendingTransaction {
@@ -48,15 +48,6 @@ interface PendingSend {
     val amount: Money
     val fee: Money
     val notes: String
-}
-
-interface ReceiveAddress {
-    val label: String
-}
-
-interface CryptoAddress : ReceiveAddress{
-    val address: String
-    val asset: CryptoCurrency
 }
 
 interface CryptoAccountGroup : CryptoAccount {

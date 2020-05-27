@@ -9,14 +9,18 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.CryptoAccountGroup
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
+import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -32,6 +36,7 @@ internal abstract class AssetTokensBase(
     protected val currencyPrefs: CurrencyPrefs,
     private val labels: DefaultLabels,
     private val custodialManager: CustodialWalletManager,
+    private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     rxBus: RxBus
 ) : AssetTokens {
@@ -121,6 +126,13 @@ internal abstract class AssetTokensBase(
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
+
+    protected fun getPitLinkingAddress(): Maybe<ReceiveAddress> =
+        pitLinking.isPitLinked().filter { it }
+            .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
+            .map { address ->
+                ExchangeAddress(asset, address, labels)
+            }
 
     // These are constant ATM, but may need to change this so hardcode here
     protected val transactionFetchCount = 50
