@@ -36,7 +36,10 @@ android {
         buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
-        manifestPlaceholders = [FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string]
+        manifestPlaceholders = [
+                FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string,
+                BACKUP_API_KEY: buildProperties.secrets['googleBackupApiKey'].string
+        ]
         resConfigs 'en',
                 'cs',
                 'de',

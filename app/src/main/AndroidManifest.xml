@@ -188,7 +188,7 @@
 
         <meta-data
             android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAIhXRjyyUl4PR4n06nfiO7FvBnkTGUs6pwo8ZlcQ" />
+            android:value="${BACKUP_API_KEY}" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
