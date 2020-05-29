@@ -5,6 +5,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
@@ -81,4 +82,7 @@ internal class EthTokens(
             .map { listOf(it) }
             .toSingle(emptyList())
     }
+
+    override fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidEthereumAddress(address)
 }

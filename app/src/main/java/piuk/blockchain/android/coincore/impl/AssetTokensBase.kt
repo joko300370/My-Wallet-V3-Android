@@ -16,6 +16,7 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.CryptoAccountGroup
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -132,6 +133,13 @@ internal abstract class AssetTokensBase(
             .map { address ->
                 ExchangeAddress(asset, address, labels)
             }
+
+    final override fun validateAddress(address: String): CryptoAddress? =
+        if(isValidAddress(address)) {
+            EnteredAddress(asset, address)
+        } else {
+            null
+        }
 
     // These are constant ATM, but may need to change this so hardcode here
     protected val transactionFetchCount = 50

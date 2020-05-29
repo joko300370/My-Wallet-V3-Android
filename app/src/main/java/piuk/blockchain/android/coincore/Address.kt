@@ -6,9 +6,17 @@ interface ReceiveAddress {
     val label: String
 }
 
-interface CryptoAddress : ReceiveAddress {
+abstract class CryptoAddress(
+    val asset: CryptoCurrency,
     val address: String
-    val asset: CryptoCurrency
-}
+) : ReceiveAddress
 
 typealias AddressList = List<ReceiveAddress>
+
+
+class AddressFactory(
+    coincore: Coincore
+) {
+    // Add APIs for converting from QR codes and use entered addressed to the
+    // correct bitpay and cryptoaddresses etc.
+}

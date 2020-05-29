@@ -17,10 +17,8 @@ internal class PaxCryptoWalletAccount(
     private val address: String,
     private val paxAccount: Erc20Account,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase() {
+) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.PAX) {
     override val isDefault: Boolean = true // Only one account, so always default
-
-    override val cryptoCurrencies = setOf(CryptoCurrency.PAX)
 
     override val balance: Single<CryptoValue>
         get() = paxAccount.getBalance()

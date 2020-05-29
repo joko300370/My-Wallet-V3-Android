@@ -6,8 +6,9 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.PendingSend
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SendTransaction
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -17,8 +18,7 @@ internal class EthCryptoWalletAccount(
     private val address: String,
     private val ethDataManager: EthDataManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase() {
-    override val cryptoCurrencies = setOf(CryptoCurrency.ETHER)
+) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.ETHER) {
 
     constructor(
         ethDataManager: EthDataManager,
@@ -64,7 +64,20 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createPendingSend(address: ReceiveAddress): PendingSend {
-        TODO("Implement me")
-    }
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        // Check type of Address here, and create Custodial or Swap or Sell or
+        // however this is going to work.
+        //
+        // For now, while I prototype this, just make the eth -> on chain eth object
+
+        balance.map { balance ->
+            EthSendTransaction(
+                ethDataManager,
+                this,
+                address as CryptoAddress,
+                balance,
+                ethDataManager.requireSecondPassword
+            )
+        }
+
 }

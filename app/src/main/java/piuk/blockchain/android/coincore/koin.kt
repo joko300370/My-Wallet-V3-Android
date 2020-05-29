@@ -30,6 +30,7 @@ val coincoreModule = applicationContext {
         bean {
             BtcTokens(
                 exchangeRates = get(),
+                environmentSettings = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadDataManager = get(),

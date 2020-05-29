@@ -68,4 +68,7 @@ internal class StxTokens(
 
     override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
         Single.just(emptyList())
+
+    override fun isValidAddress(address: String): Boolean =
+        false
 }

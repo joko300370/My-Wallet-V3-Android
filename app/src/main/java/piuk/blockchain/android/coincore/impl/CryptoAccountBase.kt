@@ -15,8 +15,8 @@ import piuk.blockchain.android.coincore.CryptoAccountGroup
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.PendingSend
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SendTransaction
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -27,11 +27,14 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
 
-abstract class CryptoSingleAccountBase : CryptoSingleAccount {
+abstract class CryptoSingleAccountBase(
+    cryptoCurrency: CryptoCurrency
+) : CryptoSingleAccount {
 
     protected abstract val exchangeRates: ExchangeRateDataManager
 
-    protected val cryptoAsset: CryptoCurrency
+    final override val cryptoCurrencies = setOf(cryptoCurrency)
+    final override val asset: CryptoCurrency
         get() = cryptoCurrencies.first()
 
     final override var hasTransactions: Boolean = false
@@ -56,27 +59,25 @@ class CustodialTradingAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager
-) : CryptoSingleAccountBase() {
+) : CryptoSingleAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
-
-    override val cryptoCurrencies = setOf(cryptoCurrency)
 
     override val receiveAddress: Single<String>
         get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
-        get() = custodialWalletManager.getBalanceForAsset(cryptoAsset)
+        get() = custodialWalletManager.getBalanceForAsset(asset)
             .doOnComplete { hasSeenFunds.set(false) }
             .doOnSuccess { hasSeenFunds.set(true) }
-            .switchToSingleIfEmpty { Single.just(CryptoValue.zero(cryptoAsset)) }
+            .switchToSingleIfEmpty { Single.just(CryptoValue.zero(asset)) }
             .onErrorReturn {
                 Timber.d("Unable to get non-custodial balance: $it")
-                CryptoValue.zero(cryptoAsset)
+                CryptoValue.zero(asset)
             }
 
     override val activity: Single<ActivitySummaryList>
-        get() = custodialWalletManager.getAllBuyOrdersFor(cryptoAsset)
+        get() = custodialWalletManager.getAllBuyOrdersFor(asset)
             .mapList { buyOrderToSummary(it) }
             .filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
@@ -87,9 +88,8 @@ class CustodialTradingAccount(
 
     override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): PendingSend {
-        TODO("Implement me")
-    }
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        Single.error(NotImplementedError("Write me!"))
 
     override val actions: AvailableActions
         get() = availableActions
@@ -137,8 +137,7 @@ internal class CryptoInterestAccount(
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountBase() {
-    override val cryptoCurrencies = setOf(cryptoCurrency)
+) : CryptoSingleAccountBase(cryptoCurrency) {
 
     private val isConfigured = AtomicBoolean(false)
 
@@ -146,13 +145,13 @@ internal class CryptoInterestAccount(
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
-        get() = custodialWalletManager.getInterestAccountDetails(cryptoAsset)
+        get() = custodialWalletManager.getInterestAccountDetails(asset)
             .doOnSuccess {
                 isConfigured.set(true)
             }.doOnComplete {
                 isConfigured.set(false)
             }.switchIfEmpty(
-                Single.just(CryptoValue.zero(cryptoAsset))
+                Single.just(CryptoValue.zero(asset))
             )
 
     override val activity: Single<ActivitySummaryList>
@@ -164,7 +163,7 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): PendingSend {
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> {
         TODO("not implemented")
     }
 
@@ -174,7 +173,9 @@ internal class CryptoInterestAccount(
     private val availableActions = emptySet<AssetAction>()
 }
 
-abstract class CryptoSingleAccountNonCustodialBase : CryptoSingleAccountBase() {
+abstract class CryptoSingleAccountNonCustodialBase(
+    cryptoCurrency: CryptoCurrency
+) : CryptoSingleAccountBase(cryptoCurrency) {
 
     override val isFunded: Boolean
         get() = false
@@ -189,7 +190,7 @@ abstract class CryptoSingleAccountNonCustodialBase : CryptoSingleAccountBase() {
         AssetAction.Swap
     )
 
-    override fun createPendingSend(address: ReceiveAddress): PendingSend {
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> {
         TODO("Implement me")
     }
 }

@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.EthAccountApi
+import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.Erc20AddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
@@ -13,7 +14,6 @@ import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.ethereum.data.TransactionState
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -25,6 +25,7 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -34,7 +35,7 @@ import java.math.BigInteger
 import java.util.HashMap
 
 class EthDataManager(
-    private val payloadManager: PayloadManager,
+    private val payloadDataManager: PayloadDataManager,
     private val ethAccountApi: EthAccountApi,
     private val ethDataStore: EthDataStore,
     private val walletOptionsDataManager: WalletOptionsDataManager,
@@ -260,15 +261,24 @@ class EthDataManager(
                 .applySchedulers()
         }
 
+    @Deprecated("Why pass the key in when we can derive it here? Use the other overload")
     fun signEthTransaction(rawTransaction: RawTransaction, ecKey: ECKey): Observable<ByteArray> =
         Observable.fromCallable {
             ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
         }
 
+    fun signEthTransaction(rawTransaction: RawTransaction, secondPassword: String = ""): Single<ByteArray> =
+        Single.fromCallable {
+            if (payloadDataManager.isDoubleEncrypted) {
+                payloadDataManager.decryptHDWallet(secondPassword)
+            }
+            val ecKey = EthereumAccount.deriveECKey(payloadDataManager.masterKey, 0)
+            ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
+        }
+
     fun pushEthTx(signedTxBytes: ByteArray): Observable<String> =
         if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.empty()
+            Observable.error(NotImplementedError("ETH Testnet not implemented"))
         } else {
             rxPinning.call<String> {
                 ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
@@ -281,11 +291,18 @@ class EthDataManager(
             }
         }
 
+    fun pushTx(signedTxBytes: ByteArray): Single<String> =
+        pushEthTx(signedTxBytes).singleOrError()
+
     fun setLastTxHashObservable(txHash: String, timestamp: Long): Observable<String> =
         rxPinning.call<String> {
             setLastTxHash(txHash, timestamp)
                 .applySchedulers()
         }
+
+    fun setLastTxHashNowSingle(txHash: String): Single<String> =
+        setLastTxHashObservable(txHash, System.currentTimeMillis())
+            .singleOrError()
 
     @Throws(Exception::class)
     private fun setLastTxHash(txHash: String, timestamp: Long): Observable<String> {
@@ -307,7 +324,7 @@ class EthDataManager(
 
                 if (ethWallet?.account == null || !ethWallet.account.isCorrect) {
                     try {
-                        val masterKey = payloadManager.payload?.hdWallets?.get(0)?.masterKey
+                        val masterKey = payloadDataManager.masterKey
                         ethWallet = EthereumWallet(masterKey, defaultLabel, defaultPaxLabel)
                         needsSave = true
                     } catch (e: HDWalletException) {
@@ -341,4 +358,7 @@ class EthDataManager(
             else -> throw IllegalArgumentException("Not an ERC20 token")
         }
     }
+
+    val requireSecondPassword: Boolean =
+        payloadDataManager.isDoubleEncrypted
 }

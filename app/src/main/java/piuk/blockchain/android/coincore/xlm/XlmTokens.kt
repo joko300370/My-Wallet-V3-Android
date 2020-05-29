@@ -6,6 +6,7 @@ import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressList
@@ -52,4 +53,7 @@ internal class XlmTokens(
 
     override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
         Single.just(emptyList())
+
+    override fun isValidAddress(address: String): Boolean =
+        xlmDataManager.isAddressValid(address)
 }

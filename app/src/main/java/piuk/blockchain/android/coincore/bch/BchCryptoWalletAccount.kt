@@ -22,8 +22,7 @@ internal class BchCryptoWalletAccount(
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters
-) : CryptoSingleAccountNonCustodialBase() {
-    override val cryptoCurrencies = setOf(CryptoCurrency.BCH)
+) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BCH) {
 
     override val balance: Single<CryptoValue>
         get() = bchManager.getBalance(address)

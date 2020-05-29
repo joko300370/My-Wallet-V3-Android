@@ -37,4 +37,7 @@ interface AssetTokens {
     fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries>
 
     fun canTransferTo(account: CryptoSingleAccount): Single<AddressList>
+
+    fun validateAddress(address: String): CryptoAddress?
+    fun isValidAddress(address: String): Boolean
 }

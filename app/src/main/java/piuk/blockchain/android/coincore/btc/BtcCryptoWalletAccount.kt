@@ -19,8 +19,7 @@ internal class BtcCryptoWalletAccount(
     private val payloadDataManager: PayloadDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase() {
-    override val cryptoCurrencies = setOf(CryptoCurrency.BTC)
+) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BTC) {
 
     override val balance: Single<CryptoValue>
         get() = payloadDataManager.getAddressBalanceRefresh(address)

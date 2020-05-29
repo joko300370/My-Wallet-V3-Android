@@ -5,12 +5,14 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -19,6 +21,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class BtcTokens(
     private val payloadDataManager: PayloadDataManager,
+    private val environmentSettings: EnvironmentSettings,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -75,4 +78,10 @@ internal class BtcTokens(
 
     override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
         Single.just(emptyList())
+
+    override fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidBitcoinAddress(
+            environmentSettings.bitcoinNetworkParameters,
+            address
+        )
 }
