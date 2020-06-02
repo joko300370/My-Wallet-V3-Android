@@ -20,10 +20,12 @@ import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class EthTokens(
     private val ethDataManager: EthDataManager,
+    private val feeDataManager: FeeDataManager,
     private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
@@ -58,6 +60,7 @@ internal class EthTokens(
             listOf(
                 EthCryptoWalletAccount(
                     ethDataManager,
+                    feeDataManager,
                     ethDataManager.getEthWallet()?.account ?: throw Exception("No ether wallet found"),
                     exchangeRates
                 )

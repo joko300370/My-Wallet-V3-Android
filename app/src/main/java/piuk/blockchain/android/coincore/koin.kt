@@ -75,6 +75,7 @@ val coincoreModule = applicationContext {
         bean {
             EthTokens(
                 ethDataManager = get(),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),

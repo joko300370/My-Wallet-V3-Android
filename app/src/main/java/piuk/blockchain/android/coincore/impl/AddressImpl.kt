@@ -12,13 +12,13 @@ internal class ExchangeAddress(
     override val label = labels.getDefaultExchangeWalletLabel(asset)
 }
 
-//internal class CustodialAddress(
+// internal class CustodialAddress(
 //    asset: CryptoCurrency,
 //    address: String,
 //    labels: DefaultLabels
-//) : CryptoAddress(asset, address) {
+// ) : CryptoAddress(asset, address) {
 //    override val label = labels.getDefaultCustodialWalletLabel(asset)
-//}
+// }
 
 internal class EnteredAddress(
     asset: CryptoCurrency,

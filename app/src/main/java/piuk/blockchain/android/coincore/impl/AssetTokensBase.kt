@@ -135,7 +135,7 @@ internal abstract class AssetTokensBase(
             }
 
     final override fun validateAddress(address: String): CryptoAddress? =
-        if(isValidAddress(address)) {
+        if (isValidAddress(address)) {
             EnteredAddress(asset, address)
         } else {
             null

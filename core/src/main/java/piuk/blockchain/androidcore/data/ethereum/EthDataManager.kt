@@ -174,6 +174,7 @@ class EthDataManager(
      * @param address The ETH address to be queried
      * @return An [Observable] returning true or false based on the address's contract status
      */
+    @Deprecated(message = "Use the Single<> version")
     fun getIfContract(address: String): Observable<Boolean> =
         if (environmentSettings.environment == Environment.TESTNET) {
             // TODO(eth testnet explorer coming soon)
@@ -184,6 +185,12 @@ class EthDataManager(
                     .applySchedulers()
             }
         }
+
+    fun isContractAddress(address: String): Single<Boolean> =
+        rxPinning.call<Boolean> {
+            ethAccountApi.getIfContract(address)
+                .applySchedulers()
+        }.singleOrError()
 
     private fun String.toLocalState() =
         when (this) {
@@ -260,6 +267,13 @@ class EthDataManager(
             ethAccountApi.getTransaction(hash)
                 .applySchedulers()
         }
+
+    fun getNonce(): Single<BigInteger> =
+        fetchEthAddress()
+            .singleOrError()
+            .map {
+                it.getNonce()
+            }
 
     @Deprecated("Why pass the key in when we can derive it here? Use the other overload")
     fun signEthTransaction(rawTransaction: RawTransaction, ecKey: ECKey): Observable<ByteArray> =

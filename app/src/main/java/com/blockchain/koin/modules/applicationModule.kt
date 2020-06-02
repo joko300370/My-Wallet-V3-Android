@@ -151,7 +151,7 @@ val applicationModule = applicationContext {
 
         factory {
             EthDataManager(
-                payloadManager = get(),
+                payloadDataManager = get(),
                 ethAccountApi = get(),
                 ethDataStore = get(),
                 walletOptionsDataManager = get(),

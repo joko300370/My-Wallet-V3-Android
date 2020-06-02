@@ -13,7 +13,6 @@ abstract class CryptoAddress(
 
 typealias AddressList = List<ReceiveAddress>
 
-
 class AddressFactory(
     coincore: Coincore
 ) {

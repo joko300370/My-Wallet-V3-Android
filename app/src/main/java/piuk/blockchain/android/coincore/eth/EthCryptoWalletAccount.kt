@@ -12,22 +12,26 @@ import piuk.blockchain.android.coincore.SendTransaction
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 internal class EthCryptoWalletAccount(
     override val label: String,
     private val address: String,
     private val ethDataManager: EthDataManager,
+    private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.ETHER) {
 
     constructor(
         ethDataManager: EthDataManager,
+        fees: FeeDataManager,
         jsonAccount: EthereumAccount,
         exchangeRates: ExchangeRateDataManager
     ) : this(
         jsonAccount.label,
         jsonAccount.address,
         ethDataManager,
+        fees,
         exchangeRates
     )
 
@@ -69,15 +73,13 @@ internal class EthCryptoWalletAccount(
         // however this is going to work.
         //
         // For now, while I prototype this, just make the eth -> on chain eth object
-
-        balance.map { balance ->
+        Single.just(
             EthSendTransaction(
                 ethDataManager,
+                fees,
                 this,
                 address as CryptoAddress,
-                balance,
                 ethDataManager.requireSecondPassword
             )
-        }
-
+        )
 }

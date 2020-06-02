@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
-import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
