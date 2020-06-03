@@ -5,12 +5,15 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -29,6 +32,7 @@ internal class BchTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
+    pitLinking: PitLinking,
     crashLogger: CrashLogger,
     rxBus: RxBus
 ) : AssetTokensBase(
@@ -37,6 +41,7 @@ internal class BchTokens(
     currencyPrefs,
     labels,
     custodialManager,
+    pitLinking,
     crashLogger,
     rxBus
 ) {
@@ -76,4 +81,13 @@ internal class BchTokens(
         }
         super.onLogoutSignal(event)
     }
+
+    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
+        Single.just(emptyList())
+
+    override fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidBitcoinCashAddress(
+            environmentSettings.bitcoinCashNetworkParameters,
+            address
+        )
 }

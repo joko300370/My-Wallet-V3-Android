@@ -8,9 +8,11 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -23,6 +25,7 @@ internal class StxTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
+    pitLinking: PitLinking,
     crashLogger: CrashLogger,
     rxBus: RxBus
 ) : AssetTokensBase(
@@ -31,6 +34,7 @@ internal class StxTokens(
     currencyPrefs,
     labels,
     custodialManager,
+    pitLinking,
     crashLogger,
     rxBus
 ) {
@@ -61,4 +65,10 @@ internal class StxTokens(
             exchangeRates = exchangeRates
         )
     }
+
+    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
+        Single.just(emptyList())
+
+    override fun isValidAddress(address: String): Boolean =
+        false
 }

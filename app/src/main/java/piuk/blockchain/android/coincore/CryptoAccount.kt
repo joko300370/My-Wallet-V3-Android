@@ -30,13 +30,9 @@ interface CryptoAccount {
 interface CryptoSingleAccount : CryptoAccount {
     val receiveAddress: Single<String>
     val isDefault: Boolean
+    val asset: CryptoCurrency
 
-//  Later, when we do send:
-//    interface PendingTransaction {
-//      fun computeFees(priority: FeePriority, pending: PendingTransaction): Single<PendingTransaction>
-//      fun validate(pending: PendingTransaction): Boolean
-//      fun execute(pending: PendingTransaction)
-//    }
+    fun createPendingSend(address: ReceiveAddress): Single<SendTransaction>
 }
 
 interface CryptoAccountGroup : CryptoAccount {

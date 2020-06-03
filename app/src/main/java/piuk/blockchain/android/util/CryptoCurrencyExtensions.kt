@@ -119,4 +119,7 @@ internal class ResourceDefaultLabels(
 
     override fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String =
         resources.getString(R.string.default_label_interest_wallet)
+
+    override fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String =
+        resources.getString(R.string.exchange_default_account_label, cryptoCurrency.displayTicker)
 }

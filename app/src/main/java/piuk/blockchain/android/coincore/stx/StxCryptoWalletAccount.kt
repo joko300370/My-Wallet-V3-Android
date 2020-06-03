@@ -11,9 +11,7 @@ class StxCryptoWalletAccount(
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase() {
-
-    override val cryptoCurrencies = setOf(CryptoCurrency.PAX)
+) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.STX) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
