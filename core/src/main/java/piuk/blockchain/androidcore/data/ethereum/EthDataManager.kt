@@ -373,6 +373,6 @@ class EthDataManager(
         }
     }
 
-    val requireSecondPassword: Boolean =
-        payloadDataManager.isDoubleEncrypted
+    val requireSecondPassword: Boolean
+        get() = payloadDataManager.isDoubleEncrypted
 }

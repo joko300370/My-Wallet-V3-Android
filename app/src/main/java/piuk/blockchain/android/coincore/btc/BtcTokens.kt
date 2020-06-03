@@ -12,8 +12,8 @@ import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
-import piuk.blockchain.android.data.api.EnvironmentSettings
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -21,7 +21,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class BtcTokens(
     private val payloadDataManager: PayloadDataManager,
-    private val environmentSettings: EnvironmentSettings,
+    private val environmentSettings: EnvironmentConfig,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
