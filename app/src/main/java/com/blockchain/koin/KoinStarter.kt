@@ -32,10 +32,12 @@ import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncements
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
 import piuk.blockchain.android.ui.start.startupUiModule
+import piuk.blockchain.android.ui.transfer.send.transferModule
 import timber.log.Timber
 
 object KoinStarter {
 
+    @Suppress("ConstantConditionIf")
     @JvmStatic
     fun start(application: Application) {
         stopKoin()
@@ -50,6 +52,7 @@ object KoinStarter {
                 applicationModule,
                 campaignModule,
                 coincoreModule,
+                transferModule,
                 okHttpModule,
                 coreModule,
                 coreUiModule,
