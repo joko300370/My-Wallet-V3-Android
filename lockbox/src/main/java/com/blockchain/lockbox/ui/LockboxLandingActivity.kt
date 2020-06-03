@@ -11,11 +11,11 @@ import android.text.style.ForegroundColorSpan
 import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.Group
+import com.blockchain.koin.scopedInject
 import com.blockchain.lockbox.R
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
@@ -25,7 +25,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 class LockboxLandingActivity : BaseMvpActivity<LockboxLandingView, LockboxLandingPresenter>(),
     LockboxLandingView {
 
-    private val presenter: LockboxLandingPresenter by inject()
+    private val presenter: LockboxLandingPresenter by scopedInject()
 
     private lateinit var toolbar: Toolbar
     private lateinit var loading: Group

@@ -3,22 +3,18 @@ package piuk.blockchain.android.ui.home
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
-import com.blockchain.swap.nabu.models.nabu.CampaignData
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.campaign.SunriverCampaignRegistration
-import piuk.blockchain.android.campaign.SunriverCardType
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.swap.nabu.models.nabu.CampaignData
+import com.blockchain.swap.nabu.models.nabu.KycState
+import com.blockchain.swap.nabu.models.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,6 +23,10 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.campaign.SunriverCampaignRegistration
+import piuk.blockchain.android.campaign.SunriverCardType
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
@@ -35,17 +35,17 @@ import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.logging.SecondPasswordEvent
+import piuk.blockchain.androidcoreui.utils.logging.secondPasswordEvent
 import timber.log.Timber
 
 interface MainView : MvpView, HomeNavigator {
@@ -110,7 +110,9 @@ class MainPresenter internal constructor(
 
     internal var cryptoCurrency: CryptoCurrency
         get() = currencyState.cryptoCurrency
-        set(v) { currencyState.cryptoCurrency = v }
+        set(v) {
+            currencyState.cryptoCurrency = v
+        }
 
     override fun onViewAttached() {
         if (!accessState.isLoggedIn) {
@@ -343,7 +345,7 @@ class MainPresenter internal constructor(
 
     private fun logEvents() {
         analytics.logEventOnce(AnalyticsEvents.WalletSignupFirstLogIn)
-        Logging.logCustom(SecondPasswordEvent(payloadDataManager.isDoubleEncrypted))
+        Logging.logEvent(secondPasswordEvent(payloadDataManager.isDoubleEncrypted))
     }
 
     internal fun clearLoginState() {
@@ -373,6 +375,17 @@ class MainPresenter internal constructor(
 
     fun onThePitMenuClicked() {
         showThePitOrPitLinkingView("")
+    }
+
+    fun onSimpleBuyClicked() {
+        compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                view?.showProgress()
+            }.doOnComplete {
+                view?.hideProgress()
+            }.subscribe {
+                view?.launchSimpleBuy()
+            }
     }
 
     private fun showThePitOrPitLinkingView(linkId: String) {

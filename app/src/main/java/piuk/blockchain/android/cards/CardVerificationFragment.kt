@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import kotlinx.android.synthetic.main.fragment_card_verification.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -20,7 +20,7 @@ class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState>()
         savedInstanceState: Bundle?
     ) = container?.inflate(R.layout.fragment_card_verification)
 
-    override val model: CardModel by inject()
+    override val model: CardModel by scopedInject()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

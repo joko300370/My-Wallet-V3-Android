@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.extensions.nextAfterOrNull
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.kyc.address.models.AddressDialog
 import piuk.blockchain.android.ui.kyc.address.models.AddressIntent
@@ -77,7 +78,7 @@ import kotlinx.android.synthetic.main.fragment_kyc_home_address.text_view_kyc_te
 class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddressPresenter>(),
     KycHomeAddressView {
 
-    private val presenter: KycHomeAddressPresenter by inject()
+    private val presenter: KycHomeAddressPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()

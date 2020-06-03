@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.kyc.countryselection.adapter.CountryCodeAdapter
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
@@ -41,7 +42,7 @@ internal class KycCountrySelectionFragment :
         arguments?.getSerializable(ARGUMENT_STATE_OR_COUNTRY) as? RegionType ?: RegionType.Country
     }
 
-    private val presenter: KycCountrySelectionPresenter by inject()
+    private val presenter: KycCountrySelectionPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val countryCodeAdapter = CountryCodeAdapter {

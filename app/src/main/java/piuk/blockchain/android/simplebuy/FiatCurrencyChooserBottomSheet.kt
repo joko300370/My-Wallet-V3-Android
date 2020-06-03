@@ -3,6 +3,7 @@ package piuk.blockchain.android.simplebuy
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,7 +24,7 @@ class FiatCurrencyChooserBottomSheet : SlidingModalBottomDialog() {
             ?: emptyList()
     }
 
-    private val settingsDataManager: SettingsDataManager by inject()
+    private val settingsDataManager: SettingsDataManager by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
 
     private val compositeDisposable = CompositeDisposable()

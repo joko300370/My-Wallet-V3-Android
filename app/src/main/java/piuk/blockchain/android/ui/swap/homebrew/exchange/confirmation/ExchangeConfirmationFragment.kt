@@ -12,7 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.annotations.CommonCode
 import piuk.blockchain.android.util.colorRes
-import com.blockchain.koin.injectActivity
+import com.blockchain.koin.scopedInject
+import com.blockchain.koin.scopedInjectActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
@@ -51,9 +52,9 @@ class ExchangeConfirmationFragment :
     BaseMvpFragment<ExchangeConfirmationView, ExchangeConfirmationPresenter>(),
     ExchangeConfirmationView {
 
-    private val presenter: ExchangeConfirmationPresenter by inject()
+    private val presenter: ExchangeConfirmationPresenter by scopedInject()
     private val analytics: Analytics by inject()
-    private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+    private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
     private val activityListener: HomebrewHostActivityListener by ParentActivityDelegate(this)
 
     private var progressDialog: MaterialProgressDialog? = null

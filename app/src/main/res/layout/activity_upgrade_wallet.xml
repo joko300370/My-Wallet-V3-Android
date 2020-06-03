@@ -16,7 +16,7 @@
             android:layout_margin="16dp"
             android:gravity="center_horizontal"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/vector_icon_blue" />
+            app:srcCompat="@drawable/ic_blockchain_logo" />
 
         <TextView
             android:id="@+id/upgrade_page_title"

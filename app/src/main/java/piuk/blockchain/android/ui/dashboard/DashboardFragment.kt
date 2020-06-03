@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
@@ -54,10 +55,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
-    override val model: DashboardModel by inject()
+    override val model: DashboardModel by scopedInject()
 
-    private val announcements: AnnouncementList by inject()
-    private val analyticsReporter: BalanceAnalyticsReporter by inject()
+    private val announcements: AnnouncementList by scopedInject()
+    private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(

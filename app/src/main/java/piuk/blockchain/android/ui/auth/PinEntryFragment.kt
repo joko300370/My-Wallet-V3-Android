@@ -50,6 +50,7 @@ import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.databinding.DataBindingUtil
+import com.blockchain.koin.scopedInject
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
@@ -60,7 +61,7 @@ import piuk.blockchain.android.util.AppUtil
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
     PinEntryView {
 
-    private val pinEntryPresenter: PinEntryPresenter by inject()
+    private val pinEntryPresenter: PinEntryPresenter by scopedInject()
     private val environmentConfig: EnvironmentConfig by inject()
     private val appUtil: AppUtil by inject()
 

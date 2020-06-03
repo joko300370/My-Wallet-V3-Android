@@ -125,7 +125,8 @@ class ActivityDetailsInteractor(
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
         Amount(item.cryptoValue),
-        Value(fiatValue),
+        Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
+        HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addFeeForTransaction(item),
         checkIfShouldAddDescription(item),
@@ -156,7 +157,8 @@ class ActivityDetailsInteractor(
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
         Amount(item.cryptoValue),
-        Value(fiatValue),
+        Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
+        HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),
@@ -187,7 +189,8 @@ class ActivityDetailsInteractor(
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
         Amount(item.cryptoValue),
-        Value(fiatValue),
+        Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
+        HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),
@@ -231,7 +234,8 @@ class ActivityDetailsInteractor(
     ) = listOfNotNull(
         Amount(item.cryptoValue),
         Fee(cryptoValue),
-        Value(fiatValue),
+        Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
+        HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),

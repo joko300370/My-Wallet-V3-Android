@@ -1,27 +1,10 @@
 package piuk.blockchain.androidcoreui.utils.logging
 
-import com.crashlytics.android.answers.CustomEvent
+fun recoverWalletEvent(successful: Boolean) =
+    LoggingEvent("Recover Wallet", mapOf("Success" to successful))
 
-class RecoverWalletEvent : CustomEvent("Recover Wallet") {
-
-    fun putSuccess(successful: Boolean): RecoverWalletEvent {
-        putCustomAttribute("Success", if (successful) "true" else "false")
-        return this
-    }
-}
-
-class PairingEvent : CustomEvent("Wallet Pairing") {
-
-    fun putSuccess(successful: Boolean): PairingEvent {
-        putCustomAttribute("Success", if (successful) "true" else "false")
-        return this
-    }
-
-    fun putMethod(pairingMethod: PairingMethod): PairingEvent {
-        putCustomAttribute("Pairing method", pairingMethod.name)
-        return this
-    }
-}
+fun pairingEvent(pairingMethod: PairingMethod) =
+    LoggingEvent("Wallet Pairing", mapOf("Pairing method" to pairingMethod.name))
 
 @Suppress("UNUSED_PARAMETER")
 enum class PairingMethod(name: String) {
@@ -30,12 +13,8 @@ enum class PairingMethod(name: String) {
     REVERSE("Reverse")
 }
 
-class ImportEvent(addressType: AddressType) : CustomEvent("Address Imported") {
-
-    init {
-        putCustomAttribute("Address Type", addressType.name)
-    }
-}
+fun importEvent(addressType: AddressType) =
+    LoggingEvent("Address Imported", mapOf("Address Type" to addressType.name))
 
 @Suppress("UNUSED_PARAMETER")
 enum class AddressType(name: String) {
@@ -43,69 +22,19 @@ enum class AddressType(name: String) {
     WATCH_ONLY("Watch Only")
 }
 
-class CreateAccountEvent(number: Int) : CustomEvent("Account Created") {
+fun createAccountEvent(number: Int) =
+    LoggingEvent("Account Created", mapOf("Number of Accounts" to number))
 
-    init {
-        putCustomAttribute("Number of Accounts", number)
-    }
-}
+fun appLaunchEvent(playServicesFound: Boolean) =
+    LoggingEvent("App Launched",
+        mapOf("Play Services found" to playServicesFound))
 
-class AppLaunchEvent(playServicesFound: Boolean) : CustomEvent("App Launched") {
+fun secondPasswordEvent(secondPasswordEnabled: Boolean) =
+    LoggingEvent("Second password event",
+        mapOf("Second password enabled" to secondPasswordEnabled))
 
-    init {
-        putCustomAttribute("Play Services found", if (playServicesFound) "true" else "false")
-    }
-}
+fun launcherShortcutEvent(type: String) =
+    LoggingEvent("Launcher Shortcut", mapOf("Launcher Shortcut used" to type))
 
-class SecondPasswordEvent(secondPasswordEnabled: Boolean) : CustomEvent("Second password event") {
-
-    init {
-        putCustomAttribute(
-            "Second password enabled",
-            if (secondPasswordEnabled) "true" else "false"
-        )
-    }
-}
-
-class ContactsEvent(eventType: ContactEventType) : CustomEvent("Contacts Event") {
-
-    init {
-        putCustomAttribute("Contacts event", eventType.name)
-    }
-}
-
-@Suppress("UNUSED_PARAMETER")
-enum class ContactEventType(name: String) {
-    RPR("Request for payment request sent"),
-    PR("Payment request sent"),
-    PAYMENT_BROADCASTED("Payment broadcasted"),
-    INVITE_SENT("Invite sent"),
-    INVITE_ACCEPTED("Invite accepted")
-}
-
-class ShapeShiftEvent : CustomEvent("ShapeShift Used") {
-
-    fun putPair(from: String, to: String): ShapeShiftEvent {
-        putCustomAttribute("Currency Pair", "$from to $to")
-        return this
-    }
-
-    fun putSuccess(successful: Boolean): ShapeShiftEvent {
-        putCustomAttribute("Success", if (successful) "true" else "false")
-        return this
-    }
-}
-
-class LauncherShortcutEvent(type: String) : CustomEvent("Launcher Shortcut") {
-
-    init {
-        putCustomAttribute("Launcher Shortcut used", type)
-    }
-}
-
-class WalletUpgradeEvent(successful: Boolean) : CustomEvent("Wallet Upgraded") {
-
-    init {
-        putCustomAttribute("Successful", if (successful) "true" else "false")
-    }
-}
+fun walletUpgradeEvent(successful: Boolean) =
+    LoggingEvent("Wallet Upgraded", mapOf("Successful" to successful))

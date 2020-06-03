@@ -4,7 +4,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import android.view.WindowManager
-import com.blockchain.koin.injectActivity
+import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.ui.password.SecondPasswordHandler
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.data.access.LogoutTimer
@@ -24,7 +24,7 @@ abstract class BaseAuthActivity : ToolBarActivity() {
 
     protected val prefs: PersistentPrefs by inject()
 
-    protected val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+    protected val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {

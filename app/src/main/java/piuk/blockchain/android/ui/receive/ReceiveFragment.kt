@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.ui.chooser.AccountChooserActivity
@@ -88,7 +89,7 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
     ReceiveView,
     NumericKeyboardCallback {
 
-    override val presenter: ReceivePresenter by inject()
+    override val presenter: ReceivePresenter by scopedInject()
     override val view: ReceiveView = this
 
     private val currencyState: CurrencyState by inject()

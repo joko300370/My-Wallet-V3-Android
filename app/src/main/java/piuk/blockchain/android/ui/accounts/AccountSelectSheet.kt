@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
@@ -35,8 +36,8 @@ class AccountSelectSheet : SlidingModalBottomDialog() {
     override val layoutResource: Int
         get() = R.layout.dialog_account_selector_sheet
 
-    private val coincore: Coincore by inject()
-    private val exchangeRates: ExchangeRateDataManager by inject()
+    private val coincore: Coincore by scopedInject()
+    private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()

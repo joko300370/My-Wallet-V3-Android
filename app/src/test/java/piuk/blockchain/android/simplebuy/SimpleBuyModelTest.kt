@@ -112,7 +112,7 @@ class SimpleBuyModelTest {
                 ))))
 
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.CreateOrder(false))
+        model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(isLoading = true))

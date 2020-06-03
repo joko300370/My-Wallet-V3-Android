@@ -10,13 +10,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.accounts.AsyncAllAccountList
+import com.blockchain.koin.scopedInject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.AccountReference
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.setCoinIcon
 import timber.log.Timber
@@ -46,7 +46,7 @@ class AccountChooserBottomDialog : BottomSheetDialogFragment() {
         super.onDetach()
     }
 
-    private val allAccountList: AsyncAllAccountList by inject()
+    private val allAccountList: AsyncAllAccountList by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,

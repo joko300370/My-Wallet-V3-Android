@@ -33,7 +33,8 @@ import android.widget.Spinner
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.AppCompatEditText
 import piuk.blockchain.android.util.errorIcon
-import com.blockchain.koin.injectActivity
+import com.blockchain.koin.scopedInject
+import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.serialization.JsonSerializableAccount
@@ -106,11 +107,11 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
     SendView,
     NumericKeyboardCallback {
 
-    override val presenter: SendPresenter<SendView> by inject()
+    override val presenter: SendPresenter<SendView> by scopedInject()
     override val view: SendView = this
 
     private val appUtil: AppUtil by inject()
-    private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+    private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     private val currencyState: CurrencyState by inject()
     private val stringUtils: StringUtils by inject()

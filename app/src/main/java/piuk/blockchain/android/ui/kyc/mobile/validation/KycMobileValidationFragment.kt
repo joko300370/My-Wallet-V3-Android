@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
@@ -46,7 +47,7 @@ class KycMobileValidationFragment :
     BaseMvpFragment<KycMobileValidationView, KycMobileValidationPresenter>(),
     KycMobileValidationView {
 
-    private val presenter: KycMobileValidationPresenter by inject()
+    private val presenter: KycMobileValidationPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val stringUtils: StringUtils by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)

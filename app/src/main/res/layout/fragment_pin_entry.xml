@@ -34,7 +34,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/vector_icon_blue" />
+            app:srcCompat="@drawable/ic_blockchain_logo" />
 
         <TextView
             android:id="@+id/titleBox"

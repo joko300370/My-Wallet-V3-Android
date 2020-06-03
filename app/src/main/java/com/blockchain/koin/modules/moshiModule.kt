@@ -1,17 +1,21 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.bigDecimal
+import com.blockchain.koin.bigInteger
+import com.blockchain.koin.kyc
+import com.blockchain.koin.nabu
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.module
 
-val moshiModule = applicationContext {
+val moshiModule = module {
 
-    bean {
+    single {
         MoshiBuilderInterceptorList(
             listOf(
-                get("BigDecimal"),
-                get("BigInteger"),
-                get("nabu"),
-                get("kyc")
+                get(bigDecimal),
+                get(bigInteger),
+                get(nabu),
+                get(kyc)
             )
         )
     }

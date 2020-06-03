@@ -15,7 +15,7 @@ object Versions {
     // Build tools and languages
     const val androidPlugin = "3.4.1"
     const val kotlin = "1.3.30"
-    const val googleServicesPlugin = "4.3.2"
+    const val googleServicesPlugin = "4.3.3"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
     const val ktlint = "0.27.0"
@@ -37,22 +37,23 @@ object Versions {
     const val lifecycle = "2.1.0"
 
     // Support Libraries
-    const val googleServices = "16.0.0"
+    const val googleServices = "17.1.0"
+    const val googleServicesPlaces = "17.0.0"
     const val googlePlayCore = "1.6.1"
-    const val firebaseMessaging = "17.3.3"
-    const val firebaseCore = "16.0.4"
-    const val firebaseConfig = "16.0.1"
-    const val firebaseDynamicLink = "16.1.2"
+    const val firebaseMessaging = "20.2.0"
+    const val firebaseCore = "17.4.2"
+    const val firebaseConfig = "19.1.0"
+    const val firebaseDynamicLink = "19.0.0"
     const val supportTesting = "1.0.2"
 
     // Networking, RxJava
     const val retrofit = "2.7.0"
     const val okHttp = "4.0.1"
-    const val mockWebServer = "v0.1.0"
+    const val mockWebServer = "v0.1.8"
     const val moshi = "1.8.0"
     const val gson = "2.8.5"
     const val jacksonCore = "2.10.0"
-    const val koin = "0.9.3"
+    const val koin = "2.1.5"
     const val rxJava = "2.2.11"
     const val rxKotlin = "2.4.0"
     const val rxAndroid = "2.1.1"
@@ -83,6 +84,7 @@ object Versions {
     const val circleIndicator = "1.2.2"
     const val bottomNav = "2.2.0"
     const val countryPicker = "1.1.7"
+
     // zxing 3.4.0 crashes with:
     //      "java.lang.NoSuchMethodError. No interface method sort(Ljava/util/Comparator;)V in class Ljava/util/List;"
     // List.sort() is not available on Android SDK < 24 so DO NOT UPGRADE until project target min is 24
@@ -100,8 +102,9 @@ object Versions {
     // Logging
     const val timber = "4.7.1"
     const val slf4j = "1.7.20"
-    const val crashlytics = "2.9.5"
-    const val fabricTools = "1.26.0"
+    const val firebaseCrashlytics = "17.0.0"
+    const val firebaseCrashlyticsPlugin = "2.1.0"
+    const val firebaseAnalytics = "17.4.2"
 
     // Debugging
     const val stetho = "1.5.1"
@@ -127,8 +130,10 @@ object Libraries {
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
-    const val googleServicesPlugin = "com.google.gms:google-services:${Versions.googleServicesPlugin}"
-    const val buildProperties = "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
+    const val googleServicesPlugin =
+        "com.google.gms:google-services:${Versions.googleServicesPlugin}"
+    const val buildProperties =
+        "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
@@ -138,13 +143,16 @@ object Libraries {
     const val gridLayout = "androidx.gridlayout:gridlayout:${Versions.gridlayout}"
     const val design = "com.google.android.material:material:${Versions.design}"
     const val v14 = "androidx.preference:preference:${Versions.preference}"
-    const val dynamicAnims = "androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
+    const val dynamicAnims =
+        "androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
     const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
-    const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
+    const val constraintLayout =
+        "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
 
     const val navigationControllerCore = "androidx.navigation:navigation-ui:${Versions.navigation}"
-    const val navigationControllerFragments = "androidx.navigation:navigation-fragment:${Versions.navigation}"
+    const val navigationControllerFragments =
+        "androidx.navigation:navigation-fragment:${Versions.navigation}"
     const val navigationControllerSafeArgsPlugin =
         "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
     const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
@@ -153,16 +161,22 @@ object Libraries {
     // Google & Firebase
     const val firebaseCore = "com.google.firebase:firebase-core:${Versions.firebaseCore}"
     const val firebaseConfig = "com.google.firebase:firebase-config:${Versions.firebaseConfig}"
-    const val firebaseMessaging = "com.google.firebase:firebase-messaging:${Versions.firebaseMessaging}"
-    const val firebaseDynamicLink = "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
-    const val googlePlayServicesBase = "com.google.android.gms:play-services-base:${Versions.googleServices}"
-    const val googlePlaces = "com.google.android.gms:play-services-places:${Versions.googleServices}"
+    const val firebaseMessaging =
+        "com.google.firebase:firebase-messaging:${Versions.firebaseMessaging}"
+    const val firebaseDynamicLink =
+        "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
+    const val googlePlayServicesBase =
+        "com.google.android.gms:play-services-base:${Versions.googleServices}"
+    const val googlePlaces =
+        "com.google.android.gms:play-services-places:${Versions.googleServicesPlaces}"
     const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
 
     // Networking, RxJava
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val retrofitJacksonConverter = "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
-    const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
+    const val retrofitJacksonConverter =
+        "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
+    const val retrofitRxMoshiConverter =
+        "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:2.5.0"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
@@ -175,14 +189,16 @@ object Libraries {
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"
-    const val koinAndroidArchitecture = "org.koin:koin-android-architecture:${Versions.koin}"
+
     const val koinTest = "org.koin:koin-test:${Versions.koin}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
     const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlin}"
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxBinding = "com.jakewharton.rxbinding2:rxbinding-kotlin:${Versions.rxBinding}"
-    const val rxBindingV4 = "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:${Versions.rxBinding}"
-    const val rxBindingV7 = "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:${Versions.rxBinding}"
+    const val rxBindingV4 =
+        "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:${Versions.rxBinding}"
+    const val rxBindingV7 =
+        "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:${Versions.rxBinding}"
     const val rxReplayShare = "com.jakewharton.rx2:replaying-share-kotlin:${Versions.rxReplayShare}"
     const val rxRelay = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxRelay}"
     const val rxFingerprint = "com.mtramin:rxfingerprint:${Versions.rxFingerprint}"
@@ -213,7 +229,8 @@ object Libraries {
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
-    const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
+    const val materialDatePicker =
+        "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 
     // Third Party SDKs
@@ -225,8 +242,11 @@ object Libraries {
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
     const val slf4j = "org.slf4j:slf4j-simple:${Versions.slf4j}"
     const val slf4jNoOp = "org.slf4j:slf4j-nop:${Versions.slf4j}"
-    const val crashlytics = "com.crashlytics.sdk.android:crashlytics:${Versions.crashlytics}@aar"
-    const val fabricTools = "io.fabric.tools:gradle:${Versions.fabricTools}"
+    const val firebaseCrashlytics =
+        "com.google.firebase:firebase-crashlytics:${Versions.firebaseCrashlytics}"
+    const val firebaseCrashlyticsPlugin =
+        "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsPlugin}"
+    const val firebaseAnalytics = "com.google.firebase:firebase-analytics:${Versions.firebaseAnalytics}"
 
     // Debugging
     const val stetho = "com.facebook.stetho:stetho:${Versions.stetho}"

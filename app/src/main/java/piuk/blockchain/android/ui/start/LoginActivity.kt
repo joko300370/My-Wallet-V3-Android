@@ -4,12 +4,12 @@ import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.koin.scopedInject
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -22,7 +22,7 @@ import timber.log.Timber
 
 class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
-    override val presenter: LoginPresenter by inject()
+    override val presenter: LoginPresenter by scopedInject()
     override val view: LoginView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {

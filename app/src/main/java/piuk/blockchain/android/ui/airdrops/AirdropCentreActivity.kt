@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_airdrops.*
 import kotlinx.android.synthetic.main.item_airdrop_header.view.*
 import kotlinx.android.synthetic.main.item_airdrop_status.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -26,7 +26,7 @@ class AirdropCentreActivity : MvpActivity<AirdropCentreView, AirdropCentrePresen
     AirdropCentreView,
     SlidingModalBottomDialog.Host {
 
-    override val presenter: AirdropCentrePresenter by inject()
+    override val presenter: AirdropCentrePresenter by scopedInject()
     override val view: AirdropCentreView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.extensions.mapList
 
 internal class BtcCryptoWalletAccount(
     override val label: String,
@@ -31,18 +32,19 @@ internal class BtcCryptoWalletAccount(
         ).singleOrError()
 
     override val activity: Single<ActivitySummaryList>
-        get() = Single.fromCallable {
-            payloadDataManager.getAccountTransactions(address, transactionFetchCount, transactionFetchOffset)
-                .map {
-                    BtcActivitySummaryItem(
-                        it,
-                        payloadDataManager,
-                        exchangeRates,
-                        this
-                    ) as ActivitySummaryItem
+        get() = payloadDataManager.getAccountTransactions(address, transactionFetchCount,
+            transactionFetchOffset)
+            .onErrorReturn { emptyList() }
+            .mapList {
+                BtcActivitySummaryItem(
+                    it,
+                    payloadDataManager,
+                    exchangeRates,
+                    this
+                ) as ActivitySummaryItem
+            }.doOnSuccess {
+                setHasTransactions(it.isNotEmpty())
             }
-        }
-        .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     constructor(
         jsonAccount: Account,

@@ -1,5 +1,6 @@
 package com.blockchain.swap.homebrew
 
+import com.blockchain.koin.bigDecimal
 import com.blockchain.swap.koin.swapModule
 import com.blockchain.swap.common.exchange.service.QuoteService
 import com.blockchain.swap.common.quote.ExchangeQuoteRequest
@@ -22,30 +23,31 @@ import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Test
-import org.koin.dsl.module.applicationContext
-import org.koin.standalone.StandAloneContext
-import org.koin.standalone.get
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
+import org.koin.test.get
 
 class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
 
     @Before
-    fun startKoin() {
-        StandAloneContext.startKoin(
-            listOf(
+    fun setUp() {
+        startKoin {
+            modules(listOf(
                 swapModule,
                 apiModule,
-                applicationContext {
-                    bean {
+                module {
+                    single {
                         MoshiBuilderInterceptorList(
                             listOf(
-                                get("BigDecimal")
+                                get(bigDecimal)
                             )
                         )
                     }
                 }
             )
-        )
+            )
+        }
     }
 
     @Test
@@ -64,7 +66,7 @@ class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
-                "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
+                    "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
         )
 
         verifyNoMoreInteractions(actualSocket)
@@ -122,12 +124,12 @@ class ExchangeRateWebSocketTest : AutoCloseKoinTest() {
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
-                "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
+                    "\"params\":{\"pairs\":[\"BTC-USD\"],\"type\":\"exchangeRates\"}}"
         )
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\",\"channel\":\"exchange_rate\"," +
-                "\"params\":{\"pairs\":[\"ETH-CAD\"],\"type\":\"exchangeRates\"}}"
+                    "\"params\":{\"pairs\":[\"ETH-CAD\"],\"type\":\"exchangeRates\"}}"
         )
     }
 

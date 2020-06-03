@@ -10,7 +10,8 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import kotlinx.android.synthetic.main.dialog_transfer_funds.*
 import piuk.blockchain.android.R
-import com.blockchain.koin.injectActivity
+import com.blockchain.koin.scopedInject
+import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.ui.password.SecondPasswordHandler
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
@@ -29,12 +30,12 @@ class ConfirmFundsTransferDialogFragment :
     BaseDialogFragment<ConfirmFundsTransferView, ConfirmFundsTransferPresenter>(),
     ConfirmFundsTransferView {
 
-    private val confirmFundsTransferPresenter: ConfirmFundsTransferPresenter by inject()
+    private val confirmFundsTransferPresenter: ConfirmFundsTransferPresenter by scopedInject()
     private val rxBus: RxBus by inject()
     private val currencyState: CurrencyState by inject()
-    private val exchangeRates: ExchangeRateDataManager by inject()
+    private val exchangeRates: ExchangeRateDataManager by scopedInject()
 
-    private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+    private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     private var progressDialog: MaterialProgressDialog? = null
 

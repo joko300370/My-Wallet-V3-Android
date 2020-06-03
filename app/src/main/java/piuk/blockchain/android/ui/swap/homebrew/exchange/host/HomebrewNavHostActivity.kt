@@ -3,19 +3,32 @@ package piuk.blockchain.android.ui.swap.homebrew.exchange.host
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.StringRes
-import com.google.android.material.snackbar.Snackbar
-import androidx.fragment.app.Fragment
-import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.accounts.AsyncAllAccountList
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.SwapAnalyticsEvents
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.swap.common.exchange.mvi.ChangeCryptoFromAccount
 import com.blockchain.swap.common.exchange.mvi.ChangeCryptoToAccount
 import com.blockchain.swap.common.exchange.mvi.SimpleFieldUpdateIntent
 import com.blockchain.swap.common.exchange.service.QuoteService
+import com.blockchain.swap.nabu.StartKyc
+import com.google.android.material.snackbar.Snackbar
+import info.blockchain.balance.AccountReference
+import info.blockchain.balance.CryptoCurrency
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import org.koin.android.ext.android.inject
+import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.swap.homebrew.exchange.AccountChooserBottomDialog
 import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeFragment
 import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeLimitState
 import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeMenuState
@@ -23,23 +36,10 @@ import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeModel
 import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeViewModelProvider
 import piuk.blockchain.android.ui.swap.homebrew.exchange.REQUEST_CODE_CHOOSE_RECEIVING_ACCOUNT
 import piuk.blockchain.android.ui.swap.homebrew.exchange.REQUEST_CODE_CHOOSE_SENDING_ACCOUNT
-import piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation.ExchangeConfirmationFragment
-import piuk.blockchain.android.ui.swap.logging.WebsocketConnectionFailureEvent
-import piuk.blockchain.android.ui.swap.showErrorDialog
-import com.blockchain.swap.nabu.StartKyc
-import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.notifications.analytics.SwapAnalyticsEvents
-import com.blockchain.notifications.analytics.logEvent
-import info.blockchain.balance.AccountReference
-import info.blockchain.balance.CryptoCurrency
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.architecture.ext.viewModel
-import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.swap.homebrew.exchange.AccountChooserBottomDialog
 import piuk.blockchain.android.ui.swap.homebrew.exchange.SwapInfoBottomDialog
+import piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation.ExchangeConfirmationFragment
+import piuk.blockchain.android.ui.swap.logging.websocketConnectionFailureEvent
+import piuk.blockchain.android.ui.swap.showErrorDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
@@ -69,10 +69,10 @@ class HomebrewNavHostActivity : BaseAuthActivity(),
         (intent.getSerializableExtra(EXTRA_PRESELECTED_FROM_CURRENCY) as? CryptoCurrency) ?: CryptoCurrency.BTC
     }
 
-    override val exchangeViewModel: ExchangeModel by viewModel()
+    override val exchangeViewModel: ExchangeModel by scopedInject()
 
     private val startKyc: StartKyc by inject()
-    private val allAccountList: AsyncAllAccountList by inject()
+    private val allAccountList: AsyncAllAccountList by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -219,7 +219,7 @@ class HomebrewNavHostActivity : BaseAuthActivity(),
                         show()
                     }
 
-                    Logging.logCustom(WebsocketConnectionFailureEvent())
+                    Logging.logEvent(websocketConnectionFailureEvent())
                 }
             }
 

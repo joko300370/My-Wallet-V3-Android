@@ -1708,9 +1708,12 @@
     <string name="activity_details_fee">Fee</string>
     <string name="activity_details_amount">Amount</string>
     <string name="activity_details_value">Value</string>
+    <string name="activity_details_historic_sent">Value when sent</string>
+    <string name="activity_details_historic_received">Value when received</string>
+    <string name="activity_details_historic_transferred">Value when transferred</string>
     <string name="activity_details_to">To</string>
     <string name="activity_details_from">From</string>
-    <string name="activity_details_empty" />
+    <string name="empty" translatable="false" />
     <string name="activity_details_action">View on Blockchain Explorer</string>
     <string name="activity_details_cancel_action">Cancel Buy</string>
     <string name="activity_detail_description_action">Add a description</string>
@@ -1743,6 +1746,7 @@
     <string name="activity_details_payment_load_fail">Couldn\'t load card details</string>
     <string name="activity_details_fee_load_fail">Couldn\'t load fee information</string>
     <string name="activity_details_value_load_fail">Couldn\'t load value information</string>
+    <string name="activity_details_historic_value_load_fail">Couldn\'t load historic value information</string>
     <string name="activity_details_to_load_fail">Couldn\'t load To address information</string>
     <string name="activity_details_from_load_fail">Couldn\'t load From address information</string>
 

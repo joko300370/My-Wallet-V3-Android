@@ -17,10 +17,10 @@ import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityUpgradeWalletBinding
 import com.blockchain.ui.password.SecondPasswordHandler
-import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -31,7 +31,7 @@ internal class UpgradeWalletActivity : BaseMvpActivity<UpgradeWalletView, Upgrad
     private lateinit var binding: ActivityUpgradeWalletBinding
     private var progressDialog: MaterialProgressDialog? = null
 
-    private val upgradeWalletPresenter: UpgradeWalletPresenter by inject()
+    private val upgradeWalletPresenter: UpgradeWalletPresenter by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -299,32 +299,32 @@ class LiveCustodialWalletManager(
     }.map { (cardsResponse, paymentMethods) ->
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
-        paymentMethods.methods.firstOrNull { it.type == PaymentMethodType.BANK_ACCOUNT }
-            ?.let { paymentMethodResponse ->
+        paymentMethods.methods.forEach {
+            if (it.type == PaymentMethodType.BANK_ACCOUNT) {
                 availablePaymentMethods.add(PaymentMethod.BankTransfer(
-                    PaymentLimits(paymentMethodResponse.limits.min,
-                        paymentMethodResponse.limits.max,
+                    PaymentLimits(it.limits.min,
+                        it.limits.max,
                         fiatCurrency)
                 ))
+            } else if (it.type == PaymentMethodType.PAYMENT_CARD) {
+                val cardLimits = PaymentLimits(it.limits.min, it.limits.max, fiatCurrency)
+                cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
+                    ?.forEach { cardResponse: CardResponse ->
+                        availablePaymentMethods.add(cardResponse.toCardPaymentMethod(cardLimits))
+                    }
             }
+        }
 
-        val cardLimits =
-            paymentMethods.methods.firstOrNull { paymentMethod ->
-                paymentMethod.type == PaymentMethodType.PAYMENT_CARD
+        paymentMethods.methods.firstOrNull { paymentMethod ->
+            paymentMethod.type == PaymentMethodType.PAYMENT_CARD
+        }?.let {
+            availablePaymentMethods.add(PaymentMethod.UndefinedCard(PaymentLimits(it.limits.min,
+                it.limits.max,
+                fiatCurrency)))
+
+            if (cardsResponse.isEmpty() && isTier2Approved) {
+                availablePaymentMethods.add(PaymentMethod.Undefined)
             }
-                ?.let { paymentMethod ->
-                    PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
-                } ?: return@map availablePaymentMethods.toList()
-
-        cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
-            ?.forEach { cardResponse: CardResponse ->
-                availablePaymentMethods.add(cardResponse.toCardPaymentMethod(cardLimits))
-            }
-
-        availablePaymentMethods.add(PaymentMethod.UndefinedCard(cardLimits))
-
-        if (cardsResponse.isEmpty() && isTier2Approved) {
-            availablePaymentMethods.add(PaymentMethod.Undefined)
         }
         availablePaymentMethods.toList()
     }

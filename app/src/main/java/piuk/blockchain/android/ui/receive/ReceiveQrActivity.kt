@@ -8,8 +8,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_receive_qr.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -18,7 +18,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 internal class ReceiveQrActivity :
     BaseMvpActivity<ReceiveQrView, ReceiveQrPresenter>(), ReceiveQrView {
 
-    private val receiveQrPresenter: ReceiveQrPresenter by inject()
+    private val receiveQrPresenter: ReceiveQrPresenter by scopedInject()
 
     override val pageIntent: Intent
         get() = intent

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -49,7 +50,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     AccountSelectSheet.Host, ActivityDetailsBottomSheet.Host, BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
-    override val model: ActivitiesModel by inject()
+    override val model: ActivitiesModel by scopedInject()
 
     private val theAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
@@ -67,7 +68,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private val disposables = CompositeDisposable()
     private val rxBus: RxBus by inject()
     private val currencyPrefs: CurrencyPrefs by inject()
-    private val exchangeRates: ExchangeRateDataManager by inject()
+    private val exchangeRates: ExchangeRateDataManager by scopedInject()
 
     private val actionEvent by unsafeLazy {
         rxBus.register(ActionEvent::class.java)

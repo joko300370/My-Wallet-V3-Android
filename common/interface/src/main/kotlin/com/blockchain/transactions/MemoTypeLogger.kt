@@ -16,7 +16,9 @@ private class MemoTypeLogger(
         transactionSender.sendFunds(sendDetails)
             .flatMap {
                 if (it.success) {
-                    (sendDetails.memo?.toCustomEvent() ?: noMemoEvent).let { eventLogger.logEvent(it) }
+                    (sendDetails.memo?.toCustomEvent() ?: noMemoEvent).let { eventBuilder ->
+                        eventLogger.logEvent(eventBuilder)
+                    }
                 }
                 Single.just(it)
             }

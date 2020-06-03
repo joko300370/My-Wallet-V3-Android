@@ -16,12 +16,18 @@ sealed class ActivityDetailsType
 data class Created(val date: Date) : ActivityDetailsType()
 data class Amount(val cryptoValue: CryptoValue) : ActivityDetailsType()
 data class Fee(val feeValue: CryptoValue?) : ActivityDetailsType()
-data class Value(val fiatAtExecution: FiatValue?) : ActivityDetailsType()
+data class Value(val currentFiatValue: FiatValue?) : ActivityDetailsType()
+data class HistoricValue(
+    val fiatAtExecution: FiatValue?,
+    val direction: TransactionSummary.Direction
+) : ActivityDetailsType()
+
 data class From(val fromAddress: String?) : ActivityDetailsType()
 data class FeeForTransaction(
     val direction: TransactionSummary.Direction,
     val cryptoValue: CryptoValue
 ) : ActivityDetailsType()
+
 data class To(val toAddress: String?) : ActivityDetailsType()
 data class Description(val description: String? = null) : ActivityDetailsType()
 data class Action(val action: String = "") : ActivityDetailsType()
@@ -120,7 +126,7 @@ class ActivityDetailsModel(
                 loadSentItems(nonCustodialActivitySummaryItem)
             }
             direction == TransactionSummary.Direction.BUY ||
-            direction == TransactionSummary.Direction.SELL -> {
+                direction == TransactionSummary.Direction.SELL -> {
                 // do nothing BUY & SELL are a custodial transaction
             }
             direction == TransactionSummary.Direction.SWAP -> TODO()

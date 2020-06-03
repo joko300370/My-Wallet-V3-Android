@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
@@ -7,6 +6,8 @@ apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.novoda.build-properties'
 apply from: '../quality/jacocoApp.gradle'
 apply from: '../quality/ktlint.gradle'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.gms.google-services'
 
 
 buildProperties {
@@ -36,7 +37,6 @@ android {
         buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
-        manifestPlaceholders = [FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string]
         resConfigs 'en',
                 'cs',
                 'de',
@@ -248,7 +248,6 @@ dependencies {
 
     implementation Libraries.koin
     implementation Libraries.koinAndroid
-    implementation Libraries.koinAndroidArchitecture
 
     // Views
     implementation project(":zxing")

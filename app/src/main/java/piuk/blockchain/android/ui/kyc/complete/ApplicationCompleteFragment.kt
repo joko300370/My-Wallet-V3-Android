@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
@@ -36,7 +37,7 @@ class ApplicationCompleteFragment : Fragment() {
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
     private val analytics: Analytics by inject()
-    private val tierService: TierService by inject()
+    private val tierService: TierService by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,

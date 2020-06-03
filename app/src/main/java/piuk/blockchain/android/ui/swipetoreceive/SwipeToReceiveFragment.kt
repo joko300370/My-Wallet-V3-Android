@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.util.drawableResFilled
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
@@ -38,7 +39,7 @@ import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListen
 class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePresenter>(),
     SwipeToReceiveView {
 
-    private val presenter: SwipeToReceivePresenter by inject()
+    private val presenter: SwipeToReceivePresenter by scopedInject()
     private val rxBus: RxBus by inject()
 
     override fun onCreateView(

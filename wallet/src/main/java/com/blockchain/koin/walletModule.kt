@@ -14,16 +14,15 @@ import info.blockchain.wallet.prices.CurrentPriceApi
 import info.blockchain.wallet.prices.PriceApi
 import info.blockchain.wallet.prices.PriceEndpoints
 import info.blockchain.wallet.prices.toCachedIndicativeFiatPriceService
-import org.koin.KoinContext
-import org.koin.dsl.module.applicationContext
-import org.koin.standalone.StandAloneContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import retrofit2.Retrofit
 
-val walletModule = applicationContext {
+val walletModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
-        bean { PayloadManager(get(), get(), get(), get()) }
+        scoped { PayloadManager(get(), get(), get(), get()) }
 
         factory { MultiAddressFactory(get()) }
 
@@ -40,21 +39,26 @@ val walletModule = applicationContext {
         )
     }
 
-    bean { get<Retrofit>("api").create(MetadataService::class.java) }
+    single { get<Retrofit>(apiRetrofit).create(MetadataService::class.java) }
 
-    bean { get<Retrofit>("api").create(PriceEndpoints::class.java) }
+    single { get<Retrofit>(apiRetrofit).create(PriceEndpoints::class.java) }
 
     factory { get<PriceApi>() as CurrentPriceApi }
 
     factory { get<CurrentPriceApi>().toCachedIndicativeFiatPriceService() }
 
-    factory { BchDustService(get<Retrofit>("kotlin-api").create(DustApi::class.java), get()) as DustService }
+    factory {
+        BchDustService(get<Retrofit>(kotlinApiRetrofit).create(DustApi::class.java),
+            get())
+    }.bind(DustService::class)
 
-    bean {
+    single {
         object : PayloadManagerWiper {
             override fun wipe() {
-                (StandAloneContext.koinContext as KoinContext).releaseContext("Payload")
+                if (!payloadScope.closed) {
+                    payloadScope.close()
+                }
             }
-        } as PayloadManagerWiper
-    }
+        }
+    }.bind(PayloadManagerWiper::class)
 }

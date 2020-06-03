@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.fragment_simple_buy_card_payment.*
 import kotlinx.android.synthetic.main.fragment_simple_buy_card_payment.icon
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
@@ -24,7 +24,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen {
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
 
     private var isFirstLoad = false
 

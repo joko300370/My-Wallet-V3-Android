@@ -9,8 +9,7 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.serialization.JsonSerializable
 import info.blockchain.wallet.payload.PayloadManagerWiper
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.KoinContext
-import org.koin.standalone.StandAloneContext
+import org.koin.core.context.GlobalContext
 import piuk.blockchain.androidcore.data.access.AccessState
 import timber.log.Timber
 
@@ -66,5 +65,5 @@ class AdbDebugService : BroadcastReceiver() {
 
     private class Empty : JsonSerializable
 
-    private inline fun <reified T> get() = (StandAloneContext.koinContext as KoinContext).get<T>()
+    private inline fun <reified T> get() = (GlobalContext().get()).get<T>()
 }

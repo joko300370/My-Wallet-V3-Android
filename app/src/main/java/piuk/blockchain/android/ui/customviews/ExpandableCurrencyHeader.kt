@@ -24,8 +24,8 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.view_expanding_currency_header.view.*
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

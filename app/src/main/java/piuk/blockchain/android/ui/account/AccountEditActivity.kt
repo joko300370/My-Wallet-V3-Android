@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.databinding.DataBindingUtil
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.CompositePermissionListener
@@ -54,7 +55,7 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    private val accountEditPresenter: AccountEditPresenter by inject()
+    private val accountEditPresenter: AccountEditPresenter by scopedInject()
     private val appUtil: AppUtil by inject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()

@@ -108,7 +108,6 @@ public class LauncherPresenterTest {
                 environmentConfig,
                 featureFlag,
                 currencyPrefs,
-                custodialWalletManager,
                 analytics,
                 prerequisites,
                 crashLogger

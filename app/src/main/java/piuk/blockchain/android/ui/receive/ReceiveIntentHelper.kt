@@ -12,7 +12,6 @@ import androidx.core.content.FileProvider
 import com.blockchain.extensions.exhaustive
 import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.fromStellarUri
-import com.crashlytics.android.answers.ShareEvent
 import info.blockchain.balance.CryptoCurrency
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
@@ -92,7 +91,7 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
                 it.remove()
             }
 
-            Logging.logShare(ShareEvent().putContentName("QR Code + URI"))
+            Logging.logShare("QR Code + URI")
 
             return dataList
         } else {

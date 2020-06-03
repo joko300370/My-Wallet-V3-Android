@@ -14,6 +14,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.transition.TransitionManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.jakewharton.rxbinding2.widget.RxTextView
@@ -37,7 +38,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     View.OnFocusChangeListener {
 
     private val stringUtils: StringUtils by inject()
-    private val createWalletPresenter: CreateWalletPresenter by inject()
+    private val createWalletPresenter: CreateWalletPresenter by scopedInject()
     private var progressDialog: MaterialProgressDialog? = null
     private var applyConstraintSet: ConstraintSet = ConstraintSet()
 
@@ -104,8 +105,8 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     private fun updateTosAndPrivacyLinks() {
         val linksMap = mapOf<String, Uri>(
-        "terms" to Uri.parse(URL_TOS_POLICY),
-        "privacy" to Uri.parse(URL_PRIVACY_POLICY)
+            "terms" to Uri.parse(URL_TOS_POLICY),
+            "privacy" to Uri.parse(URL_PRIVACY_POLICY)
         )
 
         val tosText = stringUtils.getStringWithMappedLinks(

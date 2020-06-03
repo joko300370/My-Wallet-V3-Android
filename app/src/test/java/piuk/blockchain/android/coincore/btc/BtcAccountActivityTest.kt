@@ -8,6 +8,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -62,7 +63,7 @@ class BtcAccountActivityTest {
         val transactionSummaries = listOf(summary)
 
         whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
-            .thenReturn(transactionSummaries)
+            .thenReturn(Single.just(transactionSummaries))
 
         subject.activity
             .test()

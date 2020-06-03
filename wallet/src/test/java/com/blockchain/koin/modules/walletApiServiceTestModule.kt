@@ -1,5 +1,6 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.bigInteger
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
 import com.blockchain.network.modules.OkHttpInterceptors
@@ -7,28 +8,29 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ApiCode
 import io.fabric8.mockwebserver.DefaultMockServer
 import okhttp3.OkHttpClient
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
-fun walletApiServiceTestModule(server: DefaultMockServer) = applicationContext {
+fun walletApiServiceTestModule(server: DefaultMockServer) = module {
 
-    bean { OkHttpClient() }
+    single { OkHttpInterceptors(emptyList()) }
 
-    bean { OkHttpInterceptors(emptyList()) }
+    single { OkHttpClient() }
 
     factory {
         object : ApiCode {
             override val apiCode: String
                 get() = "test"
-        } as ApiCode
-    }
+        }
+    }.bind(ApiCode::class)
 
-    bean {
+    single {
         MoshiBuilderInterceptorList(
-            listOf(get("BigInteger"))
+            listOf(get(bigInteger))
         )
     }
 
-    bean {
+    single {
         object : EnvironmentUrls {
 
             override val explorerUrl: String

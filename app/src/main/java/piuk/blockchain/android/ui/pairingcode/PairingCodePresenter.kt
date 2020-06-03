@@ -13,7 +13,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.logging.PairingEvent
+import piuk.blockchain.androidcoreui.utils.logging.pairingEvent
 import piuk.blockchain.androidcoreui.utils.logging.PairingMethod
 
 class PairingCodePresenter(
@@ -40,10 +40,7 @@ class PairingCodePresenter(
             .subscribe(
                 { bitmap ->
                     view.onQrLoaded(bitmap)
-                    Logging.logCustom(
-                        PairingEvent()
-                            .putMethod(PairingMethod.REVERSE)
-                    )
+                    Logging.logEvent(pairingEvent(PairingMethod.REVERSE))
                 },
                 { view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR) })
     }

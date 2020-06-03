@@ -2,6 +2,7 @@ package com.blockchain.notifications.koin
 
 import android.app.NotificationManager
 import android.content.Context
+import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.notifications.NotificationService
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.AnalyticsImpl
@@ -13,23 +14,24 @@ import com.blockchain.notifications.links.PendingLink
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.iid.FirebaseInstanceId
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
-val notificationModule = applicationContext {
+val notificationModule = module {
 
-    context("Payload") {
-        bean { NotificationTokenManager(get(), get(), get(), get(), get()) }
+    scope(payloadScopeQualifier) {
+        scoped { NotificationTokenManager(get(), get(), get(), get(), get()) }
     }
 
-    bean { FirebaseInstanceId.getInstance() }
+    single { FirebaseInstanceId.getInstance() }
 
-    bean { FirebaseAnalytics.getInstance(get()) }
+    single { FirebaseAnalytics.getInstance(get()) }
 
     factory { NotificationService(get()) }
 
-    factory { get<Context>().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
+    factory { get<Context>().getSystemService(Context.NOTIFICATION_SERVICE) }.bind(NotificationManager::class)
 
-    bean { FirebaseDynamicLinks.getInstance() }
+    single { FirebaseDynamicLinks.getInstance() }
 
     factory { DynamicLinkHandler(get()) as PendingLink }
 

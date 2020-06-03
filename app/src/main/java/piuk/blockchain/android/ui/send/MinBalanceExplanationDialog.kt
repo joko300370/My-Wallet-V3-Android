@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.blockchain.account.DefaultAccountDataManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoValue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,9 +34,9 @@ class MinBalanceExplanationDialog : DialogFragment() {
         setStyle(STYLE_NO_FRAME, R.style.FullscreenDialog)
     }
 
-    private val xlmDefaultAccountManager: DefaultAccountDataManager by inject()
+    private val xlmDefaultAccountManager: DefaultAccountDataManager by scopedInject()
     private val prefs: CurrencyPrefs by inject()
-    private val exchangeRates: ExchangeRateDataManager by inject()
+    private val exchangeRates: ExchangeRateDataManager by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,7 +113,7 @@ class MinBalanceExplanationDialog : DialogFragment() {
     private fun formatWithFiat(
         cryptoValue: CryptoValue
     ) = cryptoValue.toStringWithSymbol() + " " +
-        cryptoValue.toFiat(exchangeRates, prefs.selectedFiatCurrency).toStringWithSymbol()
+            cryptoValue.toFiat(exchangeRates, prefs.selectedFiatCurrency).toStringWithSymbol()
 }
 
 private class Values(val min: CryptoValue, val balance: CryptoValue, val fee: CryptoValue) {

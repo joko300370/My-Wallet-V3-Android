@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard.transfer
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.WithdrawScreenClicked
 import com.blockchain.notifications.analytics.WithdrawScreenShown
@@ -17,7 +18,6 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_basic_transfer_to_wallet.view.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
@@ -46,13 +46,13 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
     }
 
-    private val coincore: Coincore by inject()
+    private val coincore: Coincore by scopedInject()
 
     private val token: AssetTokens by lazy {
         coincore[cryptoCurrency]
     }
 
-    private val custodialWallet: CustodialWalletManager by inject()
+    private val custodialWallet: CustodialWalletManager by scopedInject()
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
 

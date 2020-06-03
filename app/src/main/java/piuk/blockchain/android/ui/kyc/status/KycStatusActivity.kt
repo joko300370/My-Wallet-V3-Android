@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import com.blockchain.activities.StartSwap
 import com.blockchain.extensions.px
+import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.models.nabu.KycState
 import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -34,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_kyc_status.toolbar_kyc as toolBar
 
 class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView {
 
-    private val presenter: KycStatusPresenter by inject()
+    private val presenter: KycStatusPresenter by scopedInject()
     private val swapStarter: StartSwap by inject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
     private var progressDialog: MaterialProgressDialog? = null

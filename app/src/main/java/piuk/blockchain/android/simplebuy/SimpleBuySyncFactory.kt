@@ -34,10 +34,6 @@ interface SimpleBuyPrefsStateAdapter {
     fun clear()
 }
 
-enum class SimpleBuySyncEvent {
-    SYNC_COMPLETE
-}
-
 internal class SimpleBuyInflateAdapter(
     private val prefs: SimpleBuyPrefs,
     private val gson: Gson
@@ -119,13 +115,13 @@ class SimpleBuySyncFactory(
                                         .doOnComplete { localStateAdapter.clear() }
                                         .doOnSuccess { state -> localStateAdapter.update(state) }
                                 } else {
-                                    Maybe.empty<SimpleBuyState>()
+                                    Maybe.empty()
                                 }
                             },
-                            onError = { Maybe.empty<SimpleBuyState>() }, // Do nothing
+                            onError = { Maybe.empty() }, // Do nothing
                             onComplete = {
                                 localStateAdapter.clear()
-                                Maybe.empty<SimpleBuyState>()
+                                Maybe.empty()
                             } // No local state. Do nothing
                         )
                         .ignoreElement()
@@ -143,7 +139,7 @@ class SimpleBuySyncFactory(
             .flatMapBy(
                 onSuccess = { checkForRemoteOverride(it) },
                 onError = {
-                    Maybe.error<SimpleBuyState>(it)
+                    Maybe.error(it)
                 },
                 onComplete = { Maybe.defer { getRemotePendingBuy() } }
             )
@@ -238,7 +234,7 @@ class SimpleBuySyncFactory(
             custodialWallet.getBuyOrder(it)
                 .map { order -> order.toSimpleBuyState() }
                 .toMaybe()
-                .onErrorResumeNext(Maybe.empty<SimpleBuyState>())
+                .onErrorResumeNext(Maybe.empty())
         } ?: Maybe.empty()
 
     private fun maybeInflateLocalState(): Maybe<SimpleBuyState> =
@@ -261,12 +257,14 @@ fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
         orderExchangePrice = price,
         selectedPaymentMethod = SelectedPaymentMethod(id = paymentMethodId),
         expirationDate = expires,
-        kycVerificationState = KycState.VERIFIED_AND_ELIGIBLE, // This MUST be so if we have an order in process.
         currentScreen = configureCurrentScreen(state, paymentMethodId == PaymentMethod.BANK_PAYMENT_ID)
     )
 
-private fun configureCurrentScreen(state: OrderState, isBankPayment: Boolean): FlowScreen =
-    if (state == OrderState.PENDING_CONFIRMATION) FlowScreen.CHECKOUT
+private fun configureCurrentScreen(
+    state: OrderState,
+    isBankPayment: Boolean
+): FlowScreen =
+    if (state == OrderState.PENDING_CONFIRMATION) FlowScreen.ENTER_AMOUNT
     else {
         if (isBankPayment) {
             FlowScreen.BANK_DETAILS

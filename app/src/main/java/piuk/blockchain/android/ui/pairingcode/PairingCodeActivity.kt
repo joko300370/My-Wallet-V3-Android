@@ -5,12 +5,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import kotlinx.android.synthetic.main.activity_pairing_code.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -23,7 +23,7 @@ class PairingCodeActivity : BaseMvpActivity<PairingCodeView, PairingCodePresente
     PairingCodeView {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    private val pairingCodePresenter: PairingCodePresenter by inject()
+    private val pairingCodePresenter: PairingCodePresenter by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

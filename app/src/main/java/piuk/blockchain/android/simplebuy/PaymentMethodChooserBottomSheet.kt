@@ -55,10 +55,7 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
                         })
                     }, canAdd)
         view.recycler.layoutManager = LinearLayoutManager(context)
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         analytics.logEvent(SimpleBuyAnalytics.PAYMENT_METHODS_SHOWN)
     }
 

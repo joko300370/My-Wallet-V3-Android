@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
@@ -37,7 +38,7 @@ import kotlinx.android.synthetic.main.fragment_kyc_add_email.input_layout_kyc_em
 class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPresenter>(),
     KycEmailEntryView {
 
-    private val presenter: KycEmailEntryPresenter by inject()
+    private val presenter: KycEmailEntryPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()

@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -55,7 +56,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     val compositeDisposable = CompositeDisposable()
 
     private val currencyPrefs: CurrencyPrefs by inject()
-    private val assetDetailsViewModel: AssetDetailsCalculator by inject()
+    private val assetDetailsViewModel: AssetDetailsCalculator by scopedInject()
     private val locale = Locale.getDefault()
 
     interface Host : SlidingModalBottomDialog.Host {
@@ -75,7 +76,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
     }
 
-    private val assetSelect: Coincore by inject()
+    private val assetSelect: Coincore by scopedInject()
     private val token: AssetTokens by lazy {
         assetSelect[cryptoCurrency]
     }

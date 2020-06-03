@@ -11,8 +11,8 @@ import kotlinx.android.synthetic.main.tour_guide_overlay.view.*
 import android.widget.FrameLayout
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.DashboardPrefs
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.inject
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.R
 import java.lang.IllegalStateException
 import kotlin.math.max

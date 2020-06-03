@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_landing.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
@@ -18,7 +18,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingView {
 
-    override val presenter: LandingPresenter by inject()
+    override val presenter: LandingPresenter by scopedInject()
     override val view: LandingView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {

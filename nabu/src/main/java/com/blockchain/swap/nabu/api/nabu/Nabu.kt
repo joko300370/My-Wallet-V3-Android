@@ -288,7 +288,7 @@ internal interface Nabu {
     fun getPaymentMethods(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
-        @Query("checkEligibility") checkEligibility: Boolean
+        @Query("checkEligibility") checkEligibility: Boolean?
     ): Single<PaymentMethodsResponse>
 
     @GET(NABU_CARDS)

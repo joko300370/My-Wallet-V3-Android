@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -16,11 +17,11 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 
 class LogoutActivity : AppCompatActivity() {
 
-    private val ethDataManager: EthDataManager by inject()
-    private val paxAccount: Erc20Account by inject()
-    private val bchDataManager: BchDataManager by inject()
-    private val walletOptionsState: WalletOptionsState by inject()
-    private val nabuDataManager: NabuDataManager by inject()
+    private val ethDataManager: EthDataManager by scopedInject()
+    private val paxAccount: Erc20Account by scopedInject()
+    private val bchDataManager: BchDataManager by scopedInject()
+    private val walletOptionsState: WalletOptionsState by scopedInject()
+    private val nabuDataManager: NabuDataManager by scopedInject()
     private val osUtil: OSUtil by inject()
     private val loginState: AccessState by inject()
     private val prefs: PersistentPrefs by inject()

@@ -2,8 +2,8 @@ package piuk.blockchain.android.simplebuy
 
 import android.os.Bundle
 import android.view.View
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.simple_buy_cancel_order_bottom_sheet.view.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
@@ -20,7 +20,7 @@ class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog() {
             ?: throw IllegalStateException("Host fragment is not a SimpleBuyCancelOrderBottomSheet.Host")
     }
 
-    private val stateFactory: SimpleBuySyncFactory by inject()
+    private val stateFactory: SimpleBuySyncFactory by scopedInject()
 
     override val layoutResource: Int = R.layout.simple_buy_cancel_order_bottom_sheet
 

@@ -11,11 +11,11 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
+import com.blockchain.koin.scopedInject
 import androidx.appcompat.widget.Toolbar
 import info.blockchain.wallet.api.data.Settings
 import kotlinx.android.synthetic.main.activity_manual_pairing.*
 import org.json.JSONObject
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
@@ -26,7 +26,7 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
     ManualPairingView {
 
     override val view: ManualPairingView = this
-    override val presenter: ManualPairingPresenter by inject()
+    override val presenter: ManualPairingPresenter by scopedInject()
 
     private val guid: String
         get() = wallet_id.text.toString()

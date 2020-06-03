@@ -8,7 +8,6 @@ import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.wallet.api.Environment
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
@@ -41,7 +40,6 @@ class LauncherPresenter(
     private val envSettings: EnvironmentConfig,
     private val featureFlag: FeatureFlag,
     private val currencyPrefs: CurrencyPrefs,
-    private val custodialWalletManager: CustodialWalletManager,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
     private val crashLogger: CrashLogger

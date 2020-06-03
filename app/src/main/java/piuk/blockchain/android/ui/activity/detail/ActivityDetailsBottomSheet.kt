@@ -9,12 +9,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.ui.urllinks.makeBlockExplorerUrl
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
@@ -38,7 +38,7 @@ class ActivityDetailsBottomSheet :
     override val layoutResource: Int
         get() = R.layout.dialog_activity_details_sheet
 
-    override val model: ActivityDetailsModel by inject()
+    override val model: ActivityDetailsModel by scopedInject()
 
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(

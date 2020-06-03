@@ -1,15 +1,16 @@
 package piuk.blockchain.androidcoreui.ui.base;
 
 import android.os.Bundle;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
-import com.crashlytics.android.answers.ContentViewEvent;
+
 import piuk.blockchain.androidcoreui.BuildConfig;
 import piuk.blockchain.androidcoreui.utils.logging.Logging;
 
 @Deprecated // "Use the kotlin-friendly MvpActivity, MvpPresenter, MvpView instead"
 public abstract class BaseMvpActivity<VIEW extends View, PRESENTER extends BasePresenter<VIEW>>
-        extends BaseAuthActivity {
+    extends BaseAuthActivity {
 
     private PRESENTER presenter;
 
@@ -29,8 +30,7 @@ public abstract class BaseMvpActivity<VIEW extends View, PRESENTER extends BaseP
      */
     protected void logScreenView() {
         if (!BuildConfig.DEBUG) {
-            Logging.INSTANCE.logContentView(new ContentViewEvent()
-                    .putContentName(getClass().getSimpleName()));
+            Logging.INSTANCE.logContentView(getClass().getSimpleName());
         }
     }
 

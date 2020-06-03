@@ -12,9 +12,9 @@ import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.standalone.StandAloneContext
-import org.koin.standalone.inject
+import org.koin.core.context.startKoin
 import org.koin.test.AutoCloseKoinTest
+import org.koin.test.inject
 
 class BchDustServiceTest : AutoCloseKoinTest() {
 
@@ -32,14 +32,14 @@ class BchDustServiceTest : AutoCloseKoinTest() {
     private val apiCode: ApiCode by inject()
 
     @Before
-    fun startKoin() {
-        StandAloneContext.startKoin(
-            listOf(
+    fun setUp() {
+        startKoin {
+            modules(listOf(
                 apiModule,
                 walletModule,
                 walletApiServiceTestModule(server)
-            )
-        )
+            ))
+        }
     }
 
     @Test

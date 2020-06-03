@@ -29,6 +29,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
@@ -37,7 +38,6 @@ import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
-import com.crashlytics.android.answers.ContentViewEvent
 import com.mukesh.countrypicker.fragments.CountryPicker
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.util.FormatsUtil
@@ -127,7 +127,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
     }
 
-    private val settingsPresenter: SettingsPresenter by inject()
+    private val settingsPresenter: SettingsPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
 
@@ -140,10 +140,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         settingsPresenter.onViewReady()
 
         analytics.logEvent(AnalyticsEvents.Settings)
-        Logging.logContentView(
-            ContentViewEvent()
-                .putContentName(javaClass.simpleName)
-        )
+        Logging.logContentView(javaClass.simpleName)
     }
 
     override fun setUpUi() {

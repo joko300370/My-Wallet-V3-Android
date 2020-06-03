@@ -2,22 +2,21 @@ package com.blockchain
 
 import android.content.Context
 import com.blockchain.logging.CrashLogger
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.answers.Answers
-import io.fabric.sdk.android.Fabric
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import piuk.blockchain.androidcoreui.BuildConfig
 import timber.log.Timber
 
 @Suppress("ConstantConditionIf")
 internal class CrashLoggerImpl(override val isDebugBuild: Boolean) : CrashLogger {
+    private val firebaseInstance = FirebaseCrashlytics.getInstance()
 
     override fun init(ctx: Any) {
         if (ctx is Context) {
             if (BuildConfig.USE_CRASHLYTICS) {
                 // Init crash reporting
-                Fabric.with(ctx, Crashlytics(), Answers())
+                firebaseInstance.setCrashlyticsCollectionEnabled(true)
             } else {
-                Fabric.with(ctx, Answers())
+                firebaseInstance.setCrashlyticsCollectionEnabled(false)
             }
         } else {
             throw IllegalStateException("Unable to init Crashlytics. No context provided")
@@ -26,31 +25,31 @@ internal class CrashLoggerImpl(override val isDebugBuild: Boolean) : CrashLogger
 
     override fun logEvent(msg: String) {
         if (BuildConfig.USE_CRASHLYTICS) {
-            Crashlytics.log(msg)
+            firebaseInstance.log(msg)
         }
     }
 
     override fun logState(name: String, data: String) {
         if (BuildConfig.USE_CRASHLYTICS) {
-            Crashlytics.setString(name, data)
+            firebaseInstance.setCustomKey(name, data)
         }
     }
 
     override fun onlineState(isOnline: Boolean) {
         if (BuildConfig.USE_CRASHLYTICS) {
-            Crashlytics.setBool(KEY_ONLINE_STATE, isOnline)
+            firebaseInstance.setCustomKey(KEY_ONLINE_STATE, isOnline)
         }
     }
 
     override fun userLanguageLocale(locale: String) {
         if (BuildConfig.USE_CRASHLYTICS) {
-            Crashlytics.setString(KEY_LOCALE_LANGUAGE, locale)
+            firebaseInstance.setCustomKey(KEY_LOCALE_LANGUAGE, locale)
         }
     }
 
     override fun logException(throwable: Throwable, logMsg: String) {
         if (BuildConfig.USE_CRASHLYTICS) {
-            Crashlytics.logException(throwable)
+            firebaseInstance.recordException(throwable)
         }
         Timber.e(throwable, logMsg)
     }

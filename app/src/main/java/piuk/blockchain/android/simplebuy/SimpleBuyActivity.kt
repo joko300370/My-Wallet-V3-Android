@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -11,7 +12,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_simple_buy.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
@@ -28,9 +28,9 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         get() = false
 
     override val enableLogoutTimer: Boolean = false
-    private val simpleBuyModel: SimpleBuyModel by inject()
+    private val simpleBuyModel: SimpleBuyModel by scopedInject()
     private val compositeDisposable = CompositeDisposable()
-    private val simpleBuyFlowNavigator: SimpleBuyFlowNavigator by inject()
+    private val simpleBuyFlowNavigator: SimpleBuyFlowNavigator by scopedInject()
 
     private val startedFromDashboard: Boolean by unsafeLazy {
         intent.getBooleanExtra(STARTED_FROM_DASHBOARD_KEY, false)

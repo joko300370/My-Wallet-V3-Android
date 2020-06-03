@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -18,7 +18,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
 
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,

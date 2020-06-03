@@ -7,6 +7,7 @@ import android.os.Handler
 import android.text.InputType
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.NotificationAppOpened
@@ -27,15 +28,16 @@ import timber.log.Timber
 
 class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {
 
-    private val launcherPresenter: LauncherPresenter by inject()
     private val analytics: Analytics by inject()
+    private val launcherPresenter: LauncherPresenter by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
 
         if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
-            intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)) {
+            intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)
+        ) {
             analytics.logEvent(NotificationAppOpened)
         }
 
@@ -107,8 +109,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         editText.setHint(R.string.password)
         editText.inputType =
             InputType.TYPE_CLASS_TEXT or
-                InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 
         val frameLayout = ViewUtils.getAlertDialogPaddedView(this, editText)
 

@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.activities.StartSwap
+import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
@@ -54,7 +55,7 @@ import java.lang.IllegalStateException
 class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresenter>(),
     VeriffSplashView {
 
-    private val presenter: VeriffSplashPresenter by inject()
+    private val presenter: VeriffSplashPresenter by scopedInject()
     private val swapStarter: StartSwap by inject()
     private val stringUtils: StringUtils by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)

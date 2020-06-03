@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.navigation.NavDirections
 import com.blockchain.activities.StartSwap
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.util.setImageDrawable
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.TierJson
@@ -49,7 +50,7 @@ import timber.log.Timber
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
     KycTierSplashView {
 
-    private val presenter: KycTierSplashPresenter by inject()
+    private val presenter: KycTierSplashPresenter by scopedInject()
     private val startSwap: StartSwap by inject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)

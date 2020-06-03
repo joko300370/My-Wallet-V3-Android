@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.payload.PayloadManager
 import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
@@ -19,7 +19,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 
 class BackupWalletActivity : BaseAuthActivity() {
 
-    private val payloadManger: PayloadManager by inject()
+    private val payloadManger: PayloadManager by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
