@@ -73,7 +73,7 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
-import piuk.blockchain.android.ui.transfer.send.TestSendContainerActivity
+import piuk.blockchain.android.ui.transfer.TestSendContainerActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom

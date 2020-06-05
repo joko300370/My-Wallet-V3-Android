@@ -1,13 +1,9 @@
 package piuk.blockchain.android.ui.transfer.send
 
-import android.content.ComponentCallbacks
+import com.blockchain.koin.payloadScope
 import io.reactivex.android.schedulers.AndroidSchedulers
-import org.koin.core.parameter.ParametersDefinition
-import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.named
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import org.koin.java.KoinJavaComponent
 
 val sendFlowScope = named("SendScope")
 
@@ -17,7 +13,7 @@ val transferModule = module {
 
         scoped {
             SendInteractor(
-                coincore = get()
+                coincore = payloadScope.get()
             )
         }
 
@@ -31,12 +27,4 @@ val transferModule = module {
     }
 }
 
-private const val SCOPE_ID = "SENDING_SCOPE_ID"
 
-val sendScope: Scope
-    get() = KoinJavaComponent.getKoin().getOrCreateScope(SCOPE_ID, sendFlowScope)
-
-inline fun <reified T : Any> ComponentCallbacks.sendInject(
-    qualifier: Qualifier? = null,
-    noinline parameters: ParametersDefinition? = null
-) = sendScope.inject<T>(qualifier, parameters)
