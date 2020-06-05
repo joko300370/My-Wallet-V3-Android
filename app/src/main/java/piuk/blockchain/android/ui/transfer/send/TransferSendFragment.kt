@@ -14,14 +14,14 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class TransferSendFragment : Fragment() {
+class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
     private val disposables = CompositeDisposable()
     private val coincore: Coincore by scopedInject()
@@ -62,11 +62,11 @@ class TransferSendFragment : Fragment() {
         // Get the model
         model.apply {
             // Trigger intent to set initial state: source account & password required
-            process(InitialiseWithAccount(account, passwordRequired))
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
                 onError = { Timber.e("Send state is broken: $it")}
             )
+            process(SendIntent.Initialise(account, passwordRequired))
         }
     }
 
@@ -75,23 +75,25 @@ class TransferSendFragment : Fragment() {
     private fun handleStateChange(newState: SendState) {
         if(currentStep != newState.currentStep) {
             currentStep = newState.currentStep
-            when (currentStep) {
-                SendStep.ZERO -> onSendComplete()
+            if(currentStep == SendStep.ZERO) {
+                onSendComplete()
+            } else {
+                showFlowStep(currentStep)
             }
         }
     }
 
     private fun showFlowStep(step: SendStep) {
-        showBottomSheet(
+        replaceBottomSheet(
             when (step) {
                 SendStep.ZERO -> null
                 SendStep.ENTER_PASSWORD -> EnterSecondPasswordSheet.newInstance()
                 SendStep.ENTER_ADDRESS -> EnterTargetAddressSheet.newInstance()
-                SendStep.ENTER_AMOUNT -> null
-                SendStep.CONFIRM_DETAIL -> null
-                SendStep.IN_PROGRESS -> null
-                SendStep.SEND_ERROR -> null
-                SendStep.SEND_COMPLETE -> null
+                SendStep.ENTER_AMOUNT -> EnterAmountSheet.newInstance()
+                SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet.newInstance()
+                SendStep.IN_PROGRESS -> TransactionInProgressSheet.newInstance()
+                SendStep.SEND_ERROR -> TransactionErrorSheet.newInstance()
+                SendStep.SEND_COMPLETE -> TransactionCompleteSheet.newInstance()
             }
         )
     }
@@ -108,17 +110,29 @@ class TransferSendFragment : Fragment() {
     private val model: SendModel
         get() = sendScope().get()
 
+    override fun onSheetClosed() {
+        disposables.clear()
+        closeScope()
+        currentStep = SendStep.ZERO
+    }
+
     private fun onSendComplete() {
         disposables.clear()
         closeScope()
-//        activity?.finish()
+        activity?.finish()
     }
 
     @UiThread
-    fun showBottomSheet(bottomSheet: BottomSheetDialogFragment?) =
-        bottomSheet?.show(childFragmentManager, "BOTTOM_SHEET")
+    fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment?) {
+        childFragmentManager.findFragmentByTag(SHEET_FRAGMENT_TAG)?.let {
+            childFragmentManager.beginTransaction().remove(it).commitNow()
+        }
+        bottomSheet?.show(childFragmentManager, SHEET_FRAGMENT_TAG)
+    }
 
     companion object {
+        private const val SHEET_FRAGMENT_TAG = "BOTTOM_SHEET"
         fun newInstance() = TransferSendFragment()
     }
 }
+
