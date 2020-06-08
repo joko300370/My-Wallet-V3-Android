@@ -16,6 +16,15 @@ buildProperties {
     }
 }
 
+def getGitCommitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
 android {
     compileSdkVersion Versions.compileSdk
     buildToolsVersion Versions.buildTools
@@ -115,6 +124,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['prodPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['prodCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
+            buildConfigField "String", "COMMIT_HASH", "\"\""
         }
         envDev {
             dimension "environment"
@@ -135,6 +145,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['devPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['devCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-dev'
         }
         envStaging {
@@ -156,6 +167,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['stagingPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['stagingCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
 
             versionNameSuffix '-staging'
             applicationId "piuk.blockchain.android.staging"
@@ -179,6 +191,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['testnetPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['testnetCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-testnet'
         }
     }
@@ -322,6 +335,3 @@ dependencies {
     testImplementation Libraries.json
     testImplementation project(':testutils-android')
 }
-
-// This must remain at the bottom of this file until Google work out a better way to do this
-apply plugin: 'com.google.gms.google-services'

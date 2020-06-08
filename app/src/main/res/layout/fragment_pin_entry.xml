@@ -59,11 +59,11 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/pin_box_0"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/rounded_view_blue_white_border"
             app:layout_constraintBottom_toTopOf="@id/fingerprint_logo"
             app:layout_constraintEnd_toStartOf="@+id/pinBox1"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/rounded_view_blue_white_border" />
 
         <ImageView
             android:id="@+id/pinBox1"
@@ -75,11 +75,11 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/pin_box_1"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/rounded_view_blue_white_border"
             app:layout_constraintBottom_toTopOf="@id/fingerprint_logo"
             app:layout_constraintEnd_toStartOf="@+id/pinBox2"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/pinBox0" />
+            app:layout_constraintStart_toEndOf="@+id/pinBox0"
+            app:srcCompat="@drawable/rounded_view_blue_white_border" />
 
         <ImageView
             android:id="@+id/pinBox2"
@@ -91,12 +91,12 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/pin_box_2"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/rounded_view_blue_white_border"
             app:layout_constraintBottom_toTopOf="@id/fingerprint_logo"
             app:layout_constraintEnd_toEndOf="@+id/titleBox"
             app:layout_constraintEnd_toStartOf="@+id/pinBox3"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/pinBox1" />
+            app:layout_constraintStart_toEndOf="@+id/pinBox1"
+            app:srcCompat="@drawable/rounded_view_blue_white_border" />
 
         <ImageView
             android:id="@+id/pinBox3"
@@ -108,11 +108,11 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/pin_box_3"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/rounded_view_blue_white_border"
             app:layout_constraintBottom_toTopOf="@id/fingerprint_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/pinBox2" />
+            app:layout_constraintStart_toEndOf="@+id/pinBox2"
+            app:srcCompat="@drawable/rounded_view_blue_white_border" />
 
         <ImageView
             android:id="@+id/fingerprint_logo"
@@ -134,10 +134,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="?selectableItemBackground"
+            android:contentDescription="@string/swipe_receive_hint"
             android:gravity="right"
             android:orientation="horizontal"
             android:paddingBottom="8dp"
-            android:contentDescription="@string/swipe_receive_hint"
             app:layout_constraintBottom_toTopOf="@+id/keyboard"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="RtlHardcoded">
@@ -172,6 +172,20 @@
             app:layout_constraintBottom_toTopOf="@+id/keyboard"
             app:layout_constraintStart_toStartOf="parent"
             tools:text="6.15.4" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/debug_commit_hash"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/keyboard"
+            app:layout_constraintEnd_toStartOf="@id/swipe_hint_layout"
+            app:layout_constraintStart_toEndOf="@id/text_view_version_code"
+            tools:text="213423jrb2f112312kf22313123edfdsfds" />
 
         <piuk.blockchain.android.ui.customviews.PinEntryKeypad
             android:id="@+id/keyboard"

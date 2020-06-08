@@ -2,7 +2,7 @@ package com.blockchain.swap.nabu.nabu
 
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.Tiers
+import com.blockchain.swap.nabu.models.nabu.TierLevels
 import com.blockchain.swap.nabu.models.nabu.UserState
 import org.amshove.kluent.`should be`
 import org.junit.Test
@@ -13,7 +13,7 @@ class NabuUserKycStateTests {
     fun `zero tiers`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 0,
                 selected = 0,
                 next = 0
@@ -28,7 +28,7 @@ class NabuUserKycStateTests {
     fun `null values tiers`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = null,
                 selected = null,
                 next = null
@@ -54,7 +54,7 @@ class NabuUserKycStateTests {
     fun `user going for tier 1`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 0,
                 selected = 1,
                 next = 1
@@ -69,7 +69,7 @@ class NabuUserKycStateTests {
     fun `user on tier 1`() {
         emptyNabuUser().copy(
             kycState = KycState.Verified,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 1,
                 selected = 1,
                 next = 2
@@ -84,7 +84,7 @@ class NabuUserKycStateTests {
     fun `user going for tier 2`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 1,
                 selected = 2,
                 next = 2
@@ -99,7 +99,7 @@ class NabuUserKycStateTests {
     fun `user on tier 2`() {
         emptyNabuUser().copy(
             kycState = KycState.Verified,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 2,
                 selected = 2,
                 next = 2
@@ -114,7 +114,7 @@ class NabuUserKycStateTests {
     fun `user on tier 3`() {
         emptyNabuUser().copy(
             kycState = KycState.Verified,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 3,
                 selected = 2,
                 next = 2
@@ -129,7 +129,7 @@ class NabuUserKycStateTests {
     fun `user being forced to to go tier 2`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 0,
                 selected = 1,
                 next = 2
@@ -144,7 +144,7 @@ class NabuUserKycStateTests {
     fun `user opting for tier 2`() {
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = 0,
                 selected = 2,
                 next = 1

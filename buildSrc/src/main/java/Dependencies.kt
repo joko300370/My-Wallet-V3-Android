@@ -74,7 +74,7 @@ object Versions {
     const val commonsIo = "2.6"
     const val urlBuilder = "2.0.9"
     const val yearclass = "2.0.0"
-    const val protobuf = "3.9.0"
+    const val protobuf = "3.0.1"
     const val findbugs = "3.0.2"
     const val guava = "28.0-android"
     const val dexter = "5.0.0"
@@ -95,7 +95,7 @@ object Versions {
     const val sparkline = "1.2.0"
 
     // Third Party SDKs
-    const val veriff = "2.8.0"
+    const val veriff = "2.13.0"
     const val probity = "1.0.0"
     const val cardForm = "4.2.0"
 
@@ -213,8 +213,8 @@ object Libraries {
     const val commonsCli = "commons-cli:commons-cli:${Versions.commonsCli}"
     const val commonsIo = "commons-io:commons-io:${Versions.commonsIo}"
     const val urlBuilder = "io.mikael:urlbuilder:${Versions.urlBuilder}"
-    const val yearclass = "com.facebook.device.yearclass:yearclass:${Versions.yearclass}"       
-    const val protobuf = "com.google.protobuf:protobuf-lite:3.0.1"
+    const val yearclass = "com.facebook.device.yearclass:yearclass:${Versions.yearclass}"
+    const val protobuf = "com.google.protobuf:protobuf-lite:${Versions.protobuf}"
     const val findbugs = "com.google.code.findbugs:jsr305:${Versions.findbugs}"
     const val guava = "com.google.guava:guava:${Versions.guava}"
     const val dexter = "com.karumi:dexter:${Versions.dexter}"

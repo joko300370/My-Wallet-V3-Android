@@ -31,7 +31,7 @@ data class NabuUser(
     val settings: NabuSettings? = null,
     val tags: Map<String, Map<String, String>>? = null,
     val userName: String? = null,
-    val tiers: Tiers? = null,
+    val tiers: TierLevels? = null,
     val walletGuid: String? = null
     // val depositAddresses":{  },  // Not sure what format these have yet. TODO: Find out
 ) : JsonSerializable {
@@ -76,7 +76,7 @@ data class NabuUser(
         get() = tags?.get("BLOCKSTACK") != null
 }
 
-data class Tiers(
+data class TierLevels(
     val current: Int?,
     val selected: Int?,
     val next: Int?

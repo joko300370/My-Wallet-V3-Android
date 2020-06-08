@@ -4,8 +4,8 @@ import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.metadata.NabuCredentialsMetadata
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -26,13 +26,14 @@ fun getBlankNabuUser(kycState: KycState = KycState.None): NabuUser = NabuUser(
 )
 
 val validOfflineTokenMetadata get() = NabuCredentialsMetadata("userId", "lifetimeToken")
-val validOfflineToken get() = NabuOfflineTokenResponse("userId",
-    "lifetimeToken")
+val validOfflineToken
+    get() = NabuOfflineTokenResponse("userId",
+        "lifetimeToken")
 
-fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
-    return TiersJson(
-        tiers = listOf(
-            TierJson(
+fun tiers(tier1State: KycTierState, tier2State: KycTierState): KycTiers {
+    return KycTiers(
+        tiersResponse = listOf(
+            TierResponse(
                 0,
                 "Tier 0",
                 state = KycTierState.Verified,
@@ -42,7 +43,7 @@ fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
                     annual = null
                 )
             ),
-            TierJson(
+            TierResponse(
                 1,
                 "Tier 1",
                 state = tier1State,
@@ -52,7 +53,7 @@ fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
                     annual = 1000.0.toBigDecimal()
                 )
             ),
-            TierJson(
+            TierResponse(
                 2,
                 "Tier 2",
                 state = tier2State,

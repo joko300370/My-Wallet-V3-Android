@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.auth
 
 import android.annotation.SuppressLint
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
-import android.view.View
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -23,6 +23,7 @@ import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.DialogButtonCallback
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -35,7 +36,6 @@ import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.net.SocketTimeoutException
@@ -94,6 +94,11 @@ class PinEntryPresenter(
         checkPinFails()
         checkFingerprintStatus()
         doTestnetCheck()
+        setupCommitHash()
+    }
+
+    private fun setupCommitHash() {
+        view.setupCommitHashView()
     }
 
     private fun doTestnetCheck() {

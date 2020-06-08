@@ -33,7 +33,6 @@ class LoginPresenter(
     override val enableLogoutTimer: Boolean = false
 
     internal fun pairWithQR(raw: String?) {
-        appUtil.clearCredentials()
 
         if (raw == null) view?.showToast(R.string.pairing_failed, ToastCustom.TYPE_ERROR)
 

@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.annotation.StringRes
 import androidx.navigation.NavDirections
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 
 interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 
@@ -10,5 +10,5 @@ interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 
     fun showErrorToast(@StringRes message: Int)
 
-    fun renderTiersList(tiers: TiersJson)
+    fun renderTiersList(tiers: KycTiers)
 }

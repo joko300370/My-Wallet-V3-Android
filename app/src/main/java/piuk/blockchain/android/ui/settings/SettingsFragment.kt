@@ -34,7 +34,7 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
@@ -316,9 +316,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         addPreferencesFromResource(R.xml.settings)
     }
 
-    override fun setKycState(kycState: Kyc2TierState) {
-        kycStatusPref?.setValue(kycState)
-        kycStatusPref?.isVisible = kycState != Kyc2TierState.Hidden
+    override fun setKycState(kycTiers: KycTiers) {
+        kycStatusPref?.setValue(kycTiers)
+        kycStatusPref?.isVisible = kycTiers.isInitialised()
     }
 
     override fun setGuidSummary(summary: String) {

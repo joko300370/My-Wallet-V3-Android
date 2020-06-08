@@ -1,14 +1,14 @@
 package piuk.blockchain.android.ui.kyc.status
 
 import androidx.annotation.StringRes
-import com.blockchain.swap.nabu.models.nabu.KycState
+import com.blockchain.swap.nabu.models.nabu.KycTierState
 import piuk.blockchain.androidcoreui.ui.base.View
 
 interface KycStatusView : View {
 
     fun finishPage()
 
-    fun renderUi(kycState: KycState)
+    fun renderUi(kycState: KycTierState)
 
     fun showProgressDialog()
 

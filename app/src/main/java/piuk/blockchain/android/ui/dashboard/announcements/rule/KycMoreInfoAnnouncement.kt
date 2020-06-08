@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.remoteconfig.FeatureFlag
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import piuk.blockchain.android.R
@@ -35,11 +35,7 @@ internal class KycMoreInfoAnnouncement(
 
     private fun didNotStartGoldLevelKyc(): Single<Boolean> =
         tierService.tiers().map {
-            it.combinedState !in listOf(
-                Kyc2TierState.Tier2InPending,
-                Kyc2TierState.Tier2Approved,
-                Kyc2TierState.Tier2Failed
-            )
+            it.isNotInitialisedFor(KycTierLevel.GOLD)
         }
 
     override fun show(host: AnnouncementHost) {

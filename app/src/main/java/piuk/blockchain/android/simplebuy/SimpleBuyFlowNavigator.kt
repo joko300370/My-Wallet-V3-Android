@@ -3,7 +3,7 @@ package piuk.blockchain.android.simplebuy
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -24,11 +24,10 @@ class SimpleBuyFlowNavigator(
                 it.currentScreen == FlowScreen.KYC_VERIFICATION
             ) {
                 tierService.tiers().toObservable().map { tier ->
-                    when (tier.combinedState) {
-                        Kyc2TierState.Tier2Approved -> FlowScreen.ENTER_AMOUNT
-                        Kyc2TierState.Tier2InPending,
-                        Kyc2TierState.Tier2InReview,
-                        Kyc2TierState.Tier2Failed -> FlowScreen.KYC_VERIFICATION
+                    when {
+                        tier.isApprovedFor(KycTierLevel.GOLD) -> FlowScreen.ENTER_AMOUNT
+                        tier.isPendingOrUnderReviewFor(KycTierLevel.GOLD) ||
+                                tier.isRejectedFor(KycTierLevel.GOLD) -> FlowScreen.KYC_VERIFICATION
                         else -> FlowScreen.KYC
                     }
                 }

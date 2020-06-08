@@ -4,8 +4,8 @@ import com.blockchain.swap.nabu.api.nabu.NABU_KYC_TIERS
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.KycTierStateAdapter
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.serialization.BigDecimalAdaptor
@@ -69,9 +69,9 @@ class NabuTiersServiceTest {
             .assertNoErrors()
             .values()
             .single() `should equal`
-            TiersJson(
-                tiers = listOf(
-                    TierJson(
+            KycTiers(
+                tiersResponse = listOf(
+                    TierResponse(
                         0,
                         "Tier 0",
                         state = KycTierState.Verified,
@@ -81,7 +81,7 @@ class NabuTiersServiceTest {
                             annual = null
                         )
                     ),
-                    TierJson(
+                    TierResponse(
                         1,
                         "Tier 1",
                         state = KycTierState.Pending,
@@ -91,7 +91,7 @@ class NabuTiersServiceTest {
                             annual = 1000.0.toBigDecimal()
                         )
                     ),
-                    TierJson(
+                    TierResponse(
                         2,
                         "Tier 2",
                         state = KycTierState.None,
