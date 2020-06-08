@@ -126,7 +126,7 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
         this.afterTextChangeEvents()
             .debounce(300, TimeUnit.MILLISECONDS)
             .map { it.editable()?.toString() ?: "" }
-            .skipFirstUnless { !it.isEmpty() }
+            .skipFirstUnless { it.isNotEmpty() }
             .observeOn(AndroidSchedulers.mainThread())
             .map { mapToCompleted(it) }
             .distinctUntilChanged()

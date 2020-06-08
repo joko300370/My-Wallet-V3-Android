@@ -1,8 +1,6 @@
 package piuk.blockchain.android.ui.kyc.status
 
 import piuk.blockchain.android.ui.kyc.BaseKycPresenter
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
-import com.blockchain.swap.nabu.models.nabu.KycState
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.notifications.NotificationTokenManager
@@ -21,8 +19,8 @@ class KycStatusPresenter(
 
     override fun onViewReady() {
         compositeDisposable +=
-            kycStatusHelper.getKyc2TierStatus()
-                .map { it.toKycState() }
+            kycStatusHelper.getKycTierStatus()
+                .map { it.highestActiveLevelState() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.showProgressDialog() }
                 .doOnEvent { _, _ -> view.dismissProgressDialog() }
@@ -32,20 +30,6 @@ class KycStatusPresenter(
                     onError = { view.finishPage() }
                 )
     }
-
-    private fun Kyc2TierState.toKycState(): KycState =
-        when (this) {
-            Kyc2TierState.Hidden -> KycState.None
-            Kyc2TierState.Locked -> KycState.None
-            Kyc2TierState.Tier1Pending -> KycState.Pending
-            Kyc2TierState.Tier1Approved -> KycState.Verified
-            Kyc2TierState.Tier1Failed -> KycState.Rejected
-            Kyc2TierState.Tier2InPending -> KycState.Pending
-            Kyc2TierState.Tier2Approved -> KycState.Verified
-            Kyc2TierState.Tier2Failed -> KycState.Rejected
-            Kyc2TierState.Tier2InReview -> KycState.UnderReview
-            Kyc2TierState.Tier1InReview -> KycState.UnderReview
-        }
 
     internal fun onClickNotifyUser() {
         compositeDisposable +=

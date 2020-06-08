@@ -3,7 +3,7 @@ package com.blockchain.swap.nabu.service
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
 import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.Authenticator
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -14,7 +14,7 @@ internal class NabuTierService(
     private val authenticator: Authenticator
 ) : TierService, TierUpdater {
 
-    override fun tiers(): Single<TiersJson> =
+    override fun tiers(): Single<KycTiers> =
         authenticator.authenticate {
             endpoint.getTiers(it.authHeader).wrapErrorMessage()
         }.subscribeOn(Schedulers.io())

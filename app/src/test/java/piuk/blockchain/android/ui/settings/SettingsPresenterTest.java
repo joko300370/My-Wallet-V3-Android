@@ -1,12 +1,13 @@
 package piuk.blockchain.android.ui.settings;
 
+import piuk.blockchain.android.ui.TestHelperKt;
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState;
+import com.blockchain.swap.nabu.models.nabu.KycTierState;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 
 import info.blockchain.wallet.api.data.Settings;
@@ -48,7 +49,6 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -145,7 +145,7 @@ public class SettingsPresenterTest extends RxTest {
         when(mockSettings.getSmsNumber()).thenReturn("sms");
         when(mockSettings.getEmail()).thenReturn("email");
         when(settingsDataManager.fetchSettings()).thenReturn(Observable.just(mockSettings));
-        when(kycStatusHelper.getSettingsKycState2Tier()).thenReturn(Single.just(Kyc2TierState.Hidden));
+        when(kycStatusHelper.getSettingsKycStateTier()).thenReturn(Single.just(TestHelperKt.tiers(KycTierState.None, KycTierState.None)));
 
         when(pitLinkState.isLinked()).thenReturn(false);
         when(custodialWalletManager.fetchUnawareLimitsCards(anyList()))
@@ -172,7 +172,7 @@ public class SettingsPresenterTest extends RxTest {
         Settings settings = new Settings();
         when(settingsDataManager.fetchSettings()).thenReturn(Observable.error(new Throwable()));
         when(pitLinkState.isLinked()).thenReturn(false);
-        when(kycStatusHelper.getSettingsKycState2Tier()).thenReturn(Single.just(Kyc2TierState.Tier2Approved));
+        when(kycStatusHelper.getSettingsKycStateTier()).thenReturn(Single.just(TestHelperKt.tiers(KycTierState.Verified, KycTierState.Verified)));
         when(pitLinking.getState()).thenReturn(Observable.just(pitLinkState));
         when(featureFlag.getEnabled()).thenReturn(Single.just(false));
         when(cardsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
@@ -194,43 +194,43 @@ public class SettingsPresenterTest extends RxTest {
 
     @Test
     public void onKycStatusClicked_should_launch_homebrew_tier1() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier1Approved);
+        assertClickLaunchesKyc(KycTierState.Verified, KycTierState.None);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_homebrew_tier2() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier2Approved);
+        assertClickLaunchesKyc(KycTierState.Verified, KycTierState.Verified);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_flow_locked() {
-        assertClickLaunchesKyc(Kyc2TierState.Locked);
+        assertClickLaunchesKyc(KycTierState.None, KycTierState.None);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier1_review() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier1Pending);
+        assertClickLaunchesKyc(KycTierState.Pending, KycTierState.None);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier2_review() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier2InPending);
+        assertClickLaunchesKyc(KycTierState.Verified, KycTierState.Pending);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier1_rejected() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier1Failed);
+        assertClickLaunchesKyc(KycTierState.Rejected, KycTierState.None);
     }
 
     @Test
     public void onKycStatusClicked_should_launch_kyc_status_tier2_rejected() {
-        assertClickLaunchesKyc(Kyc2TierState.Tier2Failed);
+        assertClickLaunchesKyc(KycTierState.Verified, KycTierState.Rejected);
     }
 
-    private void assertClickLaunchesKyc(Kyc2TierState status) {
+    private void assertClickLaunchesKyc(KycTierState status1, KycTierState status2) {
         // Arrange
-        when(kycStatusHelper.getKyc2TierStatus())
-                .thenReturn(Single.just(status));
+        when(kycStatusHelper.getKycTierStatus())
+                .thenReturn(Single.just(TestHelperKt.tiers(status1, status2)));
         // Act
         subject.onKycStatusClicked();
         // Assert

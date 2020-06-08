@@ -4,8 +4,8 @@ import androidx.navigation.NavDirections
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.swap.nabu.service.TierUpdater
 import com.blockchain.testutils.usd
@@ -141,7 +141,7 @@ class KycTierSplashPresenterTest {
         }
 }
 
-private fun givenTiers(tiers: TiersJson? = null): TierService =
+private fun givenTiers(tiers: KycTiers? = null): TierService =
     mock {
         on { tiers() } `it returns` Single.just(
             tiers ?: tiers(
@@ -151,10 +151,10 @@ private fun givenTiers(tiers: TiersJson? = null): TierService =
         )
     }
 
-fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState, FiatValue>) =
-    TiersJson(
-        tiers = listOf(
-            TierJson(
+private fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState, FiatValue>) =
+    KycTiers(
+        tiersResponse = listOf(
+            TierResponse(
                 0,
                 "Tier 0",
                 state = KycTierState.Verified,
@@ -164,7 +164,7 @@ fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState, FiatVa
                     annual = null
                 )
             ),
-            TierJson(
+            TierResponse(
                 1,
                 "Tier 1",
                 state = tier1.first,
@@ -174,7 +174,7 @@ fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState, FiatVa
                     annual = tier1.second.toBigDecimal()
                 )
             ),
-            TierJson(
+            TierResponse(
                 2,
                 "Tier 2",
                 state = tier2.first,

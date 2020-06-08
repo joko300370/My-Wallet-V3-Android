@@ -2,8 +2,8 @@ package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
@@ -53,19 +53,19 @@ class AnnouncementQueriesTest {
 
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.None,
                             sampleLimits
@@ -86,21 +86,21 @@ class AnnouncementQueriesTest {
     fun `isTier1Or2Verified returns true for tier2 verified`() {
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.Verified,
@@ -122,21 +122,21 @@ class AnnouncementQueriesTest {
     fun `isTier1Or2Verified returns false if not verified`() {
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
@@ -262,7 +262,7 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - SB state reports unfinished, but kyc docs are submitted - belt & braces case`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.Under_Review)))
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.UnderReview)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()

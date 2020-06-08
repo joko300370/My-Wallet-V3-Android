@@ -8,7 +8,8 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.ui.trackLoading
@@ -88,7 +89,7 @@ class SimpleBuyInteractor(
         tierService.tiers()
             .flatMap {
                 when {
-                    it.combinedState == Kyc2TierState.Tier2Approved ->
+                    it.isApprovedFor(KycTierLevel.GOLD) ->
                         custodialWalletManager.isEligibleForSimpleBuy(fiatCurrency).map { eligible ->
                             if (eligible) {
                                 SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)
@@ -96,10 +97,8 @@ class SimpleBuyInteractor(
                                 SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_BUT_NOT_ELIGIBLE)
                             }
                         }
-                    it.combinedState.isRejected() ->
-                        Single.just(SimpleBuyIntent.KycStateUpdated(KycState.FAILED))
-                    it.combinedState.isInReview() ->
-                        Single.just(SimpleBuyIntent.KycStateUpdated(KycState.IN_REVIEW))
+                    it.isRejectedForAny() -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.FAILED))
+                    it.isInReviewForAny() -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.IN_REVIEW))
                     else -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.PENDING))
                 }
             }.onErrorReturn {
@@ -110,17 +109,17 @@ class SimpleBuyInteractor(
             .last(SimpleBuyIntent.KycStateUpdated(KycState.PENDING))
             .map {
                 if (it.kycState == KycState.PENDING) {
-                    return@map SimpleBuyIntent.KycStateUpdated(KycState.UNDECIDED)
+                    SimpleBuyIntent.KycStateUpdated(KycState.UNDECIDED)
                 } else {
-                    return@map it
+                    it
                 }
             }
 
     fun checkTierLevel(fiatCurrency: String): Single<SimpleBuyIntent.KycStateUpdated> {
 
         return tierService.tiers().flatMap {
-            when (it.combinedState) {
-                Kyc2TierState.Tier2Approved -> custodialWalletManager.isEligibleForSimpleBuy(fiatCurrency)
+            when {
+                it.isApprovedFor(KycTierLevel.GOLD) -> custodialWalletManager.isEligibleForSimpleBuy(fiatCurrency)
                     .map { eligible ->
                         if (eligible) {
                             SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)
@@ -128,20 +127,20 @@ class SimpleBuyInteractor(
                             SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_BUT_NOT_ELIGIBLE)
                         }
                     }
-                Kyc2TierState.Tier2Failed -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.FAILED))
-                Kyc2TierState.Tier2InPending -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.IN_REVIEW))
+                it.isRejectedFor(KycTierLevel.GOLD) -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.FAILED))
+                it.isPendingFor(KycTierLevel.GOLD) -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.IN_REVIEW))
                 else -> Single.just(SimpleBuyIntent.KycStateUpdated(KycState.PENDING))
             }
         }.onErrorReturn { SimpleBuyIntent.KycStateUpdated(KycState.PENDING) }
     }
 
-    private fun Kyc2TierState.isRejected(): Boolean =
-        this == Kyc2TierState.Tier1Failed ||
-                this == Kyc2TierState.Tier2Failed
+    private fun KycTiers.isRejectedForAny(): Boolean =
+        isRejectedFor(KycTierLevel.SILVER) ||
+                isRejectedFor(KycTierLevel.GOLD)
 
-    private fun Kyc2TierState.isInReview(): Boolean =
-        this == Kyc2TierState.Tier1InReview ||
-                this == Kyc2TierState.Tier2InReview
+    private fun KycTiers.isInReviewForAny(): Boolean =
+        isUnderReviewFor(KycTierLevel.SILVER) ||
+                isUnderReviewFor(KycTierLevel.GOLD)
 
     fun exchangeRate(cryptoCurrency: CryptoCurrency): Single<SimpleBuyIntent.ExchangeRateUpdated> =
         coincore[cryptoCurrency].exchangeRate().map {
@@ -152,11 +151,11 @@ class SimpleBuyInteractor(
             Single<SimpleBuyIntent.PaymentMethodsUpdated> =
         tierService.tiers().flatMap { tier ->
             custodialWalletManager.fetchSuggestedPaymentMethod(fiatCurrency,
-                tier.combinedState == Kyc2TierState.Tier2Approved
+                tier.isApprovedFor(KycTierLevel.GOLD)
             ).map {
                 SimpleBuyIntent.PaymentMethodsUpdated(
                     it,
-                    tier.combinedState == Kyc2TierState.Tier2Approved,
+                    tier.isApprovedFor(KycTierLevel.GOLD),
                     preselectedId
                 )
             }

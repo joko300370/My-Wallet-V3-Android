@@ -5,9 +5,9 @@ import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.Tiers
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.TierLevels
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.mock
@@ -112,7 +112,7 @@ private infix fun <R> KycTiersQueries.then(function: KycTiersQueries.() -> Singl
         .assertComplete()
         .values().single()
 
-private infix fun NabuUser.and(tiersState: TiersJson): KycTiersQueries {
+private infix fun NabuUser.and(tiersState: KycTiers): KycTiersQueries {
     val nabuDataProvider = mock<NabuDataUserProvider> {
         on { getUser() } `it returns` Single.just(this@and)
     }
@@ -128,7 +128,7 @@ private fun givenUsersTiers(
     next: Int
 ) = emptyNabuUser()
     .copy(
-        tiers = Tiers(
+        tiers = TierLevels(
             selected = selected,
             current = current,
             next = next
@@ -151,9 +151,9 @@ private fun emptyNabuUser() =
     )
 
 private fun givenTiersState(tier1State: KycTierState, tier2State: KycTierState) =
-    TiersJson(
-        tiers = listOf(
-            TierJson(
+    KycTiers(
+        tiersResponse = listOf(
+            TierResponse(
                 0,
                 "Tier 0",
                 state = KycTierState.Verified,
@@ -163,7 +163,7 @@ private fun givenTiersState(tier1State: KycTierState, tier2State: KycTierState) 
                     annual = null
                 )
             ),
-            TierJson(
+            TierResponse(
                 1,
                 "Tier 1",
                 state = tier1State,
@@ -173,7 +173,7 @@ private fun givenTiersState(tier1State: KycTierState, tier2State: KycTierState) 
                     annual = 0.0.toBigDecimal()
                 )
             ),
-            TierJson(
+            TierResponse(
                 2,
                 "Tier 2",
                 state = tier2State,

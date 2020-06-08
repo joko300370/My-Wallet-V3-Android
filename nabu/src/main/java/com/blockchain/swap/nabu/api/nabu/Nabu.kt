@@ -19,7 +19,7 @@ import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
 import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.swap.nabu.models.nabu.SupportedDocumentsResponse
 import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.UpdateCoinifyTraderIdRequest
 import com.blockchain.swap.nabu.models.nabu.VeriffToken
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
@@ -158,7 +158,7 @@ internal interface Nabu {
     @GET(NABU_KYC_TIERS)
     fun getTiers(
         @Header("authorization") authorization: String
-    ): Single<TiersJson>
+    ): Single<KycTiers>
 
     @POST(NABU_KYC_TIERS)
     fun setTier(

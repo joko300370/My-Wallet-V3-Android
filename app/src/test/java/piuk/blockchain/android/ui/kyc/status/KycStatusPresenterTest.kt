@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.kyc.status
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.notifications.NotificationTokenManager
+import com.blockchain.swap.nabu.models.nabu.KycTierState
 import piuk.blockchain.android.ui.validOfflineToken
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
@@ -16,6 +16,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.android.ui.tiers
 
 class KycStatusPresenterTest {
 
@@ -45,7 +46,7 @@ class KycStatusPresenterTest {
     @Test
     fun `onViewReady exception thrown, finish page`() {
         // Arrange
-        whenever(kycStatusHelper.getKyc2TierStatus())
+        whenever(kycStatusHelper.getKycTierStatus())
             .thenReturn(Single.error { Throwable() })
         // Act
         subject.onViewReady()
@@ -56,20 +57,70 @@ class KycStatusPresenterTest {
     }
 
     @Test
-    fun `onViewReady user loaded`() {
+    fun `onViewReady user loaded with highest tier2 in pending`() {
         // Arrange
-        val kycState = KycState.Pending
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
-        whenever(kycStatusHelper.getKyc2TierStatus())
-            .thenReturn(Single.just(Kyc2TierState.Tier2InPending))
+        whenever(kycStatusHelper.getKycTierStatus())
+            .thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Pending)))
         // Act
         subject.onViewReady()
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).renderUi(kycState)
+        verify(view).renderUi(KycTierState.Pending)
+    }
+
+    @Test
+    fun `onViewReady user loaded with highest tier1 in pending`() {
+        // Arrange
+        val kycState = KycState.Pending
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(kycStatusHelper.getKycTierStatus())
+            .thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).renderUi(KycTierState.Pending)
+    }
+
+    @Test
+    fun `onViewReady user loaded with highest tier1 in failed`() {
+        // Arrange
+        val kycState = KycState.Pending
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(kycStatusHelper.getKycTierStatus())
+            .thenReturn(Single.just(tiers(KycTierState.Rejected, KycTierState.None)))
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).renderUi(KycTierState.Rejected)
+    }
+
+    @Test
+    fun `onViewReady user loaded with highest tier2 in failed`() {
+        // Arrange
+        val kycState = KycState.Pending
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(kycStatusHelper.getKycTierStatus())
+            .thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Rejected)))
+        // Act
+        subject.onViewReady()
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).renderUi(KycTierState.Rejected)
     }
 
     @Test
