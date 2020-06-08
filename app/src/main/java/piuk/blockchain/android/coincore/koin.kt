@@ -107,6 +107,7 @@ val coincoreModule = module {
 
         scoped {
             Coincore(
+                payloadManager = get(),
                 btcTokens = get(),
                 bchTokens = get(),
                 ethTokens = get(),

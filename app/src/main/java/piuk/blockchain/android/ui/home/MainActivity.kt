@@ -73,6 +73,7 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
+import piuk.blockchain.android.ui.transfer.TestSendContainerActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -394,6 +395,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
+            R.id.stub_send_test -> TestSendContainerActivity.start(this)
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)

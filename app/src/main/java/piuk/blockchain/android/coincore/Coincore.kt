@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Single
 import piuk.blockchain.android.coincore.bch.BchTokens
 import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
@@ -10,9 +11,12 @@ import piuk.blockchain.android.coincore.eth.EthTokens
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
 class Coincore internal constructor(
+    // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
+    private val payloadManager: PayloadDataManager,
     private val btcTokens: BtcTokens,
     private val bchTokens: BchTokens,
     private val ethTokens: EthTokens,
@@ -44,6 +48,9 @@ class Coincore internal constructor(
         ).doOnError {
             Timber.e("Coincore initialisation failed! $it")
         }
+
+    fun requireSecondPassword(): Single<Boolean> =
+        Single.fromCallable { payloadManager.isDoubleEncrypted }
 
     val allWallets: CryptoAccount by lazy {
         AllWalletsAccount(this, defaultLabels)

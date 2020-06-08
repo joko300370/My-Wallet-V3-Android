@@ -27,10 +27,5 @@ abstract class MviBottomSheet<M : MviModel<S, I>, I : MviIntent<S>, S : MviState
         super.onPause()
     }
 
-    override fun onDestroy() {
-        model.destroy()
-        super.onDestroy()
-    }
-
     protected abstract fun render(newState: S)
 }
