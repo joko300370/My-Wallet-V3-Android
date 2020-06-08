@@ -1,13 +1,13 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.view.View
-import android.widget.Toast
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.dialog_send_prototype.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import timber.log.Timber
 
 abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>() {
     override val model: SendModel by sendInject()
@@ -25,7 +25,7 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_password
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
     }
 
     override fun initControls(view: View) {
@@ -46,7 +46,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_address
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
     }
 
     override fun initControls(view: View) {
@@ -55,7 +55,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
 
     private fun onCtaClick() {
         model.process(SendIntent.AddressSelected(
-            object: CryptoAddress(CryptoCurrency.ETHER, "An Address") {
+            object : CryptoAddress(CryptoCurrency.ETHER, "An Address") {
                 override val label: String = "Label for ETH address"
             }
         ))
@@ -71,7 +71,7 @@ class EnterAmountSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! EnterAmountSheet")
     }
 
     override fun initControls(view: View) {
@@ -85,16 +85,16 @@ class EnterAmountSheet : SendInputSheet() {
     }
 
     companion object {
-        fun newInstance(): EnterTargetAddressSheet =
-            EnterTargetAddressSheet()
+        fun newInstance(): EnterAmountSheet =
+            EnterAmountSheet()
     }
 }
 
 class ConfirmTransactionSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_prototype
+    override val layoutResource: Int = R.layout.dialog_send_confirm
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
     }
 
     override fun initControls(view: View) {
@@ -112,15 +112,13 @@ class ConfirmTransactionSheet : SendInputSheet() {
 }
 
 class TransactionInProgressSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_prototype
+    override val layoutResource: Int = R.layout.dialog_send_in_progress
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! TransactionInProgressSheet")
     }
 
-    override fun initControls(view: View) {
-//        view.cta_button.setOnClickListener { onCtaClick() }
-    }
+    override fun initControls(view: View) { }
 
     companion object {
         fun newInstance(): TransactionInProgressSheet =
@@ -129,10 +127,10 @@ class TransactionInProgressSheet : SendInputSheet() {
 }
 
 class TransactionErrorSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_prototype
+    override val layoutResource: Int = R.layout.dialog_send_error
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! TransactionErrorSheet")
     }
 
     override fun initControls(view: View) {
@@ -150,10 +148,10 @@ class TransactionErrorSheet : SendInputSheet() {
 }
 
 class TransactionCompleteSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_prototype
+    override val layoutResource: Int = R.layout.dialog_send_complete
 
     override fun render(newState: SendState) {
-        Toast.makeText(context, "Rendering!", Toast.LENGTH_SHORT).show()
+        Timber.d("!SEND!> Rendering! TransactionCompleteSheet")
     }
 
     override fun initControls(view: View) {

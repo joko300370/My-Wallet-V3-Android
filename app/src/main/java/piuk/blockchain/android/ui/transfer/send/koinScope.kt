@@ -19,7 +19,7 @@ internal fun sendScope(): Scope =
 internal fun closeSendScope() =
     try {
         sendScope().close()
-    } catch(t: ScopeNotCreatedException) {
+    } catch (t: ScopeNotCreatedException) {
         Timber.d("Cannot close a non-existent scope")
     }
 

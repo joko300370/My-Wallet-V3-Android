@@ -26,7 +26,7 @@ data class SendState(
     val nextEnabled: Boolean = false,
     val processing: Boolean = true,
     val secondPassword: String = ""
-): MviState
+) : MviState
 
 class SendModel(
     initialState: SendState,
@@ -45,12 +45,12 @@ class SendModel(
                 .subscribeBy(
                     onSuccess = {
                         process(
-                            if(it)
+                            if (it)
                                 SendIntent.UpdatePasswordIsValidated(intent.password)
                             else
                                 SendIntent.UpdatePasswordNotValidated)
                     },
-                    onError = { /* Error! What to do? Abort? Or... */}
+                    onError = { /* Error! What to do? Abort? Or... */ }
                 )
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
@@ -67,5 +67,4 @@ class SendModel(
     override fun onStateUpdate(s: SendState) {
         Timber.d("!SEND!> Send Model: state update -> $s")
     }
-
 }

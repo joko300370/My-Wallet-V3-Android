@@ -26,5 +26,3 @@ val transferModule = module {
         }
     }
 }
-
-

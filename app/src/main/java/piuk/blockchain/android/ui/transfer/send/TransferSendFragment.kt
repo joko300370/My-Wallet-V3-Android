@@ -64,7 +64,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
             // Trigger intent to set initial state: source account & password required
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
-                onError = { Timber.e("Send state is broken: $it")}
+                onError = { Timber.e("Send state is broken: $it") }
             )
             process(SendIntent.Initialise(account, passwordRequired))
         }
@@ -73,9 +73,9 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
     private var currentStep: SendStep = SendStep.ZERO
 
     private fun handleStateChange(newState: SendState) {
-        if(currentStep != newState.currentStep) {
+        if (currentStep != newState.currentStep) {
             currentStep = newState.currentStep
-            if(currentStep == SendStep.ZERO) {
+            if (currentStep == SendStep.ZERO) {
                 onSendComplete()
             } else {
                 showFlowStep(currentStep)
@@ -97,10 +97,11 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
             }
         )
     }
+
     private fun openScope() =
         try {
             createSendScope()
-        } catch(e: Throwable) {
+        } catch (e: Throwable) {
             Timber.d("wtf? $e")
         }
 
@@ -135,4 +136,3 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
         fun newInstance() = TransferSendFragment()
     }
 }
-

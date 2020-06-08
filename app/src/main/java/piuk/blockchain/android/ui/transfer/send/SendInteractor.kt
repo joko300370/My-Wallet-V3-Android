@@ -9,4 +9,3 @@ class SendInteractor(
     fun validatePassword(password: String): Single<Boolean> =
         Single.just(true)
 }
-
