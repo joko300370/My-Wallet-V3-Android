@@ -34,7 +34,7 @@ internal class BchCryptoWalletAccount(
         get() = bchManager.getBalance(address)
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
-                if(it.amount != BigInteger.ZERO) {
+                if (it.amount != BigInteger.ZERO) {
                     hasFunds = true
                 }
             }

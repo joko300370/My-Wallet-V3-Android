@@ -28,7 +28,7 @@ internal class XlmCryptoWalletAccount(
     override val balance: Single<CryptoValue>
         get() = xlmManager.getBalance()
             .doOnSuccess {
-            if(it.amount != java.math.BigInteger.ZERO) {
+            if (it.amount != java.math.BigInteger.ZERO) {
                 hasFunds = true
             }
         }

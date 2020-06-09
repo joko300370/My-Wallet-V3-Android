@@ -46,7 +46,7 @@ internal class EthCryptoWalletAccount(
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .doOnSuccess {
-                if(it.amount != BigInteger.ZERO) {
+                if (it.amount != BigInteger.ZERO) {
                     hasFunds = true
                 }
             }

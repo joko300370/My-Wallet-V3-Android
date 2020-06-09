@@ -30,7 +30,7 @@ internal class PaxCryptoWalletAccount(
         get() = paxAccount.getBalance()
             .map { CryptoValue.fromMinor(CryptoCurrency.PAX, it) }
             .doOnSuccess {
-                if(it.amount != BigInteger.ZERO) {
+                if (it.amount != BigInteger.ZERO) {
                     hasFunds = true
                 }
             }

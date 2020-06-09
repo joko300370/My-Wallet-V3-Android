@@ -56,7 +56,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
                         onSuccess = {
                             val filteredAccounts = it.accounts
                                 .filterIsInstance<CryptoSingleAccount>()
-                                .filter{ a -> a.isFunded }
+                                .filter { a -> a.isFunded }
 
                             itemList.addAll(filteredAccounts)
                             accountAdapter.notifyDataSetChanged()
@@ -91,8 +91,6 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
                 activity?.finish()
             }
         )
-
-
     }
 
     private fun initialiseSendFlow(account: CryptoSingleAccount, passwordRequired: Boolean) {

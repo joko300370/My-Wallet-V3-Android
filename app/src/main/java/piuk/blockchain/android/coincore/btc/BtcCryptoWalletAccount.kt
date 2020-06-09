@@ -29,7 +29,7 @@ internal class BtcCryptoWalletAccount(
 
     override val balance: Single<CryptoValue>
         get() = payloadDataManager.getAddressBalanceRefresh(address).doOnSuccess {
-            if(it.amount != BigInteger.ZERO) {
+            if (it.amount != BigInteger.ZERO) {
                 hasFunds = true
             }
         }
