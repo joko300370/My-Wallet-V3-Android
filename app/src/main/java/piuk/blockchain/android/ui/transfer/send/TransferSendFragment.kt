@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
@@ -16,8 +18,10 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
@@ -34,6 +38,37 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        with(account_list) {
+            val accountAdapter = AccountsAdapter()
+            val itemList = mutableListOf<CryptoAccount>()
+            accountAdapter.itemsList = itemList
+
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            adapter = accountAdapter
+
+            CryptoCurrency.activeCurrencies().forEach { cc ->
+                disposables += coincore[cc].accounts()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onSuccess = {
+                            Timber.e("---- got account group ${it.label} ${it.accounts.size}")
+                            val filteredAccounts = it.accounts
+                                .filterIsInstance<CryptoSingleAccount>()
+                                // .filter { a -> a.hasTransactions }
+                            Timber.e("---- filtered accounts: ${filteredAccounts.size}")
+                            itemList.addAll(filteredAccounts)
+                            Timber.e("---- currentList $itemList ")
+                            accountAdapter.notifyDataSetChanged()
+                        },
+                        onError = {
+                            Timber.e("---- error getting currency ${it.message}")
+                        }
+                    )
+            }
+        }
+
 
         button_go.setOnClickListener { startSendFlow() }
     }
@@ -54,6 +89,8 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
                 activity?.finish()
             }
         )
+
+
     }
 
     private fun initialiseSendFlow(account: CryptoSingleAccount, passwordRequired: Boolean) {
