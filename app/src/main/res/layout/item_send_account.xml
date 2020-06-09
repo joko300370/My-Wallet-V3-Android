@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/item_account_parent"
     android:paddingStart="@dimen/standard_margin"
     android:paddingTop="@dimen/small_margin"
     android:paddingEnd="@dimen/standard_margin"

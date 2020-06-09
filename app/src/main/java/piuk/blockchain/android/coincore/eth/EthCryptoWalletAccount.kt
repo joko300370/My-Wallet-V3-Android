@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import java.math.BigInteger
 
 internal class EthCryptoWalletAccount(
     override val label: String,
@@ -35,10 +36,20 @@ internal class EthCryptoWalletAccount(
         exchangeRates
     )
 
+    private var hasFunds = false
+
+    override val isFunded: Boolean
+        get() = hasFunds
+
     override val balance: Single<CryptoValue>
         get() = ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
+            .doOnSuccess {
+                if(it.amount != BigInteger.ZERO) {
+                    hasFunds = true
+                }
+            }
 
     override val receiveAddress: Single<String>
         get() = Single.just(address)

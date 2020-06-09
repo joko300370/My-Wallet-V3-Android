@@ -177,9 +177,6 @@ abstract class CryptoSingleAccountNonCustodialBase(
     cryptoCurrency: CryptoCurrency
 ) : CryptoSingleAccountBase(cryptoCurrency) {
 
-    override val isFunded: Boolean
-        get() = false
-
     final override val actions: AvailableActions
         get() = availableActions
 

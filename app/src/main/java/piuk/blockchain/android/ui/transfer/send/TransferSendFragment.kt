@@ -29,6 +29,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
     private val disposables = CompositeDisposable()
     private val coincore: Coincore by scopedInject()
+    private val uiScheduler = AndroidSchedulers.mainThread()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +41,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
         super.onViewCreated(view, savedInstanceState)
 
         with(account_list) {
-            val accountAdapter = AccountsAdapter()
+            val accountAdapter = AccountsAdapter(disposables, ::onAccountSelected)
             val itemList = mutableListOf<CryptoAccount>()
             accountAdapter.itemsList = itemList
 
@@ -50,16 +51,14 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
             CryptoCurrency.activeCurrencies().forEach { cc ->
                 disposables += coincore[cc].accounts()
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .observeOn(uiScheduler)
                     .subscribeBy(
                         onSuccess = {
-                            Timber.e("---- got account group ${it.label} ${it.accounts.size}")
                             val filteredAccounts = it.accounts
                                 .filterIsInstance<CryptoSingleAccount>()
-                                // .filter { a -> a.hasTransactions }
-                            Timber.e("---- filtered accounts: ${filteredAccounts.size}")
+                                .filter{ a -> a.isFunded }
+
                             itemList.addAll(filteredAccounts)
-                            Timber.e("---- currentList $itemList ")
                             accountAdapter.notifyDataSetChanged()
                         },
                         onError = {
@@ -69,8 +68,11 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
             }
         }
 
-
         button_go.setOnClickListener { startSendFlow() }
+    }
+
+    private fun onAccountSelected(cryptoAccount: CryptoAccount) {
+        Timber.e("---- selected account: ${cryptoAccount.label}")
     }
 
     private fun startSendFlow() {
