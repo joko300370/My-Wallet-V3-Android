@@ -45,9 +45,14 @@ typealias CryptoSingleAccountList = List<CryptoSingleAccount>
 internal fun CryptoAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
+// Stub invalid account; use as an initialiser to avoid nulls.
 object NullAccount : CryptoSingleAccount {
+//    override val receiveAddress: Single<CryptoAddress>
+//        get() = Single.just(object : CryptoAddress())
+
     override val receiveAddress: Single<String>
         get() = Single.just("")
+
     override val isDefault: Boolean
         get() = false
     override val asset: CryptoCurrency

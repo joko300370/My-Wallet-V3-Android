@@ -1,10 +1,12 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
 import android.view.View
+import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.dialog_send_prototype.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
@@ -13,6 +15,8 @@ import piuk.blockchain.android.ui.transfer.send.SendState
 import timber.log.Timber
 
 class EnterTargetAddressSheet : SendInputSheet() {
+    private val addressFactory: AddressFactory by scopedInject()
+
     override val layoutResource: Int = R.layout.dialog_send_address
 
     override fun render(newState: SendState) {

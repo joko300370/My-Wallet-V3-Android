@@ -48,7 +48,7 @@ internal abstract class AssetTokensBase(
     private val accounts = mutableListOf<CryptoSingleAccount>()
 
     // Init token, set up accounts and fetch a few activities
-    fun init(): Completable =
+    override fun init(): Completable =
         initToken()
             .doOnError { throwable ->
                 crashLogger.logException(throwable, "Coincore: Failed to load $asset wallet")

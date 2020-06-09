@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -27,6 +28,8 @@ typealias AvailableActions = Set<AssetAction>
 
 interface AssetTokens {
     val asset: CryptoCurrency
+
+    fun init(): Completable
 
     fun defaultAccount(): Single<CryptoSingleAccount>
     fun accounts(filter: AssetFilter = AssetFilter.Total): Single<CryptoAccountGroup>

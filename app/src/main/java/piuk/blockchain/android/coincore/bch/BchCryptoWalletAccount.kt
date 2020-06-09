@@ -8,6 +8,7 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
@@ -37,6 +38,7 @@ internal class BchCryptoWalletAccount(
             ).map {
                 val address = Address.fromBase58(networkParams, it)
                 address.toCashAddress()
+
             }
             .singleOrError()
 
