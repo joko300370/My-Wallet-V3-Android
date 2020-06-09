@@ -42,31 +42,6 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     }
 }
 
-class EnterTargetAddressSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_address
-
-    override fun render(newState: SendState) {
-        Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
-    }
-
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
-    }
-
-    private fun onCtaClick() {
-        model.process(SendIntent.AddressSelected(
-            object : CryptoAddress(CryptoCurrency.ETHER, "An Address") {
-                override val label: String = "Label for ETH address"
-            }
-        ))
-    }
-
-    companion object {
-        fun newInstance(): EnterTargetAddressSheet =
-            EnterTargetAddressSheet()
-    }
-}
-
 class EnterAmountSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 

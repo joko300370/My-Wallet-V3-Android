@@ -18,6 +18,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.flow.EnterTargetAddressSheet
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
