@@ -14,13 +14,11 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -48,7 +46,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
         with(account_list) {
             val accountAdapter = AccountsAdapter(disposables, ::onAccountSelected)
-            val itemList = mutableListOf<CryptoAccount>()
+            val itemList = mutableListOf<CryptoSingleAccount>()
             accountAdapter.itemsList = itemList
 
             addItemDecoration(
@@ -85,39 +83,25 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
                     }
                 )
         }
-
-        button_go.setOnClickListener { startSendFlow() }
     }
 
     private fun showEmptyState() {
-        button_go.gone()
         account_list.gone()
+        send_blurb.gone()
         empty_view.visible()
         button_buy_crypto.setOnClickListener {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))
         }
     }
 
-    private fun onAccountSelected(cryptoAccount: CryptoAccount) {
-        Timber.e("---- selected account: ${cryptoAccount.label}")
-    }
-
-    private fun startSendFlow() {
-        // Get the selected crypto account - for now, just grab the default non-custodial
-        // when we have a configurable account selector, and have placed it in this fragment, we'll use that
-        // We also need to know if the selected account has a second password, so we'll query coincore for that
-
-        disposables += Singles.zip(
-            coincore[CryptoCurrency.ETHER].defaultAccount(),
-            coincore.requireSecondPassword()
-        ) { account, secondPassword ->
-            initialiseSendFlow(account, secondPassword)
-        }.subscribeBy(
-            onError = {
+    private fun onAccountSelected(cryptoAccount: CryptoSingleAccount) {
+        disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
+            .subscribeBy(onSuccess = { secondPassword ->
+                initialiseSendFlow(cryptoAccount, secondPassword)
+            }, onError = {
                 Timber.e("Unable to configure send flow, aborting. e == $it")
                 activity?.finish()
-            }
-        )
+            })
     }
 
     private fun initialiseSendFlow(account: CryptoSingleAccount, passwordRequired: Boolean) {

@@ -1762,5 +1762,7 @@
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+    <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
+    <string name="transfer_send_crypto">Send crypto</string>
 
 </resources>

@@ -10,14 +10,14 @@ import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_account.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoSingleAccount
 
 class AccountsAdapter(
     private val disposable: CompositeDisposable,
-    private val onAccountSelected: (CryptoAccount) -> Unit
+    private val onAccountSelected: (CryptoSingleAccount) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var itemsList = mutableListOf<CryptoAccount>()
+    var itemsList = mutableListOf<CryptoSingleAccount>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return AccountViewHolder(
@@ -44,7 +44,7 @@ private class AccountViewHolder(val parent: View, val disposable: CompositeDispo
     override val containerView: View?
         get() = itemView
 
-    fun bind(item: CryptoAccount, onAccountSelected: (CryptoAccount) -> Unit) {
+    fun bind(item: CryptoSingleAccount, onAccountSelected: (CryptoSingleAccount) -> Unit) {
         itemView.item_account_parent.setOnClickListener { onAccountSelected(item) }
         itemView.item_account_title.text = item.label
         disposable += item.balance.observeOn(AndroidSchedulers.mainThread()).subscribe({

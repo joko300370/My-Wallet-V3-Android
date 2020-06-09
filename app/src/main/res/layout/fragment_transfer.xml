@@ -19,33 +19,27 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_marginTop="56dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/send_blurb"
+            style="@style/Text.Semibold.20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            android:paddingBottom="@dimen/standard_margin"
+            android:text="@string/transfer_send_crypto"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/account_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/button_go"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- This is where the account selector will live etc -->
-        <!-- While I'm building the structure, this is just a button an we'll default to whatever -->
-        <!-- coin/asset we're currently implementing -->
-
-        <Button
-            android:id="@+id/button_go"
-            style="@style/CtaButton.Blue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Go!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/account_list" />
-
+            app:layout_constraintTop_toBottomOf="@id/send_blurb" />
 
         <LinearLayout
             android:id="@+id/empty_view"
@@ -55,7 +49,8 @@
             android:orientation="vertical"
             android:padding="@dimen/standard_margin"
             android:paddingBottom="@dimen/standard_margin"
-            tools:visibility="visible">
+            android:visibility="gone"
+            tools:visibility="gone">
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/Text.Semibold.Centered.20"
@@ -66,15 +61,15 @@
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/Text.Standard.Centered.14"
                 android:layout_width="match_parent"
-                android:layout_marginTop="@dimen/tiny_margin"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/tiny_margin"
                 android:text="@string/transfer_wallets_empty_details" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="match_parent"
-                android:layout_weight="1"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
+                android:layout_weight="1"
                 app:srcCompat="@drawable/ic_wallet_intro_image" />
 
             <Button
@@ -83,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="Buy Crypto"
+                android:text="@string/transfer_wallet_buy_crypto"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/account_list" />
 
