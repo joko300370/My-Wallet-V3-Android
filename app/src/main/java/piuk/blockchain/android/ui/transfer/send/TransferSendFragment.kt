@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
@@ -20,9 +22,13 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
@@ -45,30 +51,51 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
             val itemList = mutableListOf<CryptoAccount>()
             accountAdapter.itemsList = itemList
 
+            addItemDecoration(
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+
             layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             adapter = accountAdapter
 
-            CryptoCurrency.activeCurrencies().forEach { cc ->
-                disposables += coincore[cc].accounts()
-                    .observeOn(uiScheduler)
-                    .subscribeBy(
-                        onSuccess = {
-                            val filteredAccounts = it.accounts
-                                .filterIsInstance<CryptoSingleAccount>()
-                                .filter { a -> a.isFunded }
-
-                            itemList.addAll(filteredAccounts)
-                            accountAdapter.notifyDataSetChanged()
-                        },
-                        onError = {
-                            Timber.e("---- error getting currency ${it.message}")
+            disposables += Single.merge(
+                CryptoCurrency.activeCurrencies().map { ac ->
+                    coincore[ac].accounts()
+                }.toList())
+                .observeOn(uiScheduler)
+                .subscribeBy(
+                    onNext = {
+                        itemList.addAll(it.accounts
+                            .filterIsInstance<CryptoSingleAccount>()
+                            .filter { a -> a.isFunded })
+                        accountAdapter.notifyDataSetChanged()
+                    },
+                    onError = {
+                        ToastCustom.makeText(
+                            requireContext(),
+                            getString(R.string.transfer_wallets_load_error),
+                            ToastCustom.LENGTH_SHORT,
+                            ToastCustom.TYPE_ERROR
+                        )
+                    },
+                    onComplete = {
+                        if (itemList.isEmpty()) {
+                            showEmptyState()
                         }
-                    )
-            }
+                    }
+                )
         }
 
         button_go.setOnClickListener { startSendFlow() }
+    }
+
+    private fun showEmptyState() {
+        button_go.gone()
+        account_list.gone()
+        empty_view.visible()
+        button_buy_crypto.setOnClickListener {
+            startActivity(SimpleBuyActivity.newInstance(requireContext()))
+        }
     }
 
     private fun onAccountSelected(cryptoAccount: CryptoAccount) {
