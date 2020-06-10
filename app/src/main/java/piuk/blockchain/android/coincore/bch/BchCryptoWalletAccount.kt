@@ -15,6 +15,7 @@ import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BchCryptoWalletAccount(
     override val label: String,
@@ -25,17 +26,17 @@ internal class BchCryptoWalletAccount(
     private val networkParams: NetworkParameters
 ) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BCH) {
 
-    private var hasFunds = false
+    private var hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
-        get() = hasFunds
+        get() = hasFunds.get()
 
     override val balance: Single<CryptoValue>
         get() = bchManager.getBalance(address)
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
-                if (it.amount != BigInteger.ZERO) {
-                    hasFunds = true
+                if (it.amount > BigInteger.ZERO) {
+                    hasFunds.set(true)
                 }
             }
 

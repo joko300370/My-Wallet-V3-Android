@@ -14,6 +14,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BtcCryptoWalletAccount(
     override val label: String,
@@ -22,15 +23,15 @@ internal class BtcCryptoWalletAccount(
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BTC) {
-    private var hasFunds = false
+    private var hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
-        get() = hasFunds
+        get() = hasFunds.get()
 
     override val balance: Single<CryptoValue>
         get() = payloadDataManager.getAddressBalanceRefresh(address).doOnSuccess {
-            if (it.amount != BigInteger.ZERO) {
-                hasFunds = true
+            if (it.amount > BigInteger.ZERO) {
+                hasFunds.set(true)
             }
         }
 

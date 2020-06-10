@@ -10,6 +10,8 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class XlmCryptoWalletAccount(
     override val label: String = "",
@@ -20,16 +22,16 @@ internal class XlmCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
-    private var hasFunds = false
+    private var hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
-        get() = hasFunds
+        get() = hasFunds.get()
 
     override val balance: Single<CryptoValue>
         get() = xlmManager.getBalance()
             .doOnSuccess {
-            if (it.amount != java.math.BigInteger.ZERO) {
-                hasFunds = true
+            if (it.amount > BigInteger.ZERO) {
+                hasFunds.set(true)
             }
         }
 

@@ -14,6 +14,7 @@ import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
     override val label: String,
@@ -36,18 +37,18 @@ internal class EthCryptoWalletAccount(
         exchangeRates
     )
 
-    private var hasFunds = false
+    private var hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
-        get() = hasFunds
+        get() = hasFunds.get()
 
     override val balance: Single<CryptoValue>
         get() = ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .doOnSuccess {
-                if (it.amount != BigInteger.ZERO) {
-                    hasFunds = true
+                if (it.amount > BigInteger.ZERO) {
+                    hasFunds.set(true)
                 }
             }
 
