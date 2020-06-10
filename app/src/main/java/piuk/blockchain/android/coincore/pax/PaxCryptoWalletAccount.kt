@@ -11,6 +11,8 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import java.math.BigInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class PaxCryptoWalletAccount(
     override val label: String,
@@ -20,9 +22,19 @@ internal class PaxCryptoWalletAccount(
 ) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.PAX) {
     override val isDefault: Boolean = true // Only one account, so always default
 
+    private var hasFunds = AtomicBoolean(false)
+
+    override val isFunded: Boolean
+        get() = hasFunds.get()
+
     override val balance: Single<CryptoValue>
         get() = paxAccount.getBalance()
             .map { CryptoValue.fromMinor(CryptoCurrency.PAX, it) }
+            .doOnSuccess {
+                if (it.amount > BigInteger.ZERO) {
+                    hasFunds.set(true)
+                }
+            }
 
     override val receiveAddress: Single<String>
         get() = Single.just(address)

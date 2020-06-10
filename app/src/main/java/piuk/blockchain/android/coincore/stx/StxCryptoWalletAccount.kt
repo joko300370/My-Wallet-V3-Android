@@ -13,6 +13,9 @@ class StxCryptoWalletAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.STX) {
 
+    override val isFunded: Boolean
+        get() = false
+
     override val isDefault: Boolean = true // Only one account ever, so always default
 
     override val balance: Single<CryptoValue>

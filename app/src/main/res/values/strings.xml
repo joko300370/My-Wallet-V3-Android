@@ -1750,6 +1750,11 @@
     <string name="activity_details_to_load_fail">Couldn\'t load To address information</string>
     <string name="activity_details_from_load_fail">Couldn\'t load From address information</string>
 
+    <!-- Transfer -->
+    <string name="transfer_wallets_empty_title">No crypto to send</string>
+    <string name="transfer_wallets_empty_details">Looks like your wallets are empty, we can help you buy crypto</string>
+    <string name="transfer_wallets_load_error">There was an error loading your wallets, please try again later</string>
+
     <string name="order_pending">Pending</string>
     <string name="order_complete">Complete</string>
     <string name="expired">Expired</string>
@@ -1757,5 +1762,7 @@
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+    <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
+    <string name="transfer_send_crypto">Send crypto</string>
 
 </resources>
