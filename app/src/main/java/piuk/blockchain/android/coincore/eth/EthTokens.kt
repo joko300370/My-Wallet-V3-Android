@@ -13,7 +13,6 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
-import piuk.blockchain.android.coincore.impl.EnteredAddress
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
@@ -89,11 +88,18 @@ internal class EthTokens(
 
     override fun parseAddress(address: String): CryptoAddress? =
         if (isValidAddress(address)) {
-            EnteredAddress(CryptoCurrency.ETHER, address)
+            EthAddress(address)
         } else {
             null
         }
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
+}
+
+internal class EthAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.ETHER
 }

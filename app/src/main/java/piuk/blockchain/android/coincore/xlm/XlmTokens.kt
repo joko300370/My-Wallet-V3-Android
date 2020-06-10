@@ -8,7 +8,6 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
@@ -59,4 +58,11 @@ internal class XlmTokens(
 
     private fun isValidAddress(address: String): Boolean =
         xlmDataManager.isAddressValid(address)
+}
+
+internal class XlmAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.XLM
 }

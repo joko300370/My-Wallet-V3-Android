@@ -8,7 +8,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
@@ -75,4 +74,11 @@ internal class StxTokens(
 
     private fun isValidAddress(address: String): Boolean =
         false
+}
+
+internal class StxAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.STX
 }

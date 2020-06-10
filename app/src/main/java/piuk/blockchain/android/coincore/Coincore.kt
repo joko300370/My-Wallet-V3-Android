@@ -28,8 +28,7 @@ class Coincore internal constructor(
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
-    val tokens: Iterable<AssetTokens>
-        = tokenMap.values
+    val tokens: Iterable<AssetTokens> = tokenMap.values
 
     val allWallets: CryptoAccount by lazy {
         AllWalletsAccount(this, defaultLabels)

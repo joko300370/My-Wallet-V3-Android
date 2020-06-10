@@ -6,14 +6,16 @@ interface ReceiveAddress {
     val label: String
 }
 
-abstract class CryptoAddress(
-    val asset: CryptoCurrency,
+interface CryptoAddress : ReceiveAddress {
+    val asset: CryptoCurrency
     val address: String
-) : ReceiveAddress
+}
 
 typealias AddressList = List<ReceiveAddress>
 
-object NullAddress : CryptoAddress(CryptoCurrency.BTC, "") {
+object NullAddress : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.BTC
+    override val address: String = ""
     override val label: String = ""
 }
 

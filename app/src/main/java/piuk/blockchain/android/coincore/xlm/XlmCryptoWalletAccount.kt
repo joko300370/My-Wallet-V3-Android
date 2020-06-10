@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoValue
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -35,8 +36,10 @@ internal class XlmCryptoWalletAccount(
             }
         }
 
-    override val receiveAddress: Single<String>
-        get() = Single.just(address)
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            XlmAddress(address, label)
+        )
 
     override val activity: Single<ActivitySummaryList>
         get() = xlmManager.getTransactionList()

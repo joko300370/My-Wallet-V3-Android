@@ -185,4 +185,3 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
         fun newInstance() = TransferSendFragment()
     }
 }
-

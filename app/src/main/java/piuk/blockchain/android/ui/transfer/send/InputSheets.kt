@@ -5,9 +5,7 @@ import androidx.annotation.StringRes
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.dialog_send_prototype.view.*
-import kotlinx.android.synthetic.main.fragment_kyc_country_selection.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber

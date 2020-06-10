@@ -42,15 +42,12 @@ interface AssetTokens {
     fun parseAddress(address: String): CryptoAddress?
 }
 
-
 // TODO Address Parsing, from various places. Split and move to the appropriate token classes
-
-
-//fun handlePredefinedInput(
+// fun handlePredefinedInput(
 //    untrimmedscanData: String,
 //    defaultCurrency: CryptoCurrency,
 //    isDeepLinked: Boolean
-//) {
+// ) {
 //    val address: String
 //
 //    if (untrimmedscanData.isValidXlmQr()) {
@@ -138,9 +135,9 @@ interface AssetTokens {
 //    if (address != "") {
 //        delegate.processURIScanAddress(address)
 //    }
-//}
+// }
 //
-//private fun handleBitPayInvoice(invoiceId: String) {
+// private fun handleBitPayInvoice(invoiceId: String) {
 //    compositeDisposable += bitpayDataManager.getRawPaymentRequest(invoiceId = invoiceId)
 //        .doOnSuccess {
 //            val cryptoValue = CryptoValue(selectedCrypto, it.instructions[0].outputs[0].amount)
@@ -163,44 +160,40 @@ interface AssetTokens {
 //        }.doOnError {
 //            Timber.e(it)
 //        }.subscribe()
-//}
+// }
 //
-//private fun String.isBitpayAddress(): Boolean {
+// private fun String.isBitpayAddress(): Boolean {
 //
 //    val amount = FormatsUtil.getBitcoinAmount(this)
 //    val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(this)
 //    return amount == "0.0000" &&
 //        paymentRequestUrl.contains(bitpayInvoiceUrl)
-//}
+// }
 //
+// private fun requestScan() {
 //
+//   val fragment = currentFragment::class.simpleName ?: "unknown"
 //
+//    analytics.logEvent(object : AnalyticsEvent {
+//        override val event = "qr_scan_requested"
+//        override val params = mapOf("fragment" to fragment)
+//    })
 //
-////private fun requestScan() {
-////
-////    val fragment = currentFragment::class.simpleName ?: "unknown"
-////
-////    analytics.logEvent(object : AnalyticsEvent {
-////        override val event = "qr_scan_requested"
-////        override val params = mapOf("fragment" to fragment)
-////    })
-////
-////    val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-////        .with(coordinator_layout, R.string.request_camera_permission)
-////        .withButton(android.R.string.ok) { requestScan() }
-////        .build()
-////
-////    val grantedPermissionListener = CameraPermissionListener(analytics, {
-////        startScanActivity()
-////    })
-////
-////    val compositePermissionListener =
-////        CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-////
-////    Dexter.withActivity(this)
-////        .withPermission(Manifest.permission.CAMERA)
-////        .withListener(compositePermissionListener)
-////        .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-////        .check()
-////}
-
+//    val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
+//        .with(coordinator_layout, R.string.request_camera_permission)
+//        .withButton(android.R.string.ok) { requestScan() }
+//        .build()
+//
+//    val grantedPermissionListener = CameraPermissionListener(analytics, {
+//        startScanActivity()
+//    })
+//
+//    val compositePermissionListener =
+//        CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
+//
+//    Dexter.withActivity(this)
+//        .withPermission(Manifest.permission.CAMERA)
+//        .withListener(compositePermissionListener)
+//        .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
+//        .check()
+// }

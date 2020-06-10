@@ -63,7 +63,7 @@ class CustodialTradingAccount(
 
     private val hasSeenFunds = AtomicBoolean(false)
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
@@ -141,7 +141,7 @@ internal class CryptoInterestAccount(
 
     private val isConfigured = AtomicBoolean(false)
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
@@ -183,8 +183,14 @@ internal class CryptoExchangeAccount(
     override val balance: Single<CryptoValue>
         get() = Single.just(CryptoValue.zero(asset))
 
-    override val receiveAddress: Single<String>
-        get() = TODO("not implemented")
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            ExchangeAddress(
+                asset = asset,
+                label = label,
+                address = address
+            )
+        )
 
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
@@ -196,7 +202,6 @@ internal class CryptoExchangeAccount(
         get() = Single.just(emptyList())
 
     override val actions: AvailableActions = emptySet()
-
 }
 
 abstract class CryptoSingleAccountNonCustodialBase(

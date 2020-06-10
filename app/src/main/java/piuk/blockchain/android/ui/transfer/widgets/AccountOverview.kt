@@ -19,7 +19,7 @@ class AccountOverview @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-): ConstraintLayout(ctx, attr, defStyle), KoinComponent {
+) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
 
     private val disposable = CompositeDisposable()
 
@@ -50,4 +50,3 @@ class AccountOverview @JvmOverloads constructor(
             )
     }
 }
-

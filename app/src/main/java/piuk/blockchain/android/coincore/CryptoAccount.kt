@@ -28,8 +28,7 @@ interface CryptoAccount {
 }
 
 interface CryptoSingleAccount : CryptoAccount {
-    val receiveAddress: Single<String>
-//    val receiveAddress: Single<CryptoAddress>
+    val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
     val asset: CryptoCurrency
 
@@ -47,11 +46,8 @@ internal fun CryptoAccount.isCustodial(): Boolean =
 
 // Stub invalid account; use as an initialiser to avoid nulls.
 object NullAccount : CryptoSingleAccount {
-//    override val receiveAddress: Single<CryptoAddress>
-//        get() = Single.just(object : CryptoAddress())
-
-    override val receiveAddress: Single<String>
-        get() = Single.just("")
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
         get() = false

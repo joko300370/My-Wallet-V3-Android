@@ -52,8 +52,13 @@ internal class EthCryptoWalletAccount(
                 }
             }
 
-    override val receiveAddress: Single<String>
-        get() = Single.just(address)
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            EthAddress(
+                    address = address,
+                    label = label
+            )
+        )
 
     override val activity: Single<ActivitySummaryList>
         get() = ethDataManager.getLatestBlockNumber()

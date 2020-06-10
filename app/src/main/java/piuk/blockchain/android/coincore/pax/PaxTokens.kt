@@ -10,7 +10,6 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
@@ -74,4 +73,11 @@ internal class PaxTokens(
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
+}
+
+internal class PaxAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.PAX
 }

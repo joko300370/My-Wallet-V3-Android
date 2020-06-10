@@ -6,6 +6,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -36,8 +37,10 @@ internal class PaxCryptoWalletAccount(
                 }
             }
 
-    override val receiveAddress: Single<String>
-        get() = Single.just(address)
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            PaxAddress(address, label)
+        )
 
     override val activity: Single<ActivitySummaryList>
         get() {
