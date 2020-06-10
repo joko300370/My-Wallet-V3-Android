@@ -134,13 +134,6 @@ internal abstract class AssetTokensBase(
                 ExchangeAddress(asset, address, labels)
             }
 
-    final override fun validateAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            EnteredAddress(asset, address)
-        } else {
-            null
-        }
-
     // These are constant ATM, but may need to change this so hardcode here
     protected val transactionFetchCount = 50
     protected val transactionFetchOffset = 0

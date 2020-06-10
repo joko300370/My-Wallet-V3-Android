@@ -10,9 +10,11 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressList
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.impl.EnteredAddress
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
@@ -86,6 +88,13 @@ internal class EthTokens(
             .toSingle(emptyList())
     }
 
-    override fun isValidAddress(address: String): Boolean =
+    override fun parseAddress(address: String): CryptoAddress? =
+        if (isValidAddress(address)) {
+            EnteredAddress(CryptoCurrency.ETHER, address)
+        } else {
+            null
+        }
+
+    private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
 }

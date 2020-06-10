@@ -9,6 +9,7 @@ import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressList
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
@@ -69,6 +70,9 @@ internal class StxTokens(
     override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
         Single.just(emptyList())
 
-    override fun isValidAddress(address: String): Boolean =
+    override fun parseAddress(address: String): CryptoAddress? =
+        null
+
+    private fun isValidAddress(address: String): Boolean =
         false
 }

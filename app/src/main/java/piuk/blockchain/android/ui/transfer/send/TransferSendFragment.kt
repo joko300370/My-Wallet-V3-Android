@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,18 +9,34 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.sunriver.isValidXlmQr
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.listener.single.CompositePermissionListener
+import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.send.SendFragment
+import piuk.blockchain.android.ui.send.strategy.BitPayProtocol
 import piuk.blockchain.android.ui.transfer.send.flow.EnterTargetAddressSheet
+import piuk.blockchain.android.ui.zxing.CaptureActivity
+import piuk.blockchain.androidcore.data.exchangerate.toFiat
+import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
@@ -137,3 +155,4 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
         fun newInstance() = TransferSendFragment()
     }
 }
+

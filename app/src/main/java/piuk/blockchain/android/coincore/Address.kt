@@ -13,11 +13,14 @@ abstract class CryptoAddress(
 
 typealias AddressList = List<ReceiveAddress>
 
+object NullAddress : CryptoAddress(CryptoCurrency.BTC, "") {
+    override val label: String = ""
+}
+
 interface AddressFactory {
     fun parse(address: String): Set<CryptoAddress>
     fun parse(address: String, ccy: CryptoCurrency): CryptoAddress?
 }
-
 
 class AddressFactoryImpl(
     private val coincore: Coincore
@@ -29,9 +32,9 @@ class AddressFactoryImpl(
      **/
     override fun parse(address: String): Set<CryptoAddress> =
         coincore.tokens.mapNotNull { t: AssetTokens ->
-            t.validateAddress(address)
+            t.parseAddress(address)
         }.toSet()
 
     override fun parse(address: String, ccy: CryptoCurrency): CryptoAddress? =
-        coincore[ccy].validateAddress(address)
+        coincore[ccy].parseAddress(address)
 }
