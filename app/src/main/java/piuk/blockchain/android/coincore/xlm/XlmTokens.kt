@@ -51,7 +51,7 @@ internal class XlmTokens(
                 listOf(XlmCryptoWalletAccount(it, xlmDataManager, exchangeRates))
             }
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
+    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =

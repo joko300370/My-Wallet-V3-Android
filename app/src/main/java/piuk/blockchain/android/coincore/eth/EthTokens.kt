@@ -9,7 +9,6 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AddressList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
@@ -75,7 +74,7 @@ internal class EthTokens(
         }
     }
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> {
+    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> {
         require(account.cryptoCurrencies.contains(CryptoCurrency.ETHER))
 
         // ETH Only supports transfer between non-custodial and exchange account at this time
@@ -83,7 +82,7 @@ internal class EthTokens(
             return Single.just(emptyList())
         }
 
-        return getPitLinkingAddress()
+        return getPitLinkingAccount()
             .map { listOf(it) }
             .toSingle(emptyList())
     }

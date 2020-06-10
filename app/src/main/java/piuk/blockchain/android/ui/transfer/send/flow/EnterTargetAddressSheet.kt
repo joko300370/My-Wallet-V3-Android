@@ -14,9 +14,11 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
+import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
@@ -31,7 +33,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
 
-        view?.let {
+        dialogView?.let {
             it.from_details.account = newState.sendingAccount
             it.cta_button.isEnabled = newState.nextEnabled
         }
@@ -59,18 +61,22 @@ class EnterTargetAddressSheet : SendInputSheet() {
     }
 
     private fun setupTransferList() {
-        layoutManager = LinearLayoutManager(requireContext())
-        adapter = theAdapter
+        with(dialogView.wallet_select) {
+            val accountAdapter = AccountsAdapter(::accountSelected)
+            val itemList = mutableListOf<CryptoSingleAccount>()
+            accountAdapter.itemsList = itemList
 
-        addItemDecoration(
-            DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-        )
+            addItemDecoration(
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+            )
 
-        val itemList = mutableListOf<CryptoAccount>()
-        theAdapter.items = itemList
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            adapter = accountAdapter
+        }
+    }
 
-        dialogView.wallet_select
-
+    private fun accountSelected(account: CryptoSingleAccount) {
+//        addressSelected(account.receiveAddress)
     }
 
     private fun onLaunchAddressScan() {
@@ -84,7 +90,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
         }
     }
 
-    private fun addressSelected(address:CryptoAddress) {
+    private fun addressSelected(address: CryptoAddress) {
         SendIntent.AddressSelected(address)
     }
 

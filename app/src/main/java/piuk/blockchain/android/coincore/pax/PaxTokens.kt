@@ -66,7 +66,7 @@ internal class PaxTokens(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         Single.just(emptyList())
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
+    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =

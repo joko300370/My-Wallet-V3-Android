@@ -134,6 +134,20 @@ internal abstract class AssetTokensBase(
                 ExchangeAddress(asset, address, labels)
             }
 
+    protected fun getPitLinkingAccount(): Maybe<CryptoSingleAccount> =
+        pitLinking.isPitLinked().filter { it }
+            .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
+            .map { address ->
+                CryptoExchangeAccount(
+                    cryptoCurrency = asset,
+                    label = labels.getDefaultExchangeWalletLabel(asset),
+                    address = address,
+                    exchangeRates = exchangeRates
+                )
+            }
+
+
+
     // These are constant ATM, but may need to change this so hardcode here
     protected val transactionFetchCount = 50
     protected val transactionFetchOffset = 0

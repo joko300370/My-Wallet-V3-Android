@@ -1,49 +1,40 @@
 package piuk.blockchain.android.ui.transfer.send
 
-import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.AnalyticsEvent
-import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.sunriver.isValidXlmQr
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
-import info.blockchain.wallet.util.FormatsUtil
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.ui.send.SendFragment
-import piuk.blockchain.android.ui.send.strategy.BitPayProtocol
 import piuk.blockchain.android.ui.transfer.send.flow.EnterTargetAddressSheet
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
 
     private val disposables = CompositeDisposable()
     private val coincore: Coincore by scopedInject()
+    private val uiScheduler = AndroidSchedulers.mainThread()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,25 +45,64 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_go.setOnClickListener { startSendFlow() }
+        with(account_list) {
+            val accountAdapter = AccountsAdapter(::onAccountSelected)
+            val itemList = mutableListOf<CryptoSingleAccount>()
+            accountAdapter.itemsList = itemList
+
+            addItemDecoration(
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            adapter = accountAdapter
+
+            disposables += Single.merge(
+                CryptoCurrency.activeCurrencies().map { ac ->
+                    coincore[ac].accounts()
+                }.toList())
+                .observeOn(uiScheduler)
+                .subscribeBy(
+                    onNext = {
+                        itemList.addAll(it.accounts
+                            .filterIsInstance<CryptoSingleAccount>()
+                            .filter { a -> a.isFunded })
+                        accountAdapter.notifyDataSetChanged()
+                    },
+                    onError = {
+                        ToastCustom.makeText(
+                            requireContext(),
+                            getString(R.string.transfer_wallets_load_error),
+                            ToastCustom.LENGTH_SHORT,
+                            ToastCustom.TYPE_ERROR
+                        )
+                    },
+                    onComplete = {
+                        if (itemList.isEmpty()) {
+                            showEmptyState()
+                        }
+                    }
+                )
+        }
     }
 
-    private fun startSendFlow() {
-        // Get the selected crypto account - for now, just grab the default non-custodial
-        // when we have a configurable account selector, and have placed it in this fragment, we'll use that
-        // We also need to know if the selected account has a second password, so we'll query coincore for that
+    private fun showEmptyState() {
+        account_list.gone()
+        send_blurb.gone()
+        empty_view.visible()
+        button_buy_crypto.setOnClickListener {
+            startActivity(SimpleBuyActivity.newInstance(requireContext()))
+        }
+    }
 
-        disposables += Singles.zip(
-            coincore[CryptoCurrency.ETHER].defaultAccount(),
-            coincore.requireSecondPassword()
-        ) { account, secondPassword ->
-            initialiseSendFlow(account, secondPassword)
-        }.subscribeBy(
-            onError = {
+    private fun onAccountSelected(cryptoAccount: CryptoSingleAccount) {
+        disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
+            .subscribeBy(onSuccess = { secondPassword ->
+                initialiseSendFlow(cryptoAccount, secondPassword)
+            }, onError = {
                 Timber.e("Unable to configure send flow, aborting. e == $it")
                 activity?.finish()
-            }
-        )
+            })
     }
 
     private fun initialiseSendFlow(account: CryptoSingleAccount, passwordRequired: Boolean) {

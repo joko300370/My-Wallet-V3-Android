@@ -37,7 +37,7 @@ interface AssetTokens {
     fun historicRate(epochWhen: Long): Single<FiatValue>
     fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries>
 
-    fun canTransferTo(account: CryptoSingleAccount): Single<AddressList>
+    fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList>
 
     fun parseAddress(address: String): CryptoAddress?
 }

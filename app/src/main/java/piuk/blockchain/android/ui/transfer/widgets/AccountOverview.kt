@@ -4,6 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
@@ -17,6 +21,8 @@ class AccountOverview @JvmOverloads constructor(
     defStyle: Int = 0
 ): ConstraintLayout(ctx, attr, defStyle), KoinComponent {
 
+    private val disposable = CompositeDisposable()
+
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.view_account_overview, this, true)
@@ -29,15 +35,19 @@ class AccountOverview @JvmOverloads constructor(
         }
 
     private fun updateView(account: CryptoSingleAccount) {
+        disposable.clear()
+
         coin_icon.setCoinIcon(account.asset)
         label.text = account.label
+        value.text = ""
 
-//        value.aa
+        disposable += account.balance
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    value.text = it.toStringWithSymbol()
+                }
+            )
     }
-//    override fun onFinishInflate() {
-//        super.onFinishInflate()
-//        setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE)
-//        initListener()
-//    }
 }
 

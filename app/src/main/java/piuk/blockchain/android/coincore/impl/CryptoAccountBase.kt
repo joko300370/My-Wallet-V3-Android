@@ -163,9 +163,8 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> {
-        TODO("not implemented")
-    }
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val actions: AvailableActions
         get() = availableActions
@@ -173,12 +172,36 @@ internal class CryptoInterestAccount(
     private val availableActions = emptySet<AssetAction>()
 }
 
+// To handle Send to PIT
+internal class CryptoExchangeAccount(
+    cryptoCurrency: CryptoCurrency,
+    override val label: String,
+    private val address: String,
+    override val exchangeRates: ExchangeRateDataManager
+) : CryptoSingleAccountBase(cryptoCurrency) {
+
+    override val balance: Single<CryptoValue>
+        get() = Single.just(CryptoValue.zero(asset))
+
+    override val receiveAddress: Single<String>
+        get() = TODO("not implemented")
+
+    override val isDefault: Boolean = false
+    override val isFunded: Boolean = false
+
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Exchange Wallet"))
+
+    override val activity: Single<ActivitySummaryList>
+        get() = Single.just(emptyList())
+
+    override val actions: AvailableActions = emptySet()
+
+}
+
 abstract class CryptoSingleAccountNonCustodialBase(
     cryptoCurrency: CryptoCurrency
 ) : CryptoSingleAccountBase(cryptoCurrency) {
-
-    override val isFunded: Boolean
-        get() = false
 
     final override val actions: AvailableActions
         get() = availableActions
