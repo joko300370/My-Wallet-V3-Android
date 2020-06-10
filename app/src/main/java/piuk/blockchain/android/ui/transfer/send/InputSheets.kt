@@ -1,9 +1,11 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.view.View
+import android.widget.Toast
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import kotlinx.android.synthetic.main.dialog_send_prototype.view.*
+import kotlinx.android.synthetic.main.dialog_send_password.view.*
+import kotlinx.android.synthetic.main.dialog_send_prototype.view.cta_button
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -25,15 +27,19 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_password
 
     override fun render(newState: SendState) {
+        if(!newState.nextEnabled && newState.secondPassword.isEmpty() &&
+            newState.currentStep == SendStep.ENTER_PASSWORD){
+            Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
+        }
         Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
     }
 
     override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
+        view.cta_button.setOnClickListener { onCtaClick(view) }
     }
 
-    private fun onCtaClick() {
-        model.process(SendIntent.ValidatePassword("second password"))
+    private fun onCtaClick(view: View) {
+        model.process(SendIntent.ValidatePassword(view.password_input.text.toString()))
     }
 
     companion object {
@@ -118,7 +124,7 @@ class TransactionInProgressSheet : SendInputSheet() {
         Timber.d("!SEND!> Rendering! TransactionInProgressSheet")
     }
 
-    override fun initControls(view: View) { }
+    override fun initControls(view: View) {}
 
     companion object {
         fun newInstance(): TransactionInProgressSheet =

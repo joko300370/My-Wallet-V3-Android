@@ -36,8 +36,8 @@ sealed class SendIntent : MviIntent<SendState> {
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false,
-                processing = true,
+                nextEnabled = true,
+                processing = false,
                 secondPassword = password,
                 currentStep = SendStep.ENTER_ADDRESS
             )
@@ -46,9 +46,10 @@ sealed class SendIntent : MviIntent<SendState> {
     object UpdatePasswordNotValidated : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = true,
+                nextEnabled = false,
                 processing = false,
-                secondPassword = ""
+                secondPassword = "",
+                currentStep = SendStep.ENTER_PASSWORD
             )
         }
 
