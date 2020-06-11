@@ -4,7 +4,7 @@ import android.view.View
 import androidx.annotation.StringRes
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import kotlinx.android.synthetic.main.dialog_send_prototype.view.*
+import kotlinx.android.synthetic.main.dialog_send_prototype.view.cta_button
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -37,28 +37,6 @@ abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>
             ToastCustom.LENGTH_LONG,
             ToastCustom.TYPE_ERROR
         )
-    }
-}
-
-class EnterSecondPasswordSheet : SendInputSheet() {
-
-    override val layoutResource: Int = R.layout.dialog_send_password
-
-    override fun render(newState: SendState) {
-        Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
-    }
-
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
-    }
-
-    private fun onCtaClick() {
-        model.process(SendIntent.ValidatePassword("second password"))
-    }
-
-    companion object {
-        fun newInstance(): EnterSecondPasswordSheet =
-            EnterSecondPasswordSheet()
     }
 }
 
@@ -113,7 +91,7 @@ class TransactionInProgressSheet : SendInputSheet() {
         Timber.d("!SEND!> Rendering! TransactionInProgressSheet")
     }
 
-    override fun initControls(view: View) { }
+    override fun initControls(view: View) {}
 
     companion object {
         fun newInstance(): TransactionInProgressSheet =

@@ -30,6 +30,9 @@ class Coincore internal constructor(
 
     val tokens: Iterable<AssetTokens> = tokenMap.values
 
+    fun validateSecondPassword(secondPassword: String) =
+        payloadManager.validateSecondPassword(secondPassword)
+
     val allWallets: CryptoAccount by lazy {
         AllWalletsAccount(this, defaultLabels)
     }
