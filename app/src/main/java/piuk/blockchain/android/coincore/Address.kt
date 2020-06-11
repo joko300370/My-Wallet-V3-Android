@@ -13,9 +13,7 @@ interface CryptoAddress : ReceiveAddress {
 
 typealias AddressList = List<ReceiveAddress>
 
-object NullAddress : CryptoAddress {
-    override val asset: CryptoCurrency = CryptoCurrency.BTC
-    override val address: String = ""
+object NullAddress : ReceiveAddress {
     override val label: String = ""
 }
 

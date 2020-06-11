@@ -4,10 +4,10 @@ import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.NullAccount
 import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
@@ -26,7 +26,7 @@ enum class SendStep {
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoSingleAccount = NullAccount,
-    val targetAddress: CryptoAddress = NullAddress,
+    val targetAddress: ReceiveAddress = NullAddress,
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false

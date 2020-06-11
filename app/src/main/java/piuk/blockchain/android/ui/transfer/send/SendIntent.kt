@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -49,7 +49,7 @@ sealed class SendIntent : MviIntent<SendState> {
         }
 
     class AddressSelected(
-        val address: CryptoAddress
+        val address: ReceiveAddress
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(

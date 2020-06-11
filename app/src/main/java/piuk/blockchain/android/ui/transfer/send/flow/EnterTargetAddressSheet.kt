@@ -17,14 +17,17 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 
@@ -55,9 +58,9 @@ class EnterTargetAddressSheet : SendInputSheet() {
             val address = addressFactory.parse(s.toString(), CryptoCurrency.ETHER)
             if (address != null) {
                 addressSelected(address)
-                // Hide error
+                dialogView.error_msg.invisible()
             } else {
-                // Show error
+                dialogView.error_msg.visible()
             }
         }
     }
@@ -89,12 +92,12 @@ class EnterTargetAddressSheet : SendInputSheet() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = {
-                        if (itemList.isEmpty()) {
-//                            showEmptyTransfers()
-                        } else {
+                        if (itemList.isNotEmpty()) {
+                            itemList.clear()
                             itemList.addAll(it)
                             accountAdapter.notifyDataSetChanged()
                         }
+                        showHideTransferList(itemList.isEmpty())
                     },
                     onError = {
                         showErrorToast("Failed getting transfer wallets")
@@ -103,8 +106,15 @@ class EnterTargetAddressSheet : SendInputSheet() {
         }
     }
 
+    private fun showHideTransferList(hide: Boolean) {
+        dialogView.title_pick.goneIf { hide }
+        dialogView.wallet_select.goneIf { hide }
+    }
+
     private fun accountSelected(account: CryptoSingleAccount) {
-//        addressSelected(account.receiveAddress)
+        disposables += account.receiveAddress.subscribeBy(
+            onSuccess = { addressSelected(it) }
+        )
     }
 
     private fun onLaunchAddressScan() {
@@ -118,8 +128,8 @@ class EnterTargetAddressSheet : SendInputSheet() {
         }
     }
 
-    private fun addressSelected(address: CryptoAddress) {
-        SendIntent.AddressSelected(address)
+    private fun addressSelected(address: ReceiveAddress) {
+        model.process(SendIntent.AddressSelected(address))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
