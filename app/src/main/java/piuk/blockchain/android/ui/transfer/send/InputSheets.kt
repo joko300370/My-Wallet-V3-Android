@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -36,6 +37,12 @@ class EnterSecondPasswordSheet : SendInputSheet() {
 
     override fun initControls(view: View) {
         view.cta_button.setOnClickListener { onCtaClick(view) }
+        view.password_input.setOnEditorActionListener { _, actionId, _ ->
+            if(actionId == EditorInfo.IME_ACTION_GO) {
+                onCtaClick(view)
+            }
+            true
+        }
     }
 
     private fun onCtaClick(view: View) {
