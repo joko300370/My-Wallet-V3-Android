@@ -48,8 +48,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = false,
                 processing = false,
-                secondPassword = "",
-                currentStep = SendStep.ENTER_PASSWORD
+                secondPassword = ""
             )
         }
 

@@ -27,7 +27,7 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_password
 
     override fun render(newState: SendState) {
-        if(!newState.nextEnabled && newState.secondPassword.isEmpty() &&
+        if(!newState.processing && !newState.nextEnabled && newState.secondPassword.isEmpty() &&
             newState.currentStep == SendStep.ENTER_PASSWORD){
             Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
         }
