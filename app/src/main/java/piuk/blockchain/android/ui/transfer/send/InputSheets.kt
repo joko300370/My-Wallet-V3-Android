@@ -28,8 +28,8 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_password
 
     override fun render(newState: SendState) {
-        if(!newState.processing && !newState.nextEnabled && newState.secondPassword.isEmpty() &&
-            newState.currentStep == SendStep.ENTER_PASSWORD){
+        if (!newState.processing && !newState.nextEnabled && newState.secondPassword.isEmpty() &&
+            newState.currentStep == SendStep.ENTER_PASSWORD) {
             Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
         }
         Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
@@ -38,7 +38,7 @@ class EnterSecondPasswordSheet : SendInputSheet() {
     override fun initControls(view: View) {
         view.cta_button.setOnClickListener { onCtaClick(view) }
         view.password_input.setOnEditorActionListener { _, actionId, _ ->
-            if(actionId == EditorInfo.IME_ACTION_GO) {
+            if (actionId == EditorInfo.IME_ACTION_GO) {
                 onCtaClick(view)
             }
             true

@@ -8,5 +8,4 @@ class SendInteractor(
 ) {
     fun validatePassword(password: String): Single<Boolean> = Single.just(
         coincore.validateSecondPassword(password))
-
 }
