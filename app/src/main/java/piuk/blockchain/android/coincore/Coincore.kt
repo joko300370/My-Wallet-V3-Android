@@ -5,10 +5,10 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.bch.BchTokens
-import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
 import piuk.blockchain.android.coincore.eth.EthTokens
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
+import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -51,6 +51,9 @@ class Coincore internal constructor(
 
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
+
+    fun validateSecondPassword(secondPassword: String) =
+        payloadManager.validateSecondPassword(secondPassword)
 
     val allWallets: CryptoAccount by lazy {
         AllWalletsAccount(this, defaultLabels)

@@ -45,10 +45,12 @@ class SendModel(
                 .subscribeBy(
                     onSuccess = {
                         process(
-                            if (it)
+                            if (it) {
                                 SendIntent.UpdatePasswordIsValidated(intent.password)
-                            else
-                                SendIntent.UpdatePasswordNotValidated)
+                            } else {
+                                SendIntent.UpdatePasswordNotValidated
+                            }
+                        )
                     },
                     onError = { /* Error! What to do? Abort? Or... */ }
                 )
