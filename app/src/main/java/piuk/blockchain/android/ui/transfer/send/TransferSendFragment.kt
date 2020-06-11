@@ -20,9 +20,11 @@ import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.flow.EnterTargetAddressSheet
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
+import piuk.blockchain.android.ui.transfer.send.flow.EnterSecondPasswordSheet
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -45,7 +47,7 @@ class TransferSendFragment : Fragment(), SlidingModalBottomDialog.Host {
         super.onViewCreated(view, savedInstanceState)
 
         with(account_list) {
-            val accountAdapter = AccountsAdapter(disposables, ::onAccountSelected)
+            val accountAdapter = AccountsAdapter(::onAccountSelected)
             val itemList = mutableListOf<CryptoSingleAccount>()
             accountAdapter.itemsList = itemList
 

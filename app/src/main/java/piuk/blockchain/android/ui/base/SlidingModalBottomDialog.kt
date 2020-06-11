@@ -49,9 +49,8 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
             override fun onSlide(view: View, v: Float) {}
         })
 
-        initControls(view)
-
         dialogView = view
+        initControls(view)
 
         dlg.setOnShowListener {
             bottomSheetBehavior.skipCollapsed = true

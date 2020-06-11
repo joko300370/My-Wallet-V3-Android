@@ -63,7 +63,7 @@ class CustodialTradingAccount(
 
     private val hasSeenFunds = AtomicBoolean(false)
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
@@ -141,7 +141,7 @@ internal class CryptoInterestAccount(
 
     private val isConfigured = AtomicBoolean(false)
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
 
     override val balance: Single<CryptoValue>
@@ -163,14 +163,45 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> {
-        TODO("not implemented")
-    }
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val actions: AvailableActions
         get() = availableActions
 
     private val availableActions = emptySet<AssetAction>()
+}
+
+// To handle Send to PIT
+internal class CryptoExchangeAccount(
+    cryptoCurrency: CryptoCurrency,
+    override val label: String,
+    private val address: String,
+    override val exchangeRates: ExchangeRateDataManager
+) : CryptoSingleAccountBase(cryptoCurrency) {
+
+    override val balance: Single<CryptoValue>
+        get() = Single.just(CryptoValue.zero(asset))
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            ExchangeAddress(
+                asset = asset,
+                label = label,
+                address = address
+            )
+        )
+
+    override val isDefault: Boolean = false
+    override val isFunded: Boolean = false
+
+    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Exchange Wallet"))
+
+    override val activity: Single<ActivitySummaryList>
+        get() = Single.just(emptyList())
+
+    override val actions: AvailableActions = emptySet()
 }
 
 abstract class CryptoSingleAccountNonCustodialBase(

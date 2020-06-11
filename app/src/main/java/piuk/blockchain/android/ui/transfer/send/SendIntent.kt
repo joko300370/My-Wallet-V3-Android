@@ -1,23 +1,22 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
 
     class Initialise(
-        val account: CryptoSingleAccount,
-        val passwordRequired: Boolean
+        private val account: CryptoSingleAccount,
+        private val passwordRequired: Boolean
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
                 sendingAccount = account,
                 passwordRequired = passwordRequired,
                 currentStep = if (passwordRequired) SendStep.ENTER_PASSWORD else SendStep.ENTER_ADDRESS,
-                nextEnabled = passwordRequired,
-                processing = false
+                nextEnabled = passwordRequired
             )
         }
 
@@ -26,8 +25,7 @@ sealed class SendIntent : MviIntent<SendState> {
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false,
-                processing = true
+                nextEnabled = false
             )
         }
 
@@ -37,7 +35,6 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                processing = false,
                 secondPassword = password,
                 currentStep = SendStep.ENTER_ADDRESS
             )
@@ -47,18 +44,24 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
-                processing = false,
                 secondPassword = ""
             )
         }
 
     class AddressSelected(
-        val address: CryptoAddress
+        val address: ReceiveAddress
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
+                nextEnabled = true,
+                targetAddress = address
+            )
+    }
+
+    object AddressSelectionConfirmed : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
                 nextEnabled = false,
-                processing = false,
                 currentStep = SendStep.ENTER_AMOUNT
             )
     }
@@ -69,7 +72,6 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
-                processing = false,
                 currentStep = SendStep.CONFIRM_DETAIL
             )
     }
@@ -78,7 +80,6 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
-                processing = false,
                 currentStep = SendStep.IN_PROGRESS
             )
     }

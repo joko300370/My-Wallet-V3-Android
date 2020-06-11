@@ -1,15 +1,13 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.Toast
+import androidx.annotation.StringRes
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import kotlinx.android.synthetic.main.dialog_send_password.view.*
 import kotlinx.android.synthetic.main.dialog_send_prototype.view.cta_button
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
 abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>() {
@@ -21,64 +19,24 @@ abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>
             onCancel(it)
         }
     }
-}
 
-class EnterSecondPasswordSheet : SendInputSheet() {
-
-    override val layoutResource: Int = R.layout.dialog_send_password
-
-    override fun render(newState: SendState) {
-        require(newState.currentStep == SendStep.ENTER_PASSWORD)
-
-        if (!newState.processing && !newState.nextEnabled && newState.secondPassword.isEmpty() &&
-            newState.currentStep == SendStep.ENTER_PASSWORD) {
-            Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
-        }
-        Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
+    protected fun showErrorToast(@StringRes msgId: Int) {
+        ToastCustom.makeText(
+            activity,
+            getString(msgId),
+            ToastCustom.LENGTH_LONG,
+            ToastCustom.TYPE_ERROR
+        )
     }
 
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick(view) }
-        view.password_input.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                onCtaClick(view)
-            }
-            true
-        }
-    }
-
-    private fun onCtaClick(view: View) {
-        model.process(SendIntent.ValidatePassword(view.password_input.text.toString()))
-    }
-
-    companion object {
-        fun newInstance(): EnterSecondPasswordSheet =
-            EnterSecondPasswordSheet()
-    }
-}
-
-class EnterTargetAddressSheet : SendInputSheet() {
-    override val layoutResource: Int = R.layout.dialog_send_address
-
-    override fun render(newState: SendState) {
-        Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
-    }
-
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
-    }
-
-    private fun onCtaClick() {
-        model.process(SendIntent.AddressSelected(
-            object : CryptoAddress(CryptoCurrency.ETHER, "An Address") {
-                override val label: String = "Label for ETH address"
-            }
-        ))
-    }
-
-    companion object {
-        fun newInstance(): EnterTargetAddressSheet =
-            EnterTargetAddressSheet()
+    @Deprecated(message = "For dev only, use resourecID version in production code")
+    protected fun showErrorToast(msg: String) {
+        ToastCustom.makeText(
+            activity,
+            msg,
+            ToastCustom.LENGTH_LONG,
+            ToastCustom.TYPE_ERROR
+        )
     }
 }
 

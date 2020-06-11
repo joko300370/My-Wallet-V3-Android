@@ -7,7 +7,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 
-class TestSendContainerActivity() : BlockchainActivity() {
+class TestSendContainerActivity : BlockchainActivity() {
     override val alwaysDisableScreenshots: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {

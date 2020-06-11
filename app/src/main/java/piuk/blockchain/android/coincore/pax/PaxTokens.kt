@@ -10,7 +10,7 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AddressList
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
@@ -65,9 +65,19 @@ internal class PaxTokens(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         Single.just(emptyList())
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> =
+    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
         Single.just(emptyList())
 
-    override fun isValidAddress(address: String): Boolean =
+    override fun parseAddress(address: String): CryptoAddress? =
+        null
+
+    private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
+}
+
+internal class PaxAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.PAX
 }

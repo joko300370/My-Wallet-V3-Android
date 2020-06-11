@@ -1,9 +1,13 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.NullAccount
+import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
@@ -21,11 +25,11 @@ enum class SendStep {
 
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
-    val sendingAccount: CryptoSingleAccount? = null,
+    val sendingAccount: CryptoSingleAccount = NullAccount,
+    val targetAddress: ReceiveAddress = NullAddress,
     val passwordRequired: Boolean = false,
-    val nextEnabled: Boolean = false,
-    val processing: Boolean = true,
-    val secondPassword: String = ""
+    val secondPassword: String = "",
+    val nextEnabled: Boolean = false
 ) : MviState
 
 class SendModel(
@@ -59,6 +63,7 @@ class SendModel(
             is SendIntent.AddressSelected -> null
             is SendIntent.PrepareTransaction -> null
             is SendIntent.ExecuteTransaction -> null
+            is SendIntent.AddressSelectionConfirmed -> processAddressConfirmation(previousState)
         }
     }
 
@@ -68,5 +73,15 @@ class SendModel(
 
     override fun onStateUpdate(s: SendState) {
         Timber.d("!SEND!> Send Model: state update -> $s")
+    }
+
+    private fun processAddressConfirmation(state: SendState): Disposable {
+        // We have an address!
+        // TODO At this point we can build a transactor object from coincore and configure
+        // the state object a bit more; depending on whether it's an internal, external,
+        // bitpay or BTC Url address we can set things like note, amount, fee schedule
+        // and hook up the correct processor to execute the transaction.
+
+        return Completable.complete().subscribe() // Yeah, just so it builds
     }
 }

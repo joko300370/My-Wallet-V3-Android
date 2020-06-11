@@ -16,10 +16,8 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.CryptoAccountGroup
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
@@ -48,7 +46,7 @@ internal abstract class AssetTokensBase(
     private val accounts = mutableListOf<CryptoSingleAccount>()
 
     // Init token, set up accounts and fetch a few activities
-    fun init(): Completable =
+    override fun init(): Completable =
         initToken()
             .doOnError { throwable ->
                 crashLogger.logException(throwable, "Coincore: Failed to load $asset wallet")
@@ -127,23 +125,17 @@ internal abstract class AssetTokensBase(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
 
-    protected fun getPitLinkingAddress(): Maybe<ReceiveAddress> =
+    protected fun getPitLinkingAccount(): Maybe<CryptoSingleAccount> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
             .map { address ->
-                ExchangeAddress(asset, address, labels)
+                CryptoExchangeAccount(
+                    cryptoCurrency = asset,
+                    label = labels.getDefaultExchangeWalletLabel(asset),
+                    address = address,
+                    exchangeRates = exchangeRates
+                )
             }
-
-    final override fun validateAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            EnteredAddress(asset, address)
-        } else {
-            null
-        }
-
-    // These are constant ATM, but may need to change this so hardcode here
-    protected val transactionFetchCount = 50
-    protected val transactionFetchOffset = 0
 }
 
 fun ExchangeRateDataManager.fetchLastPrice(

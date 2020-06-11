@@ -8,6 +8,8 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.btc.BtcAddress
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
@@ -40,7 +42,7 @@ internal class BchCryptoWalletAccount(
                 }
             }
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = bchManager.getNextReceiveAddress(
             bchManager.getAccountMetadataList()
                 .indexOfFirst {
@@ -51,6 +53,9 @@ internal class BchCryptoWalletAccount(
                 address.toCashAddress()
             }
             .singleOrError()
+            .map {
+                BtcAddress(it, label)
+            }
 
     override val activity: Single<ActivitySummaryList>
         get() = bchManager.getAddressTransactions(address, transactionFetchCount, transactionFetchOffset)

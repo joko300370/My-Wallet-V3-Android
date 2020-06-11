@@ -9,7 +9,7 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AddressList
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
@@ -73,7 +73,7 @@ internal class EthTokens(
         }
     }
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<AddressList> {
+    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> {
         require(account.cryptoCurrencies.contains(CryptoCurrency.ETHER))
 
         // ETH Only supports transfer between non-custodial and exchange account at this time
@@ -81,11 +81,25 @@ internal class EthTokens(
             return Single.just(emptyList())
         }
 
-        return getPitLinkingAddress()
+        return getPitLinkingAccount()
             .map { listOf(it) }
             .toSingle(emptyList())
     }
 
-    override fun isValidAddress(address: String): Boolean =
+    override fun parseAddress(address: String): CryptoAddress? =
+        if (isValidAddress(address)) {
+            EthAddress(address)
+        } else {
+            null
+        }
+
+    private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
+}
+
+internal class EthAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.ETHER
 }
