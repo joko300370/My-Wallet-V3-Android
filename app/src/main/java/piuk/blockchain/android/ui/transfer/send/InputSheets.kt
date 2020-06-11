@@ -29,7 +29,7 @@ class EnterSecondPasswordSheet : SendInputSheet() {
 
     override fun render(newState: SendState) {
         require(newState.currentStep == SendStep.ENTER_PASSWORD)
-        
+
         if (!newState.processing && !newState.nextEnabled && newState.secondPassword.isEmpty() &&
             newState.currentStep == SendStep.ENTER_PASSWORD) {
             Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
