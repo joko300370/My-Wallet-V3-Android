@@ -3,7 +3,6 @@ package com.blockchain.koin.modules
 import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AsyncAllAccountList
-import piuk.blockchain.android.accounts.BtcAccountListAdapter
 import com.blockchain.activities.StartSwap
 import com.blockchain.koin.bch
 import com.blockchain.koin.bchStrategy
@@ -18,7 +17,6 @@ import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccount
 import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.pax
-import com.blockchain.koin.paxAccount
 import com.blockchain.koin.paxStrategy
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitFeatureFlag
@@ -29,7 +27,6 @@ import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
-import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.CurrentContextAccess
@@ -45,6 +42,7 @@ import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.accounts.AsyncAllAccountListImplementation
 import piuk.blockchain.android.accounts.BchAccountListAdapter
+import piuk.blockchain.android.accounts.BtcAccountListAdapter
 import piuk.blockchain.android.accounts.EthAccountListAdapter
 import piuk.blockchain.android.accounts.PaxAccountListAdapter
 import piuk.blockchain.android.cards.CardModel
@@ -52,9 +50,10 @@ import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
+import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
@@ -86,14 +85,17 @@ import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
+import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
-import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.fingerprint.FingerprintPresenter
+import piuk.blockchain.android.ui.home.CacheCredentialsWiper
+import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.home.MainPresenter
+import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
@@ -103,28 +105,31 @@ import piuk.blockchain.android.ui.receive.ReceivePresenter
 import piuk.blockchain.android.ui.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
-import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.SendPresenter
+import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.strategy.BitcoinCashSendStrategy
 import piuk.blockchain.android.ui.send.strategy.BitcoinSendStrategy
 import piuk.blockchain.android.ui.send.strategy.EtherSendStrategy
-import piuk.blockchain.android.ui.send.strategy.SendStrategy
-import piuk.blockchain.android.ui.send.strategy.XlmSendStrategy
 import piuk.blockchain.android.ui.send.strategy.PaxSendStrategy
 import piuk.blockchain.android.ui.send.strategy.ResourceSendFundsResultLocalizer
 import piuk.blockchain.android.ui.send.strategy.SendFundsResultLocalizer
+import piuk.blockchain.android.ui.send.strategy.SendStrategy
+import piuk.blockchain.android.ui.send.strategy.XlmSendStrategy
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
 import piuk.blockchain.android.ui.swap.SwapStarter
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
+import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
 import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
+import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.api.ConnectionApi
@@ -135,12 +140,6 @@ import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.ui.home.CacheCredentialsWiper
-import piuk.blockchain.android.ui.home.CredentialsWiper
-import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
-import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.androidcoreui.utils.DateUtil
 
 val applicationModule = module {
@@ -180,7 +179,7 @@ val applicationModule = module {
             )
         }
 
-        factory(paxAccount) {
+        factory {
             PaxAccount(
                 ethDataManager = get(),
                 dataStore = get(),
@@ -231,7 +230,7 @@ val applicationModule = module {
                 bchDataManager = get(),
                 xlmDataManager = get(),
                 environmentSettings = get(),
-                paxAccount = get(paxAccount),
+                paxAccount = get(),
                 crashLogger = get()
             )
         }
@@ -261,7 +260,7 @@ val applicationModule = module {
         scoped {
             CredentialsWiper(
                 payloadManagerWiper = get(),
-                paxAccount = get(paxAccount),
+                paxAccount = get(),
                 accessState = get(),
                 appUtil = get()
             )
@@ -318,7 +317,7 @@ val applicationModule = module {
                 swipeToReceiveHelper = get(),
                 stringUtils = get(),
                 gson = get(),
-                erc20Account = get(paxAccount),
+                erc20Account = get(),
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 rxBus = get(),
@@ -546,7 +545,7 @@ val applicationModule = module {
                 walletAccountHelper = get(),
                 payloadDataManager = get(),
                 ethDataManager = get(),
-                paxAccount = get(paxAccount),
+                paxAccount = get(),
                 stringUtils = get(),
                 dynamicFeeCache = get(),
                 feeDataManager = get(),

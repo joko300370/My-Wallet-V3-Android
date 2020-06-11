@@ -7,10 +7,11 @@ data class PaymentMethodsResponse(
     val methods: List<PaymentMethodResponse>
 )
 
-data class PaymentMethodResponse(val type: PaymentMethodType, val limits: Limits, val subTypes: List<CardType>?)
-
-enum class PaymentMethodType {
-    BANK_ACCOUNT, PAYMENT_CARD
+data class PaymentMethodResponse(val type: String, val limits: Limits, val subTypes: List<String>?) {
+    companion object {
+        const val BANK_ACCOUNT = "BANK_ACCOUNT"
+        const val PAYMENT_CARD = "PAYMENT_CARD"
+    }
 }
 
 data class Limits(val min: Long, val max: Long)

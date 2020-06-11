@@ -19,8 +19,8 @@ import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -33,7 +33,6 @@ import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.params.BitcoinMainNetParams
-
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.util.RootUtil
@@ -75,8 +74,8 @@ import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
 import piuk.blockchain.androidcore.utils.DeviceIdGenerator
 import piuk.blockchain.androidcore.utils.DeviceIdGeneratorImpl
-import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.UUIDGenerator
 import java.util.UUID
 
@@ -121,7 +120,7 @@ val coreModule = module {
             TransactionExecutorViaDataManagers(
                 payloadDataManager = get(),
                 ethDataManager = get(),
-                erc20Account = get(paxAccount),
+                erc20Account = get(),
                 sendDataManager = get(),
                 addressResolver = get(),
                 accountLookup = get(),

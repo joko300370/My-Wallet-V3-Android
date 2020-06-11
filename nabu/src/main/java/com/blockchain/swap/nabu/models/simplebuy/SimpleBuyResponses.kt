@@ -4,12 +4,16 @@ import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.models.nabu.Address
+import info.blockchain.balance.CryptoCurrency
 
 import java.util.Date
 
 data class SimpleBuyPairsResp(val pairs: List<SimpleBuyPairResp>)
 
-data class SimpleBuyPairResp(val pair: String, val buyMin: Long, val buyMax: Long)
+data class SimpleBuyPairResp(val pair: String, val buyMin: Long, val buyMax: Long) {
+    fun isCryptoCurrencySupported() =
+        CryptoCurrency.values().firstOrNull { it.networkTicker == pair.split("-")[0] } != null
+}
 
 data class SimpleBuyEligibility(val eligible: Boolean)
 

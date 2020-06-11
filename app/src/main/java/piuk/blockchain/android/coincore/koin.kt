@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
@@ -95,7 +94,7 @@ val coincoreModule = module {
         scoped {
             PaxTokens(
                 rxBus = get(),
-                paxAccount = get(paxAccount),
+                paxAccount = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),

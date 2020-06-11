@@ -79,6 +79,12 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             navigatedToNextScreen = true
         }
 
+        if (newState.selectedPaymentMethod?.isBank() == false &&
+            newState.selectedPaymentMethod.id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+        ) {
+            navigator().goToCheckOutScreen()
+        }
+
         kyc_failed_icon.setImageResource(
             when (newState.kycVerificationState) {
                 KycState.IN_REVIEW,
@@ -119,7 +125,6 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             val cardPartner = card.partner
 
             model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId, cardLabel, cardPartner))
-            navigator().goToCheckOutScreen()
         }
     }
 

@@ -80,7 +80,7 @@ class SimpleBuyFlowNavigatorTest {
 
     // KYC tests
     @Test
-    fun `if  current is screen is KYC and tier 2 approved then screen should be enter amount`() {
+    fun `if  current is screen is KYC and tier 2 approved then screen should be checkout`() {
         mockCurrencyIsSupported(true)
         whenever(simpleBuyModel.state)
             .thenReturn(Observable.just(SimpleBuyState().copy(currentScreen = FlowScreen.KYC)))
@@ -88,7 +88,7 @@ class SimpleBuyFlowNavigatorTest {
 
         val test =
             subject.navigateTo(startedFromKycResume = false, startedFromDashboard = true).test()
-        test.assertValueAt(0, FlowScreen.ENTER_AMOUNT)
+        test.assertValueAt(0, FlowScreen.CHECKOUT)
     }
 
     @Test

@@ -273,8 +273,6 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 orderExchangePrice = buyOrder.price,
                 isLoading = false
             )
-
-        override fun isValidFor(oldState: SimpleBuyState): Boolean = true
     }
 
     class UpdateSelectedPaymentMethod(
@@ -317,6 +315,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(isLoading = true)
     }
+
+    object SyncState : SimpleBuyIntent()
 
     object CardPaymentSucceeded : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =

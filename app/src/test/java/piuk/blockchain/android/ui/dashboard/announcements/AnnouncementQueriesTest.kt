@@ -17,6 +17,7 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.android.simplebuy.KycState
 import piuk.blockchain.android.simplebuy.SelectedPaymentMethod
 import piuk.blockchain.android.simplebuy.SimpleBuyOrder
 import piuk.blockchain.android.simplebuy.SimpleBuyState
@@ -230,6 +231,7 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - local simple buy state exists and has finished kyc, return true`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
+        whenever(state.kycVerificationState).thenReturn(null)
         whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.None)))
         whenever(sbSync.currentState()).thenReturn(state)
 
@@ -244,8 +246,9 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - simple buy state is not finished, and kyc state is pending - as expected`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
+        whenever(state.kycVerificationState).thenReturn(KycState.PENDING)
         whenever(sbSync.currentState()).thenReturn(state)
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
 
         subject.isSimpleBuyKycInProgress()
             .test()
@@ -262,21 +265,8 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - SB state reports unfinished, but kyc docs are submitted - belt & braces case`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
+
         whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.UnderReview)))
-        whenever(sbSync.currentState()).thenReturn(state)
-
-        subject.isSimpleBuyKycInProgress()
-            .test()
-            .assertValue { !it }
-            .assertValueCount(1)
-            .assertComplete()
-    }
-
-    @Test
-    fun `isSimpleBuyKycInProgress - SB state reports unfinished, but kyc docs are submitted - belt & braces case 2`() {
-        val state: SimpleBuyState = mock()
-        whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.Verified)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()

@@ -627,6 +627,7 @@ class SimpleBuySyncFactoryTest {
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
             expirationDate = LAST_ORDER_DATE,
+            kycVerificationState = KycState.VERIFIED_AND_ELIGIBLE,
             selectedPaymentMethod = SelectedPaymentMethod(PaymentMethod.BANK_PAYMENT_ID),
             currentScreen = FlowScreen.BANK_DETAILS
         )

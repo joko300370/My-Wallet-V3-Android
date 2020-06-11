@@ -24,7 +24,7 @@ import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
-import com.blockchain.swap.nabu.models.cards.PaymentMethodType
+import com.blockchain.swap.nabu.models.cards.PaymentMethodResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.State
@@ -117,12 +117,15 @@ class LiveCustodialWalletManager(
         authenticator.authenticate {
             nabuService.getSupportedCurrencies(fiatCurrency)
         }.map {
-            SimpleBuyPairs(it.pairs.map { responsePair ->
+            val supportedPairs = it.pairs.filter { pair ->
+                pair.isCryptoCurrencySupported()
+            }
+            SimpleBuyPairs(supportedPairs.map { pair ->
                 SimpleBuyPair(
-                    responsePair.pair,
+                    pair.pair,
                     BuyLimits(
-                        responsePair.buyMin,
-                        responsePair.buyMax
+                        pair.buyMin,
+                        pair.buyMax
                     )
                 )
             })
@@ -268,7 +271,7 @@ class LiveCustodialWalletManager(
     private fun onlyBank(fiatCurrency: String, tier2Approved: Boolean) =
         authenticator.authenticate {
             nabuService.getPaymentMethods(it, fiatCurrency, tier2Approved).map { response ->
-                response.methods.firstOrNull { it.type == PaymentMethodType.BANK_ACCOUNT }
+                response.methods.firstOrNull { it.type == PaymentMethodResponse.BANK_ACCOUNT }
                     ?.let { paymentMethodResponse ->
                         listOf(PaymentMethod.BankTransfer(
                             PaymentLimits(paymentMethodResponse.limits.min,
@@ -300,13 +303,13 @@ class LiveCustodialWalletManager(
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
         paymentMethods.methods.forEach {
-            if (it.type == PaymentMethodType.BANK_ACCOUNT) {
+            if (it.type == PaymentMethodResponse.BANK_ACCOUNT) {
                 availablePaymentMethods.add(PaymentMethod.BankTransfer(
                     PaymentLimits(it.limits.min,
                         it.limits.max,
                         fiatCurrency)
                 ))
-            } else if (it.type == PaymentMethodType.PAYMENT_CARD) {
+            } else if (it.type == PaymentMethodResponse.PAYMENT_CARD) {
                 val cardLimits = PaymentLimits(it.limits.min, it.limits.max, fiatCurrency)
                 cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
                     ?.forEach { cardResponse: CardResponse ->
@@ -316,7 +319,7 @@ class LiveCustodialWalletManager(
         }
 
         paymentMethods.methods.firstOrNull { paymentMethod ->
-            paymentMethod.type == PaymentMethodType.PAYMENT_CARD
+            paymentMethod.type == PaymentMethodResponse.PAYMENT_CARD
         }?.let {
             availablePaymentMethods.add(PaymentMethod.UndefinedCard(PaymentLimits(it.limits.min,
                 it.limits.max,
