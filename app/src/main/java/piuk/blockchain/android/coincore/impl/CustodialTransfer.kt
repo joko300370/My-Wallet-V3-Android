@@ -6,43 +6,30 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.SendTransaction
+import piuk.blockchain.android.coincore.PendingSendTx
+import piuk.blockchain.android.coincore.SendProcessor
 
 class CustodialTransfer(
     override val sendingAccount: CryptoSingleAccount,
     override val address: CryptoAddress
-) : SendTransaction {
+) : SendProcessor {
 
     init {
         require(sendingAccount.asset == address.asset)
     }
 
-    override var amount: CryptoValue
-        get() = TODO("not implemented")
-        set(value) {}
-
-    override var feeLevel: FeeLevel
-        get() = TODO("not implemented")
-        set(value) {}
-
-    override var notes: String
-        get() = TODO("not implemented")
-        set(value) {}
-
     override val feeOptions: Set<FeeLevel>
         get() = TODO("not implemented")
 
-    override val availableBalance: Single<CryptoValue>
-        get() = TODO("not implemented")
-
-    override val absoluteFee: Single<CryptoValue>
-        get() = TODO("not implemented")
-
-    override fun validate(): Completable {
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         TODO("not implemented")
-    }
 
-    override fun execute(secondPassword: String): Single<String> {
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         TODO("not implemented")
-    }
+
+    override fun validate(pendingTx: PendingSendTx): Completable =
+        TODO("not implemented")
+
+    override fun execute(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
+        TODO("not implemented")
 }

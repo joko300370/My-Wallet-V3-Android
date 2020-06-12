@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.transfer.send
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -61,8 +62,39 @@ sealed class SendIntent : MviIntent<SendState> {
     object AddressSelectionConfirmed : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false,
+                nextEnabled = false
+            )
+    }
+
+    class UpdateSendProcessor(
+        private val sendProcessor: SendProcessor
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                nextEnabled = false, // Or maybe true with bitpay/url addresses
+                sendProcessor = sendProcessor,
                 currentStep = SendStep.ENTER_AMOUNT
+            )
+    }
+
+    class SendAmountChanged(
+        val amount: CryptoValue
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                nextEnabled = false
+            )
+    }
+
+    class UpdateTransactionAmounts(
+        val amount: CryptoValue,
+        val maxAvailable: CryptoValue
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                nextEnabled = amount.isPositive,
+                sendAmount = amount,
+                availableBalance = maxAvailable
             )
     }
 
@@ -81,6 +113,14 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = false,
                 currentStep = SendStep.IN_PROGRESS
+            )
+    }
+
+    object FatalTransactionError : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                nextEnabled = true,
+                currentStep = SendStep.SEND_ERROR
             )
     }
 }

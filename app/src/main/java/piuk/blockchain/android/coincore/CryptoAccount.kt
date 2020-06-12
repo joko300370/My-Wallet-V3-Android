@@ -32,7 +32,7 @@ interface CryptoSingleAccount : CryptoAccount {
     val isDefault: Boolean
     val asset: CryptoCurrency
 
-    fun createPendingSend(address: ReceiveAddress): Single<SendTransaction>
+    fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor>
 }
 
 interface CryptoAccountGroup : CryptoAccount {
@@ -54,7 +54,7 @@ object NullAccount : CryptoSingleAccount {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val label: String = ""

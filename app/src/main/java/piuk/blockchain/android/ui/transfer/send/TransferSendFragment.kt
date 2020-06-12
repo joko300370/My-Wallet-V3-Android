@@ -24,7 +24,10 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.flow.EnterTargetAddressSheet
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
+import piuk.blockchain.android.ui.transfer.send.flow.ConfirmTransactionSheet
+import piuk.blockchain.android.ui.transfer.send.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transfer.send.flow.EnterSecondPasswordSheet
+import piuk.blockchain.android.ui.transfer.send.flow.TransactionErrorSheet
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate

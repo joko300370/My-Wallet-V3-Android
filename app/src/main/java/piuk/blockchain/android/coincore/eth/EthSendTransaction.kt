@@ -13,6 +13,7 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.coincore.impl.OnChainSendTransactionBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -34,16 +35,9 @@ class EthSendTransaction(
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.ETHER
 
-    override var amount: CryptoValue = CryptoValue.ZeroEth
-        set(value) {
-            field = value
-        } // Do some checks here? Or not? TBD
-
-    override var notes: String = ""
-
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override val absoluteFee: Single<CryptoValue> =
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -57,31 +51,31 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override val availableBalance: Single<CryptoValue> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         Singles.zip(
             sendingAccount.balance,
-            absoluteFee
+            absoluteFee(pendingTx)
         ) { balance: CryptoValue, fees: CryptoValue ->
             max(balance - fees, CryptoValue.ZeroEth)
         }
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid
-    override fun validate(): Completable =
-        validateAmount()
-            .then { validateSufficientFunds() }
+    override fun validate(pendingTx: PendingSendTx): Completable =
+        validateAmount(pendingTx)
+            .then { validateSufficientFunds(pendingTx) }
             .then { validateNoPendingTx() }
 
-    override fun executeTransaction(secondPassword: String): Single<String> =
-        createTransaction()
+    override fun executeTransaction(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
+        createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-            .doOnSuccess { ethDataManager.updateTransactionNotes(it, notes) }
+            .doOnSuccess { ethDataManager.updateTransactionNotes(it, pendingTx.notes) }
 
-    private fun createTransaction(): Single<RawTransaction> =
+    private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),
             ethDataManager.isContractAddress(address.address),
@@ -92,7 +86,7 @@ class EthSendTransaction(
                 to = address.address,
                 gasPriceWei = fees.gasPrice,
                 gasLimitGwei = fees.getGasLimit(isContract),
-                weiValue = amount.amount
+                weiValue = pendingTx.amount.amount
             )
         }
 
@@ -108,19 +102,19 @@ class EthSendTransaction(
             if (isContract) gasLimitContract else gasLimit
         )
 
-    private fun validateAmount(): Completable =
+    private fun validateAmount(pendingTx: PendingSendTx): Completable =
         Completable.fromCallable {
-            if (amount <= CryptoValue.ZeroEth) {
+            if (pendingTx.amount <= CryptoValue.ZeroEth) {
                 throw SendValidationError(SendValidationError.INVALID_AMOUNT)
             }
         }
 
-    private fun validateSufficientFunds(): Completable =
+    private fun validateSufficientFunds(pendingTx: PendingSendTx): Completable =
         Singles.zip(
             sendingAccount.balance,
-            absoluteFee
+            absoluteFee(pendingTx)
         ) { balance: CryptoValue, fee: CryptoValue ->
-            if (fee + amount > balance) {
+            if (fee + pendingTx.amount > balance) {
                 throw SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
             } else {
                 true
