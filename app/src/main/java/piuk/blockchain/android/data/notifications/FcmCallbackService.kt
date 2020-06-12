@@ -13,15 +13,14 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.models.NotificationPayload
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle
 import timber.log.Timber
 
-class FcmCallbackService : FirebaseMessagingService(), KoinComponent {
+class FcmCallbackService : FirebaseMessagingService() {
 
     private val notificationManager: NotificationManager by inject()
     private val notificationTokenManager: NotificationTokenManager by scopedInject()

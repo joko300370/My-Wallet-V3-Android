@@ -94,7 +94,7 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
     }
 
     private fun cardHasAlreadyBeenAdded(): Boolean {
-        availableCards?.forEach {
+        availableCards.forEach {
             if (it.expireDate.hasSameMonthAndYear(month = expiry_date.month.toInt(),
                     year = expiry_date.year.toInt().asCalendarYear()) &&
                 card_number.text?.toString()?.takeLast(4) == it.endDigits &&

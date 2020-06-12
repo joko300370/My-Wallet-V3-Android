@@ -33,7 +33,7 @@ class SimpleBuyModelTest {
     private lateinit var model: SimpleBuyModel
     private val defaultState = SimpleBuyState(
         selectedCryptoCurrency = CryptoCurrency.BTC,
-        enteredAmount = "12.22",
+        amount = FiatValue.fromMinor("USD", 1000),
         fiatCurrency = "USD"
     )
     private val gson = Gson()

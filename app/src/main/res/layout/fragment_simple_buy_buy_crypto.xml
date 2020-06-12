@@ -79,30 +79,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/fiat_currency_symbol"
-        style="@style/Text.Semibold.32"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:text="€"
-        android:textColor="@color/grey_400"
-        app:layout_constraintBottom_toBottomOf="@+id/input_amount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input_amount" />
-
-    <androidx.appcompat.widget.AppCompatEditText
+    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
         android:id="@+id/input_amount"
-        style="@style/Text.Semibold.32"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/small_margin"
-        android:hint="0.00"
-        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/fiat_currency_symbol"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header"
         app:layout_goneMarginEnd="@dimen/small_margin" />
 
@@ -117,19 +102,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_amount"
         tools:text="$20,000 Maximum buy" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/error_fix_action"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/small_margin"
-        android:background="@drawable/fix_error_action_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintBottom_toBottomOf="@+id/fiat_currency"
-        app:layout_constraintEnd_toStartOf="@+id/fiat_currency"
-        app:layout_constraintTop_toTopOf="@+id/fiat_currency"
-        tools:text="Buy Max" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/predefined_amount_1"

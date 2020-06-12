@@ -24,12 +24,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class NewCryptoCurrencySelected(val currency: CryptoCurrency) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             if (oldState.selectedCryptoCurrency == currency) oldState else
-                oldState.copy(selectedCryptoCurrency = currency, enteredAmount = "", exchangePrice = null)
+                oldState.copy(selectedCryptoCurrency = currency, amount = null, exchangePrice = null)
     }
 
-    class EnteredAmount(private val amount: String) : SimpleBuyIntent() {
+    class AmountUpdated(private val amount: FiatValue) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(enteredAmount = amount)
+            oldState.copy(amount = amount)
     }
 
     class SyncLatestState(private val state: SimpleBuyState) : SimpleBuyIntent() {
@@ -111,7 +111,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     class FiatCurrencyUpdated(private val fiatCurrency: String) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(fiatCurrency = fiatCurrency, enteredAmount = "")
+            oldState.copy(fiatCurrency = fiatCurrency, amount = null)
     }
 
     data class UpdatedBuyLimitsAndSupportedCryptoCurrencies(
@@ -155,8 +155,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     data class UpdatedPredefinedAmounts(private val amounts: List<FiatValue>) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(predefinedAmounts = amounts.filter {
-                val isBiggerThanMin = it.valueMinor >= oldState.minAmount?.valueMinor ?: return@filter true
-                val isSmallerThanMax = it.valueMinor <= oldState.maxAmount?.valueMinor ?: return@filter true
+                val isBiggerThanMin = it.valueMinor >= oldState.minFiatAmount.valueMinor
+                val isSmallerThanMax = it.valueMinor <= oldState.maxFiatAmount.valueMinor
                 isBiggerThanMin && isSmallerThanMax
             })
         }

@@ -415,7 +415,7 @@ class LiveCustodialWalletManager(
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
         PaymentMethod.Card(
             cardId = id,
-            limits = cardLimits ?: throw java.lang.IllegalStateException(),
+            limits = cardLimits,
             label = card?.label ?: "",
             endDigits = card?.number ?: "",
             partner = partner.toSupportedPartner(),

@@ -13,8 +13,6 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.utils.extensions.flatMapBy
 import timber.log.Timber
-import java.text.DecimalFormatSymbols
-import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
 // Ensure that the local and remote SimpleBuy state is the same.
@@ -251,8 +249,7 @@ class SimpleBuySyncFactory(
 fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
     SimpleBuyState(
         id = id,
-        enteredAmount = fiat.toStringWithoutSymbol()
-            .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), ""),
+        amount = fiat,
         fiatCurrency = fiat.currencyCode,
         selectedCryptoCurrency = crypto.currency,
         orderState = state,

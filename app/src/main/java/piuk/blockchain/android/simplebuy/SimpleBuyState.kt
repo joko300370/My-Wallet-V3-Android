@@ -12,6 +12,8 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.compareTo
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Date
 import java.util.regex.Pattern
@@ -24,7 +26,7 @@ import java.util.regex.Pattern
 data class SimpleBuyState(
     val id: String? = null,
     val supportedPairsAndLimits: List<SimpleBuyPair>? = null,
-    val enteredAmount: String = "", // Major units
+    private val amount: FiatValue? = null,
     val fiatCurrency: String = "USD",
     val predefinedAmounts: List<FiatValue> = emptyList(),
     val selectedCryptoCurrency: CryptoCurrency? = null,
@@ -78,14 +80,8 @@ data class SimpleBuyState(
     }
 
     @delegate:Transient
-    private val amount: FiatValue? by unsafeLazy {
-        if (enteredAmount.isEmpty() || pattern.matcher(enteredAmount).matches().not()) null else
-            FiatValue.fromMajor(fiatCurrency, enteredAmount.toBigDecimal())
-    }
-
-    @delegate:Transient
-    val maxAmount: FiatValue? by unsafeLazy {
-        val maxPairBuyLimit = maxPairsLimit() ?: return@unsafeLazy null
+    val maxFiatAmount: FiatValue by unsafeLazy {
+        val maxPairBuyLimit = maxPairsLimit() ?: return@unsafeLazy FiatValue.fromMinor(fiatCurrency, Long.MAX_VALUE)
 
         val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
 
@@ -95,8 +91,8 @@ data class SimpleBuyState(
     }
 
     @delegate:Transient
-    val minAmount: FiatValue? by unsafeLazy {
-        val minPairBuyLimit = minPairsLimit() ?: return@unsafeLazy null
+    val minFiatAmount: FiatValue by unsafeLazy {
+        val minPairBuyLimit = minPairsLimit() ?: return@unsafeLazy FiatValue.zero(fiatCurrency)
 
         val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
 
@@ -104,6 +100,16 @@ data class SimpleBuyState(
             FiatValue.fromMinor(fiatCurrency, it.coerceAtLeast(minPairBuyLimit))
         } ?: FiatValue.fromMinor(fiatCurrency, minPairBuyLimit)
     }
+
+    fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
+        selectedCryptoCurrency?.let {
+            maxFiatAmount.toCrypto(exchangeRateDataManager, it)
+        }
+
+    fun minCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
+        selectedCryptoCurrency?.let {
+            minFiatAmount.toCrypto(exchangeRateDataManager, it)
+        }
 
     private fun PaymentMethod?.maxLimit(): Long? = this?.limits?.max?.valueMinor
     private fun PaymentMethod?.minLimit(): Long? = this?.limits?.min?.valueMinor
@@ -116,31 +122,21 @@ data class SimpleBuyState(
         it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
     }?.buyLimits?.minLimit(fiatCurrency)?.valueMinor
 
-    fun maxDecimalDigitsForAmount(): Int =
-        maxAmount?.userDecimalPlaces ?: 0
-
-    fun maxIntegerDigitsForAmount(): Int =
-        maxAmount?.toStringParts()?.major?.length ?: 0
-
     @delegate:Transient
     val isAmountValid: Boolean by unsafeLazy {
         order.amount?.let {
-            if (maxAmount != null && minAmount != null) {
-                it <= maxAmount!! && it >= minAmount!!
-            } else false
+            it <= maxFiatAmount && it >= minFiatAmount
         } ?: false
     }
 
     @delegate:Transient
     val error: InputError? by unsafeLazy {
-        order.amount?.let {
-            if (maxAmount != null && minAmount != null) {
-                when {
-                    it > maxAmount!! -> InputError.ABOVE_MAX
-                    it < minAmount!! -> InputError.BELOW_MIN
-                    else -> null
-                }
-            } else null
+        order.amount?.takeIf { it.isZero.not() }?.let {
+            when {
+                it > maxFiatAmount -> InputError.ABOVE_MAX
+                it < minFiatAmount -> InputError.BELOW_MIN
+                else -> null
+            }
         }
     }
 }
@@ -148,14 +144,19 @@ data class SimpleBuyState(
 enum class KycState {
     /** Docs submitted for Gold and state is pending. Or kyc backend query returned an error  */
     PENDING,
+
     /** Docs processed, failed kyc. Not error state. */
     FAILED,
+
     /** Docs processed under manual review */
     IN_REVIEW,
+
     /** Docs submitted, no result know from server yet */
     UNDECIDED,
+
     /** Docs uploaded, processed and kyc passed. Eligible for simple buy */
     VERIFIED_AND_ELIGIBLE,
+
     /** Docs uploaded, processed and kyc passed. User is NOT eligible for simple buy. */
     VERIFIED_BUT_NOT_ELIGIBLE;
 

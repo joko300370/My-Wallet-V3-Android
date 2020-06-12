@@ -2,9 +2,7 @@ package piuk.blockchain.android.simplebuy
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +17,10 @@ import com.blockchain.notifications.analytics.cryptoChanged
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_simple_buy_buy_crypto.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -29,17 +30,17 @@ import piuk.blockchain.android.cards.icon
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
 import java.util.Locale
-import java.util.Currency
 
 class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen,
@@ -47,8 +48,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     ChangeCurrencyHost {
 
     override val model: SimpleBuyModel by scopedInject()
+    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
 
     private var lastState: SimpleBuyState? = null
+    private val compositeDesposable = CompositeDisposable()
 
     override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator)
@@ -73,11 +76,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
         model.process(SimpleBuyIntent.FetchSupportedFiatCurrencies)
         analytics.logEvent(SimpleBuyAnalytics.BUY_FORM_SHOWN)
-        input_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
-            override fun afterTextChanged(s: Editable?) {
-                model.process(SimpleBuyIntent.EnteredAmount(s.toString()))
+
+        compositeDesposable += input_amount.amount.subscribe {
+            when (it) {
+                is FiatValue -> model.process(SimpleBuyIntent.AmountUpdated(it))
+                else -> throw IllegalStateException("CryptoValue is not supported as input yet")
             }
-        })
+        }
 
         btn_continue.setOnClickListener {
             model.process(SimpleBuyIntent.BuyButtonClicked)
@@ -110,13 +115,15 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         model.process(SimpleBuyIntent.FetchPredefinedAmounts(fiatCurrency))
         model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
         analytics.logEvent(CurrencyChangedFromBuyForm(fiatCurrency))
-        input_amount.clearFocus()
     }
 
     override fun onCryptoCurrencyChanged(currency: CryptoCurrency) {
         model.process(SimpleBuyIntent.NewCryptoCurrencySelected(currency))
-        input_amount.clearFocus()
         analytics.logEvent(cryptoChanged(currency))
+        input_amount.configuration = input_amount.configuration.copy(
+            cryptoCurrency = currency,
+            predefinedAmount = CryptoValue.zero(currency)
+        )
     }
 
     override fun render(newState: SimpleBuyState) {
@@ -126,8 +133,17 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             showErrorState(newState.errorState)
             return
         }
-        fiat_currency_symbol.text =
-            Currency.getInstance(newState.fiatCurrency).getSymbol(Locale.getDefault())
+        newState.selectedCryptoCurrency?.let {
+            if (!input_amount.isConfigured) {
+                input_amount.configuration = FiatCryptoViewConfiguration(
+                    input = CurrencyType.Fiat,
+                    output = CurrencyType.Fiat,
+                    fiatCurrency = newState.fiatCurrency,
+                    cryptoCurrency = it,
+                    predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
+                )
+            }
+        }
         fiat_currency.text = newState.fiatCurrency
         newState.selectedCryptoCurrency?.let {
             crypto_icon.setImageResource(it.drawableResFilled())
@@ -141,15 +157,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
         arrow.visibleIf { newState.availableCryptoCurrencies.size > 1 }
 
-        if (newState.maxAmount != null && newState.minAmount != null) {
-            input_amount.filters =
-                arrayOf(
-                    DecimalDigitsInputFilter(
-                        newState.maxIntegerDigitsForAmount(),
-                        newState.maxDecimalDigitsForAmount()
-                    )
-                )
-        }
+        input_amount.maxLimit = newState.maxFiatAmount
 
         newState.predefinedAmounts.takeIf {
             it.isNotEmpty() && newState.selectedCryptoCurrency != null
@@ -167,26 +175,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         } ?: payment_method_root.gone()
 
         btn_continue.isEnabled = canContinue(newState)
-        input_amount.isEnabled = newState.selectedCryptoCurrency != null
-
-        input_amount.backgroundTintList =
-            ColorStateList.valueOf(
-                resources.getColor(
-                    if (newState.error != null)
-                        R.color.red_600
-                    else
-                        R.color.blue_600
-                )
-            )
-
         newState.error?.let {
             handleError(it, newState)
         } ?: kotlin.run {
             clearError()
-        }
-
-        if (input_amount.text.toString() != newState.enteredAmount) {
-            input_amount.setText(newState.enteredAmount)
         }
 
         coin_selector.takeIf { newState.availableCryptoCurrencies.size > 1 }?.setOnClickListener {
@@ -264,8 +256,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun clearError() {
-        error_text.gone()
-        error_fix_action.gone()
+        input_amount.hideError()
     }
 
     private fun showErrorState(errorState: ErrorState) {
@@ -275,35 +266,24 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun handleError(error: InputError, state: SimpleBuyState) {
         when (error) {
             InputError.ABOVE_MAX -> {
-                error_fix_action.apply {
-                    text = resources.getString(R.string.buy_max)
-                    visible()
-                    setOnClickListener {
-                        input_amount.setText(state.maxAmount?.asInputAmount() ?: "")
-                        analytics.logEvent(SimpleBuyAnalytics.BUY_MAX_CLICKED)
-                    }
-                }
-                error_text.apply {
-                    text = resources.getString(R.string.maximum_buy, state.maxAmount?.toStringWithSymbol())
-                    visible()
-                }
+                input_amount.showError(
+                    if (input_amount.configuration?.input == CurrencyType.Fiat)
+                        resources.getString(R.string.maximum_buy, state.maxFiatAmount?.toStringWithSymbol())
+                    else
+                        resources.getString(R.string.maximum_buy,
+                            state.maxCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol())
+                )
             }
             InputError.BELOW_MIN -> {
-                error_fix_action.apply {
-                    text = resources.getString(R.string.buy_min)
-                    visible()
-                    setOnClickListener {
-                        analytics.logEvent(SimpleBuyAnalytics.BUY_MIN_CLICKED)
-                        input_amount.setText(state.minAmount?.asInputAmount() ?: "")
-                    }
-                }
-                error_text.apply {
-                    text = resources.getString(R.string.minimum_buy, state.minAmount?.toStringWithSymbol())
-                    visible()
-                }
+                input_amount.showError(
+                    if (input_amount.configuration?.input == CurrencyType.Fiat)
+                        resources.getString(R.string.minimum_buy, state.minFiatAmount?.toStringWithSymbol())
+                    else
+                        resources.getString(R.string.minimum_buy,
+                            state.minCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol())
+                )
             }
         }
-        hidePredefinedAmounts()
     }
 
     private fun hidePredefinedAmounts() {
@@ -320,9 +300,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         amount?.let { amnt ->
             text = amnt.formatOrSymbolForZero().withoutTrailingDecimalsZeros()
             visible()
-            setOnClickListener {
-                input_amount.setText(amnt.asInputAmount())
-            }
         } ?: this.gone()
     }
 
