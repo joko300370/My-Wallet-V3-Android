@@ -185,7 +185,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
 
     // Temp patch fn until coincore and accounts are used throughout: TODO - remove this nonsense
     private fun startActivityWithDefaultAccountForAsset(assetFilter: AssetFilter) {
-        val coincore: Coincore = get()
+        val coincore: Coincore by scopedInject()
         val asset = coincore[cryptoCurrency]
 
         compositeDisposable += asset.accounts(assetFilter)

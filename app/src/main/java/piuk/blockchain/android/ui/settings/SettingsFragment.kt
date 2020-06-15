@@ -234,7 +234,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
 
         // App
         findPreference<Preference>("about")?.apply {
-            summary = "v" + BuildConfig.VERSION_NAME
+            summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
             onClick { onAboutClicked() }
         }
 

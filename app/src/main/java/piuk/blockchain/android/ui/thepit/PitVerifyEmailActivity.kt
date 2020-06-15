@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_pit_verify_email_layout.*
 import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
@@ -12,6 +13,8 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 
 class PitVerifyEmailActivity : BaseMvpActivity<PitVerifyEmailView, PitVerifyEmailPresenter>(), PitVerifyEmailView {
+
+    private val pitVerifyEmailPresenter: PitVerifyEmailPresenter by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +44,7 @@ class PitVerifyEmailActivity : BaseMvpActivity<PitVerifyEmailView, PitVerifyEmai
         presenter.resendMail(email)
     }
 
-    override fun createPresenter(): PitVerifyEmailPresenter = get()
+    override fun createPresenter() = pitVerifyEmailPresenter
 
     override fun getView(): PitVerifyEmailView = this
 

@@ -145,6 +145,10 @@
         <item name="android:textSize">32sp</item>
     </style>
 
+    <style name="Text.Semibold.48">
+        <item name="android:textSize">48sp</item>
+    </style>
+
     <style name="Text.Semibold.14">
         <item name="android:textSize">14sp</item>
     </style>
@@ -183,7 +187,6 @@
     <style name="Text.Error">
         <item name="android:textColor">@color/red_600</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:drawablePadding">8dp</item>
         <item name="android:background">@drawable/rounded_error_text_background</item>
     </style>
 

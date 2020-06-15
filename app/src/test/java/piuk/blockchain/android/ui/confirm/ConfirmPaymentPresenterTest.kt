@@ -125,7 +125,7 @@ class ConfirmPaymentPresenterTest {
         verify(mockActivity).setToLabel(toLabel)
         verify(mockActivity).setAmount("$paxAmount $paxUnit ($$fiatAmount)")
         verify(mockActivity).setFee("$ethFee $ethUnit ($$fiatFee)")
-        verify(mockActivity).setFiatTotalOnly("$$fiatTotal")
+        verify(mockActivity).setFiatTotalOnly(fiatTotal)
         verify(mockActivity).contactNote = contactNote
         verify(mockActivity).contactNoteDescription = contactNoteDescription
         verify(mockActivity).setUiState(UiState.CONTENT)
