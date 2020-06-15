@@ -13,6 +13,7 @@ import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
@@ -35,7 +36,10 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
             presenter.checkForRooted()
         }
 
-        text_version.text = BuildConfig.VERSION_NAME
+        text_version.text =
+            "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
+
+        text_version.copyHashOnLongClick(this)
     }
 
     private fun launchCreateWalletActivity() = CreateWalletActivity.start(this)
