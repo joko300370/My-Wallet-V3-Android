@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import timber.log.Timber
 
 enum class SendStep {
@@ -61,12 +62,13 @@ class SendModel(
             is SendIntent.UpdatePasswordNotValidated -> null
             is SendIntent.AddressSelected -> null
             is SendIntent.PrepareTransaction -> null
-            is SendIntent.ExecuteTransaction -> null
+            is SendIntent.ExecuteTransaction -> processExecuteTransaction(previousState)
             is SendIntent.AddressSelectionConfirmed -> processAddressConfirmation(previousState)
             is SendIntent.UpdateSendProcessor -> null
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount, previousState)
             is SendIntent.UpdateTransactionAmounts -> null
+            is SendIntent.UpdateTransactionComplete -> null
         }
     }
 
@@ -127,4 +129,21 @@ class SendModel(
                     }
                 )
             } ?: throw IllegalStateException("No send processor found!")
+
+    private fun processExecuteTransaction(state: SendState): Disposable =
+        state.sendProcessor?.let { tx ->
+            val pendingSend = PendingSendTx(state.sendAmount!!)
+            tx.validate(pendingSend)
+                .thenSingle {
+                    tx.execute(pendingSend)
+                }
+                .subscribeBy(
+                    onSuccess = {
+                        process(SendIntent.UpdateTransactionComplete)
+                    },
+                    onError = {
+                        process(SendIntent.FatalTransactionError)
+                    }
+                )
+        } ?: throw IllegalStateException("No send processor found!")
 }

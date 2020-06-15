@@ -123,4 +123,12 @@ sealed class SendIntent : MviIntent<SendState> {
                 currentStep = SendStep.SEND_ERROR
             )
     }
+
+    object UpdateTransactionComplete : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                nextEnabled = true,
+                currentStep = SendStep.SEND_COMPLETE
+            )
+    }
 }

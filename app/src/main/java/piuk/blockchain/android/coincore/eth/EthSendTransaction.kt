@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.impl.OnChainSendTransactionBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
+import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -65,6 +66,7 @@ class EthSendTransaction(
         validateAmount(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
             .then { validateNoPendingTx() }
+            .doOnError { Timber.e("Validation failed: $it") }
 
     override fun executeTransaction(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
         createTransaction(pendingTx)
