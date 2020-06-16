@@ -51,11 +51,6 @@ class EnterTargetAddressSheet : SendInputSheet() {
             }
             cta_button.isEnabled = newState.nextEnabled
         }
-
-        // To make development easier; don't forget to remove this!
-        if(dialogView.address_entry.text.isNullOrBlank()) {
-            dialogView.address_entry.setText("0xc859f5B7d396363F560d97c978D83314C959a89c")
-        }
         state = newState
     }
 

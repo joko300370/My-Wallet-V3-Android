@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.transfer.send
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -66,17 +65,6 @@ sealed class SendIntent : MviIntent<SendState> {
                 currentStep = SendStep.ENTER_AMOUNT
             )
     }
-
-//    class UpdateSendProcessor(
-//        private val sendProcessor: SendProcessor
-//    ) : SendIntent() {
-//        override fun reduce(oldState: SendState): SendState =
-//            oldState.copy(
-//                nextEnabled = false, // Or maybe true with bitpay/url addresses
-//                sendProcessor = sendProcessor,
-//                currentStep = SendStep.ENTER_AMOUNT
-//            )
-//    }
 
     class SendAmountChanged(
         val amount: CryptoValue

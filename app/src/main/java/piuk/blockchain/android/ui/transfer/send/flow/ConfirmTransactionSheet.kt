@@ -36,7 +36,6 @@ class ConfirmTransactionSheet : SendInputSheet() {
                 PendingTxItem("Account", newState.sendingAccount.label),
                 PendingTxItem("To", newState.targetAddress.label),
                 PendingTxItem("Amount", newState.sendAmount.toStringWithSymbol())
-//                PendingTxItem("Fee", newState.fee)
             )
         )
     }
@@ -99,7 +98,6 @@ class DetailsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             }
         }
     }
-
 }
 
 private class DetailsItemVH(val parent: View) :
