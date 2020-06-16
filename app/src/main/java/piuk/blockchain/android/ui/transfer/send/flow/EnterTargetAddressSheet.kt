@@ -51,6 +51,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
             }
             cta_button.isEnabled = newState.nextEnabled
         }
+        state = newState
     }
 
     private val addressTextWatcher = object : AfterTextChangedWatcher() {

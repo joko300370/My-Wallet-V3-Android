@@ -8,7 +8,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendTransaction
+import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -85,7 +85,7 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         // Check type of Address here, and create Custodial or Swap or Sell or
         // however this is going to work.
         //

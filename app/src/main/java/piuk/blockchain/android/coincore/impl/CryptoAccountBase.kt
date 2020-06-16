@@ -16,7 +16,7 @@ import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendTransaction
+import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -88,7 +88,7 @@ class CustodialTradingAccount(
 
     override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Write me!"))
 
     override val actions: AvailableActions
@@ -163,8 +163,8 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
-        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Interest Wallet"))
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+        Single.error<SendProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val actions: AvailableActions
         get() = availableActions
@@ -195,8 +195,8 @@ internal class CryptoExchangeAccount(
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> =
-        Single.error<SendTransaction>(NotImplementedError("Cannot Send from Exchange Wallet"))
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+        Single.error<SendProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
@@ -218,7 +218,7 @@ abstract class CryptoSingleAccountNonCustodialBase(
         AssetAction.Swap
     )
 
-    override fun createPendingSend(address: ReceiveAddress): Single<SendTransaction> {
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> {
         TODO("Implement me")
     }
 }

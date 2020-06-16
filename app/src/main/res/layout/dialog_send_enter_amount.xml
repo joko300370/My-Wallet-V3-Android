@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -26,23 +27,53 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="CryptoValue entry, validate and max, use max. All those things. When we leave this screen we should have enough infomation to construct a tx etc"
+        android:text="Amount to send:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"/>
 
-    <Button
-        android:id="@+id/test_action"
-        style="@style/CtaButton.White"
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/enter_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:text="Yeah, did that"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_block"
+        tools:text="0.001 BTC"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/max_available"
+        style="@style/Text.Standard.Centered.12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        tools:text="Max: 1.00000 BTC"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/use_max"
+        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintTop_toBottomOf="@id/enter_amount"/>
+
+    <Button
+        android:id="@+id/use_max"
+        style="@style/CtaButton.White"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:text="Use Max"
+        app:layout_constraintTop_toBottomOf="@id/enter_amount"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toEndOf="@+id/max_available"/>
+
+    error_msg
 
     <Button
         android:id="@+id/cta_button"

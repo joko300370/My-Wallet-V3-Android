@@ -21,22 +21,25 @@ enum class FeeLevel {
     Custom
 }
 
-interface SendTransaction {
+data class PendingSendTx(
+    val amount: CryptoValue,
+    val feeLevel: FeeLevel = FeeLevel.Regular,
+    val notes: String = ""
+)
+
+interface SendProcessor {
     val sendingAccount: CryptoSingleAccount
     val address: ReceiveAddress
-    var amount: CryptoValue
-    var feeLevel: FeeLevel
-    var notes: String
 
     val feeOptions: Set<FeeLevel>
 
-    val availableBalance: Single<CryptoValue>
-    val absoluteFee: Single<CryptoValue>
+    fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue>
+    fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if
     // it is not. Since the UI and Address objects should validate where possible, an error should
     // be the exception, rather than the expected case.
-    fun validate(): Completable
+    fun validate(pendingTx: PendingSendTx): Completable
     // Execute the transaction and return the transaction id - either the hash or a custodial Id
-    fun execute(secondPassword: String = ""): Single<String>
+    fun execute(pendingTx: PendingSendTx, secondPassword: String = ""): Single<String>
 }
