@@ -10,7 +10,6 @@ import piuk.blockchain.android.coincore.NullAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -31,9 +30,8 @@ data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoSingleAccount = NullAccount,
     val targetAddress: ReceiveAddress = NullAddress,
-    val sendProcessor: SendProcessor? = null, // MOve this to interactor
-    val sendAmount: CryptoValue? = null,
-    val availableBalance: CryptoValue? = null,
+    val sendAmount: CryptoValue = CryptoValue.zero(sendingAccount.asset),
+    val availableBalance: CryptoValue = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false
@@ -53,7 +51,7 @@ class SendModel(
     mainScheduler
 ) {
     override fun performAction(previousState: SendState, intent: SendIntent): Disposable? {
-        Timber.d("!SEND!> Send Model: performAction: ${intent.javaClass.simpleName}")
+        Timber.v("!SEND!> Send Model: performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
             is SendIntent.Initialise -> null
@@ -64,7 +62,6 @@ class SendModel(
             is SendIntent.PrepareTransaction -> null
             is SendIntent.ExecuteTransaction -> processExecuteTransaction(previousState)
             is SendIntent.AddressSelectionConfirmed -> processAddressConfirmation(previousState)
-            is SendIntent.UpdateSendProcessor -> null
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount, previousState)
             is SendIntent.UpdateTransactionAmounts -> null
@@ -73,11 +70,11 @@ class SendModel(
     }
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.d("!SEND!> Send Model: loop error -> $t")
+        Timber.e("!SEND!> Send Model: loop error -> $t")
     }
 
     override fun onStateUpdate(s: SendState) {
-        Timber.d("!SEND!> Send Model: state update -> $s")
+        Timber.v("!SEND!> Send Model: state update -> $s")
     }
 
     private fun processPasswordValidation(password: String) =
@@ -100,50 +97,47 @@ class SendModel(
         // the state object a bit more; depending on whether it's an internal, external,
         // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
-
-        interactor.fetchSendTransaction(state.sendingAccount, state.targetAddress)
+        interactor.initialiseTransaction(state.sendingAccount, state.targetAddress)
+            .thenSingle {
+                interactor.getAvailableBalance(
+                    PendingSendTx(
+                        amount = state.sendAmount
+                    )
+                )
+            }
             .subscribeBy(
                 onSuccess = {
-                    process(SendIntent.UpdateSendProcessor(it))
+                    process(SendIntent.UpdateTransactionAmounts(state.sendAmount, it))
                 },
                 onError = {
-                    // If we get here, then something has gone badly wrong!
-                    Timber.e("Unable to get transaction processor")
+                    Timber.e("!SEND!> Unable to get transaction processor: $it")
                     process(SendIntent.FatalTransactionError)
                 }
             )
 
         private fun processAmountChanged(amount: CryptoValue, state: SendState): Disposable =
-            state.sendProcessor?.let { tx ->
-                tx.availableBalance(
-                    PendingSendTx(amount)
-                )
-                .subscribeBy(
-                    onSuccess = {
-                        process(SendIntent.UpdateTransactionAmounts(amount, it))
-                    },
-                    onError = {
-                        // If we get here, then something has gone badly wrong!
-                        Timber.e("Unable to get update available balance")
-                        process(SendIntent.FatalTransactionError)
-                    }
-                )
-            } ?: throw IllegalStateException("No send processor found!")
+            interactor.getAvailableBalance(
+                PendingSendTx(amount)
+            )
+            .subscribeBy(
+                onSuccess = {
+                    process(SendIntent.UpdateTransactionAmounts(amount, it))
+                },
+                onError = {
+                    Timber.e("!SEND!> Unable to get update available balance")
+                    process(SendIntent.FatalTransactionError)
+                }
+            )
 
     private fun processExecuteTransaction(state: SendState): Disposable =
-        state.sendProcessor?.let { tx ->
-            val pendingSend = PendingSendTx(state.sendAmount!!)
-            tx.validate(pendingSend)
-                .thenSingle {
-                    tx.execute(pendingSend)
-                }
-                .subscribeBy(
-                    onSuccess = {
-                        process(SendIntent.UpdateTransactionComplete)
-                    },
-                    onError = {
-                        process(SendIntent.FatalTransactionError)
-                    }
-                )
-        } ?: throw IllegalStateException("No send processor found!")
+        interactor.verifyAndExecute(
+            PendingSendTx(state.sendAmount)
+        ).subscribeBy(
+            onSuccess = {
+                process(SendIntent.UpdateTransactionComplete)
+            },
+            onError = {
+                process(SendIntent.FatalTransactionError)
+            }
+        )
 }

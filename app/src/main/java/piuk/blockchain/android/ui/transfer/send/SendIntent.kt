@@ -62,20 +62,21 @@ sealed class SendIntent : MviIntent<SendState> {
     object AddressSelectionConfirmed : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false
-            )
-    }
-
-    class UpdateSendProcessor(
-        private val sendProcessor: SendProcessor
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(
-                nextEnabled = false, // Or maybe true with bitpay/url addresses
-                sendProcessor = sendProcessor,
+                nextEnabled = false,
                 currentStep = SendStep.ENTER_AMOUNT
             )
     }
+
+//    class UpdateSendProcessor(
+//        private val sendProcessor: SendProcessor
+//    ) : SendIntent() {
+//        override fun reduce(oldState: SendState): SendState =
+//            oldState.copy(
+//                nextEnabled = false, // Or maybe true with bitpay/url addresses
+//                sendProcessor = sendProcessor,
+//                currentStep = SendStep.ENTER_AMOUNT
+//            )
+//    }
 
     class SendAmountChanged(
         val amount: CryptoValue
