@@ -112,23 +112,23 @@ private fun ImageView.setAssetTint(cryptoCurrency: CryptoCurrency) {
     when (cryptoCurrency) {
         CryptoCurrency.BTC -> {
             background.setTint(ContextCompat.getColor(context, R.color.btc_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.btc))
+            setColorFilter(ContextCompat.getColor(context, R.color.btc))
         }
         CryptoCurrency.BCH -> {
             background.setTint(ContextCompat.getColor(context, R.color.bch_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.bch))
+            setColorFilter(ContextCompat.getColor(context, R.color.bch))
         }
         CryptoCurrency.ETHER -> {
             background.setTint(ContextCompat.getColor(context, R.color.ether_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.eth))
+            setColorFilter(ContextCompat.getColor(context, R.color.eth))
         }
         CryptoCurrency.PAX -> {
             background.setTint(ContextCompat.getColor(context, R.color.pax_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.pax))
+            setColorFilter(ContextCompat.getColor(context, R.color.pax))
         }
         CryptoCurrency.XLM -> {
             background.setTint(ContextCompat.getColor(context, R.color.xlm_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.xlm))
+            setColorFilter(ContextCompat.getColor(context, R.color.xlm))
         }
         else -> {
             // STX left, do nothing
