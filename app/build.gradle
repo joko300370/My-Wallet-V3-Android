@@ -124,6 +124,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['prodPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['prodCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigField "String", "COMMIT_HASH", "\"\""
         }
         envDev {
@@ -147,6 +148,7 @@ android {
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-dev'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
         }
         envStaging {
             dimension "environment"
@@ -168,8 +170,8 @@ android {
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['stagingCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
-
             versionNameSuffix '-staging'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             applicationId "piuk.blockchain.android.staging"
         }
         envTestnet {

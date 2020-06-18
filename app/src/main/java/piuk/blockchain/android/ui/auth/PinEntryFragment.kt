@@ -1,8 +1,6 @@
 package piuk.blockchain.android.ui.auth
 
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
@@ -15,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
@@ -55,6 +52,7 @@ import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.DialogButtonCallback
+import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
@@ -615,14 +613,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         binding?.debugCommitHash?.apply {
             visibleIf { BuildConfig.COMMIT_HASH.isNotEmpty() }
             text = BuildConfig.COMMIT_HASH
-            setOnLongClickListener {
-                val clipboard =
-                    requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                clipboard.primaryClip =
-                    ClipData.newPlainText("commit_hash", BuildConfig.COMMIT_HASH)
-                Toast.makeText(requireContext(), "Commit hash copied", Toast.LENGTH_SHORT).show()
-                true
-            }
+            copyHashOnLongClick(requireContext())
         }
     }
 

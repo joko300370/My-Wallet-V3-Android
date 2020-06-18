@@ -14,6 +14,7 @@ val apiInterceptorsModule = module {
 
     single {
         val env: EnvironmentConfig = get()
+        val versionName = BuildConfig.VERSION_NAME.removeSuffix(BuildConfig.VERSION_NAME_SUFFIX)
         OkHttpInterceptors(
             if (env.shouldShowDebugMenu()) {
                 listOf(
@@ -22,13 +23,13 @@ val apiInterceptorsModule = module {
                     // Add logging for debugging purposes
                     ApiInterceptor(),
                     // Add header in all requests
-                    UserAgentInterceptor(BuildConfig.VERSION_NAME, Build.VERSION.RELEASE),
+                    UserAgentInterceptor(versionName, Build.VERSION.RELEASE),
                     DeviceIdInterceptor(get(), get())
                 )
             } else {
                 listOf(
                     // Add header in all requests
-                    UserAgentInterceptor(BuildConfig.VERSION_NAME, Build.VERSION.RELEASE),
+                    UserAgentInterceptor(versionName, Build.VERSION.RELEASE),
                     DeviceIdInterceptor(get(), get())
                 )
             })
