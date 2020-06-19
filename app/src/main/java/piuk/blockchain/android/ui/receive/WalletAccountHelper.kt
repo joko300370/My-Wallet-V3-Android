@@ -54,22 +54,6 @@ class WalletAccountHelper(
             emptyList()
         }
 
-    /**
-     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
-     * objects, eg from importing accounts.
-     *
-     * @return Returns a list of [ItemAccount] objects
-     */
-    fun accountItems(cryptoCurrency: CryptoCurrency): Single<List<ItemAccount>> =
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> Single.just(allBtcAccountItems())
-            CryptoCurrency.BCH -> Single.just(allBchAccountItems())
-            CryptoCurrency.ETHER -> Single.just(getEthAccount())
-            CryptoCurrency.XLM -> getXlmAccount()
-            CryptoCurrency.PAX -> Single.just(getPaxAccount())
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        }
-
     private fun allBtcAccountItems() = getHdAccounts() + getLegacyBtcAddresses()
 
     private fun allBchAccountItems() = getHdBchAccounts() + getLegacyBchAddresses()
@@ -321,102 +305,6 @@ class WalletAccountHelper(
                     address = account.accountId
                 )
             }
-
-    /**
-     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
-     * objects, eg from importing accounts.
-     */
-    fun getAccountItemsForOverview(cryptoCurrency: CryptoCurrency): Single<List<ItemAccount>> =
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> Single.just(getBtcOverviewList())
-            CryptoCurrency.BCH -> Single.just(getBchOverviewList())
-            CryptoCurrency.ETHER -> Single.just(getEthOverviewList())
-            CryptoCurrency.XLM -> getDefaultXlmAccountItem().map { listOf(it) }
-            CryptoCurrency.PAX -> Single.just(getPaxOverviewList())
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        }
-
-    private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()
-
-    private fun getPaxOverviewList(): List<ItemAccount> = getPaxAccount()
-
-    private fun getBchOverviewList(): MutableList<ItemAccount> {
-        return mutableListOf<ItemAccount>().apply {
-
-            val legacyAddresses = getLegacyBchAddresses()
-            val accounts = getHdBchAccounts()
-
-            // Create "All Accounts" if necessary
-            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
-                add(getBchWalletAccountItem())
-            }
-            addAll(accounts)
-
-            // Create consolidated "Imported Addresses"
-            if (legacyAddresses.isNotEmpty()) {
-                add(getBchImportedAddressesAccountItem())
-            }
-        }
-    }
-
-    private fun getBtcOverviewList(): List<ItemAccount> {
-        return mutableListOf<ItemAccount>().apply {
-
-            val legacyAddresses = getLegacyBtcAddresses()
-            val accounts = getHdAccounts()
-
-            // Create "All Accounts" if necessary
-            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
-                add(getBtcWalletAccountItem())
-            }
-            addAll(accounts)
-
-            // Create consolidated "Imported Addresses"
-            if (legacyAddresses.isNotEmpty()) {
-                add(getBtcImportedAddressesAccountItem())
-            }
-        }.toList()
-    }
-
-    private fun getBtcWalletAccountItem(): ItemAccount {
-        val bigIntBalance = payloadManager.walletBalance
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.all_accounts),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BTC, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
-        )
-    }
-
-    private fun getBchWalletAccountItem(): ItemAccount {
-        val bigIntBalance = bchDataManager.getWalletBalance()
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.bch_all_accounts),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BCH, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
-        )
-    }
-
-    private fun getBtcImportedAddressesAccountItem(): ItemAccount {
-        val bigIntBalance = payloadManager.importedAddressesBalance
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.imported_addresses),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BTC, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_LEGACY
-        )
-    }
-
-    private fun getBchImportedAddressesAccountItem(): ItemAccount {
-        val bigIntBalance = bchDataManager.getImportedAddressBalance()
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.bch_imported_addresses),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BCH, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_LEGACY
-        )
-    }
 
     // /////////////////////////////////////////////////////////////////////////
     // Extension functions
