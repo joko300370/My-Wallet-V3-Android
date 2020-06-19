@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity
@@ -19,8 +20,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
 
     override val model: SimpleBuyModel by scopedInject()
-
-    private var navigatedToNextScreen = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,20 +68,12 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
                     newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
         }
 
-        // we need this ungly flag here so we dont navigate again to the next screen once the fragment is resumed
-        if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE && !navigatedToNextScreen) {
+        if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE) {
             if (newState.selectedPaymentMethod?.id == PaymentMethod.UNDEFINED_CARD_PAYMENT_ID) {
                 addCard()
             } else {
                 navigator().goToCheckOutScreen()
             }
-            navigatedToNextScreen = true
-        }
-
-        if (newState.selectedPaymentMethod?.isBank() == false &&
-            newState.selectedPaymentMethod.id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-        ) {
-            navigator().goToCheckOutScreen()
         }
 
         kyc_failed_icon.setImageResource(
@@ -124,7 +115,12 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             val cardLabel = card.uiLabel()
             val cardPartner = card.partner
 
-            model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId, cardLabel, cardPartner))
+            model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId,
+                cardLabel,
+                cardPartner,
+                PaymentMethodType.PAYMENT_CARD
+            ))
+            navigator().goToCheckOutScreen()
         }
     }
 

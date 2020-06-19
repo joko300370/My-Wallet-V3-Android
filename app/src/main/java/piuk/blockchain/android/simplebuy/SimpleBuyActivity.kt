@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -188,7 +189,8 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
                 simpleBuyModel.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(
                     cardId,
                     cardLabel,
-                    cardPartner
+                    cardPartner,
+                    PaymentMethodType.PAYMENT_CARD
                 ))
                 goToCheckOutScreen()
             } else

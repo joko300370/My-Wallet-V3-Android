@@ -130,8 +130,7 @@ class XlmDataManager internal constructor(
     override fun defaultAccountReference(): Single<AccountReference> = defaultAccount().map { it }
 
     fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
-        maybeDefaultXlmAccount()
-            .map(XlmAccount::toReference)
+        maybeDefaultXlmAccount().map(XlmAccount::toReference)
 
     fun getTransactionList(accountReference: AccountReference.Xlm): Single<List<XlmTransaction>> =
         Single.fromCallable {

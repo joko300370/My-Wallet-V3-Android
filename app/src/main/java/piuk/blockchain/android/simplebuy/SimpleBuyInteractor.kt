@@ -8,6 +8,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -60,6 +61,7 @@ class SimpleBuyInteractor(
         cryptoCurrency: CryptoCurrency,
         amount: FiatValue,
         paymentMethodId: String? = null,
+        paymentMethod: PaymentMethodType,
         isPending: Boolean
     ): Single<SimpleBuyIntent.OrderCreated> =
         custodialWalletManager.createOrder(
@@ -67,6 +69,7 @@ class SimpleBuyInteractor(
             action = "BUY",
             amount = amount,
             paymentMethodId = paymentMethodId,
+            paymentMethodType = paymentMethod,
             stateAction = if (isPending) "pending" else null
         ).map {
             SimpleBuyIntent.OrderCreated(it)

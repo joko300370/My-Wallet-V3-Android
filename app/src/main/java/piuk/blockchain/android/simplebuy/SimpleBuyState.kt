@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -193,7 +194,8 @@ data class PaymentOptions(
 data class SelectedPaymentMethod(
     val id: String,
     val partner: Partner? = null,
-    val label: String? = ""
+    val label: String? = "",
+    val paymentMethodType: PaymentMethodType
 ) {
-    fun isBank() = id == PaymentMethod.BANK_PAYMENT_ID
+    fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
 }

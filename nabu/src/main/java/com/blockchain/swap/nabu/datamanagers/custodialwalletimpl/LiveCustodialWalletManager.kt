@@ -92,6 +92,7 @@ class LiveCustodialWalletManager(
         amount: FiatValue,
         action: String,
         paymentMethodId: String?,
+        paymentMethodType: PaymentMethodType,
         stateAction: String?
     ): Single<BuyOrder> =
         authenticator.authenticate {
@@ -106,7 +107,8 @@ class LiveCustodialWalletManager(
                     output = OrderOutput(
                         cryptoCurrency.networkTicker
                     ),
-                    paymentMethodId = paymentMethodId
+                    paymentMethodId = paymentMethodId,
+                    paymentType = paymentMethodType.name
                 ),
                 stateAction
             )
@@ -483,6 +485,10 @@ private fun String.toSupportedPartner(): Partner =
         else -> Partner.UNKNOWN
     }
 
+enum class PaymentMethodType {
+    BANK_ACCOUNT, PAYMENT_CARD
+}
+
 private fun String.toLocalState(): OrderState =
     when (this) {
         BuyOrderResponse.PENDING_DEPOSIT -> OrderState.AWAITING_FUNDS
@@ -521,7 +527,11 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         updated = updatedAt.fromIso8601ToUtc() ?: Date(0),
         created = insertedAt.fromIso8601ToUtc() ?: Date(0),
         fee = fee?.let { FiatValue.fromMinor(inputCurrency, it.toLongOrDefault(0)) },
-        paymentMethodId = paymentMethodId ?: PaymentMethod.BANK_PAYMENT_ID,
+        paymentMethodId = paymentMethodId ?: (
+                if (paymentType.toPaymentMethodType() == PaymentMethodType.BANK_ACCOUNT)
+                    PaymentMethod.BANK_PAYMENT_ID
+                else PaymentMethod.UNDEFINED_CARD_PAYMENT_ID),
+        paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(
                 inputCurrency,
@@ -537,6 +547,12 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         },
         attributes = attributes
     )
+
+private fun String.toPaymentMethodType(): PaymentMethodType =
+    when (this) {
+        PaymentMethodResponse.BANK_ACCOUNT -> PaymentMethodType.BANK_ACCOUNT
+        else -> PaymentMethodType.PAYMENT_CARD
+    }
 
 interface PaymentAccountMapper {
     fun map(bankAccountResponse: BankAccountResponse): BankAccount?
