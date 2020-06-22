@@ -1590,7 +1590,7 @@
   <string name="billing_address_state">州</string>
   <string name="billing_address_country">国家</string>
   <string name="currency_not_supported_title">不支持您的货币</string>
-  <string name="currency_not_supported" formatted="false">目前，我们不支持使用%1s购买加密%1s</string>
+  <string name="currency_not_supported_1">目前，我们不支持使用%1s购买加密</string>
   <string name="activity_no_activity_title">您没有活动</string>
   <string name="activity_no_activity_text">您的所有交易都将显示在这里。</string>
   <string name="activity_custodial_pending_value">银行转账</string>

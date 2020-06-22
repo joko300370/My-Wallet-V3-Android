@@ -1589,7 +1589,7 @@
   <string name="billing_address_state">Etat</string>
   <string name="billing_address_country">Pays</string>
   <string name="currency_not_supported_title">Votre devise n\'est pas prise en charge</string>
-  <string name="currency_not_supported">Actuellement, nous ne prenons pas en charge l\'achat de crypto avec %1s</string>
+  <string name="currency_not_supported_1">Actuellement, nous ne prenons pas en charge l\'achat de crypto avec %1s</string>
   <string name="activity_no_activity_title">Vous n\'avez aucune activité</string>
   <string name="activity_no_activity_text">Toutes vos transactions s\'afficheront ici.</string>
   <string name="activity_custodial_pending_value">Virement</string>

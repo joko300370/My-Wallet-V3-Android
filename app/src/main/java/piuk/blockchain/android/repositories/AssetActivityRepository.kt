@@ -1,5 +1,6 @@
-package piuk.blockchain.android.coincore.impl
+package piuk.blockchain.android.repositories
 
+import com.blockchain.swap.nabu.datamanagers.repositories.ExpiringRepository
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -12,12 +13,10 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
-private const val CACHE_LIFETIME = 60 * 1000
-
-class AssetActivityRepo(
+class AssetActivityRepository(
     private val coincore: Coincore,
     private val rxBus: RxBus
-) {
+) : ExpiringRepository<ActivitySummaryList>() {
     private val event = rxBus.register(AuthEvent.LOGOUT::class.java)
 
     init {
@@ -29,7 +28,6 @@ class AssetActivityRepo(
     }
 
     private val transactionCache = mutableListOf<ActivitySummaryItem>()
-    private var lastUpdatedTimestamp: Long = -1L
 
     fun fetch(
         account: CryptoAccount,
@@ -37,12 +35,12 @@ class AssetActivityRepo(
     ): Observable<ActivitySummaryList> {
         return Maybe.concat(
             getFromCache(),
-            getFromNetwork(isRefreshRequested)
+            requestNetwork(isRefreshRequested)
         )
-        .toObservable()
-        .map { list ->
-            list.filter { item -> account.includes(item.account) }.sorted()
-        }
+            .toObservable()
+            .map { list ->
+                list.filter { item -> account.includes(item.account) }.sorted()
+            }
     }
 
     fun findCachedItem(cryptoCurrency: CryptoCurrency, txHash: String): ActivitySummaryItem? =
@@ -55,38 +53,38 @@ class AssetActivityRepo(
             it.txId == txHash
         }
 
-    private fun getFromNetwork(refreshRequested: Boolean): Maybe<ActivitySummaryList> {
+    private fun requestNetwork(refreshRequested: Boolean): Maybe<ActivitySummaryList> {
         return if (refreshRequested || isCacheExpired()) {
-            coincore.allWallets.activity.toMaybe().doOnSuccess { activityList ->
-                // on error of activity returns onSuccess with empty list
-                if (activityList.isNotEmpty()) {
-                    transactionCache.clear()
-                    transactionCache.addAll(activityList)
-                }
-                lastUpdatedTimestamp = System.currentTimeMillis()
-            }.map { list ->
-                // if network comes empty, but we have cache, return cache instead
-                if (list.isEmpty() && transactionCache.isNotEmpty()) {
-                    transactionCache
-                } else {
-                    list
-                }
-            }
+            getFromNetwork()
         } else {
             Maybe.empty()
         }
     }
 
-    private fun getFromCache(): Maybe<ActivitySummaryList> {
+    override fun getFromNetwork(): Maybe<ActivitySummaryList> =
+        coincore.allWallets.activity.toMaybe().doOnSuccess { activityList ->
+            // on error of activity returns onSuccess with empty list
+            if (activityList.isNotEmpty()) {
+                transactionCache.clear()
+                transactionCache.addAll(activityList)
+            }
+            lastUpdatedTimestamp = System.currentTimeMillis()
+        }.map { list ->
+            // if network comes empty, but we have cache, return cache instead
+            if (list.isEmpty() && transactionCache.isNotEmpty()) {
+                transactionCache
+            } else {
+                list
+            }
+        }
+
+    override fun getFromCache(): Maybe<ActivitySummaryList> {
         return if (transactionCache.isNotEmpty()) {
             Maybe.just(transactionCache)
         } else {
             Maybe.empty()
         }
     }
-
-    private fun isCacheExpired() =
-        System.currentTimeMillis() - lastUpdatedTimestamp >= CACHE_LIFETIME
 
     private fun doOnLogout() {
         transactionCache.clear()

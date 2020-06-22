@@ -7,10 +7,10 @@ import org.koin.dsl.module
 import piuk.blockchain.android.coincore.bch.BchTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
 import piuk.blockchain.android.coincore.eth.EthTokens
-import piuk.blockchain.android.coincore.impl.AssetActivityRepo
 import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
+import piuk.blockchain.android.repositories.AssetActivityRepository
 
 val coincoreModule = module {
 
@@ -122,7 +122,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            AssetActivityRepo(
+            AssetActivityRepository(
                 coincore = get(),
                 rxBus = get()
             )

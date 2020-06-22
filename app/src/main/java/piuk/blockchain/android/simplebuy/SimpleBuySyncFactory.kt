@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -32,10 +33,6 @@ interface SimpleBuyPrefsStateAdapter {
     fun fetch(): SimpleBuyState?
     fun update(newState: SimpleBuyState)
     fun clear()
-}
-
-enum class SimpleBuySyncEvent {
-    SYNC_COMPLETE
 }
 
 internal class SimpleBuyInflateAdapter(
@@ -119,13 +116,13 @@ class SimpleBuySyncFactory(
                                         .doOnComplete { localStateAdapter.clear() }
                                         .doOnSuccess { state -> localStateAdapter.update(state) }
                                 } else {
-                                    Maybe.empty<SimpleBuyState>()
+                                    Maybe.empty()
                                 }
                             },
-                            onError = { Maybe.empty<SimpleBuyState>() }, // Do nothing
+                            onError = { Maybe.empty() }, // Do nothing
                             onComplete = {
                                 localStateAdapter.clear()
-                                Maybe.empty<SimpleBuyState>()
+                                Maybe.empty()
                             } // No local state. Do nothing
                         )
                         .ignoreElement()
@@ -143,7 +140,7 @@ class SimpleBuySyncFactory(
             .flatMapBy(
                 onSuccess = { checkForRemoteOverride(it) },
                 onError = {
-                    Maybe.error<SimpleBuyState>(it)
+                    Maybe.error(it)
                 },
                 onComplete = { Maybe.defer { getRemotePendingBuy() } }
             )
@@ -158,11 +155,13 @@ class SimpleBuySyncFactory(
                                 it.state == OrderState.PENDING_EXECUTION ||
                                 it.state == OrderState.PENDING_CONFIRMATION
                     }?.let { buyOrder ->
-                        if (!buyOrder.isBankPayment()) {
+                        if (buyOrder.isCardPayment() &&
+                            buyOrder.paymentMethodId != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                        ) {
                             custodialWallet.getCardDetails(buyOrder.paymentMethodId).flatMapMaybe {
                                 Maybe.just(buyOrder.toSimpleBuyState().copy(
                                     selectedPaymentMethod = SelectedPaymentMethod(
-                                        it.cardId, it.partner, it.uiLabelWithDigits()
+                                        it.cardId, it.partner, it.uiLabelWithDigits(), PaymentMethodType.PAYMENT_CARD
                                     )
                                 )
                                 )
@@ -184,15 +183,21 @@ class SimpleBuySyncFactory(
                                     it.state == OrderState.PENDING_EXECUTION ||
                                     it.state == OrderState.PENDING_CONFIRMATION
                         }?.let { buyOrder ->
-                            if (!buyOrder.isBankPayment()) {
-                                custodialWallet.getCardDetails(buyOrder.paymentMethodId).flatMapMaybe {
-                                    Maybe.just(buyOrder.toSimpleBuyState().copy(
-                                        selectedPaymentMethod = SelectedPaymentMethod(
-                                            it.cardId, it.partner, it.uiLabelWithDigits()
+                            if (buyOrder.isCardPayment() &&
+                                buyOrder.paymentMethodId != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                            ) {
+                                custodialWallet.getCardDetails(buyOrder.paymentMethodId)
+                                    .flatMapMaybe {
+                                        Maybe.just(buyOrder.toSimpleBuyState().copy(
+                                            selectedPaymentMethod = SelectedPaymentMethod(
+                                                it.cardId,
+                                                it.partner,
+                                                it.uiLabelWithDigits(),
+                                                PaymentMethodType.PAYMENT_CARD
+                                            )
                                         )
-                                    )
-                                    )
-                                }
+                                        )
+                                    }
                             } else {
                                 Maybe.just(buyOrder.toSimpleBuyState())
                             }
@@ -203,8 +208,8 @@ class SimpleBuySyncFactory(
         }
     }
 
-    private fun BuyOrder.isBankPayment() =
-        paymentMethodId == PaymentMethod.BANK_PAYMENT_ID
+    private fun BuyOrder.isCardPayment() =
+        paymentMethodType == PaymentMethodType.PAYMENT_CARD
 
     private fun updateWithRemote(localState: SimpleBuyState): Maybe<SimpleBuyState> =
         getRemoteForLocal(localState.id)
@@ -238,7 +243,7 @@ class SimpleBuySyncFactory(
             custodialWallet.getBuyOrder(it)
                 .map { order -> order.toSimpleBuyState() }
                 .toMaybe()
-                .onErrorResumeNext(Maybe.empty<SimpleBuyState>())
+                .onErrorResumeNext(Maybe.empty())
         } ?: Maybe.empty()
 
     private fun maybeInflateLocalState(): Maybe<SimpleBuyState> =
@@ -259,14 +264,19 @@ fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
         fee = fee,
         orderValue = orderValue,
         orderExchangePrice = price,
-        selectedPaymentMethod = SelectedPaymentMethod(id = paymentMethodId),
+        selectedPaymentMethod = SelectedPaymentMethod(
+            id = paymentMethodId,
+            paymentMethodType = paymentMethodType
+        ),
         expirationDate = expires,
-        kycVerificationState = KycState.VERIFIED_AND_ELIGIBLE, // This MUST be so if we have an order in process.
-        currentScreen = configureCurrentScreen(state, paymentMethodId == PaymentMethod.BANK_PAYMENT_ID)
+        currentScreen = configureCurrentScreen(state, paymentMethodType == PaymentMethodType.BANK_ACCOUNT)
     )
 
-private fun configureCurrentScreen(state: OrderState, isBankPayment: Boolean): FlowScreen =
-    if (state == OrderState.PENDING_CONFIRMATION) FlowScreen.CHECKOUT
+private fun configureCurrentScreen(
+    state: OrderState,
+    isBankPayment: Boolean
+): FlowScreen =
+    if (state == OrderState.PENDING_CONFIRMATION) FlowScreen.ENTER_AMOUNT
     else {
         if (isBankPayment) {
             FlowScreen.BANK_DETAILS

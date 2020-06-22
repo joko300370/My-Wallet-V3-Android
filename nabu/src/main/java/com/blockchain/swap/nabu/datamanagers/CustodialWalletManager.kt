@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -53,6 +54,7 @@ interface CustodialWalletManager {
         amount: FiatValue,
         action: String,
         paymentMethodId: String? = null,
+        paymentMethodType: PaymentMethodType,
         stateAction: String? = null
     ): Single<BuyOrder>
 
@@ -117,6 +119,7 @@ data class BuyOrder(
     val fiat: FiatValue,
     val crypto: CryptoValue,
     val paymentMethodId: String,
+    val paymentMethodType: PaymentMethodType,
     val state: OrderState = OrderState.UNINITIALISED,
     val expires: Date = Date(),
     val updated: Date = Date(),

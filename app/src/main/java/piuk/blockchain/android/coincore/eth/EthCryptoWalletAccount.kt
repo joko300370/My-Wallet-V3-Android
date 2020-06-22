@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
     override val label: String,
-    private val address: String,
+    val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager

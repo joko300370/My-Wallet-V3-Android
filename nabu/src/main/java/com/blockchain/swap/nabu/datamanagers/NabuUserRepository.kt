@@ -4,8 +4,7 @@ import com.blockchain.swap.nabu.models.nabu.NabuUser
 import io.reactivex.Maybe
 import io.reactivex.Observable
 
-const val CACHE_LIFETIME = 2 * 60 * 1000
-
+private const val CACHE_LIFETIME = 2 * 60 * 1000
 class NabuUserRepository(private val nabuDataUserProvider: NabuDataUserProvider) {
 
     private lateinit var userCache: NabuUser

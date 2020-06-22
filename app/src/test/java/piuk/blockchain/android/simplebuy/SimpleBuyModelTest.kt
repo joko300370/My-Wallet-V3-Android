@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
@@ -34,7 +35,11 @@ class SimpleBuyModelTest {
     private val defaultState = SimpleBuyState(
         selectedCryptoCurrency = CryptoCurrency.BTC,
         enteredAmount = "12.22",
-        fiatCurrency = "USD"
+        fiatCurrency = "USD",
+        selectedPaymentMethod = SelectedPaymentMethod(
+            id = "123-321",
+            paymentMethodType = PaymentMethodType.PAYMENT_CARD
+        )
     )
     private val gson = Gson()
     private val interactor: SimpleBuyInteractor = mock()
@@ -98,18 +103,24 @@ class SimpleBuyModelTest {
     @Test
     fun `confirm order should make the order to confirm if interactor doesnt return an error`() {
         val date = Date()
-        whenever(interactor.createOrder(anyOrNull(), anyOrNull(), anyOrNull(), any()))
-            .thenReturn(Single.just(SimpleBuyIntent.OrderCreated(
-                BuyOrder(
-                    id = "testId",
-                    expires = date,
-                    state = OrderState.AWAITING_FUNDS,
-                    crypto = CryptoValue.ZeroBtc,
-                    paymentMethodId = "213",
-                    updated = Date(),
-                    fiat = FiatValue.zero("USD"),
-                    pair = "USD-BTC"
-                ))))
+        whenever(interactor.createOrder(
+            cryptoCurrency = anyOrNull(),
+            amount = anyOrNull(),
+            paymentMethodId = anyOrNull(),
+            paymentMethod = any(),
+            isPending = any()
+        )).thenReturn(Single.just(SimpleBuyIntent.OrderCreated(
+            BuyOrder(
+                id = "testId",
+                expires = date,
+                state = OrderState.AWAITING_FUNDS,
+                crypto = CryptoValue.ZeroBtc,
+                paymentMethodId = "213",
+                updated = Date(),
+                paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+                fiat = FiatValue.zero("USD"),
+                pair = "USD-BTC"
+            ))))
 
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
@@ -155,6 +166,7 @@ class SimpleBuyModelTest {
                     paymentMethodId = "123-123",
                     expires = Date(),
                     price = price,
+                    paymentMethodType = PaymentMethodType.PAYMENT_CARD,
                     attributes = CardPaymentAttributes(
                         EverypayPaymentAttrs(paymentLink = paymentLink,
                             paymentState = EverypayPaymentAttrs.WAITING_3DS)

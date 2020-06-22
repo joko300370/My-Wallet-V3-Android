@@ -11,6 +11,7 @@ data class PaymentMethodResponse(val type: String, val limits: Limits, val subTy
     companion object {
         const val BANK_ACCOUNT = "BANK_ACCOUNT"
         const val PAYMENT_CARD = "PAYMENT_CARD"
+        const val FUNDS = "FUNDS"
     }
 }
 

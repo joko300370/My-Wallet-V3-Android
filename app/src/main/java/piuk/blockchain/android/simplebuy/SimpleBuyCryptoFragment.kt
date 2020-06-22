@@ -17,6 +17,7 @@ import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.buyConfirmClicked
 import com.blockchain.notifications.analytics.cryptoChanged
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -66,7 +67,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
-        model.process(SimpleBuyIntent.SyncState)
         model.process(SimpleBuyIntent.FetchBuyLimits(currencyPrefs.selectedFiatCurrency))
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
         model.process(SimpleBuyIntent.FetchPredefinedAmounts(currencyPrefs.selectedFiatCurrency))
@@ -81,6 +81,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
         btn_continue.setOnClickListener {
             model.process(SimpleBuyIntent.BuyButtonClicked)
+            model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
             analytics.logEvent(buyConfirmClicked(
                 lastState?.order?.amount?.valueMinor.toString(),
                 lastState?.fiatCurrency ?: "")
@@ -196,7 +197,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             )
         }
 
-        if (newState.confirmationActionRequested && newState.kycVerificationState != null) {
+        if (newState.confirmationActionRequested &&
+            newState.kycVerificationState != null &&
+            newState.orderState == OrderState.PENDING_CONFIRMATION
+        ) {
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {

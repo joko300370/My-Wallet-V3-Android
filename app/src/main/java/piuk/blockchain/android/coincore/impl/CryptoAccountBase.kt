@@ -72,8 +72,8 @@ class CustodialTradingAccount(
             .doOnSuccess { hasSeenFunds.set(true) }
             .switchToSingleIfEmpty { Single.just(CryptoValue.zero(asset)) }
             .onErrorReturn {
-                Timber.d("Unable to get non-custodial balance: $it")
-                CryptoValue.zero(asset)
+                Timber.d("Unable to get custodial trading balance: $it")
+                CryptoValue.zero(cryptoAsset)
             }
 
     override val activity: Single<ActivitySummaryList>

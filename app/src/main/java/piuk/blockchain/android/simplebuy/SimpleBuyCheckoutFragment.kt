@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_simple_buy_checkout.*
 import piuk.blockchain.android.R
@@ -45,10 +45,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null && !isForPendingPayment) {
-            model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
-        }
-
         recycler.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = checkoutAdapter
@@ -222,8 +218,8 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod): String =
-        when (selectedPaymentMethod.id) {
-            PaymentMethod.BANK_PAYMENT_ID -> getString(R.string.checkout_bank_transfer_label)
+        when (selectedPaymentMethod.paymentMethodType) {
+            PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
             else -> selectedPaymentMethod.label ?: ""
         }
 

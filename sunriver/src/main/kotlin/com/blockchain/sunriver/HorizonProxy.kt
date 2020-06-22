@@ -29,44 +29,34 @@ private val basePerOperationFee = CryptoValue.lumensFromStroop(100.toBigInteger(
 internal class HorizonProxy {
 
     private var server = Server("")
+    private lateinit var currentNetwork: Network
 
     fun update(url: String) {
-        if (url.contains("test")) {
-            Network.useTestNetwork()
+        currentNetwork = if (url.contains("test")) {
+            Network.TESTNET
         } else {
-            Network.usePublicNetwork()
+            Network.PUBLIC
         }
         server = Server(url)
     }
 
-    fun fees(): CryptoValue? = try {
-        val lastLedgerBaseFee = server.operationFeeStats()
-            .execute()
-            .min
-        CryptoValue.lumensFromStroop(lastLedgerBaseFee.toBigInteger())
-    } catch (e: ErrorResponse) {
-        null
-    }
-
-    fun accountExists(accountId: String) = accountExists(KeyPair.fromAccountId(accountId))
-
-    private fun accountExists(keyPair: KeyPair) = findAccount(keyPair) != null
+    fun accountExists(accountId: String) = findAccount(accountId) != null
 
     fun getBalance(accountId: String) =
-        findAccount(KeyPair.fromAccountId(accountId)).balance
+        findAccount(accountId).balance
 
     fun getBalanceAndMin(accountId: String) =
-        findAccount(KeyPair.fromAccountId(accountId)).let { account ->
+        findAccount(accountId).let { account ->
             BalanceAndMin(
                 balance = account.balance,
                 minimumBalance = account.minBalance(minReserve)
             )
         }
 
-    private fun findAccount(keyPair: KeyPair): AccountResponse? {
+    private fun findAccount(accountId: String): AccountResponse? {
         val accounts = server.accounts()
         return try {
-            accounts.account(keyPair)
+            accounts.account(accountId)
         } catch (e: ErrorResponse) {
             if (e.code == 404) {
                 null
@@ -80,7 +70,7 @@ internal class HorizonProxy {
         server.operations()
             .order(RequestBuilder.Order.DESC)
             .limit(50)
-            .forAccount(KeyPair.fromAccountId(accountId))
+            .forAccount(accountId)
             .execute()
             .records
     } catch (e: ErrorResponse) {
@@ -143,7 +133,8 @@ internal class HorizonProxy {
     ): SendResult {
         if (amount.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
         if (perOperationFee != null && perOperationFee.currency != CryptoCurrency.XLM) throw IllegalArgumentException()
-        val destination: KeyPair = try {
+
+        try {
             KeyPair.fromAccountId(destinationAccountId)
         } catch (e: Exception) {
             return SendResult(
@@ -151,6 +142,7 @@ internal class HorizonProxy {
                 failureReason = FailureReason.BadDestinationAccountId
             )
         }
+
         if (amount < minSend) {
             return SendResult(
                 success = false,
@@ -158,7 +150,7 @@ internal class HorizonProxy {
                 failureValue = minSend
             )
         }
-        val destinationAccountExists = accountExists(destination)
+        val destinationAccountExists = accountExists(destinationAccountId)
         val newAccountMinBalance = minBalance(minReserve, subentryCount = 0)
         if (!destinationAccountExists && amount < newAccountMinBalance) {
             return SendResult(
@@ -167,11 +159,11 @@ internal class HorizonProxy {
                 failureValue = newAccountMinBalance
             )
         }
-        val account = server.accounts().account(source)
+        val account = server.accounts().account(source.accountId)
         val transaction =
             createUnsignedTransaction(
                 account,
-                destination,
+                KeyPair.fromAccountId(destinationAccountId),
                 destinationAccountExists,
                 amount.toBigDecimal(),
                 memo,
@@ -244,10 +236,10 @@ internal class HorizonProxy {
         timeout: Long,
         perOperationFee: CryptoValue? = null
     ): Transaction =
-        Transaction.Builder(source)
+        Transaction.Builder(source, currentNetwork)
             .setTimeout(timeout)
             .addOperation(buildTransactionOperation(destination, destinationAccountExists, amount.toPlainString()))
-            .setOperationFee((perOperationFee ?: basePerOperationFee).amount.toInt())
+            .setBaseFee((perOperationFee ?: basePerOperationFee).amount.toInt())
             .addMemo(memo)
             .build()
 
@@ -258,13 +250,13 @@ internal class HorizonProxy {
     ): Operation =
         if (destinationAccountExists) {
             PaymentOperation.Builder(
-                destination,
+                destination.accountId,
                 AssetTypeNative(),
                 amount
             ).build()
         } else {
             CreateAccountOperation.Builder(
-                destination,
+                destination.accountId,
                 amount
             ).build()
         }

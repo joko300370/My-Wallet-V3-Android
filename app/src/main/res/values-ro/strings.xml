@@ -1588,7 +1588,7 @@
   <string name="billing_address_state">Stat</string>
   <string name="billing_address_country">Țară</string>
   <string name="currency_not_supported_title">Moneda dvs. nu este acceptată</string>
-  <string name="currency_not_supported">În prezent, nu acceptăm cumpărarea de cripto cu %1s</string>
+  <string name="currency_not_supported_1">În prezent, nu acceptăm cumpărarea de cripto cu %1s</string>
   <string name="activity_no_activity_title">Nu aveți nicio activitate</string>
   <string name="activity_no_activity_text">Toate tranzacțiile dvs. vor apărea aici.</string>
   <string name="activity_custodial_pending_value">Transfer bancar</string>

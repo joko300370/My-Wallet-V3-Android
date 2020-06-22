@@ -292,17 +292,20 @@ class BchDataManager(
     }
 
     fun getAddressBalance(address: String): BigInteger =
-        bchDataStore.bchWallet?.getAddressBalance(address) ?: BigInteger.ZERO
+        bchDataStore.bchBalances[address] ?: BigInteger.ZERO
+
+    private fun updateBalanceForAddress(address: String, balance: BigInteger) {
+        bchDataStore.bchBalances[address] = balance
+    }
 
     fun getBalance(address: String): Single<BigInteger> =
         payloadDataManager.getBalanceOfBchAddresses(listOf(address))
             .map { it[address]!!.finalBalance }
+
             .doOnError(Timber::e)
             .singleOrError()
+            .doOnSuccess { updateBalanceForAddress(address, it) }
             .onErrorReturn { BigInteger.ZERO }
-
-    fun getWalletBalance(): BigInteger =
-        bchDataStore.bchWallet?.getWalletBalance() ?: BigInteger.ZERO
 
     fun getImportedAddressBalance(): BigInteger =
         bchDataStore.bchWallet?.getImportedAddressBalance() ?: BigInteger.ZERO

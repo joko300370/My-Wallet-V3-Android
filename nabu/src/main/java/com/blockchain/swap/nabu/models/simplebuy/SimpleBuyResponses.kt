@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.models.nabu.Address
+import com.squareup.moshi.Json
 import info.blockchain.balance.CryptoCurrency
 
 import java.util.Date
@@ -45,12 +46,37 @@ data class SimpleBuyBalanceResponse(
     val available: String
 )
 
+data class SimpleBuyAllBalancesResponse(
+    @Json(name = "BTC")
+    val BTC: SimpleBuyBalanceResponse? = null,
+    @Json(name = "BCH")
+    val BCH: SimpleBuyBalanceResponse? = null,
+    @Json(name = "ETH")
+    val ETH: SimpleBuyBalanceResponse? = null,
+    @Json(name = "XLM")
+    val XLM: SimpleBuyBalanceResponse? = null,
+    @Json(name = "PAX")
+    val PAX: SimpleBuyBalanceResponse? = null
+) {
+    operator fun get(ccy: CryptoCurrency): String? {
+        return when (ccy) {
+            CryptoCurrency.BTC -> BTC
+            CryptoCurrency.ETHER -> ETH
+            CryptoCurrency.BCH -> BCH
+            CryptoCurrency.XLM -> XLM
+            CryptoCurrency.PAX -> PAX
+            else -> null
+        }?.available
+    }
+}
+
 data class CustodialWalletOrder(
     private val pair: String,
     private val action: String,
     private val input: OrderInput,
     private val output: OrderOutput,
-    private val paymentMethodId: String?
+    private val paymentMethodId: String?,
+    private val paymentType: String
 )
 
 data class BuyOrderResponse(
@@ -61,6 +87,7 @@ data class BuyOrderResponse(
     val outputCurrency: String,
     val outputQuantity: String,
     val paymentMethodId: String?,
+    val paymentType: String,
     val state: String,
     val insertedAt: String,
     val price: String?,

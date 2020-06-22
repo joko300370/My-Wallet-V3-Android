@@ -1589,7 +1589,7 @@
   <string name="billing_address_state">stat</string>
   <string name="billing_address_country">Land</string>
   <string name="currency_not_supported_title">Din valuta stöds inte</string>
-  <string name="currency_not_supported">För närvarande stöder vi inte att köpa krypto med %1s</string>
+  <string name="currency_not_supported_1">För närvarande stöder vi inte att köpa krypto med %1s</string>
   <string name="activity_no_activity_title">Du har ingen aktivitet</string>
   <string name="activity_no_activity_text">Alla dina transaktioner dyker upp här.</string>
   <string name="activity_custodial_pending_value">Banköverföring</string>

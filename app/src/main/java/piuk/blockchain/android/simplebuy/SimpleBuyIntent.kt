@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.cards.EverypayAuthOptions
@@ -60,6 +61,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             val selectedPaymentMethodId =
                 selectedMethodId(oldState.selectedPaymentMethod?.id) ?: availablePaymentMethods[0].id
+            val selectedType =
+                (availablePaymentMethods.firstOrNull
+                { it.id == selectedPaymentMethodId } as? PaymentMethod.BankTransfer)?.let {
+                    PaymentMethodType.BANK_ACCOUNT
+                } ?: PaymentMethodType.PAYMENT_CARD
 
             return oldState.copy(
                 selectedPaymentMethod = SelectedPaymentMethod(
@@ -69,8 +75,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     } as? PaymentMethod.Card)?.partner,
                     (availablePaymentMethods.firstOrNull {
                         it.id == selectedPaymentMethodId
-                    } as? PaymentMethod.Card)?.uiLabelWithDigits() ?: ""
-                ), // todo apply the right logic
+                    } as? PaymentMethod.Card)?.uiLabelWithDigits() ?: "",
+                    selectedType
+                ),
                 paymentOptions = PaymentOptions(
                     availablePaymentMethods = availablePaymentMethods,
                     canAddCard = canAdd
@@ -95,7 +102,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     paymentMethod.id,
                     // no partner for bank transfer or ui label. Ui label for bank transfer is coming from resources
                     (paymentMethod as? PaymentMethod.Card)?.partner,
-                    (paymentMethod as? PaymentMethod.Card)?.uiLabelWithDigits() ?: ""
+                    (paymentMethod as? PaymentMethod.Card)?.uiLabelWithDigits() ?: "",
+                    if (paymentMethod is PaymentMethod.BankTransfer) PaymentMethodType.BANK_ACCOUNT
+                    else PaymentMethodType.PAYMENT_CARD
                 ))
     }
 
@@ -278,10 +287,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class UpdateSelectedPaymentMethod(
         private val id: String,
         private val label: String?,
-        private val partner: Partner?
+        private val partner: Partner?,
+        private val type: PaymentMethodType
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(selectedPaymentMethod = SelectedPaymentMethod(id, partner, label))
+            oldState.copy(selectedPaymentMethod = SelectedPaymentMethod(id, partner, label, type))
     }
 
     object ClearError : SimpleBuyIntent() {
@@ -315,8 +325,6 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(isLoading = true)
     }
-
-    object SyncState : SimpleBuyIntent()
 
     object CardPaymentSucceeded : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
