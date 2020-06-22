@@ -879,8 +879,7 @@ val applicationModule = module {
                 walletApi = get(),
                 addressGenerator = get(),
                 payloadDataManager = get(),
-                rxBus = get(),
-                nabuUserRepository = get()
+                rxBus = get()
             )
         }
 

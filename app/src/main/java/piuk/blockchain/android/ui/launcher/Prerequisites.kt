@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.launcher
 
 import com.blockchain.logging.CrashLogger
-import com.blockchain.swap.nabu.datamanagers.NabuUserRepository
 import com.google.gson.Gson
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Settings
@@ -33,8 +32,7 @@ class Prerequisites(
     private val walletApi: WalletApi,
     private val payloadDataManager: PayloadDataManager,
     private val addressGenerator: AddressGenerator,
-    private val rxBus: RxBus,
-    private val nabuUserRepository: NabuUserRepository
+    private val rxBus: RxBus
 ) {
 
     fun initMetadataAndRelatedPrerequisites(): Completable =
@@ -43,7 +41,6 @@ class Prerequisites(
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
             .then { coincore.init().logOnError(COINCORE_INIT) }
             .then { generateAndUpdateReceiveAddresses().logAndCompleteOnError(RECEIVE_ADDRESSES) }
-            .then { nabuUserRepository.fetchUser().ignoreElements() }
             .doOnComplete {
                 rxBus.emitEvent(MetadataEvent::class.java, MetadataEvent.SETUP_COMPLETE)
             }.subscribeOn(Schedulers.io())

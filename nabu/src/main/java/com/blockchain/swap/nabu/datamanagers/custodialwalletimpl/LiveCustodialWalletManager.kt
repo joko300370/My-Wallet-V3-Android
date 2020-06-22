@@ -406,23 +406,25 @@ class LiveCustodialWalletManager(
         }
 
     override fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double> =
-        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_RATES).flatMap { eligible ->
-            if (eligible) {
-                authenticator.authenticate { sessionToken ->
-                    nabuService.getInterestRates(sessionToken, crypto.networkTicker).map {
-                        it.body()?.rate ?: 0.0
+        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_RATES)
+            .onErrorReturnItem(false)
+            .flatMap { eligible ->
+                if (eligible) {
+                    authenticator.authenticate { sessionToken ->
+                        nabuService.getInterestRates(sessionToken, crypto.networkTicker).map {
+                            it.body()?.rate ?: 0.0
+                        }
                     }
+                } else {
+                    Single.just(0.0)
                 }
-            } else {
-                Single.just(0.0)
-            }
         }
 
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency
     ): Maybe<CryptoValue> =
-        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_DETAILS).toMaybe()
-            .flatMap { eligible ->
+        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_DETAILS)
+            .flatMapMaybe { eligible ->
                 if (eligible) {
                     authenticator.authenticateMaybe { sessionToken ->
                         nabuService.getInterestAccountBalance(sessionToken, crypto.networkTicker)
