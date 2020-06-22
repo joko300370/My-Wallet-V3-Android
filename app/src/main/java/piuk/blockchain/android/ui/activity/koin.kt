@@ -24,7 +24,7 @@ val activitiesModule = module {
         factory {
             ActivitiesInteractor(
                 coincore = get(),
-                activityRepo = get(),
+                activityRepository = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get()
@@ -43,7 +43,7 @@ val activitiesModule = module {
             ActivityDetailsInteractor(
                 currencyPrefs = get(),
                 transactionInputOutputMapper = get(),
-                assetActivityRepo = get(),
+                assetActivityRepository = get(),
                 custodialWalletManager = get()
             )
         }

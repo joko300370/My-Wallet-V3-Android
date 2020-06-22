@@ -69,7 +69,7 @@ class CustodialTradingAccount(
             .doOnSuccess { isConfigured.set(true) }
             .switchToSingleIfEmpty { Single.just(CryptoValue.zero(cryptoAsset)) }
             .onErrorReturn {
-                Timber.d("Unable to get non-custodial balance: $it")
+                Timber.d("Unable to get custodial trading balance: $it")
                 CryptoValue.zero(cryptoAsset)
             }
 

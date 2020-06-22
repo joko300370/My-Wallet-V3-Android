@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.models.interest.InterestResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.NabuBasicUser
 import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
 import com.blockchain.swap.nabu.models.nabu.NabuJwt
@@ -19,7 +20,6 @@ import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
 import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.swap.nabu.models.nabu.SupportedDocumentsResponse
 import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.UpdateCoinifyTraderIdRequest
 import com.blockchain.swap.nabu.models.nabu.VeriffToken
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
@@ -32,6 +32,7 @@ import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
@@ -301,6 +302,11 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("ccy") cryptoSymbol: String
     ): Single<Response<SimpleBuyBalanceResponse>>
+
+    @GET(NABU_SIMPLE_BUY_ASSET_BALANCE)
+    fun getBalanceForAllAssets(
+        @Header("authorization") authorization: String
+    ): Single<SimpleBuyAllBalancesResponse>
 
     @Headers("blockchain-origin: simplebuy")
     @POST(NABU_SIMPLE_BUY_BALANCE_TRANSFER)

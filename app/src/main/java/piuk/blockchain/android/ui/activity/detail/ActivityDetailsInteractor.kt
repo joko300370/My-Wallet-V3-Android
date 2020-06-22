@@ -14,7 +14,7 @@ import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
-import piuk.blockchain.android.coincore.impl.AssetActivityRepo
+import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.coincore.pax.PaxActivitySummaryItem
 import java.text.ParseException
 import java.util.Date
@@ -22,7 +22,7 @@ import java.util.Date
 class ActivityDetailsInteractor(
     private val currencyPrefs: CurrencyPrefs,
     private val transactionInputOutputMapper: TransactionInOutMapper,
-    private val assetActivityRepo: AssetActivityRepo,
+    private val assetActivityRepository: AssetActivityRepository,
     private val custodialWalletManager: CustodialWalletManager
 ) {
 
@@ -85,13 +85,13 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): CustodialActivitySummaryItem? =
-        assetActivityRepo.findCachedItem(cryptoCurrency, txHash) as? CustodialActivitySummaryItem
+        assetActivityRepository.findCachedItem(cryptoCurrency, txHash) as? CustodialActivitySummaryItem
 
     fun getNonCustodialActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): NonCustodialActivitySummaryItem? =
-        assetActivityRepo.findCachedItem(cryptoCurrency, txHash) as? NonCustodialActivitySummaryItem
+        assetActivityRepository.findCachedItem(cryptoCurrency, txHash) as? NonCustodialActivitySummaryItem
 
     fun loadCreationDate(
         activitySummaryItem: ActivitySummaryItem
@@ -277,7 +277,7 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         description: String
     ): Completable {
-        return when (val activityItem = assetActivityRepo.findCachedItem(cryptoCurrency, txId)) {
+        return when (val activityItem = assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
             is BtcActivitySummaryItem -> activityItem.updateDescription(description)
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
             is PaxActivitySummaryItem -> activityItem.updateDescription(description)
@@ -291,7 +291,7 @@ class ActivityDetailsInteractor(
     private fun addFeeForTransaction(item: NonCustodialActivitySummaryItem): FeeForTransaction? {
         return when (item) {
             is EthActivitySummaryItem -> {
-                val relatedItem = assetActivityRepo.findCachedItemById(item.ethTransaction.hash)
+                val relatedItem = assetActivityRepository.findCachedItemById(item.ethTransaction.hash)
                 relatedItem?.let {
                     FeeForTransaction(
                         item.direction,
