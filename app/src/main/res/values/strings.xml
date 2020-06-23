@@ -1583,6 +1583,7 @@
     <string name="buy_min">Buy Min</string>
     <string name="buy_max">Buy Max</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
+    <string name="bank_transfer">Bank Transfer</string>
     <string name="credit_or_debit_card">Credit or Debit Card</string>
     <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
     <string name="select_payment_method">Select a Payment Method</string>
@@ -1616,6 +1617,8 @@
     <string name="simple_buy_pending_buy_sheet_title">Pending %1s Buy</string>
     <string name="recipient_name_must_match_eur">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.</string>
     <string name="recipient_name_must_match_gbp">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.\n\nBy depositing funds to this account, you agree to <annotation link="modular_terms_and_conditions">Terms &amp; Conditions of Modulr</annotation>, our banking partner.</string>
+    <string name="add_bank">Add %1s Bank</string>
+    <string name="link_transfer_instructions">Please transfer %1s from your personal bank to Blockchain.com. This will securely link your bank account.</string>
     <string name="recipient_name_must_match">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
     <string name="simple_buy_no_currencies_available_title">No currencies available</string>
     <string name="simple_buy_no_currencies_available">Unfortunately, currently there are no currencies that you can trade :( </string>
@@ -1758,5 +1761,14 @@
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+    <string name="send_me_instructions">Send Me the Instructions</string>
+    <string name="bank_transfer_only">Bank Tranfer Only</string>
+    <string name="bank_transfer_only_subtitle">Please do not send any funds via ACH. A real bank transfer must be sent.</string>
+    <string name="processing_time">Processing Time</string>
+    <string name="processing_time_subtitle_eur">Funds will be credited to your EUR wallet as soon as we receive them. SEPA transfers usually take around 1 business day to reach us.</string>
+    <string name="processing_time_subtitle_gbp">Funds will be credited to your GBP wallet as soon as we receive them. In the UK Faster Payments Network, this can take a couple of hours.</string>
+    <string name="deposit_limits">Deposit Limits</string>
+    <string name="deposit_limits_subtitle">Please be aware that if you deposit more than your daily withdrawal limit, you wil not be able to withdraw all of your funds at once.</string>
+    <string name="unable_to_load_bank_details">We were unable to load our bank deposit details.</string>
 
 </resources>
