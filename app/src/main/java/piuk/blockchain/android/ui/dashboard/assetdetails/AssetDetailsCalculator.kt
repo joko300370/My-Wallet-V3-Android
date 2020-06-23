@@ -67,8 +67,18 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         val shouldShow: Boolean
     )
 
-    private fun Single<CryptoAccountGroup>.mapDetails(): Single<Details> =
-        this.flatMap { it.balance.map { balance -> Details(balance, it.actions, it.isFunded) } }
+    private fun Single<CryptoAccountGroup>.mapDetails(
+        showUnfunded: Boolean = false
+    ): Single<Details> =
+        this.flatMap { grp ->
+            grp.balance.map { balance ->
+                Details(
+                    balance,
+                    grp.actions,
+                    grp.accounts.isNotEmpty() && (showUnfunded || grp.isFunded)
+                )
+            }
+        }
 
     private fun getAssetDisplayDetails(assetTokens: AssetTokens): Single<AssetDisplayMap> {
         return Singles.zip(
@@ -86,10 +96,14 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
             val interestFiat = interest.balance.toFiat(fiatPrice)
 
             mutableMapOf(
-                AssetFilter.Total to AssetDisplayInfo(total.balance, totalFiat, total.actions),
-                AssetFilter.Wallet to AssetDisplayInfo(nonCustodial.balance, walletFiat,
-                    nonCustodial.actions)
+                AssetFilter.Total to AssetDisplayInfo(total.balance, totalFiat, total.actions)
             ).apply {
+                if (nonCustodial.shouldShow) {
+                    put(AssetFilter.Wallet,
+                        AssetDisplayInfo(nonCustodial.balance, walletFiat, nonCustodial.actions)
+                    )
+                }
+
                 if (custodial.shouldShow) {
                     put(
                         AssetFilter.Custodial,

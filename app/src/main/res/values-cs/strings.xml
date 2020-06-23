@@ -1591,7 +1591,7 @@
   <string name="billing_address_state">Stát</string>
   <string name="billing_address_country">Země</string>
   <string name="currency_not_supported_title">Vaše měna není podporována</string>
-  <string name="currency_not_supported">Momentálně nepodporujeme nákup kryptografií s %1s</string>
+  <string name="currency_not_supported_1">Momentálně nepodporujeme nákup kryptografií s %1s</string>
   <string name="activity_no_activity_title">Nemáte žádnou aktivitu</string>
   <string name="activity_no_activity_text">Zde se zobrazí všechny vaše transakce.</string>
   <string name="activity_custodial_pending_value">Bankovní převod</string>

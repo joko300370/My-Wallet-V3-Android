@@ -1590,7 +1590,7 @@
   <string name="billing_address_state">状態</string>
   <string name="billing_address_country">国</string>
   <string name="currency_not_supported_title">あなたの通貨はサポートされていません</string>
-  <string name="currency_not_supported">現在、 %1s暗号の購入はサポートされていません</string>
+  <string name="currency_not_supported_1">現在、 %1s暗号の購入はサポートされていません</string>
   <string name="activity_no_activity_title">アクティビティがありません</string>
   <string name="activity_no_activity_text">すべての取引がここに表示されます。</string>
   <string name="activity_custodial_pending_value">銀行振込</string>

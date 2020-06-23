@@ -1591,7 +1591,7 @@
   <string name="billing_address_state">Estado</string>
   <string name="billing_address_country">País</string>
   <string name="currency_not_supported_title">Sua moeda não é suportada</string>
-  <string name="currency_not_supported">Atualmente, não oferecemos suporte à compra de criptografia com %1s</string>
+  <string name="currency_not_supported_1">Atualmente, não oferecemos suporte à compra de criptografia com %1s</string>
   <string name="activity_no_activity_title">Você não tem atividade</string>
   <string name="activity_no_activity_text">Todas as suas transações serão exibidas aqui.</string>
   <string name="activity_custodial_pending_value">Transferência bancária</string>

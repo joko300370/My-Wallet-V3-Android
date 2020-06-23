@@ -587,15 +587,18 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     @ButWhy("Who calls this... it looks crazy")
     override fun onChangeFeeClicked() {
         val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as SendFragment
-        fragment.onChangeFeeClicked()
+            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
+        fragment?.onChangeFeeClicked()
     }
 
     @ButWhy("Who calls this")
+    // Turns out this is called by the confirm transfer dlg. That can, however, be invoked from
+    // both the account edit screen (when transferring between wallets) and the send screen.
+    // (As can onChangeFeeClicked()) so the send fragment might not exist. This needs cleaning up. TODO
     override fun onSendClicked() {
         val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as SendFragment
-        fragment.onSendClicked()
+            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
+        fragment?.onSendClicked()
     }
 
     override fun showTestnetWarning() {

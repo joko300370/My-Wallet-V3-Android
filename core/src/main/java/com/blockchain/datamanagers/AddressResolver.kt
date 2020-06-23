@@ -53,6 +53,7 @@ internal class AddressResolver(
                 Single.just(AddressPair(address, address))
             }
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
         }
 
     private fun getReceiveAddress(account: Account): Single<String> =

@@ -1589,7 +1589,7 @@
   <string name="billing_address_state">Staat</string>
   <string name="billing_address_country">Land</string>
   <string name="currency_not_supported_title">Uw valuta wordt niet ondersteund</string>
-  <string name="currency_not_supported">Momenteel bieden we geen ondersteuning voor het kopen van crypto met %1s</string>
+  <string name="currency_not_supported_1">Momenteel bieden we geen ondersteuning voor het kopen van crypto met %1s</string>
   <string name="activity_no_activity_title">Je hebt geen activiteit</string>
   <string name="activity_no_activity_text">Al uw transacties worden hier weergegeven.</string>
   <string name="activity_custodial_pending_value">Overschrijving</string>

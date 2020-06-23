@@ -1591,7 +1591,7 @@
   <string name="billing_address_state">Stan</string>
   <string name="billing_address_country">Kraj</string>
   <string name="currency_not_supported_title">Twoja waluta nie jest obsługiwana</string>
-  <string name="currency_not_supported">Obecnie nie obsługujemy kupowania kryptowalut za %1s</string>
+  <string name="currency_not_supported_1">Obecnie nie obsługujemy kupowania kryptowalut za %1s</string>
   <string name="activity_no_activity_title">Nie masz aktywności</string>
   <string name="activity_no_activity_text">Wszystkie Twoje transakcje pojawią się tutaj.</string>
   <string name="activity_custodial_pending_value">Przelew bankowy</string>

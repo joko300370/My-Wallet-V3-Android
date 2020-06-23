@@ -1590,7 +1590,7 @@
   <string name="billing_address_state">Tiểu bang</string>
   <string name="billing_address_country">Quốc gia</string>
   <string name="currency_not_supported_title">Tiền tệ của bạn không được hỗ trợ</string>
-  <string name="currency_not_supported">Hiện tại chúng tôi không hỗ trợ mua tiền điện tử với %1s</string>
+  <string name="currency_not_supported_1">Hiện tại chúng tôi không hỗ trợ mua tiền điện tử với %1s</string>
   <string name="activity_no_activity_title">Bạn không có hoạt động</string>
   <string name="activity_no_activity_text">Tất cả các giao dịch của bạn sẽ hiển thị ở đây.</string>
   <string name="activity_custodial_pending_value">Chuyển khoản ngân hàng</string>

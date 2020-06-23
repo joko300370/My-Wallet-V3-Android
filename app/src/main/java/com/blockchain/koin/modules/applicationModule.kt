@@ -344,12 +344,6 @@ val applicationModule = module {
         }
 
         factory {
-            SSLVerifyPresenter(
-                sslVerifyUtil = get()
-            )
-        }
-
-        factory {
             ChartsDataManager(
                 historicPriceApi = get(),
                 rxBus = get()
@@ -938,6 +932,12 @@ val applicationModule = module {
 
     single {
         SSLVerifyUtil(rxBus = get(), connectionApi = get())
+    }
+
+    factory {
+        SSLVerifyPresenter(
+            sslVerifyUtil = get()
+        )
     }
 
     factory { ResourceDefaultLabels(get()) }.bind(DefaultLabels::class)
