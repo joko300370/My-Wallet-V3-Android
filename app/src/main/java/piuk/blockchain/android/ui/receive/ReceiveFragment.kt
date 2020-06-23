@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.receive
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,16 +7,17 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
@@ -33,38 +33,20 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.alert_watch_only_spend.view.confirm_cancel
-import kotlinx.android.synthetic.main.alert_watch_only_spend.view.confirm_continue
-import kotlinx.android.synthetic.main.alert_watch_only_spend.view.confirm_dont_ask_again
-import kotlinx.android.synthetic.main.fragment_receive.amount_container
-import kotlinx.android.synthetic.main.fragment_receive.button_request
-import kotlinx.android.synthetic.main.fragment_receive.currency_header
-import kotlinx.android.synthetic.main.fragment_receive.custom_keyboard
-import kotlinx.android.synthetic.main.fragment_receive.divider1
-import kotlinx.android.synthetic.main.fragment_receive.divider3
-import kotlinx.android.synthetic.main.fragment_receive.divider_to
-import kotlinx.android.synthetic.main.fragment_receive.image_qr
-import kotlinx.android.synthetic.main.fragment_receive.progressbar
-import kotlinx.android.synthetic.main.fragment_receive.scrollview
-import kotlinx.android.synthetic.main.fragment_receive.textview_receiving_address
-import kotlinx.android.synthetic.main.fragment_receive.to_container
-import kotlinx.android.synthetic.main.include_amount_row.amountCrypto
-import kotlinx.android.synthetic.main.include_amount_row.amountFiat
-import kotlinx.android.synthetic.main.include_amount_row.currencyCrypto
-import kotlinx.android.synthetic.main.include_amount_row.currencyFiat
-import kotlinx.android.synthetic.main.include_amount_row.view.amountCrypto
-import kotlinx.android.synthetic.main.include_amount_row.view.amountFiat
-import kotlinx.android.synthetic.main.include_to_row.constraint_layout_to_row
-import kotlinx.android.synthetic.main.include_to_row.toAddressTextView
-import kotlinx.android.synthetic.main.include_to_row.toArrowImage
-import kotlinx.android.synthetic.main.view_expanding_currency_header.textview_selected_currency
+import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
+import kotlinx.android.synthetic.main.fragment_receive.*
+import kotlinx.android.synthetic.main.include_amount_row.*
+import kotlinx.android.synthetic.main.include_amount_row.view.*
+import kotlinx.android.synthetic.main.include_to_row.*
+import kotlinx.android.synthetic.main.view_expanding_currency_header.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.home.HomeScreenMvpFragment
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.EditTextFormatUtil
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
@@ -73,7 +55,6 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -156,6 +137,7 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
                 CryptoCurrency.XLM -> presenter.onXlmSelected()
                 CryptoCurrency.PAX -> presenter.onPaxSelected()
                 CryptoCurrency.STX -> TODO("STUB Asset. Not implemented")
+                CryptoCurrency.ALGO -> TODO("STUB ALG Not implemented")
             }.exhaustive
         }
     }
@@ -406,6 +388,7 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
             CryptoCurrency.XLM -> displayXlmLayout()
             CryptoCurrency.PAX -> displayERC20Layout()
             CryptoCurrency.STX -> displayStxLayout()
+            CryptoCurrency.ALGO -> TODO("ALG not implemented")
         }.exhaustive
         updateUnits()
     }

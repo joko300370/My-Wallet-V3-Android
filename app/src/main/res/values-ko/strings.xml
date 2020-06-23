@@ -1590,7 +1590,7 @@
   <string name="billing_address_state">상태</string>
   <string name="billing_address_country">국가</string>
   <string name="currency_not_supported_title">통화가 지원되지 않습니다</string>
-  <string name="currency_not_supported">현재 우리는 %1s 암호화 구입을 지원하지 않습니다</string>
+  <string name="currency_not_supported_1">현재 우리는 %1s 암호화 구입을 지원하지 않습니다</string>
   <string name="activity_no_activity_title">활동이 없습니다</string>
   <string name="activity_no_activity_text">모든 거래가 여기에 표시됩니다.</string>
   <string name="activity_custodial_pending_value">은행 송금</string>

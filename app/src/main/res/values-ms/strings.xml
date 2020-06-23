@@ -1590,7 +1590,7 @@
   <string name="billing_address_state">Nyatakan</string>
   <string name="billing_address_country">Negara</string>
   <string name="currency_not_supported_title">Mata Wang Anda Tidak Disokong</string>
-  <string name="currency_not_supported">Pada masa ini kami tidak menyokong pembelian crypto dengan %1s</string>
+  <string name="currency_not_supported_1">Pada masa ini kami tidak menyokong pembelian crypto dengan %1s</string>
   <string name="activity_no_activity_title">Anda Tidak Mempunyai Aktiviti</string>
   <string name="activity_no_activity_text">Semua urus niaga anda akan dipaparkan di sini.</string>
   <string name="activity_custodial_pending_value">Pemindahan bank</string>

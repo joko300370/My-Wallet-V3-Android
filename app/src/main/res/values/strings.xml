@@ -1647,6 +1647,7 @@
     <string name="eth_default_account_label">My Ether Wallet</string>
     <string name="xlm_default_account_label">My Stellar Wallet</string>
     <string name="pax_default_account_label_1">My USD Digital Wallet</string>
+    <string name="alg_default_account_label">My Algorand Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
     <string name="default_label_interest_wallet">Interest Wallet</string>
     <string name="exchange_default_account_label">My Exchange %1$s Address</string>
@@ -1695,7 +1696,7 @@
     <string name="billing_address_state">State</string>
     <string name="billing_address_country">Country</string>
     <string name="currency_not_supported_title">Your Currency is Not Supported</string>
-    <string name="currency_not_supported">Currently we don’t support buying crypto with %1s</string>
+    <string name="currency_not_supported_1">Currently we don’t support buying crypto with %1s</string>
     <string name="activity_no_activity_title">You Have No Activity</string>
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>

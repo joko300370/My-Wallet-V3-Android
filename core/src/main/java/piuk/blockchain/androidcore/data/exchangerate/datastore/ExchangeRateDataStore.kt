@@ -20,18 +20,21 @@ class ExchangeRateDataStore(
     private var bchTickerData: Map<String, PriceDatum>? = null
     private var xlmTickerData: Map<String, PriceDatum>? = null
     private var paxTickerData: Map<String, PriceDatum>? = null
+    private var algTickerData: Map<String, PriceDatum>? = null
 
     fun updateExchangeRates(): Completable = Single.merge(
-        exchangeRateService.getExchangeRateMap(CryptoCurrency.BTC)
-            .doOnSuccess { btcTickerData = it.toMap() },
-        exchangeRateService.getExchangeRateMap(CryptoCurrency.BCH)
-            .doOnSuccess { bchTickerData = it.toMap() },
-        exchangeRateService.getExchangeRateMap(CryptoCurrency.ETHER)
-            .doOnSuccess { ethTickerData = it.toMap() },
-        exchangeRateService.getExchangeRateMap(CryptoCurrency.XLM)
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.BTC)
+                .doOnSuccess { btcTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.BCH)
+                .doOnSuccess { bchTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.ETHER)
+                .doOnSuccess { ethTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.XLM)
             .doOnSuccess { xlmTickerData = it.toMap() }
-    ).mergeWith(exchangeRateService.getExchangeRateMap(CryptoCurrency.PAX)
-        .doOnSuccess { paxTickerData = it.toMap() }).ignoreElements()
+        ).mergeWith(exchangeRateService.getExchangeRateMap(CryptoCurrency.PAX)
+            .doOnSuccess { paxTickerData = it.toMap() })
+        .mergeWith(exchangeRateService.getExchangeRateMap(CryptoCurrency.ALGO)
+            .doOnSuccess { algTickerData = it.toMap() }).ignoreElements()
 
     fun getCurrencyLabels(): Array<String> = btcTickerData!!.keys.toTypedArray()
 
@@ -62,8 +65,10 @@ class ExchangeRateDataStore(
     }
 
     fun getFiatLastPrice(targetFiat: String, sourceFiat: String): Double {
-        val targetCurrencyPrice = CryptoCurrency.BTC.tickerData()?.get(targetFiat)?.price ?: return 0.0
-        val sourceCurrencyPrice = CryptoCurrency.BTC.tickerData()?.get(sourceFiat)?.price ?: return 0.0
+        val targetCurrencyPrice =
+            CryptoCurrency.BTC.tickerData()?.get(targetFiat)?.price ?: return 0.0
+        val sourceCurrencyPrice =
+            CryptoCurrency.BTC.tickerData()?.get(sourceFiat)?.price ?: return 0.0
         return targetCurrencyPrice.div(sourceCurrencyPrice)
     }
 
@@ -75,6 +80,7 @@ class ExchangeRateDataStore(
             CryptoCurrency.XLM -> xlmTickerData
             CryptoCurrency.PAX -> paxTickerData
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> algTickerData
         }
 
     fun getHistoricPrice(

@@ -45,6 +45,7 @@ internal class CryptoCurrencyFormatter(locale: Locale) {
     private val paxShortFormat = createCryptoDecimalFormat(locale, CryptoCurrency.PAX.userDp)
     private val paxFormat = createCryptoDecimalFormat(locale, CryptoCurrency.PAX.dp)
     private val stxFormat = createCryptoDecimalFormat(locale, CryptoCurrency.STX.dp)
+    private val algFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ALGO.dp)
 
     fun format(
         cryptoValue: CryptoValue,
@@ -74,6 +75,7 @@ internal class CryptoCurrencyFormatter(locale: Locale) {
             FormatPrecision.Full -> paxFormat
         }
         CryptoCurrency.STX -> stxFormat
+        CryptoCurrency.ALGO -> algFormat
     }
 
     private fun DecimalFormat.formatWithUnit(value: BigDecimal, symbol: String) =

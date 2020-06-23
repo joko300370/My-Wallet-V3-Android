@@ -12,7 +12,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal class EthCryptoWalletAccount(
     override val label: String,
-    private val address: String,
+    val address: String,
     private val ethDataManager: EthDataManager,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoSingleAccountNonCustodialBase() {

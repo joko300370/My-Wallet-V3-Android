@@ -6,7 +6,6 @@ import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Observable
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -18,22 +17,20 @@ internal class EthActivitySummaryItem(
     override val isFeeTransaction: Boolean,
     private val blockHeight: Long,
     override val exchangeRates: ExchangeRateDataManager,
-    override val account: CryptoSingleAccount
+    override val account: EthCryptoWalletAccount
 ) : NonCustodialActivitySummaryItem() {
 
     override val cryptoCurrency: CryptoCurrency = CryptoCurrency.ETHER
 
     override val direction: TransactionSummary.Direction by unsafeLazy {
-        val combinedEthModel = ethDataManager.getEthResponseModel()!!
-        combinedEthModel.getAccounts().let {
-            when {
-                it[0] == ethTransaction.to && it[0] == ethTransaction.from ->
-                    TransactionSummary.Direction.TRANSFERRED
-                it.contains(ethTransaction.from) ->
-                    TransactionSummary.Direction.SENT
-                else ->
-                    TransactionSummary.Direction.RECEIVED
-            }
+        val ethAddress = account.address.toLowerCase()
+        when {
+            ethAddress == ethTransaction.to && ethAddress == ethTransaction.from ->
+                TransactionSummary.Direction.TRANSFERRED
+            ethAddress == ethTransaction.from ->
+                TransactionSummary.Direction.SENT
+            else ->
+                TransactionSummary.Direction.RECEIVED
         }
     }
 

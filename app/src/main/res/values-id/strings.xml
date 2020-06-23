@@ -1588,7 +1588,7 @@
   <string name="billing_address_state">Negara</string>
   <string name="billing_address_country">Negara</string>
   <string name="currency_not_supported_title">Mata Uang Anda Tidak Didukung</string>
-  <string name="currency_not_supported">Saat ini kami tidak mendukung pembelian crypto dengan %1s</string>
+  <string name="currency_not_supported_1">Saat ini kami tidak mendukung pembelian crypto dengan %1s</string>
   <string name="activity_no_activity_title">Anda Tidak Memiliki Aktivitas</string>
   <string name="activity_no_activity_text">Semua transaksi Anda akan muncul di sini.</string>
   <string name="activity_custodial_pending_value">Transfer Bank</string>

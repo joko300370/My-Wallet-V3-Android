@@ -1587,7 +1587,7 @@
   <string name="billing_address_state">Durum</string>
   <string name="billing_address_country">ülke</string>
   <string name="currency_not_supported_title">Para Birimi Desteklenmiyor</string>
-  <string name="currency_not_supported">Şu anda %1s ile kripto satın almayı desteklemiyoruz</string>
+  <string name="currency_not_supported_1">Şu anda %1s ile kripto satın almayı desteklemiyoruz</string>
   <string name="activity_no_activity_title">Etkinliğiniz Yok</string>
   <string name="activity_no_activity_text">Tüm işlemleriniz burada görünecek.</string>
   <string name="activity_custodial_pending_value">Banka transferi</string>

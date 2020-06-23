@@ -37,19 +37,19 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.send.PendingTransaction
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.math.BigInteger
 import java.util.Locale
 
@@ -541,6 +541,7 @@ class AccountPresenterTest {
                 CryptoCurrency.XLM -> assertFalse(it in displayable)
                 CryptoCurrency.PAX -> assertFalse(it in displayable)
                 CryptoCurrency.STX -> assertFalse(it in displayable)
+                CryptoCurrency.ALGO -> assertFalse(it in displayable)
             }.exhaustive
         }
     }

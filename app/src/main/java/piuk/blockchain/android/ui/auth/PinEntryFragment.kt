@@ -81,7 +81,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     private var backPressed: Long = 0
 
     val isValidatingPinForResult: Boolean
-        get() = presenter.isForValidatingPinForResult
+        get() = presenter?.isForValidatingPinForResult ?: false
 
     private val compositeDisposable = CompositeDisposable()
 
