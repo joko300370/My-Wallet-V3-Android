@@ -4,10 +4,12 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -24,8 +26,11 @@ class DashboardInteractor(
     private val payloadManager: PayloadManager,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val assetBalancesRepository: AssetBalancesRepository
 ) {
+    private val cd: CompositeDisposable = CompositeDisposable()
+
     // We have a problem here, in that pax init depends on ETH init
     // Ultimately, we want to init metadata straight after decrypting (or creating) the wallet
     // but we can't move that somewhere sensible yet, because 2nd password. When we remove that -
@@ -33,7 +38,7 @@ class DashboardInteractor(
     // But for now, we'll catch any pax init failure here, unless ETH has initialised OK. And when we
     // get a valid ETH balance, will try for a PX balance. Yeah, this is a nasty hack TODO: Fix this
     fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter): Disposable {
-        val cd = CompositeDisposable()
+
         CryptoCurrency.activeCurrencies()
             .filter { it != CryptoCurrency.PAX }
             .forEach {
@@ -75,6 +80,13 @@ class DashboardInteractor(
         return cd
     }
 
+    fun checkForFiatBalances() {
+        Maybe.zip(assetBalancesRepository.getBalanceForAsset("EUR"),
+            assetBalancesRepository.getBalanceForAsset("GBP"), { item1, item2 ->
+            // do something
+        })
+    }
+
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
 
@@ -94,11 +106,11 @@ class DashboardInteractor(
         } else {
             Single.just(FLATLINE_CHART)
         }
-        .map { PriceHistoryUpdate(crypto, it) }
-        .subscribeBy(
-            onSuccess = { model.process(it) },
-            onError = { Timber.e(it) }
-        )
+            .map { PriceHistoryUpdate(crypto, it) }
+            .subscribeBy(
+                onSuccess = { model.process(it) },
+                onError = { Timber.e(it) }
+            )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
         return tokens[crypto].accounts(AssetFilter.Custodial)
@@ -119,13 +131,13 @@ class DashboardInteractor(
 
     fun cancelSimpleBuyOrder(orderId: String): Disposable? {
         return custodialWalletManager.deleteBuyOrder(orderId)
-                .subscribeBy(
-                    onComplete = { simpleBuyPrefs.clearState() },
-                    onError = { error ->
-                        analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_ERROR)
-                        Timber.e(error)
-                    }
-                )
+            .subscribeBy(
+                onComplete = { simpleBuyPrefs.clearState() },
+                onError = { error ->
+                    analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_ERROR)
+                    Timber.e(error)
+                }
+            )
     }
 
     companion object {

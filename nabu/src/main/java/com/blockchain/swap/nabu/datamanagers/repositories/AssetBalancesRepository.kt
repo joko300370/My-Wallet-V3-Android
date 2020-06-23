@@ -3,6 +3,7 @@ package com.blockchain.swap.nabu.datamanagers.repositories
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -45,6 +46,9 @@ class AssetBalancesRepository {
             lock.release()
         }
     }
+
+    fun getBalanceForAsset(fiat: String): Maybe<FiatValue> =
+        Maybe.just(FiatValue.fromMinor(fiat, 5000))
 
     @Synchronized
     private fun updateCache(response: SimpleBuyAllBalancesResponse) {
