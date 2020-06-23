@@ -9,6 +9,8 @@ import com.blockchain.swap.nabu.api.nabu.NabuMarkets
 import com.blockchain.swap.nabu.api.trade.TransactionStateAdapter
 import com.blockchain.swap.nabu.datamanagers.AnalyticsNabuUserReporterImpl
 import com.blockchain.swap.nabu.datamanagers.AnalyticsWalletReporter
+import com.blockchain.swap.nabu.datamanagers.BalanceProviderImpl
+import com.blockchain.swap.nabu.datamanagers.BalancesProvider
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
@@ -92,6 +94,13 @@ val nabuModule = module {
             )
         }.bind(CustodialWalletManager::class)
 
+        factory {
+            BalanceProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(BalancesProvider::class)
+
         factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
                 nabuUserReporter = get(userAnalytics),
@@ -140,7 +149,7 @@ val nabuModule = module {
         }
 
         scoped {
-            AssetBalancesRepository()
+            AssetBalancesRepository(balancesProvider = get())
         }
     }
 

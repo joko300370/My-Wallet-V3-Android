@@ -38,7 +38,6 @@ import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.service.NabuService
@@ -66,10 +65,6 @@ class LiveCustodialWalletManager(
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository
 ) : CustodialWalletManager {
-
-    init {
-        assetBalancesRepository.fnRefresh = ::getBalanceForAllAssets
-    }
 
     override fun getQuote(
         action: String,
@@ -245,11 +240,6 @@ class LiveCustodialWalletManager(
                     Maybe.empty()
                 }
             }
-
-    private fun getBalanceForAllAssets(): Single<SimpleBuyAllBalancesResponse> =
-        authenticator.authenticate {
-            nabuService.getBalanceForAllAssets(it)
-        }
 
     override fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Completable =
         authenticator.authenticateCompletable {
@@ -428,7 +418,7 @@ class LiveCustodialWalletManager(
                 } else {
                     Single.just(0.0)
                 }
-        }
+            }
 
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency

@@ -25,7 +25,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
@@ -283,8 +282,8 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     @SuppressLint("SetTextI18n")
     private fun updatePriceChange(percentageView: AppCompatTextView, data: PriceSeries) {
         // We have filtered out nulls by here, so we can 'safely' default to zeros for the price
-        val firstPrice: Double = data.first().price ?: 0.0
-        val lastPrice: Double = data.last().price ?: 0.0
+        val firstPrice: Double = data.firstOrNull()?.price ?: 0.0
+        val lastPrice: Double = data.lastOrNull()?.price ?: 0.0
         val difference = lastPrice - firstPrice
 
         val percentChange = (difference / firstPrice) * 100
@@ -391,6 +390,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             CryptoCurrency.XLM -> 4
             CryptoCurrency.PAX -> 2
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> 2
         }
 
     companion object {

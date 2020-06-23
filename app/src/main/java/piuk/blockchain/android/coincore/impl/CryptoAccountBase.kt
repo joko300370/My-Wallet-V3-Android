@@ -54,7 +54,7 @@ abstract class CryptoSingleAccountBase(
     }
 }
 
-class CustodialTradingAccount(
+open class CustodialTradingAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
@@ -73,7 +73,7 @@ class CustodialTradingAccount(
             .switchToSingleIfEmpty { Single.just(CryptoValue.zero(asset)) }
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading balance: $it")
-                CryptoValue.zero(cryptoAsset)
+                CryptoValue.zero(asset)
             }
 
     override val activity: Single<ActivitySummaryList>
@@ -86,7 +86,8 @@ class CustodialTradingAccount(
     override val isFunded: Boolean
         get() = hasSeenFunds.get()
 
-    override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
+    override val isDefault: Boolean =
+        false // Default is, presently, only ever a non-custodial account.
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Write me!"))
@@ -208,6 +209,8 @@ abstract class CryptoSingleAccountNonCustodialBase(
     cryptoCurrency: CryptoCurrency
 ) : CryptoSingleAccountBase(cryptoCurrency) {
 
+    override val isFunded: Boolean = true
+
     final override val actions: AvailableActions
         get() = availableActions
 
@@ -277,10 +280,14 @@ class CryptoAccountCompoundGroup(
 
     // Produce the sum of all balances of all accounts
     override val balance: Single<CryptoValue>
-        get() = Single.zip(
-            accounts.map { it.balance }
-        ) { t: Array<Any> ->
-            t.sumBy { it as CryptoValue }
+        get() = if (accounts.isEmpty()) {
+            Single.just(CryptoValue.zero(asset))
+        } else {
+            Single.zip(
+                accounts.map { it.balance }
+            ) { t: Array<Any> ->
+                t.sumBy { it as CryptoValue }
+            }
         }
 
     private fun <T> Array<T>.sumBy(selector: (T) -> CryptoValue): CryptoValue {
@@ -293,29 +300,40 @@ class CryptoAccountCompoundGroup(
 
     // All the activities for all the accounts
     override val activity: Single<ActivitySummaryList>
-        get() = Single.zip(
-            accounts.map { it.activity }
-        ) { t: Array<Any> ->
-            t.filterIsInstance<List<ActivitySummaryItem>>().flatten()
+        get() = if (accounts.isEmpty()) {
+            Single.just(emptyList())
+        } else {
+            Single.zip(
+                accounts.map { it.activity }
+            ) { t: Array<Any> ->
+                t.filterIsInstance<List<ActivitySummaryItem>>().flatten()
+            }
         }
 
     // The intersection of the actions for each account
     override val actions: AvailableActions
-        get() = accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+        get() = if (accounts.isEmpty()) {
+            emptySet()
+        } else {
+            accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+        }
 
     // if _any_ of the accounts have transactions
     override val hasTransactions: Boolean
         get() = accounts.map { it.hasTransactions }.any { it }
 
     // Are any of the accounts funded
-    override val isFunded: Boolean =
-        accounts.map { it.isFunded }.any { it }
+    override val isFunded: Boolean = accounts.map { it.isFunded }.any { it }
 
     override fun fiatBalance(
         fiat: String,
         exchangeRates: ExchangeRateDataManager
     ): Single<FiatValue> =
-        balance.map { it.toFiat(exchangeRates, fiat) }
+        if (accounts.isEmpty()) {
+            Single.just(FiatValue.zero(fiat))
+        } else {
+            balance.map { it.toFiat(exchangeRates, fiat) }
+        }
 
     override fun includes(cryptoAccount: CryptoSingleAccount): Boolean =
         accounts.contains(cryptoAccount)

@@ -208,7 +208,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(supportedFiatCurrencies = emptyList())
     }
 
-    object CancelOrder : SimpleBuyIntent()
+    object CancelOrder : SimpleBuyIntent() {
+        override fun isValidFor(oldState: SimpleBuyState) = true
+    }
 
     object ClearState : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =

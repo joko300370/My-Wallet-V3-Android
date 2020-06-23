@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Outline
 import android.graphics.drawable.Drawable
 import android.os.Build
-import androidx.annotation.DrawableRes
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -15,11 +14,11 @@ import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
-import piuk.blockchain.android.util.coinIconWhite
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.balance.CryptoCurrency
@@ -28,6 +27,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.coinIconWhite
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
@@ -133,7 +133,8 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
             CryptoCurrency.BCH -> textview_bitcoin_cash
             CryptoCurrency.XLM -> textview_lumens
             CryptoCurrency.PAX -> textview_pax
-            CryptoCurrency.STX -> null
+            CryptoCurrency.STX,
+            CryptoCurrency.ALGO -> null
         }
 
     fun isOpen() = expanded

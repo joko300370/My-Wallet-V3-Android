@@ -32,8 +32,8 @@ internal abstract class AssetTokensBase(
     protected val exchangeRates: ExchangeRateDataManager,
     private val historicRates: ChartsDataManager,
     protected val currencyPrefs: CurrencyPrefs,
-    private val labels: DefaultLabels,
-    private val custodialManager: CustodialWalletManager,
+    protected val labels: DefaultLabels,
+    protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     rxBus: RxBus
@@ -92,17 +92,15 @@ internal abstract class AssetTokensBase(
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
 
-    private fun loadCustodialAccount(): Single<CryptoSingleAccountList> =
-        Single.fromCallable {
-            listOf(
-                CustodialTradingAccount(
-                    asset,
-                    labels.getDefaultCustodialWalletLabel(asset),
-                    exchangeRates,
-                    custodialManager
-                )
-            )
-        }
+    open fun loadCustodialAccount(): Single<CryptoSingleAccountList> =
+        Single.just(
+            listOf(CustodialTradingAccount(
+                asset,
+                labels.getDefaultCustodialWalletLabel(asset),
+                exchangeRates,
+                custodialManager
+            ))
+        )
 
     protected open fun onLogoutSignal(event: AuthEvent) {}
 

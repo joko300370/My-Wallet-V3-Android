@@ -18,9 +18,9 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
-import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.send.strategy.BitPayProtocol
@@ -137,6 +137,7 @@ class SendPresenter<View : SendView>(
             CryptoCurrency.XLM -> xlmStrategy
             CryptoCurrency.PAX -> paxStrategy
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
         }
 
         selectedCrypto = currency

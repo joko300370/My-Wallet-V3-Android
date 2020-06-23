@@ -6,6 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 

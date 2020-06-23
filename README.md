@@ -12,11 +12,12 @@ Install Android Studio: https://developer.android.com/sdk/index.html
 
 Import as Android Studio project.
 
-Run the bootstrap script from terminal via `scripts/bootstrap.sh`. This will install the Google Java code style as well 
-as the official Android Kotlin code style and remove any file header templates. The script may indicate that you need 
-to restart Android Studio for it's changes to take effect.
+**Required: Run the quickstart script from a bash terminal at the base of the project; `./scripts/quick_start.sh` this will install the necessary
+dependencies for the project to compile successfully.**
 
-The Stellar libraries live in a git submodule, so be sure to 'git submodule update --init' before starting the build.
+Optional: Run the bootstrap script from terminal via `scripts/bootstrap.sh`. This will install the Google Java code style as well
+as the official Android Kotlin code style and remove any file header templates. The script may indicate that you need
+to restart Android Studio for it's changes to take effect.
 
 Build -> Make Project
 
