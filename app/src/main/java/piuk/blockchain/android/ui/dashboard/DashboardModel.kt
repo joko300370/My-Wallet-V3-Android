@@ -165,6 +165,7 @@ class DashboardModel(
         return when (intent) {
             is RefreshAllIntent -> {
                 interactor.refreshBalances(this, AssetFilter.Total)
+                interactor.checkForFiatBalances(this)
             }
             is BalanceUpdate -> {
                 process(CheckForCustodialBalanceIntent(intent.cryptoCurrency))

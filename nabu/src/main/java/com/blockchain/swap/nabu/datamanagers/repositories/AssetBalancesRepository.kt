@@ -6,6 +6,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import io.reactivex.Maybe
+import timber.log.Timber
 
 class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
@@ -23,9 +24,15 @@ class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
     fun getBalanceForAsset(fiat: String): Maybe<FiatValue> =
         cache.getCachedSingle().flatMapMaybe {
-            it[fiat]?.let {
-                Maybe.just(FiatValue.fromMinor(fiat, it.toLong()))
-            } ?: Maybe.empty()
+            Timber.e("----- fiat get balance $fiat - ${it[fiat]}")
+            // TODO remove dummy data
+            if(fiat == "EUR") {
+                Maybe.just(FiatValue.fromMinor(fiat, "2000".toLong()))
+            } else {
+                it[fiat]?.let {
+                    Maybe.just(FiatValue.fromMinor(fiat, it.toLong()))
+                } ?: Maybe.empty()
+            }
         }
 
     companion object {

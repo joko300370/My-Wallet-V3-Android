@@ -6,13 +6,16 @@ import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
-import io.reactivex.Maybe
+import io.reactivex.Notification
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -80,12 +83,40 @@ class DashboardInteractor(
         return cd
     }
 
-    fun checkForFiatBalances() {
-        Maybe.zip(assetBalancesRepository.getBalanceForAsset("EUR"),
-            assetBalancesRepository.getBalanceForAsset("GBP"), { item1, item2 ->
-            // do something
-        })
+    fun checkForFiatBalances(model: DashboardModel): Disposable =
+        Observable.zip(
+            assetBalancesRepository.getBalanceForAsset("EUR").toObservable().materialize(),
+            assetBalancesRepository.getBalanceForAsset("GBP").toObservable().materialize(),
+            BiFunction { eurValue: Notification<FiatValue>, gbpValue: Notification<FiatValue> ->
+                Timber.e("----- eur ${eurValue.value} - gbp ${gbpValue.value}")
+            }).subscribe()
+
+
+/*
+
+    Maybe.zip(assetBalancesRepository.getBalanceForAsset("EUR"),
+    assetBalancesRepository.getBalanceForAsset("GBP"), BiFunction
+    {
+        eurFiat: FiatValue,
+        gbpFiat: FiatValue ->
+        Timber.e("---- zip result $eurFiat - $gbpFiat")
+        // do something
+    }).subscribeBy(
+    onSuccess=
+    {
+        Timber.e("---- checkForFiatBalances success")
+    },
+    onComplete =
+    {
+        Timber.e("---- checkForFiatBalances complete")
+    },
+    onError =
+    {
+        Timber.e("---- checkForFiatBalances error $it")
     }
+    )
+*/
+
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
