@@ -116,8 +116,8 @@ private class MultipleFundsAdapter(
 private fun TextView.setStringFromTicker(context: Context, ticker: String) {
     text = context.getString(
         when (ticker) {
-            "EUR" -> R.string.common_euros
-            "GBP" -> R.string.common_pounds
+            "EUR" -> R.string.euros
+            "GBP" -> R.string.pounds
             else -> R.string.empty
         }
     )

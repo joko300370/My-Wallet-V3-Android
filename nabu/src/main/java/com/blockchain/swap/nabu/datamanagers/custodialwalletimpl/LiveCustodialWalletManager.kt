@@ -305,12 +305,13 @@ class LiveCustodialWalletManager(
         isTier2Approved: Boolean
     ) = authenticator.authenticate {
         Singles.zip(
+            assetBalancesRepository.getBalanceForAsset(fiatCurrency).toSingle(FiatValue.zero(fiatCurrency)),
             nabuService.getCards(it).onErrorReturn { emptyList() },
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
                 updateSupportedCards(it)
             }
         )
-    }.map { (cardsResponse, paymentMethods) ->
+    }.map { (fiatBalance, cardsResponse, paymentMethods) ->
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
         paymentMethods.methods.forEach {
@@ -326,6 +327,23 @@ class LiveCustodialWalletManager(
                     ?.forEach { cardResponse: CardResponse ->
                         availablePaymentMethods.add(cardResponse.toCardPaymentMethod(cardLimits))
                     }
+            } else if (it.type == PaymentMethodResponse.FUNDS &&
+                it.currency == fiatCurrency &&
+                SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+            ) {
+                if (fiatBalance.isPositive) {
+                    val fundsLimits =
+                        PaymentLimits(it.limits.min, it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
+                    availablePaymentMethods.add(PaymentMethod.Funds(
+                        fiatBalance,
+                        it.currency,
+                        fundsLimits
+                    ))
+                } else {
+                    availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
+                        it.currency,
+                        PaymentLimits(it.limits.min, it.limits.max, it.currency)))
+                }
             }
         }
 
@@ -335,12 +353,12 @@ class LiveCustodialWalletManager(
             availablePaymentMethods.add(PaymentMethod.UndefinedCard(PaymentLimits(it.limits.min,
                 it.limits.max,
                 fiatCurrency)))
-
             if (cardsResponse.isEmpty() && isTier2Approved) {
                 availablePaymentMethods.add(PaymentMethod.Undefined)
             }
         }
-        availablePaymentMethods.toList()
+
+        availablePaymentMethods.sortedBy { it.order }.toList()
     }
 
     override fun addNewCard(
@@ -475,6 +493,10 @@ class LiveCustodialWalletManager(
 
     companion object {
         private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
+
+        private val SUPPORTED_FUNDS_CURRENCIES = listOf(
+            "GBP", "EUR"
+        )
     }
 }
 
@@ -485,7 +507,7 @@ private fun String.toSupportedPartner(): Partner =
     }
 
 enum class PaymentMethodType {
-    BANK_ACCOUNT, PAYMENT_CARD
+    BANK_ACCOUNT, PAYMENT_CARD, FUNDS, UNKNOWN
 }
 
 private fun String.toLocalState(): OrderState =
@@ -527,9 +549,11 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         created = insertedAt.fromIso8601ToUtc() ?: Date(0),
         fee = fee?.let { FiatValue.fromMinor(inputCurrency, it.toLongOrDefault(0)) },
         paymentMethodId = paymentMethodId ?: (
-                if (paymentType.toPaymentMethodType() == PaymentMethodType.BANK_ACCOUNT)
-                    PaymentMethod.BANK_PAYMENT_ID
-                else PaymentMethod.UNDEFINED_CARD_PAYMENT_ID),
+                when (paymentType.toPaymentMethodType()) {
+                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(
@@ -550,7 +574,9 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
 private fun String.toPaymentMethodType(): PaymentMethodType =
     when (this) {
         PaymentMethodResponse.BANK_ACCOUNT -> PaymentMethodType.BANK_ACCOUNT
-        else -> PaymentMethodType.PAYMENT_CARD
+        PaymentMethodResponse.PAYMENT_CARD -> PaymentMethodType.PAYMENT_CARD
+        PaymentMethodResponse.FUNDS -> PaymentMethodType.FUNDS
+        else -> PaymentMethodType.UNKNOWN
     }
 
 interface PaymentAccountMapper {

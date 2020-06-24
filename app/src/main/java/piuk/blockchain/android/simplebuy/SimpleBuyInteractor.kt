@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -155,11 +156,12 @@ class SimpleBuyInteractor(
         tierService.tiers().flatMap { tier ->
             custodialWalletManager.fetchSuggestedPaymentMethod(fiatCurrency,
                 tier.isApprovedFor(KycTierLevel.GOLD)
-            ).map {
+            ).map { paymentMethods ->
                 SimpleBuyIntent.PaymentMethodsUpdated(
-                    it,
-                    tier.isApprovedFor(KycTierLevel.GOLD),
-                    preselectedId
+                    availablePaymentMethods = paymentMethods,
+                    canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
+                    canLinkFunds = paymentMethods.firstOrNull { it is PaymentMethod.UndefinedFunds } != null,
+                    preselectedId = preselectedId
                 )
             }
         }

@@ -9,7 +9,7 @@ import io.reactivex.Maybe
 
 class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
-    val cache = TimedCacheRequest(
+    private val cache = TimedCacheRequest(
         cacheLifetimeSeconds = CACHE_LIFETIME,
         refreshFn = { balancesProvider.getBalanceForAllAssets() }
     )

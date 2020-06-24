@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/payment_method_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/standard_margin"
+    android:layout_marginEnd="@dimen/standard_margin"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/payment_method_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/small_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_bank_transfer" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payment_method_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="@string/bank_transfer"
+        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+        app:layout_constraintTop_toTopOf="@+id/payment_method_icon" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payment_method_limit"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/small_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
+        tools:text="$5,000 USD Limit" />
+
+    <View
+        style="@style/Separator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/title"
+            style="@style/Text.Semibold.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            tools:text="Add an EUR account" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/subtitle"
+            style="@style/Text.Semibold.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:text="@string/bank_transfer"
+            android:textColor="@color/grey_600"
+            tools:text="Bank Transfer" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/instructions"
+            style="@style/Text.Semibold.14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:textColor="@color/grey_600"
+            tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
+
+        <piuk.blockchain.android.simplebuy.BankDetailsContainer
+            android:id="@+id/bank_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:background="@drawable/rounded_box"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/small_margin" />
+
+        <piuk.blockchain.android.ui.dashboard.sheets.BankTransferDetailsLayout
+            android:id="@+id/bank_transfer_only"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:image="@drawable/ic_transfer_bank"
+            app:subtitle="@string/bank_transfer_only_subtitle"
+            app:title="@string/bank_transfer_only" />
+
+        <piuk.blockchain.android.ui.dashboard.sheets.BankTransferDetailsLayout
+            android:id="@+id/processing_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:image="@drawable/ic_clock"
+            app:title="@string/processing_time" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bank_deposit_instruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cta_button"
+            style="@style/CtaButton.White"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin"
+            android:text="@string/send_me_instructions" />
+
+        <include
+            android:id="@+id/bank_details_error"
+            layout="@layout/bank_details_error_layout" />
+    </LinearLayout>
+</ScrollView>

@@ -70,8 +70,16 @@ class SimpleBuyBankDetailsFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
         val amount = newState.order.amount
         if (newState.bankAccount != null && amount != null) {
             bank_details_container.initWithBankDetailsAndAmount(
-                newState.bankAccount.details,
-                amount,
+                newState.bankAccount.details.map {
+                    BankDetailField(it.title, it.value, it.isCopyable)
+                }.toMutableList().apply {
+                    add(BankDetailField(
+                        getString(R.string.simple_buy_amount_to_send),
+                        amount.toStringWithSymbol(),
+                        false
+                    )
+                    )
+                },
                 this
             )
             secure_transfer.text = getString(

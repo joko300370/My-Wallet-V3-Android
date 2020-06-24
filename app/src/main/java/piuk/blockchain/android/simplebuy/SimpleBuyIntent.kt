@@ -55,32 +55,35 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     class PaymentMethodsUpdated(
         private val availablePaymentMethods: List<PaymentMethod>,
-        private val canAdd: Boolean,
+        private val canAddCard: Boolean,
+        private val canLinkFunds: Boolean,
         private val preselectedId: String? = null // pass this value if you want to preselect one
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             val selectedPaymentMethodId =
                 selectedMethodId(oldState.selectedPaymentMethod?.id) ?: availablePaymentMethods[0].id
-            val selectedType =
-                (availablePaymentMethods.firstOrNull
-                { it.id == selectedPaymentMethodId } as? PaymentMethod.BankTransfer)?.let {
-                    PaymentMethodType.BANK_ACCOUNT
-                } ?: PaymentMethodType.PAYMENT_CARD
+            val selectedPaymentMethod = availablePaymentMethods.firstOrNull {
+                it.id == selectedPaymentMethodId
+            }
+
+            val type = when (selectedPaymentMethod) {
+                is PaymentMethod.Card -> PaymentMethodType.PAYMENT_CARD
+                is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT
+                is PaymentMethod.Funds -> PaymentMethodType.FUNDS
+                else -> PaymentMethodType.UNKNOWN
+            }
 
             return oldState.copy(
                 selectedPaymentMethod = SelectedPaymentMethod(
                     selectedPaymentMethodId,
-                    (availablePaymentMethods.firstOrNull {
-                        it.id == selectedPaymentMethodId
-                    } as? PaymentMethod.Card)?.partner,
-                    (availablePaymentMethods.firstOrNull {
-                        it.id == selectedPaymentMethodId
-                    } as? PaymentMethod.Card)?.uiLabelWithDigits() ?: "",
-                    selectedType
+                    (selectedPaymentMethod as? PaymentMethod.Card)?.partner,
+                    (selectedPaymentMethod as? PaymentMethod.Card)?.uiLabelWithDigits() ?: "",
+                    type
                 ),
                 paymentOptions = PaymentOptions(
                     availablePaymentMethods = availablePaymentMethods,
-                    canAddCard = canAdd
+                    canAddCard = canAddCard,
+                    canLinkFunds = canLinkFunds
                 )
             )
         }
@@ -103,8 +106,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     // no partner for bank transfer or ui label. Ui label for bank transfer is coming from resources
                     (paymentMethod as? PaymentMethod.Card)?.partner,
                     (paymentMethod as? PaymentMethod.Card)?.uiLabelWithDigits() ?: "",
-                    if (paymentMethod is PaymentMethod.BankTransfer) PaymentMethodType.BANK_ACCOUNT
-                    else PaymentMethodType.PAYMENT_CARD
+                    when (paymentMethod) {
+                        is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT
+                        is PaymentMethod.Funds -> PaymentMethodType.FUNDS
+                        else -> PaymentMethodType.PAYMENT_CARD
+                    }
                 ))
     }
 
@@ -199,8 +205,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     data class FetchSuggestedPaymentMethod(val fiatCurrency: String, val selectedPaymentMethodId: String? = null) :
         SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(paymentOptions = PaymentOptions(
-                emptyList(), false))
+            oldState.copy(paymentOptions = PaymentOptions())
     }
 
     object FetchSupportedFiatCurrencies : SimpleBuyIntent() {
@@ -297,6 +302,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object ClearError : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(errorState = null)
+
+        override fun isValidFor(oldState: SimpleBuyState): Boolean {
+            return oldState.errorState != null
+        }
     }
 
     object ResetEveryPayAuth : SimpleBuyIntent() {
