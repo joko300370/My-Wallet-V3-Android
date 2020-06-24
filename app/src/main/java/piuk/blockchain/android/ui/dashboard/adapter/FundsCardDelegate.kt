@@ -9,8 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.FiatValue
-import kotlinx.android.synthetic.main.item_dashboard_funds_bordered.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
+import kotlinx.android.synthetic.main.item_dashboard_funds_bordered.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate

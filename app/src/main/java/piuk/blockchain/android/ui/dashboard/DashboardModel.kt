@@ -89,7 +89,7 @@ data class DashboardState(
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
     val transferFundsCurrency: CryptoCurrency? = null,
-    val fundsFiatBalances: FundsBalanceState = FundsBalanceState(emptyList())
+    val fundsFiatBalances: FundsBalanceState? = null
 ) : MviState, BalanceState {
 
     // If ALL the assets are refreshing, then report true. Else false

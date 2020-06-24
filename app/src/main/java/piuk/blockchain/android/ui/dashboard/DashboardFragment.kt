@@ -117,7 +117,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         with(displayList) {
             add(IDX_CARD_ANNOUNCE, EmptyDashboardItem()) // Placeholder for announcements
             add(IDX_CARD_BALANCE, newState)
-            add(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
+            add(IDX_FUNDS_BALANCE, EmptyDashboardItem()) // Placeholder for funds
             add(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC])
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
@@ -142,7 +142,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
             modList.removeAll { it == null }
 
-            if (newState.fundsFiatBalances.fiatBalances.isNotEmpty()) {
+            if (newState.fundsFiatBalances?.fiatBalances?.isNotEmpty() == true) {
                 set(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
                 modList.add { theAdapter.notifyItemChanged(IDX_FUNDS_BALANCE) }
             }
@@ -294,7 +294,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onFundsClicked(fiat: FiatValue) {
-        Timber.e("----- funds clicked for $fiat")
+        Timber.e("TODO in story with bottom sheet - funds clicked for $fiat")
     }
 
     private val announcementHost = object : AnnouncementHost {
