@@ -86,16 +86,13 @@ class DashboardInteractor(
             assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP"))
         ) { euroValue, gbpValue ->
                 val fiatBalances = mutableListOf<FiatValue>()
-                if(euroValue != FiatValue.zero("EUR")) {
-                    Timber.e("---- adding eur")
-                    fiatBalances.add(euroValue )
+                if (euroValue != FiatValue.zero("EUR")) {
+                    fiatBalances.add(euroValue)
                 }
-                if(gbpValue != FiatValue.zero("GBP")) {
-                    Timber.e("---- adding gbp")
+                if (gbpValue != FiatValue.zero("GBP")) {
                     fiatBalances.add(gbpValue)
                 }
-                if(fiatBalances.isNotEmpty()) {
-                    Timber.e("---- list populated, process update")
+                if (fiatBalances.isNotEmpty()) {
                     model.process(FiatBalanceUpdate(fiatBalances))
                 }
             }.subscribe()

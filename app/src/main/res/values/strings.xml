@@ -1758,5 +1758,7 @@
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+    <string name="common_euros">Euros</string>
+    <string name="common_pounds">Pounds</string>
 
 </resources>

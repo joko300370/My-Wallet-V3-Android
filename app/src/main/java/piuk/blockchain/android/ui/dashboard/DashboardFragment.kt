@@ -14,6 +14,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -42,6 +43,7 @@ import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import timber.log.Timber
 
 class EmptyDashboardItem : DashboardItem
 
@@ -63,7 +65,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
-            analytics = get()
+            analytics = get(),
+            onFundsItemClicked = { onFundsClicked(it) }
         )
     }
 
@@ -139,7 +142,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
             modList.removeAll { it == null }
 
-            if(newState.fundsFiatBalances.fiatBalances.isNotEmpty()) {
+            if (newState.fundsFiatBalances.fiatBalances.isNotEmpty()) {
                 set(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
                 modList.add { theAdapter.notifyItemChanged(IDX_FUNDS_BALANCE) }
             }
@@ -288,6 +291,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
         model.process(ShowAssetDetails(cryptoCurrency))
+    }
+
+    private fun onFundsClicked(fiat: FiatValue) {
+        Timber.e("----- funds clicked for $fiat")
     }
 
     private val announcementHost = object : AnnouncementHost {

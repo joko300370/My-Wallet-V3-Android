@@ -12,7 +12,7 @@ sealed class DashboardIntent : MviIntent<DashboardState>
 
 class FiatBalanceUpdate(
     val balanceList: List<FiatValue>
-): DashboardIntent() {
+) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         return oldState.copy(
             fundsFiatBalances = FundsBalanceState(balanceList)
