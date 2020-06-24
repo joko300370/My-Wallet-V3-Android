@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds_bordered.view.*
@@ -19,6 +20,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class FundsCardDelegate<in T>(
+    private val prefs: CurrencyPrefs,
     private val onFundsItemClicked: (FiatValue) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -27,7 +29,7 @@ class FundsCardDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         FundsCardViewHolder(parent.inflate(R.layout.item_dashboard_funds_parent),
-            onFundsItemClicked)
+            onFundsItemClicked, prefs)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -38,10 +40,11 @@ class FundsCardDelegate<in T>(
 
 private class FundsCardViewHolder(
     itemView: View,
-    private val onFundsItemClicked: (FiatValue) -> Unit
+    private val onFundsItemClicked: (FiatValue) -> Unit,
+    prefs: CurrencyPrefs
 ) : RecyclerView.ViewHolder(itemView) {
     private val multipleFundsAdapter: MultipleFundsAdapter by lazy {
-        MultipleFundsAdapter(onFundsItemClicked)
+        MultipleFundsAdapter(onFundsItemClicked, prefs)
     }
 
     fun bind(funds: FundsBalanceState) {
@@ -70,7 +73,8 @@ private class FundsCardViewHolder(
 }
 
 private class MultipleFundsAdapter(
-    private val onFundsItemClicked: (FiatValue) -> Unit
+    private val onFundsItemClicked: (FiatValue) -> Unit,
+    private val prefs: CurrencyPrefs
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var items = listOf<FiatValue>()
         set(value) {
