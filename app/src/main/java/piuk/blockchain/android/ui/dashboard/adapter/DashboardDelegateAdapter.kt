@@ -20,7 +20,7 @@ class DashboardDelegateAdapter(
             addAdapterDelegate(StdAnnouncementDelegate(analytics))
             addAdapterDelegate(MiniAnnouncementDelegate(analytics))
             addAdapterDelegate(BalanceCardDelegate())
-            addAdapterDelegate(BalanceCardDelegate())
+            addAdapterDelegate(FundsCardDelegate())
             addAdapterDelegate(AssetCardDelegate(prefs, onCardClicked))
             addAdapterDelegate(EmptyCardDelegate())
         }

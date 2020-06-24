@@ -114,6 +114,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         with(displayList) {
             add(IDX_CARD_ANNOUNCE, EmptyDashboardItem()) // Placeholder for announcements
             add(IDX_CARD_BALANCE, newState)
+            add(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
             add(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC])
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
@@ -137,6 +138,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             modList.add(handleUpdatedAssetState(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO]))
 
             modList.removeAll { it == null }
+
+            if(newState.fundsFiatBalances.fiatBalances.isNotEmpty()) {
+                set(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
+                modList.add { theAdapter.notifyItemChanged(IDX_FUNDS_BALANCE) }
+            }
 
             if (modList.isNotEmpty()) {
                 set(IDX_CARD_BALANCE, newState)
@@ -398,12 +404,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1
-        private const val IDX_CARD_BTC = 2
-        private const val IDX_CARD_ETH = 3
-        private const val IDX_CARD_BCH = 4
-        private const val IDX_CARD_XLM = 5
-        private const val IDX_CARD_PAX = 6
-        private const val IDX_CARD_ALG = 7
+        private const val IDX_FUNDS_BALANCE = 2
+        private const val IDX_CARD_BTC = 3
+        private const val IDX_CARD_ETH = 4
+        private const val IDX_CARD_BCH = 5
+        private const val IDX_CARD_XLM = 6
+        private const val IDX_CARD_PAX = 7
+        private const val IDX_CARD_ALG = 8
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }

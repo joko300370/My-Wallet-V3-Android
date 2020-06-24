@@ -10,12 +10,9 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
-import io.reactivex.Notification
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -84,39 +81,24 @@ class DashboardInteractor(
     }
 
     fun checkForFiatBalances(model: DashboardModel): Disposable =
-        Observable.zip(
-            assetBalancesRepository.getBalanceForAsset("EUR").toObservable().materialize(),
-            assetBalancesRepository.getBalanceForAsset("GBP").toObservable().materialize(),
-            BiFunction { eurValue: Notification<FiatValue>, gbpValue: Notification<FiatValue> ->
-                Timber.e("----- eur ${eurValue.value} - gbp ${gbpValue.value}")
-            }).subscribe()
-
-
-/*
-
-    Maybe.zip(assetBalancesRepository.getBalanceForAsset("EUR"),
-    assetBalancesRepository.getBalanceForAsset("GBP"), BiFunction
-    {
-        eurFiat: FiatValue,
-        gbpFiat: FiatValue ->
-        Timber.e("---- zip result $eurFiat - $gbpFiat")
-        // do something
-    }).subscribeBy(
-    onSuccess=
-    {
-        Timber.e("---- checkForFiatBalances success")
-    },
-    onComplete =
-    {
-        Timber.e("---- checkForFiatBalances complete")
-    },
-    onError =
-    {
-        Timber.e("---- checkForFiatBalances error $it")
-    }
-    )
-*/
-
+        Singles.zip(
+            assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
+            assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP"))
+        ) { euroValue, gbpValue ->
+                val fiatBalances = mutableListOf<FiatValue>()
+                if(euroValue != FiatValue.zero("EUR")) {
+                    Timber.e("---- adding eur")
+                    fiatBalances.add(euroValue )
+                }
+                if(gbpValue != FiatValue.zero("GBP")) {
+                    Timber.e("---- adding gbp")
+                    fiatBalances.add(gbpValue)
+                }
+                if(fiatBalances.isNotEmpty()) {
+                    Timber.e("---- list populated, process update")
+                    model.process(FiatBalanceUpdate(fiatBalances))
+                }
+            }.subscribe()
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY

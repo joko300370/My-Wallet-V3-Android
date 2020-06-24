@@ -61,6 +61,10 @@ interface BalanceState : DashboardItem {
     fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
 }
 
+data class FundsBalanceState(
+    val fiatBalances: List<FiatValue> = emptyList()
+) : DashboardItem
+
 enum class DashboardSheet {
     STX_AIRDROP_COMPLETE,
     CUSTODY_INTRO,
@@ -84,7 +88,8 @@ data class DashboardState(
     val announcement: AnnouncementCard? = null,
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
-    val transferFundsCurrency: CryptoCurrency? = null
+    val transferFundsCurrency: CryptoCurrency? = null,
+    val fundsFiatBalances: FundsBalanceState = FundsBalanceState(emptyList())
 ) : MviState, BalanceState {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -184,6 +189,7 @@ class DashboardModel(
             }
             is CheckBackupStatus -> interactor.hasUserBackedUp(this)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
+            is FiatBalanceUpdate,
             is BackupStatusUpdate,
             is BalanceUpdateError,
             is PriceHistoryUpdate,

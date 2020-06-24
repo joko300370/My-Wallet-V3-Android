@@ -26,13 +26,13 @@ class AssetBalancesRepository(balancesProvider: BalancesProvider) {
         cache.getCachedSingle().flatMapMaybe {
             Timber.e("----- fiat get balance $fiat - ${it[fiat]}")
             // TODO remove dummy data
-            if(fiat == "EUR") {
+           /* if(fiat == "EUR") {
                 Maybe.just(FiatValue.fromMinor(fiat, "2000".toLong()))
-            } else {
+            } else {*/
                 it[fiat]?.let {
                     Maybe.just(FiatValue.fromMinor(fiat, it.toLong()))
                 } ?: Maybe.empty()
-            }
+           // }
         }
 
     companion object {
