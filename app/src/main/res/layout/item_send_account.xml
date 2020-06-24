@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/item_account_parent"
+    android:orientation="vertical"
     android:paddingTop="@dimen/small_margin"
     android:paddingBottom="@dimen/small_margin">
 
@@ -12,4 +14,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/message"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="60dp"
+        android:background="@drawable/bkgd_status_expired">
+
+        <ImageView
+            android:id="@+id/msg_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="5dp"
+            android:src="@drawable/ic_information"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/msg_body"
+            style="@style/Text.Standard.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            tools:text="Unavailable due to pending transaction" />
+
+    </LinearLayout>
+
+</LinearLayout>

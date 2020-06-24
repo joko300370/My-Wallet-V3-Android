@@ -25,6 +25,16 @@ interface CryptoAccount {
     fun fiatBalance(fiat: String, exchangeRates: ExchangeRateDataManager): Single<FiatValue>
 
     fun includes(cryptoAccount: CryptoSingleAccount): Boolean
+
+    val sendState: Single<SendState>
+}
+
+enum class SendState {
+    CAN_SEND,
+    NO_FUNDS,
+    NOT_ENOUGH_GAS,
+    SEND_IN_FLIGHT,
+    NOT_SUPPORTED
 }
 
 interface CryptoSingleAccount : CryptoAccount {
@@ -56,6 +66,9 @@ object NullAccount : CryptoSingleAccount {
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 
     override val label: String = ""
 

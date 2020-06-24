@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -52,6 +53,9 @@ abstract class CryptoSingleAccountBase(
     protected fun setHasTransactions(hasTransactions: Boolean) {
         this.hasTransactions = hasTransactions
     }
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 }
 
 open class CustodialTradingAccount(
@@ -91,6 +95,9 @@ open class CustodialTradingAccount(
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Write me!"))
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 
     override val actions: AvailableActions
         get() = availableActions
@@ -166,6 +173,9 @@ internal class CryptoInterestAccount(
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error<SendProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 
     override val actions: AvailableActions
         get() = availableActions
@@ -269,6 +279,9 @@ class CryptoAccountCustodialGroup(
 
     override fun includes(cryptoAccount: CryptoSingleAccount): Boolean =
         accounts.contains(cryptoAccount)
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 }
 
 class CryptoAccountCompoundGroup(
@@ -337,4 +350,7 @@ class CryptoAccountCompoundGroup(
 
     override fun includes(cryptoAccount: CryptoSingleAccount): Boolean =
         accounts.contains(cryptoAccount)
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 }

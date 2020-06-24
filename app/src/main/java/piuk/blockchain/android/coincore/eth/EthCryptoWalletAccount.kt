@@ -4,11 +4,13 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -18,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
     override val label: String,
-    val address: String,
+    internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager
@@ -99,4 +101,16 @@ internal class EthCryptoWalletAccount(
                 ethDataManager.requireSecondPassword
             )
         )
+
+    override val sendState: Single<SendState>
+        get() = Singles.zip(
+                balance,
+                ethDataManager.isLastTxPending()
+            ) { balance: CryptoValue, hasUnconfirmed: Boolean ->
+                when {
+                    balance.isZero -> SendState.NO_FUNDS
+                    hasUnconfirmed -> SendState.SEND_IN_FLIGHT
+                    else -> SendState.CAN_SEND
+                }
+            }
 }

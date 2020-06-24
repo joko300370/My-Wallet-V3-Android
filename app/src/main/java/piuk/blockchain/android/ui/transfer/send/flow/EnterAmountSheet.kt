@@ -17,17 +17,18 @@ import java.text.DecimalFormatSymbols
 class EnterAmountSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 
+    private var state: SendState = SendState()
+
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! EnterAmountSheet")
 
         with(dialogView) {
             cta_button.isEnabled = newState.nextEnabled
 
-            max_available.text = newState.availableBalance?.toStringWithSymbol()
+            max_available.text = newState.availableBalance.toStringWithSymbol()
         }
-//        view.enter_amount
-//        view.max_available
 //        view.error_msg
+        state = newState
     }
 
     override fun initControls(view: View) {
@@ -46,6 +47,7 @@ class EnterAmountSheet : SendInputSheet() {
     }
 
     private fun onUseMaxClick() {
+        dialogView.enter_amount.setText(state.availableBalance.toStringWithoutSymbol())
     }
 
     private fun onCtaClick() {

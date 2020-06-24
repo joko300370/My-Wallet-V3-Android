@@ -8,46 +8,46 @@
     android:layout_margin="@dimen/standard_margin">
 
     <ImageView
-        android:id="@+id/coin_icon"
+        android:id="@+id/icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:src="@drawable/vector_bitcoin_colored"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@+id/value"/>
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/label"
-        style="@style/Text.Light.14"
+        style="@style/Text.Semibold.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/coin_icon"
-        tools:text="Amount" />
+        app:layout_constraintStart_toEndOf="@+id/icon"
+        tools:text="BTC Wallet" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/value"
-        style="@style/Text.Semibold.16"
+        style="@style/Text.Semibold.14"
+        android:layout_marginTop="@dimen/tiny_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/label"
         app:layout_constraintTop_toBottomOf="@+id/label"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="15,000 Dollars in BTC" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/selected"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:checked="true"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="@+id/label"
+        app:layout_constraintBottom_toBottomOf="@+id/value"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

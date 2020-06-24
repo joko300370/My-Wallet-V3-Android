@@ -17,6 +17,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
@@ -51,6 +52,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
             }
             cta_button.isEnabled = newState.nextEnabled
         }
+
         state = newState
     }
 
@@ -76,9 +78,8 @@ class EnterTargetAddressSheet : SendInputSheet() {
 
     private fun setupTransferList(account: CryptoSingleAccount) {
         with(dialogView.wallet_select) {
-            val accountAdapter = AccountsAdapter(::accountSelected)
-            val itemList = mutableListOf<CryptoSingleAccount>()
-            accountAdapter.itemsList = itemList
+            val itemList = mutableListOf<CryptoAccount>()
+            val accountAdapter = AccountsAdapter(itemList, ::accountSelected)
 
             addItemDecoration(
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
@@ -112,10 +113,12 @@ class EnterTargetAddressSheet : SendInputSheet() {
         dialogView.wallet_select.goneIf { hide }
     }
 
-    private fun accountSelected(account: CryptoSingleAccount) {
-        disposables += account.receiveAddress.subscribeBy(
-            onSuccess = { addressSelected(it) }
-        )
+    private fun accountSelected(account: CryptoAccount) {
+        if (account is CryptoSingleAccount) {
+            disposables += account.receiveAddress.subscribeBy(
+                onSuccess = { addressSelected(it) }
+            )
+        }
     }
 
     private fun onLaunchAddressScan() {
