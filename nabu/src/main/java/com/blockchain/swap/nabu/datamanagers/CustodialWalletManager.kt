@@ -165,13 +165,19 @@ sealed class SimpleBuyError : Throwable() {
     object WithdrawlInsufficientFunds : SimpleBuyError()
 }
 
-sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null)
+sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) : Serializable {
+    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, Integer.MAX_VALUE)
     data class BankTransfer(override val limits: PaymentLimits) :
-        PaymentMethod(BANK_PAYMENT_ID, limits)
+        PaymentMethod(BANK_PAYMENT_ID, limits, 1)
 
     data class UndefinedCard(override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits)
+        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, 3)
+
+    data class Funds(val balance: FiatValue, val fiatCurrency: String, override val limits: PaymentLimits) :
+        PaymentMethod(FUNDS_PAYMENT_ID, limits, 0)
+
+    data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
+        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, 4)
 
     data class Card(
         val cardId: String,
@@ -182,7 +188,7 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Se
         val expireDate: Date,
         val cardType: CardType,
         val status: CardStatus
-    ) : PaymentMethod(cardId, limits), Serializable {
+    ) : PaymentMethod(cardId, limits, 2), Serializable {
         fun uiLabelWithDigits() =
             "${uiLabel()} ${dottedEndDigits()}"
 
@@ -208,6 +214,8 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Se
         const val BANK_PAYMENT_ID = "BANK_PAYMENT_ID"
         const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
+        const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
+        const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
     }
 }
 

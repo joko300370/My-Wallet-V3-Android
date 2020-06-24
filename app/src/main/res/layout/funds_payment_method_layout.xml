@@ -20,7 +20,7 @@
         android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_bank_transfer" />
+        tools:srcCompat="@drawable/ic_euro_funds" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payment_method_title"
@@ -31,28 +31,10 @@
         android:layout_marginEnd="@dimen/standard_margin"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintEnd_toStartOf="@+id/card_number"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toTopOf="@+id/payment_method_icon"
         tools:text="Chase Saphire 8291 Chase Saphire 8291" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/card_number"
-        style="@style/Text.Standard.16"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/payment_method_title"
-        tools:text="8291" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/exp_date"
-        style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/payment_method_limit"
-        tools:text="Exp: 04/2024" />
 
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -61,32 +43,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
         tools:text="$5,000 USD Limit" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/instructions"
-        style="@style/Text.Light.14"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-        app:layout_constraintTop_toBottomOf="@+id/payment_method_limit"
-        tools:text="Instantly buy crypto with any Visa or Mastercard." />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/add_payment_method_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/small_margin"
-        android:rotation="-90"
-        app:layout_constraintBottom_toBottomOf="@+id/payment_method_title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/payment_method_title"
-        app:srcCompat="@drawable/ic_arrow_down" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/balance"
@@ -104,11 +67,9 @@
         android:layout_height="1dp"
         android:layout_marginStart="0dp"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/instructions"
         app:layout_goneMarginTop="@dimen/small_margin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

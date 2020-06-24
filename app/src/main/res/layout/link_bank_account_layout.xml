@@ -71,15 +71,6 @@
             app:image="@drawable/ic_clock"
             app:title="@string/processing_time" />
 
-        <piuk.blockchain.android.ui.dashboard.sheets.BankTransferDetailsLayout
-            android:id="@+id/deposit_limits"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:image="@drawable/ic_warning"
-            app:subtitle="@string/deposit_limits_subtitle"
-            app:title="@string/deposit_limits" />
-
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bank_deposit_instruction"
             android:layout_width="match_parent"

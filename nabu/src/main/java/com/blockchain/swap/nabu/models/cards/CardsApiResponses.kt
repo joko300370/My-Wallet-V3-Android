@@ -7,7 +7,12 @@ data class PaymentMethodsResponse(
     val methods: List<PaymentMethodResponse>
 )
 
-data class PaymentMethodResponse(val type: String, val limits: Limits, val subTypes: List<String>?) {
+data class PaymentMethodResponse(
+    val type: String,
+    val limits: Limits,
+    val subTypes: List<String>?,
+    val currency: String?
+) {
     companion object {
         const val BANK_ACCOUNT = "BANK_ACCOUNT"
         const val PAYMENT_CARD = "PAYMENT_CARD"

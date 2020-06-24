@@ -42,7 +42,7 @@ data class SimpleBuyState(
     val orderExchangePrice: FiatValue? = null,
     val orderValue: CryptoValue? = null,
     val fee: FiatValue? = null,
-    @Transient val paymentOptions: PaymentOptions = PaymentOptions(emptyList(), false),
+    @Transient val paymentOptions: PaymentOptions = PaymentOptions(),
     val supportedFiatCurrencies: List<String> = emptyList(),
     @Transient val errorState: ErrorState? = null,
     @Transient val exchangePrice: FiatValue? = null,
@@ -187,8 +187,9 @@ data class SimpleBuyOrder(
 )
 
 data class PaymentOptions(
-    val availablePaymentMethods: List<PaymentMethod>,
-    val canAddCard: Boolean
+    val availablePaymentMethods: List<PaymentMethod> = emptyList(),
+    val canAddCard: Boolean = false,
+    val canLinkFunds: Boolean = false
 )
 
 data class SelectedPaymentMethod(
@@ -198,4 +199,5 @@ data class SelectedPaymentMethod(
     val paymentMethodType: PaymentMethodType
 ) {
     fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
+    fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
 }

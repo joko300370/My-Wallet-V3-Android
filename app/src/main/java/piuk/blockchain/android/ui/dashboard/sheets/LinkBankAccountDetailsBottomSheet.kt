@@ -8,13 +8,11 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.bankFieldName
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
-import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.bank_details_error_layout.view.*
-import kotlinx.android.synthetic.main.link_bank_account_layout.*
 import kotlinx.android.synthetic.main.link_bank_account_layout.view.*
 import kotlinx.android.synthetic.main.link_bank_account_layout.view.bank_deposit_instruction
 import kotlinx.android.synthetic.main.link_bank_account_layout.view.title
@@ -28,7 +26,6 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import java.lang.IllegalStateException
 
 class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
@@ -83,35 +80,37 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
             bank_transfer_only.gone()
             processing_time.gone()
             cta_button.gone()
-            deposit_limits.gone()
             bank_deposit_instruction.gone()
         }
     }
 
     private fun configureUi(fiatCurrency: String, view: View) {
-        if (fiatCurrency == "GBP") {
-            val linksMap = mapOf<String, Uri>(
-                "modular_terms_and_conditions" to Uri.parse(MODULAR_TERMS_AND_CONDITIONS)
-            )
-            view.bank_deposit_instruction.text =
-                stringUtils.getStringWithMappedLinks(
-                    R.string.recipient_name_must_match_gbp,
-                    linksMap,
-                    requireActivity()
+        with(view) {
+            if (fiatCurrency == "GBP") {
+                val linksMap = mapOf<String, Uri>(
+                    "modular_terms_and_conditions" to Uri.parse(MODULAR_TERMS_AND_CONDITIONS)
                 )
-            view.bank_deposit_instruction.movementMethod = LinkMovementMethod.getInstance()
-        } else {
-            bank_deposit_instruction.text = getString(R.string.recipient_name_must_match_eur)
+
+                bank_deposit_instruction.text =
+                    stringUtils.getStringWithMappedLinks(
+                        R.string.recipient_name_must_match_gbp,
+                        linksMap,
+                        requireActivity()
+                    )
+                bank_deposit_instruction.movementMethod = LinkMovementMethod.getInstance()
+            } else {
+                bank_deposit_instruction.text = getString(R.string.recipient_name_must_match_eur)
+            }
+
+            processing_time.updateSubtitle(
+                if (fiatCurrency == "GBP") getString(R.string.processing_time_subtitle_gbp)
+                else getString(R.string.processing_time_subtitle_eur)
+            )
+            title.text =
+                if (isForLink) getString(R.string.add_bank, fiatCurrency) else
+                    getString(R.string.deposit_currency, fiatCurrency)
+            instructions.text = getString(R.string.link_transfer_instructions, fiatCurrency)
         }
-        view.bank_transfer_only.visibleIf { !isForLink }
-        view.processing_time.visibleIf { !isForLink }
-        view.deposit_limits.visibleIf { !isForLink }
-        view.processing_time.updateSubtitle(
-            if (fiatCurrency == "GBP") getString(R.string.processing_time_subtitle_gbp)
-            else getString(R.string.processing_time_subtitle_eur)
-        )
-        view.title.text = getString(R.string.add_bank, fiatCurrency)
-        view.instructions.text = getString(R.string.link_transfer_instructions, fiatCurrency)
     }
 
     override fun dismiss() {
@@ -135,7 +134,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
         private const val FIAT_CURRENCY = "FIAT_CURRENCY_KEY"
         private const val IS_FOR_LINK = "IS_FOR_LINK"
 
-        fun newInstance(fiatAmount: FiatValue? = null, fiatCurrency: String, isForLink: Boolean = true):
+        fun newInstance(fiatCurrency: String, isForLink: Boolean = true):
                 LinkBankAccountDetailsBottomSheet =
             LinkBankAccountDetailsBottomSheet().apply {
                 arguments = Bundle().apply {

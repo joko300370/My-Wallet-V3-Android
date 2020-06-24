@@ -78,10 +78,14 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     override fun render(newState: SimpleBuyState) {
         lastState = newState
         progress.visibleIf { newState.isLoading }
-        purchase_note.text = if (newState.selectedPaymentMethod?.isBank() == true) {
-            getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
-        } else {
-            getString(R.string.purchase_card_note)
+        purchase_note.text = when {
+            newState.selectedPaymentMethod?.isBank() == true -> {
+                getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
+            }
+            newState.selectedPaymentMethod?.isCard() == true -> {
+                getString(R.string.purchase_card_note)
+            }
+            else -> ""
         }
 
         if (newState.errorState != null) {
@@ -220,6 +224,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod): String =
         when (selectedPaymentMethod.paymentMethodType) {
             PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
+            PaymentMethodType.FUNDS -> getString(R.string.checkout_funds_transfer_label)
             else -> selectedPaymentMethod.label ?: ""
         }
 

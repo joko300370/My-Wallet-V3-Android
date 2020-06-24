@@ -2,8 +2,8 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import info.blockchain.balance.CryptoCurrency
@@ -85,10 +85,9 @@ class SimpleBuyModel(
                     previousState.selectedCryptoCurrency
                         ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
-                    previousState.selectedPaymentMethod?.id?.takeIf {
-                        it != PaymentMethod.BANK_PAYMENT_ID &&
-                                it != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                    },
+                    previousState.selectedPaymentMethod?.takeIf {
+                        it.paymentMethodType == PaymentMethodType.PAYMENT_CARD
+                    }?.id,
                     previousState.selectedPaymentMethod?.paymentMethodType
                         ?: throw IllegalStateException("Missing Payment Method"),
                     true
