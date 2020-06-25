@@ -305,7 +305,8 @@ class LiveCustodialWalletManager(
         isTier2Approved: Boolean
     ) = authenticator.authenticate {
         Singles.zip(
-            assetBalancesRepository.getBalanceForAsset(fiatCurrency).toSingle(FiatValue.zero(fiatCurrency)),
+            assetBalancesRepository.getBalanceForAsset(fiatCurrency)
+                .toSingle(FiatValue.zero(fiatCurrency)),
             nabuService.getCards(it).onErrorReturn { emptyList() },
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
                 updateSupportedCards(it)
@@ -333,7 +334,8 @@ class LiveCustodialWalletManager(
             ) {
                 if (fiatBalance.isPositive) {
                     val fundsLimits =
-                        PaymentLimits(it.limits.min, it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
+                        PaymentLimits(it.limits.min,
+                            it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
                     availablePaymentMethods.add(PaymentMethod.Funds(
                         fiatBalance,
                         it.currency,
@@ -457,6 +459,22 @@ class LiveCustodialWalletManager(
                 }
             }
 
+    override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean) =
+        authenticator.authenticate {
+            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
+        }.map { paymentMethodsResponse ->
+            val supportedFiatFunds = mutableListOf<String>()
+            paymentMethodsResponse.methods.forEach { paymentMethod ->
+                if (paymentMethod.type == PaymentMethodResponse.FUNDS &&
+                    SUPPORTED_FUNDS_CURRENCIES.contains(paymentMethod.currency)) {
+                    paymentMethod.currency?.let {
+                        supportedFiatFunds.add(it)
+                    }
+                }
+            }
+            supportedFiatFunds
+        }
+
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
         PaymentMethod.Card(
             cardId = id,
@@ -507,7 +525,10 @@ private fun String.toSupportedPartner(): Partner =
     }
 
 enum class PaymentMethodType {
-    BANK_ACCOUNT, PAYMENT_CARD, FUNDS, UNKNOWN
+    BANK_ACCOUNT,
+    PAYMENT_CARD,
+    FUNDS,
+    UNKNOWN
 }
 
 private fun String.toLocalState(): OrderState =
@@ -549,11 +570,11 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         created = insertedAt.fromIso8601ToUtc() ?: Date(0),
         fee = fee?.let { FiatValue.fromMinor(inputCurrency, it.toLongOrDefault(0)) },
         paymentMethodId = paymentMethodId ?: (
-                when (paymentType.toPaymentMethodType()) {
-                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                }),
+            when (paymentType.toPaymentMethodType()) {
+                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+            }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(

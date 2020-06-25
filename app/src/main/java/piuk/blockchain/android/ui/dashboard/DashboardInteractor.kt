@@ -2,9 +2,12 @@ package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.payload.PayloadManager
@@ -27,7 +30,9 @@ class DashboardInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics,
-    private val assetBalancesRepository: AssetBalancesRepository
+    private val assetBalancesRepository: AssetBalancesRepository,
+    private val currencyPrefs: CurrencyPrefs,
+    private val tierService: TierService
 ) {
     private val cd: CompositeDisposable = CompositeDisposable()
 
@@ -81,21 +86,28 @@ class DashboardInteractor(
     }
 
     fun checkForFiatBalances(model: DashboardModel): Disposable =
-        Singles.zip(
-            assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
-            assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP"))
-        ) { euroValue, gbpValue ->
-                val fiatBalances = mutableListOf<FiatValue>()
-                if (euroValue != FiatValue.zero("EUR")) {
-                    fiatBalances.add(euroValue)
+        tierService.tiers().flatMap { tier ->
+            Singles.zip(
+                assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
+                assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP")),
+                custodialWalletManager.getSupportedFundsFiats(
+                    currencyPrefs.selectedFiatCurrency,
+                    tier.isApprovedFor(KycTierLevel.GOLD)
+                )
+            ) { euroValue, gbpValue, supportedFunds ->
+                    val fiatBalances = supportedFunds.map {
+                        when (it) {
+                            "EUR" -> euroValue
+                            "GBP" -> gbpValue
+                            else -> FiatValue.zero(it)
+                        }
+                    }
+
+                    if (fiatBalances.isNotEmpty()) {
+                        model.process(FiatBalanceUpdate(fiatBalances))
+                    }
                 }
-                if (gbpValue != FiatValue.zero("GBP")) {
-                    fiatBalances.add(gbpValue)
-                }
-                if (fiatBalances.isNotEmpty()) {
-                    model.process(FiatBalanceUpdate(fiatBalances))
-                }
-            }.subscribe()
+        }.subscribe()
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
