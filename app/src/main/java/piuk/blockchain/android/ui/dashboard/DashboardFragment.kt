@@ -46,7 +46,6 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import timber.log.Timber
 
 class EmptyDashboardItem : DashboardItem
 
@@ -317,7 +316,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     private fun onFundsClicked(fiat: FiatValue) {
         model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_DETAILS, fiat))
-        Timber.e("TODO in story with bottom sheet - funds clicked for $fiat")
     }
 
     private val announcementHost = object : AnnouncementHost {
