@@ -34,7 +34,6 @@ class DashboardInteractor(
     private val currencyPrefs: CurrencyPrefs,
     private val tierService: TierService
 ) {
-    private val cd: CompositeDisposable = CompositeDisposable()
 
     // We have a problem here, in that pax init depends on ETH init
     // Ultimately, we want to init metadata straight after decrypting (or creating) the wallet
@@ -43,6 +42,7 @@ class DashboardInteractor(
     // But for now, we'll catch any pax init failure here, unless ETH has initialised OK. And when we
     // get a valid ETH balance, will try for a PX balance. Yeah, this is a nasty hack TODO: Fix this
     fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter): Disposable {
+        val cd = CompositeDisposable()
 
         CryptoCurrency.activeCurrencies()
             .filter { it != CryptoCurrency.PAX }
@@ -82,10 +82,13 @@ class DashboardInteractor(
                         }
                     )
             }
+
+        cd += checkForFiatBalances(model)
+
         return cd
     }
 
-    fun checkForFiatBalances(model: DashboardModel): Disposable =
+    private fun checkForFiatBalances(model: DashboardModel): Disposable =
         tierService.tiers().flatMap { tier ->
             Singles.zip(
                 assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
@@ -94,20 +97,25 @@ class DashboardInteractor(
                     currencyPrefs.selectedFiatCurrency,
                     tier.isApprovedFor(KycTierLevel.GOLD)
                 )
-            ) { euroValue, gbpValue, supportedFunds ->
-                    val fiatBalances = supportedFunds.map {
-                        when (it) {
-                            "EUR" -> euroValue
-                            "GBP" -> gbpValue
-                            else -> FiatValue.zero(it)
-                        }
-                    }
-
-                    if (fiatBalances.isNotEmpty()) {
-                        model.process(FiatBalanceUpdate(fiatBalances))
+            )
+        }.subscribeBy (
+            onSuccess = { (euroValue, gbpValue, supportedFunds) ->
+                val fiatBalances = supportedFunds.map {
+                    when (it) {
+                        "EUR" -> euroValue
+                        "GBP" -> gbpValue
+                        else -> FiatValue.zero(it)
                     }
                 }
-        }.subscribe()
+
+                if (fiatBalances.isNotEmpty()) {
+                    model.process(FiatBalanceUpdate(fiatBalances))
+                }
+            },
+            onError = {
+                Timber.e("Error while loading Funds balances $it")
+            }
+        )
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
