@@ -169,7 +169,8 @@ class ShowAssetDetails(
 }
 
 class ShowDashboardSheet(
-    private val dashboardSheet: DashboardSheet
+    private val dashboardSheet: DashboardSheet,
+    private val selectedFiatValue: FiatValue? = null
 ) : DashboardIntent() {
     override fun isValidFor(oldState: DashboardState): Boolean =
         dashboardSheet != DashboardSheet.CUSTODY_INTRO
@@ -178,7 +179,8 @@ class ShowDashboardSheet(
         // Custody sheet isn't displayed via this intent, so filter it out
         oldState.copy(
             showDashboardSheet = dashboardSheet,
-            showAssetSheetFor = null
+            showAssetSheetFor = null,
+            selectedFundsBalance = selectedFiatValue
         )
 }
 

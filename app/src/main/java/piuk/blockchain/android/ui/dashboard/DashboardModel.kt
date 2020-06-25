@@ -71,7 +71,8 @@ enum class DashboardSheet {
     SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
     BASIC_WALLET_TRANSFER,
-    SIMPLE_BUY_CANCEL_ORDER
+    SIMPLE_BUY_CANCEL_ORDER,
+    FIAT_FUNDS_DETAILS
 }
 
 data class DashboardState(
@@ -89,7 +90,8 @@ data class DashboardState(
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
     val transferFundsCurrency: CryptoCurrency? = null,
-    val fundsFiatBalances: FundsBalanceState? = null
+    val fundsFiatBalances: FundsBalanceState? = null,
+    val selectedFundsBalance: FiatValue? = null
 ) : MviState, BalanceState {
 
     // If ALL the assets are refreshing, then report true. Else false
