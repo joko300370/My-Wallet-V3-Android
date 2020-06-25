@@ -98,7 +98,7 @@ class DashboardInteractor(
                     tier.isApprovedFor(KycTierLevel.GOLD)
                 )
             )
-        }.subscribeBy (
+        }.subscribeBy(
             onSuccess = { (euroValue, gbpValue, supportedFunds) ->
                 val fiatBalances = supportedFunds.map {
                     when (it) {
