@@ -23,16 +23,9 @@ class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
     fun getBalanceForAsset(fiat: String): Maybe<FiatValue> =
         cache.getCachedSingle().flatMapMaybe {
-            // TODO remove dummy data
-            if (fiat == "EUR") {
-                Maybe.just(FiatValue.fromMinor(fiat, "2000".toLong()))
-            } /*else if (fiat == "GBP") {
-                Maybe.just(FiatValue.fromMinor(fiat, "50000".toLong()))
-            } */else {
-                it[fiat]?.let {
+            it[fiat]?.let {
                     Maybe.just(FiatValue.fromMinor(fiat, it.toLong()))
-                } ?: Maybe.empty()
-            }
+            } ?: Maybe.empty()
         }
 
     companion object {

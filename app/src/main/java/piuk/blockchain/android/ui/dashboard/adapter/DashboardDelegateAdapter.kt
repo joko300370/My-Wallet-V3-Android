@@ -8,12 +8,14 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.MiniAnnouncementDelegate
 import piuk.blockchain.android.ui.dashboard.announcements.StdAnnouncementDelegate
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class DashboardDelegateAdapter(
     prefs: CurrencyPrefs,
     onCardClicked: (CryptoCurrency) -> Unit,
     analytics: Analytics,
-    onFundsItemClicked: (FiatValue) -> Unit
+    onFundsItemClicked: (FiatValue) -> Unit,
+    exchangeRateDataManager: ExchangeRateDataManager
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
 
     init {
@@ -22,7 +24,7 @@ class DashboardDelegateAdapter(
             addAdapterDelegate(StdAnnouncementDelegate(analytics))
             addAdapterDelegate(MiniAnnouncementDelegate(analytics))
             addAdapterDelegate(BalanceCardDelegate())
-            addAdapterDelegate(FundsCardDelegate(prefs, onFundsItemClicked))
+            addAdapterDelegate(FundsCardDelegate(prefs, onFundsItemClicked, exchangeRateDataManager))
             addAdapterDelegate(AssetCardDelegate(prefs, onCardClicked))
             addAdapterDelegate(EmptyCardDelegate())
         }

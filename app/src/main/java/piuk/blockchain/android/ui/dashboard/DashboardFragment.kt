@@ -40,6 +40,7 @@ import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcore.data.events.ActionEvent
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -61,12 +62,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
+    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
             analytics = get(),
-            onFundsItemClicked = { onFundsClicked(it) }
+            onFundsItemClicked = { onFundsClicked(it) },
+            exchangeRateDataManager = exchangeRateDataManager
         )
     }
 
