@@ -315,13 +315,7 @@ class LiveCustodialWalletManager(
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
         paymentMethods.methods.forEach {
-            if (it.type == PaymentMethodResponse.BANK_ACCOUNT) {
-                availablePaymentMethods.add(PaymentMethod.BankTransfer(
-                    PaymentLimits(it.limits.min,
-                        it.limits.max,
-                        fiatCurrency)
-                ))
-            } else if (it.type == PaymentMethodResponse.PAYMENT_CARD) {
+            if (it.type == PaymentMethodResponse.PAYMENT_CARD) {
                 val cardLimits = PaymentLimits(it.limits.min, it.limits.max, fiatCurrency)
                 cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
                     ?.forEach { cardResponse: CardResponse ->

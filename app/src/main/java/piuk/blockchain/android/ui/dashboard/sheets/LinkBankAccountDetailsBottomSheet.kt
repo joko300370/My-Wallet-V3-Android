@@ -90,7 +90,6 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                 val linksMap = mapOf<String, Uri>(
                     "modular_terms_and_conditions" to Uri.parse(MODULAR_TERMS_AND_CONDITIONS)
                 )
-
                 bank_deposit_instruction.text =
                     stringUtils.getStringWithMappedLinks(
                         R.string.recipient_name_must_match_gbp,

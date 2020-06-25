@@ -206,7 +206,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun canContinue(state: SimpleBuyState) =
-        state.isAmountValid && state.selectedPaymentMethod != null
+        state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
 
     private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
 

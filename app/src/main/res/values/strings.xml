@@ -1629,7 +1629,7 @@
     <string name="cancel_order">Cancel Order</string>
     <string name="cancel_order_do_cancel">Cancel Order</string>
     <string name="cancel_order_go_back">Go Back</string>
-    <string name="card_payment">Card Payment</string>
+    <string name="payment">Payment</string>
     <string name="cancel_order_do_cancel_dashboard">Yes, Cancel</string>
     <string name="cancel_order_go_back_dashboard">No, Keep Order</string>
     <string name="cancel_token_instruction">This will remove your %1$s Buy order.</string>
@@ -1646,7 +1646,7 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Let’s get your wallet set up. You can quickly buy crypto now or do this later.</string>
-    <string name="buy_now">Buy Now</string>
+    <string name="buy_now_1">Buy %1s</string>
 
     <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
     <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
@@ -1682,6 +1682,7 @@
     <string name="linking_card_subtitle">This could take up to 1 minute.</string>
     <string name="linking_card_error_title">Oops! Something Went Wrong.</string>
     <string name="card_error_subtitle">Please go back and try again.</string>
+    <string name="order_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
     <string name="card_expiry_date">Exp: %1s</string>
     <string name="card_buying">Buying %1s</string>
     <string name="card_in_progress">%1s Buy In Progress</string>
@@ -1707,7 +1708,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
-    <string name="checkout_funds_transfer_label">Funds</string>
+    <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
     <!-- Activity Details -->
