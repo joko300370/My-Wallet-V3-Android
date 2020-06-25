@@ -28,7 +28,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/funds_fiat_ticker"
-        style="@style/Text.Light.16"
+        style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/funds_title"

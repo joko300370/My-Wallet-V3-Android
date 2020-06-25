@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.Context
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,7 +10,9 @@ import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
+import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
+import kotlinx.android.synthetic.main.item_dashboard_funds.view.funds_fiat_ticker
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -17,8 +20,9 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import timber.log.Timber
 
-class FiatFundsDetailSheet: SlidingModalBottomDialog() {
+class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     private val fiatValue: FiatValue by lazy {
         arguments?.getSerializable(FIAT_DATA) as? FiatValue
             ?: throw IllegalArgumentException("No fiat data specified")
@@ -33,6 +37,9 @@ class FiatFundsDetailSheet: SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         val ticker = fiatValue.currencyCode
         view.apply {
+            funds_title.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                context.resources.getDimension(R.dimen.size_standard))
+
             funds_balance_other_fiat.visibleIf { prefs.selectedFiatCurrency != ticker }
             funds_balance_other_fiat.text = fiatValue.toStringWithSymbol()
             funds_list.gone()
@@ -47,6 +54,10 @@ class FiatFundsDetailSheet: SlidingModalBottomDialog() {
                     .toStringWithSymbol()
             }
             funds_icon.setDrawableFromTicker(context, ticker)
+
+            funds_deposit_holder.setOnClickListener {
+                Timber.e("---- TODO navigate to depositing funds")
+            }
         }
     }
 
@@ -60,7 +71,8 @@ class FiatFundsDetailSheet: SlidingModalBottomDialog() {
                         putSerializable(FIAT_DATA, fiatValue)
                     }
                 }
-            } ?: throw  IllegalStateException("Fiat value can't be null when displaying Fund details")
+            } ?: throw  IllegalStateException(
+                "Fiat value can't be null when displaying Fund details")
         }
     }
 
