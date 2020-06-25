@@ -16,7 +16,6 @@ import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
-import java.lang.IllegalStateException
 
 class SimpleBuyModel(
     private val prefs: SimpleBuyPrefs,

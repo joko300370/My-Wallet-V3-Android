@@ -14,6 +14,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -39,9 +40,11 @@ import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcore.data.events.ActionEvent
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import timber.log.Timber
 
 class EmptyDashboardItem : DashboardItem
 
@@ -59,11 +62,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
+    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
-            analytics = get()
+            analytics = get(),
+            onFundsItemClicked = { onFundsClicked(it) },
+            exchangeRateDataManager = exchangeRateDataManager
         )
     }
 
@@ -114,6 +120,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         with(displayList) {
             add(IDX_CARD_ANNOUNCE, EmptyDashboardItem()) // Placeholder for announcements
             add(IDX_CARD_BALANCE, newState)
+            add(IDX_FUNDS_BALANCE, EmptyDashboardItem()) // Placeholder for funds
             add(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC])
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
@@ -137,6 +144,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             modList.add(handleUpdatedAssetState(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO]))
 
             modList.removeAll { it == null }
+
+            if (newState.fundsFiatBalances?.fiatBalances?.isNotEmpty() == true) {
+                set(IDX_FUNDS_BALANCE, newState.fundsFiatBalances)
+                modList.add { theAdapter.notifyItemChanged(IDX_FUNDS_BALANCE) }
+            }
 
             if (modList.isNotEmpty()) {
                 set(IDX_CARD_BALANCE, newState)
@@ -284,6 +296,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowAssetDetails(cryptoCurrency))
     }
 
+    private fun onFundsClicked(fiat: FiatValue) {
+        Timber.e("TODO in story with bottom sheet - funds clicked for $fiat")
+    }
+
     private val announcementHost = object : AnnouncementHost {
 
         override val disposables: CompositeDisposable
@@ -398,12 +414,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1
-        private const val IDX_CARD_BTC = 2
-        private const val IDX_CARD_ETH = 3
-        private const val IDX_CARD_BCH = 4
-        private const val IDX_CARD_XLM = 5
-        private const val IDX_CARD_PAX = 6
-        private const val IDX_CARD_ALG = 7
+        private const val IDX_FUNDS_BALANCE = 2
+        private const val IDX_CARD_BTC = 3
+        private const val IDX_CARD_ETH = 4
+        private const val IDX_CARD_BCH = 5
+        private const val IDX_CARD_XLM = 6
+        private const val IDX_CARD_PAX = 7
+        private const val IDX_CARD_ALG = 8
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }

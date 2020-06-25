@@ -10,6 +10,16 @@ import java.math.BigInteger
 
 sealed class DashboardIntent : MviIntent<DashboardState>
 
+class FiatBalanceUpdate(
+    private val balanceList: List<FiatValue>
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            fundsFiatBalances = FundsBalanceState(balanceList)
+        )
+    }
+}
+
 object RefreshAllIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         return oldState.copy(assets = oldState.assets.reset())
