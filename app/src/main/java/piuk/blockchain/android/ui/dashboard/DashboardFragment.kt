@@ -204,7 +204,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                             !it.isPositive
                         )
                     }
-
                 }
                 null -> null
             }

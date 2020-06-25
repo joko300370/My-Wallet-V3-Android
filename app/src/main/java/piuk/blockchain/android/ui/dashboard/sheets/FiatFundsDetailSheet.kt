@@ -81,7 +81,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                         putSerializable(FIAT_DATA, fiatValue)
                     }
                 }
-            } ?: throw  IllegalStateException(
+            } ?: throw IllegalStateException(
                 "Fiat value can't be null when displaying Fund details")
         }
     }
