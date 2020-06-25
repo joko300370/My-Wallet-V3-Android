@@ -102,6 +102,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         configureButtons(newState)
 
         when (newState.order.orderState) {
+            OrderState.FINISHED, // Funds orders are getting finished right after confirmation
             OrderState.AWAITING_FUNDS -> {
                 if (newState.confirmationActionRequested) {
                     if (newState.selectedPaymentMethod?.isBank() == true) {
@@ -176,7 +177,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
             CheckoutItem(getString(R.string.payment_method),
                 state.selectedPaymentMethod?.let {
-                    paymentMethodLabel(it)
+                    paymentMethodLabel(it, state.fiatCurrency)
                 } ?: ""
             )
         )
@@ -192,7 +193,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
         button_action.apply {
             if (!isForPendingPayment && !isOrderAwaitingFunds) {
-                text = getString(R.string.buy_now)
+                text = getString(R.string.buy_now_1, state.orderValue?.toStringWithSymbol())
                 setOnClickListener {
                     model.process(SimpleBuyIntent.ConfirmOrder)
                     analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED)
@@ -221,10 +222,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
     }
 
-    private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod): String =
+    private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod, fiatCurrency: String): String =
         when (selectedPaymentMethod.paymentMethodType) {
             PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
-            PaymentMethodType.FUNDS -> getString(R.string.checkout_funds_transfer_label)
+            PaymentMethodType.FUNDS -> getString(R.string.checkout_funds_transfer_label, fiatCurrency)
             else -> selectedPaymentMethod.label ?: ""
         }
 

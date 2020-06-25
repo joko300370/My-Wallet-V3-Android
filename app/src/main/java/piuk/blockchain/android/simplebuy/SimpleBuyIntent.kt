@@ -285,6 +285,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 fee = buyOrder.fee,
                 orderValue = buyOrder.orderValue,
                 orderExchangePrice = buyOrder.price,
+                paymentSucceeded = buyOrder.state == OrderState.FINISHED,
                 isLoading = false
             )
     }
@@ -325,7 +326,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         }
     }
 
-    class MakeCardPayment(val orderId: String) : SimpleBuyIntent() {
+    class MakePayment(val orderId: String) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(isLoading = true)
     }
@@ -337,11 +338,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object CardPaymentSucceeded : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(cardPaymentSucceeded = true, isLoading = false)
+            oldState.copy(paymentSucceeded = true, isLoading = false)
     }
 
     object CardPaymentPending : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(cardPaymentPending = true, isLoading = false)
+            oldState.copy(paymentPending = true, isLoading = false)
     }
 }

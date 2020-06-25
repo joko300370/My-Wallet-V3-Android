@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import kotlinx.android.synthetic.main.layout_payment_method_chooser_item.view.*
+import kotlinx.android.synthetic.main.add_funds_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 

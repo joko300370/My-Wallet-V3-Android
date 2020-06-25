@@ -174,7 +174,7 @@ class SimpleBuyModelTest {
             ))
 
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.MakeCardPayment("testId"))
+        model.process(SimpleBuyIntent.MakePayment("testId"))
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(isLoading = true))

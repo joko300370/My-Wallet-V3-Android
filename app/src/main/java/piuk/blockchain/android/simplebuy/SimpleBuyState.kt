@@ -48,8 +48,8 @@ data class SimpleBuyState(
     @Transient val exchangePrice: FiatValue? = null,
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
-    @Transient val cardPaymentSucceeded: Boolean = false,
-    @Transient val cardPaymentPending: Boolean = false,
+    val paymentSucceeded: Boolean = false,
+    @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false
 ) : MviState {

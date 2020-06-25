@@ -49,6 +49,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
         enter_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(s: Editable?) {
+                if (configuration.isInitialised.not())
+                    return
                 if (configuration.input == CurrencyType.Fiat) {
 
                     val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
