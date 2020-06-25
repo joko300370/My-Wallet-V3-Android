@@ -20,9 +20,18 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
-import timber.log.Timber
 
 class FiatFundsDetailSheet : SlidingModalBottomDialog() {
+
+    interface Host : SlidingModalBottomDialog.Host {
+        fun depositFiat(fiat: FiatValue)
+    }
+
+    override val host: Host by lazy {
+        super.host as? Host ?: throw IllegalStateException(
+            "Host fragment is not a FiatFundsDetailSheet.Host")
+    }
+
     private val fiatValue: FiatValue by lazy {
         arguments?.getSerializable(FIAT_DATA) as? FiatValue
             ?: throw IllegalArgumentException("No fiat data specified")
@@ -56,7 +65,8 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             funds_icon.setDrawableFromTicker(context, ticker)
 
             funds_deposit_holder.setOnClickListener {
-                Timber.e("---- TODO navigate to depositing funds")
+                dismiss()
+                host.depositFiat(fiatValue)
             }
         }
     }

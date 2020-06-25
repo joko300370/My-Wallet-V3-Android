@@ -37,6 +37,7 @@ import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
@@ -56,7 +57,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     ForceBackupForSendSheet.Host,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
-    SimpleBuyCancelOrderBottomSheet.Host {
+    SimpleBuyCancelOrderBottomSheet.Host,
+    FiatFundsDetailSheet.Host {
 
     override val model: DashboardModel by scopedInject()
 
@@ -85,7 +87,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         rxBus.register(ActionEvent::class.java)
     }
 
-    private var state: DashboardState? = null // Hold the 'current' display state, to enable optimising of state updates
+    private var state: DashboardState? =
+        null // Hold the 'current' display state, to enable optimising of state updates
 
     @UiThread
     override fun render(newState: DashboardState) {
@@ -138,7 +141,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             val modList = mutableListOf<RefreshFn?>()
 
             modList.add(handleUpdatedAssetState(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
+            modList.add(
+                handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
             modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
             modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
             modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
@@ -180,16 +184,28 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private fun showPromoSheet(state: DashboardState) {
         showBottomSheet(
             when (state.showDashboardSheet) {
-                DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(blockstackCampaignName)
+                DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
+                    blockstackCampaignName)
                 DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
-                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(state.transferFundsCurrency!!)
+                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
+                    state.transferFundsCurrency!!)
                 DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
-                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(state.selectedFundsBalance)
+                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
+                    state.selectedFundsBalance)
+                DashboardSheet.LINK_OR_DEPOSIT -> {
+                    state.selectedFundsBalance?.let {
+                        LinkBankAccountDetailsBottomSheet.newInstance(
+                            it.currencyCode,
+                            !it.isPositive
+                        )
+                    }
+
+                }
                 null -> null
             }
         )
@@ -206,7 +222,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         newState.assets.forEach { (cc, s) ->
             val newBalance = s.cryptoBalance
             if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.cryptoBalance) {
-                analyticsReporter.gotAssetBalance(cc, newBalance) // IF we have the full set, this will fire
+                analyticsReporter.gotAssetBalance(cc,
+                    newBalance) // IF we have the full set, this will fire
             }
         }
         analyticsReporter
@@ -266,11 +283,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         (activity as? MainActivity)?.let {
-            compositeDisposable += it.refreshAnnouncements.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                if (announcements.enable()) {
-                    announcements.checkLatest(announcementHost, compositeDisposable)
+            compositeDisposable += it.refreshAnnouncements.observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (announcements.enable()) {
+                        announcements.checkLatest(announcementHost, compositeDisposable)
+                    }
                 }
-            }
         }
 
         announcements.checkLatest(announcementHost, compositeDisposable)
@@ -318,7 +336,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(targetCurrency = swapTarget)
+        override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(
+            targetCurrency = swapTarget)
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -364,6 +383,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
+    override fun depositFiat(fiat: FiatValue) {
+        model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT, fiat))
+    }
+
     // AssetDetailSheet.Host
     override fun onSheetClosed() {
         model.process(ClearBottomSheet)
@@ -374,7 +397,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             AssetFilter.Total -> throw IllegalStateException("The Send.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoSendFor(cryptoCurrency)
             AssetFilter.Custodial -> model.process(StartCustodialTransfer(cryptoCurrency))
-            AssetFilter.Interest -> throw IllegalStateException("The Send.Interest action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException(
+                "The Send.Interest action is invalid")
         }.exhaustive
     }
 
@@ -382,8 +406,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         when (filter) {
             AssetFilter.Total -> throw IllegalStateException("The Receive.Total action is invalid")
             AssetFilter.Wallet -> navigator().gotoReceiveFor(cryptoCurrency)
-            AssetFilter.Custodial -> throw IllegalStateException("The Receive.Custodial action is invalid")
-            AssetFilter.Interest -> throw IllegalStateException("The Receive.Interest action is invalid")
+            AssetFilter.Custodial -> throw IllegalStateException(
+                "The Receive.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException(
+                "The Receive.Interest action is invalid")
         }.exhaustive
 
     override fun gotoActivityFor(account: CryptoAccount) =
@@ -396,8 +422,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 fromCryptoCurrency = fromCryptoCurrency,
                 targetCurrency = fromCryptoCurrency.defaultSwapTo
             )
-            AssetFilter.Custodial -> throw IllegalStateException("The Swap.Custodial action is invalid")
-            AssetFilter.Interest -> throw IllegalStateException("The Swap.Interest action is invalid")
+            AssetFilter.Custodial -> throw IllegalStateException(
+                "The Swap.Custodial action is invalid")
+            AssetFilter.Interest -> throw IllegalStateException(
+                "The Swap.Interest action is invalid")
         }.exhaustive
 
     override fun startBackupForTransfer() {
