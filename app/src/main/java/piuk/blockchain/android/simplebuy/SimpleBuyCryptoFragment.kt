@@ -193,9 +193,25 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
                 // We have done kyc and are verified
                 KycState.VERIFIED_AND_ELIGIBLE -> {
-                    navigator().goToCheckOutScreen()
+                    if (newState.selectedPaymentMethod?.paymentMethodType != PaymentMethodType.UNKNOWN)
+                        navigator().goToCheckOutScreen()
+                    else
+                        goToAddNewPaymentMethod(newState.selectedPaymentMethod.id)
                 }
             }.exhaustive
+        }
+    }
+
+    private fun goToAddNewPaymentMethod(selectedPaymentMethodId: String) {
+        when (selectedPaymentMethodId) {
+            PaymentMethod.UNDEFINED_CARD_PAYMENT_ID -> {
+                addPaymentMethod(PaymentMethodType.PAYMENT_CARD)
+            }
+            PaymentMethod.UNDEFINED_FUNDS_PAYMENT_ID -> {
+                addPaymentMethod(PaymentMethodType.FUNDS)
+            }
+            else -> {
+            }
         }
     }
 
