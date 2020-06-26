@@ -7,6 +7,16 @@ data class PaymentMethodsResponse(
     val methods: List<PaymentMethodResponse>
 )
 
+data class BeneficiariesResponse(
+    val id: String,
+    val address: String,
+    val currency: String,
+    val name: String,
+    val agent: AgentResponse
+)
+
+data class AgentResponse(val account: String)
+
 data class PaymentMethodResponse(
     val type: String,
     val limits: Limits,

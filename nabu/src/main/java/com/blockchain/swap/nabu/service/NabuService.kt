@@ -314,6 +314,13 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader, cardId
     ).wrapErrorMessage()
 
+    fun deleteBank(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.deleteBank(
+        sessionToken.authHeader, id
+    ).wrapErrorMessage()
+
     fun addNewCard(
         sessionToken: NabuSessionTokenResponse,
         addNewCardBodyRequest: AddNewCardBodyRequest
@@ -390,6 +397,9 @@ class NabuService(retrofit: Retrofit) {
         currency = currency,
         checkEligibility = checkEligibility.takeIf { it }
     ).wrapErrorMessage()
+
+    fun getLinkedBanks(sessionToken: NabuSessionTokenResponse) =
+        service.getLinkedBanks(sessionToken.authHeader).wrapErrorMessage()
 
     fun getCards(
         sessionToken: NabuSessionTokenResponse

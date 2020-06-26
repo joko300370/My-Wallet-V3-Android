@@ -105,9 +105,10 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                 if (fiatCurrency == "GBP") getString(R.string.processing_time_subtitle_gbp)
                 else getString(R.string.processing_time_subtitle_eur)
             )
-            title.text =
-                if (isForLink) getString(R.string.add_bank, fiatCurrency) else
-                    getString(R.string.deposit_currency, fiatCurrency)
+            title.text = if (isForLink) getString(R.string.add_bank) else
+                getString(R.string.deposit_currency, fiatCurrency)
+            subtitle.text = if (isForLink) getString(R.string.currency_bank_transfer, fiatCurrency) else
+                getString(R.string.bank_transfer)
             instructions.text = getString(R.string.link_transfer_instructions, fiatCurrency)
         }
     }

@@ -11,6 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.BuyOrderList
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
+import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
 import com.blockchain.swap.nabu.datamanagers.OrderState
@@ -230,6 +231,11 @@ class LiveCustodialWalletManager(
             nabuService.deleteCard(it, cardId)
         }
 
+    override fun deleteBank(bankId: String): Completable =
+        authenticator.authenticateCompletable {
+            nabuService.deleteBank(it, bankId)
+        }
+
     override fun getBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
         kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
             .flatMapMaybe { eligible ->
@@ -267,6 +273,21 @@ class LiveCustodialWalletManager(
                 updateSupportedCards(it)
             }
         }.ignoreElement()
+
+    override fun getLinkedBanks(): Single<List<LinkedBank>> =
+        authenticator.authenticate {
+            nabuService.getLinkedBanks(it)
+        }.map {
+            it.map { beneficiary ->
+                LinkedBank(
+                    id = beneficiary.id,
+                    title = "${beneficiary.name} ${beneficiary.agent.account}",
+                    // address is returned from the api as ****6810
+                    account = beneficiary.address.removePrefix("****"),
+                    currency = beneficiary.currency
+                )
+            }
+        }
 
     override fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,

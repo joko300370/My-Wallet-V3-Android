@@ -12,6 +12,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents;
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
+import com.blockchain.swap.nabu.datamanagers.LinkedBank;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
@@ -133,6 +134,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                     getView().showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR);
                                 }));
         updateCards();
+        updateBanks();
         getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated, throwable -> {
         }));
         getCompositeDisposable().add(featureFlag.getEnabled().subscribe(this::showPitItem));
@@ -155,7 +157,22 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
                     getView().cardsEnabled(false);
                     onCardsUpdated(Collections.emptyList());
+                    getView().updateBanks(Collections.emptyList());
                 }).subscribe(this::onCardsUpdated));
+    }
+
+    private void updateBanks() {
+        getCompositeDisposable().add(
+                custodialWalletManager.getLinkedBanks()
+                        .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
+                    getView().cardsEnabled(false);
+                    onBanksUpdated(Collections.emptyList());
+                    getView().updateBanks(Collections.emptyList());
+                }).subscribe(this::onBanksUpdated));
+    }
+
+    private void onBanksUpdated(List<LinkedBank> banks) {
+        getView().updateBanks(banks);
     }
 
 

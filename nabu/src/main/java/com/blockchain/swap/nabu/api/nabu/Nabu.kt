@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.api.nabu
 
+import com.blockchain.swap.nabu.models.cards.BeneficiariesResponse
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountBalanceResponse
@@ -272,6 +273,12 @@ internal interface Nabu {
         @Path("cardId") cardId: String
     ): Completable
 
+    @DELETE("$NABU_BANKS/{id}")
+    fun deleteBank(
+        @Header("authorization") authHeader: String,
+        @Path("id") id: String
+    ): Completable
+
     @POST("$NABU_CARDS/{cardId}/activate")
     fun activateCard(
         @Header("authorization") authHeader: String,
@@ -291,6 +298,11 @@ internal interface Nabu {
         @Query("currency") currency: String,
         @Query("checkEligibility") checkEligibility: Boolean?
     ): Single<PaymentMethodsResponse>
+
+    @GET(NABU_BENEFICIARIES)
+    fun getLinkedBanks(
+        @Header("authorization") authorization: String
+    ): Single<List<BeneficiariesResponse>>
 
     @GET(NABU_CARDS)
     fun getCards(

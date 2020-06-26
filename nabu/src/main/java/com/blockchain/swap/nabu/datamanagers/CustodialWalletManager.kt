@@ -12,6 +12,7 @@ import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.util.Date
 
@@ -82,12 +83,16 @@ interface CustodialWalletManager {
 
     fun deleteCard(cardId: String): Completable
 
+    fun deleteBank(bankId: String): Completable
+
     fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Completable
 
     // For test/dev
     fun cancelAllPendingBuys(): Completable
 
     fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
+
+    fun getLinkedBanks(): Single<List<LinkedBank>>
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
@@ -135,6 +140,18 @@ typealias BuyOrderList = List<BuyOrder>
 data class OrderInput(private val symbol: String, private val amount: String)
 
 data class OrderOutput(private val symbol: String)
+
+data class LinkedBank(
+    val id: String,
+    val title: String,
+    private val account: String,
+    val currency: String
+) : Serializable {
+
+    val accountDotted: String by unsafeLazy {
+        "•••• $account"
+    }
+}
 
 data class SimpleBuyPairs(val pairs: List<SimpleBuyPair>)
 
