@@ -1780,4 +1780,6 @@
     <string name="deposit_limits_subtitle">Please be aware that if you deposit more than your daily withdrawal limit, you wil not be able to withdraw all of your funds at once.</string>
     <string name="unable_to_load_bank_details">We were unable to load our bank deposit details.</string>
     <string name="most_popular">Most Popular</string>
+    <string name="fiat_funds_detail_deposit_title">Deposit</string>
+    <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
 </resources>
