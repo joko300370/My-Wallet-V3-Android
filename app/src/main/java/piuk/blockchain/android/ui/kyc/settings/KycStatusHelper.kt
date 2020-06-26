@@ -2,16 +2,16 @@ package piuk.blockchain.android.ui.kyc.settings
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.exceptions.MetadataNotFoundException
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.Scope
 import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import timber.log.Timber
@@ -26,35 +26,17 @@ class KycStatusHelper(
     private val fetchOfflineToken
         get() = nabuToken.fetchNabuToken()
 
-    fun getSettingsKycState(): Single<SettingsKycState> = Single.zip(
-        shouldDisplayKyc(),
-        getKycStatus(),
-        BiFunction { shouldDisplay, status ->
-            if (!shouldDisplay) {
-                SettingsKycState.Hidden
+    fun getSettingsKycStateTier(): Single<KycTiers> =
+        shouldDisplayKyc().flatMap {
+            if (it) {
+                getKycTierStatus()
             } else {
-                status.toUiState()
+                Single.just(KycTiers.default())
             }
         }
-    )
 
-    fun getSettingsKycState2Tier(): Single<Kyc2TierState> = Single.zip(
-        shouldDisplayKyc(),
-        getKyc2TierStatus(),
-        BiFunction { shouldDisplay, status ->
-            if (!shouldDisplay) {
-                Kyc2TierState.Hidden
-            } else {
-                status
-            }
-        }
-    )
-
-    fun shouldDisplayKyc(): Single<Boolean> = Single.zip(
-        isInKycRegion(),
-        hasAccount(),
-        BiFunction { allowedRegion, hasAccount -> allowedRegion || hasAccount }
-    )
+    fun shouldDisplayKyc(): Single<Boolean> = Singles.zip(
+        isInKycRegion(), hasAccount()) { allowedRegion, hasAccount -> allowedRegion || hasAccount }
 
     @Deprecated("Use NabuUserSync")
     fun syncPhoneNumberWithNabu(): Completable = nabuDataManager.requestJwt()
@@ -85,11 +67,10 @@ class KycStatusHelper(
         .doOnError { Timber.e(it) }
         .onErrorReturn { KycState.None }
 
-    fun getKyc2TierStatus(): Single<Kyc2TierState> =
+    fun getKycTierStatus(): Single<KycTiers> =
         tierService.tiers()
-            .map { it.combinedState }
+            .onErrorReturn { KycTiers.default() }
             .doOnError { Timber.e(it) }
-            .onErrorReturn { Kyc2TierState.Hidden }
 
     fun getUserState(): Single<UserState> =
         fetchOfflineToken
@@ -122,22 +103,4 @@ class KycStatusHelper(
                     .map { it.code }
                     .contains(countryCode)
             }
-}
-
-private fun KycState.toUiState(): SettingsKycState = when (this) {
-    KycState.None -> SettingsKycState.Unverified
-    KycState.Pending -> SettingsKycState.InProgress
-    KycState.UnderReview -> SettingsKycState.UnderReview
-    KycState.Rejected -> SettingsKycState.Failed
-    KycState.Expired -> SettingsKycState.Failed
-    KycState.Verified -> SettingsKycState.Verified
-}
-
-enum class SettingsKycState {
-    Unverified,
-    Verified,
-    InProgress,
-    UnderReview,
-    Failed,
-    Hidden
 }

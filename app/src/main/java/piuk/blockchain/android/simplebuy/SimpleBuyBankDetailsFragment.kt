@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.BankDetailsViewed
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.bankFieldName
@@ -24,7 +25,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 class SimpleBuyBankDetailsFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen,
     CopyFieldListener {
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
 
     override fun onCreateView(

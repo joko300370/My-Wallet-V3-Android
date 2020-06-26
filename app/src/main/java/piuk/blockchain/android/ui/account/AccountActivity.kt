@@ -18,6 +18,7 @@ import android.view.MotionEvent
 import android.widget.CheckBox
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.dialog.MaterialProgressDialog
@@ -65,6 +66,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
 
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
+    private val accountPresenter: AccountPresenter by scopedInject()
 
     private var transferFundsMenuItem: MenuItem? = null
     private val accountsAdapter: AccountAdapter by unsafeLazy {
@@ -433,7 +435,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         dismissProgressDialog()
     }
 
-    override fun createPresenter() = get<AccountPresenter>()
+    override fun createPresenter() = accountPresenter
 
     override fun getView() = this
 

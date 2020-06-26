@@ -29,14 +29,14 @@ private fun CreateAccountOperationResponse.mapCreate(
     horizonProxy: HorizonProxy
 ): XlmTransaction {
     val transactionResponse = horizonProxy.getTransaction(transactionHash)
-    val fee = CryptoValue.lumensFromStroop(transactionResponse.feePaid.toBigInteger())
+    val fee = CryptoValue.lumensFromStroop(transactionResponse.feeCharged.toBigInteger())
     return XlmTransaction(
         timeStamp = createdAt,
-        value = deltaValueForAccount(usersAccountId, funder, startingBalance),
+        value = deltaValueForAccount(usersAccountId, KeyPair.fromAccountId(funder), startingBalance),
         fee = fee,
         hash = transactionHash,
-        to = account.toHorizonKeyPair().neuter(),
-        from = funder.toHorizonKeyPair().neuter()
+        to = KeyPair.fromAccountId(account).toHorizonKeyPair().neuter(),
+        from = KeyPair.fromAccountId(funder).toHorizonKeyPair().neuter()
     )
 }
 
@@ -45,14 +45,14 @@ private fun PaymentOperationResponse.mapPayment(
     horizonProxy: HorizonProxy
 ): XlmTransaction {
     val transactionResponse = horizonProxy.getTransaction(transactionHash)
-    val fee = CryptoValue.lumensFromStroop(transactionResponse.feePaid.toBigInteger())
+    val fee = CryptoValue.lumensFromStroop(transactionResponse.feeCharged.toBigInteger())
     return XlmTransaction(
         timeStamp = createdAt,
-        value = deltaValueForAccount(usersAccountId, from, amount),
+        value = deltaValueForAccount(usersAccountId, KeyPair.fromAccountId(from), amount),
         fee = fee,
         hash = transactionHash,
-        to = to.toHorizonKeyPair().neuter(),
-        from = from.toHorizonKeyPair().neuter()
+        to = KeyPair.fromAccountId(to).toHorizonKeyPair().neuter(),
+        from = KeyPair.fromAccountId(from).toHorizonKeyPair().neuter()
     )
 }
 

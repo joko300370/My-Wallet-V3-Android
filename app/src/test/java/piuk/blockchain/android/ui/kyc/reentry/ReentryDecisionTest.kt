@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.kyc.reentry
 import com.blockchain.swap.nabu.models.nabu.Address
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.Tiers
+import com.blockchain.swap.nabu.models.nabu.TierLevels
 import com.blockchain.swap.nabu.models.nabu.UserState
 import org.amshove.kluent.`should be`
 import org.junit.Test
@@ -175,7 +175,7 @@ class ReentryDecisionTest {
     ) =
         emptyNabuUser().copy(
             kycState = KycState.None,
-            tiers = Tiers(
+            tiers = TierLevels(
                 current = tier,
                 next = next,
                 selected = selected

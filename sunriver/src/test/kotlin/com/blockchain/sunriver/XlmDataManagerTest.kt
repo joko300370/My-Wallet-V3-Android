@@ -83,8 +83,8 @@ class XlmDataManagerTest {
         givenXlmDataManager(
             givenBalances("ANY" to 456.lumens())
         )
-        .getBalance(AccountReference.Xlm("", "ANY"))
-        .testSingle() `should equal` 456.lumens()
+            .getBalance(AccountReference.Xlm("", "ANY"))
+            .testSingle() `should equal` 456.lumens()
     }
 
     @Test
@@ -447,7 +447,7 @@ class XlmDataManagerTransactionListTest {
     fun `get transaction fee`() {
         givenXlmDataManager(
             givenTransaction("HASH" to mock {
-                on { feePaid } `it returns` 99L
+                on { feeCharged } `it returns` 99L
             })
         ).getTransactionFee("HASH")
             .testSingle() `should equal` 99.stroops()
@@ -458,7 +458,7 @@ class XlmDataManagerTransactionListTest {
         givenXlmDataManager(
             givenTransaction("HASH_X" to
                     mock {
-                        on { feePaid } `it returns` 4 * 125
+                        on { feeCharged } `it returns` 4 * 125
                         on { operationCount } `it returns` 4
                     }
             )
@@ -492,18 +492,18 @@ class XlmDataManagerTransactionListTest {
             on { startingBalance } `it returns` "10000"
             on { transactionHash } `it returns` "transactionHash"
             on { account } `it returns`
-                    KeyPair.fromAccountId("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
+                    "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
             on { funder } `it returns`
-                    KeyPair.fromAccountId("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR")
+                    "GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR"
         }
         val mockPayment: PaymentOperationResponse = mock {
             on { createdAt } `it returns` "createdAt"
             on { amount } `it returns` "100"
             on { transactionHash } `it returns` "transactionHash"
             on { to } `it returns`
-                    KeyPair.fromAccountId("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT")
+                    "GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"
             on { from } `it returns`
-                    KeyPair.fromAccountId("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2")
+                    "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"
             on { type } `it returns` "payment"
         }
 
@@ -751,7 +751,7 @@ class XlmDataManagerSendTransactionTest {
     fun `can send from a specific account`() {
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toInt()
+            on { fee } `it returns` 101.stroops().amount.toLong()
         }
         val horizonProxy: HorizonProxy = mock {
             on {
@@ -827,7 +827,7 @@ class XlmDataManagerSendTransactionTest {
     fun `can dry run send from a specific account`() {
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 1000.stroops().amount.toInt()
+            on { fee } `it returns` 1000.stroops().amount.toLong()
         }
         val horizonProxy: HorizonProxy = mock {
             on {
@@ -959,7 +959,7 @@ class XlmDataManagerSendWithMemoTest {
         val memoText = org.stellar.sdk.Memo.text("Hi, this is the memo to add")
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toInt()
+            on { fee } `it returns` 101.stroops().amount.toLong()
             on { memo } `it returns` memoText
         }
         val horizonProxy: HorizonProxy = mock {
@@ -1006,7 +1006,7 @@ class XlmDataManagerSendWithMemoTest {
         val memoId = org.stellar.sdk.Memo.id(1234L)
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toInt()
+            on { fee } `it returns` 101.stroops().amount.toLong()
             on { memo } `it returns` memoId
         }
         val horizonProxy: HorizonProxy = mock {
@@ -1090,7 +1090,7 @@ private fun givenTransactions(
     vararg transactions: Pair<String, List<OperationResponse>>
 ): HorizonProxy {
     val horizonProxy: HorizonProxy = mock()
-    val mockTx: TransactionResponse = mock { on { feePaid } `it returns` fee }
+    val mockTx: TransactionResponse = mock { on { feeCharged } `it returns` fee }
     transactions
         .forEach { pair ->
             whenever(horizonProxy.getTransactionList(pair.first)) `it returns` pair.second

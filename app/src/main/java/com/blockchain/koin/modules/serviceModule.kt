@@ -1,5 +1,8 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.apiRetrofit
+import com.blockchain.koin.everypayRetrofit
+import com.blockchain.koin.explorerRetrofit
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.api.FeeApi
@@ -9,21 +12,22 @@ import info.blockchain.wallet.api.WalletExplorerEndpoints
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.settings.SettingsManager
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth
 import piuk.blockchain.android.data.fingerprint.FingerprintAuthImpl
 import piuk.blockchain.android.everypay.service.EveryPayService
 import retrofit2.Retrofit
 
-val serviceModule = applicationContext {
+val serviceModule = module {
 
-    bean { SettingsManager(get()) }
+    single { SettingsManager(get()) }
 
-    bean { get<Retrofit>("explorer").create(WalletExplorerEndpoints::class.java) }
+    single { get<Retrofit>(explorerRetrofit).create(WalletExplorerEndpoints::class.java) }
 
-    bean { get<Retrofit>("api").create(FeeEndpoints::class.java) }
+    single { get<Retrofit>(apiRetrofit).create(FeeEndpoints::class.java) }
 
-    bean { get<Retrofit>("everypay").create(EveryPayService::class.java) }
+    single { get<Retrofit>(everypayRetrofit).create(EveryPayService::class.java) }
 
     factory { WalletApi(get(), get()) }
 
@@ -35,10 +39,10 @@ val serviceModule = applicationContext {
         object : ApiCode {
             override val apiCode: String
                 get() = BlockchainFramework.getApiCode()
-        } as ApiCode
-    }
+        }
+    }.bind(ApiCode::class)
 
-    factory { FingerprintAuthImpl() as FingerprintAuth }
+    factory { FingerprintAuthImpl() }.bind(FingerprintAuth::class)
 
     factory { EthAccountApi(get()) }
 }

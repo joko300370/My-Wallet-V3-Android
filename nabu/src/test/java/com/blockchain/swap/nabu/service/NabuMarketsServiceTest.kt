@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.service
 
 import com.blockchain.koin.nabuModule
+import com.blockchain.koin.payloadScope
 import com.blockchain.morph.CoinPair
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.api.CryptoAndFiat
@@ -32,10 +33,9 @@ import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.standalone.StandAloneContext.startKoin
-import org.koin.standalone.get
-import org.koin.standalone.inject
+import org.koin.core.context.startKoin
 import org.koin.test.AutoCloseKoinTest
+import org.koin.test.get
 import java.math.BigDecimal
 
 class NabuMarketsServiceTest : AutoCloseKoinTest() {
@@ -50,17 +50,19 @@ class NabuMarketsServiceTest : AutoCloseKoinTest() {
         ioTrampoline()
     }
 
-    private val subject: NabuMarketsService by inject()
+    private lateinit var subject: NabuMarketsService
 
     @Before
-    fun startKoin() {
-        startKoin(
-            listOf(
+    fun setUp() {
+        startKoin {
+            modules(listOf(
                 apiModule,
                 nabuModule,
                 apiServerTestModule(server)
-            )
-        )
+            ))
+        }
+
+        subject = payloadScope.get()
     }
 
     @Test

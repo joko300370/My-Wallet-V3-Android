@@ -48,26 +48,11 @@ class WalletAccountHelper(
                 CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
                 CryptoCurrency.PAX -> getPaxAccount()
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+                CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
             }
         } catch (t: Throwable) {
             crashLogger.logException(t)
             emptyList()
-        }
-
-    /**
-     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
-     * objects, eg from importing accounts.
-     *
-     * @return Returns a list of [ItemAccount] objects
-     */
-    fun accountItems(cryptoCurrency: CryptoCurrency): Single<List<ItemAccount>> =
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> Single.just(allBtcAccountItems())
-            CryptoCurrency.BCH -> Single.just(allBchAccountItems())
-            CryptoCurrency.ETHER -> Single.just(getEthAccount())
-            CryptoCurrency.XLM -> getXlmAccount()
-            CryptoCurrency.PAX -> Single.just(getPaxAccount())
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     private fun allBtcAccountItems() = getHdAccounts() + getLegacyBtcAddresses()
@@ -205,6 +190,7 @@ class WalletAccountHelper(
             CryptoCurrency.XLM -> throw IllegalArgumentException("XLM is not supported here")
             CryptoCurrency.PAX -> getDefaultPaxAccount()
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
         }
 
     fun getEthAccount() =
@@ -322,102 +308,6 @@ class WalletAccountHelper(
                 )
             }
 
-    /**
-     * Returns a list of [ItemAccount] objects containing both HD accounts and [LegacyAddress]
-     * objects, eg from importing accounts.
-     */
-    fun getAccountItemsForOverview(cryptoCurrency: CryptoCurrency): Single<List<ItemAccount>> =
-        when (cryptoCurrency) {
-            CryptoCurrency.BTC -> Single.just(getBtcOverviewList())
-            CryptoCurrency.BCH -> Single.just(getBchOverviewList())
-            CryptoCurrency.ETHER -> Single.just(getEthOverviewList())
-            CryptoCurrency.XLM -> getDefaultXlmAccountItem().map { listOf(it) }
-            CryptoCurrency.PAX -> Single.just(getPaxOverviewList())
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        }
-
-    private fun getEthOverviewList(): List<ItemAccount> = getEthAccount()
-
-    private fun getPaxOverviewList(): List<ItemAccount> = getPaxAccount()
-
-    private fun getBchOverviewList(): MutableList<ItemAccount> {
-        return mutableListOf<ItemAccount>().apply {
-
-            val legacyAddresses = getLegacyBchAddresses()
-            val accounts = getHdBchAccounts()
-
-            // Create "All Accounts" if necessary
-            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
-                add(getBchWalletAccountItem())
-            }
-            addAll(accounts)
-
-            // Create consolidated "Imported Addresses"
-            if (legacyAddresses.isNotEmpty()) {
-                add(getBchImportedAddressesAccountItem())
-            }
-        }
-    }
-
-    private fun getBtcOverviewList(): List<ItemAccount> {
-        return mutableListOf<ItemAccount>().apply {
-
-            val legacyAddresses = getLegacyBtcAddresses()
-            val accounts = getHdAccounts()
-
-            // Create "All Accounts" if necessary
-            if (accounts.size > 1 || legacyAddresses.isNotEmpty()) {
-                add(getBtcWalletAccountItem())
-            }
-            addAll(accounts)
-
-            // Create consolidated "Imported Addresses"
-            if (legacyAddresses.isNotEmpty()) {
-                add(getBtcImportedAddressesAccountItem())
-            }
-        }.toList()
-    }
-
-    private fun getBtcWalletAccountItem(): ItemAccount {
-        val bigIntBalance = payloadManager.walletBalance
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.all_accounts),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BTC, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
-        )
-    }
-
-    private fun getBchWalletAccountItem(): ItemAccount {
-        val bigIntBalance = bchDataManager.getWalletBalance()
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.bch_all_accounts),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BCH, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_ACCOUNTS_AND_LEGACY
-        )
-    }
-
-    private fun getBtcImportedAddressesAccountItem(): ItemAccount {
-        val bigIntBalance = payloadManager.importedAddressesBalance
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.imported_addresses),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BTC, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_LEGACY
-        )
-    }
-
-    private fun getBchImportedAddressesAccountItem(): ItemAccount {
-        val bigIntBalance = bchDataManager.getImportedAddressBalance()
-
-        return ItemAccount(
-            label = stringUtils.getString(R.string.bch_imported_addresses),
-            balance = CryptoValue.fromMinor(CryptoCurrency.BCH, bigIntBalance),
-            type = ItemAccount.TYPE.ALL_LEGACY
-        )
-    }
-
     // /////////////////////////////////////////////////////////////////////////
     // Extension functions
     // /////////////////////////////////////////////////////////////////////////
@@ -432,5 +322,6 @@ class WalletAccountHelper(
             CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
             CryptoCurrency.PAX -> getEthAccount().size
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALG) NOT IMPLEMENTED")
         } > 1
 }

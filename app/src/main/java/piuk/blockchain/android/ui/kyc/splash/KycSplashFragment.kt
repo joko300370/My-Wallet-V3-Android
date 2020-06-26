@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.NavDirections
 import com.blockchain.activities.StartOnboarding
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
@@ -37,9 +38,9 @@ import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_terms_an
 
 class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), KycSplashView {
 
-    private val presenter: KycSplashPresenter by inject()
+    private val presenter: KycSplashPresenter by scopedInject()
 
-    private val settingsDataManager: SettingsDataManager by inject()
+    private val settingsDataManager: SettingsDataManager by scopedInject()
 
     private val onBoardingStarter: StartOnboarding by inject()
 

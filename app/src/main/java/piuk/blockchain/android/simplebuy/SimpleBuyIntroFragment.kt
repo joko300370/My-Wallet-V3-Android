@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -28,11 +29,11 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
 
-    private val nabuToken: NabuToken by inject()
+    private val nabuToken: NabuToken by scopedInject()
     private val simpleBuyPrefs: SimpleBuyPrefs by inject()
     private val analytics: Analytics by inject()
     private val currencyPrefs: CurrencyPrefs by inject()
-    private val settingsDataManager: SettingsDataManager by inject()
+    private val settingsDataManager: SettingsDataManager by scopedInject()
 
     private val compositeDisposable = CompositeDisposable()
 

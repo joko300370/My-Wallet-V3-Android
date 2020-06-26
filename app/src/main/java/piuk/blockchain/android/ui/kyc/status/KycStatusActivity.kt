@@ -7,10 +7,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import com.blockchain.activities.StartSwap
 import com.blockchain.extensions.px
-import com.blockchain.swap.nabu.models.nabu.KycState
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.swap.nabu.models.nabu.KycTierState
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -34,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_kyc_status.toolbar_kyc as toolBar
 
 class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView {
 
-    private val presenter: KycStatusPresenter by inject()
+    private val presenter: KycStatusPresenter by scopedInject()
     private val swapStarter: StartSwap by inject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
     private var progressDialog: MaterialProgressDialog? = null
@@ -61,13 +62,13 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         finish()
     }
 
-    override fun renderUi(kycState: KycState) {
+    override fun renderUi(kycState: KycTierState) {
         when (kycState) {
-            KycState.Pending -> onPending()
-            KycState.UnderReview -> onInReview()
-            KycState.Expired, KycState.Rejected -> onFailed()
-            KycState.Verified -> onVerified()
-            KycState.None -> throw IllegalStateException(
+            KycTierState.Pending -> onPending()
+            KycTierState.UnderReview -> onInReview()
+            KycTierState.Expired, KycTierState.Rejected -> onFailed()
+            KycTierState.Verified -> onVerified()
+            KycTierState.None -> throw IllegalStateException(
                 "Users who haven't started KYC should not be able to access this page"
             )
         }

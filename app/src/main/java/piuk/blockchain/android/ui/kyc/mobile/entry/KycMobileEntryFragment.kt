@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
 import piuk.blockchain.android.ui.kyc.mobile.entry.models.PhoneDisplayModel
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
@@ -20,7 +21,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -40,7 +40,7 @@ import kotlinx.android.synthetic.main.fragment_kyc_add_phone_number.input_layout
 class KycMobileEntryFragment : BaseFragment<KycMobileEntryView, KycMobileEntryPresenter>(),
     KycMobileEntryView {
 
-    private val presenter: KycMobileEntryPresenter by inject()
+    private val presenter: KycMobileEntryPresenter by scopedInject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
     private val countryCode by unsafeLazy {

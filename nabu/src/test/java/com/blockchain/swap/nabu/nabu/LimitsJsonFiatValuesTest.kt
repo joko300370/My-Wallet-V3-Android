@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.nabu
 
+import com.blockchain.swap.nabu.models.nabu.Limits
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
 import com.blockchain.testutils.gbp
 import com.blockchain.testutils.usd
@@ -11,37 +12,37 @@ class LimitsJsonFiatValuesTest {
 
     @Test
     fun `null daily fiat`() {
-        LimitsJson(
+        Limits(LimitsJson(
             currency = "USD",
             daily = null,
             annual = 100.toBigDecimal()
-        ).dailyFiat `should be` null
+        )).dailyFiat `should be` null
     }
 
     @Test
     fun `null annual fiat`() {
-        LimitsJson(
+        Limits(LimitsJson(
             currency = "USD",
             daily = 100.toBigDecimal(),
             annual = null
-        ).annualFiat `should be` null
+        )).annualFiat `should be` null
     }
 
     @Test
     fun `can get daily fiat`() {
-        LimitsJson(
+        Limits(LimitsJson(
             currency = "USD",
             daily = 100.toBigDecimal(),
             annual = null
-        ).dailyFiat `should equal` 100.usd()
+        )).dailyFiat `should equal` 100.usd()
     }
 
     @Test
     fun `can get annual fiat`() {
-        LimitsJson(
+        Limits(LimitsJson(
             currency = "GBP",
             daily = 100.toBigDecimal(),
             annual = 50.12.toBigDecimal()
-        ).annualFiat `should equal` 50.12.gbp()
+        )).annualFiat `should equal` 50.12.gbp()
     }
 }

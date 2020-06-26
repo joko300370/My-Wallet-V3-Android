@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
@@ -25,7 +25,7 @@ class KycInvalidCountryFragment :
     override val displayModel by unsafeLazy {
         KycInvalidCountryFragmentArgs.fromBundle(arguments ?: Bundle()).countryDisplayModel
     }
-    private val presenter: KycInvalidCountryPresenter by inject()
+    private val presenter: KycInvalidCountryPresenter by scopedInject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private var progressDialog: MaterialProgressDialog? = null
 

@@ -50,7 +50,7 @@ class ConfirmPaymentPresenter : BasePresenter<ConfirmPaymentView>() {
                 paymentDetails.fiatTotal
             )
         } else {
-            view.setFiatTotalOnly(paymentDetails.fiatSymbol + paymentDetails.fiatTotal)
+            view.setFiatTotalOnly(paymentDetails.fiatTotal)
         }
 
         if (!paymentDetails.warningText.isEmpty()) {

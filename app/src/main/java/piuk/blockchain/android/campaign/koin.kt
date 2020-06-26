@@ -1,14 +1,17 @@
 package piuk.blockchain.android.campaign
 
-import org.koin.dsl.module.applicationContext
+import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.sunriver
 
-val campaignModule = applicationContext {
+import org.koin.dsl.module
 
-    context("Payload") {
+val campaignModule = module {
+
+    scope(payloadScopeQualifier) {
 
         factory {
             SunriverCampaignRegistration(
-                featureFlag = get("sunriver"),
+                featureFlag = get(sunriver),
                 nabuDataManager = get(),
                 nabuToken = get(),
                 kycStatusHelper = get(),

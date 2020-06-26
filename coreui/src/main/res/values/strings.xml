@@ -21,6 +21,7 @@
     <string name="lumens" translatable="false">Stellar</string>
     <string name="usd_pax_1" translatable="true">USD Digital</string>
     <string name="stacks_1" translatable="false">Stacks</string>
+    <string name="algorand" translatable="false">Algorand</string>
 
     <!-- Country Selection Dialog -->
     <string name="search_country">Search Country</string>

@@ -4,6 +4,7 @@ import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
+import info.blockchain.balance.CryptoValue
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 
@@ -11,7 +12,7 @@ class PaymentSentEventTest {
 
     @Test
     fun `event name`() {
-        PaymentSentEvent().eventName `should equal` "Payment Sent"
+        paymentSentEvent(true, CryptoValue.ZeroBtc).identifier `should equal` "Payment Sent"
     }
 
     @Test
@@ -33,13 +34,9 @@ class PaymentSentEventTest {
             1_000.bitcoin() to "1000 BTC",
             1_000_000.bitcoin() to "1000 BTC"
         ).forEach { (value, expected) ->
-            PaymentSentEvent()
-                .putAmountForRange(value)
-                .buildToMap()
-                .also {
-                    it["Amount"] `should equal` expected
-                    it["Currency"] `should equal` "BTC"
-                }
+            val event = paymentSentEvent(true, value)
+            event.params["Amount"] `should equal` expected
+            event.params["Currency"] `should equal` "BTC"
         }
     }
 
@@ -62,13 +59,9 @@ class PaymentSentEventTest {
             1_000.bitcoinCash() to "1000 BCH",
             1_000_000.bitcoinCash() to "1000 BCH"
         ).forEach { (value, expected) ->
-            PaymentSentEvent()
-                .putAmountForRange(value)
-                .buildToMap()
-                .also {
-                    it["Amount"] `should equal` expected
-                    it["Currency"] `should equal` "BCH"
-                }
+            val event = paymentSentEvent(true, value)
+            event.params["Amount"] `should equal` expected
+            event.params["Currency"] `should equal` "BCH"
         }
     }
 
@@ -91,13 +84,9 @@ class PaymentSentEventTest {
             1_000.ether() to "1000 ETH",
             1_000_000.ether() to "1000 ETH"
         ).forEach { (value, expected) ->
-            PaymentSentEvent()
-                .putAmountForRange(value)
-                .buildToMap()
-                .also {
-                    it["Amount"] `should equal` expected
-                    it["Currency"] `should equal` "ETH"
-                }
+            val event = paymentSentEvent(true, value)
+            event.params["Amount"] `should equal` expected
+            event.params["Currency"] `should equal` "ETH"
         }
     }
 
@@ -120,13 +109,9 @@ class PaymentSentEventTest {
             1_000.lumens() to "1000 XLM",
             1_000_000.lumens() to "1000 XLM"
         ).forEach { (value, expected) ->
-            PaymentSentEvent()
-                .putAmountForRange(value)
-                .buildToMap()
-                .also {
-                    it["Amount"] `should equal` expected
-                    it["Currency"] `should equal` "XLM"
-                }
+            val event = paymentSentEvent(true, value)
+            event.params["Amount"] `should equal` expected
+            event.params["Currency"] `should equal` "XLM"
         }
     }
 }

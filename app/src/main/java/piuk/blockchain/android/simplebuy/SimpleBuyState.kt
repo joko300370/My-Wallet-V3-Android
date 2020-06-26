@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -148,14 +149,19 @@ data class SimpleBuyState(
 enum class KycState {
     /** Docs submitted for Gold and state is pending. Or kyc backend query returned an error  */
     PENDING,
+
     /** Docs processed, failed kyc. Not error state. */
     FAILED,
+
     /** Docs processed under manual review */
     IN_REVIEW,
+
     /** Docs submitted, no result know from server yet */
     UNDECIDED,
+
     /** Docs uploaded, processed and kyc passed. Eligible for simple buy */
     VERIFIED_AND_ELIGIBLE,
+
     /** Docs uploaded, processed and kyc passed. User is NOT eligible for simple buy. */
     VERIFIED_BUT_NOT_ELIGIBLE;
 
@@ -192,7 +198,8 @@ data class PaymentOptions(
 data class SelectedPaymentMethod(
     val id: String,
     val partner: Partner? = null,
-    val label: String? = ""
+    val label: String? = "",
+    val paymentMethodType: PaymentMethodType
 ) {
-    fun isBank() = id == PaymentMethod.BANK_PAYMENT_ID
+    fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
 }

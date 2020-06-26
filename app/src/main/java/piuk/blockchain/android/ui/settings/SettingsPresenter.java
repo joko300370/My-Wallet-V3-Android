@@ -14,7 +14,8 @@ import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState;
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
+import com.blockchain.swap.nabu.models.nabu.KycTiersKt;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
 
@@ -139,8 +140,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void updateCards() {
         getCompositeDisposable().add(
-                Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycState2Tier(),
-                        (enabled, kycState) -> enabled && kycState == Kyc2TierState.Tier2Approved)
+                Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
+                        (enabled, kycState) -> enabled && kycState.isApprovedFor(KycTierLevel.GOLD))
                         .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
                         .flatMap(enabled -> {
                             if (enabled) {
@@ -157,6 +158,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                 }).subscribe(this::onCardsUpdated));
     }
 
+
     private void showPitItem(Boolean pitEnabled) {
         getView().isPitEnabled(pitEnabled);
     }
@@ -172,7 +174,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void loadKyc2TierState() {
         getCompositeDisposable().add(
-                kycStatusHelper.getSettingsKycState2Tier()
+                kycStatusHelper.getSettingsKycStateTier()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 settingsKycState -> getView().setKycState(settingsKycState),

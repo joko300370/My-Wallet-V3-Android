@@ -88,6 +88,13 @@ class CustodialBalanceClicked(cryptoCurrency: CryptoCurrency) : AnalyticsEvent {
     )
 }
 
+class PaymentMethodSelected(paymentMethod: String) : AnalyticsEvent {
+    override val event: String = "sb_payment_method_selected"
+    override val params: Map<String, String> = mapOf(
+        "selection" to paymentMethod
+    )
+}
+
 class CustodialBalanceSendClicked(cryptoCurrency: CryptoCurrency) : AnalyticsEvent {
     override val event: String = "sb_trading_wallet_send"
     override val params: Map<String, String> = mapOf(

@@ -10,7 +10,6 @@ import org.amshove.kluent.`should throw`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import org.stellar.sdk.KeyPair
 import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.ManageDataOperationResponse
@@ -37,8 +36,8 @@ class HorizonOperationMappingTest {
         val myAccount = "GDCERC7BR5N6NFK5B74XTTTA5OLC3YPWODQ5CHKRCRU6IVXFYP364JG7"
         val otherAccount = "GBPF72LVHGENTAC6JCBDU6KG6GNTQIHTTIYZGURQQL3CWXEBVNSUVFPL"
         mapOperationResponse(mock<PaymentOperationResponse> {
-            on { from } `it returns` KeyPair.fromAccountId(otherAccount)
-            on { to } `it returns` KeyPair.fromAccountId(myAccount)
+            on { from } `it returns`otherAccount
+            on { to } `it returns` myAccount
             on { transactionHash } `it returns` "ABCD"
             on { createdAt } `it returns` "TIME"
             on { amount } `it returns` 50.lumens().toStringWithoutSymbol()
@@ -58,8 +57,8 @@ class HorizonOperationMappingTest {
         val myAccount = "GDCERC7BR5N6NFK5B74XTTTA5OLC3YPWODQ5CHKRCRU6IVXFYP364JG7"
         val otherAccount = "GBPF72LVHGENTAC6JCBDU6KG6GNTQIHTTIYZGURQQL3CWXEBVNSUVFPL"
         mapOperationResponse(mock<PaymentOperationResponse> {
-            on { from } `it returns` KeyPair.fromAccountId(myAccount)
-            on { to } `it returns` KeyPair.fromAccountId(otherAccount)
+            on { from } `it returns`myAccount
+            on { to } `it returns`otherAccount
             on { transactionHash } `it returns` "ABCD"
             on { createdAt } `it returns` "TIME"
             on { amount } `it returns` 50.lumens().toStringWithoutSymbol()
@@ -79,8 +78,8 @@ class HorizonOperationMappingTest {
         val myAccount = "GDCERC7BR5N6NFK5B74XTTTA5OLC3YPWODQ5CHKRCRU6IVXFYP364JG7"
         val otherAccount = "GBPF72LVHGENTAC6JCBDU6KG6GNTQIHTTIYZGURQQL3CWXEBVNSUVFPL"
         mapOperationResponse(mock<CreateAccountOperationResponse> {
-            on { funder } `it returns` KeyPair.fromAccountId(otherAccount)
-            on { account } `it returns` KeyPair.fromAccountId(myAccount)
+            on { funder } `it returns` otherAccount
+            on { account } `it returns` myAccount
             on { transactionHash } `it returns` "ABCD"
             on { createdAt } `it returns` "TIME"
             on { startingBalance } `it returns` 100.lumens().toStringWithoutSymbol()
@@ -100,8 +99,8 @@ class HorizonOperationMappingTest {
         val myAccount = "GDCERC7BR5N6NFK5B74XTTTA5OLC3YPWODQ5CHKRCRU6IVXFYP364JG7"
         val otherAccount = "GBPF72LVHGENTAC6JCBDU6KG6GNTQIHTTIYZGURQQL3CWXEBVNSUVFPL"
         mapOperationResponse(mock<CreateAccountOperationResponse> {
-            on { funder } `it returns` KeyPair.fromAccountId(myAccount)
-            on { account } `it returns` KeyPair.fromAccountId(otherAccount)
+            on { funder } `it returns` myAccount
+            on { account } `it returns` otherAccount
             on { transactionHash } `it returns` "ABCD"
             on { createdAt } `it returns` "TIME"
             on { startingBalance } `it returns` 100.lumens().toStringWithoutSymbol()
@@ -118,7 +117,7 @@ class HorizonOperationMappingTest {
 
     private fun givenHorizonProxy(fee: Long): HorizonProxy {
         val mockTx: TransactionResponse = mock {
-            on { feePaid } `it returns` fee
+            on { feeCharged } `it returns` fee
         }
         return mock {
             on { getTransaction(any()) } `it returns` mockTx

@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_simple_buy_checkout.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -29,7 +29,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
 
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
     private var lastState: SimpleBuyState? = null
     private val checkoutAdapter = CheckoutAdapter()
 
@@ -45,10 +45,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null && !isForPendingPayment) {
-            model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
-        }
-
         recycler.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = checkoutAdapter
@@ -160,11 +156,11 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             if (state.selectedPaymentMethod?.isBank() == true) {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
                     "${state.quote?.rate?.toStringWithSymbol()} / " +
-                        "${state.selectedCryptoCurrency?.displayTicker}")
+                            "${state.selectedCryptoCurrency?.displayTicker}")
             } else {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
                     "${state.orderExchangePrice?.toStringWithSymbol()} / " +
-                        "${state.selectedCryptoCurrency?.displayTicker}")
+                            "${state.selectedCryptoCurrency?.displayTicker}")
             },
 
             CheckoutItem(getString(R.string.fees),
@@ -222,8 +218,8 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod): String =
-        when (selectedPaymentMethod.id) {
-            PaymentMethod.BANK_PAYMENT_ID -> getString(R.string.checkout_bank_transfer_label)
+        when (selectedPaymentMethod.paymentMethodType) {
+            PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
             else -> selectedPaymentMethod.label ?: ""
         }
 

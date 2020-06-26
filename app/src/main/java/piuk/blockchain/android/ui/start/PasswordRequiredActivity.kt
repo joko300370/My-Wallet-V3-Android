@@ -8,10 +8,10 @@ import android.text.InputType
 import android.text.method.DigitsKeyListener
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.AppCompatEditText
+import com.blockchain.koin.scopedInject
 import info.blockchain.wallet.api.data.Settings
 import kotlinx.android.synthetic.main.activity_password_required.*
 import org.json.JSONObject
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
@@ -23,7 +23,7 @@ import piuk.blockchain.androidcoreui.utils.ViewUtils
 class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequiredPresenter>(),
     PasswordRequiredView {
 
-    override val presenter: PasswordRequiredPresenter by inject()
+    override val presenter: PasswordRequiredPresenter by scopedInject()
     override val view: PasswordRequiredView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,11 +64,11 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
     override fun showForgetWalletWarning(onForgetConfirmed: () -> Unit) {
         showAlert(
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.warning)
-            .setMessage(R.string.forget_wallet_warning)
-            .setPositiveButton(R.string.forget_wallet) { _, _ -> onForgetConfirmed() }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
-            .create()
+                .setTitle(R.string.warning)
+                .setMessage(R.string.forget_wallet_warning)
+                .setPositiveButton(R.string.forget_wallet) { _, _ -> onForgetConfirmed() }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .create()
         )
     }
 
@@ -111,7 +111,7 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
-            )
+        )
     }
 
     override fun onDestroy() {

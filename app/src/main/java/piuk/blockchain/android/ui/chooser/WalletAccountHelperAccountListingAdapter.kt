@@ -5,10 +5,10 @@ import com.blockchain.ui.chooser.AccountListing
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.formatDisplayBalance
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class WalletAccountHelperAccountListingAdapter(
@@ -25,6 +25,7 @@ class WalletAccountHelperAccountListingAdapter(
             CryptoCurrency.XLM -> walletAccountHelper.getXlmAccount()
             CryptoCurrency.PAX -> Single.just(walletAccountHelper.getEthAccount())
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
         }.map {
             it.map { account -> mapAccountSummary(account) }
         }
@@ -37,7 +38,8 @@ class WalletAccountHelperAccountListingAdapter(
                 CryptoCurrency.ETHER,
                 CryptoCurrency.XLM,
                 CryptoCurrency.PAX,
-                CryptoCurrency.STX -> emptyList()
+                CryptoCurrency.STX,
+                CryptoCurrency.ALGO -> emptyList()
             }.map(this::mapLegacyAddress)
         )
 

@@ -1,11 +1,12 @@
 package piuk.blockchain.android.ui.start
 
-import org.koin.dsl.module.applicationContext
+import com.blockchain.koin.payloadScopeQualifier
+import org.koin.dsl.module
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
-val startupUiModule = applicationContext {
+val startupUiModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
         factory {
             LandingPresenter(
                 environmentSettings = get(),

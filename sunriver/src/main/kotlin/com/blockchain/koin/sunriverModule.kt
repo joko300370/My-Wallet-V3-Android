@@ -10,11 +10,12 @@ import com.blockchain.sunriver.XlmSecretAccess
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.transactions.logMemoType
 import com.blockchain.transactions.updateLastTxOnSend
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
-val sunriverModule = applicationContext {
+val sunriverModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
         factory { XlmSecretAccess(get()) }
 
@@ -25,9 +26,9 @@ val sunriverModule = applicationContext {
 
         factory { HorizonProxy() }
 
-        bean { XlmMetaDataInitializer(get(), get(), get(), get()) }
+        scoped { XlmMetaDataInitializer(get(), get(), get(), get()) }
 
-        factory("XLM") {
+        factory(xlm) {
             XlmAsyncAccountListAdapter(xlmDataManager = get())
         }.bind(AccountList::class)
     }

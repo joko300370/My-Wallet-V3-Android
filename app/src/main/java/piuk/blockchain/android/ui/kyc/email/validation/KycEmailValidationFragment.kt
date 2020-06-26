@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.logEvent
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
@@ -37,7 +38,7 @@ class KycEmailValidationFragment :
     BaseMvpFragment<KycEmailValidationView, KycEmailValidationPresenter>(),
     KycEmailValidationView {
 
-    private val presenter: KycEmailValidationPresenter by inject()
+    private val presenter: KycEmailValidationPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val stringUtils: StringUtils by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)

@@ -1,5 +1,6 @@
 package com.blockchain.swap.homebrew
 
+import com.blockchain.koin.bigDecimal
 import com.blockchain.swap.koin.swapModule
 import com.blockchain.swap.nabu.service.Quote
 import com.blockchain.swap.common.exchange.service.QuoteService
@@ -23,30 +24,30 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Test
-import org.koin.dsl.module.applicationContext
-import org.koin.standalone.StandAloneContext
-import org.koin.standalone.get
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
+import org.koin.test.get
 
 class QuoteWebSocketTest : AutoCloseKoinTest() {
 
     @Before
-    fun startKoin() {
-        StandAloneContext.startKoin(
-            listOf(
+    fun setUp() {
+        startKoin {
+            modules(listOf(
                 swapModule,
                 apiModule,
-                applicationContext {
-                    bean {
+                module {
+                    single {
                         MoshiBuilderInterceptorList(
                             listOf(
-                                get("BigDecimal")
+                                get(bigDecimal)
                             )
                         )
                     }
                 }
-            )
-        )
+            ))
+        }
     }
 
     @Test
@@ -65,14 +66,14 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\"," +
-                "\"channel\":\"conversion\"," +
-                "\"params\":{" +
-                "\"fiatCurrency\":\"USD\"," +
-                "\"fix\":\"base\"," +
-                "\"pair\":\"BTC-ETH\"," +
-                "\"type\":\"conversionSpecification\"," +
-                "\"volume\":\"100.0\"}" +
-                "}"
+                    "\"channel\":\"conversion\"," +
+                    "\"params\":{" +
+                    "\"fiatCurrency\":\"USD\"," +
+                    "\"fix\":\"base\"," +
+                    "\"pair\":\"BTC-ETH\"," +
+                    "\"type\":\"conversionSpecification\"," +
+                    "\"volume\":\"100.0\"}" +
+                    "}"
         )
 
         verifyNoMoreInteractions(actualSocket)
@@ -130,35 +131,35 @@ class QuoteWebSocketTest : AutoCloseKoinTest() {
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\"," +
-                "\"channel\":\"conversion\"," +
-                "\"params\":{" +
-                "\"fiatCurrency\":\"USD\"," +
-                "\"fix\":\"base\"," +
-                "\"pair\":\"BTC-ETH\"," +
-                "\"type\":\"conversionSpecification\"," +
-                "\"volume\":\"200.0\"}" +
-                "}"
+                    "\"channel\":\"conversion\"," +
+                    "\"params\":{" +
+                    "\"fiatCurrency\":\"USD\"," +
+                    "\"fix\":\"base\"," +
+                    "\"pair\":\"BTC-ETH\"," +
+                    "\"type\":\"conversionSpecification\"," +
+                    "\"volume\":\"200.0\"}" +
+                    "}"
         )
 
         verify(actualSocket).send(
             "{\"action\":\"unsubscribe\"," +
-                "\"channel\":\"conversion\"," +
-                "\"params\":{" +
-                "\"pair\":\"BTC-ETH\"," +
-                "\"type\":\"conversionPair\"}" +
-                "}"
+                    "\"channel\":\"conversion\"," +
+                    "\"params\":{" +
+                    "\"pair\":\"BTC-ETH\"," +
+                    "\"type\":\"conversionPair\"}" +
+                    "}"
         )
 
         verify(actualSocket).send(
             "{\"action\":\"subscribe\"," +
-                "\"channel\":\"conversion\"," +
-                "\"params\":{" +
-                "\"fiatCurrency\":\"USD\"," +
-                "\"fix\":\"base\"," +
-                "\"pair\":\"BTC-ETH\"," +
-                "\"type\":\"conversionSpecification\"," +
-                "\"volume\":\"300.0\"}" +
-                "}"
+                    "\"channel\":\"conversion\"," +
+                    "\"params\":{" +
+                    "\"fiatCurrency\":\"USD\"," +
+                    "\"fix\":\"base\"," +
+                    "\"pair\":\"BTC-ETH\"," +
+                    "\"type\":\"conversionSpecification\"," +
+                    "\"volume\":\"300.0\"}" +
+                    "}"
         )
     }
 

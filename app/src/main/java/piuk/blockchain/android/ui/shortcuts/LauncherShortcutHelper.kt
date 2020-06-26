@@ -10,16 +10,16 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import org.koin.standalone.KoinComponent
-import org.koin.standalone.get
+import org.koin.core.KoinComponent
+import org.koin.core.get
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.receive.ReceiveQrActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.logging.LauncherShortcutEvent
-import piuk.blockchain.androidcoreui.utils.logging.Logging.logCustom
+import piuk.blockchain.androidcoreui.utils.logging.launcherShortcutEvent
+import piuk.blockchain.androidcoreui.utils.logging.Logging
 
 class LauncherShortcutHelper(
     private val ctx: Context
@@ -123,9 +123,7 @@ class LauncherShortcutHelper(
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
     private fun doLogShortcutUsed(shortcutId: String) {
         shortcutManager.reportShortcutUsed(shortcutId)
-        logCustom(
-            LauncherShortcutEvent(shortcutId)
-        )
+        Logging.logEvent(launcherShortcutEvent(shortcutId))
     }
 
     private fun areShortcutsEnabled(): Boolean {

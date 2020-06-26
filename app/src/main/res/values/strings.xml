@@ -1651,6 +1651,7 @@
     <string name="eth_default_account_label">My Ether Wallet</string>
     <string name="xlm_default_account_label">My Stellar Wallet</string>
     <string name="pax_default_account_label_1">My USD Digital Wallet</string>
+    <string name="alg_default_account_label">My Algorand Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
     <string name="default_label_interest_wallet">Interest Wallet</string>
     <string name="exchange_default_account_label">My Exchange %1$s Address</string>
@@ -1699,7 +1700,7 @@
     <string name="billing_address_state">State</string>
     <string name="billing_address_country">Country</string>
     <string name="currency_not_supported_title">Your Currency is Not Supported</string>
-    <string name="currency_not_supported">Currently we don’t support buying crypto with %1s</string>
+    <string name="currency_not_supported_1">Currently we don’t support buying crypto with %1s</string>
     <string name="activity_no_activity_title">You Have No Activity</string>
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
@@ -1712,9 +1713,12 @@
     <string name="activity_details_fee">Fee</string>
     <string name="activity_details_amount">Amount</string>
     <string name="activity_details_value">Value</string>
+    <string name="activity_details_historic_sent">Value when sent</string>
+    <string name="activity_details_historic_received">Value when received</string>
+    <string name="activity_details_historic_transferred">Value when transferred</string>
     <string name="activity_details_to">To</string>
     <string name="activity_details_from">From</string>
-    <string name="activity_details_empty" />
+    <string name="empty" translatable="false" />
     <string name="activity_details_action">View on Blockchain Explorer</string>
     <string name="activity_details_cancel_action">Cancel Buy</string>
     <string name="activity_detail_description_action">Add a description</string>
@@ -1747,6 +1751,7 @@
     <string name="activity_details_payment_load_fail">Couldn\'t load card details</string>
     <string name="activity_details_fee_load_fail">Couldn\'t load fee information</string>
     <string name="activity_details_value_load_fail">Couldn\'t load value information</string>
+    <string name="activity_details_historic_value_load_fail">Couldn\'t load historic value information</string>
     <string name="activity_details_to_load_fail">Couldn\'t load To address information</string>
     <string name="activity_details_from_load_fail">Couldn\'t load From address information</string>
 

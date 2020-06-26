@@ -5,14 +5,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigationHeader"
     android:layout_width="match_parent"
-    android:layout_height="156dp">
+    android:layout_height="96dp">
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="50dp"
         app:srcCompat="@drawable/logo_blockchain" />
 
     <View style="@style/Divider"

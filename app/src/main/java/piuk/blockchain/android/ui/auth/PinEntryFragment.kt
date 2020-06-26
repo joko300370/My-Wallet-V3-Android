@@ -7,16 +7,22 @@ import android.content.IntentSender
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import androidx.annotation.StringRes
-import com.google.android.material.snackbar.Snackbar
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import com.blockchain.koin.scopedInject
+import com.blockchain.ui.dialog.MaterialProgressDialog
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -30,37 +36,34 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad
+import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
+import piuk.blockchain.android.ui.home.MobileNoticeDialogFragment
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.DialogButtonCallback
+import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
-import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
-import androidx.appcompat.app.AppCompatActivity.RESULT_OK
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.databinding.DataBindingUtil
-import org.koin.android.ext.android.get
-import org.koin.android.ext.android.inject
-import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
-import piuk.blockchain.android.ui.home.MobileNoticeDialogFragment
-import piuk.blockchain.android.ui.start.PasswordRequiredActivity
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
     PinEntryView {
 
-    private val pinEntryPresenter: PinEntryPresenter by inject()
+    private val pinEntryPresenter: PinEntryPresenter by scopedInject()
     private val environmentConfig: EnvironmentConfig by inject()
     private val appUtil: AppUtil by inject()
 
@@ -78,7 +81,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     private var backPressed: Long = 0
 
     val isValidatingPinForResult: Boolean
-        get() = presenter.isForValidatingPinForResult
+        get() = presenter?.isForValidatingPinForResult ?: false
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -121,7 +124,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             }
         }
 
-        binding?.keyboard?.setPadClickedListener(object : PinEntryKeypad.OnPinEntryPadClickedListener {
+        binding?.keyboard?.setPadClickedListener(object :
+            PinEntryKeypad.OnPinEntryPadClickedListener {
             override fun onNumberClicked(number: String) {
                 presenter.onPadClicked(number)
             }
@@ -146,7 +150,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             }
         }
 
-        binding?.textViewVersionCode?.text = BuildConfig.VERSION_NAME
+        binding?.textViewVersionCode?.text =
+            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
 
         return binding?.root
     }
@@ -166,7 +171,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         binding?.fingerprintLogo?.setOnClickListener { presenter.checkFingerprintStatus() }
         // Show dialog itself if not already showing
         if (fingerprintDialog == null && presenter.canShowFingerprintDialog()) {
-            fingerprintDialog = FingerprintDialog.newInstance(pincode, FingerprintStage.AUTHENTICATE)
+            fingerprintDialog =
+                FingerprintDialog.newInstance(pincode, FingerprintStage.AUTHENTICATE)
             fingerprintDialog?.setAuthCallback(object : FingerprintDialog.FingerprintAuthCallback {
                 override fun onAuthenticated(data: String?) {
                     dismissFingerprintDialog()
@@ -216,7 +222,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
                     .setMessage(getString(R.string.check_connectivity_exit))
                     .setCancelable(false)
-                    .setPositiveButton(R.string.dialog_continue) { dialog, id -> restartPageAndClearTop() }
+                    .setPositiveButton(
+                        R.string.dialog_continue) { dialog, id -> restartPageAndClearTop() }
                     .create()
                     .show()
             }
@@ -229,8 +236,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.password_or_wipe)
                 .setCancelable(false)
-                .setPositiveButton(R.string.use_password) { dialog, whichButton -> showValidationDialog() }
-                .setNegativeButton(R.string.wipe_wallet) { dialog, whichButton -> presenter.resetApp() }
+                .setPositiveButton(
+                    R.string.use_password) { dialog, whichButton -> showValidationDialog() }
+                .setNegativeButton(
+                    R.string.wipe_wallet) { dialog, whichButton -> presenter.resetApp() }
                 .show()
         }
     }
@@ -254,9 +263,11 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         if (context != null && walletVersion != null) {
             AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
                 .setTitle(R.string.warning)
-                .setMessage(String.format(getString(R.string.unsupported_encryption_version), walletVersion))
+                .setMessage(String.format(getString(R.string.unsupported_encryption_version),
+                    walletVersion))
                 .setCancelable(false)
-                .setPositiveButton(R.string.exit) { dialog, whichButton -> presenter.clearLoginState() }
+                .setPositiveButton(
+                    R.string.exit) { dialog, whichButton -> presenter.clearLoginState() }
                 .setNegativeButton(R.string.logout) { dialog, which ->
                     presenter.clearLoginState()
                     restartApp()
@@ -315,8 +326,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
                 .setTitle(R.string.common_pin_dialog_title)
                 .setMessage(R.string.common_pin_dialog_message)
-                .setPositiveButton(R.string.common_pin_dialog_try_again) { _, _ -> callback.onPositiveClicked() }
-                .setNegativeButton(R.string.common_pin_dialog_continue) { _, _ -> callback.onNegativeClicked() }
+                .setPositiveButton(
+                    R.string.common_pin_dialog_try_again) { _, _ -> callback.onPositiveClicked() }
+                .setNegativeButton(
+                    R.string.common_pin_dialog_continue) { _, _ -> callback.onNegativeClicked() }
                 .setCancelable(false)
                 .create()
                 .show()
@@ -328,7 +341,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             val password = AppCompatEditText(context!!)
             password.inputType =
                 InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             password.setHint(R.string.password)
 
             AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
@@ -424,7 +437,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         val appUpdateManager = AppUpdateManagerFactory.create(context)
         if (isForced) {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
-                if (canTriggerAnUpdateOfType(AppUpdateType.IMMEDIATE, appUpdateInfoTask) && activity != null) {
+                if (canTriggerAnUpdateOfType(AppUpdateType.IMMEDIATE,
+                        appUpdateInfoTask) && activity != null) {
                     updateForcedNatively(appUpdateManager, appUpdateInfoTask.result)
                 } else {
                     handleForcedUpdateFromStore()
@@ -432,7 +446,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             })
         } else {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
-                if (canTriggerAnUpdateOfType(AppUpdateType.FLEXIBLE, appUpdateInfoTask) && activity != null) {
+                if (canTriggerAnUpdateOfType(AppUpdateType.FLEXIBLE,
+                        appUpdateInfoTask) && activity != null) {
                     updateFlexibleNatively(appUpdateManager, appUpdateInfoTask.result)
                 }
             })
@@ -445,16 +460,22 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private fun canTriggerAnUpdateOfType(updateAvailabilityType: Int, appUpdateInfoTask: Task<AppUpdateInfo>): Boolean {
+    private fun canTriggerAnUpdateOfType(
+        updateAvailabilityType: Int,
+        appUpdateInfoTask: Task<AppUpdateInfo>
+    ): Boolean {
         return (appUpdateInfoTask.result.updateAvailability() ==
-                UpdateAvailability.UPDATE_AVAILABLE ||
-                appUpdateInfoTask.result.updateAvailability() ==
-                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
-                appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
+            UpdateAvailability.UPDATE_AVAILABLE ||
+            appUpdateInfoTask.result.updateAvailability() ==
+            UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
     }
 
     @Throws(IntentSender.SendIntentException::class)
-    private fun updateFlexibleNatively(appUpdateManager: AppUpdateManager, appUpdateInfo: AppUpdateInfo) {
+    private fun updateFlexibleNatively(
+        appUpdateManager: AppUpdateManager,
+        appUpdateInfo: AppUpdateInfo
+    ) {
 
         val updatedListener = object : InstallStateUpdatedListener {
             override fun onStateUpdate(installState: InstallState) {
@@ -476,13 +497,16 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     private fun shouldBeUnregistered(installStatus: Int): Boolean {
         return installStatus == InstallStatus.CANCELED ||
-                installStatus == InstallStatus.DOWNLOADED ||
-                installStatus == InstallStatus.INSTALLED ||
-                installStatus == InstallStatus.FAILED
+            installStatus == InstallStatus.DOWNLOADED ||
+            installStatus == InstallStatus.INSTALLED ||
+            installStatus == InstallStatus.FAILED
     }
 
     @Throws(IntentSender.SendIntentException::class)
-    private fun updateForcedNatively(appUpdateManager: AppUpdateManager, appUpdateInfo: AppUpdateInfo) {
+    private fun updateForcedNatively(
+        appUpdateManager: AppUpdateManager,
+        appUpdateInfo: AppUpdateInfo
+    ) {
         appUpdateManager.startUpdateFlowForResult(
             appUpdateInfo,
             AppUpdateType.IMMEDIATE,
@@ -504,7 +528,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val appPackageName = context?.packageName
             try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
             } catch (e: ActivityNotFoundException) {
                 // Device doesn't have the Play Store installed, direct them to the official
                 // store web page anyway
@@ -512,7 +537,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                     Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")))
             }
         }
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener { v -> presenter.clearLoginState() }
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            .setOnClickListener { v -> presenter.clearLoginState() }
     }
 
     override val pageIntent: Intent?
@@ -583,6 +609,14 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         return pinEntryPresenter
     }
 
+    override fun setupCommitHashView() {
+        binding?.debugCommitHash?.apply {
+            visibleIf { BuildConfig.COMMIT_HASH.isNotEmpty() }
+            text = BuildConfig.COMMIT_HASH
+            copyHashOnLongClick(requireContext())
+        }
+    }
+
     override fun getMvpView(): PinEntryView {
         return this
     }
@@ -596,7 +630,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         private const val KEY_IS_AFTER_WALLET_CREATION = "is_after_wallet_creation"
         private val HANDLER = Handler()
 
-        fun newInstance(showSwipeHint: Boolean, isAfterCreateWallet: Boolean): PinEntryFragment {
+        fun newInstance(
+            showSwipeHint: Boolean,
+            isAfterCreateWallet: Boolean
+        ): PinEntryFragment {
             val args = Bundle()
             args.putBoolean(KEY_SHOW_SWIPE_HINT, showSwipeHint)
             args.putBoolean(KEY_IS_AFTER_WALLET_CREATION, isAfterCreateWallet)

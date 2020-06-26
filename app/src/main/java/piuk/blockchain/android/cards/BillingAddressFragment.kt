@@ -5,16 +5,17 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.BillingAddress
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.swap.nabu.models.nabu.NabuUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_billing_address.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
@@ -28,8 +29,8 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
     PickerItemListener, AddCardFlowFragment {
 
     private var usSelected = false
-    private val nabuToken: NabuToken by inject()
-    private val nabuDataManager: NabuDataManager by inject()
+    private val nabuToken: NabuToken by scopedInject()
+    private val nabuDataManager: NabuDataManager by scopedInject()
 
     private val compositeDisposable = CompositeDisposable()
     private val nabuUser = nabuToken
@@ -87,11 +88,11 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
         state.addTextChangedListener(textWatcher)
         postcode.addTextChangedListener(textWatcher)
 
-        compositeDisposable += nabuUser.map { it.address?.countryCode ?: "" }
+        compositeDisposable += nabuUser
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = {}, onSuccess = { countryCode ->
-                onItemPicked(CountryPickerItem(countryCode))
-                configureUiForCountry(countryCode == "US")
+            .subscribeBy(onError = {}, onSuccess = { user ->
+                setupCountryDetails(user.address?.countryCode ?: "")
+                setupUserDetails(user)
             })
 
         btn_next.setOnClickListener {
@@ -113,6 +114,26 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
             analytics.logEvent(SimpleBuyAnalytics.CARD_BILLING_ADDRESS_SET)
         }
         activity.setupToolbar(R.string.add_card_address_title)
+    }
+
+    private fun setupUserDetails(user: NabuUser) {
+        full_name.setText(getString(R.string.common_spaced_strings, user.firstName, user.lastName))
+        user.address?.let {
+            address_line_1.setText(it.line1)
+            address_line_2.setText(it.line2)
+            city.setText(it.city)
+            if (it.countryCode == "US") {
+                zip_usa.setText(it.postCode)
+                state.setText(it.state?.substringAfter("US-"))
+            } else {
+                postcode.setText(it.postCode)
+            }
+        }
+    }
+
+    private fun setupCountryDetails(countryCode: String) {
+        onItemPicked(CountryPickerItem(countryCode))
+        configureUiForCountry(countryCode == "US")
     }
 
     override fun onDestroyView() {
@@ -141,7 +162,7 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
         this.usSelected = usSelected
     }
 
-    override val model: CardModel by inject()
+    override val model: CardModel by scopedInject()
     override val navigator: AddCardNavigator
         get() = (activity as? AddCardNavigator)
             ?: throw IllegalStateException("Parent must implement AddCardNavigator")

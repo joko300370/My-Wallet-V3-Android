@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.campaign.CampaignType
 import kotlinx.android.synthetic.main.fragment_swap_intro.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.home.HomeScreenMvpFragment
 import piuk.blockchain.android.ui.home.MainActivity
@@ -18,7 +18,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class SwapIntroFragment : HomeScreenMvpFragment<SwapIntroView, SwapIntroPresenter>(), SwapIntroView {
 
-    override val presenter: SwapIntroPresenter by inject()
+    override val presenter: SwapIntroPresenter by scopedInject()
     override val view: SwapIntroView = this
 
     override fun onBackPressed(): Boolean =

@@ -4,15 +4,15 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.exceptions.MetadataNotFoundException
 import piuk.blockchain.android.ui.getBlankNabuUser
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
 import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
 import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.models.nabu.UserState
-import piuk.blockchain.android.ui.tiers
 import piuk.blockchain.android.ui.validOfflineToken
 import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
@@ -22,6 +22,7 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.ui.tiers
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
 class KycStatusHelperTest {
@@ -229,11 +230,11 @@ class KycStatusHelperTest {
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.Hidden)
+        testObserver.assertValue(KycTiers.default())
     }
 
     @Test
@@ -250,14 +251,16 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser(KycState.None)))
+        whenever(tierService.tiers())
+            .thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.Pending)))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.Unverified)
+        testObserver.assertValue {
+            it.isPendingFor(KycTierLevel.SILVER)
+        }
     }
 
     @Test
@@ -274,14 +277,16 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser(KycState.Verified)))
+        whenever(tierService.tiers())
+            .thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Verified)))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.Verified)
+        testObserver.assertValue {
+            it.isApprovedFor(KycTierLevel.GOLD)
+        }
     }
 
     @Test
@@ -298,14 +303,17 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser(KycState.Rejected)))
+        whenever(tierService.tiers())
+            .thenReturn(Single.just(tiers(KycTierState.Rejected, KycTierState.Rejected)))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getKycTierStatus().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.Failed)
+        testObserver.assertValue {
+            it.isRejectedFor(KycTierLevel.GOLD) &&
+                    it.isRejectedFor(KycTierLevel.SILVER)
+        }
     }
 
     @Test
@@ -322,14 +330,16 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser(KycState.Pending)))
+        whenever(tierService.tiers())
+            .thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.InProgress)
+        testObserver.assertValue {
+            it.isPendingFor(KycTierLevel.SILVER)
+        }
     }
 
     @Test
@@ -346,14 +356,16 @@ class KycStatusHelperTest {
         val settings: Settings = mock()
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
-        whenever(nabuDataManager.getUser(validOfflineToken))
-            .thenReturn(Single.just(getBlankNabuUser(KycState.UnderReview)))
+        whenever(tierService.tiers())
+            .thenReturn(Single.just(tiers(KycTierState.UnderReview, KycTierState.None)))
         // Act
-        val testObserver = subject.getSettingsKycState().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(SettingsKycState.UnderReview)
+        testObserver.assertValue {
+            it.isUnderReviewFor(KycTierLevel.SILVER)
+        }
     }
 
     @Test
@@ -387,11 +399,13 @@ class KycStatusHelperTest {
         whenever(settings.countryCode).thenReturn(countryCode)
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(settings))
         // Act
-        val testObserver = subject.getKyc2TierStatus().test()
+        val testObserver = subject.getSettingsKycStateTier().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
-        testObserver.assertValue(Kyc2TierState.Tier2Approved)
+        testObserver.assertValue {
+            it.isApprovedFor(KycTierLevel.GOLD)
+        }
     }
 
     @Test

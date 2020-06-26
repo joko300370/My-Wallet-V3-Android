@@ -73,7 +73,8 @@ dependencies {
     api Libraries.rxFingerprint
 
     // Logging
-    api(Libraries.crashlytics) { transitive = true }
+    implementation(Libraries.firebaseCrashlytics)
+    implementation(Libraries.firebaseAnalytics)
 
     // Custom Views
     api Libraries.konfetti
@@ -83,7 +84,9 @@ dependencies {
     api Libraries.dexter
 
     // Firebase
-    implementation Libraries.firebaseConfig
+    implementation (Libraries.firebaseConfig) {
+        exclude group:'com.google.protobuf', module: 'protobuf-lite'
+    }
 
     // Unit Test dependencies
     testImplementation project(':testutils-android')

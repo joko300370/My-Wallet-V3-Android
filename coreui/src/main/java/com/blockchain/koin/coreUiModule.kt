@@ -11,24 +11,24 @@ import com.blockchain.remoteconfig.ABTestExperiment
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.RemoteConfiguration
 import com.blockchain.ui.chooser.AccountChooserPresenter
-import com.crashlytics.android.answers.Answers
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import piuk.blockchain.androidcoreui.BuildConfig
 import piuk.blockchain.androidcoreui.utils.OverlayDetection
-import piuk.blockchain.androidcoreui.utils.logging.AnswersEventLogger
+import piuk.blockchain.androidcoreui.utils.logging.InjectableLogging
 
-val coreUiModule = applicationContext {
+val coreUiModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
         factory {
             AccountChooserPresenter(get(), get())
         }
     }
 
-    bean {
+    single {
         val config = FirebaseRemoteConfigSettings.Builder()
             .setDeveloperModeEnabled(BuildConfig.DEBUG)
             .build()
@@ -41,19 +41,17 @@ val coreUiModule = applicationContext {
         .bind(RemoteConfig::class)
         .bind(ABTestExperiment::class)
 
-    factory { Answers.getInstance() }
+    factory { InjectableLogging(get()) as EventLogger }
 
-    factory { AnswersEventLogger(get()) as EventLogger }
-
-    bean {
+    single {
         OverlayDetection(get())
     }
 
-    bean {
+    single {
         CrashLoggerImpl(BuildConfig.DEBUG)
     }.bind(CrashLogger::class)
 
-    bean {
+    single {
         SwapDiagnosticsImpl(crashLogger = get())
     }.bind(SwapDiagnostics::class)
 }

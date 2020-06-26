@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencySelected
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -30,7 +31,7 @@ class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyInt
     ChangeCurrencyOptionHost {
 
     private val currencyPrefs: CurrencyPrefs by inject()
-    private val settingsDataManager: SettingsDataManager by inject()
+    private val settingsDataManager: SettingsDataManager by scopedInject()
     private val appUtil: AppUtil by inject()
     private val compositeDisposable = CompositeDisposable()
     private var filter: (CurrencyItem) -> Boolean = { true }
@@ -83,7 +84,7 @@ class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyInt
         showBottomSheet(CurrencyNotSupportedBottomSheet.newInstance(item))
     }
 
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
     private val locale = Locale.getDefault()
 
     override fun render(newState: SimpleBuyState) {

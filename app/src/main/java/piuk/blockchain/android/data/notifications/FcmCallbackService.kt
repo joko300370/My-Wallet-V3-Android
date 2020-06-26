@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import com.blockchain.annotations.BurnCandidate
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.R
@@ -22,14 +23,14 @@ import timber.log.Timber
 class FcmCallbackService : FirebaseMessagingService() {
 
     private val notificationManager: NotificationManager by inject()
-    private val notificationTokenManager: NotificationTokenManager by inject()
+    private val notificationTokenManager: NotificationTokenManager by scopedInject()
     private val rxBus: RxBus by inject()
     private val accessState: AccessState by inject()
     private val analytics: Analytics by inject()
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage?) {
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Check if message contains a data payload.
-        if (remoteMessage?.data?.isEmpty() == false) {
+        if (remoteMessage.data.isNotEmpty()) {
             Timber.d("Message data payload: %s", remoteMessage.data)
 
             // Parse data, emit events
@@ -39,7 +40,7 @@ class FcmCallbackService : FirebaseMessagingService() {
         }
     }
 
-    override fun onNewToken(newToken: String?) {
+    override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
         newToken?.let {
             notificationTokenManager.storeAndUpdateToken(it)

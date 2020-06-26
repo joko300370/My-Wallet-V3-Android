@@ -25,6 +25,7 @@ dependencies {
     testImplementation Libraries.json
     testImplementation Libraries.kluent
     testImplementation Libraries.mockWebServer
+    testImplementation Libraries.okHttpMock
     testImplementation Libraries.koinTest
     testImplementation project(':testutils')
     testImplementation(Libraries.mockitoKotlin) {

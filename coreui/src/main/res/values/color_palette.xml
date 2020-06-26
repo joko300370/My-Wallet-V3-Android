@@ -61,6 +61,7 @@
     <color name="grey_800_with_opacity">#66353F52</color>
 
     <color name="blue_600_with_opacity">#660C6CF2</color>
+    <color name="blue_600_disabled">#639DED</color>
 
     <color name="red_600_with_opacity">#66D93B30</color>
 
@@ -75,12 +76,20 @@
     <color name="ether_bkgd">@color/purple_000</color>
     <color name="btc_bkgd">@color/orange_000</color>
     <color name="xlm_bkgd">@color/grey_000</color>
+    <color name="usdt_bkgd">#2626A17B</color>
+    <color name="ltc_bkgd">#26BFBBBB</color>
+    <color name="xrp_bkgd">#26000000</color>
+    <color name="algo_bkgd">#26000000</color>
 
     <color name="btc">#FF9B22</color>
     <color name="bch">#8DC351</color>
     <color name="eth">#473BCB</color>
     <color name="xlm">#000000</color>
     <color name="pax">#00522C</color>
+    <color name="usdt">#26A17B</color>
+    <color name="ltc">#BFBBBB</color>
+    <color name="xrp">#000000</color>
+    <color name="algo">#000000</color>
 
 </resources>
 

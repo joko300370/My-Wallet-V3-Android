@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.home
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.Tiers
+import com.blockchain.swap.nabu.models.nabu.TierLevels
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
@@ -64,15 +64,15 @@ class MainPresenterTest {
     }
 
     private val userTierZero: NabuUser = mock {
-        on { tiers } `it returns` Tiers(0, 0, 0)
+        on { tiers } `it returns` TierLevels(0, 0, 0)
     }
 
     private val userTierOne: NabuUser = mock {
-        on { tiers } `it returns` Tiers(1, 1, 2)
+        on { tiers } `it returns` TierLevels(1, 1, 2)
     }
 
     private val userTierTwo: NabuUser = mock {
-        on { tiers } `it returns` Tiers(2, 2, 2)
+        on { tiers } `it returns` TierLevels(2, 2, 2)
     }
 
     @get:Rule

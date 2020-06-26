@@ -95,10 +95,10 @@ class PayloadDataManager(
 
     val isBackedUp: Boolean
         get() = (
-                payloadManager.payload != null &&
-                        payloadManager.payload!!.hdWallets != null &&
-                        payloadManager.payload!!.hdWallets[0].isMnemonicVerified
-                )
+            payloadManager.payload != null &&
+                payloadManager.payload!!.hdWallets != null &&
+                payloadManager.payload!!.hdWallets[0].isMnemonicVerified
+            )
 
     val mnemonic: List<String>
         get() = payloadManager.payload!!.hdWallets[0].mnemonic
@@ -252,7 +252,7 @@ class PayloadDataManager(
      */
     fun updateAllBalances(): Completable =
         rxPinning.call { payloadService.updateAllBalances() }
-        .applySchedulers()
+            .applySchedulers()
 
     /**
      * Update notes for a specific transaction hash and then sync the payload to the server
@@ -275,7 +275,9 @@ class PayloadDataManager(
      * @param addresses A List of addresses as Strings
      * @return A [LinkedHashMap]
      */
-    fun getBalanceOfBtcAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
+    fun getBalanceOfBtcAddresses(
+        addresses: List<String>
+    ): Observable<LinkedHashMap<String, Balance>> =
         rxPinning.call<LinkedHashMap<String, Balance>> {
             payloadService.getBalanceOfBtcAddresses(addresses)
         }.applySchedulers()
@@ -287,7 +289,9 @@ class PayloadDataManager(
      * @param addresses A List of Bitcoin cash addresses as Strings
      * @return A [LinkedHashMap]
      */
-    fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
+    fun getBalanceOfBchAddresses(
+        addresses: List<String>
+    ): Observable<LinkedHashMap<String, Balance>> =
         rxPinning.call<LinkedHashMap<String, Balance>> {
             payloadService.getBalanceOfBchAddresses(addresses)
         }.applySchedulers()
@@ -472,7 +476,10 @@ class PayloadDataManager(
         fnRefresh = { Completable.fromCallable { updateAllBalances() } }
     )
 
-    fun getAddressBalanceRefresh(address: String, forceRefresh: Boolean = false): Single<CryptoValue> =
+    fun getAddressBalanceRefresh(
+        address: String,
+        forceRefresh: Boolean = false
+    ): Single<CryptoValue> =
         balanceUpdater.get(
             fnFetch = { getAddressBalance(address) },
             force = forceRefresh
@@ -575,8 +582,11 @@ class PayloadDataManager(
         ApiException::class
     )
 
-    fun getAccountTransactions(xpub: String?, limit: Int, offset: Int): List<TransactionSummary> =
-        payloadManager.getAccountTransactions(xpub, limit, offset)
+    fun getAccountTransactions(xpub: String?, limit: Int, offset: Int):
+        Single<List<TransactionSummary>> =
+            Single.fromCallable {
+                payloadManager.getAccountTransactions(xpub, limit, offset)
+            }
 
     /**
      * Returns the transaction notes for a given transaction hash. May return null if not found.
@@ -657,7 +667,8 @@ class PayloadDataManager(
     fun validateSecondPassword(secondPassword: String?): Boolean =
         payloadManager.validateSecondPassword(secondPassword)
 
-    @Deprecated("This seems to be always called with bitcoin network parameters, just use other overload")
+    @Deprecated(
+        "This seems to be always called with bitcoin network parameters, just use other overload")
     @Throws(Exception::class)
     fun decryptHDWallet(networkParameters: NetworkParameters, secondPassword: String?) {
         payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)

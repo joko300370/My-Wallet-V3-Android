@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -18,28 +15,22 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import piuk.blockchain.android.util.coinIconWhite
-import piuk.blockchain.android.util.colorRes
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.swap.common.exchange.mvi.ApplyMaxSpendable
-import com.blockchain.swap.common.exchange.mvi.ExchangeIntent
-import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
-import com.blockchain.swap.nabu.service.Fix
-import piuk.blockchain.android.ui.swap.customviews.Maximums
-import com.blockchain.swap.nabu.service.Quote
-import com.blockchain.swap.common.exchange.mvi.QuoteValidity
-import com.blockchain.swap.common.exchange.mvi.SimpleFieldUpdateIntent
-import com.blockchain.swap.common.exchange.mvi.ToggleFiatCryptoIntent
-import piuk.blockchain.android.ui.swap.customviews.ThreePartText
-import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewHostActivityListener
-import piuk.blockchain.android.ui.swap.logging.AmountErrorEvent
-import piuk.blockchain.android.ui.swap.logging.AmountErrorType
-import piuk.blockchain.android.ui.swap.logging.FixType
-import piuk.blockchain.android.ui.swap.logging.FixTypeEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.swap.common.exchange.mvi.ApplyMaxSpendable
+import com.blockchain.swap.common.exchange.mvi.ExchangeIntent
+import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
+import com.blockchain.swap.common.exchange.mvi.QuoteValidity
+import com.blockchain.swap.common.exchange.mvi.SimpleFieldUpdateIntent
+import com.blockchain.swap.common.exchange.mvi.ToggleFiatCryptoIntent
+import com.blockchain.swap.nabu.service.Fix
+import com.blockchain.swap.nabu.service.Quote
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_PAX_NEEDS_ETH_FAQ
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -55,7 +46,16 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_homebrew_exchange.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.swap.customviews.Maximums
+import piuk.blockchain.android.ui.swap.customviews.ThreePartText
+import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewHostActivityListener
+import piuk.blockchain.android.ui.swap.logging.amountErrorEvent
+import piuk.blockchain.android.ui.swap.logging.AmountErrorType
+import piuk.blockchain.android.ui.swap.logging.FixType
+import piuk.blockchain.android.ui.swap.logging.fixTypeEvent
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.coinIconWhite
+import piuk.blockchain.android.util.colorRes
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -204,7 +204,7 @@ internal class ExchangeFragment : Fragment() {
         compositeDisposable += inputTypeRelay.map { it.toLoggingFixType() }
             .distinctUntilChanged()
             .subscribeBy {
-                Logging.logCustom(FixTypeEvent(it))
+                Logging.logEvent(fixTypeEvent(it))
             }
 
         compositeDisposable += exchangeModel
@@ -394,7 +394,7 @@ internal class ExchangeFragment : Fragment() {
             QuoteValidity.OverUserBalance -> AmountErrorType.OverBalance
         }
 
-        errorType?.let { Logging.logCustom(AmountErrorEvent(it)) }
+        errorType?.let { Logging.logEvent(amountErrorEvent(it)) }
     }
 
     private fun ExchangeViewState.formatSpendableString(): CharSequence {

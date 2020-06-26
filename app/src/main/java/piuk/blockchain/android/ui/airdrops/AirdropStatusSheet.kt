@@ -10,9 +10,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.STX_STACKS_LEARN_MORE
 import kotlinx.android.synthetic.main.dialog_airdrop_status.view.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.campaign.sunriverCampaignName
@@ -26,7 +26,7 @@ import java.text.DateFormat
 
 class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
 
-    private val presenter: AirdropCentrePresenter by inject()
+    private val presenter: AirdropCentrePresenter by scopedInject()
 
     private val airdropName: String by unsafeLazy {
         arguments?.getString(ARG_AIRDROP_NAME) ?: blockstackCampaignName
@@ -47,8 +47,12 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
             ?: throw IllegalStateException("No $airdropName airdrop found")
 
         when (airdropName) {
-            sunriverCampaignName -> { renderSunriver(airdrop) }
-            blockstackCampaignName -> { renderBlockstacks(airdrop) }
+            sunriverCampaignName -> {
+                renderSunriver(airdrop)
+            }
+            blockstackCampaignName -> {
+                renderBlockstacks(airdrop)
+            }
         }
     }
 
@@ -191,6 +195,6 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
         dismiss()
     }
 
-    override fun showProgressDialog(messageId: Int, onCancel: (() -> Unit)?) { }
-    override fun dismissProgressDialog() { }
+    override fun showProgressDialog(messageId: Int, onCancel: (() -> Unit)?) {}
+    override fun dismissProgressDialog() {}
 }

@@ -2,11 +2,14 @@
 
 package piuk.blockchain.android.ui.kyc.koin
 
+import com.blockchain.koin.payloadScopeQualifier
 import piuk.blockchain.android.ui.kyc.splash.KycSplashPresenter
 import com.blockchain.swap.nabu.CurrentTier
 import com.blockchain.swap.nabu.EthEligibility
 import com.blockchain.swap.nabu.StartKyc
-import org.koin.dsl.module.applicationContext
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import piuk.blockchain.android.ui.kyc.address.CurrentTierAdapter
 import piuk.blockchain.android.ui.kyc.address.EligibilityForFreeEthAdapter
 import piuk.blockchain.android.ui.kyc.address.KycHomeAddressPresenter
@@ -29,21 +32,21 @@ import piuk.blockchain.android.ui.kyc.status.KycStatusPresenter
 import piuk.blockchain.android.ui.kyc.tiersplash.KycTierSplashPresenter
 import piuk.blockchain.android.ui.kyc.veriffsplash.VeriffSplashPresenter
 
-val kycUiModule = applicationContext {
+val kycUiModule = module {
 
     factory { KycStarter() as StartKyc }
 
     factory { TiersReentryDecision() as ReentryDecision }
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
         factory {
             ReentryDecisionKycNavigator(
                 token = get(),
                 dataManager = get(),
                 reentryDecision = get()
-            ) as KycNavigator
-        }
+            )
+        }.bind(KycNavigator::class)
 
         factory {
             KycTierSplashPresenter(
@@ -103,13 +106,14 @@ val kycUiModule = applicationContext {
 
         factory { KycStatusPresenter(get(), get(), get()) }
 
-        factory { KycNavHostPresenter(
-            nabuToken = get(),
-            nabuDataManager = get(),
-            sunriverCampaign = get(),
-            reentryDecision = get(),
-            tierUpdater = get(),
-            kycNavigator = get()
+        factory {
+            KycNavHostPresenter(
+                nabuToken = get(),
+                nabuDataManager = get(),
+                sunriverCampaign = get(),
+                reentryDecision = get(),
+                tierUpdater = get(),
+                kycNavigator = get()
             )
         }
 
@@ -117,9 +121,9 @@ val kycUiModule = applicationContext {
     }
 }
 
-val kycUiNabuModule = applicationContext {
+val kycUiNabuModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
         factory {
             Tier2DecisionAdapter(get(), get()) as Tier2Decision
@@ -133,7 +137,7 @@ val kycUiNabuModule = applicationContext {
             EligibilityForFreeEthAdapter(
                 nabuToken = get(),
                 nabuDataManager = get()
-            ) as EthEligibility
-        }
+            )
+        }.bind(EthEligibility::class)
     }
 }

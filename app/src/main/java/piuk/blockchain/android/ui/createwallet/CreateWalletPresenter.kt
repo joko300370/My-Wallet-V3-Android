@@ -5,11 +5,11 @@ import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.crashlytics.android.answers.SignUpEvent
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -17,9 +17,8 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.logging.Logging
-import piuk.blockchain.androidcoreui.utils.logging.RecoverWalletEvent
+import piuk.blockchain.androidcoreui.utils.logging.recoverWalletEvent
 import timber.log.Timber
 
 class CreateWalletPresenter(
@@ -115,18 +114,14 @@ class CreateWalletPresenter(
                 {
                     prefs.setValue(PersistentPrefs.KEY_EMAIL, email)
                     view.startPinEntryActivity()
-                    Logging.logSignUp(
-                        SignUpEvent().putSuccess(true)
-                    )
+                    Logging.logSignUp(true)
                     analytics.logEvent(AnalyticsEvents.WalletCreation)
                 },
                 {
                     Timber.e(it)
                     view.showToast(R.string.hd_error, ToastCustom.TYPE_ERROR)
                     appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
-                    Logging.logSignUp(
-                        SignUpEvent().putSuccess(false)
-                    )
+                    Logging.logSignUp(false)
                 }
             )
     }
@@ -151,16 +146,12 @@ class CreateWalletPresenter(
                     prefs.setValue(PersistentPrefs.KEY_EMAIL, email)
                     prefs.setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
                     view.startPinEntryActivity()
-                    Logging.logCustom(
-                        RecoverWalletEvent().putSuccess(true)
-                    )
+                    Logging.logEvent(recoverWalletEvent(true))
                 },
                 {
                     Timber.e(it)
                     view.showToast(R.string.restore_failed, ToastCustom.TYPE_ERROR)
-                    Logging.logCustom(
-                        RecoverWalletEvent().putSuccess(false)
-                    )
+                    Logging.logEvent(recoverWalletEvent(false))
                 }
             )
     }

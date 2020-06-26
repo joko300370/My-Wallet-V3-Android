@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.send
 
 import android.Manifest
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -12,11 +11,6 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import androidx.annotation.ColorRes
-import androidx.annotation.Nullable
-import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
 import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
@@ -31,17 +25,25 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Spinner
 import androidx.annotation.CallSuper
+import androidx.annotation.ColorRes
+import androidx.annotation.Nullable
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.ContextCompat
 import piuk.blockchain.android.util.errorIcon
-import com.blockchain.koin.injectActivity
+import com.blockchain.koin.scopedInject
+import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.notifications.analytics.SendAnalytics
-import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.serialization.JsonSerializableAccount
+import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.transactions.Memo
 import com.blockchain.ui.chooser.AccountChooserActivity
 import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_PAX_NEEDS_ETH_FAQ
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.widget.textChanges
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.CompositePermissionListener
@@ -67,24 +69,24 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
+import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
+import piuk.blockchain.android.ui.home.HomeScreenMvpFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
-import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
-import com.google.android.material.snackbar.Snackbar
-import piuk.blockchain.android.ui.home.HomeScreenMvpFragment
+import piuk.blockchain.android.util.errorIcon
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
+import piuk.blockchain.androidcoreui.ui.customviews.NumericKeyboardCallback
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
@@ -97,7 +99,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
-import java.lang.NullPointerException
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -106,11 +107,11 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
     SendView,
     NumericKeyboardCallback {
 
-    override val presenter: SendPresenter<SendView> by inject()
+    override val presenter: SendPresenter<SendView> by scopedInject()
     override val view: SendView = this
 
     private val appUtil: AppUtil by inject()
-    private val secondPasswordHandler: SecondPasswordHandler by injectActivity()
+    private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     private val currencyState: CurrencyState by inject()
     private val stringUtils: StringUtils by inject()
@@ -593,6 +594,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 CryptoCurrency.XLM -> R.string.xlm_to_field_helper
                 CryptoCurrency.PAX -> R.string.pax_to_field_helper_1
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+                CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
             }
         } else {
             when (currencyState.cryptoCurrency) {
@@ -602,6 +604,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 CryptoCurrency.XLM -> R.string.xlm_to_field_helper_no_dropdown
                 CryptoCurrency.PAX -> R.string.pax_to_field_helper_no_dropdown_1
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+                CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
             }
         }
         toContainer.toAddressEditTextView.setHint(hint)

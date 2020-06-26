@@ -1,15 +1,17 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
+import com.blockchain.koin.coinifyUsersToKyc
+import com.blockchain.koin.payloadScope
+import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.pitAnnouncementFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
-import org.koin.dsl.context.Context
-import org.koin.dsl.context.ParameterProvider
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BackupPhraseAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BitpayAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BuyBitcoinAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
@@ -18,19 +20,20 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.PitAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferBitcoinAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
 
-val dashboardAnnouncementsModule = applicationContext {
+val dashboardAnnouncementsModule = module {
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
-        bean {
-            val availableAnnouncements = getAllAnnouncements(this@context, it)
+        scoped {
+            val availableAnnouncements = getAllAnnouncements()
 
             AnnouncementList(
                 mainScheduler = AndroidSchedulers.mainThread(),
@@ -75,7 +78,7 @@ val dashboardAnnouncementsModule = applicationContext {
         factory {
             KycMoreInfoAnnouncement(
                 tierService = get(),
-                showPopupFeatureFlag = get("ff_notify_coinify_users_to_kyc"),
+                showPopupFeatureFlag = get(coinifyUsersToKyc),
                 dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
@@ -84,7 +87,7 @@ val dashboardAnnouncementsModule = applicationContext {
             PitAnnouncement(
                 pitLink = get(),
                 dismissRecorder = get(),
-                featureFlag = get("ff_pit_announcement"),
+                featureFlag = get(pitAnnouncementFeatureFlag),
                 analytics = get()
             )
         }.bind(AnnouncementRule::class)
@@ -209,22 +212,20 @@ val dashboardAnnouncementsModule = applicationContext {
         }.bind(AnnouncementRule::class)
     }
 
-    bean {
+    single {
         DismissRecorder(
             prefs = get(),
             clock = get()
         )
     }
 
-    bean {
+    single {
         object : DismissClock {
             override fun now(): Long = System.currentTimeMillis()
         }
     }.bind(DismissClock::class)
 }
 
-fun getAllAnnouncements(koinContext: Context, params: ParameterProvider): List<AnnouncementRule> {
-    return koinContext.definitions
-        .filter { it.types.contains(AnnouncementRule::class) }
-        .map { it.definition.invoke(params) as AnnouncementRule }
+fun getAllAnnouncements(): List<AnnouncementRule> {
+    return payloadScope.getAll()
 }

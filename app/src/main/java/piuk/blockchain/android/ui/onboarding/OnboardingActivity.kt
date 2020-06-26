@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import org.koin.android.ext.android.inject
-
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
@@ -17,7 +16,7 @@ internal class OnboardingActivity : BaseMvpActivity<OnboardingView, OnboardingPr
     FingerprintPromptFragment.OnFragmentInteractionListener,
     EmailPromptFragment.OnFragmentInteractionListener {
 
-    private val onboardingPresenter: OnboardingPresenter by inject()
+    private val onboardingPresenter: OnboardingPresenter by scopedInject()
     private var emailLaunched = false
 
     private var progressDialog: MaterialProgressDialog? = null

@@ -13,11 +13,11 @@ import android.view.animation.DecelerateInterpolator
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import com.blockchain.swap.nabu.StartKyc
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -41,7 +41,7 @@ internal class KycStarter : StartKyc {
 class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(),
     KycProgressListener, KycNavHostView {
 
-    private val presenter: KycNavHostPresenter by inject()
+    private val presenter: KycNavHostPresenter by scopedInject()
     private var navInitialDestination: NavDestination? = null
     private val navController by unsafeLazy { findNavController(navHostFragment) }
     private val currentFragment: Fragment?
@@ -164,8 +164,8 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     private fun flowShouldBeClosedAfterBackAction() =
         // If on final page, close host Activity on navigate up
         currentFragment is ApplicationCompleteFragment ||
-            // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
-            (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
+                // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
+                (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
 
     override fun createPresenter(): KycNavHostPresenter = presenter
 

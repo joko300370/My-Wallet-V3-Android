@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.swap.homebrew.exchange.detail.HomebrewTradeDetailActivity
 import piuk.blockchain.android.ui.swap.homebrew.exchange.history.adapter.TradeHistoryAdapter
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.Trade
@@ -25,6 +26,7 @@ class TradeHistoryActivity :
 
     private val tradeHistoryAdapter = TradeHistoryAdapter(this::tradeClicked)
     private val analytics: Analytics by inject()
+    private val tradeHistoryPresenter: TradeHistoryPresenter by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,7 +78,7 @@ class TradeHistoryActivity :
 
     override fun onSupportNavigateUp(): Boolean = consume { finish() }
 
-    override fun createPresenter(): TradeHistoryPresenter = get()
+    override fun createPresenter(): TradeHistoryPresenter = tradeHistoryPresenter
 
     override fun getView(): TradeHistoryView = this
 

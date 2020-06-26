@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
@@ -7,12 +6,23 @@ apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.novoda.build-properties'
 apply from: '../quality/jacocoApp.gradle'
 apply from: '../quality/ktlint.gradle'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.gms.google-services'
 
 
 buildProperties {
     secrets {
         using(file('secrets.properties')) | file('secretsDefaults.properties')
     }
+}
+
+def getGitCommitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
 }
 
 android {
@@ -36,10 +46,12 @@ android {
         buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
+
         manifestPlaceholders = [
                 FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string,
                 BACKUP_API_KEY: buildProperties.secrets['googleBackupApiKey'].string
         ]
+
         resConfigs 'en',
                 'cs',
                 'de',
@@ -118,6 +130,8 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['prodPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['prodCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            buildConfigField "String", "COMMIT_HASH", "\"\""
         }
         envDev {
             dimension "environment"
@@ -138,7 +152,9 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['devPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['devCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-dev'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
         }
         envStaging {
             dimension "environment"
@@ -159,8 +175,9 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['stagingPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['stagingCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
-
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-staging'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             applicationId "piuk.blockchain.android.staging"
         }
         envTestnet {
@@ -182,6 +199,7 @@ android {
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['testnetPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['testnetCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
+            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-testnet'
         }
     }
@@ -251,7 +269,6 @@ dependencies {
 
     implementation Libraries.koin
     implementation Libraries.koinAndroid
-    implementation Libraries.koinAndroidArchitecture
 
     // Views
     implementation project(":zxing")
@@ -326,6 +343,3 @@ dependencies {
     testImplementation Libraries.json
     testImplementation project(':testutils-android')
 }
-
-// This must remain at the bottom of this file until Google work out a better way to do this
-apply plugin: 'com.google.gms.google-services'

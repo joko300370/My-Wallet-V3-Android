@@ -357,6 +357,12 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
+    fun getBalanceForAllAssets(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getBalanceForAllAssets(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
     fun transferFunds(
         sessionToken: NabuSessionTokenResponse,
         request: TransferRequest
@@ -382,7 +388,7 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getPaymentMethods(
         authorization = sessionToken.authHeader,
         currency = currency,
-        checkEligibility = checkEligibility
+        checkEligibility = checkEligibility.takeIf { it }
     ).wrapErrorMessage()
 
     fun getCards(

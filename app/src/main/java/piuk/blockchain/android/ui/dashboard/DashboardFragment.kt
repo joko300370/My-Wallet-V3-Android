@@ -3,13 +3,14 @@ package piuk.blockchain.android.ui.dashboard
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.UiThread
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
@@ -26,22 +27,21 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
-import piuk.blockchain.android.ui.home.HomeScreenMviFragment
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
-import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
-import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
+import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
+import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import java.lang.IllegalStateException
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class EmptyDashboardItem : DashboardItem
 
@@ -54,10 +54,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
-    override val model: DashboardModel by inject()
+    override val model: DashboardModel by scopedInject()
 
-    private val announcements: AnnouncementList by inject()
-    private val analyticsReporter: BalanceAnalyticsReporter by inject()
+    private val announcements: AnnouncementList by scopedInject()
+    private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -119,6 +119,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
             add(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM])
             add(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX])
+            add(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO])
         }
         theAdapter.notifyDataSetChanged()
     }
@@ -133,6 +134,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
             modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
             modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
+            modList.add(handleUpdatedAssetState(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO]))
 
             modList.removeAll { it == null }
 
@@ -401,6 +403,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         private const val IDX_CARD_BCH = 4
         private const val IDX_CARD_XLM = 5
         private const val IDX_CARD_PAX = 6
+        private const val IDX_CARD_ALG = 7
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }

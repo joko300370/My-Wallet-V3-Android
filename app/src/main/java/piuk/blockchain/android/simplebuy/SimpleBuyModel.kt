@@ -65,16 +65,6 @@ class SimpleBuyModel(
                     onComplete = { process(SimpleBuyIntent.OrderCanceled) },
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
-            is SimpleBuyIntent.CreateOrder -> interactor.createOrder(
-                previousState.selectedCryptoCurrency
-                    ?: throw IllegalStateException("Missing Cryptocurrency "),
-                previousState.order.amount ?: throw IllegalStateException("Missing amount"),
-                previousState.selectedPaymentMethod?.id.takeIf { it != PaymentMethod.BANK_PAYMENT_ID },
-                intent.isPending
-            ).subscribeBy(
-                onSuccess = { process(it) },
-                onError = { process(SimpleBuyIntent.ErrorIntent()) }
-            )
             is SimpleBuyIntent.FetchBankAccount ->
                 when {
                     previousState.bankAccount != null -> {
@@ -84,7 +74,10 @@ class SimpleBuyModel(
                     previousState.selectedPaymentMethod?.isBank() == true ->
                         interactor.fetchBankAccount(previousState.fiatCurrency).subscribeBy(
                             onSuccess = { process(it) },
-                            onError = { process(SimpleBuyIntent.ErrorIntent()) }
+                            onError = {
+                                process(SimpleBuyIntent.ErrorIntent())
+                                process(SimpleBuyIntent.CancelOrder)
+                            }
                         )
                     else -> null
                 }
@@ -95,7 +88,12 @@ class SimpleBuyModel(
                     previousState.selectedCryptoCurrency
                         ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
-                    previousState.selectedPaymentMethod?.id?.takeIf { it != PaymentMethod.BANK_PAYMENT_ID },
+                    previousState.selectedPaymentMethod?.id?.takeIf {
+                        it != PaymentMethod.BANK_PAYMENT_ID &&
+                                it != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                    },
+                    previousState.selectedPaymentMethod?.paymentMethodType
+                        ?: throw IllegalStateException("Missing Payment Method"),
                     true
                 )
             }
@@ -194,14 +192,6 @@ class SimpleBuyModel(
                     process(SimpleBuyIntent.ErrorIntent())
                 }
             )
-            is SimpleBuyIntent.SyncState -> {
-                gson.fromJson(prefs.simpleBuyState(), SimpleBuyState::class.java)?.let { state ->
-                    state.id?.let {
-                        process(SimpleBuyIntent.SyncLatestState(state))
-                    }
-                }
-                null
-            }
             else -> null
         }
 

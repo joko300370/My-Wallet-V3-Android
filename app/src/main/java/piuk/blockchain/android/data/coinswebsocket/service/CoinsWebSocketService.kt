@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
 import io.reactivex.disposables.CompositeDisposable
@@ -25,7 +26,7 @@ class CoinsWebSocketService : Service(), MessagesSocketHandler {
     private val binder = LocalBinder()
     private val compositeDisposable = CompositeDisposable()
     private val notificationManager: NotificationManager by inject()
-    private val coinsWebSocketStrategy: CoinsWebSocketStrategy by inject()
+    private val coinsWebSocketStrategy: CoinsWebSocketStrategy by scopedInject()
     private val lifecycleInterestedComponent: LifecycleInterestedComponent by inject()
     private val rxBus: RxBus by inject()
     private val analytics: Analytics by inject()

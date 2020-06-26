@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
 import com.blockchain.notifications.analytics.logEvent
@@ -48,7 +49,7 @@ import kotlinx.android.synthetic.main.fragment_kyc_profile.input_layout_kyc_date
 
 class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), KycProfileView {
 
-    private val presenter: KycProfilePresenter by inject()
+    private val presenter: KycProfilePresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()

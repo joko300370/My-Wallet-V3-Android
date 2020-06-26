@@ -13,10 +13,10 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.navigation.NavDirections
 import com.blockchain.activities.StartSwap
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.util.setImageDrawable
 import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
@@ -27,6 +27,8 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import com.blockchain.ui.urllinks.URL_LEARN_MORE_REJECTED
@@ -49,7 +51,7 @@ import timber.log.Timber
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
     KycTierSplashView {
 
-    private val presenter: KycTierSplashPresenter by inject()
+    private val presenter: KycTierSplashPresenter by scopedInject()
     private val startSwap: StartSwap by inject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
@@ -88,13 +90,16 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     private val disposable = CompositeDisposable()
 
-    override fun renderTiersList(tiers: TiersJson) {
+    override fun renderTiersList(tiers: KycTiers) {
         // Logic is now limited to 2 tiers, future refactor to traverse tiersList
-        renderTier1(tiers.tiers[1])
 
-        renderTier2(tiers.tiers[2])
+        renderTier1(tiers.tierForLevel(KycTierLevel.SILVER))
+        renderTier2(tiers.tierForLevel(KycTierLevel.GOLD))
 
-        reportState(tiers.tiers[1].state, tiers.tiers[2].state)
+        reportState(
+            tiers.tierForLevel(KycTierLevel.SILVER).state,
+            tiers.tierForLevel(KycTierLevel.GOLD).state
+        )
     }
 
     private fun reportState(
@@ -109,7 +114,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         }
     }
 
-    private fun renderTier(tier: TierJson, layoutElements: TierLayoutElements) {
+    private fun renderTier(tier: Tier, layoutElements: TierLayoutElements) {
         when (tier.state) {
             KycTierState.Rejected -> {
                 layoutElements.icon.setImageDrawable(R.drawable.vector_tier_locked)
@@ -155,7 +160,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         layoutElements.textPeriodicLimit.text = getString(getLimitString(tier))
     }
 
-    private fun renderTier1(tier: TierJson) {
+    private fun renderTier1(tier: Tier) {
         val layoutElements = TierLayoutElements(
             cardTier = card_tier_1,
             icon = icon_tier1_state,
@@ -169,7 +174,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         renderTier(tier, layoutElements)
     }
 
-    private fun renderTier2(tier: TierJson) {
+    private fun renderTier2(tier: Tier) {
         val layoutElements = TierLayoutElements(
             cardTier = card_tier_2,
             icon = icon_tier2_state,
@@ -183,25 +188,25 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         renderTier(tier, layoutElements)
     }
 
-    private fun getLevelForTier(tier: TierJson): String =
-        when (tier.index) {
+    private fun getLevelForTier(tier: Tier): String =
+        when (tier.state.ordinal) {
             1 -> getString(R.string.silver_level)
             2 -> getString(R.string.gold_level)
-            else -> tier.name
+            else -> ""
         }
 
-    private fun getLimitForTier(tier: TierJson): String? {
+    private fun getLimitForTier(tier: Tier): String? {
         val limits = tier.limits
-        return (limits.annualFiat ?: limits.dailyFiat)?.toStringWithSymbol()
+        return (limits?.annualFiat ?: limits?.dailyFiat)?.toStringWithSymbol() ?: ""
     }
 
     @StringRes
-    private fun getLimitString(tier: TierJson): Int {
+    private fun getLimitString(tier: Tier): Int {
         val limits = tier.limits
         return when {
-            limits.annual != null -> if (tier.index == SILVER_TIER_INDEX)
+            limits?.annualFiat != null -> if (tier.state.ordinal == SILVER_TIER_INDEX)
                 R.string.annual_swap_limit else R.string.annual_swap_and_buy_limit
-            limits.daily != null -> if (tier.index == SILVER_TIER_INDEX)
+            limits?.dailyFiat != null -> if (tier.state.ordinal == SILVER_TIER_INDEX)
                 R.string.daily_swap_limit else R.string.daily_swap_and_buy_limit
             else -> 0
         }

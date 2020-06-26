@@ -1,52 +1,84 @@
 package com.blockchain.swap.nabu.nabu
 
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
-import org.amshove.kluent.`should be`
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import org.junit.Test
+import kotlin.test.assertTrue
 
 class KycStateCombinerTest {
 
     @Test
     fun `combinedState when tier 2 is None`() {
-        tiers(KycTierState.None, KycTierState.None).combinedState `should be` Kyc2TierState.Locked
-        tiers(KycTierState.Pending, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Pending
-        tiers(KycTierState.Verified, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Approved
-        tiers(KycTierState.Rejected, KycTierState.None).combinedState `should be` Kyc2TierState.Tier1Failed
+        tiers(KycTierState.None, KycTierState.None).let {
+            assertTrue { it.isInInitialState() }
+        }
+        tiers(KycTierState.Pending, KycTierState.None).let {
+            assertTrue { it.isPendingFor(KycTierLevel.SILVER) }
+        }
+        tiers(KycTierState.Verified, KycTierState.None).let {
+            assertTrue { it.isApprovedFor(KycTierLevel.SILVER) }
+        }
+        tiers(KycTierState.Rejected, KycTierState.None).let {
+            assertTrue { it.isRejectedFor(KycTierLevel.SILVER) }
+        }
     }
 
     @Test
     fun `combinedState when tier 2 is Pending`() {
-        tiers(KycTierState.None, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
-        tiers(KycTierState.Pending, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
-        tiers(KycTierState.Verified, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
-        tiers(KycTierState.Rejected, KycTierState.Pending).combinedState `should be` Kyc2TierState.Tier2InPending
+        tiers(KycTierState.None, KycTierState.Pending).let {
+            assertTrue { it.isPendingFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Pending, KycTierState.Pending).let {
+            assertTrue { it.isPendingFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Verified, KycTierState.Pending).let {
+            assertTrue { it.isPendingFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Rejected, KycTierState.Pending).let {
+            assertTrue { it.isPendingFor(KycTierLevel.GOLD) }
+        }
     }
 
     @Test
     fun `combinedState when tier 2 is Approved`() {
-        tiers(KycTierState.None, KycTierState.Verified).combinedState `should be` Kyc2TierState.Tier2Approved
-        tiers(KycTierState.Pending, KycTierState.Verified).combinedState `should be` Kyc2TierState.Tier2Approved
-        tiers(KycTierState.Verified, KycTierState.Verified).combinedState `should be` Kyc2TierState.Tier2Approved
-        tiers(KycTierState.Rejected, KycTierState.Verified).combinedState `should be` Kyc2TierState.Tier2Approved
+        tiers(KycTierState.None, KycTierState.Verified).let {
+            assertTrue { it.isApprovedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Pending, KycTierState.Verified).let {
+            assertTrue { it.isApprovedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Verified, KycTierState.Verified).let {
+            assertTrue { it.isApprovedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Rejected, KycTierState.Verified).let {
+            assertTrue { it.isApprovedFor(KycTierLevel.GOLD) }
+        }
     }
 
     @Test
     fun `combinedState when tier 2 is Rejected`() {
-        tiers(KycTierState.None, KycTierState.Rejected).combinedState `should be` Kyc2TierState.Tier2Failed
-        tiers(KycTierState.Pending, KycTierState.Rejected).combinedState `should be` Kyc2TierState.Tier2Failed
-        tiers(KycTierState.Verified, KycTierState.Rejected).combinedState `should be` Kyc2TierState.Tier2Failed
-        tiers(KycTierState.Rejected, KycTierState.Rejected).combinedState `should be` Kyc2TierState.Tier2Failed
+        tiers(KycTierState.None, KycTierState.Rejected).let {
+            assertTrue { it.isRejectedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Pending, KycTierState.Rejected).let {
+            assertTrue { it.isRejectedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Verified, KycTierState.Rejected).let {
+            assertTrue { it.isRejectedFor(KycTierLevel.GOLD) }
+        }
+        tiers(KycTierState.Rejected, KycTierState.Rejected).let {
+            assertTrue { it.isRejectedFor(KycTierLevel.GOLD) }
+        }
     }
 }
 
-fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
-    return TiersJson(
-        tiers = listOf(
-            TierJson(
+fun tiers(tier1State: KycTierState, tier2State: KycTierState): KycTiers {
+    return KycTiers(
+        tiersResponse = listOf(
+            TierResponse(
                 0,
                 "Tier 0",
                 state = KycTierState.Verified,
@@ -56,7 +88,7 @@ fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
                     annual = null
                 )
             ),
-            TierJson(
+            TierResponse(
                 1,
                 "Tier 1",
                 state = tier1State,
@@ -66,7 +98,7 @@ fun tiers(tier1State: KycTierState, tier2State: KycTierState): TiersJson {
                     annual = 1000.0.toBigDecimal()
                 )
             ),
-            TierJson(
+            TierResponse(
                 2,
                 "Tier 2",
                 state = tier2State,

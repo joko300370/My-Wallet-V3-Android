@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.navigation.NavDirections
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
 import com.blockchain.swap.nabu.service.TierService
@@ -66,8 +67,8 @@ class KycTierSplashPresenter(
 
     private fun navDirections(tier: Int): Maybe<NavDirections> =
         tierService.tiers()
-            .filter { tier in (0 until it.tiers.size) }
-            .map { it.tiers[tier] }
+            .filter { tier in (KycTierLevel.values().indices) }
+            .map { it.tierForIndex(tier) }
             .filter { it.state == KycTierState.None }
             .flatMap {
                 tierUpdater.setUserTier(tier)

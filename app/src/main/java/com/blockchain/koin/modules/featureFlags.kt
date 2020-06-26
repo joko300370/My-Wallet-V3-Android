@@ -1,43 +1,52 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.cardPaymentsFeatureFlag
+import com.blockchain.koin.coinifyFeatureFlag
+import com.blockchain.koin.coinifyUsersToKyc
+import com.blockchain.koin.interestAccount
+import com.blockchain.koin.pitAnnouncementFeatureFlag
+import com.blockchain.koin.pitFeatureFlag
+import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.smsVerifFeatureFlag
+import com.blockchain.koin.sunriver
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.featureFlag
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.module
 
-val featureFlagsModule = applicationContext {
-    factory("ff_notify_coinify_users_to_kyc") {
+val featureFlagsModule = module {
+    factory(coinifyUsersToKyc) {
         get<RemoteConfig>().featureFlag("android_notify_coinify_users_to_kyc")
     }
 
-    factory("ff_pit_linking") {
+    factory(pitFeatureFlag) {
         get<RemoteConfig>().featureFlag("pit_linking_enabled")
     }
 
-    factory("ff_coinify") {
+    factory(coinifyFeatureFlag) {
         get<RemoteConfig>().featureFlag("coinify_enabled")
     }
 
-    factory("ff_card_payments") {
+    factory(cardPaymentsFeatureFlag) {
         get<RemoteConfig>().featureFlag("simple_buy_method_card_enabled")
     }
 
-    factory("ff_simple_buy") {
+    factory(simpleBuyFeatureFlag) {
         get<RemoteConfig>().featureFlag("simple_buy_enabled")
     }
 
-    factory("ff_pit_announcement") {
+    factory(pitAnnouncementFeatureFlag) {
         get<RemoteConfig>().featureFlag("pit_show_announcement")
     }
 
-    factory("ff_sms_verification") {
+    factory(smsVerifFeatureFlag) {
         get<RemoteConfig>().featureFlag("android_sms_verification")
     }
 
-    factory("sunriver") {
+    factory(sunriver) {
         get<RemoteConfig>().featureFlag("android_sunriver_airdrop_enabled")
     }
 
-    factory("ff_interest_account") {
+    factory(interestAccount) {
         get<RemoteConfig>().featureFlag("interest_account_enabled")
     }
 }

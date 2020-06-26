@@ -1,12 +1,13 @@
 package com.blockchain.koin.modules
 
+import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.sunriver.XlmFeesFetcher
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.module
 import piuk.blockchain.android.sunriver.XlmFeesFetcherAdapter
 
-val xlmModule = applicationContext {
-    context("Payload") {
-        bean {
+val xlmModule = module {
+    scope(payloadScopeQualifier) {
+        scoped {
             XlmFeesFetcherAdapter(get()) as XlmFeesFetcher
         }
     }

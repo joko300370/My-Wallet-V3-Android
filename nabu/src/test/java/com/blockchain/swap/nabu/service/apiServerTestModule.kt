@@ -1,5 +1,7 @@
 package com.blockchain.swap.nabu.service
 
+import com.blockchain.koin.bigDecimal
+import com.blockchain.koin.nabu
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
@@ -8,24 +10,25 @@ import com.nhaarman.mockito_kotlin.spy
 import info.blockchain.balance.CryptoCurrency
 import io.fabric8.mockwebserver.DefaultMockServer
 import okhttp3.OkHttpClient
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
-fun apiServerTestModule(server: DefaultMockServer) = applicationContext {
+fun apiServerTestModule(server: DefaultMockServer) = module {
 
-    bean { OkHttpClient() }
+    single { OkHttpClient() }
 
-    bean { OkHttpInterceptors(emptyList()) }
+    single { OkHttpInterceptors(emptyList()) }
 
-    bean {
+    single {
         MoshiBuilderInterceptorList(
             listOf(
-                get("BigDecimal"),
-                get("nabu")
+                get(bigDecimal),
+                get(nabu)
             )
         )
     }
 
-    bean {
+    single {
         object : EnvironmentUrls {
 
             override val explorerUrl: String
@@ -40,8 +43,8 @@ fun apiServerTestModule(server: DefaultMockServer) = applicationContext {
             override fun websocketUrl(currency: CryptoCurrency): String {
                 throw NotImplementedError()
             }
-        } as EnvironmentUrls
-    }
+        }
+    }.bind(EnvironmentUrls::class)
 
-    bean { spy(MockAuthenticator("testToken")) as Authenticator }
+    single { spy(MockAuthenticator("testToken")) }.bind(Authenticator::class)
 }

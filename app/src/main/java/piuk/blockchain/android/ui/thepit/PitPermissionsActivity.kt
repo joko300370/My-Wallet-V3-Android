@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.thepit
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import com.blockchain.ui.extensions.throttledClicks
@@ -20,9 +21,9 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 
 class PitPermissionsActivity : PitPermissionsView, BaseMvpActivity<PitPermissionsView, PitPermissionsPresenter>() {
 
-    override fun createPresenter(): PitPermissionsPresenter = get()
+    override fun createPresenter(): PitPermissionsPresenter = pitPermissionsPresenter
     override fun getView(): PitPermissionsView = this
-
+    private val pitPermissionsPresenter: PitPermissionsPresenter by scopedInject()
     private val analytics: Analytics = get()
     private var loadingDialog: PitStateBottomDialog? = null
 
@@ -49,8 +50,8 @@ class PitPermissionsActivity : PitPermissionsView, BaseMvpActivity<PitPermission
                     analytics.logEvent(PitAnalyticsEvent.LearnMoreEvent)
                     launchUrlInBrowser(
                         URL_THE_PIT_LANDING_LEARN_MORE +
-                            "/?utm_source=android_wallet" +
-                            "&utm_medium=wallet_linking"
+                                "/?utm_source=android_wallet" +
+                                "&utm_medium=wallet_linking"
                     )
                 }
             )

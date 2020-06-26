@@ -2,8 +2,7 @@ package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
@@ -27,7 +26,7 @@ internal interface SettingsView : View {
 
     fun setGuidSummary(summary: String)
 
-    fun setKycState(kycState: Kyc2TierState)
+    fun setKycState(kycTiers: KycTiers)
 
     fun setEmailSummary(summary: String)
 

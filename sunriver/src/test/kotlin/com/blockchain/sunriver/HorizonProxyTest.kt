@@ -1,5 +1,6 @@
 package com.blockchain.sunriver
 
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.sunriverModule
 import com.blockchain.network.initRule
 import com.blockchain.testutils.after
@@ -21,13 +22,11 @@ import org.amshove.kluent.`should throw`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.standalone.StandAloneContext
-import org.koin.standalone.get
+import org.koin.core.context.startKoin
 import org.koin.test.AutoCloseKoinTest
 import org.stellar.sdk.CreateAccountOperation
 import org.stellar.sdk.KeyPair
 import org.stellar.sdk.Memo
-import org.stellar.sdk.Network
 import org.stellar.sdk.PaymentOperation
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
@@ -49,13 +48,14 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Before
-    fun startKoin() {
-        StandAloneContext.startKoin(
-            listOf(
+    fun setUp() {
+        startKoin {
+            properties(mapOf("HorizonURL" to server.url("")))
+            modules(listOf(
                 sunriverModule
-            ),
-            extraProperties = mapOf("HorizonURL" to server.url(""))
-        )
+            ))
+        }
+        server.requestCount
     }
 
     @Test
@@ -67,7 +67,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -86,7 +86,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -105,7 +105,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -124,7 +124,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -143,7 +143,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -163,7 +163,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         };
 
@@ -182,7 +182,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -205,7 +205,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -225,7 +225,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         };
 
@@ -243,21 +243,21 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
         val transaction =
             proxy.getTransaction("2dcb356e88d0c778a0c5ed8d33543f167994744ed0019b96553c310449133aba")
 
-        transaction.feePaid `should equal` 100L
+        transaction.feeCharged `should equal` 100L
     }
 
     @Test
     fun `accountExists - get account existence`() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -268,7 +268,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     fun `accountExists - get account non-existence`() {
         server.givenAccountDoesNotExist("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -284,7 +284,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         };
 
@@ -294,27 +294,13 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     @Test
-    fun `Uses test net if url contains the word test`() {
-        HorizonProxy().apply { update("test_net") }
-
-        Network.current().networkPassphrase `should equal` "Test SDF Network ; September 2015"
-    }
-
-    @Test
-    fun `Uses the public network if url does not contains the word test`() {
-        HorizonProxy().apply { update("te_st_net") }
-
-        Network.current().networkPassphrase `should equal` "Public Global Stellar Network ; September 2015"
-    }
-
-    @Test
     fun `can send transaction to an account that exists`() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
-
+        server.givenRootResponse()
         server.givenPostWillBeSuccessful()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -333,14 +319,14 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             transaction!!.operations.single().apply {
                 this `should be instance of` PaymentOperation::class
                 (this as PaymentOperation).apply {
-                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    destination `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
                     amount `should equal` "123.4567891"
                 }
             }
-            transaction.fee `should equal` 100
+            transaction.fee `should equal` 100L
         }
 
-        server.requestCount `should be` 3
+        server.requestCount `should be` 5
     }
 
     @Test
@@ -350,7 +336,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
         server.givenPostWillBeSuccessful()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -369,11 +355,11 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             transaction!!.operations.single().apply {
                 this `should be instance of` PaymentOperation::class
                 (this as PaymentOperation).apply {
-                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    destination `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
                     amount `should equal` "123.4567891"
                 }
             }
-            transaction.fee `should equal` 100
+            transaction.fee `should equal` 100L
         }
 
         server.requestCount `should be` 2
@@ -412,22 +398,22 @@ class HorizonProxyTest : AutoCloseKoinTest() {
 
     @Test
     fun `absolute minimum balance can be sent`() {
-        assertSendPasses(109969.999970.lumens() - fee - minimumBalance)
+        assertSendPasses(109969.999970.lumens() - fee - minimumBalance, expectedRequests = 5)
     }
 
     @Test
     fun `existing account - minimum send`() {
-        assertSendPasses(minimumBalance, destinationAccountExists = true)
+        assertSendPasses(minimumBalance, destinationAccountExists = true, expectedRequests = 5)
     }
 
     @Test
     fun `non-existing account - minimum send`() {
-        assertSendPasses(minimumBalance, destinationAccountExists = false)
+        assertSendPasses(minimumBalance, destinationAccountExists = false, expectedRequests = 4)
     }
 
     @Test
     fun `existing account - no lower limit on send`() {
-        assertSendPasses(1.stroops(), destinationAccountExists = true)
+        assertSendPasses(1.stroops(), destinationAccountExists = true, expectedRequests = 5)
     }
 
     @Test
@@ -549,9 +535,9 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         assertSendPasses(
             value = 100.lumens() - ((2 + 5) * 0.5).lumens() - fee,
             destinationAccountExists = true,
-            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557")
+            sourceAccount = KeyPair.fromSecretSeed("SDRURR3G4FSIRO6ZD2UEPY3OAVT6MFBUO7I3DPG2QLUD6CPKTMHEC557"),
+            expectedRequests = 5
         )
-        server.requestCount `should be` 3
     }
 
     @Test
@@ -601,7 +587,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             destinationAccountExists = destinationAccountExists
         )
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -640,7 +626,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             destinationAccountExists = destinationAccountExists
         )
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -669,17 +655,18 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         ),
         destinationAccount: KeyPair = KeyPair.fromAccountId(
             "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
-        )
+        ),
+        expectedRequests: Int
     ) {
         server.givenAccounts(
             sourceAccountId = sourceAccount.accountId,
             destinationAccountId = destinationAccount.accountId,
             destinationAccountExists = destinationAccountExists
         )
-
+        server.givenRootResponse()
         server.givenPostWillBeSuccessful()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -693,7 +680,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             transaction?.signatures?.size `should be` 1
         }
 
-        server.requestCount `should be` 3
+        server.requestCount `should be` expectedRequests
     }
 
     private fun assertDryRunSaysSendShouldPass(
@@ -712,7 +699,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             destinationAccountExists = destinationAccountExists
         )
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -734,6 +721,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
+        server.givenRootResponse()
+
         server.expect().post().withPath("/transactions")
             .andReturn(
                 400,
@@ -741,7 +730,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             )
             .once()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -752,7 +741,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             10
         ).success `should be` false
 
-        server.requestCount `should be` 3
+        server.requestCount `should be` 5
     }
 
     @Test
@@ -760,8 +749,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
         server.givenPostWillBeSuccessful()
-
-        val proxy = get<HorizonProxy>().apply {
+        server.givenRootResponse()
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -779,15 +768,15 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             transaction!!.operations.single().apply {
                 this `should be instance of` CreateAccountOperation::class
                 (this as CreateAccountOperation).apply {
-                    destination.accountId `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
+                    destination `should equal` "GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"
                     startingBalance `should equal` "12300.0000000"
                 }
             }
-            transaction.fee `should equal` 100
+            transaction.fee `should equal` 100L
             transaction.memo `should equal` Memo.none()
         }
 
-        server.requestCount `should be` 3
+        server.requestCount `should be` 4
     }
 
     @Test
@@ -795,8 +784,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
         server.givenPostWillBeSuccessful()
-
-        val proxy = get<HorizonProxy>().apply {
+        server.givenRootResponse()
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -814,7 +803,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             success `should be` true
             transaction `should not be` null
             transaction!!.memo `should be` memo
-            transaction.fee `should equal` 100
+            transaction.fee `should equal` 100L
         }
     }
 
@@ -823,7 +812,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -840,7 +829,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             success `should be` true
             transaction `should not be` null
             transaction!!.memo `should be` memo
-            transaction.fee `should equal` 100
+            transaction.fee `should equal` 100L
         }
     }
 
@@ -849,8 +838,8 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
         server.givenPostWillBeSuccessful()
-
-        val proxy = get<HorizonProxy>().apply {
+        server.givenRootResponse()
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -869,7 +858,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             success `should be` true
             transaction `should not be` null
             transaction!!.memo `should be` memo
-            transaction.fee `should equal` 2100
+            transaction.fee `should equal` 2100L
         }
     }
 
@@ -878,7 +867,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountDoesNotExist("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -896,7 +885,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
             success `should be` true
             transaction `should not be` null
             transaction!!.memo `should be` memo
-            transaction.fee `should equal` 1700
+            transaction.fee `should equal` 1700L
         }
     }
 
@@ -905,7 +894,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -927,8 +916,9 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         server.givenAccountExists("GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4")
         server.givenAccountExists("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI")
         server.givenPostWillBeSuccessful()
+        server.givenRootResponse()
 
-        val proxy = get<HorizonProxy>().apply {
+        val proxy = payloadScope.get<HorizonProxy>().apply {
             update(server.url(""))
         }
 
@@ -977,6 +967,15 @@ private fun DefaultMockServer.givenAccountExists(accountId: String) {
         .andReturn(
             200,
             getStringFromResource("accounts/$accountId.json")
+        )
+        .once()
+}
+
+private fun DefaultMockServer.givenRootResponse() {
+    expect().get().withPath("/")
+        .andReturn(
+            200,
+            getStringFromResource("root_response.json")
         )
         .once()
 }

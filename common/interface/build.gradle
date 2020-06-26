@@ -9,6 +9,7 @@ dependencies {
     implementation Libraries.kotlin
     implementation project(':balance')
     api Libraries.rxKotlin
+    api Libraries.koin
 
     // Testing
     testImplementation project(':testutils')

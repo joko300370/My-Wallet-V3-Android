@@ -10,11 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
+import com.blockchain.notifications.analytics.PaymentMethodSelected
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.buyConfirmClicked
 import com.blockchain.notifications.analytics.cryptoChanged
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -44,7 +47,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     PaymentMethodChangeListener,
     ChangeCurrencyHost {
 
-    override val model: SimpleBuyModel by inject()
+    override val model: SimpleBuyModel by scopedInject()
 
     private var lastState: SimpleBuyState? = null
 
@@ -64,7 +67,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
-        model.process(SimpleBuyIntent.SyncState)
         model.process(SimpleBuyIntent.FetchBuyLimits(currencyPrefs.selectedFiatCurrency))
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
         model.process(SimpleBuyIntent.FetchPredefinedAmounts(currencyPrefs.selectedFiatCurrency))
@@ -79,6 +81,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
         btn_continue.setOnClickListener {
             model.process(SimpleBuyIntent.BuyButtonClicked)
+            model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
             analytics.logEvent(buyConfirmClicked(
                 lastState?.order?.amount?.valueMinor.toString(),
                 lastState?.fiatCurrency ?: "")
@@ -194,7 +197,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             )
         }
 
-        if (newState.confirmationActionRequested && newState.kycVerificationState != null) {
+        if (newState.confirmationActionRequested &&
+            newState.kycVerificationState != null &&
+            newState.orderState == OrderState.PENDING_CONFIRMATION
+        ) {
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {
@@ -341,11 +347,16 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
         model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
+        analytics.logEvent(PaymentMethodSelected(
+            if (paymentMethod is PaymentMethod.BankTransfer) BANK_ANALYTICS
+            else CARD_ANALYTICS
+        ))
     }
 
     override fun addPaymentMethod() {
         val intent = Intent(activity, CardDetailsActivity::class.java)
         startActivityForResult(intent, ADD_CARD_REQUEST_CODE)
+        analytics.logEvent(PaymentMethodSelected(NEW_CARD_ANALYTICS))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -357,6 +368,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
                 ))
         }
+    }
+
+    companion object {
+        private const val BANK_ANALYTICS = "BANK"
+        private const val CARD_ANALYTICS = "CARD"
+        private const val NEW_CARD_ANALYTICS = "CARD"
     }
 }
 

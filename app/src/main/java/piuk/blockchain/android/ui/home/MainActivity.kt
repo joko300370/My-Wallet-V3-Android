@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.annotations.ButWhy
+import com.blockchain.koin.scopedInject
 import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvent
@@ -42,7 +43,6 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -79,6 +79,8 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -88,7 +90,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     IntroTourHost,
     ConfirmPaymentDialog.OnConfirmDialogInteractionListener {
 
-    override val presenter: MainPresenter by inject()
+    override val presenter: MainPresenter by scopedInject()
     override val view: MainView = this
 
     var drawerOpen = false
@@ -161,7 +163,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         setContentView(R.layout.activity_main)
 
         if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
-            intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)) {
+            intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)
+        ) {
             analytics.logEvent(NotificationAppOpened)
         }
 
@@ -395,7 +398,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
-            R.id.nav_simple_buy -> launchSimpleBuy()
+            R.id.nav_simple_buy -> presenter.onSimpleBuyClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
             R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java), ACCOUNT_EDIT)
             R.id.login_web_wallet -> PairingCodeActivity.start(this)
@@ -406,7 +409,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         drawer_layout.closeDrawers()
     }
 
-    private fun launchSimpleBuy() {
+    override fun launchSimpleBuy() {
         analytics.logEvent(SimpleBuyAnalytics.SIMPLE_BUY_SIDE_NAV)
         startActivity(
             SimpleBuyActivity.newInstance(
@@ -414,6 +417,14 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 launchFromDashboard = true
             )
         )
+    }
+
+    override fun showProgress() {
+        progress.visible()
+    }
+
+    override fun hideProgress() {
+        progress.gone()
     }
 
     override fun launchThePitLinking(linkId: String) {
@@ -576,15 +587,18 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     @ButWhy("Who calls this... it looks crazy")
     override fun onChangeFeeClicked() {
         val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as SendFragment
-        fragment.onChangeFeeClicked()
+            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
+        fragment?.onChangeFeeClicked()
     }
 
     @ButWhy("Who calls this")
+    // Turns out this is called by the confirm transfer dlg. That can, however, be invoked from
+    // both the account edit screen (when transferring between wallets) and the send screen.
+    // (As can onChangeFeeClicked()) so the send fragment might not exist. This needs cleaning up. TODO
     override fun onSendClicked() {
         val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as SendFragment
-        fragment.onSendClicked()
+            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
+        fragment?.onSendClicked()
     }
 
     override fun showTestnetWarning() {

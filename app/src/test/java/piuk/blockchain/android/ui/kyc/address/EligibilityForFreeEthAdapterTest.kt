@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.kyc.address
 import com.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.getBlankNabuUser
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.Tiers
+import com.blockchain.swap.nabu.models.nabu.TierLevels
 import com.blockchain.swap.nabu.NabuToken
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
@@ -40,7 +40,7 @@ class EligibilityForFreeEthAdapterTest {
             .thenReturn(Single.just(
                 getBlankNabuUser()
                 .copy(
-                    tiers = Tiers(1, 1, 2))
+                    tiers = TierLevels(1, 1, 2))
                 .copy(tags = mapOf())
             ))
 
@@ -60,7 +60,7 @@ class EligibilityForFreeEthAdapterTest {
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(
                 getBlankNabuUser()
-                .copy(tiers = Tiers(1, 1, 2))
+                .copy(tiers = TierLevels(1, 1, 2))
                 .copy(tags = mapOf("POWER_PAX" to mapOf("some key" to "some key")))
             ))
 
@@ -80,7 +80,7 @@ class EligibilityForFreeEthAdapterTest {
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(
                 getBlankNabuUser()
-                .copy(tiers = Tiers(2, 2, 2))
+                .copy(tiers = TierLevels(2, 2, 2))
                 .copy(tags = mapOf("POWER_PAX" to mapOf("some key" to "some key")))
             ))
 
@@ -100,7 +100,7 @@ class EligibilityForFreeEthAdapterTest {
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(Single.just(
                 getBlankNabuUser()
-                .copy(tiers = Tiers(2, 2, 2))
+                .copy(tiers = TierLevels(2, 2, 2))
                 .copy(tags = mapOf())
             ))
 

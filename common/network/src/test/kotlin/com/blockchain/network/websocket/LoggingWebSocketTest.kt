@@ -10,8 +10,8 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should be`
 import org.junit.Before
 import org.junit.Test
-import org.koin.dsl.module.applicationContext
-import org.koin.standalone.StandAloneContext
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 
 class LoggingWebSocketTest : AutoCloseKoinTest() {
@@ -20,15 +20,16 @@ class LoggingWebSocketTest : AutoCloseKoinTest() {
 
     @Before
     fun setup() {
-        StandAloneContext.startKoin(
-            listOf(
-                applicationContext {
-                    bean {
+        startKoin {
+            // load Koin modules
+            modules(listOf(
+                module {
+                    single {
                         logger
                     }
                 }
-            )
-        )
+            ))
+        }
     }
 
     @Test
@@ -99,15 +100,15 @@ class LoggingWebSocketWithNullLoggerTest : AutoCloseKoinTest() {
 
     @Before
     fun setup() {
-        StandAloneContext.startKoin(
-            listOf(
-                applicationContext {
-                    bean {
+        startKoin {
+            modules(listOf(
+                module {
+                    single {
                         NullLogger as Logger
                     }
                 }
-            )
-        )
+            ))
+        }
     }
 
     @Test

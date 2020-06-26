@@ -35,7 +35,11 @@ class NabuMarketsService internal constructor(
                         config.minOrderSize
                     )
                 )
+            }.doOnError {
+                println("")
             }
+        }.doOnError {
+            println("")
         }
     }
 

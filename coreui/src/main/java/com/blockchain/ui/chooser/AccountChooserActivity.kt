@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.serialization.toMoshiJson
 import com.blockchain.wallet.toAccountReference
@@ -16,7 +17,6 @@ import kotlinx.android.synthetic.main.activity_account_chooser.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import com.squareup.moshi.Moshi
 import info.blockchain.balance.AccountReference
-import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.R
@@ -27,7 +27,7 @@ import java.io.IOException
 class AccountChooserActivity : BaseMvpActivity<AccountChooserView, AccountChooserPresenter>(),
     AccountChooserView {
 
-    private val accountChooserPresenter: AccountChooserPresenter by inject()
+    private val accountChooserPresenter: AccountChooserPresenter by scopedInject()
 
     override val accountMode: AccountMode by unsafeLazy {
         intent.getParcelableExtra(EXTRA_CHOOSER_MODE) as AccountMode

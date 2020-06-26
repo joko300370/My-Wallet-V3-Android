@@ -61,7 +61,6 @@ class LoginPresenterTest {
         verify(view).dismissProgressDialog()
         verify(view).startPinEntryActivity()
         verifyNoMoreInteractions(view)
-        verify(appUtil).clearCredentials()
         verify(appUtil).sharedKey = sharedKey
         verifyNoMoreInteractions(appUtil)
         verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
@@ -90,7 +89,6 @@ class LoginPresenterTest {
         //noinspection WrongConstant
         verify(view).showToast(any(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(view)
-        verify(appUtil).clearCredentials()
         verify(appUtil).clearCredentialsAndRestart(LauncherActivity::class.java)
         verifyNoMoreInteractions(appUtil)
         verifyZeroInteractions(prefsUtil)
@@ -117,7 +115,7 @@ class LoginPresenterTest {
         verify(view).showProgressDialog(R.string.please_wait, null)
         verify(view).dismissProgressDialog()
         verifyNoMoreInteractions(view)
-        verify(appUtil, times(2)).clearCredentials()
+        verify(appUtil).clearCredentials()
         verifyNoMoreInteractions(appUtil)
         verifyZeroInteractions(prefsUtil)
         verify(payloadDataManager).handleQrCode(qrCode)

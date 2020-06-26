@@ -2,19 +2,17 @@ package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.models.nabu.goldTierComplete
-import com.blockchain.swap.nabu.models.nabu.kycVerified
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.Kyc2TierState
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.UserCampaignState
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.campaign.blockstackCampaignName
-import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
@@ -49,10 +47,10 @@ class AnnouncementQueries(
     // Have we been through the Gold KYC process? ie are we Tier2InReview, Tier2Approved or Tier2Failed (cf TierJson)
     fun isGoldComplete(): Single<Boolean> =
         tierService.tiers()
-            .map { it.combinedState in goldTierComplete }
+            .map { it.tierCompletedForLevel(KycTierLevel.GOLD) }
 
     fun isTier1Or2Verified(): Single<Boolean> =
-        tierService.tiers().map { it.combinedState in kycVerified }
+        tierService.tiers().map { it.isVerified() }
 
     fun isRegistedForStxAirdrop(): Single<Boolean> {
         return nabuToken.fetchNabuToken()
@@ -71,7 +69,9 @@ class AnnouncementQueries(
         // If we have a local simple buy in progress and it has the kyc unfinished state set
         return Single.defer {
             sbStateFactory.currentState()?.let {
-                Single.just(it.kycStartedButNotCompleted && !it.kycDataSubmitted())
+                Single.just(it.kycStartedButNotCompleted).zipWith(tierService.tiers()) { kycStarted, tier ->
+                    kycStarted && !tier.docsSubmittedForGoldTier()
+                }
             } ?: Single.just(false)
         }
     }
@@ -91,11 +91,11 @@ class AnnouncementQueries(
         }
 
     fun isKycGoldVerifiedAndHasPendingCardToAdd(): Single<Boolean> =
-        tierService.tiers().map { it.combinedState == Kyc2TierState.Tier2Approved }.zipWith(
+        tierService.tiers().map { it.isApprovedFor(KycTierLevel.GOLD) }.zipWith(
             hasSelectedToAddNewCard()) { isGold, addNewCard ->
             isGold && addNewCard
         }
 }
 
-private fun SimpleBuyState?.kycDataSubmitted(): Boolean =
-    this?.kycVerificationState?.docsSubmitted() ?: false
+private fun KycTiers.docsSubmittedForGoldTier(): Boolean =
+    isInitialisedFor(KycTierLevel.GOLD)

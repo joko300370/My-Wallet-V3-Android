@@ -15,11 +15,15 @@ import com.blockchain.koin.modules.urls
 import com.blockchain.koin.modules.xlmModule
 import com.blockchain.lockbox.koin.lockboxModule
 import com.blockchain.network.modules.apiModule
+import com.blockchain.network.modules.okHttpModule
 import com.blockchain.notifications.koin.notificationModule
 import com.blockchain.swap.koin.swapModule
-import org.koin.android.ext.android.startKoin
-import org.koin.log.Logger
-import org.koin.standalone.StandAloneContext
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.logger.Level
+import org.koin.core.logger.Logger
+import org.koin.core.logger.MESSAGE
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.campaign.campaignModule
 import piuk.blockchain.android.coincore.coincoreModule
@@ -32,21 +36,21 @@ import timber.log.Timber
 
 object KoinStarter {
 
-    private lateinit var application: Application
-
     @JvmStatic
     fun start(application: Application) {
-        StandAloneContext.closeKoin()
-        @Suppress("ConstantConditionIf")
-        application.startKoin(
-            application,
-            listOf(
+        stopKoin()
+        startKoin {
+            if (BuildConfig.LOG_KOIN_STARTUP) TimberLogger() else NullLogger()
+            properties(appProperties + keys + urls)
+            androidContext(application)
+            modules(listOf(
                 activitiesModule,
                 apiInterceptorsModule,
                 apiModule,
                 applicationModule,
                 campaignModule,
                 coincoreModule,
+                okHttpModule,
                 coreModule,
                 coreUiModule,
                 dashboardAnnouncementsModule,
@@ -67,30 +71,23 @@ object KoinStarter {
                 swapModule,
                 walletModule,
                 xlmModule
-            ),
-            extraProperties = appProperties + keys + urls,
-            logger = if (BuildConfig.LOG_KOIN_STARTUP) TimberLogger() else NullLogger()
-        )
-        KoinStarter.application = application
+            ))
+        }
     }
 }
 
-private class TimberLogger : Logger {
-    override fun debug(msg: String) {
-        Timber.d(msg)
-    }
-
-    override fun err(msg: String) {
-        Timber.e(msg)
-    }
-
-    override fun log(msg: String) {
-        Timber.i(msg)
+private class TimberLogger : Logger() {
+    override fun log(level: Level, msg: MESSAGE) {
+        when (level) {
+            Level.DEBUG -> Timber.d(msg)
+            Level.INFO -> Timber.i(msg)
+            Level.ERROR -> Timber.e(msg)
+            else -> {
+            }
+        }
     }
 }
 
-private class NullLogger : Logger {
-    override fun debug(msg: String) { }
-    override fun err(msg: String) { }
-    override fun log(msg: String) { }
+private class NullLogger : Logger() {
+    override fun log(level: Level, msg: MESSAGE) {}
 }

@@ -222,3 +222,6 @@
     @com.squareup.moshi.FromJson *;
     @com.squareup.moshi.ToJson *;
 }
+
+# XLM
+-keep public class org.stellar.sdk.responses.** { *; }

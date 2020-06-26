@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.status
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
-import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
@@ -20,7 +20,7 @@ class KycTiersQueries(
             .map { it.tiers?.next ?: 0 }
             .zipWith(tiersService.tiers())
             .map { (user, tiers) ->
-                tiers.tiers[user].state == KycTierState.None
+                tiers.isNotInitialisedFor(KycTierLevel.values()[user])
             }
 
     fun isKycResubmissionRequired(): Single<Boolean> =

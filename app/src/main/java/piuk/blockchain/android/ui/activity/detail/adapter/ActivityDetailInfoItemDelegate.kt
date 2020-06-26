@@ -22,6 +22,7 @@ import piuk.blockchain.android.ui.activity.detail.Description
 import piuk.blockchain.android.ui.activity.detail.Fee
 import piuk.blockchain.android.ui.activity.detail.FeeForTransaction
 import piuk.blockchain.android.ui.activity.detail.From
+import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -66,6 +67,19 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 is Amount -> R.string.activity_details_amount
                 is Fee -> R.string.activity_details_fee
                 is Value -> R.string.activity_details_value
+                is HistoricValue -> {
+                    when (infoType.direction) {
+                        TransactionSummary.Direction.SENT,
+                        TransactionSummary.Direction.SELL ->
+                            R.string.activity_details_historic_sent
+                        TransactionSummary.Direction.RECEIVED,
+                        TransactionSummary.Direction.BUY ->
+                            R.string.activity_details_historic_received
+                        TransactionSummary.Direction.TRANSFERRED,
+                        TransactionSummary.Direction.SWAP
+                        -> R.string.activity_details_historic_transferred
+                    }
+                }
                 is To -> R.string.activity_details_to
                 is From -> R.string.activity_details_from
                 is FeeForTransaction -> R.string.activity_details_transaction_fee
@@ -74,9 +88,8 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 is BuyTransactionId -> R.string.activity_details_buy_tx_id
                 is BuyCryptoWallet -> R.string.activity_details_buy_sending_to
                 is BuyPaymentMethod -> R.string.activity_details_buy_payment_method
-                else -> R.string.activity_details_empty
-            }
-        )
+                else -> R.string.empty
+            })
 
     private fun getValueForType(infoType: ActivityDetailsType): String =
         when (infoType) {
@@ -84,8 +97,11 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is Amount -> infoType.cryptoValue.toStringWithSymbol()
             is Fee -> infoType.feeValue?.toStringWithSymbol() ?: parent.context.getString(
                 R.string.activity_details_fee_load_fail)
-            is Value -> infoType.fiatAtExecution?.toStringWithSymbol() ?: parent.context.getString(
+            is Value -> infoType.currentFiatValue?.toStringWithSymbol() ?: parent.context.getString(
                 R.string.activity_details_value_load_fail)
+            is HistoricValue -> infoType.fiatAtExecution?.toStringWithSymbol()
+                ?: parent.context.getString(
+                    R.string.activity_details_historic_value_load_fail)
             is To -> infoType.toAddress ?: parent.context.getString(
                 R.string.activity_details_to_load_fail)
             is From -> infoType.fromAddress ?: parent.context.getString(

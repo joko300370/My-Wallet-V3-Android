@@ -2,12 +2,13 @@ package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierJson
-import com.blockchain.swap.nabu.models.nabu.TiersJson
+import com.blockchain.swap.nabu.models.nabu.TierResponse
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -17,11 +18,11 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.simplebuy.KycState
 import piuk.blockchain.android.simplebuy.SelectedPaymentMethod
 import piuk.blockchain.android.simplebuy.SimpleBuyOrder
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
+import piuk.blockchain.android.ui.tiers
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
 class AnnouncementQueriesTest {
@@ -53,19 +54,19 @@ class AnnouncementQueriesTest {
 
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierJson(0,
+                        TierResponse(0,
                             "",
                             KycTierState.None,
                             sampleLimits
@@ -86,21 +87,21 @@ class AnnouncementQueriesTest {
     fun `isTier1Or2Verified returns true for tier2 verified`() {
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.Verified,
@@ -122,21 +123,21 @@ class AnnouncementQueriesTest {
     fun `isTier1Or2Verified returns false if not verified`() {
         whenever(tierService.tiers()).thenReturn(
             Single.just(
-                TiersJson(
+                KycTiers(
                     listOf(
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierJson(
+                        TierResponse(
                             0,
                             "",
                             KycTierState.None,
@@ -185,7 +186,10 @@ class AnnouncementQueriesTest {
     @Test
     fun `isSimpleBuyTransactionPending - has prefs state and is AWAITING FUNDS and payment BANK should return true`() {
         val state: SimpleBuyState = mock {
-            on { selectedPaymentMethod } `it returns` SelectedPaymentMethod(PaymentMethod.BANK_PAYMENT_ID)
+            on { selectedPaymentMethod } `it returns` SelectedPaymentMethod(
+                id = PaymentMethod.BANK_PAYMENT_ID,
+                paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            )
         }
         val order: SimpleBuyOrder = mock()
 
@@ -216,6 +220,7 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - local simple buy state exists but has finished kyc, return false`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(false)
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Verified)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()
@@ -230,6 +235,8 @@ class AnnouncementQueriesTest {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
         whenever(state.kycVerificationState).thenReturn(null)
+
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.None)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()
@@ -243,8 +250,9 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - simple buy state is not finished, and kyc state is pending - as expected`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(state.kycVerificationState).thenReturn(KycState.PENDING)
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
         whenever(sbSync.currentState()).thenReturn(state)
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.None)))
 
         subject.isSimpleBuyKycInProgress()
             .test()
@@ -261,7 +269,8 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - SB state reports unfinished, but kyc docs are submitted - belt & braces case`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(state.kycVerificationState).thenReturn(KycState.IN_REVIEW)
+
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.UnderReview)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()
@@ -275,7 +284,7 @@ class AnnouncementQueriesTest {
     fun `isSimpleBuyKycInProgress - SB state reports unfinished, but kyc docs are submitted - belt & braces case 2`() {
         val state: SimpleBuyState = mock()
         whenever(state.kycStartedButNotCompleted).thenReturn(true)
-        whenever(state.kycVerificationState).thenReturn(KycState.VERIFIED_AND_ELIGIBLE)
+        whenever(tierService.tiers()).thenReturn(Single.just(tiers(KycTierState.Pending, KycTierState.Verified)))
         whenever(sbSync.currentState()).thenReturn(state)
 
         subject.isSimpleBuyKycInProgress()

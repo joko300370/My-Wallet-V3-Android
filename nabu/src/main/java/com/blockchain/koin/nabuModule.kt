@@ -9,8 +9,9 @@ import com.blockchain.swap.nabu.api.nabu.NabuMarkets
 import com.blockchain.swap.nabu.api.trade.TransactionStateAdapter
 import com.blockchain.swap.nabu.datamanagers.AnalyticsNabuUserReporterImpl
 import com.blockchain.swap.nabu.datamanagers.AnalyticsWalletReporter
+import com.blockchain.swap.nabu.datamanagers.BalanceProviderImpl
+import com.blockchain.swap.nabu.datamanagers.BalancesProvider
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
@@ -18,10 +19,15 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManagerImpl
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.swap.nabu.datamanagers.NabuUserReporter
+import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.swap.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.swap.nabu.datamanagers.WalletReporter
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
+import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
+import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -39,14 +45,15 @@ import com.blockchain.swap.nabu.service.TierUpdater
 import com.blockchain.swap.nabu.service.TradeLimitService
 import com.blockchain.swap.nabu.status.KycTiersQueries
 import com.blockchain.swap.nabu.stores.NabuSessionTokenStore
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import retrofit2.Retrofit
 
-val nabuModule = applicationContext {
+val nabuModule = module {
 
-    bean { get<Retrofit>("nabu").create(NabuMarkets::class.java) }
+    single { get<Retrofit>(nabu).create(NabuMarkets::class.java) }
 
-    context("Payload") {
+    scope(payloadScopeQualifier) {
 
         factory { NabuMarketsService(get(), get()) }
             .bind(TradeLimitService::class)
@@ -68,10 +75,10 @@ val nabuModule = applicationContext {
                 settingsDataManager = get(),
                 payloadDataManager = get(),
                 prefs = get(),
-                walletReporter = get("unique_id"),
-                userReporter = get("unique_user_analytics")
-            ) as NabuDataManager
-        }
+                walletReporter = get(uniqueId),
+                userReporter = get(uniqueUserAnalytics)
+            )
+        }.bind(NabuDataManager::class)
 
         factory {
             LiveCustodialWalletManager(
@@ -79,35 +86,44 @@ val nabuModule = applicationContext {
                 authenticator = get(),
                 simpleBuyPrefs = get(),
                 paymentAccountMapperMappers = mapOf(
-                    "EUR" to get("EUR"), "GBP" to get("GBP")
+                    "EUR" to get(eur), "GBP" to get(gbp)
                 ),
-                featureFlag = get("ff_card_payments")
+                featureFlag = get(cardPaymentsFeatureFlag),
+                kycFeatureEligibility = get(),
+                assetBalancesRepository = get()
             )
         }.bind(CustodialWalletManager::class)
 
-        factory("unique_user_analytics") {
+        factory {
+            BalanceProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(BalancesProvider::class)
+
+        factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
-                nabuUserReporter = get("user_analytics"),
+                nabuUserReporter = get(userAnalytics),
                 prefs = get()
             )
         }.bind(NabuUserReporter::class)
 
-        factory("user_analytics") {
+        factory(userAnalytics) {
             AnalyticsNabuUserReporterImpl(
                 userAnalytics = get()
             )
         }.bind(NabuUserReporter::class)
 
-        factory("unique_id") {
-            UniqueAnalyticsWalletReporter(get("wallet_analytics"), prefs = get())
+        factory(uniqueId) {
+            UniqueAnalyticsWalletReporter(get(walletAnalytics), prefs = get())
         }.bind(WalletReporter::class)
 
-        factory("wallet_analytics") {
+        factory(walletAnalytics) {
             AnalyticsWalletReporter(userAnalytics = get())
         }.bind(WalletReporter::class)
 
         factory {
-            get<Retrofit>("nabu").create(Nabu::class.java)
+            get<Retrofit>(nabu).create(Nabu::class.java)
         }
 
         factory { NabuTierService(get(), get()) }
@@ -115,36 +131,45 @@ val nabuModule = applicationContext {
             .bind(TierUpdater::class)
 
         factory {
-            CreateNabuTokenAdapter(get()) as CreateNabuToken
+            CreateNabuTokenAdapter(get())
+        }.bind(CreateNabuToken::class)
+
+        factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) }.bind(
+            NabuDataUserProvider::class)
+
+        factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) }.bind(NabuUserSync::class)
+
+        factory { KycTiersQueries(get(), get()) }
+
+        scoped { KycFeatureEligibility(userRepository = get()) }.bind(FeatureEligibility::class)
+
+        scoped {
+            NabuUserRepository(
+                nabuDataUserProvider = get())
+        }
+
+        scoped {
+            AssetBalancesRepository(balancesProvider = get())
         }
     }
 
-    moshiInterceptor("nabu") { builder ->
+    moshiInterceptor(nabu) { builder ->
         builder.add(TransactionStateAdapter())
     }
 
-    bean { NabuSessionTokenStore() }
+    single { NabuSessionTokenStore() }
 
-    bean { NabuService(get("nabu")) }
+    single { NabuService(get(nabu)) }
 
-    bean {
+    single {
         RetailWalletTokenService(
             environmentConfig = get(),
             apiCode = getProperty("api-code"),
-            retrofit = get("kotlin")
+            retrofit = get(moshiExplorerRetrofit)
         )
     }
 
-    context("Payload") {
-
-        factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) as NabuDataUserProvider }
-
-        factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) as NabuUserSync }
-
-        factory { KycTiersQueries(get(), get()) }
-    }
-
-    moshiInterceptor("kyc") { builder ->
+    moshiInterceptor(kyc) { builder ->
         builder
             .add(KycStateAdapter())
             .add(KycTierStateAdapter())
@@ -156,14 +181,14 @@ val nabuModule = applicationContext {
     }
 }
 
-val authenticationModule = applicationContext {
-    context("Payload") {
+val authenticationModule = module {
+    scope(payloadScopeQualifier) {
         factory {
             NabuAuthenticator(
                 nabuToken = get(),
                 nabuDataManager = get(),
                 crashLogger = get()
-            ) as Authenticator
-        }
+            )
+        }.bind(Authenticator::class)
     }
 }

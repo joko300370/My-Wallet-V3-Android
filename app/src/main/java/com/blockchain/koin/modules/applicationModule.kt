@@ -3,13 +3,30 @@ package com.blockchain.koin.modules
 import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AsyncAllAccountList
-import piuk.blockchain.android.accounts.BtcAccountListAdapter
 import com.blockchain.activities.StartSwap
+import com.blockchain.koin.bch
+import com.blockchain.koin.bchStrategy
+import com.blockchain.koin.btc
+import com.blockchain.koin.btcStrategy
+import com.blockchain.koin.cardPaymentsFeatureFlag
+import com.blockchain.koin.eth
+import com.blockchain.koin.etherStrategy
+import com.blockchain.koin.eur
+import com.blockchain.koin.explorerRetrofit
+import com.blockchain.koin.gbp
+import com.blockchain.koin.interestAccount
+import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.pax
+import com.blockchain.koin.paxStrategy
+import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.pitFeatureFlag
+import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.xlm
+import com.blockchain.koin.xlmStrategy
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
-import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.CurrentContextAccess
@@ -18,13 +35,14 @@ import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.OkHttpClient
-import org.koin.dsl.module.applicationContext
+import org.koin.dsl.bind
+import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.accounts.AsyncAllAccountListImplementation
 import piuk.blockchain.android.accounts.BchAccountListAdapter
+import piuk.blockchain.android.accounts.BtcAccountListAdapter
 import piuk.blockchain.android.accounts.EthAccountListAdapter
 import piuk.blockchain.android.accounts.PaxAccountListAdapter
 import piuk.blockchain.android.cards.CardModel
@@ -32,9 +50,10 @@ import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
+import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
@@ -66,14 +85,17 @@ import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
+import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
-import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.fingerprint.FingerprintPresenter
+import piuk.blockchain.android.ui.home.CacheCredentialsWiper
+import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.home.MainPresenter
+import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
@@ -83,28 +105,31 @@ import piuk.blockchain.android.ui.receive.ReceivePresenter
 import piuk.blockchain.android.ui.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.receive.WalletAccountHelper
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
-import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.SendPresenter
+import piuk.blockchain.android.ui.send.SendView
 import piuk.blockchain.android.ui.send.strategy.BitcoinCashSendStrategy
 import piuk.blockchain.android.ui.send.strategy.BitcoinSendStrategy
 import piuk.blockchain.android.ui.send.strategy.EtherSendStrategy
-import piuk.blockchain.android.ui.send.strategy.SendStrategy
-import piuk.blockchain.android.ui.send.strategy.XlmSendStrategy
 import piuk.blockchain.android.ui.send.strategy.PaxSendStrategy
 import piuk.blockchain.android.ui.send.strategy.ResourceSendFundsResultLocalizer
 import piuk.blockchain.android.ui.send.strategy.SendFundsResultLocalizer
+import piuk.blockchain.android.ui.send.strategy.SendStrategy
+import piuk.blockchain.android.ui.send.strategy.XlmSendStrategy
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
 import piuk.blockchain.android.ui.swap.SwapStarter
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
+import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
 import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
+import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.api.ConnectionApi
@@ -115,22 +140,15 @@ import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.ui.home.CacheCredentialsWiper
-import piuk.blockchain.android.ui.home.CredentialsWiper
-import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
-import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.androidcoreui.utils.DateUtil
-import piuk.blockchain.androidcoreui.utils.OverlayDetection
 
-val applicationModule = applicationContext {
+val applicationModule = module {
 
     factory { OSUtil(get()) }
 
     factory { StringUtils(get()) }
 
-    bean {
+    single {
         AppUtil(
             context = get(),
             payloadManager = get(),
@@ -141,14 +159,13 @@ val applicationModule = applicationContext {
 
     factory { get<Context>().resources }
 
-    bean { CurrencyState(prefs = get()) }
+    single { CurrencyState(prefs = get()) }
 
-    bean { CurrentContextAccess() }
+    single { CurrentContextAccess() }
 
-    bean { LifecycleInterestedComponent() }
+    single { LifecycleInterestedComponent() }
 
-    context("Payload") {
-
+    scope(payloadScopeQualifier) {
         factory {
             EthDataManager(
                 payloadManager = get(),
@@ -162,13 +179,13 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory("pax") {
+        factory {
             PaxAccount(
                 ethDataManager = get(),
                 dataStore = get(),
                 environmentSettings = get()
-            ) as Erc20Account
-        }
+            )
+        }.bind(Erc20Account::class)
 
         factory {
             BchDataManager(
@@ -202,7 +219,7 @@ val applicationModule = applicationContext {
         }
 
         factory {
-            AssetDetailsCalculator(get("ff_interest_account"))
+            AssetDetailsCalculator(get(interestAccount))
         }
 
         factory {
@@ -213,7 +230,7 @@ val applicationModule = applicationContext {
                 bchDataManager = get(),
                 xlmDataManager = get(),
                 environmentSettings = get(),
-                paxAccount = get("pax"),
+                paxAccount = get(),
                 crashLogger = get()
             )
         }
@@ -227,8 +244,8 @@ val applicationModule = applicationContext {
         }.bind(AccountListing::class)
 
         factory {
-            SecondPasswordHandlerDialog(get(), get()) as SecondPasswordHandler
-        }
+            SecondPasswordHandlerDialog(get(), get())
+        }.bind(SecondPasswordHandler::class)
 
         factory { KycStatusHelper(get(), get(), get(), get()) }
 
@@ -240,7 +257,7 @@ val applicationModule = applicationContext {
             )
         }
 
-        bean {
+        scoped {
             CredentialsWiper(
                 payloadManagerWiper = get(),
                 paxAccount = get(),
@@ -273,7 +290,7 @@ val applicationModule = applicationContext {
                 deepLinkProcessor = get(),
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
-                pitFeatureFlag = get("ff_pit_linking"),
+                pitFeatureFlag = get(pitFeatureFlag),
                 pitLinking = get(),
                 nabuDataManager = get(),
                 nabuToken = get(),
@@ -285,22 +302,22 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory("GBP") {
+        factory(gbp) {
             GBPPaymentAccountMapper(stringUtils = get())
         }.bind(PaymentAccountMapper::class)
 
-        factory("EUR") {
+        factory(eur) {
             EURPaymentAccountMapper(stringUtils = get())
         }.bind(PaymentAccountMapper::class)
 
-        bean {
+        scoped {
             CoinsWebSocketStrategy(
                 coinsWebSocket = get(),
                 ethDataManager = get(),
                 swipeToReceiveHelper = get(),
                 stringUtils = get(),
                 gson = get(),
-                erc20Account = get("pax"),
+                erc20Account = get(),
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 rxBus = get(),
@@ -316,7 +333,7 @@ val applicationModule = applicationContext {
 
         factory {
             SimpleBuyAvailability(
-                simpleBuyFlag = get("ff_simple_buy")
+                simpleBuyFlag = get(simpleBuyFeatureFlag)
             )
         }
 
@@ -324,12 +341,6 @@ val applicationModule = applicationContext {
             OkHttpClient()
                 .newBlockchainWebSocket(options = Options(url = BuildConfig.COINS_WEBSOCKET_URL))
                 .autoRetry().debugLog("COIN_SOCKET")
-        }
-
-        factory {
-            SSLVerifyPresenter(
-                sslVerifyUtil = get()
-            )
         }
 
         factory {
@@ -417,23 +428,23 @@ val applicationModule = applicationContext {
 
         factory<SendPresenter<SendView>> {
             SendPresenter(
-                btcStrategy = get("BTCStrategy"),
-                bchStrategy = get("BCHStrategy"),
-                etherStrategy = get("EtherStrategy"),
-                xlmStrategy = get("XLMStrategy"),
-                paxStrategy = get("PaxStrategy"),
+                btcStrategy = get(btcStrategy),
+                bchStrategy = get(bchStrategy),
+                etherStrategy = get(etherStrategy),
+                xlmStrategy = get(xlmStrategy),
+                paxStrategy = get(paxStrategy),
                 prefs = get(),
                 exchangeRates = get(),
                 stringUtils = get(),
                 envSettings = get(),
                 exchangeRateFactory = get(),
-                pitLinkingFeatureFlag = get("ff_pit_linking"),
+                pitLinkingFeatureFlag = get(pitFeatureFlag),
                 bitpayDataManager = get(),
                 analytics = get()
             )
         }
 
-        factory<SendStrategy<SendView>>("BTCStrategy") {
+        factory<SendStrategy<SendView>>(btcStrategy) {
             BitcoinSendStrategy(
                 walletAccountHelper = get(),
                 payloadDataManager = get(),
@@ -456,7 +467,7 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory<SendStrategy<SendView>>("BCHStrategy") {
+        factory<SendStrategy<SendView>>(bchStrategy) {
             BitcoinCashSendStrategy(
                 walletAccountHelper = get(),
                 payloadDataManager = get(),
@@ -480,7 +491,7 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory<SendStrategy<SendView>>("EtherStrategy") {
+        factory<SendStrategy<SendView>>(etherStrategy) {
             EtherSendStrategy(
                 walletAccountHelper = get(),
                 payloadDataManager = get(),
@@ -505,7 +516,7 @@ val applicationModule = applicationContext {
             )
         }.bind(SendFundsResultLocalizer::class)
 
-        factory<SendStrategy<SendView>>("XLMStrategy") {
+        factory<SendStrategy<SendView>>(xlmStrategy) {
             XlmSendStrategy(
                 currencyState = get(),
                 xlmDataManager = get(),
@@ -523,12 +534,12 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory<SendStrategy<SendView>>("PaxStrategy") {
+        factory<SendStrategy<SendView>>(paxStrategy) {
             PaxSendStrategy(
                 walletAccountHelper = get(),
                 payloadDataManager = get(),
                 ethDataManager = get(),
-                paxAccount = get("pax"),
+                paxAccount = get(),
                 stringUtils = get(),
                 dynamicFeeCache = get(),
                 feeDataManager = get(),
@@ -677,7 +688,7 @@ val applicationModule = applicationContext {
             )
         }
 
-        bean {
+        scoped {
             val inflateAdapter = SimpleBuyInflateAdapter(
                 prefs = get(),
                 gson = get()
@@ -733,8 +744,8 @@ val applicationModule = applicationContext {
                 /* kycStatusHelper = */ get(),
                 /* pitLinking = */ get(),
                 /* analytics = */ get(),
-                /*featureFlag = */get("ff_pit_linking"),
-                /*featureFlag = */get("ff_card_payments")
+                /*featureFlag = */get(pitFeatureFlag),
+                /*featureFlag = */get(cardPaymentsFeatureFlag)
             )
         }
 
@@ -756,7 +767,7 @@ val applicationModule = applicationContext {
             )
         }
 
-        bean {
+        scoped {
             PitLinkingImpl(
                 nabu = get(),
                 nabuToken = get(),
@@ -776,7 +787,7 @@ val applicationModule = applicationContext {
         factory {
             BitPayService(
                 environmentConfig = get(),
-                retrofit = get("kotlin"),
+                retrofit = get(moshiExplorerRetrofit),
                 rxBus = get()
             )
         }
@@ -842,8 +853,7 @@ val applicationModule = applicationContext {
                 settingsDataManager = get(),
                 notificationTokenManager = get(),
                 envSettings = get(),
-                featureFlag = get("ff_simple_buy"),
-                custodialWalletManager = get(),
+                featureFlag = get(simpleBuyFeatureFlag),
                 currencyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),
@@ -875,31 +885,27 @@ val applicationModule = applicationContext {
             )
         }
 
-        factory("BTC") { BtcAccountListAdapter(get()) }.bind(AccountList::class)
-        factory("BCH") { BchAccountListAdapter(get()) }.bind(AccountList::class)
-        factory("ETH") { EthAccountListAdapter(get()) }.bind(AccountList::class)
-        factory("PAX") { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
+        factory(btc) { BtcAccountListAdapter(get()) }.bind(AccountList::class)
+        factory(bch) { BchAccountListAdapter(get()) }.bind(AccountList::class)
+        factory(eth) { EthAccountListAdapter(get()) }.bind(AccountList::class)
+        factory(pax) { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
 
         factory {
             AsyncAllAccountListImplementation(
                 mapOf(
-                    CryptoCurrency.BTC to get("BTC"),
-                    CryptoCurrency.ETHER to get("ETH"),
-                    CryptoCurrency.BCH to get("BCH"),
-                    CryptoCurrency.XLM to get("XLM"),
-                    CryptoCurrency.PAX to get("PAX")
+                    CryptoCurrency.BTC to get(btc),
+                    CryptoCurrency.ETHER to get(eth),
+                    CryptoCurrency.BCH to get(bch),
+                    CryptoCurrency.XLM to get(xlm),
+                    CryptoCurrency.PAX to get(pax)
                 )
             )
         }.bind(AsyncAllAccountList::class)
     }
 
     factory {
-        FirebaseMobileNoticeRemoteConfig(remoteConfig = get()) as MobileNoticeRemoteConfig
-    }
-
-    factory {
-        OverlayDetection(prefs = get())
-    }
+        FirebaseMobileNoticeRemoteConfig(remoteConfig = get())
+    }.bind(MobileNoticeRemoteConfig::class)
 
     factory {
         SwapStarter(prefs = get())
@@ -907,32 +913,32 @@ val applicationModule = applicationContext {
 
     factory { DateUtil(get()) }
 
-    bean {
+    single {
         PrngHelper(
             context = get(),
             accessState = get()
         )
     }.bind(PrngFixer::class)
 
-    factory { PrivateKeyFactory() }
-
-    bean { DynamicFeeCache() }
+    single { DynamicFeeCache() }
 
     factory { CoinSelectionRemoteConfig(get()) }
 
     factory { RecoverFundsPresenter() }
 
-    bean {
-        ConnectionApi(retrofit = get("explorer"))
+    single {
+        ConnectionApi(retrofit = get(explorerRetrofit))
     }
 
-    bean {
-        ConnectionApi(retrofit = get("explorer"))
-    }
-
-    bean {
+    single {
         SSLVerifyUtil(rxBus = get(), connectionApi = get())
     }
 
-    factory { ResourceDefaultLabels(get()) as DefaultLabels }
+    factory {
+        SSLVerifyPresenter(
+            sslVerifyUtil = get()
+        )
+    }
+
+    factory { ResourceDefaultLabels(get()) }.bind(DefaultLabels::class)
 }

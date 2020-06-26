@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SendAnalytics
 import kotlinx.android.synthetic.main.dialog_confirm_transaction.*
@@ -25,7 +26,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 class ConfirmPaymentDialog : BaseDialogFragment<ConfirmPaymentView, ConfirmPaymentPresenter>(),
     ConfirmPaymentView {
 
-    private val confirmPaymentPresenter: ConfirmPaymentPresenter by inject()
+    private val confirmPaymentPresenter: ConfirmPaymentPresenter by scopedInject()
     private val analytics: Analytics by inject()
 
     private var listener: OnConfirmDialogInteractionListener? = null

@@ -419,7 +419,8 @@ public class PinEntryPresenterTest {
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(accessState).clearPin();
-        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
+        verify(appUtil).clearCredentials();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @Test
@@ -858,7 +859,8 @@ public class PinEntryPresenterTest {
         // Act
         subject.resetApp();
         // Assert
-        verify(appUtil).clearCredentialsAndRestart(LauncherActivity.class);
+        verify(appUtil).clearCredentials();
+        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @Test

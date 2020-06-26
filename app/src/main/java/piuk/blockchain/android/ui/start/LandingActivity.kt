@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_landing.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
@@ -13,12 +13,13 @@ import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingView {
 
-    override val presenter: LandingPresenter by inject()
+    override val presenter: LandingPresenter by scopedInject()
     override val view: LandingView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +36,10 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
             presenter.checkForRooted()
         }
 
-        text_version.text = BuildConfig.VERSION_NAME
+        text_version.text =
+            "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
+
+        text_version.copyHashOnLongClick(this)
     }
 
     private fun launchCreateWalletActivity() = CreateWalletActivity.start(this)

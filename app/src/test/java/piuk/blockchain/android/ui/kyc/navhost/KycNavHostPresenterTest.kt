@@ -7,7 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.models.nabu.Address
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.Tiers
+import com.blockchain.swap.nabu.models.nabu.TierLevels
 import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.service.TierUpdater
@@ -382,7 +382,7 @@ class KycNavHostPresenterTest {
             kycState = KycState.None,
             insertedAt = null,
             updatedAt = null,
-            tiers = Tiers(current = 1, next = 2, selected = 2)
+            tiers = TierLevels(current = 1, next = 2, selected = 2)
         )
         whenever(nabuDataManager.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
         // Act

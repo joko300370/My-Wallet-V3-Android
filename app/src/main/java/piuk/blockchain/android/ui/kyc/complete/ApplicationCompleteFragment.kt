@@ -5,10 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.models.nabu.kycVerified
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.campaign.CampaignType
@@ -36,7 +37,7 @@ class ApplicationCompleteFragment : Fragment() {
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
     private val analytics: Analytics by inject()
-    private val tierService: TierService by inject()
+    private val tierService: TierService by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,7 +59,8 @@ class ApplicationCompleteFragment : Fragment() {
             button_done
                 .throttledClicks().zipWith(
                     if (progressListener.campaignType == CampaignType.Swap) tierService.tiers().toObservable()
-                        .map { it.combinedState in kycVerified }.onErrorReturn { false }
+                        .map { it.isApprovedFor(KycTierLevel.SILVER) || it.isApprovedFor(KycTierLevel.GOLD) }
+                        .onErrorReturn { false }
                     else Observable.just(false))
                 .subscribeBy(
                     onNext = { (_, isTier1OrTier2Verified) ->
