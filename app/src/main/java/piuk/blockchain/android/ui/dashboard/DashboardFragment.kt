@@ -140,8 +140,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             val modList = mutableListOf<RefreshFn?>()
 
             modList.add(handleUpdatedAssetState(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC]))
-            modList.add(
-                handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
+            modList.add(handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
             modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
             modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
             modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
@@ -220,8 +219,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         newState.assets.forEach { (cc, s) ->
             val newBalance = s.cryptoBalance
             if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.cryptoBalance) {
-                analyticsReporter.gotAssetBalance(cc,
-                    newBalance) // IF we have the full set, this will fire
+                // IF we have the full set, this will fire
+                analyticsReporter.gotAssetBalance(cc, newBalance)
             }
         }
         analyticsReporter
