@@ -65,6 +65,7 @@ interface BalanceState : DashboardItem {
     val fiatBalance: FiatValue?
     val delta: Pair<FiatValue, Double>?
     operator fun get(currency: CryptoCurrency): AssetState
+    fun getFundsFiat(fiat: String): FiatValue
     fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
 }
 
@@ -110,21 +111,21 @@ data class DashboardState(
     }
 
     override val fiatBalance: FiatValue? by unsafeLazy {
-        val totalBalance = fundsFiatBalances?.let { fundsList ->
+        fundsFiatBalances?.let { _ ->
             val assetFiatBalance = addAssetFiatBalances()
 
-            val addedBalances = assetFiatBalance?.let { assetFiat ->
-                val fundsBalance = fundsList.fiatBalances.map {
-                    it.toFiatWithCurrency(exchangeRateDataManager, assetFiat.currencyCode)
-                }.sum() ?: FiatValue.zero(assetFiat.currencyCode)
+            val totalBalance = assetFiatBalance?.let { assetFiat ->
+                val fundsBalance = addFundsFiatBalances(assetFiat.currencyCode)
                 assetFiat + fundsBalance
             }
 
-            addedBalances
+            totalBalance
         } ?: addAssetFiatBalances()
-
-        totalBalance
     }
+
+    private fun addFundsFiatBalances(fiat: String) = fundsFiatBalances?.fiatBalances?.map {
+        it.toFiatWithCurrency(exchangeRateDataManager, fiat)
+    }?.sum() ?: FiatValue.zero(fiat)
 
     private fun addAssetFiatBalances() = assets.values
         .filter { !it.isLoading && it.fiatBalance != null }
@@ -151,6 +152,8 @@ data class DashboardState(
 
     override operator fun get(currency: CryptoCurrency): AssetState =
         assets[currency]
+
+    override fun getFundsFiat(fiat: String): FiatValue = addFundsFiatBalances(fiat)
 
     override fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean =
         !custodyIntroSeen && get(currency).hasCustodialBalance
