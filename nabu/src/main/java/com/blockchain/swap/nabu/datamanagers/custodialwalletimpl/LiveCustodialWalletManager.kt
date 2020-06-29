@@ -457,12 +457,16 @@ class LiveCustodialWalletManager(
         authenticator.authenticate {
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
         }.map { paymentMethodsResponse ->
-            paymentMethodsResponse.methods.filter {
-                it.type == PaymentMethodResponse.FUNDS &&
-                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
-            }.mapNotNull {
-                it.currency
+            val supportedFiatFunds = mutableListOf<String>()
+            paymentMethodsResponse.methods.forEach { paymentMethod ->
+                if (paymentMethod.type == PaymentMethodResponse.FUNDS &&
+                    SUPPORTED_FUNDS_CURRENCIES.contains(paymentMethod.currency)) {
+                    paymentMethod.currency?.let {
+                        supportedFiatFunds.add(it)
+                    }
+                }
             }
+            supportedFiatFunds
         }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
