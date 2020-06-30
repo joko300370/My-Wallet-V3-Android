@@ -1,8 +1,8 @@
 package piuk.blockchain.androidcore.utils
 
+import android.content.SharedPreferences
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
-import com.blockchain.preferences.EncryptedPrefs
 import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -23,6 +23,8 @@ interface PersistentPrefs :
 
     val deviceId: String // Pre-IDV device identifier
     var devicePreIDVCheckFailed: Boolean // Pre-IDV check has failed! Don't show 'gold' announce cards etc
+
+    var pin: String
 
     fun getValue(name: String): String?
     fun getValue(name: String, defaultValue: String): String
@@ -48,8 +50,6 @@ interface PersistentPrefs :
     var qaRandomiseDeviceId: Boolean
 
     companion object {
-
-        const val KEY_PIN_IDENTIFIER = "pin_lookup_key"
         const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
         const val KEY_WALLET_GUID = "guid"
         const val KEY_SHARED_KEY = "sharedKey"

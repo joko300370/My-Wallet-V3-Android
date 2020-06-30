@@ -20,7 +20,6 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
-import com.blockchain.preferences.EncryptedPrefs
 import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -73,8 +72,10 @@ import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
+import piuk.blockchain.androidcore.utils.CloudBackupAgent
 import piuk.blockchain.androidcore.utils.DeviceIdGenerator
 import piuk.blockchain.androidcore.utils.DeviceIdGeneratorImpl
+import piuk.blockchain.androidcore.utils.EncryptedPrefs
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.UUIDGenerator
@@ -232,6 +233,7 @@ val coreModule = module {
     single {
         PrefsUtil(
             store = get(),
+            backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),
             uuidGenerator = get()
         )

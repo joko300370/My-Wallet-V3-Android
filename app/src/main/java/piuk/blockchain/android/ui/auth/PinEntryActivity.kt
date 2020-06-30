@@ -47,7 +47,7 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     }
 
     private val isCreatingNewPin: Boolean
-        get() = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "").isEmpty()
+        get() = prefs.pin.isEmpty()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

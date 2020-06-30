@@ -153,7 +153,7 @@ class AuthDataManager(
     }
 
     private fun getValidatePinObservable(passedPin: String): Observable<String> {
-        val key = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
+        val key = prefs.pin
 
         if (!passedPin.isValidPin()) {
             return Observable.error(IllegalArgumentException("Invalid PIN"))
@@ -172,7 +172,9 @@ class AuthDataManager(
                     accessState.isNewlyCreated = false
                     accessState.isRestored = false
                     val decryptionKey = response.body()!!.success
+
                     handleBackup(decryptionKey)
+
                     return@map aesUtilWrapper.decrypt(
                         prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""),
                         decryptionKey,
@@ -201,32 +203,10 @@ class AuthDataManager(
             return
         }
 
-        if (prefs.hasBackup && prefs.getValue(PersistentPrefs.KEY_WALLET_GUID) == null) {
-            // Pull in the values from the backup, we don't have local state
-            // TODO add restore metric here
-            prefs.setValue(PersistentPrefs.KEY_PIN_IDENTIFIER, prefs.backupPinIdentifier!!)
-            prefs.setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, prefs.backupEncryptedPassword!!)
-            prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, aesUtilWrapper.decrypt(
-                    prefs.backupEncryptedGuid,
-                    decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS_GUID))
-            prefs.setValue(PersistentPrefs.KEY_SHARED_KEY, aesUtilWrapper.decrypt(
-                    prefs.backupEncryptedSharedKey,
-                    decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY))
+        if (prefs.hasBackup() && prefs.getValue(PersistentPrefs.KEY_WALLET_GUID) == null) {
+            prefs.restoreFromBackup(decryptionKey, aesUtilWrapper)
         } else {
-            // Make sure to update the backup with up-to-date values.
-            prefs.backupPinIdentifier = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
-            prefs.backupEncryptedPassword = prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
-
-            prefs.backupEncryptedGuid = aesUtilWrapper.encrypt(
-                    prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
-                    decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS_GUID)
-            prefs.backupEncryptedSharedKey = aesUtilWrapper.encrypt(
-                    prefs.getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
-                    decryptionKey,
-                    AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY)
+            prefs.backupCurrentPrefs(decryptionKey, aesUtilWrapper)
         }
     }
 
@@ -261,7 +241,7 @@ class AuthDataManager(
                         )
 
                         prefs.setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
-                        prefs.setValue(PersistentPrefs.KEY_PIN_IDENTIFIER, key)
+                        prefs.pin = key
 
                         if (!subscriber.isDisposed) {
                             subscriber.onComplete()

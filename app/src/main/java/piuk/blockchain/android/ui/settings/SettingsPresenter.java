@@ -559,7 +559,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS);
-        prefs.removeValue(PersistentPrefs.KEY_PIN_IDENTIFIER);
+        prefs.setPin("");
 
         getView().goToPinEntryPage();
     }

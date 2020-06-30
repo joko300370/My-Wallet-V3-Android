@@ -84,20 +84,18 @@ class LauncherPresenter(
 
         // The PIN identifier is stored in plaintext in the backup. We can restore it here straight
         // away, which means we don't need to adjust all the other places where we access it.
-        val value = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
-        if (prefs.hasBackup && value.isEmpty()) {
-            prefs.setValue(PersistentPrefs.KEY_PIN_IDENTIFIER, prefs.backupPinIdentifier!!)
-        }
+        val hasBackup = prefs.hasBackup()
+        val pin = prefs.pin
 
         when {
             // No GUID and no backup? Treat as new installation
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && !prefs.hasBackup -> view.onNoGuid()
+            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && !hasBackup -> view.onNoGuid()
             // No GUID but a backup. Show PIN entry page to populate other values
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && prefs.hasBackup -> view.onRequestPin()
+            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && hasBackup -> view.onRequestPin()
             // User has logged out recently. Show password reentry page
             hasLoggedOut -> view.onReEnterPassword()
             // No PIN ID? Treat as installed app without confirmed PIN
-            prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "").isEmpty() -> view.onRequestPin()
+            pin.isEmpty() -> view.onRequestPin()
             // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
             // Legacy app has not been prompted for upgrade
