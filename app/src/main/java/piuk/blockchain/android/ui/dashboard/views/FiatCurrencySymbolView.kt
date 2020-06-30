@@ -26,7 +26,7 @@ class FiatCurrencySymbolView @JvmOverloads constructor(
                 when (fiat) {
                     "EUR" -> R.drawable.ic_vector_euro
                     "GBP" -> R.drawable.ic_vector_pound
-                    else -> android.R.drawable.menuitem_background
+                    else -> R.drawable.ic_vector_dollar // show dollar if currency isn't selected
                 }
             ))
 }
