@@ -212,8 +212,8 @@ class PrefsUtil(
 
     @SuppressLint("ApplySharedPref")
     override fun backupCurrentPrefs(encryptionKey: String, aes: AESUtilWrapper) {
-        // Make sure to update the backup with up-to-date values.
         backupStore.edit()
+            .clear()
             .putString(KEY_PIN_IDENTIFIER, getValue(KEY_PIN_IDENTIFIER, ""))
             .putString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""))
             .putString(
@@ -277,7 +277,17 @@ class PrefsUtil(
 
     @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
-        backupStore.edit().clear().commit()
+        // We need to set all the backed values here and not just clear(), since that deletes the
+        // prefs files, so there is nothing to back up, so the next restore will return the wallet
+        // we just logged out of.
+        backupStore.edit()
+            .putString(KEY_PIN_IDENTIFIER, "")
+            .putString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+            .putString(KEY_ENCRYPTED_GUID, "")
+            .putString(KEY_ENCRYPTED_SHARED_KEY, "")
+            .commit()
+
+        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
     }
 
     // Raw accessors

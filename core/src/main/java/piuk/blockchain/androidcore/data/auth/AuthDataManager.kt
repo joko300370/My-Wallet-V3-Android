@@ -243,6 +243,8 @@ class AuthDataManager(
                         prefs.setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
                         prefs.pin = key
 
+                        handleBackup(encryptionKey)
+
                         if (!subscriber.isDisposed) {
                             subscriber.onComplete()
                         }
