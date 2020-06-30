@@ -112,15 +112,11 @@ class AuthDataManagerTest : RxTest() {
         val encryptedPin = "1234"
 
         status.success = decryptionKey
-        whenever(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn(key)
+        whenever(prefsUtil.pinId).thenReturn(key)
         whenever(prefsUtil.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""))
             .thenReturn(encryptedPassword)
-        whenever(prefsUtil.backupPinIdentifier).thenReturn(encryptedPin)
-        whenever(prefsUtil.backupEncryptedPassword).thenReturn(encryptedPassword)
-        whenever(prefsUtil.backupEncryptedGuid).thenReturn(encryptedPassword)
-        whenever(prefsUtil.backupEncryptedSharedKey).thenReturn(encryptedPassword)
         whenever(prefsUtil.backupEnabled).thenReturn(true)
-        whenever(prefsUtil.hasBackup).thenReturn(true)
+        whenever(prefsUtil.hasBackup()).thenReturn(true)
         whenever(authService.validateAccess(key, pin))
             .thenReturn(Observable.just(Response.success(status)))
 
@@ -156,20 +152,15 @@ class AuthDataManagerTest : RxTest() {
         verify(accessState).isNewlyCreated = false
         verify(accessState).isRestored = false
         verifyNoMoreInteractions(accessState)
-        verify(prefsUtil).getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
-        verify(prefsUtil).hasBackup
+        verify(prefsUtil).pinId == ""
+        verify(prefsUtil).hasBackup()
         verify(prefsUtil).backupEnabled
         verify(prefsUtil).getValue(PersistentPrefs.KEY_WALLET_GUID)
 
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_PIN_IDENTIFIER, encryptedPin)
-        verify(prefsUtil).backupPinIdentifier
+        verify(prefsUtil).pinId = encryptedPin
         verify(prefsUtil).setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
-        verify(prefsUtil).backupEncryptedPassword
         verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, encryptedPin)
-        verify(prefsUtil).backupEncryptedGuid
         verify(prefsUtil).setValue(PersistentPrefs.KEY_SHARED_KEY, key)
-        verify(prefsUtil).backupEncryptedSharedKey
-        verify(prefsUtil).backupEncryptedGuid
         verify(prefsUtil).getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
 
         verifyNoMoreInteractions(prefsUtil)
@@ -211,7 +202,7 @@ class AuthDataManagerTest : RxTest() {
         val status = Status()
         status.success = decryptionKey
 
-        whenever(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn(key)
+        whenever(prefsUtil.pinId).thenReturn(key)
         whenever(authService.validateAccess(key, pin))
             .thenReturn(
                 Observable.just(
@@ -229,7 +220,7 @@ class AuthDataManagerTest : RxTest() {
         // Assert
         verify(accessState).setPin(pin)
         verifyNoMoreInteractions(accessState)
-        verify(prefsUtil).getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")
+        verify(prefsUtil).pinId == ""
         verifyNoMoreInteractions(prefsUtil)
         verify(authService).validateAccess(key, pin)
         verifyNoMoreInteractions(authService)
@@ -299,7 +290,7 @@ class AuthDataManagerTest : RxTest() {
         )
         verifyNoMoreInteractions(aesUtilWrapper)
         verify(prefsUtil).setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
-        verify(prefsUtil).setValue(eq(PersistentPrefs.KEY_PIN_IDENTIFIER), anyString())
+        verify(prefsUtil).pinId
         verifyNoMoreInteractions(prefsUtil)
         observer.assertComplete()
         observer.assertNoErrors()

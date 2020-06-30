@@ -153,7 +153,7 @@ class AuthDataManager(
     }
 
     private fun getValidatePinObservable(passedPin: String): Observable<String> {
-        val key = prefs.pin
+        val key = prefs.pinId
 
         if (!passedPin.isValidPin()) {
             return Observable.error(IllegalArgumentException("Invalid PIN"))
@@ -241,7 +241,7 @@ class AuthDataManager(
                         )
 
                         prefs.setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
-                        prefs.pin = key
+                        prefs.pinId = key
 
                         handleBackup(encryptionKey)
 

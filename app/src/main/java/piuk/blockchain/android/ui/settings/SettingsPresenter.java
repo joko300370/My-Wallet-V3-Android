@@ -15,7 +15,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
-import com.blockchain.swap.nabu.models.nabu.KycTiersKt;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
 
@@ -559,7 +558,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS);
-        prefs.setPin("");
+        prefs.setPinId("");
 
         getView().goToPinEntryPage();
     }

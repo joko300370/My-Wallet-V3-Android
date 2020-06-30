@@ -24,7 +24,7 @@ class AppUtil(
             }
 
             val encryptedPassword = prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
-            val pinID = prefs.pin
+            val pinID = prefs.pinId
 
             return !(encryptedPassword.isEmpty() || pinID.isEmpty())
         }

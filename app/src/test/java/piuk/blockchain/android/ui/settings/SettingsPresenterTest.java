@@ -736,7 +736,7 @@ public class SettingsPresenterTest extends RxTest {
         subject.pinCodeValidatedForChange();
         // Assert
         verify(prefsUtil).removeValue(PersistentPrefs.Companion.KEY_PIN_FAILS);
-        verify(prefsUtil).removeValue(PersistentPrefs.Companion.KEY_PIN_IDENTIFIER);
+        verify(prefsUtil).setPinId("");
         verify(activity).goToPinEntryPage();
         verifyNoMoreInteractions(activity);
     }

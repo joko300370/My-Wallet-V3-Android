@@ -45,7 +45,7 @@ class PrefsUtil(
             }
         }
 
-    override var pin: String
+    override var pinId: String
         get() = getValue(KEY_PIN_IDENTIFIER) ?: backupStore.getString(KEY_PIN_IDENTIFIER, null) ?: ""
 
         @SuppressLint("ApplySharedPref")

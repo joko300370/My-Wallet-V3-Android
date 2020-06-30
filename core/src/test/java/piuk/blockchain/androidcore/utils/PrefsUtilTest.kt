@@ -15,11 +15,12 @@ import org.junit.Test
 class PrefsUtilTest {
 
     private val store: SharedPreferences = mock()
+    private val backupStore: SharedPreferences = mock()
     private val editor: SharedPreferences.Editor = mock()
     private val idGenerator: DeviceIdGenerator = mock()
     private val uuidGenerator: UUIDGenerator = mock()
 
-    private val subject: PrefsUtil = PrefsUtil(store, idGenerator, uuidGenerator)
+    private val subject: PrefsUtil = PrefsUtil(store, backupStore, idGenerator, uuidGenerator)
 
     @Before
     fun setUpSharedPrefs() {
