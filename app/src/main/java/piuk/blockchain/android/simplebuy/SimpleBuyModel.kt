@@ -74,7 +74,10 @@ class SimpleBuyModel(
                     previousState.selectedPaymentMethod?.isBank() == true ->
                         interactor.fetchBankAccount(previousState.fiatCurrency).subscribeBy(
                             onSuccess = { process(it) },
-                            onError = { process(SimpleBuyIntent.ErrorIntent()) }
+                            onError = {
+                                process(SimpleBuyIntent.ErrorIntent())
+                                process(SimpleBuyIntent.CancelOrder)
+                            }
                         )
                     else -> null
                 }
