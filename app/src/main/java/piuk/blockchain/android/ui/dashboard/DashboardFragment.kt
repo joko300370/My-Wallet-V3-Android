@@ -13,6 +13,7 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -63,6 +64,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override val model: DashboardModel by scopedInject()
 
+    private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
@@ -368,6 +370,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun showFiatFundsKyc() {
             model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+        }
+
+        override fun showBankLinking() {
+            model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT,
+                FiatValue.zero(currencyPrefs.selectedFiatCurrency)))
         }
     }
 

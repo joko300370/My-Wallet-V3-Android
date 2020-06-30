@@ -11,7 +11,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class FiatFundsNoKycAnnouncement(
+class FiatFundsKycAnnouncement(
     dismissRecorder: DismissRecorder,
     private val featureEligibility: KycFeatureEligibility
 ) : AnnouncementRule(dismissRecorder) {
@@ -23,8 +23,8 @@ class FiatFundsNoKycAnnouncement(
             return Single.just(false)
         }
 
-        // if not eligible for simple buy balance then user is not KYC gold
-        return featureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE).map { !it }
+        // if eligible for simple buy balance then user is KYC gold
+        return featureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
     }
 
     override fun show(host: AnnouncementHost) {
@@ -33,13 +33,13 @@ class FiatFundsNoKycAnnouncement(
                 name = name,
                 dismissRule = DismissRule.CardOneTime,
                 dismissEntry = dismissEntry,
-                iconImage = R.drawable.vector_new_badge,
-                titleText = R.string.fiat_funds_no_kyc_announcement_title,
-                bodyText = R.string.fiat_funds_no_kyc_announcement_description,
-                ctaText = R.string.learn_more,
+                iconImage = R.drawable.ic_transfer_bank_blue_600,
+                titleText = R.string.fiat_funds_kyc_announcement_title,
+                bodyText = R.string.fiat_funds_kyc_announcement_description,
+                ctaText = R.string.fiat_funds_kyc_announcement_action,
                 ctaFunction = {
                     host.dismissAnnouncementCard()
-                    host.showFiatFundsKyc()
+                    host.showBankLinking()
                 },
                 dismissFunction = {
                     host.dismissAnnouncementCard()
@@ -48,10 +48,10 @@ class FiatFundsNoKycAnnouncement(
         )
     }
 
-    override val name = "fiat_funds_no_kyc"
+    override val name = "fiat_funds_kyc"
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        const val DISMISS_KEY = "FiatFundsNoKycAnnouncement_DISMISSED"
+        const val DISMISS_KEY = "FiatFundsKycAnnouncement_DISMISSED"
     }
 }
