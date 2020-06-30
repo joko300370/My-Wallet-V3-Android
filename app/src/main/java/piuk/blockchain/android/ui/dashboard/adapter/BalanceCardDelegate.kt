@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
@@ -21,13 +20,13 @@ import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.colorRes
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-class BalanceCardDelegate<in T>(private val prefs: CurrencyPrefs) : AdapterDelegate<T> {
+class BalanceCardDelegate<in T>(private val selectedFiat: String) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is BalanceState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        BalanceCardViewHolder(parent.inflate(R.layout.item_dashboard_balance_card), prefs)
+        BalanceCardViewHolder(parent.inflate(R.layout.item_dashboard_balance_card), selectedFiat)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -38,7 +37,7 @@ class BalanceCardDelegate<in T>(private val prefs: CurrencyPrefs) : AdapterDeleg
 
 private class BalanceCardViewHolder internal constructor(
     itemView: View,
-    private val prefs: CurrencyPrefs
+    private val selectedFiat: String
 ) : RecyclerView.ViewHolder(itemView) {
 
     internal fun bind(state: BalanceState) {
@@ -110,7 +109,7 @@ private class BalanceCardViewHolder internal constructor(
                 }
 
                 // Add all fiat from Funds
-                add(PieEntry(state.getFundsFiat(prefs.selectedFiatCurrency).toFloat()))
+                add(PieEntry(state.getFundsFiat(selectedFiat).toFloat()))
             }
 
             if (entries.all { it.value == 0.0f }) {

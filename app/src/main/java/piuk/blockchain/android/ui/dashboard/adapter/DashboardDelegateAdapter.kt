@@ -23,7 +23,7 @@ class DashboardDelegateAdapter(
         with(delegatesManager) {
             addAdapterDelegate(StdAnnouncementDelegate(analytics))
             addAdapterDelegate(MiniAnnouncementDelegate(analytics))
-            addAdapterDelegate(BalanceCardDelegate(prefs))
+            addAdapterDelegate(BalanceCardDelegate(prefs.selectedFiatCurrency))
             addAdapterDelegate(FundsCardDelegate(prefs.selectedFiatCurrency, onFundsItemClicked,
                 exchangeRateDataManager))
             addAdapterDelegate(AssetCardDelegate(prefs, onCardClicked))
