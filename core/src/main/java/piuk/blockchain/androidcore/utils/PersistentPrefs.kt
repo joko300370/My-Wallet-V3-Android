@@ -1,6 +1,5 @@
 package piuk.blockchain.androidcore.utils
 
-import android.content.SharedPreferences
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs

@@ -39,9 +39,8 @@ class LogoutActivity : AppCompatActivity() {
                 stopService(intent)
             }
 
-            // TODO: 21/02/2018 I'm not sure this is a great way to reset things, but it'll
-            // do for now until we've had a rethink. Should individual datamanagers get
-            // Rx events and handle their own state during logout?
+            // TODO: 30/06/20 We shouldn't need this any more now we have koin scopes
+            // TODO: see Jira AND-3312
             clearData()
         }
     }

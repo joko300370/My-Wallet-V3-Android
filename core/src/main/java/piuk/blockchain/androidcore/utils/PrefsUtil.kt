@@ -273,10 +273,11 @@ class PrefsUtil(
 
     override fun hasBackup(): Boolean =
         backupEnabled &&
-            backupStore.getString(KEY_ENCRYPTED_GUID, "" ).isNullOrEmpty().not()
+            backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
 
+    @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
-        backupStore.edit().clear().apply()
+        backupStore.edit().clear().commit()
     }
 
     // Raw accessors
@@ -323,7 +324,6 @@ class PrefsUtil(
 
     override fun clear() {
         store.edit().clear().apply()
-        // TODO should this clear the backup or not? Seems like there are quite a few entry points
         clearBackup()
     }
 
