@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.nhaarman.mockito_kotlin.mock
@@ -14,6 +16,7 @@ class FiatFundsKycAnnouncementTest {
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val kycFeatureEligibility: KycFeatureEligibility = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
     private lateinit var subject: FiatFundsKycAnnouncement
 
@@ -25,7 +28,8 @@ class FiatFundsKycAnnouncementTest {
         subject =
             FiatFundsKycAnnouncement(
                 dismissRecorder = dismissRecorder,
-                featureEligibility = kycFeatureEligibility
+                featureEligibility = kycFeatureEligibility,
+                custodialWalletManager = custodialWalletManager
             )
     }
 
@@ -41,10 +45,12 @@ class FiatFundsKycAnnouncementTest {
     }
 
     @Test
-    fun `should show, when not already shown and user is kyc gold`() {
+    fun `should show, when not already shown and user is kyc gold without linked banks`() {
         whenever(dismissEntry.isDismissed).thenReturn(false)
         whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
             .thenReturn(Single.just(true))
+
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
 
         subject.shouldShow()
             .test()
@@ -54,10 +60,29 @@ class FiatFundsKycAnnouncementTest {
     }
 
     @Test
-    fun `should not show, when not already shown and user is not kyc gold`() {
+    fun `should not show, when not already shown and user is kyc gold but has linked banks`() {
+        whenever(dismissEntry.isDismissed).thenReturn(false)
+        whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
+            .thenReturn(Single.just(true))
+
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(
+            Single.just(listOf(LinkedBank("", "", "", "")))
+        )
+
+        subject.shouldShow()
+            .test()
+            .assertValue { !it }
+            .assertValueCount(1)
+            .assertComplete()
+    }
+
+    @Test
+    fun `should not show, when not already shown and user is not kyc gold and has no linked banks`() {
         whenever(dismissEntry.isDismissed).thenReturn(false)
         whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
             .thenReturn(Single.just(false))
+
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
 
         subject.shouldShow()
             .test()

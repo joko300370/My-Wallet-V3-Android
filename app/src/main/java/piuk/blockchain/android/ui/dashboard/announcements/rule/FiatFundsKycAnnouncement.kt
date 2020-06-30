@@ -1,9 +1,11 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
@@ -13,7 +15,8 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 class FiatFundsKycAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val featureEligibility: KycFeatureEligibility
+    private val featureEligibility: KycFeatureEligibility,
+    private val custodialWalletManager: CustodialWalletManager
 ) : AnnouncementRule(dismissRecorder) {
 
     override val dismissKey = DISMISS_KEY
@@ -24,7 +27,10 @@ class FiatFundsKycAnnouncement(
         }
 
         // if eligible for simple buy balance then user is KYC gold
-        return featureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
+        return Singles.zip(featureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE),
+            custodialWalletManager.getLinkedBanks()) { isEligible, linkedBanks ->
+            isEligible && linkedBanks.isEmpty()
+        }
     }
 
     override fun show(host: AnnouncementHost) {
