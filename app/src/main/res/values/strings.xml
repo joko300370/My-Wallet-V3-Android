@@ -1786,4 +1786,6 @@
     <string name="most_popular">Most Popular</string>
     <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
+    <string name="fiat_funds_no_kyc_announcement_title">Keep Cash in Your Wallet</string>
+    <string name="fiat_funds_no_kyc_announcement_description">Verify your identity to deposit cash into the Wallet and buy crypto.</string>
 </resources>

@@ -362,6 +362,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         override fun startSimpleBuy() {
             navigator().startSimpleBuy()
         }
+
+        override fun showFiatFundsKyc() {
+            TODO("Show KYC bottom sheet")
+        }
     }
 
     override fun startWarnCancelSimpleBuyOrder() {
