@@ -15,14 +15,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/vector_sheet_indicator_small" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <piuk.blockchain.android.ui.dashboard.views.FiatCurrencySymbolView
         android:id="@+id/funds_kyc_default_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/very_small_margin"
-        android:background="@drawable/rounded_view_green_500"
-        android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/funds_kyc_sheet_indicator"
         tools:src="@drawable/ic_vector_euro" />

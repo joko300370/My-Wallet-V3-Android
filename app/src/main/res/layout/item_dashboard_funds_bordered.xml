@@ -9,12 +9,10 @@
     android:background="@drawable/rounded_view_grey_border"
     android:padding="@dimen/small_margin">
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <piuk.blockchain.android.ui.dashboard.views.FiatCurrencySymbolView
         android:id="@+id/bordered_funds_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_view_green_500"
-        android:padding="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/ic_vector_euro" />

@@ -36,6 +36,7 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
+import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
@@ -203,6 +204,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                         )
                     }
                 }
+                DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
                 null -> null
             }
         )
@@ -364,7 +366,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         override fun showFiatFundsKyc() {
-            TODO("Show KYC bottom sheet")
+            model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
         }
     }
 
