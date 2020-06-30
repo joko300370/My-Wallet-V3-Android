@@ -24,6 +24,6 @@ class FiatFundsNoKycDetailsSheet : SlidingModalBottomDialog() {
     }
 
     companion object {
-        fun newInstance() : FiatFundsNoKycDetailsSheet = FiatFundsNoKycDetailsSheet()
+        fun newInstance(): FiatFundsNoKycDetailsSheet = FiatFundsNoKycDetailsSheet()
     }
 }
