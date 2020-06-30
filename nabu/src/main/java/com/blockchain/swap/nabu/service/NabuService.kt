@@ -395,7 +395,7 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getPaymentMethods(
         authorization = sessionToken.authHeader,
         currency = currency,
-        checkEligibility = checkEligibility.takeIf { it }
+        checkEligibility = checkEligibility
     ).wrapErrorMessage()
 
     fun getLinkedBanks(sessionToken: NabuSessionTokenResponse) =

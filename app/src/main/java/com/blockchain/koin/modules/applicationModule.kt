@@ -21,6 +21,7 @@ import com.blockchain.koin.paxStrategy
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.xlm
 import com.blockchain.koin.xlmStrategy
 import com.blockchain.network.websocket.Options
@@ -748,7 +749,8 @@ val applicationModule = module {
                 /* pitLinking = */ get(),
                 /* analytics = */ get(),
                 /*featureFlag = */get(pitFeatureFlag),
-                /*featureFlag = */get(cardPaymentsFeatureFlag)
+                /*featureFlag = */get(cardPaymentsFeatureFlag),
+                /*featureFlag = */get(simpleBuyFundsFeatureFlag)
             )
         }
 

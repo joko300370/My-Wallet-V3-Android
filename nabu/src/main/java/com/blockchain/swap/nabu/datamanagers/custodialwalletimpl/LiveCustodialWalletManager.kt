@@ -50,6 +50,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.flatMapIterable
+import io.reactivex.rxkotlin.zipWith
 import okhttp3.internal.toLongOrDefault
 import java.math.BigDecimal
 import java.util.Calendar
@@ -60,7 +61,8 @@ class LiveCustodialWalletManager(
     private val nabuService: NabuService,
     private val authenticator: Authenticator,
     private val simpleBuyPrefs: SimpleBuyPrefs,
-    private val featureFlag: FeatureFlag,
+    private val cardsPaymentFeatureFlag: FeatureFlag,
+    private val fundsFeatureFlag: FeatureFlag,
     private val paymentAccountMapperMappers: Map<String, PaymentAccountMapper>,
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository
@@ -293,25 +295,8 @@ class LiveCustodialWalletManager(
         fiatCurrency: String,
         isTier2Approved: Boolean
     ): Single<List<PaymentMethod>> =
-        featureFlag.enabled.flatMap { enabled ->
-            if (enabled)
-                allPaymentsMethods(fiatCurrency, isTier2Approved)
-            else
-                onlyBank(fiatCurrency, isTier2Approved)
-        }
-
-    private fun onlyBank(fiatCurrency: String, tier2Approved: Boolean) =
-        authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency, tier2Approved).map { response ->
-                response.methods.firstOrNull { it.type == PaymentMethodResponse.BANK_ACCOUNT }
-                    ?.let { paymentMethodResponse ->
-                        listOf(PaymentMethod.BankTransfer(
-                            PaymentLimits(paymentMethodResponse.limits.min,
-                                paymentMethodResponse.limits.max,
-                                fiatCurrency)
-                        ))
-                    } ?: emptyList()
-            }
+        cardsPaymentFeatureFlag.enabled.zipWith(fundsFeatureFlag.enabled).flatMap { (cardsEnabled, fundsEnabled) ->
+            paymentMethods(cardsEnabled, fundsEnabled, fiatCurrency, isTier2Approved)
         }
 
     private val updateSupportedCards: (PaymentMethodsResponse) -> Unit = {
@@ -321,7 +306,9 @@ class LiveCustodialWalletManager(
         simpleBuyPrefs.updateSupportedCards(cardTypes.joinToString())
     }
 
-    private fun allPaymentsMethods(
+    private fun paymentMethods(
+        cardsEnabled: Boolean,
+        fundsEnabled: Boolean,
         fiatCurrency: String,
         isTier2Approved: Boolean
     ) = authenticator.authenticate {
@@ -337,7 +324,7 @@ class LiveCustodialWalletManager(
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
         paymentMethods.methods.forEach {
-            if (it.type == PaymentMethodResponse.PAYMENT_CARD) {
+            if (it.type == PaymentMethodResponse.PAYMENT_CARD && cardsEnabled) {
                 val cardLimits = PaymentLimits(it.limits.min, it.limits.max, fiatCurrency)
                 cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
                     ?.forEach { cardResponse: CardResponse ->
@@ -345,7 +332,8 @@ class LiveCustodialWalletManager(
                     }
             } else if (it.type == PaymentMethodResponse.FUNDS &&
                 it.currency == fiatCurrency &&
-                SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) &&
+                fundsEnabled
             ) {
                 if (fiatBalance.isPositive) {
                     val fundsLimits =
@@ -365,7 +353,7 @@ class LiveCustodialWalletManager(
         }
 
         paymentMethods.methods.firstOrNull { paymentMethod ->
-            paymentMethod.type == PaymentMethodResponse.PAYMENT_CARD
+            paymentMethod.type == PaymentMethodResponse.PAYMENT_CARD && cardsEnabled
         }?.let {
             availablePaymentMethods.add(PaymentMethod.UndefinedCard(PaymentLimits(it.limits.min,
                 it.limits.max,
@@ -475,19 +463,22 @@ class LiveCustodialWalletManager(
             }
 
     override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean) =
-        authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
-        }.map { paymentMethodsResponse ->
-            val supportedFiatFunds = mutableListOf<String>()
-            paymentMethodsResponse.methods.forEach { paymentMethod ->
-                if (paymentMethod.type == PaymentMethodResponse.FUNDS &&
-                    SUPPORTED_FUNDS_CURRENCIES.contains(paymentMethod.currency)) {
-                    paymentMethod.currency?.let {
-                        supportedFiatFunds.add(it)
+        fundsFeatureFlag.enabled.flatMap { enabled ->
+            if (enabled) {
+                authenticator.authenticate {
+                    nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
+                }.map { paymentMethodsResponse ->
+                    paymentMethodsResponse.methods.filter {
+                        it.type == PaymentMethodResponse.FUNDS &&
+                                SUPPORTED_FUNDS_CURRENCIES.contains(
+                                    it.currency)
+                    }.mapNotNull {
+                        it.currency
                     }
                 }
+            } else {
+                Single.just(emptyList())
             }
-            supportedFiatFunds
         }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
@@ -585,11 +576,11 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         created = insertedAt.fromIso8601ToUtc() ?: Date(0),
         fee = fee?.let { FiatValue.fromMinor(inputCurrency, it.toLongOrDefault(0)) },
         paymentMethodId = paymentMethodId ?: (
-            when (paymentType.toPaymentMethodType()) {
-                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-            }),
+                when (paymentType.toPaymentMethodType()) {
+                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(

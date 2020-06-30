@@ -1,9 +1,14 @@
 package piuk.blockchain.android.ui.settings;
 
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
 import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 
 import com.blockchain.notifications.NotificationTokenManager;
@@ -70,6 +75,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     Settings settings;
     private final PitLinking pitLinking;
     private final FeatureFlag cardsFeatureFlag;
+    private final FeatureFlag fundsFeatureFlag;
     private final Analytics analytics;
     private final FeatureFlag featureFlag;
     private PitLinkingState pitLinkState = new PitLinkingState();
@@ -93,8 +99,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             PitLinking pitLinking,
             Analytics analytics,
             FeatureFlag featureFlag,
-            FeatureFlag cardsFeatureFlag) {
-
+            FeatureFlag cardsFeatureFlag,
+            FeatureFlag fundsFeatureFlag) {
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
         this.settingsDataManager = settingsDataManager;
@@ -109,6 +115,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.exchangeRateDataManager = exchangeRateDataManager;
         this.kycStatusHelper = kycStatusHelper;
         this.pitLinking = pitLinking;
+        this.fundsFeatureFlag = fundsFeatureFlag;
         this.analytics = analytics;
         this.featureFlag = featureFlag;
         this.cardsFeatureFlag = cardsFeatureFlag;
@@ -163,12 +170,24 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void updateBanks() {
         getCompositeDisposable().add(
-                custodialWalletManager.getLinkedBanks()
+                Single.zip(fundsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
+                        (enabled, kycState) -> new Pair<>(enabled, kycState.isApprovedFor(KycTierLevel.GOLD)))
+                        .flatMap(pair -> {
+                            if (pair.first)
+                                return canLinkBank(getFiatUnits(), pair.second).doOnSuccess(canLink ->
+                                        getView().banksEnabled(canLink)).zipWith(custodialWalletManager.getLinkedBanks(), (canLink, linkedBanks) -> linkedBanks);
+                            else
+                                return Single.just(Collections.<LinkedBank>emptyList());
+                        })
                         .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
-                    getView().cardsEnabled(false);
+                    getView().banksEnabled(false);
                     onBanksUpdated(Collections.emptyList());
                     getView().updateBanks(Collections.emptyList());
                 }).subscribe(this::onBanksUpdated));
+    }
+
+    private Single<Boolean> canLinkBank(String fiat, boolean isGold) {
+        return custodialWalletManager.getSupportedFundsFiats(fiat, isGold).map(supportedCurrencies -> supportedCurrencies.size() > 0);
     }
 
     private void onBanksUpdated(List<LinkedBank> banks) {
