@@ -1769,4 +1769,7 @@
     <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
     <string name="transfer_second_pswd_hint">2nd password</string>
 
+    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
+    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
+    <string name="algorand_announcement_action">Buy Algorand</string>
 </resources>

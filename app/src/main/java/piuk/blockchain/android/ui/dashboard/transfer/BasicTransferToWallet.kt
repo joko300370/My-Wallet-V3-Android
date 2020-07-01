@@ -84,6 +84,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                 Pair(custodialBalance, custodialFiat)
             }
                 .observeOn(uiScheduler)
+                .doOnSubscribe { cta_button.isEnabled = false }
                 .subscribeBy(
                     onSuccess = { (crypto, fiat) ->
                         valueToSend = crypto
@@ -98,8 +99,8 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                 )
 
             disposables += token.defaultAccount()
-                .flatMap {
-                    account -> account.receiveAddress
+                .flatMap { account ->
+                    account.receiveAddress
                         .map { address -> Pair(address, account.label) }
                 }
                 .observeOn(uiScheduler)

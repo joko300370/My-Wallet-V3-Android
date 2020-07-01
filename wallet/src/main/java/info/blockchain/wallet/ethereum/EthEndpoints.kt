@@ -29,6 +29,7 @@ internal interface EthEndpoints {
     @GET(EthUrls.V2_DATA + "/block/latest/number")
     fun latestBlockNumber(): Single<EthLatestBlockNumber>
 
+    @Headers("Accept: application/json")
     @GET(EthUrls.V2_DATA_TRANSACTION + "/{hash}")
     fun getTransaction(@Path("hash") txHash: String): Observable<EthTransaction>
 

@@ -108,19 +108,24 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                    PaymentMethod.Card) ?: return
-            val cardId = card.cardId
-            val cardLabel = card.uiLabel()
-            val cardPartner = card.partner
+        if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
+                        PaymentMethod.Card) ?: return
+                val cardId = card.cardId
+                val cardLabel = card.uiLabel()
+                val cardPartner = card.partner
 
-            model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId,
-                cardLabel,
-                cardPartner,
-                PaymentMethodType.PAYMENT_CARD
-            ))
-            navigator().goToCheckOutScreen()
+                model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId,
+                    cardLabel,
+                    cardPartner,
+                    PaymentMethodType.PAYMENT_CARD
+                ))
+                navigator().goToCheckOutScreen()
+            } else {
+                model.process(SimpleBuyIntent.ClearState)
+                navigator().exitSimpleBuyFlow()
+            }
         }
     }
 

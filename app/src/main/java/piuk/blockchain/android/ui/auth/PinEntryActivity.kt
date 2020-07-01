@@ -22,6 +22,7 @@ import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ApplicationLifeCycle
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.OverlayDetection
@@ -145,7 +146,9 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     }
 
     private fun startWebSocketService() {
-        CoinsWebSocketService::class.java.start(this, osUtil)
+        if (ApplicationLifeCycle.getInstance().isForeground) {
+            CoinsWebSocketService::class.java.start(this, osUtil)
+        }
     }
 
     private class SwipeToReceiveFragmentPagerAdapter internal constructor(
