@@ -21,7 +21,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.currency.CurrencyState
@@ -266,7 +265,7 @@ class AccountPresenter internal constructor(
      *
      * @param address The address to be saved
      */
-    @SuppressLint("CheckResult")
+   /* @SuppressLint("CheckResult")
     internal fun confirmImportWatchOnly(address: String) {
         val legacyAddress = LegacyAddress()
         legacyAddress.address = address
@@ -286,7 +285,7 @@ class AccountPresenter internal constructor(
                     view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR)
                 }
             )
-    }
+    }*/
 
     private fun importWatchOnlyAddress(address: String) {
         val addressCopy = correctAddressFormatting(address)
@@ -402,6 +401,10 @@ class AccountPresenter internal constructor(
         accountsAndImportedList.add(AccountItem(AccountItem.TYPE_IMPORT_ADDRESS_BUTTON))
 
         for (legacyAddress in getLegacyAddresses()) {
+            if(legacyAddress.isWatchOnly) {
+                continue
+            }
+
             var label: String? = legacyAddress.label
             val address: String = legacyAddress.address ?: ""
             val balance = getBtcAddressBalance(address)

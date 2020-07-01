@@ -445,7 +445,7 @@ class AccountPresenterTest {
         verifyNoMoreInteractions(activity)
     }
 
-    @Test
+   /* @Test
     fun confirmImportWatchOnlySuccess() {
         // Arrange
         val address = "17UovdU9ZvepPe75igTQwxqNME1HbnvMB7"
@@ -471,7 +471,7 @@ class AccountPresenterTest {
         verify(payloadDataManager).addLegacyAddress(any())
         verify(activity).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
         verifyNoMoreInteractions(activity)
-    }
+    }*/
 
     @SuppressLint("VisibleForTests")
     @Test
