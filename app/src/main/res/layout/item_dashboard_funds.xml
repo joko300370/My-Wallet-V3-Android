@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/small_margin">
 
-    <piuk.blockchain.android.ui.dashboard.views.FiatCurrencySymbolView
+    <piuk.blockchain.android.ui.customviews.FiatCurrencySymbolView
         android:id="@+id/funds_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

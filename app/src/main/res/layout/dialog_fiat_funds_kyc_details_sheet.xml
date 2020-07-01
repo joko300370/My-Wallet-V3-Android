@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/vector_sheet_indicator_small" />
 
-    <piuk.blockchain.android.ui.dashboard.views.FiatCurrencySymbolView
+    <piuk.blockchain.android.ui.customviews.FiatCurrencySymbolView
         android:id="@+id/funds_kyc_default_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

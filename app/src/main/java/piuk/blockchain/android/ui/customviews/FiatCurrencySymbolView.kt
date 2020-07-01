@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard.views
+package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
 import android.util.AttributeSet
