@@ -534,13 +534,13 @@ class AccountPresenter internal constructor(
 
     private fun shouldShow(cryptoCurrency: CryptoCurrency): Boolean =
         when (cryptoCurrency) {
-            CryptoCurrency.BTC -> true
+            CryptoCurrency.BTC,
             CryptoCurrency.BCH -> true
-            CryptoCurrency.ETHER -> false
-            CryptoCurrency.XLM -> false
-            CryptoCurrency.PAX -> false
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ETHER,
+            CryptoCurrency.XLM,
+            CryptoCurrency.PAX,
             CryptoCurrency.ALGO -> false
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     companion object {
