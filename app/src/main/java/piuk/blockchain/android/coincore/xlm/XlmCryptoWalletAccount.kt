@@ -8,7 +8,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.math.BigInteger
@@ -19,7 +19,7 @@ internal class XlmCryptoWalletAccount(
     private val address: String,
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.XLM) {
+) : CryptoNonCustodialAccount(CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 

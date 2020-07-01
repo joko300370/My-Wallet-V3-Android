@@ -21,7 +21,6 @@ import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class PaxTokens(
     private val paxAccount: Erc20Account,
@@ -32,8 +31,7 @@ internal class PaxTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -41,8 +39,7 @@ internal class PaxTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset = CryptoCurrency.PAX
@@ -63,9 +60,6 @@ internal class PaxTokens(
     }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
-        Single.just(emptyList())
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =

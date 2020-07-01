@@ -11,7 +11,7 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -24,7 +24,7 @@ internal class EthCryptoWalletAccount(
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.ETHER) {
+) : CryptoNonCustodialAccount(CryptoCurrency.ETHER) {
 
     constructor(
         ethDataManager: EthDataManager,

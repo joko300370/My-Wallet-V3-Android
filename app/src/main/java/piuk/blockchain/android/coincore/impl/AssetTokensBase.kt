@@ -11,20 +11,16 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.CryptoAccountGroup
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.then
 import timber.log.Timber
 
@@ -35,13 +31,8 @@ internal abstract class AssetTokensBase(
     protected val labels: DefaultLabels,
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
-    protected val crashLogger: CrashLogger,
-    rxBus: RxBus
+    protected val crashLogger: CrashLogger
 ) : AssetTokens {
-
-    val logoutSignal = rxBus.register(AuthEvent.UNPAIR::class.java)
-        .observeOn(Schedulers.computation())
-        .subscribeBy(onNext = ::onLogoutSignal)
 
     private val accounts = mutableListOf<CryptoSingleAccount>()
 
@@ -102,8 +93,6 @@ internal abstract class AssetTokensBase(
             ))
         )
 
-    protected open fun onLogoutSignal(event: AuthEvent) {}
-
     final override fun accounts(filter: AssetFilter): Single<CryptoAccountGroup> =
         Single.fromCallable {
             filterTokenAccounts(asset, labels, accounts, filter)
@@ -113,6 +102,12 @@ internal abstract class AssetTokensBase(
         Single.fromCallable {
             accounts.first { it.isDefault }
         }
+
+    private fun getNonCustodialAccountList(): Single<CryptoSingleAccountList> =
+        accounts(filter = AssetFilter.Wallet)
+            .doOnSuccess { Timber.d("@@@@ got unfiltered list: $it") }
+            .map { group -> group.accounts.mapNotNull { it as? CryptoSingleAccount } }
+            .doOnSuccess { Timber.d("@@@@ got list: $it") }
 
     final override fun exchangeRate(): Single<FiatValue> =
         exchangeRates.fetchLastPrice(asset, currencyPrefs.selectedFiatCurrency)
@@ -134,6 +129,20 @@ internal abstract class AssetTokensBase(
                     exchangeRates = exchangeRates
                 )
             }
+
+    final override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> {
+        require(account.cryptoCurrencies.contains(asset))
+
+        return when (account) {
+            is CustodialTradingAccount -> getNonCustodialAccountList()
+            is CryptoInterestAccount -> Single.just(emptyList())
+            is CryptoExchangeAccount -> Single.just(emptyList())
+            is CryptoNonCustodialAccount -> getPitLinkingAccount()
+                    .map { listOf(it) }
+                    .toSingle(emptyList())
+            else -> Single.just(emptyList())
+        }
+    }
 }
 
 fun ExchangeRateDataManager.fetchLastPrice(

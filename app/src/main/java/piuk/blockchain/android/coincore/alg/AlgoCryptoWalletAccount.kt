@@ -6,14 +6,14 @@ import io.reactivex.Single
 import org.apache.commons.lang3.NotImplementedException
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal class AlgoCryptoWalletAccount(
     override val label: String,
     override val isDefault: Boolean = true,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.ALGO) {
+) : CryptoNonCustodialAccount(CryptoCurrency.ALGO) {
 
     override val balance: Single<CryptoValue>
         get() = Single.just(CryptoValue.ZeroAlg)

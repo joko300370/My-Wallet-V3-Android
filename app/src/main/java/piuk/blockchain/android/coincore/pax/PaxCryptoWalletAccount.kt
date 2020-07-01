@@ -7,7 +7,7 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -20,7 +20,7 @@ internal class PaxCryptoWalletAccount(
     private val address: String,
     private val paxAccount: Erc20Account,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.PAX) {
+) : CryptoNonCustodialAccount(CryptoCurrency.PAX) {
     override val isDefault: Boolean = true // Only one account, so always default
 
     private var hasFunds = AtomicBoolean(false)

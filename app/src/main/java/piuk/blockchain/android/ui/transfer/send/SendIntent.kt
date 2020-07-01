@@ -77,7 +77,7 @@ sealed class SendIntent : MviIntent<SendState> {
 
     class UpdateTransactionAmounts(
         val amount: CryptoValue,
-        val maxAvailable: CryptoValue
+        private val maxAvailable: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
@@ -87,12 +87,10 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    class PrepareTransaction(
-        val amount: CryptoValue
-    ) : SendIntent() {
+    object PrepareTransaction : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false,
+                nextEnabled = true,
                 currentStep = SendStep.CONFIRM_DETAIL
             )
     }
@@ -105,7 +103,9 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    object FatalTransactionError : SendIntent() {
+    class FatalTransactionError(
+        private val error: Throwable
+    ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,

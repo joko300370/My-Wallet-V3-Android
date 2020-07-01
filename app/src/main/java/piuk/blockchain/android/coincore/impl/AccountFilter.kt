@@ -52,7 +52,7 @@ private fun buildNonCustodialGroup(
     CryptoAccountCompoundGroup(
         asset,
         labels.getDefaultCustodialWalletLabel(asset),
-        accountList.filterIsInstance<CryptoSingleAccountNonCustodialBase>()
+        accountList.filterIsInstance<CryptoNonCustodialAccount>()
     )
 
 private fun buildAssetMasterGroup(

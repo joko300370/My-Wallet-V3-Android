@@ -15,7 +15,6 @@ import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class StxTokens(
@@ -26,8 +25,7 @@ internal class StxTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -35,8 +33,7 @@ internal class StxTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -65,9 +62,6 @@ internal class StxTokens(
             exchangeRates = exchangeRates
         )
     }
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
-        Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
         null

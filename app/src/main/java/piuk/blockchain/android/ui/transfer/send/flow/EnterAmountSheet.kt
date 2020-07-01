@@ -41,7 +41,7 @@ class EnterAmountSheet : SendInputSheet() {
         override fun afterTextChanged(s: Editable?) {
             val txtAmount = s.toString()
 
-            val r = textToCryptoValue(txtAmount, CryptoCurrency.ETHER)
+            val r = textToCryptoValue(txtAmount, state.sendingAccount.asset)
             model.process(SendIntent.SendAmountChanged(r))
         }
     }
@@ -50,12 +50,8 @@ class EnterAmountSheet : SendInputSheet() {
         dialogView.enter_amount.setText(state.availableBalance.toStringWithoutSymbol())
     }
 
-    private fun onCtaClick() {
-        model.process(
-            SendIntent.PrepareTransaction(
-            CryptoValue.fromMinor(CryptoCurrency.ETHER, 1000000.toBigDecimal()))
-        )
-    }
+    private fun onCtaClick() =
+        model.process(SendIntent.PrepareTransaction)
 
     companion object {
         fun newInstance(): EnterAmountSheet =

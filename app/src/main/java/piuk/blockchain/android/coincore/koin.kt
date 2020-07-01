@@ -19,7 +19,6 @@ val coincoreModule = module {
 
         scoped {
             StxTokens(
-                rxBus = get(),
                 payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -38,7 +37,6 @@ val coincoreModule = module {
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadDataManager = get(),
-                rxBus = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
@@ -52,7 +50,6 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                rxBus = get(),
                 crashLogger = get(),
                 stringUtils = get(),
                 custodialManager = get(),
@@ -64,7 +61,6 @@ val coincoreModule = module {
 
         scoped {
             XlmTokens(
-                rxBus = get(),
                 xlmDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -83,7 +79,6 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                rxBus = get(),
                 crashLogger = get(),
                 stringUtils = get(),
                 custodialManager = get(),
@@ -94,7 +89,6 @@ val coincoreModule = module {
 
         scoped {
             PaxTokens(
-                rxBus = get(),
                 paxAccount = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -109,7 +103,6 @@ val coincoreModule = module {
 
         scoped {
             AlgoTokens(
-                rxBus = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),

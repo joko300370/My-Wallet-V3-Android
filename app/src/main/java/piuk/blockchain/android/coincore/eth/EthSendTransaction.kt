@@ -15,7 +15,7 @@ import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendValidationError
-import piuk.blockchain.android.coincore.impl.OnChainSendTransactionBase
+import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
@@ -29,7 +29,7 @@ class EthSendTransaction(
     sendingAccount: CryptoSingleAccount,
     address: CryptoAddress,
     requireSecondPassword: Boolean
-) : OnChainSendTransactionBase(
+) : OnChainSendProcessorBase(
         sendingAccount,
         address,
         requireSecondPassword

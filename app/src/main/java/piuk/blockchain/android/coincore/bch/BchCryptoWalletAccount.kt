@@ -10,7 +10,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.btc.BtcAddress
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -26,7 +26,7 @@ internal class BchCryptoWalletAccount(
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BCH) {
+) : CryptoNonCustodialAccount(CryptoCurrency.BCH) {
 
     private var hasFunds = AtomicBoolean(false)
 

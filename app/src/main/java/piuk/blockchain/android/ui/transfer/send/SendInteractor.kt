@@ -8,7 +8,7 @@ import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
-import piuk.blockchain.androidcore.utils.extensions.thenSingle
+import piuk.blockchain.androidcore.utils.extensions.then
 
 class SendInteractor(
     private val coincore: Coincore
@@ -30,9 +30,9 @@ class SendInteractor(
     fun getAvailableBalance(tx: PendingSendTx): Single<CryptoValue> =
         sendProcessor.availableBalance(tx)
 
-    fun verifyAndExecute(tx: PendingSendTx): Single<String> =
+    fun verifyAndExecute(tx: PendingSendTx): Completable =
         sendProcessor.validate(tx)
-            .thenSingle {
+            .then {
                 sendProcessor.execute(tx)
             }
 }

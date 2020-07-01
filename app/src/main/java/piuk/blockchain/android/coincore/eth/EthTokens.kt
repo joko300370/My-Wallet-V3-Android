@@ -10,18 +10,14 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
-import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class EthTokens(
     private val ethDataManager: EthDataManager,
@@ -33,8 +29,7 @@ internal class EthTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -42,8 +37,7 @@ internal class EthTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -66,25 +60,6 @@ internal class EthTokens(
                 )
             )
         )
-
-    override fun onLogoutSignal(event: AuthEvent) {
-        if (event != AuthEvent.LOGIN) {
-            ethDataManager.clearEthAccountDetails()
-        }
-    }
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> {
-        require(account.cryptoCurrencies.contains(CryptoCurrency.ETHER))
-
-        // ETH Only supports transfer between non-custodial and exchange account at this time
-        if (account.isCustodial()) {
-            return Single.just(emptyList())
-        }
-
-        return getPitLinkingAccount()
-            .map { listOf(it) }
-            .toSingle(emptyList())
-    }
 
     override fun parseAddress(address: String): CryptoAddress? =
         if (isValidAddress(address)) {

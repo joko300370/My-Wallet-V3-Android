@@ -111,7 +111,7 @@ class SendModel(
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get transaction processor: $it")
-                    process(SendIntent.FatalTransactionError)
+                    process(SendIntent.FatalTransactionError(it))
                 }
             )
 
@@ -125,7 +125,7 @@ class SendModel(
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get update available balance")
-                    process(SendIntent.FatalTransactionError)
+                    process(SendIntent.FatalTransactionError(it))
                 }
             )
 
@@ -133,11 +133,12 @@ class SendModel(
         interactor.verifyAndExecute(
             PendingSendTx(state.sendAmount)
         ).subscribeBy(
-            onSuccess = {
+            onComplete = {
                 process(SendIntent.UpdateTransactionComplete)
             },
             onError = {
-                process(SendIntent.FatalTransactionError)
+                Timber.e("!SEND!> Unable to execute transaction: $it")
+                process(SendIntent.FatalTransactionError(it))
             }
         )
 }

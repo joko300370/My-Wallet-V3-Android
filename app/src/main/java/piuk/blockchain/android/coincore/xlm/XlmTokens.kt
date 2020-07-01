@@ -9,13 +9,11 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class XlmTokens(
     private val xlmDataManager: XlmDataManager,
@@ -25,8 +23,7 @@ internal class XlmTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -34,8 +31,7 @@ internal class XlmTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -49,9 +45,6 @@ internal class XlmTokens(
             .map {
                 listOf(XlmCryptoWalletAccount(it, xlmDataManager, exchangeRates))
             }
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
-        Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
         null

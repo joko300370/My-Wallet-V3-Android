@@ -14,7 +14,6 @@ import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class AlgoTokens(
@@ -24,8 +23,7 @@ internal class AlgoTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -33,8 +31,7 @@ internal class AlgoTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -63,9 +60,6 @@ internal class AlgoTokens(
                 custodialManager
             ))
         )
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
-        Single.error(NotImplementedError("ALOG Send/receive not supported yet"))
 
     override fun parseAddress(address: String): CryptoAddress? = null
 }

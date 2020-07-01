@@ -6,12 +6,14 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.compareTo
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccountGroup
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
@@ -94,10 +96,21 @@ open class CustodialTradingAccount(
         false // Default is, presently, only ever a non-custodial account.
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
-        Single.error(NotImplementedError("Write me!"))
+        Single.just(
+            CustodialTransferProcessor(
+                sendingAccount = this,
+                address = address as CryptoAddress,
+                walletManager = custodialWalletManager
+            )
+        )
 
     override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
+        get() = balance.map { balance ->
+                if (balance <= CryptoValue.zero(asset))
+                    SendState.NO_FUNDS
+                else
+                    SendState.CAN_SEND
+            }
 
     override val actions: AvailableActions
         get() = availableActions
@@ -215,7 +228,7 @@ internal class CryptoExchangeAccount(
     override val actions: AvailableActions = emptySet()
 }
 
-abstract class CryptoSingleAccountNonCustodialBase(
+abstract class CryptoNonCustodialAccount(
     cryptoCurrency: CryptoCurrency
 ) : CryptoSingleAccountBase(cryptoCurrency) {
 

@@ -8,7 +8,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -23,7 +23,7 @@ internal class BtcCryptoWalletAccount(
     private val payloadDataManager: PayloadDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase(CryptoCurrency.BTC) {
+) : CryptoNonCustodialAccount(CryptoCurrency.BTC) {
     private var hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean

@@ -17,7 +17,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 internal class BtcTokens(
     private val payloadDataManager: PayloadDataManager,
@@ -28,8 +27,7 @@ internal class BtcTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -37,8 +35,7 @@ internal class BtcTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -76,11 +73,12 @@ internal class BtcTokens(
             }
         }
 
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
-        Single.just(emptyList())
-
     override fun parseAddress(address: String): CryptoAddress? =
-        null
+        if (isValidAddress(address)) {
+            BtcAddress(address)
+        } else {
+            null
+        }
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidBitcoinAddress(

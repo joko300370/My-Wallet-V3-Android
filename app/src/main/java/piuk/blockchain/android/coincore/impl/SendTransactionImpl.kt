@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
@@ -9,10 +10,10 @@ import piuk.blockchain.android.coincore.SendProcessor
 
 class SendError(msg: String) : Exception(msg)
 
-abstract class OnChainSendTransactionBase(
+abstract class OnChainSendProcessorBase(
     final override val sendingAccount: CryptoSingleAccount,
     final override val address: CryptoAddress,
-    protected val requireSecondPassword: Boolean
+    private val requireSecondPassword: Boolean
 ) : SendProcessor {
 
     protected abstract val asset: CryptoCurrency
@@ -22,11 +23,12 @@ abstract class OnChainSendTransactionBase(
         require(sendingAccount.asset == address.asset)
     }
 
-    final override fun execute(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
+    final override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
         if (requireSecondPassword && secondPassword.isEmpty()) {
-            Single.error(SendError("Second password not supplied"))
+            Completable.error(SendError("Second password not supplied"))
         } else {
             executeTransaction(pendingTx, secondPassword)
+                .ignoreElement()
         }
 
     protected abstract fun executeTransaction(

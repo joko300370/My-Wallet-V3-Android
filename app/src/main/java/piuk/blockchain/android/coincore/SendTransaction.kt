@@ -5,7 +5,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.lang.Exception
 
-class SendValidationError(val errorCode: Int) : Exception("Invalid Send Tx") {
+class SendValidationError(val errorCode: Int) : Exception("Invalid Send Tx: code $errorCode") {
 
     companion object {
         const val HAS_TX_IN_FLIGHT = 1000
@@ -40,6 +40,9 @@ interface SendProcessor {
     // it is not. Since the UI and Address objects should validate where possible, an error should
     // be the exception, rather than the expected case.
     fun validate(pendingTx: PendingSendTx): Completable
-    // Execute the transaction and return the transaction id - either the hash or a custodial Id
-    fun execute(pendingTx: PendingSendTx, secondPassword: String = ""): Single<String>
+
+    // Execute the transaction.
+    // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
+    // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
+    fun execute(pendingTx: PendingSendTx, secondPassword: String = ""): Completable
 }

@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,15 +16,15 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
-import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
@@ -52,13 +50,13 @@ class EnterTargetAddressSheet : SendInputSheet() {
             }
             cta_button.isEnabled = newState.nextEnabled
         }
-
         state = newState
     }
 
+    // TODO: THis address processing should occur viw the interactor
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
-            val address = addressFactory.parse(s.toString(), CryptoCurrency.ETHER)
+            val address = addressFactory.parse(s.toString(), state.sendingAccount.asset)
             if (address != null) {
                 addressSelected(address)
                 dialogView.error_msg.invisible()
@@ -73,50 +71,38 @@ class EnterTargetAddressSheet : SendInputSheet() {
             address_entry.addTextChangedListener(addressTextWatcher)
             btn_scan.setOnClickListener { onLaunchAddressScan() }
             cta_button.setOnClickListener { onCtaClick() }
+
+            wallet_select.apply {
+                onLoadError = { showErrorToast("Failed getting transfer wallets") }
+                onAccountSelected = { accountSelected(it) }
+                onEmptyList = { hideTransferList() }
+            }
         }
     }
 
     private fun setupTransferList(account: CryptoSingleAccount) {
-        with(dialogView.wallet_select) {
-            val itemList = mutableListOf<CryptoAccount>()
-            val accountAdapter = AccountsAdapter(itemList, ::accountSelected)
-
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-            )
-
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            adapter = accountAdapter
-
-            // This list should be fetched by the interactor when we get initialised, but this is a hacky UI
-            // just to get things working, so we'll do it here. For now. TODO: Move this!
-            disposables += coincore[account.asset].canTransferTo(account)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        if (itemList.isNotEmpty()) {
-                            itemList.clear()
-                            itemList.addAll(it)
-                            accountAdapter.notifyDataSetChanged()
-                        }
-                        showHideTransferList(itemList.isEmpty())
-                    },
-                    onError = {
-                        showErrorToast("Failed getting transfer wallets")
-                    }
-                )
-        }
+        dialogView.wallet_select.initialise(
+            coincore[account.asset].canTransferTo(account)
+        )
     }
 
-    private fun showHideTransferList(hide: Boolean) {
-        dialogView.title_pick.goneIf { hide }
-        dialogView.wallet_select.goneIf { hide }
+    private fun hideTransferList() {
+        dialogView.title_pick.gone()
+        dialogView.wallet_select.gone()
     }
 
     private fun accountSelected(account: CryptoAccount) {
         if (account is CryptoSingleAccount) {
-            disposables += account.receiveAddress.subscribeBy(
-                onSuccess = { addressSelected(it) }
+            disposables += account.receiveAddress
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                onSuccess = {
+                    if (it is CryptoAddress) {
+                        dialogView.address_entry.setText(it.address)
+                    } else {
+                        Timber.e("!SEND!> Unsupported address type selected")
+                    }
+                }
             )
         }
     }

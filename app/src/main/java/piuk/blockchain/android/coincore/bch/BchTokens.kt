@@ -15,12 +15,10 @@ import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class BchTokens(
@@ -33,8 +31,7 @@ internal class BchTokens(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
@@ -42,8 +39,7 @@ internal class BchTokens(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger,
-    rxBus
+    crashLogger
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -74,16 +70,6 @@ internal class BchTokens(
                 result
             }
         }
-
-    override fun onLogoutSignal(event: AuthEvent) {
-        if (event != AuthEvent.LOGIN) {
-            bchDataManager.clearBchAccountDetails()
-        }
-        super.onLogoutSignal(event)
-    }
-
-    override fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList> =
-        Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
         null
