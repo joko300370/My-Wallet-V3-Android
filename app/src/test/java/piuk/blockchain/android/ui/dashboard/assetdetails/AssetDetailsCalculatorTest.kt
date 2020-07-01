@@ -287,7 +287,7 @@ class AssetDetailsCalculatorTest {
     fun `historic prices are returned properly`() {
         val token: AssetTokens = mock()
 
-        whenever(token.historicRateSeries(TimeSpan.MONTH, TimeInterval.FIFTEEN_MINUTES))
+        whenever(token.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
             .thenReturn(Single.just(listOf(
                 PriceDatum(5556, 2.toDouble(), volume24h = 0.toDouble()),
                 PriceDatum(587, 22.toDouble(), volume24h = 0.toDouble()),
@@ -314,7 +314,7 @@ class AssetDetailsCalculatorTest {
     @Test
     fun `when historic prices api returns error, empty list should be returned`() {
         val token: AssetTokens = mock()
-        whenever(token.historicRateSeries(TimeSpan.MONTH, TimeInterval.FIFTEEN_MINUTES))
+        whenever(token.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
             .thenReturn(Single.error(Throwable()))
 
         calculator.token.accept(token)

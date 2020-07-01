@@ -1763,4 +1763,7 @@
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
 
+    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
+    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
+    <string name="algorand_announcement_action">Buy Algorand</string>
 </resources>

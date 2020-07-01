@@ -32,7 +32,7 @@ typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
 class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
     // input
     val token = BehaviorRelay.create<AssetTokens>()
-    val timeSpan = BehaviorRelay.createDefault<TimeSpan>(TimeSpan.MONTH)
+    val timeSpan = BehaviorRelay.createDefault<TimeSpan>(TimeSpan.DAY)
 
     private val _chartLoading: BehaviorRelay<Boolean> = BehaviorRelay.createDefault<Boolean>(false)
 
