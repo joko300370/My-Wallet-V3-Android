@@ -38,6 +38,7 @@ interface AnnouncementHost {
     fun startSimpleBuy()
 
     fun showFiatFundsKyc()
+    fun showBankLinking()
 }
 
 abstract class AnnouncementRule(private val dismissRecorder: DismissRecorder) {
