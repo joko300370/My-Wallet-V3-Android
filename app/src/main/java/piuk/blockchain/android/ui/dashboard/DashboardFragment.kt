@@ -36,6 +36,7 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
+import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
@@ -57,7 +58,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
-    FiatFundsDetailSheet.Host {
+    FiatFundsDetailSheet.Host,
+    FiatFundsNoKycDetailsSheet.Host {
 
     override val model: DashboardModel by scopedInject()
 
@@ -203,6 +205,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                         )
                     }
                 }
+                DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
                 null -> null
             }
         )
@@ -364,7 +367,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         override fun showFiatFundsKyc() {
-            TODO("Show KYC bottom sheet")
+            model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
         }
     }
 
@@ -385,6 +388,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun depositFiat(fiat: FiatValue) {
         model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT, fiat))
+    }
+
+    override fun fiatFundsVerifyIdentityCta() {
+        navigator().launchKyc(CampaignType.FiatFunds)
     }
 
     // AssetDetailSheet.Host

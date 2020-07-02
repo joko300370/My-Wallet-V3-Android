@@ -81,6 +81,10 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="Text.Blue.Semibold.20">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="Text.White.Semibold">
         <item name="fontFamily">@font/inter_medium</item>
     </style>

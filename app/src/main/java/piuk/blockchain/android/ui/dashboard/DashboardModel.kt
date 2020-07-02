@@ -73,7 +73,8 @@ enum class DashboardSheet {
     BASIC_WALLET_TRANSFER,
     SIMPLE_BUY_CANCEL_ORDER,
     FIAT_FUNDS_DETAILS,
-    LINK_OR_DEPOSIT
+    LINK_OR_DEPOSIT,
+    FIAT_FUNDS_NO_KYC
 }
 
 data class DashboardState(

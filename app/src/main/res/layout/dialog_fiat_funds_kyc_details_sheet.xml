@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/funds_kyc_sheet_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vector_sheet_indicator_small" />
+
+    <piuk.blockchain.android.ui.customviews.FiatCurrencySymbolView
+        android:id="@+id/funds_kyc_default_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/very_small_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_sheet_indicator"
+        tools:src="@drawable/ic_vector_euro" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_intro_title"
+        style="@style/Text.Semibold.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:text="@string/fiat_funds_no_kyc_announcement_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_default_symbol" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_intro_description"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_margin"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingEnd="@dimen/standard_margin"
+        android:text="@string/fiat_funds_no_kyc_sheet_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_intro_title" />
+
+    <View
+        android:id="@+id/funds_kyc_header_separator"
+        style="@style/SeparatorWithoutMargins"
+        android:layout_marginTop="@dimen/small_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_intro_description" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_1_identifier"
+        style="@style/Text.Blue.Semibold.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:background="@drawable/bkgd_tx_circle"
+        android:backgroundTint="@color/blue_000"
+        android:gravity="center"
+        android:text="@string/fiat_funds_no_kyc_step_1_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_header_separator" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_1_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="24dp"
+        android:text="@string/fiat_funds_no_kyc_step_1_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_1_identifier"
+        app:layout_constraintTop_toTopOf="@id/funds_kyc_1_identifier" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_1_description"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/smallest_margin"
+        android:layout_marginEnd="24dp"
+        android:text="@string/fiat_funds_no_kyc_step_1_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_1_identifier"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_1_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_2_identifier"
+        style="@style/Text.Blue.Semibold.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:background="@drawable/bkgd_tx_circle"
+        android:backgroundTint="@color/blue_000"
+        android:gravity="center"
+        android:text="@string/fiat_funds_no_kyc_step_2_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_1_description" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_2_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="24dp"
+        android:text="@string/fiat_funds_no_kyc_step_2_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_2_identifier"
+        app:layout_constraintTop_toTopOf="@id/funds_kyc_2_identifier" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_2_description"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/smallest_margin"
+        android:layout_marginEnd="24dp"
+        android:text="@string/fiat_funds_no_kyc_step_2_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_2_identifier"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_2_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_3_identifier"
+        style="@style/Text.Blue.Semibold.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:background="@drawable/bkgd_tx_circle"
+        android:backgroundTint="@color/blue_000"
+        android:gravity="center"
+        android:text="@string/fiat_funds_no_kyc_step_3_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_2_description" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_3_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="24dp"
+        android:text="@string/fiat_funds_no_kyc_step_3_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_3_identifier"
+        app:layout_constraintTop_toTopOf="@id/funds_kyc_3_identifier" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_kyc_3_description"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/smallest_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/fiat_funds_no_kyc_step_3_description"
+        app:layout_constraintBottom_toTopOf="@+id/funds_kyc_negative_action"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/funds_kyc_3_identifier"
+        app:layout_constraintTop_toBottomOf="@id/funds_kyc_3_title"
+        app:layout_constraintVertical_bias="0" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/funds_kyc_negative_action"
+        style="@style/CtaButton.White"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:text="@string/fiat_funds_no_kyc_negative_action"
+        app:layout_constraintBottom_toTopOf="@id/funds_kyc_positive_action"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/funds_kyc_positive_action"
+        style="@style/CtaButton.Blue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/fiat_funds_no_kyc_positive_action"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
