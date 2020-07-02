@@ -13,6 +13,7 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,6 +37,7 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
+import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
@@ -57,10 +59,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
-    FiatFundsDetailSheet.Host {
+    FiatFundsDetailSheet.Host,
+    FiatFundsNoKycDetailsSheet.Host {
 
     override val model: DashboardModel by scopedInject()
 
+    private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
@@ -203,6 +207,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                         )
                     }
                 }
+                DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
                 null -> null
             }
         )
@@ -362,6 +367,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         override fun startSimpleBuy() {
             navigator().startSimpleBuy()
         }
+
+        override fun showFiatFundsKyc() {
+            model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+        }
+
+        override fun showBankLinking() {
+            model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT,
+                FiatValue.zero(currencyPrefs.selectedFiatCurrency)))
+        }
     }
 
     override fun startWarnCancelSimpleBuyOrder() {
@@ -381,6 +395,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun depositFiat(fiat: FiatValue) {
         model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT, fiat))
+    }
+
+    override fun fiatFundsVerifyIdentityCta() {
+        navigator().launchKyc(CampaignType.FiatFunds)
     }
 
     // AssetDetailSheet.Host

@@ -3,9 +3,7 @@ package piuk.blockchain.android.ui.dashboard.adapter
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.FiatValue
@@ -70,7 +68,7 @@ private class FundsCardViewHolder(
                     fiatValue.toFiatWithCurrency(exchangeRateDataManager, selectedFiat)
                         .toStringWithSymbol()
                 }
-                funds_icon.setDrawableFromTicker(context, ticker)
+                funds_icon.setIcon(ticker)
             }
         } else {
             itemView.funds_single_item.gone()
@@ -130,7 +128,7 @@ private class MultipleFundsAdapter(
                     value.toFiatWithCurrency(exchangeRateDataManager, selectedFiat)
                         .toStringWithSymbol()
                 }
-                bordered_funds_icon.setDrawableFromTicker(context, ticker)
+                bordered_funds_icon.setIcon(ticker)
             }
         }
     }
@@ -144,15 +142,4 @@ private fun TextView.setStringFromTicker(context: Context, ticker: String) {
             else -> R.string.empty
         }
     )
-}
-
-private fun ImageView.setDrawableFromTicker(context: Context, ticker: String) {
-    setImageDrawable(
-        ContextCompat.getDrawable(context,
-            when (ticker) {
-                "EUR" -> R.drawable.ic_vector_euro
-                "GBP" -> R.drawable.ic_vector_pound
-                else -> android.R.drawable.menuitem_background
-            }
-        ))
 }

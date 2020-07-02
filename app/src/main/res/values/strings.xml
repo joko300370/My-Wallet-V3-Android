@@ -1775,7 +1775,7 @@
     <string name="euros">Euros</string>
     <string name="deposit_cash">Deposit Cash</string>
     <string name="send_me_instructions">Send Me the Instructions</string>
-    <string name="bank_transfer_only">Bank Tranfer Only</string>
+    <string name="bank_transfer_only">Bank Transfer Only</string>
     <string name="bank_transfer_only_subtitle">Please do not send any funds via ACH. A real bank transfer must be sent.</string>
     <string name="processing_time">Processing Time</string>
     <string name="processing_time_subtitle_eur">Funds will be credited to your EUR wallet as soon as we receive them. SEPA transfers usually take around 1 business day to reach us.</string>
@@ -1784,6 +1784,25 @@
     <string name="deposit_limits_subtitle">Please be aware that if you deposit more than your daily withdrawal limit, you wil not be able to withdraw all of your funds at once.</string>
     <string name="unable_to_load_bank_details">We were unable to load our bank deposit details.</string>
     <string name="most_popular">Most Popular</string>
+
+    <!-- Fiat Funds -->
     <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
+    <string name="fiat_funds_no_kyc_announcement_title">Keep Cash in Your Wallet</string>
+    <string name="fiat_funds_no_kyc_announcement_description">Verify your identity to deposit cash into the Wallet and buy crypto.</string>
+    <string name="fiat_funds_no_kyc_sheet_description">Verify your identity to deposit cash into your Wallet. Buy &amp; Sell crypto. Withdraw at any time.</string>
+    <string name="fiat_funds_no_kyc_step_1_title">Verify Your Identity</string>
+    <string name="fiat_funds_no_kyc_step_1_description">We need to make sure it\'s really you to prevent fraud by uploading an ID.</string>
+    <string name="fiat_funds_no_kyc_step_2_title">Deposit Cash</string>
+    <string name="fiat_funds_no_kyc_step_2_description">Transfer cash from your bank and enable your cash balances.</string>
+    <string name="fiat_funds_no_kyc_step_3_title">Buy Crypto with Cash</string>
+    <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Use your cash wallet as a payment method to buy BTC, ETH, XLM & more.]]></string>
+    <string name="fiat_funds_no_kyc_positive_action">Verify My Identity</string>
+    <string name="fiat_funds_no_kyc_negative_action">Not Now</string>
+    <string name="fiat_funds_no_kyc_step_1_label">1</string>
+    <string name="fiat_funds_no_kyc_step_2_label">2</string>
+    <string name="fiat_funds_no_kyc_step_3_label">3</string>
+    <string name="fiat_funds_kyc_announcement_title">Link a Bank to Buy Crypto</string>
+    <string name="fiat_funds_kyc_announcement_description">Hold cash in your Blockchain.com Wallet. Deposit and Withdraw at anytime.</string>
+    <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
 </resources>
