@@ -395,7 +395,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
-            R.id.stub_send_test -> TestSendContainerActivity.start(this)
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)

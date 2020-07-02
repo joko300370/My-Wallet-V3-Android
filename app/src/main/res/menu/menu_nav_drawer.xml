@@ -40,9 +40,7 @@
             android:title="@string/item_lockbox"
             android:visible="false"
             app:contentDescription="@string/item_lockbox" />
-        <item
-            android:id="@+id/stub_send_test"
-            android:title="TEST NEW SEND"/>
+
     </group>
 
     <group android:id="@+id/nav_menu_bottom">
