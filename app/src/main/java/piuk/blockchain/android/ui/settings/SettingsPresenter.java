@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.settings;
 
+import android.annotation.SuppressLint;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
+import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
 import com.blockchain.swap.nabu.datamanagers.LinkedBank;
@@ -70,6 +72,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private final NotificationTokenManager notificationTokenManager;
     private final ExchangeRateDataManager exchangeRateDataManager;
     private final KycStatusHelper kycStatusHelper;
+    private final SimpleBuyPrefs simpleBuyPrefs;
     private final CustodialWalletManager custodialWalletManager;
     @VisibleForTesting
     Settings settings;
@@ -100,7 +103,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             Analytics analytics,
             FeatureFlag featureFlag,
             FeatureFlag cardsFeatureFlag,
-            FeatureFlag fundsFeatureFlag) {
+            FeatureFlag fundsFeatureFlag,
+            SimpleBuyPrefs simpleBuyPrefs
+    ) {
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
         this.settingsDataManager = settingsDataManager;
@@ -115,6 +120,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.exchangeRateDataManager = exchangeRateDataManager;
         this.kycStatusHelper = kycStatusHelper;
         this.pitLinking = pitLinking;
+        this.simpleBuyPrefs = simpleBuyPrefs;
         this.fundsFeatureFlag = fundsFeatureFlag;
         this.analytics = analytics;
         this.featureFlag = featureFlag;
@@ -485,12 +491,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                             updateUi();
                         })
                         .subscribe(
-                                () -> {
-                                    getView().showDialogSmsVerified();
-                                },
-                                throwable -> {
-                                    getView().showWarningDialog(R.string.verify_sms_failed);
-                                }));
+                                () -> getView().showDialogSmsVerified(),
+                                throwable -> getView().showWarningDialog(R.string.verify_sms_failed)));
     }
 
     private Completable syncPhoneNumberWithNabu() {
@@ -606,6 +608,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      * @param password         The requested new password as a String
      * @param fallbackPassword The user's current password as a fallback
      */
+    @SuppressLint("CheckResult")
     void updatePassword(@NonNull String password, @NonNull String fallbackPassword) {
         payloadManager.setTempPassword(password);
 
@@ -641,6 +644,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                     if (prefs.getSelectedFiatCurrency().equals(fiatUnit))
                                         analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency);
                                     prefs.setSelectedFiatCurrency(fiatUnit);
+                                    simpleBuyPrefs.clearState();
                                     this.settings = settings;
                                     analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged.INSTANCE);
                                 },

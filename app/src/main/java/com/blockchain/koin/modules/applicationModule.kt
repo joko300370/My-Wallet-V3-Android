@@ -750,7 +750,8 @@ val applicationModule = module {
                 /* analytics = */ get(),
                 /*featureFlag = */get(pitFeatureFlag),
                 /*featureFlag = */get(cardPaymentsFeatureFlag),
-                /*featureFlag = */get(simpleBuyFundsFeatureFlag)
+                /*featureFlag = */get(simpleBuyFundsFeatureFlag),
+                /*simpleBuyPrefs = */get()
             )
         }
 

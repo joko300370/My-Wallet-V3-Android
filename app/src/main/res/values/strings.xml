@@ -1776,7 +1776,7 @@
     <string name="deposit_cash">Deposit Cash</string>
     <string name="send_me_instructions">Send Me the Instructions</string>
     <string name="bank_transfer_only">Bank Transfer Only</string>
-    <string name="bank_transfer_only_subtitle">Please do not send any funds via ACH. A real bank transfer must be sent.</string>
+    <string name="bank_transfer_only_subtitle">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
     <string name="processing_time">Processing Time</string>
     <string name="processing_time_subtitle_eur">Funds will be credited to your EUR wallet as soon as we receive them. SEPA transfers usually take around 1 business day to reach us.</string>
     <string name="processing_time_subtitle_gbp">Funds will be credited to your GBP wallet as soon as we receive them. In the UK Faster Payments Network, this can take a couple of hours.</string>

@@ -61,10 +61,6 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                     renderErrorUi(view)
                 }
             )
-
-        view.cta_button.setOnClickListener {
-            dismiss()
-        }
     }
 
     private fun renderErrorUi(view: View) {
@@ -79,7 +75,6 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
             bank_details.gone()
             bank_transfer_only.gone()
             processing_time.gone()
-            cta_button.gone()
             bank_deposit_instruction.gone()
         }
     }
@@ -110,6 +105,9 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
             subtitle.text = if (isForLink) getString(R.string.currency_bank_transfer, fiatCurrency) else
                 getString(R.string.bank_transfer)
             instructions.text = getString(R.string.link_transfer_instructions, fiatCurrency)
+
+            bank_transfer_only.visible()
+            processing_time.visible()
         }
     }
 

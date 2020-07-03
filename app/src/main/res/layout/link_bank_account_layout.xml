@@ -79,16 +79,6 @@
             android:layout_marginTop="@dimen/standard_margin"
             tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/cta_button"
-            style="@style/CtaButton.White"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_marginBottom="@dimen/standard_margin"
-            android:text="@string/send_me_instructions" />
-
         <include
             android:id="@+id/bank_details_error"
             layout="@layout/bank_details_error_layout" />

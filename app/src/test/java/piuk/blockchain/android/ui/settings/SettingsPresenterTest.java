@@ -5,6 +5,7 @@ import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
+import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
 import com.blockchain.swap.nabu.models.nabu.KycTierState;
@@ -101,6 +102,8 @@ public class SettingsPresenterTest extends RxTest {
     @Mock
     private Analytics analytics;
     @Mock
+    private SimpleBuyPrefs simpleBuyPrefs;
+    @Mock
     private CustodialWalletManager custodialWalletManager;
 
     @Mock
@@ -131,7 +134,8 @@ public class SettingsPresenterTest extends RxTest {
                 analytics,
                 featureFlag,
                 cardsFeatureFlag,
-                fundsFeatureFlag
+                fundsFeatureFlag,
+                simpleBuyPrefs
         );
         subject.initView(activity);
     }
