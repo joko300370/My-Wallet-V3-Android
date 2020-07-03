@@ -87,7 +87,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
             analytics.logEvent(buyConfirmClicked(
                 lastState?.order?.amount?.valueMinor.toString(),
-                lastState?.fiatCurrency ?: "")
+                lastState?.fiatCurrency ?: "",
+                lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: "")
             )
         }
 
@@ -193,9 +194,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
                 // We have done kyc and are verified
                 KycState.VERIFIED_AND_ELIGIBLE -> {
-                    if (newState.selectedPaymentMethod?.paymentMethodType != PaymentMethodType.UNKNOWN)
+                    if (newState.selectedPaymentMethod?.paymentMethodType != PaymentMethodType.UNKNOWN) {
                         navigator().goToCheckOutScreen()
-                    else
+                    } else
                         goToAddNewPaymentMethod(newState.selectedPaymentMethod.id)
                 }
             }.exhaustive
@@ -317,8 +318,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
         model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
         analytics.logEvent(PaymentMethodSelected(
-            if (paymentMethod is PaymentMethod.BankTransfer) BANK_ANALYTICS
-            else CARD_ANALYTICS
+            when (paymentMethod) {
+                is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT.toAnalyticsString()
+                is PaymentMethod.Card -> PaymentMethodType.PAYMENT_CARD.toAnalyticsString()
+                is PaymentMethod.Funds -> PaymentMethodType.FUNDS.toAnalyticsString()
+                else -> ""
+            }
         ))
     }
 
@@ -327,7 +332,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             PaymentMethodType.PAYMENT_CARD -> {
                 val intent = Intent(activity, CardDetailsActivity::class.java)
                 startActivityForResult(intent, ADD_CARD_REQUEST_CODE)
-                analytics.logEvent(PaymentMethodSelected(NEW_CARD_ANALYTICS))
             }
             PaymentMethodType.FUNDS -> {
                 showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
@@ -338,6 +342,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             else -> {
             }
         }
+        analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -349,12 +354,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
                 ))
         }
-    }
-
-    companion object {
-        private const val BANK_ANALYTICS = "BANK"
-        private const val CARD_ANALYTICS = "CARD"
-        private const val NEW_CARD_ANALYTICS = "CARD"
     }
 }
 
