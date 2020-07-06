@@ -8,12 +8,13 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class StxTokens(
@@ -23,16 +24,16 @@ internal class StxTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    pitLinking: PitLinking,
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
-    crashLogger,
-    rxBus
+    pitLinking,
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -61,4 +62,17 @@ internal class StxTokens(
             exchangeRates = exchangeRates
         )
     }
+
+    override fun parseAddress(address: String): CryptoAddress? =
+        null
+
+    private fun isValidAddress(address: String): Boolean =
+        false
+}
+
+internal class StxAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.STX
 }

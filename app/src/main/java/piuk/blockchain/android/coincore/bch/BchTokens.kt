@@ -5,19 +5,20 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class BchTokens(
@@ -29,16 +30,16 @@ internal class BchTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    pitLinking: PitLinking,
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
-    crashLogger,
-    rxBus
+    pitLinking,
+    crashLogger
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -70,10 +71,19 @@ internal class BchTokens(
             }
         }
 
-    override fun onLogoutSignal(event: AuthEvent) {
-        if (event != AuthEvent.LOGIN) {
-            bchDataManager.clearBchAccountDetails()
-        }
-        super.onLogoutSignal(event)
-    }
+    override fun parseAddress(address: String): CryptoAddress? =
+        null
+
+    private fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidBitcoinCashAddress(
+            environmentSettings.bitcoinCashNetworkParameters,
+            address
+        )
+}
+
+internal class BchAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.BCH
 }

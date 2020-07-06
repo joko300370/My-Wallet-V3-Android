@@ -255,6 +255,11 @@ class ActivityDetailsBottomSheet :
         model.process(LoadActivityDetailsIntent(cryptoCurrency, txHash, isCustodial))
     }
 
+    override fun onDestroy() {
+        model.destroy()
+        super.onDestroy()
+    }
+
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto_currency"
         private const val ARG_TRANSACTION_HASH = "tx_hash"

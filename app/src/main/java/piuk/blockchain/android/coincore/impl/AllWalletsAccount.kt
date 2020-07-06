@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import timber.log.Timber
 
@@ -46,6 +47,9 @@ class AllWalletsAccount(
             .toSingle(FiatValue.zero(fiat))
 
     override fun includes(cryptoAccount: CryptoSingleAccount): Boolean = true
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
 
     private fun allTokens() = CryptoCurrency.activeCurrencies().map { coincore[it] }
 

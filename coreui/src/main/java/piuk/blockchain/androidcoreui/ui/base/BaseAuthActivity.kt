@@ -15,7 +15,7 @@ import piuk.blockchain.androidcoreui.ApplicationLifeCycle
 /**
  * A base Activity for all activities which need auth timeouts & screenshot prevention
  */
-@Deprecated("Use SecureActivityBase in :app instead")
+@Deprecated("Use BlockchainActivity in :app instead")
 abstract class BaseAuthActivity : ToolBarActivity() {
 
     private val environment: EnvironmentConfig by inject()

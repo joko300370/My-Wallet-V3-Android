@@ -22,6 +22,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.AssetTokens
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.setImageDrawable
@@ -105,7 +106,8 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                 .observeOn(uiScheduler)
                 .subscribeBy(
                     onSuccess = { (address, label) ->
-                        addressToSend = address
+                        require(address is CryptoAddress)
+                        addressToSend = address.address
                         title.text = getString(R.string.basic_transfer_title, label)
                         checkCtaEnable()
                     },
