@@ -107,7 +107,8 @@ class ReceivePresenter(
             CryptoCurrency.XLM -> onXlmSelected()
             CryptoCurrency.PAX -> onPaxSelected()
             CryptoCurrency.STX -> TODO("STX is not yet fully supported")
-            CryptoCurrency.ALGO -> TODO("ALG is not yet fully supported")
+            CryptoCurrency.ALGO -> TODO("ALGO is not yet fully supported")
+            CryptoCurrency.USDT -> TODO("USDT is not yet fully supported")
         }.exhaustive
     }
 

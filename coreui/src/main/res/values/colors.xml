@@ -71,6 +71,7 @@
     <color name="color_stellar_logo">@color/xlm</color>
     <color name="color_pax_logo">@color/pax</color>
     <color name="color_algo_logo">@color/algo</color>
+    <color name="color_usdt_logo">@color/usdt</color>
 
     <!-- Non-Spendable colours -->
     <color name="non_spendable_button_background">@color/grey_100</color>

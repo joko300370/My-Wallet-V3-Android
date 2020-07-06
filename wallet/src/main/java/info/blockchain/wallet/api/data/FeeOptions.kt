@@ -91,6 +91,13 @@ class FeeOptions constructor(
             )
         }
 
+        private fun defaultForUsdt(): FeeOptions {
+            return FeeOptions(
+                regularFee = 4, // TODO what is the right amount here?
+                priorityFee = 4
+            )
+        }
+
         private fun defaultForErc20(): FeeOptions = defaultForEth()
 
         /**
@@ -106,6 +113,7 @@ class FeeOptions constructor(
                 CryptoCurrency.PAX -> defaultForErc20()
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
                 CryptoCurrency.ALGO -> defaultForAlg()
+                CryptoCurrency.USDT -> defaultForUsdt()
             }
         }
 
