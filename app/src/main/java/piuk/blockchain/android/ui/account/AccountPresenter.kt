@@ -259,34 +259,6 @@ class AccountPresenter internal constructor(
         }
     }
 
-    /**
-     * Create [LegacyAddress] from correctly formatted address string, show rename dialog
-     * after finishing
-     *
-     * @param address The address to be saved
-     */
-   /* @SuppressLint("CheckResult")
-    internal fun confirmImportWatchOnly(address: String) {
-        val legacyAddress = LegacyAddress()
-        legacyAddress.address = address
-        legacyAddress.createdDeviceName = "android"
-        legacyAddress.createdTime = System.currentTimeMillis()
-        legacyAddress.createdDeviceVersion = BuildConfig.VERSION_NAME
-
-        compositeDisposable += payloadDataManager.addLegacyAddress(legacyAddress)
-            .doOnError { Timber.e(it) }
-            .subscribe(
-                {
-                    analytics.logEvent(AddressAnalytics.ImportBTCAddress)
-                    view.showRenameImportedAddressDialog(legacyAddress)
-                    Logging.logEvent(importEvent(AddressType.WATCH_ONLY))
-                },
-                {
-                    view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR)
-                }
-            )
-    }*/
-
     private fun importWatchOnlyAddress(address: String) {
         val addressCopy = correctAddressFormatting(address)
 
@@ -401,7 +373,7 @@ class AccountPresenter internal constructor(
         accountsAndImportedList.add(AccountItem(AccountItem.TYPE_IMPORT_ADDRESS_BUTTON))
 
         for (legacyAddress in getLegacyAddresses()) {
-            if(legacyAddress.isWatchOnly) {
+            if (legacyAddress.isWatchOnly) {
                 continue
             }
 

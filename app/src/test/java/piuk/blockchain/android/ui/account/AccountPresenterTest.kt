@@ -445,34 +445,6 @@ class AccountPresenterTest {
         verifyNoMoreInteractions(activity)
     }
 
-   /* @Test
-    fun confirmImportWatchOnlySuccess() {
-        // Arrange
-        val address = "17UovdU9ZvepPe75igTQwxqNME1HbnvMB7"
-        whenever(payloadDataManager.addLegacyAddress(any()))
-            .thenReturn(Completable.complete())
-        // Act
-        subject.confirmImportWatchOnly(address)
-        // Assert
-        verify(payloadDataManager).addLegacyAddress(any())
-        verify(activity).showRenameImportedAddressDialog(any())
-        verifyNoMoreInteractions(activity)
-    }
-
-    @Test
-    fun confirmImportWatchOnlyFailure() {
-        // Arrange
-        val address = "17UovdU9ZvepPe75igTQwxqNME1HbnvMB7"
-        whenever(payloadDataManager.addLegacyAddress(any()))
-            .thenReturn(Completable.error(Throwable()))
-        // Act
-        subject.confirmImportWatchOnly(address)
-        // Assert
-        verify(payloadDataManager).addLegacyAddress(any())
-        verify(activity).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verifyNoMoreInteractions(activity)
-    }*/
-
     @SuppressLint("VisibleForTests")
     @Test
     fun handlePrivateKeyWhenKeyIsNull() {
