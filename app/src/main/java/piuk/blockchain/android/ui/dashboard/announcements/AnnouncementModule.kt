@@ -7,6 +7,7 @@ import com.blockchain.koin.pitAnnouncementFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.android.ui.dashboard.announcements.rule.AlgorandAvailableAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BackupPhraseAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BitpayAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BuyBitcoinAnnouncement
@@ -225,6 +226,12 @@ val dashboardAnnouncementsModule = module {
                 dismissRecorder = get(),
                 featureEligibility = get(),
                 custodialWalletManager = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            AlgorandAvailableAnnouncement(
+                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
     }

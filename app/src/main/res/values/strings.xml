@@ -1762,6 +1762,11 @@
     <string name="activity_details_to_load_fail">Couldn\'t load To address information</string>
     <string name="activity_details_from_load_fail">Couldn\'t load From address information</string>
 
+    <!-- Transfer -->
+    <string name="transfer_wallets_empty_title">No crypto to send</string>
+    <string name="transfer_wallets_empty_details">Looks like your wallets are empty, we can help you buy crypto</string>
+    <string name="transfer_wallets_load_error">There was an error loading your wallets, please try again later</string>
+
     <string name="order_pending">Pending</string>
     <string name="order_complete">Complete</string>
     <string name="expired">Expired</string>
@@ -1805,4 +1810,13 @@
     <string name="fiat_funds_kyc_announcement_title">Link a Bank to Buy Crypto</string>
     <string name="fiat_funds_kyc_announcement_description">Hold cash in your Blockchain.com Wallet. Deposit and Withdraw at anytime.</string>
     <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
+    <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
+    <string name="transfer_send_crypto">Send crypto</string>
+    <string name="transfer_second_pswd_title">2nd Password</string>
+    <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
+    <string name="transfer_second_pswd_hint">2nd password</string>
+
+    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
+    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
+    <string name="algorand_announcement_action">Buy Algorand</string>
 </resources>

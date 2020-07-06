@@ -169,7 +169,7 @@ val applicationModule = module {
     scope(payloadScopeQualifier) {
         factory {
             EthDataManager(
-                payloadManager = get(),
+                payloadDataManager = get(),
                 ethAccountApi = get(),
                 ethDataStore = get(),
                 walletOptionsDataManager = get(),

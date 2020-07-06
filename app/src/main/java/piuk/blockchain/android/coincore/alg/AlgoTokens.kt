@@ -7,12 +7,13 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
 internal class AlgoTokens(
@@ -21,16 +22,16 @@ internal class AlgoTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
+    pitLinking: PitLinking,
+    crashLogger: CrashLogger
 ) : AssetTokensBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
-    crashLogger,
-    rxBus
+    pitLinking,
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -59,4 +60,6 @@ internal class AlgoTokens(
                 custodialManager
             ))
         )
+
+    override fun parseAddress(address: String): CryptoAddress? = null
 }

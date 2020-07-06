@@ -15,7 +15,6 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -30,12 +29,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.web3j.crypto.RawTransaction
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import java.math.BigInteger
@@ -43,7 +42,7 @@ import java.math.BigInteger
 class EthDataManagerTest {
 
     private lateinit var subject: EthDataManager
-    private val payloadManager: PayloadManager = mock()
+    private val payloadManager: PayloadDataManager = mock()
     private val ethAccountApi: EthAccountApi = mock()
     private val ethDataStore: EthDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
@@ -122,7 +121,7 @@ class EthDataManagerTest {
     fun `get balance found`() {
         // Arrange
         val ethAddress = "ADDRESS"
-        val ethAddressResponseMap: EthAddressResponseMap = mock(defaultAnswer = RETURNS_DEEP_STUBS)
+        val ethAddressResponseMap: EthAddressResponseMap = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
         val response: EthAddressResponse = mock()
         whenever(response.balance).thenReturn(BigInteger.TEN)
         whenever(ethAddressResponseMap.ethAddressResponseMap.values).thenReturn(mutableListOf(response))

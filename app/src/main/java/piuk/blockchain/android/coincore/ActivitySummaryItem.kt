@@ -27,8 +27,11 @@ abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
         cryptoValue.toFiat(exchangeRates, selectedFiat)
 
     fun totalFiatWhenExecuted(selectedFiat: String): Single<FiatValue> =
-        exchangeRates.getHistoricPrice(cryptoValue, selectedFiat,
-            timeStampMs / 1000) // API uses seconds
+        exchangeRates.getHistoricPrice(
+            value = cryptoValue,
+            fiat = selectedFiat,
+            timeInSeconds = timeStampMs / 1000 // API uses seconds
+        )
 
     override operator fun compareTo(
         other: ActivitySummaryItem
