@@ -118,8 +118,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
             add(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM])
-            add(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX])
             add(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO])
+            add(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX])
             add(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT])
         }
         theAdapter.notifyDataSetChanged()
@@ -134,8 +134,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             modList.add(handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
             modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
             modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
             modList.add(handleUpdatedAssetState(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO]))
+            modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
             modList.add(handleUpdatedAssetState(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT]))
 
             modList.removeAll { it == null }
@@ -404,8 +404,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         private const val IDX_CARD_ETH = 3
         private const val IDX_CARD_BCH = 4
         private const val IDX_CARD_XLM = 5
-        private const val IDX_CARD_PAX = 6
-        private const val IDX_CARD_ALGO = 7
+        private const val IDX_CARD_ALGO = 6
+        private const val IDX_CARD_PAX = 7
         private const val IDX_CARD_USDT = 8
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
