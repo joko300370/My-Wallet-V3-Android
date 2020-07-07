@@ -35,6 +35,7 @@
     <string name="toolbar_cmd_activity">Activity</string>
     <string name="toolbar_cmd_view_activity">View Activity</string>
     <string name="toolbar_cmd_swap">Swap</string>
+    <string name="toolbar_cmd_transfer">Transfer</string>
 
     <string name="cancel">Cancel</string>
     <string name="btn_ok">OK</string>
