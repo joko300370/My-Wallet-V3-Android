@@ -14,7 +14,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_transfer.*
+import kotlinx.android.synthetic.main.fragment_transfer_send.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -46,7 +46,7 @@ class TransferSendFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_transfer)
+    ) = container?.inflate(R.layout.fragment_transfer_send)
 
     private val filterFn: AccountListFilterFn =
         { account -> (account is CryptoSingleAccount) && account.isFunded }
