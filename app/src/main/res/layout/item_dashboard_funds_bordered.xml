@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bordered_funds_parent"
+    style="@style/DashboardCard"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/very_small_margin"
     android:layout_marginTop="@dimen/very_small_margin"
-    android:layout_marginBottom="@dimen/very_small_margin"
     android:layout_marginEnd="@dimen/tiny_margin"
+    android:layout_marginBottom="@dimen/very_small_margin"
     android:background="@drawable/rounded_view_grey_border"
     android:padding="@dimen/small_margin">
 

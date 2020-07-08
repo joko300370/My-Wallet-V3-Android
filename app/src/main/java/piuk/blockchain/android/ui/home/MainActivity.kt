@@ -695,8 +695,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(fragment)
     }
 
-    override fun gotoActivityFor(account: CryptoAccount) {
-        presenter.cryptoCurrency = account.cryptoCurrencies.first()
+    override fun gotoActivityFor(account: CryptoAccount?) {
+        account?.let {
+            presenter.cryptoCurrency = it.cryptoCurrencies.first()
+        }
         startActivitiesFragment(account)
     }
 

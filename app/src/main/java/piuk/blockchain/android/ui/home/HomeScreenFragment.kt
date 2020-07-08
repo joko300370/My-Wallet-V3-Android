@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.home
 
 import androidx.fragment.app.Fragment
-import piuk.blockchain.android.campaign.CampaignType
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
@@ -11,7 +11,6 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import java.lang.IllegalStateException
 
 interface HomeScreenFragment {
     fun navigator(): HomeNavigator
@@ -47,7 +46,7 @@ interface HomeNavigator {
 
     fun gotoSendFor(cryptoCurrency: CryptoCurrency)
     fun gotoReceiveFor(cryptoCurrency: CryptoCurrency)
-    fun gotoActivityFor(account: CryptoAccount)
+    fun gotoActivityFor(account: CryptoAccount?)
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy()

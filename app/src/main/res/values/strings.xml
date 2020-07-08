@@ -1793,6 +1793,8 @@
     <!-- Fiat Funds -->
     <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
+    <string name="fiat_funds_detail_activity_title">Activity</string>
+    <string name="fiat_funds_detail_activity_details">View All Transactions</string>
     <string name="fiat_funds_no_kyc_announcement_title">Keep Cash in Your Wallet</string>
     <string name="fiat_funds_no_kyc_announcement_description">Verify your identity to deposit cash into the Wallet and buy crypto.</string>
     <string name="fiat_funds_no_kyc_sheet_description">Verify your identity to deposit cash into your Wallet. Buy &amp; Sell crypto. Withdraw at any time.</string>

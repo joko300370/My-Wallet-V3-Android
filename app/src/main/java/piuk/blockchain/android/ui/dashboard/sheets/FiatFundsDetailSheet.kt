@@ -10,7 +10,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
-import kotlinx.android.synthetic.main.item_dashboard_funds.view.funds_fiat_ticker
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -23,6 +22,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun depositFiat(fiat: FiatValue)
+        fun showActivity(fiat: FiatValue)
     }
 
     override val host: Host by lazy {
@@ -65,6 +65,11 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             funds_deposit_holder.setOnClickListener {
                 dismiss()
                 host.depositFiat(fiatValue)
+            }
+
+            funds_activity_holder.setOnClickListener {
+                dismiss()
+                host.showActivity(fiatValue)
             }
         }
     }
