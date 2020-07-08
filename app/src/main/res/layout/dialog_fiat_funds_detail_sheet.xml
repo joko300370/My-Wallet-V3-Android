@@ -45,9 +45,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/tiny_margin"
-            android:background="@drawable/bkgd_tx_circle"
-            android:backgroundTint="@color/green_000"
-            android:padding="6dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_tx_deposit" />
