@@ -16,7 +16,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/funds_title"
-        style="@style/Text.Semibold.20"
+        style="@style/Text.Standard.20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
@@ -35,7 +35,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/funds_balance"
-        style="@style/Text.Semibold.16"
+        style="@style/Text.Standard.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/funds_balance_other_fiat"

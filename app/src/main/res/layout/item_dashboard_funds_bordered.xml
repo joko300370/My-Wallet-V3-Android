@@ -5,7 +5,10 @@
     android:id="@+id/bordered_funds_parent"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/very_small_margin"
+    android:layout_marginStart="@dimen/very_small_margin"
+    android:layout_marginTop="@dimen/very_small_margin"
+    android:layout_marginBottom="@dimen/very_small_margin"
+    android:layout_marginEnd="@dimen/tiny_margin"
     android:background="@drawable/rounded_view_grey_border"
     android:padding="@dimen/small_margin">
 
@@ -19,7 +22,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bordered_funds_title"
-        style="@style/Text.Semibold.20"
+        style="@style/Text.Standard.20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
@@ -29,7 +32,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bordered_funds_fiat_ticker"
-        style="@style/Text.Light.16"
+        style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/bordered_funds_title"
@@ -38,7 +41,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bordered_funds_balance"
-        style="@style/Text.Semibold.16"
+        style="@style/Text.Standard.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/large_margin"
