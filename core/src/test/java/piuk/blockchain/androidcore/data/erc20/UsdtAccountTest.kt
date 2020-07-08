@@ -20,9 +20,9 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 
-class PaxAccountTest {
+class UsdtAccountTest {
 
-    private lateinit var paxAccount: PaxAccount
+    private lateinit var usdtAccount: UsdtAccount
     private val ethDataManager: EthDataManager = mock()
     private val erc20DataStore: Erc20DataStore = mock()
     private val environmentSettings: EnvironmentConfig = mock()
@@ -42,7 +42,7 @@ class PaxAccountTest {
 
     @Before
     fun setUp() {
-        paxAccount = PaxAccount(
+        usdtAccount = UsdtAccount(
             ethDataManager,
             erc20DataStore,
             environmentSettings = environmentSettings
@@ -52,7 +52,7 @@ class PaxAccountTest {
     @Test
     fun clearErc20AccountDetails() {
         // Actv
-        paxAccount.clear()
+        usdtAccount.clear()
         // Assert
         verify(erc20DataStore).clearData()
         verifyNoMoreInteractions(erc20DataStore)
@@ -62,20 +62,20 @@ class PaxAccountTest {
     fun fetchErc20Address() {
         // Arrange
         whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
-        whenever(ethDataManager.getErc20Address(CryptoCurrency.PAX)).thenReturn(Observable.just(
+        whenever(ethDataManager.getErc20Address(CryptoCurrency.USDT)).thenReturn(Observable.just(
             erc20AddressResponse))
         // Act
-        val testObserver = paxAccount.fetchErc20Address().test()
+        val testObserver = usdtAccount.fetchErc20Address().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.assertValue {
             it.accountHash == erc20AddressResponse.accountHash &&
                     it.totalBalance.amount == erc20AddressResponse.balance &&
-                    it.totalBalance.currency == CryptoCurrency.PAX
+                    it.totalBalance.currency == CryptoCurrency.USDT
         }
         verify(erc20DataStore).erc20DataModel = any(Erc20DataModel::class)
-        verify(ethDataManager).getErc20Address(CryptoCurrency.PAX)
+        verify(ethDataManager).getErc20Address(CryptoCurrency.USDT)
     }
 
     @Test
@@ -83,7 +83,7 @@ class PaxAccountTest {
         // Arrange
         whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
         // Act
-        val testObserver = paxAccount.fetchErc20Address().test()
+        val testObserver = usdtAccount.fetchErc20Address().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -95,7 +95,7 @@ class PaxAccountTest {
     @Test
     fun `no transactions should be returned from empty model`() {
         // Act
-        val testObserver = paxAccount.getTransactions().test()
+        val testObserver = usdtAccount.getTransactions().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -105,9 +105,9 @@ class PaxAccountTest {
     @Test
     fun `transactions from not null model should return the correct transactions`() {
         // Arrange
-        whenever(erc20DataStore.erc20DataModel).thenReturn(Erc20DataModel(erc20AddressResponse, CryptoCurrency.PAX))
+        whenever(erc20DataStore.erc20DataModel).thenReturn(Erc20DataModel(erc20AddressResponse, CryptoCurrency.USDT))
         // Act
-        val testObserver = paxAccount.getTransactions().test()
+        val testObserver = usdtAccount.getTransactions().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -121,9 +121,9 @@ class PaxAccountTest {
     @Test
     fun `account has should be the correct one`() {
         // Arrange
-        whenever(erc20DataStore.erc20DataModel).thenReturn(Erc20DataModel(erc20AddressResponse, CryptoCurrency.PAX))
+        whenever(erc20DataStore.erc20DataModel).thenReturn(Erc20DataModel(erc20AddressResponse, CryptoCurrency.USDT))
         // Act
-        val testObserver = paxAccount.getAccountHash().test()
+        val testObserver = usdtAccount.getAccountHash().test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -142,7 +142,7 @@ class PaxAccountTest {
         val amount = 7.toBigInteger()
 
         val rawTransaction =
-            paxAccount.createTransaction(nonce, to, contractAddress, gasPrice, gasLimit, amount)
+            usdtAccount.createTransaction(nonce, to, contractAddress, gasPrice, gasLimit, amount)
 
         assertEquals(nonce, rawTransaction!!.nonce)
         assertEquals(gasPrice, rawTransaction.gasPrice)

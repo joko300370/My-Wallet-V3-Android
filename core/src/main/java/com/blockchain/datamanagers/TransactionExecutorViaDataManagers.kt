@@ -98,6 +98,7 @@ internal class TransactionExecutorViaDataManagers(
                 sendPaxTransaction(fees as EthereumFees, destination, amount)
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
 
     private fun sendPaxTransaction(
@@ -150,6 +151,7 @@ internal class TransactionExecutorViaDataManagers(
             is AccountReference.Xlm -> defaultAccountDataManager.getMaxSpendableAfterFees(feeType)
             is AccountReference.Pax -> getMaxSpendablePax()
             is AccountReference.Stx -> TODO("STUB: STX NOT IMPLEMENTED")
+            is AccountReference.Usdt -> getMaxSpendableUsdt()
         }
 
     override fun getFeeForTransaction(
@@ -165,6 +167,7 @@ internal class TransactionExecutorViaDataManagers(
                 (fees as BitcoinLikeFees).feeForType(feeType)
             )
             is AccountReference.Pax,
+            is AccountReference.Usdt,
             is AccountReference.Ethereum -> {
                 when (feeType) {
                     FeeType.Regular -> (fees as EthereumFees).absoluteRegularFeeInWei.just()
@@ -244,6 +247,12 @@ internal class TransactionExecutorViaDataManagers(
             .map { CryptoValue.usdPaxFromMinor(it) }
             .doOnError { Timber.e(it) }
             .onErrorReturn { CryptoValue.ZeroPax }
+
+    private fun getMaxSpendableUsdt(): Single<CryptoValue> =
+        erc20Account.getBalance()
+            .map { CryptoValue.usdtFromMinor(it) }
+            .doOnError { Timber.e(it) }
+            .onErrorReturn { CryptoValue.ZeroUsdt }
 
     private fun sendBtcTransaction(
         amount: CryptoValue,
@@ -367,7 +376,8 @@ internal class TransactionExecutorViaDataManagers(
             CryptoCurrency.XLM -> throw IllegalArgumentException("Xlm does not have unspent outputs")
             CryptoCurrency.PAX -> throw IllegalArgumentException("PAX does not have unspent outputs")
             CryptoCurrency.STX -> throw IllegalArgumentException("STX not supported by this method")
-            CryptoCurrency.ALGO -> throw IllegalArgumentException("ALG not supported by this method")
+            CryptoCurrency.ALGO -> throw IllegalArgumentException("ALGO not supported by this method")
+            CryptoCurrency.USDT -> throw IllegalArgumentException("USDT not supported by this method")
         }.subscribeOn(Schedulers.io())
             .singleOrError()
 
@@ -399,7 +409,8 @@ internal class TransactionExecutorViaDataManagers(
         CryptoCurrency.XLM -> throw IllegalArgumentException("XLM not supported by this method")
         CryptoCurrency.PAX -> throw IllegalArgumentException("PAX not supported by this method")
         CryptoCurrency.STX -> throw IllegalArgumentException("STX not supported by this method")
-        CryptoCurrency.ALGO -> throw IllegalArgumentException("ALG not supported by this method")
+        CryptoCurrency.ALGO -> throw IllegalArgumentException("ALGO not supported by this method")
+        CryptoCurrency.USDT -> throw IllegalArgumentException("USDT not supported by this method")
     }.subscribeOn(Schedulers.io())
         .singleOrError()
 

@@ -137,7 +137,8 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
                 CryptoCurrency.XLM -> presenter.onXlmSelected()
                 CryptoCurrency.PAX -> presenter.onPaxSelected()
                 CryptoCurrency.STX -> TODO("STUB Asset. Not implemented")
-                CryptoCurrency.ALGO -> TODO("STUB ALG Not implemented")
+                CryptoCurrency.ALGO -> TODO("STUB ALGO Not implemented")
+                CryptoCurrency.USDT -> TODO("STUB USDT Not implemented")
             }.exhaustive
         }
     }
@@ -388,7 +389,8 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
             CryptoCurrency.XLM -> displayXlmLayout()
             CryptoCurrency.PAX -> displayERC20Layout()
             CryptoCurrency.STX -> displayStxLayout()
-            CryptoCurrency.ALGO -> TODO("ALG not implemented")
+            CryptoCurrency.ALGO -> TODO("ALGO not implemented")
+            CryptoCurrency.USDT -> TODO("USDT not implemented")
         }.exhaustive
         updateUnits()
     }

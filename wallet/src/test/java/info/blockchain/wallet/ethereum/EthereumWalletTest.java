@@ -1,11 +1,5 @@
 package info.blockchain.wallet.ethereum;
 
-import info.blockchain.wallet.MockedResponseTest;
-import info.blockchain.wallet.api.PersistentUrls;
-import info.blockchain.wallet.bip44.HDWallet;
-import info.blockchain.wallet.bip44.HDWalletFactory;
-import info.blockchain.wallet.bip44.HDWalletFactory.Language;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +8,12 @@ import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.LinkedList;
+
+import info.blockchain.wallet.MockedResponseTest;
+import info.blockchain.wallet.api.PersistentUrls;
+import info.blockchain.wallet.bip44.HDWallet;
+import info.blockchain.wallet.bip44.HDWalletFactory;
+import info.blockchain.wallet.bip44.HDWalletFactory.Language;
 
 import static com.blockchain.testutils.GetStringFromResourceKt.getStringFromResource;
 
@@ -24,8 +24,8 @@ public class EthereumWalletTest extends MockedResponseTest {
 
     private HDWallet getWallet(String seedHex) throws Exception {
         return HDWalletFactory
-                .restoreWallet(PersistentUrls.getInstance().getBitcoinParams(), Language.US,
-                        seedHex, "", 1);
+            .restoreWallet(PersistentUrls.getInstance().getBitcoinParams(), Language.US,
+                seedHex, "", 1);
     }
 
     private HDWallet getWallet1() throws Exception {
@@ -56,17 +56,17 @@ public class EthereumWalletTest extends MockedResponseTest {
         mockInterceptor.setResponseList(responseList);
 
         //Act
-        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet");
+        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet", "My Tether Wallet");
 
         //Assert
         Assert.assertFalse(subject.hasSeen());
         Assert.assertEquals(0, subject.getTxNotes().size());
 
         Assert.assertEquals("60e2d382449758aab3866585dc69a946e3566bca0eea274b9073cb60da636133",
-                EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
+            EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
 
         Assert.assertTrue(subject.getAccount().getAddress()
-                .equalsIgnoreCase("0x14f2BD143692B14D170c34b2eE25EE5FC61e8570"));
+            .equalsIgnoreCase("0x14f2BD143692B14D170c34b2eE25EE5FC61e8570"));
     }
 
     @Test
@@ -82,17 +82,17 @@ public class EthereumWalletTest extends MockedResponseTest {
         mockInterceptor.setResponseList(responseList);
 
         //Act
-        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet");
+        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet", "My Tether Wallet");
 
         //Assert
         Assert.assertFalse(subject.hasSeen());
         Assert.assertEquals(0, subject.getTxNotes().size());
 
         Assert.assertEquals("b96e9ccb774cc33213cbcb2c69d3cdae17b0fe4888a1ccd343cbd1a17fd98b18",
-                EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
+            EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
 
         Assert.assertTrue(subject.getAccount().getAddress()
-                .equalsIgnoreCase("0xaC39b311DCEb2A4b2f5d8461c1cdaF756F4F7Ae9"));
+            .equalsIgnoreCase("0xaC39b311DCEb2A4b2f5d8461c1cdaF756F4F7Ae9"));
     }
 
     @Test
@@ -108,17 +108,17 @@ public class EthereumWalletTest extends MockedResponseTest {
         mockInterceptor.setResponseList(responseList);
 
         //Act
-        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet");
+        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet", "My Tether Wallet");
 
         //Assert
         Assert.assertFalse(subject.hasSeen());
         Assert.assertEquals(0, subject.getTxNotes().size());
 
         Assert.assertEquals("6e1ae089604577d31f25617297e4f50ef1b06376d7b04419c7e82e2507927857",
-                EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
+            EthereumAccount.Companion.deriveECKey(wallet.getMasterKey(), 0).getPrivateKeyAsHex());
 
         Assert.assertTrue(subject.getAccount().getAddress()
-                .equalsIgnoreCase("0x351e4184A9aBe6B71a2a7a71c2628c47cC861e51"));
+            .equalsIgnoreCase("0x351e4184A9aBe6B71a2a7a71c2628c47cC861e51"));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class EthereumWalletTest extends MockedResponseTest {
         //Arrange
         HDWallet wallet = getWallet3();
 
-        EthereumWallet eth = new EthereumWallet(wallet.getMasterKey(), "label", "My USD PAX Wallet");
+        EthereumWallet eth = new EthereumWallet(wallet.getMasterKey(), "label", "My USD PAX Wallet", "My Tether Wallet");
         eth.setHasSeen(true);
 
         //Act
@@ -156,7 +156,7 @@ public class EthereumWalletTest extends MockedResponseTest {
         HDWallet wallet = getWallet3();
 
         //Act
-        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet");
+        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet", "My Tether Wallet");
 
         //Assert
         Erc20TokenData tokenData = subject.getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME);
@@ -170,7 +170,7 @@ public class EthereumWalletTest extends MockedResponseTest {
         subject = EthereumWallet.fromJson(json);
 
         //Act
-        boolean wasUpdated = subject.updateErc20Tokens("My USD PAX Wallet");
+        boolean wasUpdated = subject.updateErc20Tokens("My USD PAX Wallet", "My Tether Wallet");
 
         //Assert
         Assert.assertTrue(wasUpdated);
@@ -184,9 +184,9 @@ public class EthereumWalletTest extends MockedResponseTest {
         //Arrange
         HDWallet wallet = getWallet3();
 
-        EthereumWallet eth = new EthereumWallet(wallet.getMasterKey(), "label", "My USD PAX Wallet");
+        EthereumWallet eth = new EthereumWallet(wallet.getMasterKey(), "label", "My USD PAX Wallet", "My Tether Wallet");
         eth.getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME)
-           .putTxNote("one", "two");
+            .putTxNote("one", "two");
 
         //Act
         subject = EthereumWallet.load(eth.toJson());
@@ -208,7 +208,7 @@ public class EthereumWalletTest extends MockedResponseTest {
         responseList.add(Pair.of(404, "{\"message\":\"Not Found\"}"));
         mockInterceptor.setResponseList(responseList);
 
-        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet");
+        subject = new EthereumWallet(wallet.getMasterKey(), "My Ether Wallet", "My USD PAX Wallet", "My Tether Wallet");
         RawTransaction tx = createEtherTransaction();
 
         //Act
@@ -216,15 +216,15 @@ public class EthereumWalletTest extends MockedResponseTest {
 
         //Assert
         Assert.assertEquals(
-                "0xf85580010a840add5355887fffffffffffffff801ca032472aef4a52"
-                        + "fde34912307409bc3f9d4c0be12aaa09468da6967e9ceb80ea04a01b60edf2"
-                        + "1a188f14b8e00ddfe5fa5e1552be20a1a5462667501d047c4a5327ed"
-                , Numeric.toHexString(signTransaction));
+            "0xf85580010a840add5355887fffffffffffffff801ca032472aef4a52"
+                + "fde34912307409bc3f9d4c0be12aaa09468da6967e9ceb80ea04a01b60edf2"
+                + "1a188f14b8e00ddfe5fa5e1552be20a1a5462667501d047c4a5327ed"
+            , Numeric.toHexString(signTransaction));
     }
 
     private static RawTransaction createEtherTransaction() {
         return RawTransaction.createEtherTransaction(
-                BigInteger.ZERO, BigInteger.ONE, BigInteger.TEN, "0xadd5355",
-                BigInteger.valueOf(Long.MAX_VALUE));
+            BigInteger.ZERO, BigInteger.ONE, BigInteger.TEN, "0xadd5355",
+            BigInteger.valueOf(Long.MAX_VALUE));
     }
 }

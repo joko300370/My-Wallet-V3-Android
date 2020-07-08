@@ -17,10 +17,10 @@ import java.util.HashMap;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(fieldVisibility = Visibility.NONE,
-        getterVisibility = Visibility.NONE,
-        setterVisibility = Visibility.NONE,
-        creatorVisibility = Visibility.NONE,
-        isGetterVisibility = Visibility.NONE)
+    getterVisibility = Visibility.NONE,
+    setterVisibility = Visibility.NONE,
+    creatorVisibility = Visibility.NONE,
+    isGetterVisibility = Visibility.NONE)
 public class EthereumWallet {
 
     public static final int METADATA_TYPE_EXTERNAL = 5;
@@ -40,7 +40,7 @@ public class EthereumWallet {
      * @param defaultAccountName The desired default account name
      * @param defaultPaxLabel    The desired default account name for PAX
      */
-    public EthereumWallet(DeterministicKey walletMasterKey, String defaultAccountName, String defaultPaxLabel) {
+    public EthereumWallet(DeterministicKey walletMasterKey, String defaultAccountName, String defaultPaxLabel, String defaultUsdtLabel) {
 
         ArrayList<EthereumAccount> accounts = new ArrayList<>();
         accounts.add(EthereumAccount.Companion.deriveAccount(walletMasterKey, ACCOUNT_INDEX, defaultAccountName));
@@ -51,7 +51,7 @@ public class EthereumWallet {
         this.walletData.setTxNotes(new HashMap<String, String>());
         this.walletData.setAccounts(accounts);
 
-        updateErc20Tokens(defaultPaxLabel);
+        updateErc20Tokens(defaultPaxLabel, defaultUsdtLabel);
     }
 
     /**
@@ -83,11 +83,11 @@ public class EthereumWallet {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
-                .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+            .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+            .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+            .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+            .withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+            .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
 
         return mapper.readValue(json, EthereumWallet.class);
     }
@@ -149,7 +149,7 @@ public class EthereumWallet {
         return walletData.getErc20Tokens().get(tokenName);
     }
 
-    public boolean updateErc20Tokens(String defaultPaxLabel) {
+    public boolean updateErc20Tokens(String defaultPaxLabel, String defaultUsdtLabel) {
         boolean wasUpdated = false;
         if (walletData.getErc20Tokens() == null) {
             walletData.setErc20Tokens(new HashMap<String, Erc20TokenData>());
@@ -157,10 +157,22 @@ public class EthereumWallet {
         }
 
         HashMap<String, Erc20TokenData> map = walletData.getErc20Tokens();
-        if (!map.containsKey(Erc20TokenData.PAX_CONTRACT_NAME) || !map.get(Erc20TokenData.PAX_CONTRACT_NAME).hasLabelAndAddressStored()) {
+        if (!map.containsKey(Erc20TokenData.PAX_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.PAX_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
             map.put(
-                    Erc20TokenData.PAX_CONTRACT_NAME,
-                    Erc20TokenData.Companion.createPaxTokenData(defaultPaxLabel)
+                Erc20TokenData.PAX_CONTRACT_NAME,
+                Erc20TokenData.Companion.createPaxTokenData(defaultPaxLabel)
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.USDT_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.USDT_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.USDT_CONTRACT_NAME,
+                Erc20TokenData.Companion.createUsdtTokenData(defaultUsdtLabel)
             );
             wasUpdated = true;
         }
