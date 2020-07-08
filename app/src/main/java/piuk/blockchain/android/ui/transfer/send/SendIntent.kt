@@ -120,4 +120,19 @@ sealed class SendIntent : MviIntent<SendState> {
                 currentStep = SendStep.SEND_COMPLETE
             )
     }
+
+    object ReturnToPreviousStep : SendIntent() {
+        override fun reduce(oldState: SendState): SendState {
+            val steps = SendStep.values()
+            val currentStep = oldState.currentStep.ordinal
+            if(currentStep == 0) {
+                throw IllegalStateException("Cannot go back")
+            }
+            val previousStep = steps[currentStep - 1]
+
+            return oldState.copy(
+                currentStep = previousStep
+            )
+        }
+    }
 }

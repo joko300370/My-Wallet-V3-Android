@@ -5,7 +5,6 @@ import android.view.View
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
-import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.cta_button
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
@@ -35,6 +34,9 @@ class EnterAmountSheet : SendInputSheet() {
         view.enter_amount.addTextChangedListener(amountTextWatcher)
         view.use_max.setOnClickListener { onUseMaxClick() }
         view.cta_button.setOnClickListener { onCtaClick() }
+        view.amount_sheet_back.setOnClickListener {
+            model.process(SendIntent.ReturnToPreviousStep)
+        }
     }
 
     private val amountTextWatcher = object : AfterTextChangedWatcher() {

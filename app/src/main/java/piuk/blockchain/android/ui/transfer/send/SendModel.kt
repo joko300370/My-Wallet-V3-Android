@@ -66,6 +66,7 @@ class SendModel(
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount, previousState)
             is SendIntent.UpdateTransactionAmounts -> null
             is SendIntent.UpdateTransactionComplete -> null
+            is SendIntent.ReturnToPreviousStep -> null
         }
     }
 
