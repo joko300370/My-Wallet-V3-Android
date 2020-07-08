@@ -12,14 +12,6 @@ class FiatCurrencySymbolView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    private val dpPadding = 8
-    private val pxPadding = (dpPadding * resources.displayMetrics.density + 0.5f).toInt()
-
-    init {
-        background = ContextCompat.getDrawable(context, R.drawable.rounded_view_green_500)
-        setPadding(pxPadding, pxPadding, pxPadding, pxPadding)
-    }
-
     fun setIcon(fiat: String) =
         setImageDrawable(
             ContextCompat.getDrawable(context,

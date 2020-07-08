@@ -4,9 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
@@ -62,7 +60,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                     prefs.selectedFiatCurrency)
                     .toStringWithSymbol()
             }
-            funds_icon.setDrawableFromTicker(context, ticker)
+            funds_icon.setIcon(ticker)
 
             funds_deposit_holder.setOnClickListener {
                 dismiss()
@@ -94,16 +92,5 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                 else -> R.string.empty
             }
         )
-    }
-
-    private fun ImageView.setDrawableFromTicker(context: Context, ticker: String) {
-        setImageDrawable(
-            ContextCompat.getDrawable(context,
-                when (ticker) {
-                    "EUR" -> R.drawable.ic_vector_euro
-                    "GBP" -> R.drawable.ic_vector_pound
-                    else -> android.R.drawable.menuitem_background
-                }
-            ))
     }
 }
