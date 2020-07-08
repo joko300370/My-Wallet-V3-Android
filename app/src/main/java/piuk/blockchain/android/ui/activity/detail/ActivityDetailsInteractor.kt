@@ -13,9 +13,9 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
+import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
-import piuk.blockchain.android.coincore.pax.PaxActivitySummaryItem
 import java.text.ParseException
 import java.util.Date
 
@@ -280,7 +280,7 @@ class ActivityDetailsInteractor(
         return when (val activityItem = assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
             is BtcActivitySummaryItem -> activityItem.updateDescription(description)
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
-            is PaxActivitySummaryItem -> activityItem.updateDescription(description)
+            is Erc20ActivitySummaryItem -> activityItem.updateDescription(description)
             else -> {
                 Completable.error(UnsupportedOperationException(
                     "This type of currency doesn't support descriptions"))
@@ -336,7 +336,7 @@ class ActivityDetailsInteractor(
     ): Description? = when (item) {
         is BtcActivitySummaryItem,
         is EthActivitySummaryItem,
-        is PaxActivitySummaryItem -> Description(item.description)
+        is Erc20ActivitySummaryItem -> Description(item.description)
         else -> null
     }
 }

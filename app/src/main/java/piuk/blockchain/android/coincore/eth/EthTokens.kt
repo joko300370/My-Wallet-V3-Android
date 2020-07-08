@@ -8,12 +8,10 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoSingleAccountList
 import piuk.blockchain.android.coincore.impl.AssetTokensBase
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -22,7 +20,6 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 internal class EthTokens(
     private val ethDataManager: EthDataManager,
     private val feeDataManager: FeeDataManager,
-    private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -45,8 +42,9 @@ internal class EthTokens(
 
     override fun initToken(): Completable =
         ethDataManager.initEthereumWallet(
-            stringUtils.getString(R.string.eth_default_account_label),
-            stringUtils.getString(R.string.pax_default_account_label_1)
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER),
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT)
         )
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =

@@ -14,7 +14,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.coinswebsocket.models.Parameters
 import piuk.blockchain.android.data.coinswebsocket.models.BtcBchResponse
 import piuk.blockchain.android.data.coinswebsocket.models.Coin
 import piuk.blockchain.android.data.coinswebsocket.models.CoinWebSocketInput
@@ -23,6 +22,7 @@ import piuk.blockchain.android.data.coinswebsocket.models.EthResponse
 import piuk.blockchain.android.data.coinswebsocket.models.EthTransaction
 import piuk.blockchain.android.data.coinswebsocket.models.Input
 import piuk.blockchain.android.data.coinswebsocket.models.Output
+import piuk.blockchain.android.data.coinswebsocket.models.Parameters
 import piuk.blockchain.android.data.coinswebsocket.models.SocketRequest
 import piuk.blockchain.android.data.coinswebsocket.models.SocketResponse
 import piuk.blockchain.android.data.coinswebsocket.models.TransactionState
@@ -30,6 +30,7 @@ import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.data.rxjava.RxUtil
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -45,7 +46,6 @@ import piuk.blockchain.androidcore.data.websockets.WebSocketReceiveEvent
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
-import piuk.blockchain.android.util.AppUtil
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Locale
@@ -343,7 +343,7 @@ class CoinsWebSocketStrategy(
                 Coin.ETH,
                 Parameters.TokenedAddress(
                     address = input.erc20Address,
-                    tokenAddress = input.erc20ContractAddress
+                    tokenAddress = input.erc20PaxContractAddress
                 ))))
 
             coinsWebSocket.send(gson.toJson(SocketRequest.UnSubscribeRequest(Entity.Wallet, Coin.None,
@@ -362,7 +362,8 @@ class CoinsWebSocketStrategy(
             guid(),
             ethAddress(),
             erc20Address(),
-            erc20ContractAddress(),
+            erc20PaxContractAddress(),
+            erc20UsdtContractAddress(),
             btcReceiveAddresses(),
             bchReceiveAddresses(),
             xPubsBtc(),
@@ -463,8 +464,12 @@ class CoinsWebSocketStrategy(
         }
     }
 
-    private fun erc20ContractAddress(): String =
+    private fun erc20PaxContractAddress(): String =
         ethDataManager.getEthWallet()?.getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME)?.contractAddress
+            ?: ""
+
+    private fun erc20UsdtContractAddress(): String =
+        ethDataManager.getEthWallet()?.getErc20TokenData(Erc20TokenData.USDT_CONTRACT_NAME)?.contractAddress
             ?: ""
 
     private fun erc20Address(): String =
@@ -513,7 +518,7 @@ class CoinsWebSocketStrategy(
             Coin.ETH,
             Parameters.TokenedAddress(
                 address = coinWebSocketInput.erc20Address,
-                tokenAddress = coinWebSocketInput.erc20ContractAddress
+                tokenAddress = coinWebSocketInput.erc20PaxContractAddress
             ))))
     }
 

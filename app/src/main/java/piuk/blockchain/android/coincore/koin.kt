@@ -7,8 +7,9 @@ import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoTokens
 import piuk.blockchain.android.coincore.bch.BchTokens
 import piuk.blockchain.android.coincore.btc.BtcTokens
+import piuk.blockchain.android.coincore.erc20.pax.PaxTokens
+import piuk.blockchain.android.coincore.erc20.usdt.UsdtTokens
 import piuk.blockchain.android.coincore.eth.EthTokens
-import piuk.blockchain.android.coincore.pax.PaxTokens
 import piuk.blockchain.android.coincore.stx.StxTokens
 import piuk.blockchain.android.coincore.xlm.XlmTokens
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -80,7 +81,6 @@ val coincoreModule = module {
                 historicRates = get(),
                 currencyPrefs = get(),
                 crashLogger = get(),
-                stringUtils = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 labels = get()
@@ -89,12 +89,11 @@ val coincoreModule = module {
 
         scoped {
             PaxTokens(
-                paxAccount = get(),
+                erc20Account = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
-                stringUtils = get(),
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get()
@@ -114,6 +113,19 @@ val coincoreModule = module {
         }
 
         scoped {
+            UsdtTokens(
+                erc20Account = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get()
+            )
+        }
+
+        scoped {
             Coincore(
                 payloadManager = get(),
                 tokenMap = mapOf(
@@ -123,7 +135,8 @@ val coincoreModule = module {
                     CryptoCurrency.XLM to get<XlmTokens>(),
                     CryptoCurrency.PAX to get<PaxTokens>(),
                     CryptoCurrency.STX to get<StxTokens>(),
-                    CryptoCurrency.ALGO to get<AlgoTokens>()
+                    CryptoCurrency.ALGO to get<AlgoTokens>(),
+                    CryptoCurrency.USDT to get<UsdtTokens>()
                 ),
                 defaultLabels = get()
             )

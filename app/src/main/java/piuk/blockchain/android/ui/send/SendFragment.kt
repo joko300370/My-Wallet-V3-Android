@@ -32,7 +32,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
-import piuk.blockchain.android.util.errorIcon
 import com.blockchain.koin.scopedInject
 import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.notifications.analytics.SendAnalytics
@@ -595,6 +594,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 CryptoCurrency.PAX -> R.string.pax_to_field_helper_1
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
                 CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+                CryptoCurrency.USDT -> R.string.usdt_to_field_helper_1
             }
         } else {
             when (currencyState.cryptoCurrency) {
@@ -605,6 +605,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 CryptoCurrency.PAX -> R.string.pax_to_field_helper_no_dropdown_1
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
                 CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+                CryptoCurrency.USDT -> R.string.usdt_to_field_helper_no_dropdown_1
             }
         }
         toContainer.toAddressEditTextView.setHint(hint)

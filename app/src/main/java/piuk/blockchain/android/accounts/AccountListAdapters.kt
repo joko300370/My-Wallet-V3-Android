@@ -61,6 +61,23 @@ internal class PaxAccountListAdapter(
         Single.just(listOf(defaultAccountReference()))
 }
 
+internal class UsdtAccountListAdapter(
+    private val ethDataManager: EthDataManager,
+    private val labels: DefaultLabels
+) : AccountList {
+
+    override fun defaultAccount(): Single<AccountReference> =
+        Single.just(defaultAccountReference())
+
+    override fun defaultAccountReference() =
+        AccountReference.Usdt(labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT),
+            ethDataManager.getEthWallet()?.account?.address
+                ?: throw Exception("No usdt wallet found"), "")
+
+    override fun accounts(): Single<AccountReferenceList> =
+        Single.just(listOf(defaultAccountReference()))
+}
+
 internal class EthAccountListAdapter(private val ethDataManager: EthDataManager) : AccountList {
 
     override fun defaultAccount(): Single<AccountReference> =

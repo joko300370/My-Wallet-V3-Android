@@ -15,6 +15,8 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
+import piuk.blockchain.android.coincore.erc20.pax.PaxCryptoWalletAccount
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
@@ -34,7 +36,7 @@ class PaxAccountActivityTest {
         PaxCryptoWalletAccount(
             label = "Text Pax Account",
             address = "Test Px Address",
-            paxAccount = paxAccount,
+            erc20Account = paxAccount,
             exchangeRates = exchangeRates
         )
 
@@ -95,7 +97,7 @@ class PaxAccountActivityTest {
             .assertNoErrors()
             .assertValue {
                 it.size == 1 && it[0].run {
-                    this is PaxActivitySummaryItem &&
+                    this is Erc20ActivitySummaryItem &&
                     cryptoCurrency == CryptoCurrency.PAX &&
                     !doubleSpend &&
                     !isFeeTransaction &&

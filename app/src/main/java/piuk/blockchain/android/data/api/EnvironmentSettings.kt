@@ -22,6 +22,7 @@ class EnvironmentSettings : EnvironmentConfig {
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
 
     override fun shouldShowDebugMenu(): Boolean = BuildConfig.FLAVOR != "envProd"

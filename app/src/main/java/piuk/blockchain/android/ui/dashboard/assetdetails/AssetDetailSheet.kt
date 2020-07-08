@@ -386,11 +386,12 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         when (this) {
             CryptoCurrency.BTC,
             CryptoCurrency.ETHER,
-            CryptoCurrency.BCH -> 2
+            CryptoCurrency.BCH,
+            CryptoCurrency.PAX,
+            CryptoCurrency.ALGO,
+            CryptoCurrency.USDT -> 2
             CryptoCurrency.XLM -> 4
-            CryptoCurrency.PAX -> 2
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> 2
         }
 
     companion object {

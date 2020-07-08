@@ -31,6 +31,7 @@
     <color name="primary_grey">@color/grey_600</color>
     <color name="primary_navy_grey">@color/grey_600</color>
     <color name="primary_navy_medium">@color/blue_800</color>
+    <color name="primary_blue_dark">@color/grey_900</color>
 
     <color name="secondary_yellow_light">@color/orange_300</color>
     <color name="secondary_yellow_medium">@color/orange_400</color>
@@ -71,6 +72,7 @@
     <color name="color_stellar_logo">@color/xlm</color>
     <color name="color_pax_logo">@color/pax</color>
     <color name="color_algo_logo">@color/algo</color>
+    <color name="color_usdt_logo">@color/usdt</color>
 
     <!-- Non-Spendable colours -->
     <color name="non_spendable_button_background">@color/grey_100</color>

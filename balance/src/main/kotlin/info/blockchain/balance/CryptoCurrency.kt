@@ -72,6 +72,14 @@ enum class CryptoCurrency(
         userDp = 6,
         requiredConfirmations = 12,
         featureFlags = CryptoCurrency.PRICE_CHARTING
+    ),
+    USDT(
+        networkTicker = "USDT",
+        displayTicker = "USDT",
+        dp = 6,
+        userDp = 6,
+        requiredConfirmations = 12,
+        featureFlags = CryptoCurrency.PRICE_CHARTING
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))

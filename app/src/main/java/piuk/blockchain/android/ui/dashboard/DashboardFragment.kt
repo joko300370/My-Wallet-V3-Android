@@ -132,8 +132,9 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
             add(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM])
+            add(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO])
             add(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX])
-            add(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO])
+            add(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT])
         }
         theAdapter.notifyDataSetChanged()
     }
@@ -147,8 +148,9 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             modList.add(handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
             modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
             modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
+            modList.add(handleUpdatedAssetState(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO]))
             modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_ALG, newState.assets[CryptoCurrency.ALGO]))
+            modList.add(handleUpdatedAssetState(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT]))
 
             modList.removeAll { it == null }
 
@@ -459,13 +461,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1
-        private const val IDX_FUNDS_BALANCE = 2
-        private const val IDX_CARD_BTC = 3
-        private const val IDX_CARD_ETH = 4
-        private const val IDX_CARD_BCH = 5
-        private const val IDX_CARD_XLM = 6
-        private const val IDX_CARD_PAX = 7
-        private const val IDX_CARD_ALG = 8
+        private const val IDX_FUNDS_BALANCE = 3
+        private const val IDX_CARD_BTC = 4
+        private const val IDX_CARD_ETH = 5
+        private const val IDX_CARD_BCH = 6
+        private const val IDX_CARD_XLM = 7
+        private const val IDX_CARD_ALGO = 8
+        private const val IDX_CARD_PAX = 9
+        private const val IDX_CARD_USDT = 10
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }
