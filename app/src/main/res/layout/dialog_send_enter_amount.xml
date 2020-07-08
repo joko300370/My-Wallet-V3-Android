@@ -42,6 +42,53 @@
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_indicator" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/amount_sheet_from"
+        style="@style/Text.Light.12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_title"
+        tools:text="From: Loaded account" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/amount_sheet_asset_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
+        tools:src="@drawable/vector_bitcoin_colored" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/amount_sheet_to"
+        style="@style/Text.Semibold.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_from"
+        tools:text="To: Empty account" />
+
+    <View
+        android:id="@+id/amount_sheet_separator"
+        style="@style/SeparatorWithoutMargins"
+        android:layout_marginTop="@dimen/very_small_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_to" />
+
+    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
+        android:id="@+id/amount_sheet_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_separator" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_block"
         style="@style/Text.Semibold.14"
         android:layout_width="match_parent"
@@ -52,7 +99,7 @@
         android:text="Amount to send:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_title" />
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_input" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/enter_amount"

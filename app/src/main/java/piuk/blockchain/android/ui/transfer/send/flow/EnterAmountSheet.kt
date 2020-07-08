@@ -26,7 +26,7 @@ class EnterAmountSheet : SendInputSheet() {
 
             max_available.text = newState.availableBalance.toStringWithSymbol()
         }
-//        view.error_msg
+
         state = newState
     }
 
