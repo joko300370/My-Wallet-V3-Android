@@ -411,6 +411,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowDashboardSheet(DashboardSheet.LINK_OR_DEPOSIT, fiat))
     }
 
+    override fun showActivity(fiat: FiatValue) {
+        // TODO pass fiat value when this is supported in activity
+        navigator().gotoActivityFor(null)
+    }
+
     override fun fiatFundsVerifyIdentityCta() {
         navigator().launchKyc(CampaignType.FiatFunds)
     }

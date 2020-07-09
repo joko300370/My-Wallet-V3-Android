@@ -2,17 +2,13 @@ package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.Context
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
-import kotlinx.android.synthetic.main.item_dashboard_funds.view.funds_fiat_ticker
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -25,6 +21,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun depositFiat(fiat: FiatValue)
+        fun showActivity(fiat: FiatValue)
     }
 
     override val host: Host by lazy {
@@ -46,9 +43,6 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         val ticker = fiatValue.currencyCode
         view.apply {
-            funds_title.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                context.resources.getDimension(R.dimen.size_standard))
-
             funds_balance_other_fiat.visibleIf { prefs.selectedFiatCurrency != ticker }
             funds_balance_other_fiat.text = fiatValue.toStringWithSymbol()
             funds_list.gone()
@@ -62,11 +56,16 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                     prefs.selectedFiatCurrency)
                     .toStringWithSymbol()
             }
-            funds_icon.setDrawableFromTicker(context, ticker)
+            funds_icon.setIcon(ticker)
 
             funds_deposit_holder.setOnClickListener {
                 dismiss()
                 host.depositFiat(fiatValue)
+            }
+
+            funds_activity_holder.setOnClickListener {
+                dismiss()
+                host.showActivity(fiatValue)
             }
         }
     }
@@ -94,16 +93,5 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                 else -> R.string.empty
             }
         )
-    }
-
-    private fun ImageView.setDrawableFromTicker(context: Context, ticker: String) {
-        setImageDrawable(
-            ContextCompat.getDrawable(context,
-                when (ticker) {
-                    "EUR" -> R.drawable.ic_vector_euro
-                    "GBP" -> R.drawable.ic_vector_pound
-                    else -> android.R.drawable.menuitem_background
-                }
-            ))
     }
 }
