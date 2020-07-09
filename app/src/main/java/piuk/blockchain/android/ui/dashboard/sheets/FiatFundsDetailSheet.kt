@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.Context
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import com.blockchain.koin.scopedInject

@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.home
 import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.MvpFragment
