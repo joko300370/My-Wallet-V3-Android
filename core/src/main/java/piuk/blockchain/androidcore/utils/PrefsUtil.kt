@@ -269,6 +269,9 @@ class PrefsUtil(
         get() = getValue(KEY_CLOUD_BACKUP_ENABLED, true)
         set(value) {
             setValue(KEY_CLOUD_BACKUP_ENABLED, value)
+            if (!value) {
+                clearBackup()
+            }
         }
 
     override fun hasBackup(): Boolean =

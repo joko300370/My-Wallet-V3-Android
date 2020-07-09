@@ -237,7 +237,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
 
         cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
             settingsPresenter.updateCloudData(newValue as Boolean)
-            analytics.logEvent(SettingsAnalyticsEvents.SwipeToReceiveSwitch)
+            analytics.logEvent(SettingsAnalyticsEvents.CloudBackupSwitch)
             true
         }
 
@@ -259,8 +259,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {
-            }
+            intent == null -> {}
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
