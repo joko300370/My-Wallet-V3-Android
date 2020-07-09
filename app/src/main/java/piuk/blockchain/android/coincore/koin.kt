@@ -1,14 +1,20 @@
 package piuk.blockchain.android.coincore
 
 import com.blockchain.koin.payloadScopeQualifier
+import info.blockchain.balance.CryptoCurrency
+import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.coincore.alg.AlgoTokens
-import piuk.blockchain.android.coincore.bch.BchTokens
-import piuk.blockchain.android.coincore.btc.BtcTokens
-import piuk.blockchain.android.coincore.eth.EthTokens
-import piuk.blockchain.android.coincore.pax.PaxTokens
-import piuk.blockchain.android.coincore.stx.StxTokens
-import piuk.blockchain.android.coincore.xlm.XlmTokens
+
+import piuk.blockchain.android.coincore.alg.AlgoAsset
+import piuk.blockchain.android.coincore.bch.BchAsset
+import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.android.coincore.eth.EthAsset
+import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
+import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
+import piuk.blockchain.android.coincore.stx.StxAsset
+import piuk.blockchain.android.coincore.xlm.XlmAsset
+
 import piuk.blockchain.android.repositories.AssetActivityRepository
 
 val coincoreModule = module {
@@ -16,108 +22,130 @@ val coincoreModule = module {
     scope(payloadScopeQualifier) {
 
         scoped {
-            StxTokens(
-                rxBus = get(),
+            StxAsset(
                 payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 crashLogger = get(),
+                pitLinking = get(),
                 labels = get()
             )
         }
 
         scoped {
-            BtcTokens(
+            BtcAsset(
                 exchangeRates = get(),
+                environmentSettings = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadDataManager = get(),
-                rxBus = get(),
                 custodialManager = get(),
+                pitLinking = get(),
                 crashLogger = get(),
                 labels = get()
             )
         }
 
         scoped {
-            BchTokens(
+            BchAsset(
                 bchDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                rxBus = get(),
                 crashLogger = get(),
                 stringUtils = get(),
                 custodialManager = get(),
                 environmentSettings = get(),
+                pitLinking = get(),
                 labels = get()
             )
         }
 
         scoped {
-            XlmTokens(
-                rxBus = get(),
+            XlmAsset(
                 xlmDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
+                pitLinking = get(),
                 crashLogger = get(),
                 labels = get()
             )
         }
 
         scoped {
-            EthTokens(
+            EthAsset(
                 ethDataManager = get(),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                rxBus = get(),
                 crashLogger = get(),
-                stringUtils = get(),
                 custodialManager = get(),
+                pitLinking = get(),
                 labels = get()
             )
         }
 
         scoped {
-            PaxTokens(
-                rxBus = get(),
+            PaxAsset(
                 paxAccount = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
-                stringUtils = get(),
+                pitLinking = get(),
                 crashLogger = get(),
                 labels = get()
             )
         }
 
         scoped {
-            AlgoTokens(
-                rxBus = get(),
+            AlgoAsset(
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                pitLinking = get(),
+                crashLogger = get(),
+                labels = get()
+            )
+        }
+
+        scoped {
+            FiatAsset()
+        }
+
+        scoped {
+            UsdtAsset(
+                erc20Account = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                pitLinking = get()
             )
         }
 
         scoped {
             Coincore(
-                btcTokens = get(),
-                bchTokens = get(),
-                ethTokens = get(),
-                xlmTokens = get(),
-                paxTokens = get(),
-                stxTokens = get(),
-                algoTokens = get(),
+                payloadManager = get(),
+                fiatAsset = get<FiatAsset>(),
+                assetMap = mapOf(
+                    CryptoCurrency.BTC to get<BtcAsset>(),
+                    CryptoCurrency.BCH to get<BchAsset>(),
+                    CryptoCurrency.ETHER to get<EthAsset>(),
+                    CryptoCurrency.XLM to get<XlmAsset>(),
+                    CryptoCurrency.PAX to get<PaxAsset>(),
+                    CryptoCurrency.STX to get<StxAsset>(),
+                    CryptoCurrency.ALGO to get<AlgoAsset>(),
+                    CryptoCurrency.USDT to get<UsdtAsset>()
+                ),
                 defaultLabels = get()
             )
         }
@@ -128,5 +156,11 @@ val coincoreModule = module {
                 rxBus = get()
             )
         }
+
+        scoped {
+            AddressFactoryImpl(
+                coincore = get()
+            )
+        }.bind(AddressFactory::class)
     }
 }

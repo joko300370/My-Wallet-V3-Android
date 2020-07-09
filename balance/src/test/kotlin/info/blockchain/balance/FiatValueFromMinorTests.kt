@@ -27,7 +27,7 @@ class FiatValueFromMinorTests {
         FiatValue.fromMinor(
             "GBP",
             200
-        ).value.scale() `should be` 2
+        ).toBigDecimal().scale() `should be` 2
     }
 
     @Test
@@ -51,6 +51,6 @@ class FiatValueFromMinorTests {
         FiatValue.fromMinor(
             "JPY",
             200
-        ).value.scale() `should be` 0
+        ).toBigDecimal().scale() `should be` 0
     }
 }

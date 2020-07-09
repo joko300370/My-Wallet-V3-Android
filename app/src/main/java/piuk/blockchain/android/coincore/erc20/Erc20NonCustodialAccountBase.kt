@@ -1,41 +1,38 @@
-package piuk.blockchain.android.coincore.pax
+package piuk.blockchain.android.coincore.erc20
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 
-internal class PaxCryptoWalletAccount(
+abstract class Erc20NonCustodialAccountBase(
+    private val cryptoCurrency: CryptoCurrency,
     override val label: String,
-    private val address: String,
-    private val paxAccount: Erc20Account,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoSingleAccountNonCustodialBase() {
+) : CryptoNonCustodialAccount(cryptoCurrency) {
+    abstract val erc20Account: Erc20Account
+
     override val isDefault: Boolean = true // Only one account, so always default
 
-    override val cryptoCurrencies = setOf(CryptoCurrency.PAX)
-
-    override val balance: Single<CryptoValue>
-        get() = paxAccount.getBalance()
-            .map { CryptoValue.fromMinor(CryptoCurrency.PAX, it) }
-
-    override val receiveAddress: Single<String>
-        get() = Single.just(address)
+    override val balance: Single<Money>
+        get() = erc20Account.getBalance()
+            .map { CryptoValue.fromMinor(cryptoCurrency, it) }
 
     override val activity: Single<ActivitySummaryList>
         get() {
-            val ethDataManager = paxAccount.ethDataManager
+            val ethDataManager = erc20Account.ethDataManager
 
             val feedTransactions =
-                paxAccount.fetchErc20Address()
-                    .flatMap { paxAccount.getTransactions() }
+                erc20Account.fetchErc20Address()
+                    .flatMap { erc20Account.getTransactions() }
                     .mapList {
                         val feeObservable = ethDataManager
                             .getTransaction(it.transactionHash)
@@ -47,11 +44,12 @@ internal class PaxCryptoWalletAccount(
 
             return Singles.zip(
                 feedTransactions,
-                paxAccount.getAccountHash(),
+                erc20Account.getAccountHash(),
                 ethDataManager.getLatestBlockNumber()
-            ).map { (transactions, accountHash, latestBlockNumber) ->
+            ) { transactions, accountHash, latestBlockNumber ->
                 transactions.map { transaction ->
-                    PaxActivitySummaryItem(
+                    Erc20ActivitySummaryItem(
+                        cryptoCurrency,
                         feedTransfer = transaction,
                         accountHash = accountHash,
                         ethDataManager = ethDataManager,
@@ -60,7 +58,6 @@ internal class PaxCryptoWalletAccount(
                         account = this
                     ) as ActivitySummaryItem
                 }
-            }
-            .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 }

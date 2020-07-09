@@ -5,22 +5,22 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
-internal class BchTokens(
+internal class BchAsset(
     private val bchDataManager: BchDataManager,
     private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
@@ -29,16 +29,16 @@ internal class BchTokens(
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
-) : AssetTokensBase(
+    pitLinking: PitLinking,
+    crashLogger: CrashLogger
+) : CryptoAssetBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
-    crashLogger,
-    rxBus
+    pitLinking,
+    crashLogger
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -48,32 +48,39 @@ internal class BchTokens(
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
             with(bchDataManager) {
-                val result = mutableListOf<CryptoSingleAccount>()
-                val defaultIndex = getDefaultAccountPosition()
-
-                val accounts = getAccountMetadataList()
-                accounts.forEachIndexed { i, a ->
-                    result.add(
+                getAccountMetadataList()
+                    .mapIndexed { i, a ->
                         BchCryptoWalletAccount(
-                            a,
-                            bchDataManager,
-                            i == defaultIndex,
-                            exchangeRates,
-                            environmentSettings.bitcoinCashNetworkParameters
+                            jsonAccount = a,
+                            bchManager = bchDataManager,
+                            isDefault = i == getDefaultAccountPosition(),
+                            exchangeRates = exchangeRates,
+                            networkParams = environmentSettings.bitcoinCashNetworkParameters
                         )
-                    )
                 }
-                result
             }
         }
 
-    override fun onLogoutSignal(event: AuthEvent) {
-        if (event != AuthEvent.LOGIN) {
-            bchDataManager.clearBchAccountDetails()
+    override fun parseAddress(address: String): CryptoAddress? =
+        if (isValidAddress(address)) {
+            BchAddress(address)
+        } else {
+            null
         }
-        super.onLogoutSignal(event)
-    }
+
+    private fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidBitcoinCashAddress(
+            environmentSettings.bitcoinCashNetworkParameters,
+            address
+        )
+}
+
+internal class BchAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.BCH
 }

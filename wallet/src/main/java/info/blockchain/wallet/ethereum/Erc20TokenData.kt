@@ -48,10 +48,17 @@ class Erc20TokenData {
 
     companion object {
         const val PAX_CONTRACT_NAME = "pax"
+        const val USDT_CONTRACT_NAME = "usdt"
         private const val PAX_CONTRACT_ADDRESS = "0x8E870D67F660D95d5be530380D0eC0bd388289E1"
+        private const val USDT_CONTRACT_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 
         fun createPaxTokenData(label: String) = Erc20TokenData().apply {
             contractAddress = PAX_CONTRACT_ADDRESS
+            this.label = label
+        }
+
+        fun createUsdtTokenData(label: String) = Erc20TokenData().apply {
+            contractAddress = USDT_CONTRACT_ADDRESS
             this.label = label
         }
     }

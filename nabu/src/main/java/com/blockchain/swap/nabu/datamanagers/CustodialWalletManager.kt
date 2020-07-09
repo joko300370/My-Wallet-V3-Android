@@ -109,6 +109,8 @@ interface CustodialWalletManager {
     fun getInterestAccountDetails(crypto: CryptoCurrency): Maybe<CryptoValue>
 
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
+
+    fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 }
 
 data class BuyOrder(

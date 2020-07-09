@@ -7,30 +7,32 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import timber.log.Timber
 
-internal class AlgoTokens(
+internal class AlgoAsset(
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    crashLogger: CrashLogger,
-    rxBus: RxBus
-) : AssetTokensBase(
+    pitLinking: PitLinking,
+    crashLogger: CrashLogger
+) : CryptoAssetBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
-    crashLogger,
-    rxBus
+    pitLinking,
+    crashLogger
 ) {
 
     override val asset: CryptoCurrency
@@ -39,18 +41,18 @@ internal class AlgoTokens(
     override fun initToken(): Completable =
         Completable.complete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
             listOf(getAlgoAccount())
         }
         .doOnError { Timber.e(it) }
         .onErrorReturn { emptyList() }
 
-    private fun getAlgoAccount(): CryptoSingleAccount =
+    private fun getAlgoAccount(): SingleAccount =
         AlgoCryptoWalletAccount(label = labels.getDefaultNonCustodialWalletLabel(asset),
             exchangeRates = exchangeRates)
 
-    override fun loadCustodialAccount(): Single<CryptoSingleAccountList> =
+    override fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
             listOf(AlgoCustodialTradingAccount(
                 asset,
@@ -59,4 +61,13 @@ internal class AlgoTokens(
                 custodialManager
             ))
         )
+
+    override fun parseAddress(address: String): ReceiveAddress? = null
+}
+
+internal class AlgoAddress(
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    override val asset: CryptoCurrency = CryptoCurrency.ALGO
 }

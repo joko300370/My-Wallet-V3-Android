@@ -18,7 +18,6 @@ import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
 import piuk.blockchain.androidcoreui.utils.extensions.gone

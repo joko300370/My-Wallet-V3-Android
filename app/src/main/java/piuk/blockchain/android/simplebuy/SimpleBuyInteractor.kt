@@ -147,7 +147,7 @@ class SimpleBuyInteractor(
 
     fun exchangeRate(cryptoCurrency: CryptoCurrency): Single<SimpleBuyIntent.ExchangeRateUpdated> =
         coincore[cryptoCurrency].exchangeRate().map {
-            SimpleBuyIntent.ExchangeRateUpdated(it)
+            SimpleBuyIntent.ExchangeRateUpdated(it.price() as FiatValue)
         }
 
     fun fetchPaymentMethods(fiatCurrency: String, preselectedId: String?):

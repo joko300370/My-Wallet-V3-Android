@@ -2,8 +2,8 @@
 
     <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Common styles across all res qualifiers resides here, anything specific can inherit from this -->
-        <item name="colorPrimary">@color/primary_navy_medium</item>
-        <item name="colorPrimaryDark">@color/primary_navy_dark</item>
+        <item name="colorPrimary">@color/primary_blue_dark</item>
+        <item name="colorPrimaryDark">@color/primary_blue_dark</item>
         <item name="colorAccent">@color/primary_blue_accent</item>
 
         <item name="android:textColorPrimary">@color/black</item>

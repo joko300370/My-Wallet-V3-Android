@@ -1,7 +1,6 @@
 package com.blockchain.swap.nabu.service
 
 import info.blockchain.balance.FiatValue
-import info.blockchain.balance.compareTo
 import io.reactivex.Single
 
 interface TradeLimitService {

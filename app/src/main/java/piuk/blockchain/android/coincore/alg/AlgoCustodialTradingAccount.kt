@@ -13,6 +13,7 @@ class AlgoCustodialTradingAccount(
     exchangeRates: ExchangeRateDataManager,
     custodialWalletManager: CustodialWalletManager
 ) : CustodialTradingAccount(cryptoCurrency, label, exchangeRates, custodialWalletManager) {
+
     override val actions: AvailableActions
         get() = availableActions
 

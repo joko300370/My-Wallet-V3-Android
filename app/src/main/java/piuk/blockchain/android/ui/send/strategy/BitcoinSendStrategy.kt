@@ -15,7 +15,6 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.compareTo
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -54,7 +53,6 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -735,14 +733,14 @@ class BitcoinSendStrategy(
 
                     updateFee(getSuggestedAbsoluteFee(
                         coins,
-                        CryptoValue.bitcoinFromSatoshis(amountToSend),
+                        CryptoValue.fromMinor(CryptoCurrency.BTC, amountToSend),
                         feePerKb,
                         newCoinSelectionEnabled
                     ))
 
                     suggestedFeePayment(
                         coins,
-                        CryptoValue.bitcoinFromSatoshis(amountToSend),
+                        CryptoValue.fromMinor(CryptoCurrency.BTC, amountToSend),
                         spendAll,
                         feePerKb,
                         newCoinSelectionEnabled
@@ -769,7 +767,7 @@ class BitcoinSendStrategy(
         feePerKb: BigInteger,
         useNewCoinSelection: Boolean
     ) {
-        var amount = amountToSend.amount
+        var amount = amountToSend.toBigInteger()
 
         // Calculate sweepable amount to display max available
         val sweepBundle = sendDataManager.getMaximumAvailable(

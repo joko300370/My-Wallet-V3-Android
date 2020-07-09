@@ -32,5 +32,6 @@ internal class AccountLookup(
             )
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
 }

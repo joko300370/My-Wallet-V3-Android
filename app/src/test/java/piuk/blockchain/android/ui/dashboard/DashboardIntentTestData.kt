@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.ExchangeRate
 import org.amshove.kluent.mock
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
@@ -17,25 +17,25 @@ val TEST_ASSETS = listOf(
 
 val initialBtcState = AssetState(
     currency = CryptoCurrency.BTC,
-    cryptoBalance = CryptoValue.zero(CryptoCurrency.BTC),
-    price = FiatValue.fromMajor(FIAT_CURRENCY, 300.toBigDecimal()),
-    price24h = FiatValue.fromMajor(FIAT_CURRENCY, 400.toBigDecimal()),
+    balance = CryptoValue.zero(CryptoCurrency.BTC),
+    price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),
+    price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 400.toBigDecimal()),
     priceTrend = emptyList()
 )
 
 val initialEthState = AssetState(
     currency = CryptoCurrency.ETHER,
-    cryptoBalance = CryptoValue.zero(CryptoCurrency.ETHER),
-    price = FiatValue.fromMajor(FIAT_CURRENCY, 200.toBigDecimal()),
-    price24h = FiatValue.fromMajor(FIAT_CURRENCY, 100.toBigDecimal()),
+    balance = CryptoValue.zero(CryptoCurrency.ETHER),
+    price = ExchangeRate.CryptoToFiat(CryptoCurrency.ETHER, FIAT_CURRENCY, 200.toBigDecimal()),
+    price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.ETHER, FIAT_CURRENCY, 100.toBigDecimal()),
     priceTrend = emptyList()
 )
 
 val initialXlmState = AssetState(
     currency = CryptoCurrency.XLM,
-    cryptoBalance = CryptoValue.zero(CryptoCurrency.XLM),
-    price = FiatValue.fromMajor(FIAT_CURRENCY, 100.toBigDecimal()),
-    price24h = FiatValue.fromMajor(FIAT_CURRENCY, 75.toBigDecimal()),
+    balance = CryptoValue.zero(CryptoCurrency.XLM),
+    price = ExchangeRate.CryptoToFiat(CryptoCurrency.XLM, FIAT_CURRENCY, 100.toBigDecimal()),
+    price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.XLM, FIAT_CURRENCY, 75.toBigDecimal()),
     priceTrend = emptyList()
 )
 

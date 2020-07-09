@@ -30,6 +30,7 @@ import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
+import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
 import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
@@ -83,7 +84,7 @@ class LiveCustodialWalletManager(
             Quote(
                 date = quoteResponse.time.toLocalTime(),
                 fee = FiatValue.fromMinor(amount.currencyCode,
-                    quoteResponse.fee.times(amountCrypto.amount.toLong())),
+                    quoteResponse.fee.times(amountCrypto.toBigInteger().toLong())),
                 estimatedAmount = amountCrypto,
                 rate = FiatValue.fromMinor(amount.currencyCode, quoteResponse.rate)
             )
@@ -247,7 +248,7 @@ class LiveCustodialWalletManager(
                 TransferRequest(
                     address = walletAddress,
                     currency = amount.currency.networkTicker,
-                    amount = amount.amount.toString()
+                    amount = amount.toBigInteger().toString()
                 )
             )
         }
@@ -438,6 +439,19 @@ class LiveCustodialWalletManager(
                     Maybe.empty()
                 }
             }
+
+    override fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String> =
+        authenticator.authenticateMaybe { sessionToken ->
+            nabuService.fetchPitSendToAddressForCrypto(sessionToken, crypto.networkTicker)
+                .flatMapMaybe { response ->
+                    if (response.state == State.ACTIVE) {
+                        Maybe.just(response.address)
+                    } else {
+                        Maybe.empty()
+                    }
+                }
+                .onErrorComplete()
+        }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
         PaymentMethod.Card(

@@ -1,5 +1,6 @@
 package info.blockchain.wallet.payload
 
+import com.blockchain.testutils.satoshi
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -83,8 +84,8 @@ class CryptoBalanceMapTest {
             legacy = setOf("A"),
             watchOnlyLegacy = emptySet()
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(123L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinFromSatoshis(123L)
+            totalSpendable `should equal` 123L.satoshi()
+            totalSpendableLegacy `should equal` 123L.satoshi()
             totalWatchOnly `should equal` CryptoValue.ZeroBtc
         }
     }
@@ -164,18 +165,18 @@ class CryptoBalanceMapTest {
             legacy = setOf("B"),
             watchOnlyLegacy = setOf("C")
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(300L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinFromSatoshis(200L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinFromSatoshis(400L)
+            totalSpendable `should equal` 300L.satoshi()
+            totalSpendableLegacy `should equal` 200L.satoshi()
+            totalWatchOnly `should equal` 400L.satoshi()
         }.run {
-            subtractAmountFromAddress("A", CryptoValue.bitcoinFromSatoshis(30L))
+            subtractAmountFromAddress("A", 30L.satoshi())
         }.apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(270L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinFromSatoshis(200L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinFromSatoshis(400L)
-            get("A") `should equal` CryptoValue.bitcoinFromSatoshis(70L)
-            get("B") `should equal` CryptoValue.bitcoinFromSatoshis(200L)
-            get("C") `should equal` CryptoValue.bitcoinFromSatoshis(400L)
+            totalSpendable `should equal` 270L.satoshi()
+            totalSpendableLegacy `should equal` 200L.satoshi()
+            totalWatchOnly `should equal` 400L.satoshi()
+            get("A") `should equal` 70L.satoshi()
+            get("B") `should equal` 200L.satoshi()
+            get("C") `should equal` 400L.satoshi()
         }
     }
 
@@ -216,7 +217,7 @@ class CryptoBalanceMapTest {
             totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
             totalWatchOnly `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
         }.run {
-            subtractAmountFromAddress("C", CryptoValue.bitcoinFromSatoshis(260L))
+            subtractAmountFromAddress("C", 260L.satoshi())
         }.apply {
             totalSpendable `should equal` CryptoValue.bitcoinCashFromSatoshis(300L)
             totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
@@ -237,7 +238,7 @@ class CryptoBalanceMapTest {
             watchOnlyLegacy = setOf("C")
         ).apply {
             {
-                subtractAmountFromAddress("Missing", CryptoValue.bitcoinFromSatoshis(500L))
+                subtractAmountFromAddress("Missing", 500L.satoshi())
             } `should throw the Exception` Exception::class `with message`
                 "No info for this address. updateAllBalances should be called first."
         }

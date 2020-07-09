@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.compareTo
 import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -48,7 +47,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -655,14 +653,14 @@ class BitcoinCashSendStrategy(
 
                     updateFee(getSuggestedAbsoluteFee(
                         coins,
-                        CryptoValue.bitcoinCashFromSatoshis(amountToSend),
+                        CryptoValue.fromMinor(CryptoCurrency.BCH, amountToSend),
                         feePerKb,
                         newCoinSelectionEnabled
                     ))
 
                     suggestedFeePayment(
                         coins,
-                        CryptoValue.bitcoinCashFromSatoshis(amountToSend),
+                        CryptoValue.fromMinor(CryptoCurrency.BCH, amountToSend),
                         spendAll,
                         feePerKb,
                         newCoinSelectionEnabled
@@ -689,7 +687,7 @@ class BitcoinCashSendStrategy(
         feePerKb: BigInteger,
         useNewCoinSelection: Boolean
     ) {
-        var amount = amountToSend.amount
+        var amount = amountToSend.toBigInteger()
 
         // Calculate sweepable amount to display max available
         val sweepBundle = sendDataManager.getMaximumAvailable(

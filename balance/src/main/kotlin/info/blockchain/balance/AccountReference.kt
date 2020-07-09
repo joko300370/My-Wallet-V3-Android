@@ -41,6 +41,15 @@ sealed class AccountReference(
             get() = ethAddress
     }
 
+    data class Usdt(
+        private val _label: String,
+        val ethAddress: String,
+        val apiCode: String
+    ) : AccountReference(CryptoCurrency.USDT, _label) {
+        override val receiveAddress: String
+            get() = ethAddress
+    }
+
     data class Stx(
         private val _label: String,
         val address: String

@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.EthAccountApi
+import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.Erc20AddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
@@ -13,7 +14,6 @@ import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.ethereum.data.TransactionState
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -25,6 +25,7 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -34,7 +35,7 @@ import java.math.BigInteger
 import java.util.HashMap
 
 class EthDataManager(
-    private val payloadManager: PayloadManager,
+    private val payloadDataManager: PayloadDataManager,
     private val ethAccountApi: EthAccountApi,
     private val ethDataStore: EthDataStore,
     private val walletOptionsDataManager: WalletOptionsDataManager,
@@ -173,6 +174,7 @@ class EthDataManager(
      * @param address The ETH address to be queried
      * @return An [Observable] returning true or false based on the address's contract status
      */
+    @Deprecated(message = "Use the Single<> version")
     fun getIfContract(address: String): Observable<Boolean> =
         if (environmentSettings.environment == Environment.TESTNET) {
             // TODO(eth testnet explorer coming soon)
@@ -183,6 +185,12 @@ class EthDataManager(
                     .applySchedulers()
             }
         }
+
+    fun isContractAddress(address: String): Single<Boolean> =
+        rxPinning.call<Boolean> {
+            ethAccountApi.getIfContract(address)
+                .applySchedulers()
+        }.singleOrError()
 
     private fun String.toLocalState() =
         when (this) {
@@ -222,8 +230,8 @@ class EthDataManager(
      * @param defaultPaxLabel The default label for PAX
      * @return An [Completable]
      */
-    fun initEthereumWallet(defaultLabel: String, defaultPaxLabel: String): Completable =
-        fetchOrCreateEthereumWallet(defaultLabel, defaultPaxLabel)
+    fun initEthereumWallet(defaultLabel: String, defaultPaxLabel: String, defaultUsdtLabel: String): Completable =
+        fetchOrCreateEthereumWallet(defaultLabel, defaultPaxLabel, defaultUsdtLabel)
             .flatMapCompletable { (wallet, needsSave) ->
                 ethDataStore.ethWallet = wallet
                 if (needsSave) {
@@ -260,15 +268,31 @@ class EthDataManager(
                 .applySchedulers()
         }
 
+    fun getNonce(): Single<BigInteger> =
+        fetchEthAddress()
+            .singleOrError()
+            .map {
+                it.getNonce()
+            }
+
+    @Deprecated("Why pass the key in when we can derive it here? Use the other overload")
     fun signEthTransaction(rawTransaction: RawTransaction, ecKey: ECKey): Observable<ByteArray> =
         Observable.fromCallable {
             ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
         }
 
+    fun signEthTransaction(rawTransaction: RawTransaction, secondPassword: String = ""): Single<ByteArray> =
+        Single.fromCallable {
+            if (payloadDataManager.isDoubleEncrypted) {
+                payloadDataManager.decryptHDWallet(secondPassword)
+            }
+            val ecKey = EthereumAccount.deriveECKey(payloadDataManager.masterKey, 0)
+            ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
+        }
+
     fun pushEthTx(signedTxBytes: ByteArray): Observable<String> =
         if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.empty()
+            Observable.error(NotImplementedError("ETH Testnet not implemented"))
         } else {
             rxPinning.call<String> {
                 ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
@@ -281,11 +305,18 @@ class EthDataManager(
             }
         }
 
+    fun pushTx(signedTxBytes: ByteArray): Single<String> =
+        pushEthTx(signedTxBytes).singleOrError()
+
     fun setLastTxHashObservable(txHash: String, timestamp: Long): Observable<String> =
         rxPinning.call<String> {
             setLastTxHash(txHash, timestamp)
                 .applySchedulers()
         }
+
+    fun setLastTxHashNowSingle(txHash: String): Single<String> =
+        setLastTxHashObservable(txHash, System.currentTimeMillis())
+            .singleOrError()
 
     @Throws(Exception::class)
     private fun setLastTxHash(txHash: String, timestamp: Long): Observable<String> {
@@ -296,8 +327,8 @@ class EthDataManager(
     }
 
     @Throws(Exception::class)
-    private fun fetchOrCreateEthereumWallet(defaultLabel: String, defaultPaxLabel: String):
-            Single<Pair<EthereumWallet, Boolean>> =
+    private fun fetchOrCreateEthereumWallet(defaultLabel: String, defaultPaxLabel: String, defaultUsdtLabel: String):
+        Single<Pair<EthereumWallet, Boolean>> =
         metadataManager.fetchMetadata(EthereumWallet.METADATA_TYPE_EXTERNAL).defaultIfEmpty("")
             .map { metadata ->
                 val walletJson = if (metadata != "") metadata else null
@@ -307,8 +338,8 @@ class EthDataManager(
 
                 if (ethWallet?.account == null || !ethWallet.account.isCorrect) {
                     try {
-                        val masterKey = payloadManager.payload?.hdWallets?.get(0)?.masterKey
-                        ethWallet = EthereumWallet(masterKey, defaultLabel, defaultPaxLabel)
+                        val masterKey = payloadDataManager.masterKey
+                        ethWallet = EthereumWallet(masterKey, defaultLabel, defaultPaxLabel, defaultUsdtLabel)
                         needsSave = true
                     } catch (e: HDWalletException) {
                         // Wallet private key unavailable. First decrypt with second password.
@@ -316,7 +347,7 @@ class EthDataManager(
                     }
                 }
                 // AND-2011: Add erc20 token data if not present
-                if (ethWallet.updateErc20Tokens(defaultPaxLabel)) {
+                if (ethWallet.updateErc20Tokens(defaultPaxLabel, defaultUsdtLabel)) {
                     needsSave = true
                 }
 
@@ -337,8 +368,14 @@ class EthDataManager(
 
     fun getErc20TokenData(currency: CryptoCurrency): Erc20TokenData {
         when (currency) {
-            CryptoCurrency.PAX -> return getEthWallet()!!.getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME)
+            CryptoCurrency.PAX -> return getEthWallet()!!.getErc20TokenData(
+                Erc20TokenData.PAX_CONTRACT_NAME)
+            CryptoCurrency.USDT -> return getEthWallet()!!.getErc20TokenData(
+                Erc20TokenData.USDT_CONTRACT_NAME)
             else -> throw IllegalArgumentException("Not an ERC20 token")
         }
     }
+
+    val requireSecondPassword: Boolean
+        get() = payloadDataManager.isDoubleEncrypted
 }

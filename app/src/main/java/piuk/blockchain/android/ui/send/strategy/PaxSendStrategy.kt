@@ -40,7 +40,6 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -291,13 +290,15 @@ class PaxSendStrategy(
     private fun getConfirmationDetails(): PaymentConfirmationDetails {
         val tx = pendingTx
 
-        val paxValue = CryptoValue.usdPaxFromMinor(pendingTx.amountPax)
+        val paxValue = CryptoValue.fromMinor(CryptoCurrency.PAX, pendingTx.amountPax)
         var paxAmount = paxValue.toBigDecimal()
         paxAmount = paxAmount.setScale(8, RoundingMode.HALF_UP).stripTrailingZeros()
         val fiatValue = paxValue.toFiat(exchangeRates, fiatCurrency)
         var ethFeeValue = Convert.fromWei(pendingTx.feeEth.toString(), Convert.Unit.ETHER)
         ethFeeValue = ethFeeValue.setScale(8, RoundingMode.HALF_UP).stripTrailingZeros()
-        val fiatFeeValue = CryptoValue.etherFromWei(pendingTx.feeEth).toFiat(exchangeRates, fiatCurrency)
+        val fiatFeeValue = CryptoValue.fromMinor(
+            CryptoCurrency.ETHER, (pendingTx.feeEth)
+        ).toFiat(exchangeRates, fiatCurrency)
 
         return PaymentConfirmationDetails(
             fromLabel = tx.sendingAccountLabel,
@@ -446,7 +447,7 @@ class PaxSendStrategy(
         maxPaxAvailable = maxPaxAvailable.max(BigInteger.ZERO)
 
         val availablePax = maxPaxAvailable
-        val cryptoValue = CryptoValue.usdPaxFromMinor(availablePax)
+        val cryptoValue = CryptoValue.fromMinor(CryptoCurrency.PAX, availablePax)
 
         if (spendAll) {
             view?.updateCryptoAmount(cryptoValue)

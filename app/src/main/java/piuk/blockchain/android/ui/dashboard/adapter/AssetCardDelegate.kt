@@ -88,9 +88,9 @@ private class AssetCardViewHolder(
             showContent()
 
             fiat_balance.text = state.fiatBalance.format(fiatSymbol)
-            crypto_balance.text = state.cryptoBalance.format(state.currency)
+            crypto_balance.text = state.balance.format(state.currency)
 
-            price.text = state.price.format(fiatSymbol)
+            price.text = state.price?.price().format(fiatSymbol)
 
             price_delta.asDeltaPercent(state.priceDelta)
             price_delta_interval.text = context.getString(R.string.asset_card_rate_period)

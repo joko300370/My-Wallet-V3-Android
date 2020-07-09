@@ -10,7 +10,6 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodTy
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
-import info.blockchain.balance.compareTo
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

@@ -62,4 +62,5 @@ fun makeBlockExplorerUrl(
     CryptoCurrency.PAX -> "https://www.blockchain.com/eth/tx/"
     CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
     CryptoCurrency.ALGO -> TODO("Unknown URL here - https://www.blockchain.com/alg/tx/ ?")
+    CryptoCurrency.USDT -> TODO("Unknown URL here - https://www.blockchain.com/usdt/tx/ ?")
 } + transactionHash

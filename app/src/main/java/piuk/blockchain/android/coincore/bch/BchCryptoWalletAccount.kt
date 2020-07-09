@@ -2,18 +2,22 @@ package piuk.blockchain.android.coincore.bch
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import io.reactivex.Single
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.impl.CryptoSingleAccountNonCustodialBase
+import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.btc.BtcAddress
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BchCryptoWalletAccount(
     override val label: String,
@@ -22,14 +26,22 @@ internal class BchCryptoWalletAccount(
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters
-) : CryptoSingleAccountNonCustodialBase() {
-    override val cryptoCurrencies = setOf(CryptoCurrency.BCH)
+) : CryptoNonCustodialAccount(CryptoCurrency.BCH) {
 
-    override val balance: Single<CryptoValue>
+    private var hasFunds = AtomicBoolean(false)
+
+    override val isFunded: Boolean
+        get() = hasFunds.get()
+
+    override val balance: Single<Money>
         get() = bchManager.getBalance(address)
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
+            .doOnSuccess {
+                hasFunds.set(it > CryptoValue.ZeroBch)
+            }
+            .map { it as Money }
 
-    override val receiveAddress: Single<String>
+    override val receiveAddress: Single<ReceiveAddress>
         get() = bchManager.getNextReceiveAddress(
             bchManager.getAccountMetadataList()
                 .indexOfFirst {
@@ -40,6 +52,9 @@ internal class BchCryptoWalletAccount(
                 address.toCashAddress()
             }
             .singleOrError()
+            .map {
+                BtcAddress(it, label)
+            }
 
     override val activity: Single<ActivitySummaryList>
         get() = bchManager.getAddressTransactions(address, transactionFetchCount, transactionFetchOffset)

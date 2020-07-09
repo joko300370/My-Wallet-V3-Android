@@ -832,6 +832,9 @@
     <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>
     <string name="pax_to_field_helper_1">Enter USD-D/ETH address or select</string>
     <string name="pax_invalid_address_1">Invalid USD-D address</string>
+    <string name="usdt_to_field_helper_no_dropdown_1">Enter TETHER/ETH address</string>
+    <string name="usdt_to_field_helper_1">Enter TETHER/ETH address or select</string>
+    <string name="usdt_invalid_address_1">Invalid TETHER address</string>
 
     <!-- DASHBOARD -->
     <string name="dashboard_title">Dashboard</string>
@@ -924,6 +927,7 @@
 
     <string name="pax_title_1">USD Digital</string>
     <string name="pax_wallet_name_1">My USD Digital Wallet</string>
+    <string name="usdt_wallet_name">My Tether Wallet</string>
 
     <string name="morph_exchange">Swap</string>
 
@@ -1651,7 +1655,8 @@
     <string name="eth_default_account_label">My Ether Wallet</string>
     <string name="xlm_default_account_label">My Stellar Wallet</string>
     <string name="pax_default_account_label_1">My USD Digital Wallet</string>
-    <string name="alg_default_account_label">My Algorand Wallet</string>
+    <string name="algo_default_account_label">My Algorand Wallet</string>
+    <string name="usdt_default_account_label">My Tether Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
     <string name="default_label_interest_wallet">Interest Wallet</string>
     <string name="exchange_default_account_label">My Exchange %1$s Address</string>
@@ -1755,6 +1760,11 @@
     <string name="activity_details_to_load_fail">Couldn\'t load To address information</string>
     <string name="activity_details_from_load_fail">Couldn\'t load From address information</string>
 
+    <!-- Transfer -->
+    <string name="transfer_wallets_empty_title">No crypto to send</string>
+    <string name="transfer_wallets_empty_details">Looks like your wallets are empty, we can help you buy crypto</string>
+    <string name="transfer_wallets_load_error">There was an error loading your wallets, please try again later</string>
+
     <string name="order_pending">Pending</string>
     <string name="order_complete">Complete</string>
     <string name="expired">Expired</string>
@@ -1762,8 +1772,19 @@
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+    <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
+    <string name="transfer_send_crypto">Send crypto</string>
+    <string name="transfer_second_pswd_title">2nd Password</string>
+    <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
+    <string name="transfer_second_pswd_hint">2nd password</string>
 
     <string name="algorand_announcement_title">Say Hello to Algorand!</string>
     <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
     <string name="algorand_announcement_action">Buy Algorand</string>
+
+    <string name="tether_announcement_title">Say Hello to Tether!</string>
+    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
+    <string name="tether_announcement_action">Buy Tether Now</string>
+
+
 </resources>

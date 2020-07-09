@@ -45,8 +45,8 @@ class CoinsTest {
             payment.makeSimpleTransaction(
                 BitcoinMainNetParams.get(),
                 bundle.spendableOutputs,
-                hashMapOf("1GYkgRtJmEp355xUtVFfHSFjFdbqjiwKmb" to max.amount),
-                absoluteFee.amount,
+                hashMapOf("1GYkgRtJmEp355xUtVFfHSFjFdbqjiwKmb" to max.toBigInteger()),
+                absoluteFee.toBigInteger(),
                 "1GiEQZt9aX2XfDcj14tCC4xAWEJtq9EXW7"
             )
         }
@@ -104,13 +104,13 @@ private fun spendableUnspentOutputs(
     value: CryptoValue,
     fee: Int
 ) = Coins.getMinimumCoinsForPayment(
-    unspentOutputs, value.amount, fee.toBigInteger(), useReplayProtection, useNewCoinSelection)
+    unspentOutputs, value.toBigInteger(), fee.toBigInteger(), useReplayProtection, useNewCoinSelection)
 
 private fun unspentOutputs(vararg values: CryptoValue): UnspentOutputs {
     return UnspentOutputs().apply {
         unspentOutputs = ArrayList(values.map {
             UnspentOutput().apply {
-                value = it.amount
+                value = it.toBigInteger()
                 script = "76a91469dec09e9b32ffd447c80d413d58f0413e99208e88ac"
                 txHash = "0000000000000000000000000000000000000000000000000000000000000000"
             }
