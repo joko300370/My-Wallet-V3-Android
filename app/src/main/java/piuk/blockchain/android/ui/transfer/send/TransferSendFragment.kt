@@ -16,9 +16,9 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
@@ -29,7 +29,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
-typealias AccountListFilterFn = (CryptoAccount) -> Boolean
+typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
 class TransferSendFragment :
     Fragment(),
@@ -49,7 +49,7 @@ class TransferSendFragment :
     ) = container?.inflate(R.layout.fragment_transfer)
 
     private val filterFn: AccountListFilterFn =
-        { account -> (account is CryptoSingleAccount) && account.isFunded }
+        { account -> (account is CryptoAccount) && account.isFunded }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,14 +81,14 @@ class TransferSendFragment :
 
             disposables += Single.merge(
                 CryptoCurrency.activeCurrencies().map { ac ->
-                    coincore[ac].accounts()
+                    coincore[ac].accountGroup()
                 }.toList()
             )
             .observeOn(uiScheduler)
             .subscribeBy(
                 onNext = {
-                    itemList.addAll(it.accounts
-                        .filter(filterFn)
+                    itemList.addAll(
+                        it.accounts.filter(filterFn).map { it as CryptoAccount }
                     )
                     accountAdapter.notifyDataSetChanged()
                 },
@@ -119,7 +119,7 @@ class TransferSendFragment :
     }
 
     private fun onAccountSelected(cryptoAccount: CryptoAccount) {
-        if (cryptoAccount is CryptoSingleAccount) {
+        if (cryptoAccount is CryptoAccount) {
             disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
                 .subscribeBy(onSuccess = { secondPassword ->
                     flow.startFlow(cryptoAccount, secondPassword)

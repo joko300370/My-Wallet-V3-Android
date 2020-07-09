@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.CustodialBalanceSendClicked
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,8 +24,10 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
-import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
@@ -42,6 +45,7 @@ import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import timber.log.Timber
 
 class EmptyDashboardItem : DashboardItem
 
@@ -82,6 +86,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     @UiThread
     override fun render(newState: DashboardState) {
+        try {
+            doRender(newState)
+        } catch (e: Throwable) {
+            Timber.e("Error rendering: $e")
+        }
+    }
+
+    private fun doRender(newState: DashboardState) {
 
         swipe.isRefreshing = false
 
@@ -192,12 +204,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         analyticsReporter.updateFiatTotal(newState.fiatBalance)
 
         newState.assets.forEach { (cc, s) ->
-            val newBalance = s.cryptoBalance
-            if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.cryptoBalance) {
+            val newBalance = s.balance
+            if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.balance) {
                 analyticsReporter.gotAssetBalance(cc, newBalance) // IF we have the full set, this will fire
             }
         }
-        analyticsReporter
     }
 
     override fun onBackPressed(): Boolean = false
@@ -352,35 +363,33 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun gotoSendFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter) {
-        when (filter) {
-            AssetFilter.Total -> throw IllegalStateException("The Send.Total action is invalid")
-            AssetFilter.Wallet -> navigator().gotoSendFor(cryptoCurrency)
-            AssetFilter.Custodial -> model.process(StartCustodialTransfer(cryptoCurrency))
-            AssetFilter.Interest -> throw IllegalStateException("The Send.Interest action is invalid")
+    override fun gotoSendFor(account: SingleAccount) {
+        when (account) {
+            is CryptoNonCustodialAccount -> navigator().gotoSendFor(account)
+            is CustodialTradingAccount -> {
+                analytics.logEvent(CustodialBalanceSendClicked(account.asset))
+                model.process(StartCustodialTransfer(account.asset))
+            }
+            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
         }.exhaustive
     }
 
-    override fun goToReceiveFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter) =
-        when (filter) {
-            AssetFilter.Total -> throw IllegalStateException("The Receive.Total action is invalid")
-            AssetFilter.Wallet -> navigator().gotoReceiveFor(cryptoCurrency)
-            AssetFilter.Custodial -> throw IllegalStateException("The Receive.Custodial action is invalid")
-            AssetFilter.Interest -> throw IllegalStateException("The Receive.Interest action is invalid")
+    override fun goToReceiveFor(account: SingleAccount) =
+        when (account) {
+            is CryptoNonCustodialAccount -> navigator().gotoReceiveFor(account)
+            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
         }.exhaustive
 
-    override fun gotoActivityFor(account: CryptoAccount) =
+    override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
 
-    override fun gotoSwap(fromCryptoCurrency: CryptoCurrency, filter: AssetFilter) =
-        when (filter) {
-            AssetFilter.Total -> throw IllegalStateException("The Swap.Total action is invalid")
-            AssetFilter.Wallet -> navigator().launchSwapOrKyc(
-                fromCryptoCurrency = fromCryptoCurrency,
-                targetCurrency = fromCryptoCurrency.defaultSwapTo
+    override fun gotoSwap(account: SingleAccount) =
+        when (account) {
+            is CryptoNonCustodialAccount -> navigator().launchSwapOrKyc(
+                fromCryptoCurrency = account.asset,
+                targetCurrency = account.asset.defaultSwapTo
             )
-            AssetFilter.Custodial -> throw IllegalStateException("The Swap.Custodial action is invalid")
-            AssetFilter.Interest -> throw IllegalStateException("The Swap.Interest action is invalid")
+            else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")
         }.exhaustive
 
     override fun startBackupForTransfer() {

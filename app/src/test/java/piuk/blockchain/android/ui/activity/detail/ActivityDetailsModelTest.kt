@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -37,7 +37,7 @@ class ActivityDetailsModelTest {
         override val inputsMap: Map<String, CryptoValue> = mock(),
         override val outputsMap: Map<String, CryptoValue> = mock(),
         override val description: String? = "desc",
-        override val account: CryptoSingleAccount = mock()
+        override val account: CryptoAccount = mock()
     ) : NonCustodialActivitySummaryItem()
 
     private val custodialItem = CustodialActivitySummaryItem(

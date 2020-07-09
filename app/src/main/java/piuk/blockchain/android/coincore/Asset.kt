@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -9,8 +9,8 @@ import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
 enum class AssetFilter {
-    Total,
-    Wallet,
+    All,
+    NonCustodial,
     Custodial,
     Interest
 }
@@ -24,22 +24,27 @@ enum class AssetAction {
 
 typealias AvailableActions = Set<AssetAction>
 
-interface AssetTokens {
-    val asset: CryptoCurrency
-
+interface Asset {
     fun init(): Completable
 
-    fun defaultAccount(): Single<CryptoSingleAccount>
-    fun accounts(filter: AssetFilter = AssetFilter.Total): Single<CryptoAccountGroup>
+    fun defaultAccount(): Single<SingleAccount>
+    fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
+    fun accounts(): List<SingleAccount>
+
+    fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
+
+    fun parseAddress(address: String): ReceiveAddress?
+}
+
+interface CryptoAsset : Asset {
+    val asset: CryptoCurrency
+
     fun interestRate(): Single<Double>
 
-    fun exchangeRate(): Single<FiatValue>
-    fun historicRate(epochWhen: Long): Single<FiatValue>
+    // Fetch exchange rate to user's selected/display fiat
+    fun exchangeRate(): Single<ExchangeRate>
+    fun historicRate(epochWhen: Long): Single<ExchangeRate>
     fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries>
-
-    fun canTransferTo(account: CryptoSingleAccount): Single<CryptoSingleAccountList>
-
-    fun parseAddress(address: String): CryptoAddress?
 }
 
 // TODO Address Parsing, from various places. Split and move to the appropriate token classes

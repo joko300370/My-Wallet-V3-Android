@@ -81,7 +81,7 @@ class XlmAccountActivityTest {
         assertEquals(TransactionSummary.Direction.RECEIVED, activityItem.direction)
         assertEquals(1, activityItem.confirmations.toLong())
         assertFalse(activityItem.isFeeTransaction)
-        assertEquals(output, activityItem.cryptoValue.amount)
+        assertEquals(output, activityItem.cryptoValue.toBigInteger())
         assertEquals(
             mapOf(HORIZON_ACCOUNT_ID_2 to CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)),
             activityItem.inputsMap

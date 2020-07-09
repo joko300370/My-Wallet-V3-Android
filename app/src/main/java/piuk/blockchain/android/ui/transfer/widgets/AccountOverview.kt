@@ -11,6 +11,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAccount
 import piuk.blockchain.android.util.setCoinIcon
@@ -31,22 +32,25 @@ class AccountOverview @JvmOverloads constructor(
             .inflate(R.layout.view_account_overview, this, true)
     }
 
-    var account: CryptoAccount = NullAccount
+    var account: BlockchainAccount = NullAccount
         set(value) {
             field = value
             updateView(value)
         }
 
-    private fun updateView(account: CryptoAccount) {
+    private fun updateView(account: BlockchainAccount) {
         disposable.clear()
 
-        if (account.cryptoCurrencies.size == 1) {
-            icon.setCoinIcon(account.cryptoCurrencies.first())
-            icon.visible()
-        } else {
-            // Need a specialised asset, but this is currently only the case for AllWallets, so can come back to
-            // this later: TODO
-            icon.gone()
+        when (account) {
+            is CryptoAccount -> {
+                icon.setCoinIcon(account.asset)
+                icon.visible()
+            }
+            else -> {
+                // Need a specialised asset, but this is currently only the case for AllWallets, so can come back to
+                // this later: TODO
+                icon.gone()
+            }
         }
 
         label.text = account.label

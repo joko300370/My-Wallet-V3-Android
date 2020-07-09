@@ -8,7 +8,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -35,7 +35,7 @@ class SendFlow(
 
     private var currentStep: SendStep = SendStep.ZERO
 
-    fun startFlow(account: CryptoSingleAccount, passwordRequired: Boolean) {
+    fun startFlow(account: CryptoAccount, passwordRequired: Boolean) {
         // Create the send scope
         openScope()
         // Get the model
@@ -85,7 +85,7 @@ class SendFlow(
         try {
             createSendScope()
         } catch (e: Throwable) {
-            Timber.d("wtf? $e")
+            Timber.wtf("$e")
         }
 
     private fun closeScope() =

@@ -71,7 +71,7 @@ class PaxAccountTest {
         testObserver.assertNoErrors()
         testObserver.assertValue {
             it.accountHash == erc20AddressResponse.accountHash &&
-                    it.totalBalance.amount == erc20AddressResponse.balance &&
+                    it.totalBalance.toBigInteger() == erc20AddressResponse.balance &&
                     it.totalBalance.currency == CryptoCurrency.PAX
         }
         verify(erc20DataStore).erc20DataModel = any(Erc20DataModel::class)

@@ -16,7 +16,6 @@ import piuk.blockchain.android.util.colorRes
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.toFloat
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 
@@ -103,7 +102,7 @@ private class BalanceCardViewHolder internal constructor(
             val entries = ArrayList<PieEntry>().apply {
                 CryptoCurrency.activeCurrencies().forEach {
                     val asset = state[it]
-                    val point = asset.fiatBalance.toFloat()
+                    val point = asset.fiatBalance?.toFloat() ?: 0.0f
                     add(PieEntry(point))
                 }
             }

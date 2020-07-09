@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.MultiAddressFactory
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Single
@@ -128,8 +128,8 @@ class TransactionInOutMapper(
 
     private fun setToAndFrom(
         cryptoCurrency: CryptoCurrency,
-        inputs: Map<String, CryptoValue>,
-        outputs: Map<String, CryptoValue>
+        inputs: Map<String, Money>,
+        outputs: Map<String, Money>
     ) = TransactionInOutDetails(
         inputs = getFromList(cryptoCurrency, inputs),
         outputs = getToList(cryptoCurrency, outputs)
@@ -137,7 +137,7 @@ class TransactionInOutMapper(
 
     private fun getFromList(
         currency: CryptoCurrency,
-        inputMap: Map<String, CryptoValue>
+        inputMap: Map<String, Money>
     ): List<TransactionDetailModel> {
         val inputs = handleTransactionMap(inputMap, currency)
         // No inputs = coinbase transaction
@@ -154,11 +154,11 @@ class TransactionInOutMapper(
 
     private fun getToList(
         currency: CryptoCurrency,
-        outputMap: Map<String, CryptoValue>
+        outputMap: Map<String, Money>
     ): List<TransactionDetailModel> = handleTransactionMap(outputMap, currency)
 
     private fun handleTransactionMap(
-        inputMap: Map<String, CryptoValue>,
+        inputMap: Map<String, Money>,
         currency: CryptoCurrency
     ): MutableList<TransactionDetailModel> {
         val inputs = mutableListOf<TransactionDetailModel>()
@@ -178,7 +178,7 @@ class TransactionInOutMapper(
 
     private fun buildTransactionDetailModel(
         label: String,
-        value: CryptoValue,
+        value: Money,
         cryptoCurrency: CryptoCurrency
     ): TransactionDetailModel =
         TransactionDetailModel(

@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.ExchangeRate
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -27,9 +27,9 @@ class AssetMapTest {
     fun `copy with patchAsset works as expected`() {
         val newAsset = AssetState(
             currency = CryptoCurrency.BTC,
-            cryptoBalance = CryptoValue.bitcoinFromMajor(20),
-            price = FiatValue.fromMajor(FIAT_CURRENCY, 300.toBigDecimal()),
-            price24h = FiatValue.fromMajor(FIAT_CURRENCY, 400.toBigDecimal()),
+            balance = CryptoValue.bitcoinFromMajor(20),
+            price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),
+            price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 400.toBigDecimal()),
             priceTrend = emptyList()
         )
 
@@ -49,7 +49,7 @@ class AssetMapTest {
 
         assertEquals(copy[CryptoCurrency.BTC], subject[CryptoCurrency.BTC])
         assertNotEquals(copy[CryptoCurrency.ETHER], subject[CryptoCurrency.ETHER])
-        assertEquals(copy[CryptoCurrency.ETHER].cryptoBalance, newBalance)
+        assertEquals(copy[CryptoCurrency.ETHER].balance, newBalance)
         assertEquals(copy[CryptoCurrency.XLM], subject[CryptoCurrency.XLM])
     }
 
