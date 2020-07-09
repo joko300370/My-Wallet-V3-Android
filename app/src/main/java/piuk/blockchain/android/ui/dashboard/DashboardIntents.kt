@@ -2,7 +2,9 @@ package piuk.blockchain.android.ui.dashboard
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -28,14 +30,14 @@ object RefreshAllIntent : DashboardIntent() {
 
 class BalanceUpdate(
     val cryptoCurrency: CryptoCurrency,
-    private val newBalance: CryptoValue
+    private val newBalance: Money
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
-
-        require(cryptoCurrency == newBalance.currency) { throw IllegalStateException("CryptoCurrency mismatch") }
+        val balance = newBalance as CryptoValue
+        require(cryptoCurrency == balance.currency) { throw IllegalStateException("CryptoCurrency mismatch") }
 
         val oldAsset = oldState[cryptoCurrency]
-        val newAsset = oldAsset.copy(cryptoBalance = newBalance, hasBalanceError = false)
+        val newAsset = oldAsset.copy(balance = newBalance, hasBalanceError = false)
         val newAssets = oldState.assets.copy(patchAsset = newAsset)
 
         return oldState.copy(assets = newAssets)
@@ -48,7 +50,7 @@ class BalanceUpdateError(
     override fun reduce(oldState: DashboardState): DashboardState {
         val oldAsset = oldState[cryptoCurrency]
         val newAsset = oldAsset.copy(
-            cryptoBalance = CryptoValue(cryptoCurrency, BigInteger.ZERO),
+            balance = CryptoValue(cryptoCurrency, BigInteger.ZERO),
             hasBalanceError = true
         )
         val newAssets = oldState.assets.copy(patchAsset = newAsset)
@@ -92,8 +94,8 @@ class RefreshPrices(
 
 class PriceUpdate(
     val cryptoCurrency: CryptoCurrency,
-    private val latestPrice: FiatValue,
-    private val oldPrice: FiatValue
+    private val latestPrice: ExchangeRate,
+    private val oldPrice: ExchangeRate
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         val oldAsset = oldState.assets[cryptoCurrency]
@@ -104,8 +106,8 @@ class PriceUpdate(
 
     private fun updateAsset(
         old: AssetState,
-        latestPrice: FiatValue,
-        oldPrice: FiatValue
+        latestPrice: ExchangeRate,
+        oldPrice: ExchangeRate
     ): AssetState {
         return old.copy(
             price = latestPrice,

@@ -44,9 +44,6 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         val ticker = fiatValue.currencyCode
         view.apply {
-            funds_title.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                context.resources.getDimension(R.dimen.size_standard))
-
             funds_balance_other_fiat.visibleIf { prefs.selectedFiatCurrency != ticker }
             funds_balance_other_fiat.text = fiatValue.toStringWithSymbol()
             funds_list.gone()

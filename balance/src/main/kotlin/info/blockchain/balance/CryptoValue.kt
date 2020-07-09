@@ -7,12 +7,8 @@ import java.util.Locale
 
 data class CryptoValue(
     val currency: CryptoCurrency,
-
-    /**
-     * Amount in the smallest unit of the currency, Satoshi/Wei for example.
-     */
-    val amount: BigInteger
-) : Money {
+    private val amount: BigInteger // Amount in the minor unit of the currency, Satoshi/Wei for example.
+) : Money() {
 
     override val maxDecimalPlaces: Int = currency.dp
 
@@ -27,18 +23,27 @@ data class CryptoValue(
 
     override fun toNetworkString(): String = format(Locale.US).removeComma()
 
+    override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String) =
+        FiatValue.fromMajor(
+            fiatCurrency,
+            exchangeRates.getLastPrice(currency, fiatCurrency).toBigDecimal() * toBigDecimal()
+        )
+
     /**
      * Amount in the major value of the currency, Bitcoin/Ether for example.
      */
     override fun toBigDecimal(): BigDecimal = amount.toBigDecimal().movePointLeft(currency.dp)
+
+    override fun toBigInteger(): BigInteger = amount
+    override fun toFloat(): Float = toBigDecimal().toFloat()
 
     override val isPositive: Boolean get() = amount.signum() == 1
 
     override val isZero: Boolean get() = amount.signum() == 0
 
     companion object {
-        val ZeroBtc = bitcoinFromSatoshis(0L)
-        val ZeroBch = bitcoinCashFromSatoshis(0L)
+        val ZeroBtc = CryptoValue(CryptoCurrency.BTC, BigInteger.ZERO)
+        val ZeroBch = CryptoValue(CryptoCurrency.BCH, BigInteger.ZERO)
         val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
         val ZeroStx = CryptoValue(CryptoCurrency.STX, BigInteger.ZERO)
         val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
@@ -52,35 +57,31 @@ data class CryptoValue(
             CryptoCurrency.ETHER -> ZeroEth
             CryptoCurrency.XLM -> ZeroXlm
             CryptoCurrency.PAX -> ZeroPax
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.STX -> ZeroStx
             CryptoCurrency.ALGO -> ZeroAlg
             CryptoCurrency.USDT -> ZeroUsdt
         }
 
-        fun bitcoinFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
-        fun bitcoinFromSatoshis(satoshi: BigInteger) = CryptoValue(CryptoCurrency.BTC, satoshi)
+        fun bitcoinFromSatoshis(satoshi: Long) =
+            CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
 
         fun bitcoinFromMajor(bitcoin: Int) = bitcoinFromMajor(bitcoin.toBigDecimal())
         fun bitcoinFromMajor(bitcoin: BigDecimal) = fromMajor(CryptoCurrency.BTC, bitcoin)
 
-        fun bitcoinCashFromSatoshis(satoshi: Long) = CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
-        fun bitcoinCashFromSatoshis(satoshi: BigInteger) = CryptoValue(CryptoCurrency.BCH, satoshi)
+        fun bitcoinCashFromSatoshis(satoshi: Long) =
+            CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
 
-        fun bitcoinCashFromMajor(bitcoinCash: Int) = bitcoinCashFromMajor(bitcoinCash.toBigDecimal())
-        fun bitcoinCashFromMajor(bitcoinCash: BigDecimal) = fromMajor(CryptoCurrency.BCH, bitcoinCash)
+        fun bitcoinCashFromMajor(bitcoinCash: Int) =
+            bitcoinCashFromMajor(bitcoinCash.toBigDecimal())
 
-        fun etherFromWei(wei: BigInteger) = CryptoValue(CryptoCurrency.ETHER, wei)
+        fun bitcoinCashFromMajor(bitcoinCash: BigDecimal) =
+            fromMajor(CryptoCurrency.BCH, bitcoinCash)
 
         fun etherFromMajor(ether: Long) = etherFromMajor(ether.toBigDecimal())
         fun etherFromMajor(ether: BigDecimal) = fromMajor(CryptoCurrency.ETHER, ether)
 
         fun lumensFromMajor(lumens: BigDecimal) = fromMajor(CryptoCurrency.XLM, lumens)
         fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
-
-        fun usdPaxFromMajor(usdPax: BigDecimal) = fromMajor(CryptoCurrency.PAX, usdPax)
-        fun usdPaxFromMinor(value: BigInteger) = CryptoValue(CryptoCurrency.PAX, value)
-
-        fun usdtFromMinor(value: BigInteger) = CryptoValue(CryptoCurrency.USDT, value)
 
         fun fromMajor(
             currency: CryptoCurrency,
@@ -96,10 +97,6 @@ data class CryptoValue(
             currency: CryptoCurrency,
             minor: BigInteger
         ) = CryptoValue(currency, minor)
-
-        fun min(a: CryptoValue, b: CryptoValue) = if (a <= b) a else b
-
-        fun max(a: CryptoValue, b: CryptoValue) = if (a >= b) a else b
     }
 
     /**
@@ -109,24 +106,32 @@ data class CryptoValue(
 
     override fun toZero(): CryptoValue = zero(currency)
 
-    operator fun plus(other: CryptoValue): CryptoValue {
-        ensureComparable("add", currency, other.currency)
+    fun abs(): CryptoValue = CryptoValue(currency, amount.abs())
+
+    override fun add(other: Money): CryptoValue {
+        require(other is CryptoValue)
         return CryptoValue(currency, amount + other.amount)
     }
 
-    operator fun minus(other: CryptoValue): CryptoValue {
-        ensureComparable("subtract", currency, other.currency)
+    override fun subtract(other: Money): CryptoValue {
+        require(other is CryptoValue)
         return CryptoValue(currency, amount - other.amount)
     }
-}
 
-operator fun CryptoValue.compareTo(other: CryptoValue): Int {
-    ensureComparable("compare", currency, other.currency)
-    return amount.compareTo(other.amount)
-}
+    override fun compare(other: Money): Int {
+        require(other is CryptoValue)
+        return amount.compareTo(other.amount)
+    }
 
-private fun ensureComparable(operation: String, a: CryptoCurrency, b: CryptoCurrency) {
-    if (a != b) throw ValueTypeMismatchException(operation, a.networkTicker, b.networkTicker)
+    override fun ensureComparable(operation: String, other: Money) {
+        if (other is CryptoValue) {
+            if (currency != other.currency) {
+                throw ValueTypeMismatchException(operation, currencyCode, other.currencyCode)
+            }
+        } else {
+            throw ValueTypeMismatchException(operation, currencyCode, other.currencyCode)
+        }
+    }
 }
 
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)

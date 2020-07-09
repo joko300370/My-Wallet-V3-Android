@@ -4,19 +4,19 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.CryptoAccountGroup
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.SingleAccount
 
 fun filterTokenAccounts(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<CryptoSingleAccount>,
+    accountList: List<SingleAccount>,
     assetFilter: AssetFilter
-): CryptoAccountGroup =
+): AccountGroup =
         when (assetFilter) {
-            AssetFilter.Total ->
+            AssetFilter.All ->
                 buildAssetMasterGroup(asset, labels, accountList)
-            AssetFilter.Wallet ->
+            AssetFilter.NonCustodial ->
                 buildNonCustodialGroup(asset, labels, accountList)
             AssetFilter.Custodial ->
                 buildCustodialGroup(asset, labels, accountList)
@@ -27,8 +27,8 @@ fun filterTokenAccounts(
 private fun buildInterestGroup(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<CryptoSingleAccount>
-): CryptoAccountGroup =
+    accountList: List<SingleAccount>
+): AccountGroup =
     CryptoAccountCustodialGroup(
         labels.getDefaultInterestWalletLabel(asset),
         accountList.filterIsInstance<CryptoInterestAccount>()
@@ -37,8 +37,8 @@ private fun buildInterestGroup(
 private fun buildCustodialGroup(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<CryptoSingleAccount>
-): CryptoAccountGroup =
+    accountList: List<SingleAccount>
+): AccountGroup =
     CryptoAccountCustodialGroup(
         labels.getDefaultCustodialWalletLabel(asset),
         accountList.filterIsInstance<CustodialTradingAccount>()
@@ -47,9 +47,9 @@ private fun buildCustodialGroup(
 private fun buildNonCustodialGroup(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<CryptoSingleAccount>
-): CryptoAccountGroup =
-    CryptoAccountCompoundGroup(
+    accountList: List<SingleAccount>
+): AccountGroup =
+    CryptoAccountNonCustodialGroup(
         asset,
         labels.getDefaultCustodialWalletLabel(asset),
         accountList.filterIsInstance<CryptoNonCustodialAccount>()
@@ -58,9 +58,9 @@ private fun buildNonCustodialGroup(
 private fun buildAssetMasterGroup(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<CryptoSingleAccount>
-): CryptoAccountGroup =
-    CryptoAccountCompoundGroup(
+    accountList: List<SingleAccount>
+): AccountGroup =
+    CryptoAccountNonCustodialGroup(
         asset,
         labels.getAssetMasterWalletLabel(asset),
         accountList

@@ -265,7 +265,7 @@ class WalletAccountHelper(
     private fun getDefaultEthAccount(): ItemAccount? {
         val ethModel = ethDataManager.getEthResponseModel()
         val ethAccount = ethDataManager.getEthWallet()?.account
-        val balance = CryptoValue.etherFromWei(ethModel?.getTotalBalance() ?: BigInteger.ZERO)
+        val balance = CryptoValue.fromMinor(CryptoCurrency.ETHER, ethModel?.getTotalBalance() ?: BigInteger.ZERO)
 
         return if (ethAccount == null) {
             Timber.e("Invalid ETHER account: no account")

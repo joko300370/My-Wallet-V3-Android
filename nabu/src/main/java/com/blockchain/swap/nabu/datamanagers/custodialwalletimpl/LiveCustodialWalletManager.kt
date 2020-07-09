@@ -87,7 +87,7 @@ class LiveCustodialWalletManager(
             Quote(
                 date = quoteResponse.time.toLocalTime(),
                 fee = FiatValue.fromMinor(amount.currencyCode,
-                    quoteResponse.fee.times(amountCrypto.amount.toLong())),
+                    quoteResponse.fee.times(amountCrypto.toBigInteger().toLong())),
                 estimatedAmount = amountCrypto,
                 rate = FiatValue.fromMinor(amount.currencyCode, quoteResponse.rate)
             )
@@ -256,7 +256,7 @@ class LiveCustodialWalletManager(
                 TransferRequest(
                     address = walletAddress,
                     currency = amount.currency.networkTicker,
-                    amount = amount.amount.toString()
+                    amount = amount.toBigInteger().toString()
                 )
             )
         }
@@ -336,20 +336,18 @@ class LiveCustodialWalletManager(
                 SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) &&
                 fundsEnabled
             ) {
-                if (fiatBalance.isPositive) {
-                    val fundsLimits =
-                        PaymentLimits(it.limits.min,
-                            it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
-                    availablePaymentMethods.add(PaymentMethod.Funds(
-                        fiatBalance,
-                        it.currency,
-                        fundsLimits
-                    ))
-                } else {
-                    availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
-                        it.currency,
-                        PaymentLimits(it.limits.min, it.limits.max, it.currency)))
-                }
+                val fundsLimits =
+                    PaymentLimits(it.limits.min,
+                        it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
+                availablePaymentMethods.add(PaymentMethod.Funds(
+                    fiatBalance,
+                    it.currency,
+                    fundsLimits
+                ))
+
+                availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
+                    it.currency,
+                    PaymentLimits(it.limits.min, it.limits.max, it.currency)))
             }
         }
 

@@ -28,7 +28,7 @@ internal class SelfFeeCalculatingTransactionExecutor(
         } else {
             balanceCalculator.balance(CryptoCurrency.ETHER).singleOrError()
                 .zipWith(getFeeForTransaction(amount, sendingAccount)) { balance, fee ->
-                    balance.amount >= fee.amount
+                    balance >= fee
                 }
         }
     }

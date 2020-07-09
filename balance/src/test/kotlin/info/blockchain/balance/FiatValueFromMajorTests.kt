@@ -34,7 +34,7 @@ class FiatValueFromMajorTests {
         FiatValue.fromMajor(
             "GBP",
             1.toBigDecimal()
-        ).value.scale() `should equal` 2
+        ).toBigDecimal().scale() `should equal` 2
     }
 
     @Test
@@ -50,6 +50,6 @@ class FiatValueFromMajorTests {
         FiatValue.fromMajor(
             "JPY",
             1.toBigDecimal()
-        ).value.scale() `should equal` 0
+        ).toBigDecimal().scale() `should equal` 0
     }
 }

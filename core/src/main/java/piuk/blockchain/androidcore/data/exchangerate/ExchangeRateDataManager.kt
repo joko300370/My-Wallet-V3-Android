@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.data.exchangerate
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -19,17 +20,17 @@ import java.math.RoundingMode
 class ExchangeRateDataManager(
     private val exchangeRateDataStore: ExchangeRateDataStore,
     rxBus: RxBus
-) {
+) : ExchangeRates {
     private val rxPinning = RxPinning(rxBus)
 
     fun updateTickers(): Completable =
         rxPinning.call { exchangeRateDataStore.updateExchangeRates() }
             .subscribeOn(Schedulers.io())
 
-    fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
+    override fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
         exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
 
-    fun getLastPriceOfFiat(targetFiat: String, sourceFiat: String) =
+    override fun getLastPriceOfFiat(targetFiat: String, sourceFiat: String) =
         exchangeRateDataStore.getFiatLastPrice(targetFiat = targetFiat, sourceFiat = sourceFiat)
 
     fun getHistoricPrice(value: CryptoValue, fiat: String, timeInSeconds: Long): Single<FiatValue> =
@@ -44,22 +45,6 @@ class ExchangeRateDataManager(
 
     fun getCurrencyLabels() = exchangeRateDataStore.getCurrencyLabels()
 }
-
-fun CryptoValue.toFiat(exchangeRateDataManager: ExchangeRateDataManager, fiatUnit: String) =
-    FiatValue.fromMajor(
-        fiatUnit,
-        exchangeRateDataManager.getLastPrice(currency, fiatUnit).toBigDecimal() * toBigDecimal()
-    )
-
-fun FiatValue.toFiatWithCurrency(
-    exchangeRateDataManager: ExchangeRateDataManager,
-    targetCurrency: String
-) = FiatValue.fromMajor(targetCurrency,
-        exchangeRateDataManager.getLastPriceOfFiat(
-            sourceFiat = this.currencyCode,
-            targetFiat = targetCurrency
-        ).toBigDecimal() * toBigDecimal()
-    )
 
 fun FiatValue.toCrypto(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =
     toCryptoOrNull(exchangeRateDataManager, cryptoCurrency) ?: CryptoValue.zero(cryptoCurrency)
@@ -78,3 +63,13 @@ fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRateDataManager, c
             )
         }
     }
+
+fun FiatValue.toFiatWithCurrency(
+    exchangeRateDataManager: ExchangeRateDataManager,
+    targetCurrency: String
+) = FiatValue.fromMajor(targetCurrency,
+    exchangeRateDataManager.getLastPriceOfFiat(
+        sourceFiat = this.currencyCode,
+        targetFiat = targetCurrency
+    ).toBigDecimal() * toBigDecimal()
+)

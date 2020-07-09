@@ -20,7 +20,7 @@ data class CryptoBalanceMap(
             balances[address] ?: throw Exception("No info for this address. updateAllBalances should be called first.")
         val newBalances = balances.toMutableMap()
             .apply {
-                set(address, value - cryptoValue.amount)
+                set(address, value - cryptoValue.toBigInteger())
             }
         return copy(balances = newBalances)
     }

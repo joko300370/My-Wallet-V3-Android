@@ -10,7 +10,6 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.toFloat
 import kotlinx.android.synthetic.main.item_dashboard_balance_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -104,7 +103,7 @@ private class BalanceCardViewHolder internal constructor(
             val entries = ArrayList<PieEntry>().apply {
                 CryptoCurrency.activeCurrencies().forEach {
                     val asset = state[it]
-                    val point = asset.fiatBalance.toFloat()
+                    val point = asset.fiatBalance?.toFloat() ?: 0f
                     add(PieEntry(point))
                 }
 

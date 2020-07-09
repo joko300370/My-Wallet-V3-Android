@@ -2,9 +2,8 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import com.blockchain.remoteconfig.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
-import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
-import info.blockchain.balance.toFiat
+import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Observable
@@ -14,24 +13,25 @@ import io.reactivex.rxkotlin.withLatestFrom
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAccountGroup
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator.Companion.NOT_USED
+import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
 data class AssetDisplayInfo(
-    val cryptoValue: CryptoValue,
-    val fiatValue: FiatValue,
+    val account: BlockchainAccount,
+    val amount: Money,
+    val fiatValue: Money,
     val actions: Set<AssetAction>,
-    val interestRate: Double = NOT_USED
+    val interestRate: Double = AssetDetailsCalculator.NOT_USED
 )
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
 
 class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
     // input
-    val token = BehaviorRelay.create<AssetTokens>()
+    val token = BehaviorRelay.create<CryptoAsset>()
     val timeSpan = BehaviorRelay.createDefault<TimeSpan>(TimeSpan.DAY)
 
     private val _chartLoading: BehaviorRelay<Boolean> = BehaviorRelay.createDefault<Boolean>(false)
@@ -42,7 +42,7 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
     val exchangeRate: Observable<String> = token.flatMapSingle {
         it.exchangeRate()
     }.map {
-        it.toStringWithSymbol()
+        it.price().toStringWithSymbol()
     }.subscribeOn(Schedulers.io())
 
     val historicPrices: Observable<List<PriceDatum>> =
@@ -62,17 +62,19 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         }.subscribeOn(Schedulers.computation())
 
     private data class Details(
-        val balance: CryptoValue,
+        val account: BlockchainAccount,
+        val balance: Money,
         val actions: AvailableActions,
         val shouldShow: Boolean
     )
 
-    private fun Single<CryptoAccountGroup>.mapDetails(
+    private fun Single<AccountGroup>.mapDetails(
         showUnfunded: Boolean = false
     ): Single<Details> =
         this.flatMap { grp ->
             grp.balance.map { balance ->
                 Details(
+                    grp,
                     balance,
                     grp.actions,
                     grp.accounts.isNotEmpty() && (showUnfunded || grp.isFunded)
@@ -80,42 +82,58 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
             }
         }
 
-    private fun getAssetDisplayDetails(assetTokens: AssetTokens): Single<AssetDisplayMap> {
+    private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
-            assetTokens.exchangeRate(),
-            assetTokens.accounts(AssetFilter.Total).mapDetails(),
-            assetTokens.accounts(AssetFilter.Wallet).mapDetails(),
-            assetTokens.accounts(AssetFilter.Custodial).mapDetails(),
-            assetTokens.accounts(AssetFilter.Interest).mapDetails(),
-            assetTokens.interestRate(),
+            asset.exchangeRate(),
+            asset.accountGroup(AssetFilter.All).mapDetails(),
+            asset.accountGroup(AssetFilter.NonCustodial).mapDetails(),
+            asset.accountGroup(AssetFilter.Custodial).mapDetails(),
+            asset.accountGroup(AssetFilter.Interest).mapDetails(),
+            asset.interestRate(),
             interestFeatureFlag.enabled
-        ) { fiatPrice, total, nonCustodial, custodial, interest, interestRate, interestEnabled ->
-            val totalFiat = total.balance.toFiat(fiatPrice)
-            val walletFiat = nonCustodial.balance.toFiat(fiatPrice)
-            val custodialFiat = custodial.balance.toFiat(fiatPrice)
-            val interestFiat = interest.balance.toFiat(fiatPrice)
+        ) { fiatRate, total, nonCustodial, custodial, interest, interestRate, interestEnabled ->
+            makeAssetDisplayMap(
+                fiatRate, total, nonCustodial, custodial, interest, interestRate, interestEnabled
+            )
+        }
+    }
 
-            mutableMapOf(
-                AssetFilter.Total to AssetDisplayInfo(total.balance, totalFiat, total.actions)
-            ).apply {
-                if (nonCustodial.shouldShow) {
-                    put(AssetFilter.Wallet,
-                        AssetDisplayInfo(nonCustodial.balance, walletFiat, nonCustodial.actions)
-                    )
-                }
+    private fun makeAssetDisplayMap(
+        fiatRate: ExchangeRate,
+        total: Details,
+        nonCustodial: Details,
+        custodial: Details,
+        interest: Details,
+        interestRate: Double,
+        interestEnabled: Boolean
+    ): AssetDisplayMap {
+        val totalFiat = fiatRate.convert(total.balance)
+        val walletFiat = fiatRate.convert(nonCustodial.balance)
+        val custodialFiat = fiatRate.convert(custodial.balance)
+        val interestFiat = fiatRate.convert(interest.balance)
 
-                if (custodial.shouldShow) {
-                    put(
-                        AssetFilter.Custodial,
-                        AssetDisplayInfo(custodial.balance, custodialFiat, custodial.actions)
-                    )
-                }
+        return mutableMapOf(
+            AssetFilter.All to AssetDisplayInfo(total.account, total.balance, totalFiat, total.actions)
+        ).apply {
+            if (nonCustodial.shouldShow) {
+                put(
+                    AssetFilter.NonCustodial,
+                    AssetDisplayInfo(nonCustodial.account, nonCustodial.balance, walletFiat, nonCustodial.actions)
+                )
+            }
 
-                if (interest.shouldShow && interestEnabled) {
-                    put(AssetFilter.Interest,
-                        AssetDisplayInfo(interest.balance, interestFiat, interest.actions,
-                            interestRate))
-                }
+            if (custodial.shouldShow) {
+                put(
+                    AssetFilter.Custodial,
+                    AssetDisplayInfo(custodial.account, custodial.balance, custodialFiat, custodial.actions)
+                )
+            }
+
+            if (interest.shouldShow && interestEnabled) {
+                put(
+                    AssetFilter.Interest,
+                    AssetDisplayInfo(interest.account, interest.balance, interestFiat, interest.actions, interestRate)
+                )
             }
         }
     }
