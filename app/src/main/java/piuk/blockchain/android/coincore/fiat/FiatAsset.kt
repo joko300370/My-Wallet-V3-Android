@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 
 class FiatAsset : Asset {
     override fun init(): Completable = Completable.complete()
+    override val isEnabled: Boolean = true
 
     private val accounts = listOf(
         FiatCustodialAccount(

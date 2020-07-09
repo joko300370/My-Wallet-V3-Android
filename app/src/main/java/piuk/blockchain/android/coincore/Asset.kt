@@ -26,6 +26,7 @@ typealias AvailableActions = Set<AssetAction>
 
 interface Asset {
     fun init(): Completable
+    val isEnabled: Boolean
 
     fun defaultAccount(): Single<SingleAccount>
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>

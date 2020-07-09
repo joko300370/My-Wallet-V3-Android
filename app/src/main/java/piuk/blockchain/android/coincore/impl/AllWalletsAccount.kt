@@ -45,7 +45,7 @@ class AllWalletsAccount(
 
     override fun includes(account: BlockchainAccount): Boolean = true
 
-    private fun allTokens() = coincore.assets
+    private fun allTokens() = coincore.assets.filter { it.isEnabled }
 
     private fun allAccounts(): Single<List<BlockchainAccount>> =
         Single.zip(
