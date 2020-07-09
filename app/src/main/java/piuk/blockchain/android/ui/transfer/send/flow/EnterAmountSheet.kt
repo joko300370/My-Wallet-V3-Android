@@ -31,11 +31,13 @@ class EnterAmountSheet : SendInputSheet() {
     }
 
     override fun initControls(view: View) {
-        view.enter_amount.addTextChangedListener(amountTextWatcher)
-        view.use_max.setOnClickListener { onUseMaxClick() }
-        view.cta_button.setOnClickListener { onCtaClick() }
-        view.amount_sheet_back.setOnClickListener {
-            model.process(SendIntent.ReturnToPreviousStep)
+        view.apply {
+            enter_amount.addTextChangedListener(amountTextWatcher)
+            use_max.setOnClickListener { onUseMaxClick() }
+            cta_button.setOnClickListener { onCtaClick() }
+            amount_sheet_back.setOnClickListener {
+                model.process(SendIntent.ReturnToPreviousStep)
+            }
         }
     }
 
