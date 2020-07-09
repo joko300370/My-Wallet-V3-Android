@@ -10,6 +10,7 @@ import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
@@ -47,12 +48,14 @@ class DashboardInteractor(
         CryptoCurrency.activeCurrencies()
             .filter { it != CryptoCurrency.PAX }
             .forEach {
-                cd += tokens[it].accounts(balanceFilter)
-                    .flatMap { it.balance }
+                cd += tokens[it].accountGroup(balanceFilter)
+                    .flatMap { asset -> asset.balance }
+                    .map { balance -> balance as CryptoValue }
+                    // CURRENCY HERE
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
-                            cd += tokens[CryptoCurrency.PAX].accounts(balanceFilter)
-                                .flatMap { it.balance }
+                            cd += tokens[CryptoCurrency.PAX].accountGroup(balanceFilter)
+                                .flatMap { asset -> asset.balance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
                                         Timber.d("*****> Got balance for PAX")
@@ -143,7 +146,7 @@ class DashboardInteractor(
             )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
-        return tokens[crypto].accounts(AssetFilter.Custodial)
+        return tokens[crypto].accountGroup(AssetFilter.Custodial)
             .flatMap { it.balance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },

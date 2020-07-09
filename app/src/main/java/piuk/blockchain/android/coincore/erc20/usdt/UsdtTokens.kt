@@ -6,10 +6,11 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
+import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
@@ -18,7 +19,7 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-internal class UsdtTokens(
+internal class UsdtAsset(
     override val asset: CryptoCurrency = CryptoCurrency.USDT,
     erc20Account: Erc20Account,
     custodialManager: CustodialWalletManager,
@@ -38,10 +39,10 @@ internal class UsdtTokens(
     pitLinking,
     crashLogger
 ) {
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(listOf(getNonCustodialUsdtAccount()))
 
-    private fun getNonCustodialUsdtAccount(): CryptoSingleAccount {
+    private fun getNonCustodialUsdtAccount(): CryptoAccount {
         val usdtAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No USDT wallet found")
 
@@ -53,7 +54,14 @@ internal class UsdtTokens(
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
-        null
+        if (isValidAddress(address)) {
+            UsdtAddress(address)
+        } else {
+            null
+        }
+
+    private fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidEthereumAddress(address)
 }
 
 internal class UsdtAddress(

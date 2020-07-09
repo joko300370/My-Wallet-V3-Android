@@ -51,7 +51,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.MULTI_WALLET
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
-import info.blockchain.balance.compareTo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

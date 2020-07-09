@@ -20,5 +20,5 @@ internal class TestNonCustodialSummaryItem(
     override val description: String? = null,
     override val confirmations: Int = 0,
     override val isFeeTransaction: Boolean = false,
-    override val account: CryptoSingleAccount = mock()
+    override val account: CryptoAccount = mock()
 ) : NonCustodialActivitySummaryItem()

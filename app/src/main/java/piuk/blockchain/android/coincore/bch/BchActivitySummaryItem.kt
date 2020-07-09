@@ -4,14 +4,14 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Observable
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal class BchActivitySummaryItem(
     private val transactionSummary: TransactionSummary,
     override val exchangeRates: ExchangeRateDataManager,
-    override val account: CryptoSingleAccount
+    override val account: CryptoAccount
 ) : NonCustodialActivitySummaryItem() {
 
     override val cryptoCurrency = CryptoCurrency.BCH

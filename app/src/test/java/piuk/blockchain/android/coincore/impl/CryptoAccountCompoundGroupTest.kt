@@ -4,12 +4,13 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.testutils.bitcoin
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import kotlin.test.assertEquals
 
 class CryptoAccountCompoundGroupTest {
@@ -24,11 +25,11 @@ class CryptoAccountCompoundGroupTest {
     @Test
     fun `group with single account returns single account balance`() {
         // Arrange
-        val account: CryptoSingleAccount = mock {
-            on { balance } itReturns Single.just(100.bitcoin())
+        val account: CryptoAccount = mock {
+            on { balance } itReturns Single.just(100.bitcoin() as Money)
         }
 
-        val subject = CryptoAccountCompoundGroup(
+        val subject = CryptoAccountNonCustodialGroup(
             asset = CryptoCurrency.BTC,
             label = "group label",
             accounts = listOf(account)
@@ -43,15 +44,15 @@ class CryptoAccountCompoundGroupTest {
     @Test
     fun `group with two accounts returns the sum of the account balance`() {
         // Arrange
-        val account1: CryptoSingleAccount = mock {
-            on { balance } itReturns Single.just(100.bitcoin())
+        val account1: CryptoAccount = mock {
+            on { balance } itReturns Single.just(100.bitcoin() as Money)
         }
 
-        val account2: CryptoSingleAccount = mock {
-            on { balance } itReturns Single.just(150.bitcoin())
+        val account2: CryptoAccount = mock {
+            on { balance } itReturns Single.just(150.bitcoin() as Money)
         }
 
-        val subject = CryptoAccountCompoundGroup(
+        val subject = CryptoAccountNonCustodialGroup(
             asset = CryptoCurrency.BTC,
             label = "group label",
             accounts = listOf(account1, account2)
@@ -68,11 +69,11 @@ class CryptoAccountCompoundGroupTest {
         // Arrange
         val accountActions = setOf(AssetAction.Send, AssetAction.Receive)
 
-        val account: CryptoSingleAccount = mock {
+        val account: CryptoAccount = mock {
             on { actions } itReturns accountActions
         }
 
-        val subject = CryptoAccountCompoundGroup(
+        val subject = CryptoAccountNonCustodialGroup(
             asset = CryptoCurrency.BTC,
             label = "group label",
             accounts = listOf(account)
@@ -105,19 +106,19 @@ class CryptoAccountCompoundGroupTest {
 
         val expectedResult = setOf(AssetAction.Send)
 
-        val account1: CryptoSingleAccount = mock {
+        val account1: CryptoAccount = mock {
             on { actions } itReturns accountActions1
         }
 
-        val account2: CryptoSingleAccount = mock {
+        val account2: CryptoAccount = mock {
             on { actions } itReturns accountActions2
         }
 
-        val account3: CryptoSingleAccount = mock {
+        val account3: CryptoAccount = mock {
             on { actions } itReturns accountActions3
         }
 
-        val subject = CryptoAccountCompoundGroup(
+        val subject = CryptoAccountNonCustodialGroup(
             asset = CryptoCurrency.BTC,
             label = "group label",
             accounts = listOf(account1, account2, account3)

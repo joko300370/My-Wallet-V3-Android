@@ -87,7 +87,7 @@ class LiveCustodialWalletManager(
             Quote(
                 date = quoteResponse.time.toLocalTime(),
                 fee = FiatValue.fromMinor(amount.currencyCode,
-                    quoteResponse.fee.times(amountCrypto.amount.toLong())),
+                    quoteResponse.fee.times(amountCrypto.toBigInteger().toLong())),
                 estimatedAmount = amountCrypto,
                 rate = FiatValue.fromMinor(amount.currencyCode, quoteResponse.rate)
             )
@@ -256,7 +256,7 @@ class LiveCustodialWalletManager(
                 TransferRequest(
                     address = walletAddress,
                     currency = amount.currency.networkTicker,
-                    amount = amount.amount.toString()
+                    amount = amount.toBigInteger().toString()
                 )
             )
         }

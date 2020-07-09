@@ -6,10 +6,11 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
@@ -30,7 +31,7 @@ class AssetActivityRepository(
     private val transactionCache = mutableListOf<ActivitySummaryItem>()
 
     fun fetch(
-        account: CryptoAccount,
+        account: BlockchainAccount,
         isRefreshRequested: Boolean
     ): Observable<ActivitySummaryList> {
         return Maybe.concat(
@@ -39,7 +40,13 @@ class AssetActivityRepository(
         )
             .toObservable()
             .map { list ->
-                list.filter { item -> account.includes(item.account) }.sorted()
+                list.filter { item ->
+                    if (account is AccountGroup) {
+                        account.includes(item.account)
+                    } else {
+                        account == item.account
+                    }
+                }.sorted()
             }
     }
 

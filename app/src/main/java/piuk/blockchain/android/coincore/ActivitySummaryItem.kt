@@ -9,7 +9,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.helperfunctions.JavaHashCode
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import kotlin.math.sign
@@ -37,7 +36,7 @@ abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
         other: ActivitySummaryItem
     ) = (other.timeStampMs - timeStampMs).sign
 
-    abstract val account: CryptoSingleAccount
+    abstract val account: CryptoAccount
 }
 
 data class CustodialActivitySummaryItem(
@@ -46,7 +45,7 @@ data class CustodialActivitySummaryItem(
     override val txId: String,
     override val timeStampMs: Long,
     override val cryptoValue: CryptoValue,
-    override val account: CryptoSingleAccount,
+    override val account: CryptoAccount,
     val fundedFiat: FiatValue,
     val status: OrderState,
     val fee: FiatValue,

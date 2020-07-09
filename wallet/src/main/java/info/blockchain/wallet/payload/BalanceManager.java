@@ -33,22 +33,22 @@ public abstract class BalanceManager {
 
     @Nonnull
     public BigInteger getAddressBalance(String address) {
-        return balanceMap.get(address).getAmount();
+        return balanceMap.get(address).toBigInteger();
     }
 
     @Nonnull
-    public BigInteger getWalletBalance() {
-        return balanceMap.getTotalSpendable().getAmount();
+    BigInteger getWalletBalance() {
+        return balanceMap.getTotalSpendable().toBigInteger();
     }
 
     @Nonnull
     public BigInteger getImportedAddressesBalance() {
-        return balanceMap.getTotalSpendableLegacy().getAmount();
+        return balanceMap.getTotalSpendableLegacy().toBigInteger();
     }
 
     @Nonnull
-    public BigInteger getWatchOnlyBalance() {
-        return balanceMap.getTotalWatchOnly().getAmount();
+    BigInteger getWatchOnlyBalance() {
+        return balanceMap.getTotalWatchOnly().toBigInteger();
     }
 
     public void updateAllBalances(

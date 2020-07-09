@@ -237,13 +237,16 @@ class SendDataManagerTest {
         val payment = 1.bitcoin()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
-        whenever(mockPaymentService.getSpendableCoins(unspent, payment.amount, fee, false, useNewCoinSelection))
-            .thenReturn(outputs)
+        whenever(mockPaymentService.getSpendableCoins(
+            unspent, payment.toBigInteger(), fee, false, useNewCoinSelection)
+        ).thenReturn(outputs)
         // Act
         val result = subject.getSpendableCoins(unspent, payment, fee, useNewCoinSelection)
         // Assert
         result shouldEqual outputs
-        verify(mockPaymentService).getSpendableCoins(unspent, payment.amount, fee, false, useNewCoinSelection)
+        verify(mockPaymentService).getSpendableCoins(
+            unspent, payment.toBigInteger(), fee, false, useNewCoinSelection
+        )
         verifyNoMoreInteractions(mockPaymentService)
     }
 
@@ -254,13 +257,16 @@ class SendDataManagerTest {
         val payment = 1.bitcoinCash()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
-        whenever(mockPaymentService.getSpendableCoins(unspent, payment.amount, fee, true, useNewCoinSelection))
-            .thenReturn(outputs)
+        whenever(mockPaymentService.getSpendableCoins(
+            unspent, payment.toBigInteger(), fee, true, useNewCoinSelection)
+        ).thenReturn(outputs)
         // Act
         val result = subject.getSpendableCoins(unspent, payment, fee, useNewCoinSelection)
         // Assert
         result shouldEqual outputs
-        verify(mockPaymentService).getSpendableCoins(unspent, payment.amount, fee, true, useNewCoinSelection)
+        verify(mockPaymentService).getSpendableCoins(
+            unspent, payment.toBigInteger(), fee, true, useNewCoinSelection
+        )
         verifyNoMoreInteractions(mockPaymentService)
     }
 

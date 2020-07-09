@@ -4,14 +4,14 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendProcessor
 
 class SendError(msg: String) : Exception(msg)
 
 abstract class OnChainSendProcessorBase(
-    final override val sendingAccount: CryptoSingleAccount,
+    final override val sendingAccount: CryptoAccount,
     final override val address: CryptoAddress,
     private val requireSecondPassword: Boolean
 ) : SendProcessor {

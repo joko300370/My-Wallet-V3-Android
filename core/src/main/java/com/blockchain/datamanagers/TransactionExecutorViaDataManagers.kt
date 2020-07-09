@@ -106,7 +106,7 @@ internal class TransactionExecutorViaDataManagers(
         receivingAddress: String,
         cryptoValue: CryptoValue
     ): Single<String> =
-        createPaxTransaction(feeOptions, receivingAddress, cryptoValue.amount)
+        createPaxTransaction(feeOptions, receivingAddress, cryptoValue.toBigInteger())
             .flatMap {
                 val ecKey = EthereumAccount.deriveECKey(payloadDataManager.wallet!!.hdWallets[0].masterKey, 0)
                 return@flatMap ethDataManager.signEthTransaction(it, ecKey)
@@ -235,22 +235,22 @@ internal class TransactionExecutorViaDataManagers(
                     is FeeType.Regular -> fees.absoluteRegularFeeInWei
                     is FeeType.Priority -> fees.absolutePriorityFeeInWei
                 }
-                (it.getAddressResponse()!!.balance - fee.amount).max(BigInteger.ZERO)
+                (it.getAddressResponse()!!.balance - fee.toBigInteger()).max(BigInteger.ZERO)
             }
-            .map { CryptoValue.etherFromWei(it) }
+            .map { CryptoValue.fromMinor(CryptoCurrency.ETHER, it) }
             .doOnError { Timber.e(it) }
             .onErrorReturn { CryptoValue.ZeroEth }
             .singleOrError()
 
     private fun getMaxSpendablePax(): Single<CryptoValue> =
         erc20Account.getBalance()
-            .map { CryptoValue.usdPaxFromMinor(it) }
+            .map { CryptoValue.fromMinor(CryptoCurrency.PAX, it) }
             .doOnError { Timber.e(it) }
             .onErrorReturn { CryptoValue.ZeroPax }
 
     private fun getMaxSpendableUsdt(): Single<CryptoValue> =
         erc20Account.getBalance()
-            .map { CryptoValue.usdtFromMinor(it) }
+            .map { CryptoValue.fromMinor(CryptoCurrency.USDT, it) }
             .doOnError { Timber.e(it) }
             .onErrorReturn { CryptoValue.ZeroUsdt }
 
@@ -339,7 +339,7 @@ internal class TransactionExecutorViaDataManagers(
                             to = destination,
                             gasPriceWei = gasPrice,
                             gasLimitGwei = fees.gasLimitInGwei,
-                            weiValue = amount.amount
+                            weiValue = amount.toBigInteger()
                         )
                     }
                     .map {
@@ -395,7 +395,7 @@ internal class TransactionExecutorViaDataManagers(
             depositAddress,
             changeAddress,
             absoluteFee,
-            amount.amount
+            amount.toBigInteger()
         )
         CryptoCurrency.BCH -> sendDataManager.submitBchPayment(
             unspent,
@@ -403,7 +403,7 @@ internal class TransactionExecutorViaDataManagers(
             depositAddress,
             changeAddress,
             absoluteFee,
-            amount.amount
+            amount.toBigInteger()
         )
         CryptoCurrency.ETHER -> throw IllegalArgumentException("Ether not supported by this method")
         CryptoCurrency.XLM -> throw IllegalArgumentException("XLM not supported by this method")

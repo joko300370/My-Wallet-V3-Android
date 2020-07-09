@@ -1,6 +1,6 @@
 package com.blockchain.datamanagers.fees
 
-import info.blockchain.balance.CryptoValue
+import com.blockchain.testutils.wei
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 
@@ -27,8 +27,8 @@ class EthereumFeesTest {
             10,
             5
         ).apply {
-            absoluteRegularFeeInWei `should equal` CryptoValue.etherFromWei(25_000_000_000.toBigInteger())
-            absolutePriorityFeeInWei `should equal` CryptoValue.etherFromWei(50_000_000_000.toBigInteger())
+            absoluteRegularFeeInWei `should equal` 25_000_000_000.wei()
+            absolutePriorityFeeInWei `should equal` 50_000_000_000.wei()
         }
     }
 }

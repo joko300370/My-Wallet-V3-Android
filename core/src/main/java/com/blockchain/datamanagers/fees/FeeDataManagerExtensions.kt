@@ -66,10 +66,10 @@ data class EthereumFees(
 ) : NetworkFees() {
 
     val absoluteRegularFeeInWei: CryptoValue =
-        CryptoValue.etherFromWei((gasPriceRegularGwei * gasLimitGwei).gweiToWei())
+        CryptoValue.fromMinor(CryptoCurrency.ETHER, (gasPriceRegularGwei * gasLimitGwei).gweiToWei())
 
     val absolutePriorityFeeInWei: CryptoValue =
-        CryptoValue.etherFromWei((gasPricePriorityGwei * gasLimitGwei).gweiToWei())
+        CryptoValue.fromMinor(CryptoCurrency.ETHER, (gasPricePriorityGwei * gasLimitGwei).gweiToWei())
 
     val gasPriceRegularInWei: BigInteger = gasPriceRegularGwei.gweiToWei()
 

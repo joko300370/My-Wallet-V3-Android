@@ -16,16 +16,16 @@ import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class AccountSelectSheet : SlidingModalBottomDialog() {
 
     interface Host : SlidingModalBottomDialog.Host {
-        fun onAccountSelected(account: CryptoAccount)
+        fun onAccountSelected(account: BlockchainAccount)
     }
 
     override val host: Host by lazy {
@@ -55,7 +55,7 @@ class AccountSelectSheet : SlidingModalBottomDialog() {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
     }
 
-    private fun onAccountSelected(account: CryptoAccount) {
+    private fun onAccountSelected(account: BlockchainAccount) {
         analytics.logEvent(activityShown(account.label))
         host.onAccountSelected(account)
         dismiss()
@@ -69,19 +69,19 @@ class AccountSelectSheet : SlidingModalBottomDialog() {
             addItemDecoration(
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
 
-            val itemList = mutableListOf<CryptoAccount>()
+            val itemList = mutableListOf<BlockchainAccount>()
             theAdapter.items = itemList
 
             itemList.add(coincore.allWallets)
 
             CryptoCurrency.activeCurrencies().forEach { cc ->
-                disposables += coincore[cc].accounts()
+                disposables += coincore[cc].accountGroup()
                     .observeOn(uiScheduler)
                     .subscribeBy(
                         onSuccess = {
                             itemList.addAll(
                                 it.accounts
-                                    .filterIsInstance<CryptoSingleAccount>()
+                                    .filterIsInstance<CryptoAccount>()
                                     .filter { a -> a.hasTransactions }
                             )
                             theAdapter.notifyDataSetChanged()

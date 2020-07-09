@@ -14,16 +14,14 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import kotlinx.android.synthetic.main.dialog_account_selector_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
-class CryptoSingleAccountDelegate<in T>(
+class CryptoAccountDelegate<in T>(
     private val disposables: CompositeDisposable,
     private val exchangeRates: ExchangeRateDataManager,
     private val currencyPrefs: CurrencyPrefs,
@@ -31,7 +29,7 @@ class CryptoSingleAccountDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is CryptoSingleAccount
+        items[position] is CryptoAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         CryptoSingleAccountViewHolder(parent.inflate(R.layout.dialog_account_selector_item))
@@ -41,7 +39,7 @@ class CryptoSingleAccountDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as CryptoSingleAccountViewHolder).bind(
-        items[position] as CryptoSingleAccount,
+        items[position] as CryptoAccount,
         disposables,
         exchangeRates,
         currencyPrefs.selectedFiatCurrency,
@@ -54,14 +52,14 @@ private class CryptoSingleAccountViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
     internal fun bind(
-        account: CryptoSingleAccount,
+        account: CryptoAccount,
         disposables: CompositeDisposable,
         exchangeRates: ExchangeRateDataManager,
         currency: String,
         onAccountClicked: (CryptoAccount) -> Unit
     ) {
         with(itemView) {
-            val crypto = account.cryptoCurrencies.first()
+            val crypto = account.asset
             icon.setCoinIcon(crypto)
             asset_spend_locked.goneIf(account.isCustodial().not())
             wallet_name.text = account.label
