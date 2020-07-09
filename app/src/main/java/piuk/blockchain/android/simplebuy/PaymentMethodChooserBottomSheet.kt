@@ -89,9 +89,9 @@ private class PaymentMethodsAdapter(adapterItems: List<PaymentMethodItem>) :
     init {
         val bankPaymentDelegate = BankPaymentDelegate()
         val cardPaymentDelegate = CardPaymentDelegate()
-        val fundsPaymentDelegate = AddFundsDelegate()
-        val addCardPaymentDelegate = FundsPaymentDelegate()
-        val addFundsPaymentDelegate = AddCardDelegate()
+        val addFundsPaymentDelegate = AddFundsDelegate()
+        val addCardPaymentDelegate = AddCardDelegate()
+        val fundsPaymentDelegate = FundsPaymentDelegate()
 
         delegatesManager.apply {
             addAdapterDelegate(bankPaymentDelegate)

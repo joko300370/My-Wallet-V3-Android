@@ -36,9 +36,8 @@
         tools:text="Chase Saphire 8291 Chase Saphire 8291" />
 
 
-
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/payment_method_limit"
+        android:id="@+id/ticker"
         style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,9 +46,7 @@
         android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
-        tools:text="$5,000 USD Limit" />
-
-
+        tools:text="GBP" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/balance"

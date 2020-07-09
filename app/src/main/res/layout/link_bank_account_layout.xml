@@ -31,18 +31,6 @@
             android:textColor="@color/grey_600"
             tools:text="Bank Transfer" />
 
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/instructions"
-            style="@style/Text.Semibold.14"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:textColor="@color/grey_600"
-            tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
-
         <piuk.blockchain.android.simplebuy.BankDetailsContainer
             android:id="@+id/bank_details"
             android:layout_width="match_parent"
@@ -76,6 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/standard_margin"
+            android:gravity="center"
             android:layout_marginTop="@dimen/standard_margin"
             tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
 

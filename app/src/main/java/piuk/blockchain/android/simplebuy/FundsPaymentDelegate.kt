@@ -32,7 +32,7 @@ class FundsPaymentDelegate : AdapterDelegate<PaymentMethodItem> {
 
     private class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: AppCompatTextView = itemView.payment_method_title
-        val limit: AppCompatTextView = itemView.payment_method_limit
+        val ticker: AppCompatTextView = itemView.ticker
         val balance: AppCompatTextView = itemView.balance
         val icon: ImageView = itemView.payment_method_icon
         val root: ViewGroup = itemView.payment_method_root
@@ -40,9 +40,7 @@ class FundsPaymentDelegate : AdapterDelegate<PaymentMethodItem> {
         fun bind(paymentMethodItem: PaymentMethodItem) {
             (paymentMethodItem.paymentMethod as? PaymentMethod.Funds)?.let {
                 icon.setImageResource(it.icon())
-                limit.text =
-                    limit.context.getString(R.string.payment_method_limit,
-                        paymentMethodItem.paymentMethod.limits.max.toStringWithSymbol())
+                ticker.text = paymentMethodItem.paymentMethod.fiatCurrency
                 title.text = title.context.getString(it.label())
                 balance.text = it.balance.toStringWithSymbol()
             }

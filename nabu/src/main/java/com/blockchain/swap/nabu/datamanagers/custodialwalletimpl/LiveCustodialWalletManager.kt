@@ -336,20 +336,18 @@ class LiveCustodialWalletManager(
                 SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) &&
                 fundsEnabled
             ) {
-                if (fiatBalance.isPositive) {
-                    val fundsLimits =
-                        PaymentLimits(it.limits.min,
-                            it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
-                    availablePaymentMethods.add(PaymentMethod.Funds(
-                        fiatBalance,
-                        it.currency,
-                        fundsLimits
-                    ))
-                } else {
-                    availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
-                        it.currency,
-                        PaymentLimits(it.limits.min, it.limits.max, it.currency)))
-                }
+                val fundsLimits =
+                    PaymentLimits(it.limits.min,
+                        it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
+                availablePaymentMethods.add(PaymentMethod.Funds(
+                    fiatBalance,
+                    it.currency,
+                    fundsLimits
+                ))
+
+                availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
+                    it.currency,
+                    PaymentLimits(it.limits.min, it.limits.max, it.currency)))
             }
         }
 

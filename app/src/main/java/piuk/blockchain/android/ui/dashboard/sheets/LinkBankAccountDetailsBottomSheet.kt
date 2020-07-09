@@ -71,7 +71,6 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
             }
             title.gone()
             subtitle.gone()
-            instructions.gone()
             bank_details.gone()
             bank_transfer_only.gone()
             processing_time.gone()
@@ -87,24 +86,22 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                 )
                 bank_deposit_instruction.text =
                     stringUtils.getStringWithMappedLinks(
-                        R.string.recipient_name_must_match_gbp,
+                        R.string.by_depositing_funds_terms_and_conds,
                         linksMap,
                         requireActivity()
                     )
                 bank_deposit_instruction.movementMethod = LinkMovementMethod.getInstance()
             } else {
-                bank_deposit_instruction.text = getString(R.string.recipient_name_must_match_eur)
+                bank_deposit_instruction.gone()
             }
 
             processing_time.updateSubtitle(
                 if (fiatCurrency == "GBP") getString(R.string.processing_time_subtitle_gbp)
                 else getString(R.string.processing_time_subtitle_eur)
             )
-            title.text = if (isForLink) getString(R.string.add_bank) else
+            title.text = if (isForLink) getString(R.string.add_bank_with_currency, fiatCurrency) else
                 getString(R.string.deposit_currency, fiatCurrency)
-            subtitle.text = if (isForLink) getString(R.string.currency_bank_transfer, fiatCurrency) else
-                getString(R.string.bank_transfer)
-            instructions.text = getString(R.string.link_transfer_instructions, fiatCurrency)
+            subtitle.text = getString(R.string.bank_transfer)
 
             bank_transfer_only.visible()
             processing_time.visible()
