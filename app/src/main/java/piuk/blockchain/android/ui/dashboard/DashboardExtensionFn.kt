@@ -8,15 +8,16 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.R
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
 
 fun LoaderTextView.showLoading() =
     resetLoader()
 
-fun FiatValue?.format(fiatSymbol: String) =
+fun Money?.format(fiatSymbol: String) =
     this?.toStringWithSymbol()
         ?: FiatValue.zero(fiatSymbol).toStringWithSymbol()
 
-fun CryptoValue?.format(cryptoCurrency: CryptoCurrency) =
+fun Money?.format(cryptoCurrency: CryptoCurrency) =
     this?.toStringWithSymbol()
         ?: CryptoValue.zero(cryptoCurrency).toStringWithSymbol()
 

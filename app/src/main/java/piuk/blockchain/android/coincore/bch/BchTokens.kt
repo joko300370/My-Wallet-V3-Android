@@ -10,9 +10,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -21,7 +21,7 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import timber.log.Timber
 
-internal class BchTokens(
+internal class BchAsset(
     private val bchDataManager: BchDataManager,
     private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
@@ -32,7 +32,7 @@ internal class BchTokens(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger
-) : AssetTokensBase(
+) : CryptoAssetBase(
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -49,30 +49,28 @@ internal class BchTokens(
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
             with(bchDataManager) {
-                val result = mutableListOf<CryptoSingleAccount>()
-                val defaultIndex = getDefaultAccountPosition()
-
-                val accounts = getAccountMetadataList()
-                accounts.forEachIndexed { i, a ->
-                    result.add(
+                getAccountMetadataList()
+                    .mapIndexed { i, a ->
                         BchCryptoWalletAccount(
-                            a,
-                            bchDataManager,
-                            i == defaultIndex,
-                            exchangeRates,
-                            environmentSettings.bitcoinCashNetworkParameters
+                            jsonAccount = a,
+                            bchManager = bchDataManager,
+                            isDefault = i == getDefaultAccountPosition(),
+                            exchangeRates = exchangeRates,
+                            networkParams = environmentSettings.bitcoinCashNetworkParameters
                         )
-                    )
                 }
-                result
             }
         }
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        null
+    override fun parseAddress(address: String): ReceiveAddress? =
+        if (isValidAddress(address)) {
+            BchAddress(address)
+        } else {
+            null
+        }
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidBitcoinCashAddress(

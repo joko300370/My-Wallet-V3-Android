@@ -1,49 +1,45 @@
 package info.blockchain.balance
 
 import java.io.Serializable
+import java.lang.IndexOutOfBoundsException
 import java.math.BigDecimal
+import java.math.BigInteger
+import java.math.RoundingMode
 import java.util.Locale
 
-interface Money : Serializable {
+abstract class Money : Serializable {
 
-    /**
-     * Use [symbol] for user display. This can be used by APIs etc.
-     */
-    val currencyCode: String
-    /**
-     * User displayable symbol
-     */
-    val symbol: String
+    // Use [symbol] for user display. This can be used by APIs etc.
+    abstract val currencyCode: String
+    // User displayable symbol
+    abstract val symbol: String
 
-    val isZero: Boolean
-    val isPositive: Boolean
+    abstract val isZero: Boolean
+    abstract val isPositive: Boolean
 
-    val maxDecimalPlaces: Int
+    abstract val maxDecimalPlaces: Int
 
     /**
      * Where a Money type can store more decimal places than is necessary,
      * this property can be used to limit it for user input and display.
      */
-    val userDecimalPlaces: Int
+    open val userDecimalPlaces: Int
         get() = maxDecimalPlaces
 
-    fun toBigDecimal(): BigDecimal
+    abstract fun toZero(): Money
 
-    fun toZero(): Money
+    abstract fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String): Money
 
-    /**
-     * String formatted in the specified locale, or the systems default locale.
-     * Includes symbol, which may appear on either side of the number.
-     */
-    fun toStringWithSymbol(): String
+    // Format for display
+    abstract fun toStringWithSymbol(): String
+    abstract fun toStringWithoutSymbol(): String
+    // Format for network transmission
+    abstract fun toNetworkString(): String
 
-    /**
-     * String formatted in the specified locale, or the systems default locale.
-     * Without symbol.
-     */
-    fun toStringWithoutSymbol(): String
-
-    fun toNetworkString(): String
+    // Type conversions
+    abstract fun toBigInteger(): BigInteger
+    abstract fun toBigDecimal(): BigDecimal
+    abstract fun toFloat(): Float
 
     /**
      * The formatted string in parts in the specified locale, or the systems default locale.
@@ -81,6 +77,57 @@ interface Money : Serializable {
         } else {
             toStringWithSymbol()
         }
+
+    operator fun plus(other: Money): Money {
+        ensureComparable("add", other)
+        return add(other)
+    }
+
+    operator fun minus(other: Money): Money {
+        ensureComparable("subtract", other)
+        return subtract(other)
+    }
+
+    operator fun compareTo(other: Money): Int {
+        ensureComparable("compare", other)
+        return compare(other)
+    }
+
+    internal abstract fun ensureComparable(operation: String, other: Money)
+    protected abstract fun add(other: Money): Money
+    protected abstract fun subtract(other: Money): Money
+    protected abstract fun compare(other: Money): Int
+
+    companion object {
+        fun min(a: Money, b: Money): Money {
+            a.ensureComparable("compare", b)
+            return if (a <= b) a else b
+        }
+
+        fun max(a: Money, b: Money): Money {
+            a.ensureComparable("compare", b)
+            return if (a >= b) a else b
+        }
+    }
+}
+
+fun Money?.percentageDelta(previous: Money?): Double =
+    if (this != null && previous != null && !previous.isZero) {
+        val current = this.toBigDecimal()
+        val prev = previous.toBigDecimal()
+
+        (current - prev)
+            .divide(prev, 4, RoundingMode.HALF_EVEN)
+            .movePointRight(2)
+            .toDouble()
+    } else {
+        Double.NaN
+    }
+
+fun Iterable<Money>.total(): Money {
+    if (!iterator().hasNext())
+        throw IndexOutOfBoundsException("Can't sum an empty list")
+    return reduce { a, v -> a + v }
 }
 
 open class ValueTypeMismatchException(
@@ -88,22 +135,6 @@ open class ValueTypeMismatchException(
     lhsSymbol: String,
     rhsSymbol: String
 ) : RuntimeException("Can't $verb $lhsSymbol and $rhsSymbol")
-
-operator fun Money.compareTo(other: Money): Int {
-    return when (this) {
-        is FiatValue -> {
-            compareTo(
-                other as? FiatValue ?: throw ValueTypeMismatchException("compare", currencyCode, other.currencyCode)
-            )
-        }
-        is CryptoValue -> {
-            compareTo(
-                other as? CryptoValue ?: throw ValueTypeMismatchException("compare", currencyCode, other.currencyCode)
-            )
-        }
-        else -> throw IllegalArgumentException()
-    }
-}
 
 fun String.removeComma(): String {
     return replace(",", "")

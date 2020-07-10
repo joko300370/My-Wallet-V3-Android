@@ -49,6 +49,7 @@ class WalletAccountHelper(
                 CryptoCurrency.PAX -> getPaxAccount()
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
                 CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+                CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
             }
         } catch (t: Throwable) {
             crashLogger.logException(t)
@@ -191,6 +192,7 @@ class WalletAccountHelper(
             CryptoCurrency.PAX -> getDefaultPaxAccount()
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
 
     fun getEthAccount() =
@@ -263,7 +265,7 @@ class WalletAccountHelper(
     private fun getDefaultEthAccount(): ItemAccount? {
         val ethModel = ethDataManager.getEthResponseModel()
         val ethAccount = ethDataManager.getEthWallet()?.account
-        val balance = CryptoValue.etherFromWei(ethModel?.getTotalBalance() ?: BigInteger.ZERO)
+        val balance = CryptoValue.fromMinor(CryptoCurrency.ETHER, ethModel?.getTotalBalance() ?: BigInteger.ZERO)
 
         return if (ethAccount == null) {
             Timber.e("Invalid ETHER account: no account")
@@ -322,6 +324,7 @@ class WalletAccountHelper(
             CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
             CryptoCurrency.PAX -> getEthAccount().size
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> TODO("STUB: ALG) NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         } > 1
 }

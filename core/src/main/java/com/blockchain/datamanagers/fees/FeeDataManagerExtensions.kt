@@ -35,7 +35,8 @@ fun FeeDataManager.getFeeOptions(cryptoCurrency: CryptoCurrency): Single<out Net
                 CryptoValue.lumensFromStroop(it.priorityFee.toBigInteger())
             )
         }
-        CryptoCurrency.PAX -> ethFeeOptions.map {
+        CryptoCurrency.PAX,
+        CryptoCurrency.USDT -> ethFeeOptions.map {
             EthereumFees(
                 it.regularFee,
                 it.priorityFee,
@@ -65,10 +66,10 @@ data class EthereumFees(
 ) : NetworkFees() {
 
     val absoluteRegularFeeInWei: CryptoValue =
-        CryptoValue.etherFromWei((gasPriceRegularGwei * gasLimitGwei).gweiToWei())
+        CryptoValue.fromMinor(CryptoCurrency.ETHER, (gasPriceRegularGwei * gasLimitGwei).gweiToWei())
 
     val absolutePriorityFeeInWei: CryptoValue =
-        CryptoValue.etherFromWei((gasPricePriorityGwei * gasLimitGwei).gweiToWei())
+        CryptoValue.fromMinor(CryptoCurrency.ETHER, (gasPricePriorityGwei * gasLimitGwei).gweiToWei())
 
     val gasPriceRegularInWei: BigInteger = gasPriceRegularGwei.gweiToWei()
 

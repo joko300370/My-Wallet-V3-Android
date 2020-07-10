@@ -10,14 +10,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.CustodialBalanceClicked
-import com.blockchain.notifications.analytics.CustodialBalanceSendClicked
-import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_detail_item.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.AssetTokens
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
@@ -28,9 +29,9 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 data class AssetDetailItem(
     val assetFilter: AssetFilter,
-    val tokens: AssetTokens,
-    val crypto: CryptoValue,
-    val fiat: FiatValue,
+    val account: BlockchainAccount,
+    val balance: Money,
+    val fiatBalance: Money,
     val actions: Set<AssetAction>,
     val interestRate: Double
 )
@@ -43,16 +44,22 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         analytics: Analytics
     ) {
         with(itemView) {
-            icon.setCoinIcon(item.tokens.asset)
-            asset_name.text = resources.getString(item.tokens.asset.assetName())
+            val asset = getAsset(item.account)
+
+            icon.setCoinIcon(asset)
+            asset_name.text = resources.getString(asset.assetName())
+
             status_date.text = when (item.assetFilter) {
-                AssetFilter.Total -> resources.getString(R.string.dashboard_asset_balance_total)
-                AssetFilter.Wallet -> resources.getString(
-                    R.string.dashboard_asset_balance_wallet)
+                AssetFilter.All -> resources.getString(R.string.dashboard_asset_balance_total)
+                AssetFilter.NonCustodial -> resources.getString(
+                    R.string.dashboard_asset_balance_wallet
+                )
                 AssetFilter.Custodial -> resources.getString(
-                    R.string.dashboard_asset_balance_custodial)
+                    R.string.dashboard_asset_balance_custodial
+                )
                 AssetFilter.Interest -> resources.getString(
-                    R.string.dashboard_asset_balance_interest, item.interestRate)
+                    R.string.dashboard_asset_balance_interest, item.interestRate
+                )
             }
 
             if (item.actions.isEmpty()) {
@@ -63,23 +70,31 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             }
 
             asset_spend_locked.goneIf {
-                item.assetFilter == AssetFilter.Wallet || item.assetFilter == AssetFilter.Interest
+                item.assetFilter == AssetFilter.NonCustodial || item.assetFilter == AssetFilter.Interest
             }
 
-            asset_balance_crypto.text = item.crypto.toStringWithSymbol()
-            asset_balance_fiat.text = item.fiat.toStringWithSymbol()
+            asset_balance_crypto.text = item.balance.toStringWithSymbol()
+            asset_balance_fiat.text = item.fiatBalance.toStringWithSymbol()
         }
     }
+
+    private fun getAsset(account: BlockchainAccount): CryptoCurrency =
+        when (account) {
+            is CryptoAccount -> account.asset
+            is AccountGroup -> account.accounts.filterIsInstance<CryptoAccount>().firstOrNull()?.asset
+            else -> null
+        } ?: throw IllegalStateException("Unsupported account type")
 
     private fun doShowMenu(
         detailItem: AssetDetailItem,
         onActionSelected: AssetActionHandler,
         analytics: Analytics
     ) {
-        val crypto = detailItem.tokens.asset
-
-        if (detailItem.assetFilter == AssetFilter.Custodial) {
-            analytics.logEvent(CustodialBalanceClicked(crypto))
+        if (detailItem.account is CryptoAccount) {
+            if (detailItem.assetFilter == AssetFilter.Custodial) {
+                val crypto = detailItem.account.asset
+                analytics.logEvent(CustodialBalanceClicked(crypto))
+            }
         }
 
         PopupMenu(itemView.context, itemView.action_menu).apply {
@@ -93,19 +108,20 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             MenuCompat.setGroupDividerEnabled(menu, true)
 
             setOnMenuItemClickListener {
-                val filter = detailItem.assetFilter
+                val account = detailItem.account
                 val action = mapMenuItemToAction(it.itemId)
 
-                if (filter == AssetFilter.Custodial && action == AssetAction.Send) {
-                    analytics.logEvent(CustodialBalanceSendClicked(crypto))
-                }
-
-                onActionSelected(action, filter)
+                onActionSelected(action, account)
                 true
             }
 
             setOnDismissListener {
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.white))
+                itemView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.white
+                    )
+                )
             }
 
             gravity = Gravity.END
@@ -133,7 +149,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         }.exhaustive
 }
 
-typealias AssetActionHandler = (action: AssetAction, assetFilter: AssetFilter) -> Unit
+typealias AssetActionHandler = (action: AssetAction, account: BlockchainAccount) -> Unit
 
 internal class AssetDetailAdapter(
     private val itemList: List<AssetDetailItem>,

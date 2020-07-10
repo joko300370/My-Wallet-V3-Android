@@ -2,13 +2,13 @@ package piuk.blockchain.android.ui.activity
 
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class ActivitiesIntent : MviIntent<ActivitiesState>
 
 class AccountSelectedIntent(
-    val account: CryptoAccount,
+    val account: BlockchainAccount,
     val isRefreshRequested: Boolean
 ) : ActivitiesIntent() {
     override fun reduce(oldState: ActivitiesState): ActivitiesState {

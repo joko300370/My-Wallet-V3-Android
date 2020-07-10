@@ -26,6 +26,7 @@ class WalletAccountHelperAccountListingAdapter(
             CryptoCurrency.PAX -> Single.just(walletAccountHelper.getEthAccount())
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }.map {
             it.map { account -> mapAccountSummary(account) }
         }
@@ -39,7 +40,8 @@ class WalletAccountHelperAccountListingAdapter(
                 CryptoCurrency.XLM,
                 CryptoCurrency.PAX,
                 CryptoCurrency.STX,
-                CryptoCurrency.ALGO -> emptyList()
+                CryptoCurrency.ALGO,
+                CryptoCurrency.USDT -> emptyList()
             }.map(this::mapLegacyAddress)
         )
 

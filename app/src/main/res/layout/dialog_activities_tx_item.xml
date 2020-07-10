@@ -14,9 +14,10 @@
         android:layout_height="32dp"
         android:layout_marginStart="@dimen/standard_margin"
         android:importantForAccessibility="no"
-        tools:srcCompat="@drawable/vector_bitcoin_colored"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/vector_bitcoin_colored" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tx_type"
@@ -24,17 +25,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        tools:text="Send BTC"
         app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/status_date"
+        tools:text="Send BTC" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status_date"
         style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/tx_type"
-        app:layout_constraintTop_toBottomOf="@+id/tx_type"
+        app:layout_constraintTop_toBottomOf="@id/tx_type"
         tools:text="Confirming" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -43,8 +46,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/tx_type"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="$15,879.90" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -53,9 +56,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintBottom_toBottomOf="@id/status_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/status_date"
-        app:layout_constraintBottom_toBottomOf="@id/status_date"
         tools:text="1.638192 BTC" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

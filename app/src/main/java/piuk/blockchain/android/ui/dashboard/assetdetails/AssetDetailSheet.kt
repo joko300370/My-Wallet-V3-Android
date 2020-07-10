@@ -27,12 +27,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.AssetTokens
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -59,10 +60,10 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private val locale = Locale.getDefault()
 
     interface Host : SlidingModalBottomDialog.Host {
-        fun gotoSendFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
-        fun goToReceiveFor(cryptoCurrency: CryptoCurrency, filter: AssetFilter)
-        fun gotoActivityFor(account: CryptoAccount)
-        fun gotoSwap(fromCryptoCurrency: CryptoCurrency, filter: AssetFilter)
+        fun gotoSendFor(account: SingleAccount)
+        fun goToReceiveFor(account: SingleAccount)
+        fun gotoActivityFor(account: BlockchainAccount)
+        fun gotoSwap(account: SingleAccount)
     }
 
     override val host: Host by lazy {
@@ -76,7 +77,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     }
 
     private val assetSelect: Coincore by scopedInject()
-    private val token: AssetTokens by lazy {
+    private val token: CryptoAsset by lazy {
         assetSelect[cryptoCurrency]
     }
 
@@ -88,7 +89,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
 
             configureChart(chart,
                 getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                token.asset.getDecimalPlaces())
+                cryptoCurrency.getDecimalPlaces())
 
             configureTabs(view.chart_price_periods)
 
@@ -144,27 +145,46 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
 
             asset_list.layoutManager = LinearLayoutManager(requireContext())
             asset_list.addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+            )
             val itemList = mutableListOf<AssetDetailItem>()
 
-            assetDetails[AssetFilter.Wallet]?.let {
+            assetDetails[AssetFilter.NonCustodial]?.let {
                 itemList.add(
-                    AssetDetailItem(AssetFilter.Wallet, token, it.cryptoValue, it.fiatValue,
-                        it.actions, it.interestRate)
+                    AssetDetailItem(
+                        AssetFilter.NonCustodial,
+                        it.account,
+                        it.amount,
+                        it.fiatValue,
+                        it.actions,
+                        it.interestRate
+                    )
                 )
             }
 
             assetDetails[AssetFilter.Custodial]?.let {
                 itemList.add(
-                    AssetDetailItem(AssetFilter.Custodial, token, it.cryptoValue, it.fiatValue,
-                        it.actions, it.interestRate)
+                    AssetDetailItem(
+                        AssetFilter.Custodial,
+                        it.account,
+                        it.amount,
+                        it.fiatValue,
+                        it.actions,
+                        it.interestRate
+                    )
                 )
             }
 
             assetDetails[AssetFilter.Interest]?.let {
                 itemList.add(
-                    AssetDetailItem(AssetFilter.Interest, token, it.cryptoValue, it.fiatValue,
-                        it.actions, it.interestRate)
+                    AssetDetailItem(
+                        AssetFilter.Interest,
+                        it.account,
+                        it.amount,
+                        it.fiatValue,
+                        it.actions,
+                        it.interestRate
+                    )
                 )
             }
 
@@ -172,34 +192,25 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         }
     }
 
-    private fun onAssetActionSelected(action: AssetAction, assetFilter: AssetFilter) {
+    private fun onAssetActionSelected(action: AssetAction, account: BlockchainAccount) {
         dismiss()
         when (action) {
-            AssetAction.ViewActivity -> startActivityWithDefaultAccountForAsset(assetFilter)
-            AssetAction.Send -> host.gotoSendFor(cryptoCurrency, assetFilter)
-            AssetAction.Receive -> host.goToReceiveFor(cryptoCurrency, assetFilter)
-            AssetAction.Swap -> host.gotoSwap(cryptoCurrency, assetFilter)
+            AssetAction.ViewActivity -> host.gotoActivityFor(selectAccount(account))
+            AssetAction.Send -> host.gotoSendFor(selectAccount(account))
+            AssetAction.Receive -> host.goToReceiveFor(selectAccount(account))
+            AssetAction.Swap -> host.gotoSwap(selectAccount(account))
         }.exhaustive
     }
 
-    // Temp patch fn until coincore and accounts are used throughout: TODO - remove this nonsense
-    private fun startActivityWithDefaultAccountForAsset(assetFilter: AssetFilter) {
-        val coincore: Coincore by scopedInject()
-        val asset = coincore[cryptoCurrency]
-
-        compositeDisposable += asset.accounts(assetFilter)
-            .subscribeBy(
-                onSuccess = { group ->
-                    val account = group.accounts
-                        .filterIsInstance<CryptoSingleAccount>()
-                        .firstOrNull { a -> a.isDefault } ?: group.accounts.firstOrNull()
-
-                    account?.let {
-                        host.gotoActivityFor(it)
-                    }
-                }
-            )
-    }
+    private fun selectAccount(account: BlockchainAccount): SingleAccount =
+        when (account) {
+            is SingleAccount -> account
+            is AccountGroup -> account.accounts
+                    .firstOrNull { a -> a.isDefault }
+                ?: account.accounts.firstOrNull()
+                ?: throw IllegalStateException("No SingleAccount found")
+            else -> throw IllegalStateException("Unknown account base")
+        }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {
         chart.apply {
@@ -386,11 +397,12 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         when (this) {
             CryptoCurrency.BTC,
             CryptoCurrency.ETHER,
-            CryptoCurrency.BCH -> 2
+            CryptoCurrency.BCH,
+            CryptoCurrency.PAX,
+            CryptoCurrency.ALGO,
+            CryptoCurrency.USDT -> 2
             CryptoCurrency.XLM -> 4
-            CryptoCurrency.PAX -> 2
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> 2
         }
 
     companion object {

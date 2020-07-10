@@ -13,6 +13,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
+import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.util.Date
 
@@ -46,8 +47,9 @@ private class CustodialActivityItemViewHolder(
     ) {
         with(itemView) {
             icon.setIcon(tx.status)
-            if (tx.status != OrderState.PENDING_EXECUTION) {
-                icon.setAssetTint(tx.cryptoCurrency)
+            if (tx.status != OrderState.PENDING_EXECUTION &&
+                tx.status != OrderState.AWAITING_FUNDS) {
+                icon.setAssetIconColours(tx.cryptoCurrency, context)
             }
 
             tx_type.setTxLabel(tx.cryptoCurrency)
@@ -79,39 +81,6 @@ private class CustodialActivityItemViewHolder(
                 asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
                 asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
             }
-        }
-    }
-}
-
-private fun ImageView.setAssetTint(cryptoCurrency: CryptoCurrency) {
-    setBackgroundResource(R.drawable.bkgd_tx_circle)
-    when (cryptoCurrency) {
-        CryptoCurrency.BTC -> {
-            background.setTint(ContextCompat.getColor(context, R.color.btc_bkgd))
-            setColorFilter(ContextCompat.getColor(context, R.color.btc))
-        }
-        CryptoCurrency.BCH -> {
-            background.setTint(ContextCompat.getColor(context, R.color.bch_bkgd))
-            setColorFilter(ContextCompat.getColor(context, R.color.bch))
-        }
-        CryptoCurrency.ETHER -> {
-            background.setTint(ContextCompat.getColor(context, R.color.ether_bkgd))
-            setColorFilter(ContextCompat.getColor(context, R.color.eth))
-        }
-        CryptoCurrency.PAX -> {
-            background.setTint(ContextCompat.getColor(context, R.color.pax_bkgd))
-            setColorFilter(ContextCompat.getColor(context, R.color.pax))
-        }
-        CryptoCurrency.XLM -> {
-            background.setTint(ContextCompat.getColor(context, R.color.xlm_bkgd))
-            setColorFilter(ContextCompat.getColor(context, R.color.xlm))
-        }
-        CryptoCurrency.ALGO -> {
-            background.setTint(ContextCompat.getColor(context, R.color.algo_bkgd))
-            drawable.setTint(ContextCompat.getColor(context, R.color.algo))
-        }
-        else -> {
-            // STX left, do nothing
         }
     }
 }

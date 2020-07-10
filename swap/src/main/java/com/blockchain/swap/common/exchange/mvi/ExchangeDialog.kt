@@ -9,7 +9,6 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
-import info.blockchain.balance.compareTo
 import info.blockchain.balance.times
 import info.blockchain.balance.withMajorValue
 import io.reactivex.Observable
@@ -121,7 +120,7 @@ data class ExchangeViewState(
     val maxTrade: Money?
         get() {
             val limit = maxTradeOrTierLimit
-            val maxSpendableFiat = maxSpendable * c2fRate ?: return limit
+            val maxSpendableFiat = try { maxSpendable * c2fRate } catch (e: Throwable) { null } ?: return limit
             if (maxSpendableFiat.currencyCode != fromFiat.currencyCode) return limit
             if (limit == null) return maxSpendableFiat
             if (limit.currencyCode != maxSpendableFiat.currencyCode) return null

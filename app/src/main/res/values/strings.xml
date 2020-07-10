@@ -828,6 +828,9 @@
     <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>
     <string name="pax_to_field_helper_1">Enter USD-D/ETH address or select</string>
     <string name="pax_invalid_address_1">Invalid USD-D address</string>
+    <string name="usdt_to_field_helper_no_dropdown_1">Enter TETHER/ETH address</string>
+    <string name="usdt_to_field_helper_1">Enter TETHER/ETH address or select</string>
+    <string name="usdt_invalid_address_1">Invalid TETHER address</string>
 
     <!-- DASHBOARD -->
     <string name="dashboard_title">Dashboard</string>
@@ -920,6 +923,7 @@
 
     <string name="pax_title_1">USD Digital</string>
     <string name="pax_wallet_name_1">My USD Digital Wallet</string>
+    <string name="usdt_wallet_name">My Tether Wallet</string>
 
     <string name="morph_exchange">Swap</string>
 
@@ -1647,7 +1651,8 @@
     <string name="eth_default_account_label">My Ether Wallet</string>
     <string name="xlm_default_account_label">My Stellar Wallet</string>
     <string name="pax_default_account_label_1">My USD Digital Wallet</string>
-    <string name="alg_default_account_label">My Algorand Wallet</string>
+    <string name="algo_default_account_label">My Algorand Wallet</string>
+    <string name="usdt_default_account_label">My Tether Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
     <string name="default_label_interest_wallet">Interest Wallet</string>
     <string name="exchange_default_account_label">My Exchange %1$s Address</string>
@@ -1772,4 +1777,10 @@
     <string name="algorand_announcement_title">Say Hello to Algorand!</string>
     <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
     <string name="algorand_announcement_action">Buy Algorand</string>
+
+    <string name="tether_announcement_title">Say Hello to Tether!</string>
+    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
+    <string name="tether_announcement_action">Buy Tether Now</string>
+
+
 </resources>

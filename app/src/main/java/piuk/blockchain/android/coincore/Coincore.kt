@@ -6,22 +6,22 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
-    private val tokenMap: Map<CryptoCurrency, AssetTokens>,
+    private val fiatAsset: Asset,
+    private val assetMap: Map<CryptoCurrency, CryptoAsset>,
     private val defaultLabels: DefaultLabels
 ) {
-    operator fun get(ccy: CryptoCurrency): AssetTokens =
-        tokenMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
+    operator fun get(ccy: CryptoCurrency): CryptoAsset =
+        assetMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
 
     fun init(): Completable =
         Completable.concat(
-            tokenMap.values.map { token -> Completable.defer { token.init() } }.toList()
+            assetMap.values.map { asset -> Completable.defer { asset.init() } }.toList()
         ).doOnError {
             Timber.e("Coincore initialisation failed! $it")
         }
@@ -29,12 +29,12 @@ class Coincore internal constructor(
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
-    val tokens: Iterable<AssetTokens> = tokenMap.values
+    val assets: Iterable<Asset> = assetMap.values + fiatAsset
 
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)
 
-    val allWallets: CryptoAccount by lazy {
+    val allWallets: AccountGroup by lazy {
         AllWalletsAccount(this, defaultLabels)
     }
 }

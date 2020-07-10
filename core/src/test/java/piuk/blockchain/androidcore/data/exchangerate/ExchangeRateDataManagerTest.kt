@@ -3,7 +3,6 @@ package piuk.blockchain.androidcore.data.exchangerate
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
-import com.blockchain.testutils.gbp
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.rxInit
 import com.blockchain.testutils.usd
@@ -131,27 +130,12 @@ class ExchangeRateDataManagerTest {
         5.usd().toCrypto(subject, CryptoCurrency.BTC) `should equal` 0.55555556.bitcoin()
     }
 
-    @Test
-    fun `usd to gbp`() {
-        givenExchangeRateForFiat(sourceCurrency = "USD", targetCurrency = "GBP", exchangeRate = 1.333)
-        5.usd().toFiatWithCurrency(subject, "GBP") `should equal` 6.66.gbp()
-    }
-
     private fun givenExchangeRate(
         cryptoCurrency: CryptoCurrency,
         currencyName: String,
         exchangeRate: Double
     ) {
         whenever(exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)).thenReturn(exchangeRate)
-    }
-
-    private fun givenExchangeRateForFiat(
-        sourceCurrency: String,
-        targetCurrency: String,
-        exchangeRate: Double
-    ) {
-        whenever(exchangeRateDataStore.getFiatLastPrice(targetFiat = targetCurrency,
-            sourceFiat = sourceCurrency)).thenReturn(exchangeRate)
     }
 
     private fun givenHistoricExchangeRate(

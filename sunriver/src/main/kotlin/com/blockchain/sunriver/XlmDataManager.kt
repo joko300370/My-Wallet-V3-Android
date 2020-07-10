@@ -110,7 +110,9 @@ class XlmDataManager internal constructor(
                     xlmFeesFetcher.operationFee(feeType).map { accountRef to it }
                 }
                 .flatMap { (accountRef, fee) ->
-                    getBalanceAndMin(accountRef).map { it.balance - it.minimumBalance - fee }
+                    getBalanceAndMin(accountRef).map {
+                        (it.balance - it.minimumBalance - fee) as CryptoValue
+                    }
                 }.toMaybe(),
             Maybe.just(CryptoValue.ZeroXlm)
         ).firstOrError()

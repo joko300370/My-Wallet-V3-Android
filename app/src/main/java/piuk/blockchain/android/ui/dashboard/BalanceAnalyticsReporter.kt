@@ -3,19 +3,18 @@ package piuk.blockchain.android.ui.dashboard
 import com.blockchain.notifications.analytics.UserAnalytics
 import com.blockchain.notifications.analytics.UserProperty
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import java.math.BigDecimal
 
 class BalanceAnalyticsReporter(
     private val analytics: UserAnalytics
 ) {
-    private val collectedBalances = mutableMapOf<CryptoCurrency, CryptoValue>()
+    private val collectedBalances = mutableMapOf<CryptoCurrency, Money>()
     private val assetCount = CryptoCurrency.activeCurrencies().size
 
-    private var totalBalance: FiatValue? = null
+    private var totalBalance: Money? = null
 
-    fun gotAssetBalance(crypto: CryptoCurrency, amount: CryptoValue) {
+    fun gotAssetBalance(crypto: CryptoCurrency, amount: Money) {
         collectedBalances[crypto] = amount
         if (collectedBalances.size == assetCount) {
             sendAssetData()
@@ -55,7 +54,7 @@ class BalanceAnalyticsReporter(
         )
     }
 
-    fun updateFiatTotal(fiatBalance: FiatValue?) {
+    fun updateFiatTotal(fiatBalance: Money?) {
         totalBalance = fiatBalance
     }
 

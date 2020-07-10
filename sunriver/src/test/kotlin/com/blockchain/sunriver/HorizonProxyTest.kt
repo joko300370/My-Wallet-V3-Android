@@ -11,6 +11,7 @@ import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.balance.withMajorValue
 import io.fabric8.mockwebserver.DefaultMockServer
 import org.amshove.kluent.`should be instance of`
@@ -570,10 +571,10 @@ class HorizonProxyTest : AutoCloseKoinTest() {
      * Ensures that the request is never sent to Horizon as that would cost the fee
      */
     private fun assertFailsAndTransactionIsNotSentToHorizon(
-        value: CryptoValue,
+        value: Money,
         destinationAccountExists: Boolean = true,
         expectedReason: HorizonProxy.FailureReason? = null,
-        expectedFailureValue: CryptoValue? = null,
+        expectedFailureValue: Money? = null,
         sourceAccount: KeyPair = KeyPair.fromSecretSeed(
             "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
         ),
@@ -594,7 +595,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         proxy.sendTransaction(
             sourceAccount,
             destinationAccount.accountId,
-            value,
+            value as CryptoValue,
             10
         ).apply {
             success `should be` false
@@ -609,10 +610,10 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     private fun assertDryRunFailsAndTransactionIsNotSentToHorizon(
-        value: CryptoValue,
+        value: Money,
         destinationAccountExists: Boolean = true,
         expectedReason: HorizonProxy.FailureReason? = null,
-        expectedFailureValue: CryptoValue? = null,
+        expectedFailureValue: Money? = null,
         sourceAccount: KeyPair = KeyPair.fromSecretSeed(
             "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
         ),
@@ -633,7 +634,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         proxy.dryRunTransaction(
             sourceAccount,
             destinationAccount.accountId,
-            value,
+            value as CryptoValue,
             Memo.none()
         ).apply {
             success `should be` false
@@ -648,7 +649,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     private fun assertSendPasses(
-        value: CryptoValue,
+        value: Money,
         destinationAccountExists: Boolean = true,
         sourceAccount: KeyPair = KeyPair.fromSecretSeed(
             "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
@@ -673,7 +674,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         proxy.sendTransaction(
             sourceAccount,
             destinationAccount.accountId,
-            value,
+            value as CryptoValue,
             10
         ).apply {
             success `should be` true
@@ -684,7 +685,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
     }
 
     private fun assertDryRunSaysSendShouldPass(
-        value: CryptoValue,
+        value: Money,
         destinationAccountExists: Boolean = true,
         sourceAccount: KeyPair = KeyPair.fromSecretSeed(
             "SAD6LOTFMPIGAPOF2SPQSYD4OIGIE5XVVX3FW3K7QVFUTRSUUHMZQ76I"
@@ -706,7 +707,7 @@ class HorizonProxyTest : AutoCloseKoinTest() {
         proxy.dryRunTransaction(
             sourceAccount,
             destinationAccount.accountId,
-            value,
+            value as CryptoValue,
             Memo.none()
         ).apply {
             success `should be` true

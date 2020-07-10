@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.eth
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -15,7 +16,6 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
@@ -44,15 +44,14 @@ internal class EthCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<CryptoValue>
+    override val balance: Single<Money>
         get() = ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .doOnSuccess {
-                if (it.amount > BigInteger.ZERO) {
-                    hasFunds.set(true)
-                }
+                hasFunds.set(it > CryptoValue.ZeroEth)
             }
+            .map { it as Money }
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
@@ -106,7 +105,7 @@ internal class EthCryptoWalletAccount(
         get() = Singles.zip(
                 balance,
                 ethDataManager.isLastTxPending()
-            ) { balance: CryptoValue, hasUnconfirmed: Boolean ->
+            ) { balance: Money, hasUnconfirmed: Boolean ->
                 when {
                     balance.isZero -> SendState.NO_FUNDS
                     hasUnconfirmed -> SendState.SEND_IN_FLIGHT

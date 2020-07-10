@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import kotlinx.android.synthetic.main.dialog_account_selector_item.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -24,7 +24,7 @@ class AllWalletsAccountDelegate<in T>(
     private val disposables: CompositeDisposable,
     private val exchangeRates: ExchangeRateDataManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val onAccountClicked: (CryptoAccount) -> Unit
+    private val onAccountClicked: (BlockchainAccount) -> Unit
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
@@ -55,7 +55,7 @@ private class AllWalletsAccountViewHolder(
         disposables: CompositeDisposable,
         exchangeRates: ExchangeRateDataManager,
         currency: String,
-        onAccountClicked: (CryptoAccount) -> Unit
+        onAccountClicked: (BlockchainAccount) -> Unit
     ) {
         with(itemView) {
             icon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_blue))

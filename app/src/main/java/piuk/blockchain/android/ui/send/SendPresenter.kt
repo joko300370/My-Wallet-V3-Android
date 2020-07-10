@@ -30,7 +30,6 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import timber.log.Timber
 import java.text.DecimalFormatSymbols
@@ -46,6 +45,7 @@ class SendPresenter<View : SendView>(
     private val etherStrategy: SendStrategy<View>,
     private val xlmStrategy: SendStrategy<View>,
     private val paxStrategy: SendStrategy<View>,
+    private val usdtStrategy: SendStrategy<View>,
     private val exchangeRates: ExchangeRateDataManager,
     private val envSettings: EnvironmentConfig,
     private val stringUtils: StringUtils,
@@ -138,6 +138,7 @@ class SendPresenter<View : SendView>(
             CryptoCurrency.PAX -> paxStrategy
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> usdtStrategy
         }
 
         selectedCrypto = currency

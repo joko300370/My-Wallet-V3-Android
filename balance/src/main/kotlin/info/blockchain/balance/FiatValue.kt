@@ -2,6 +2,7 @@ package info.blockchain.balance
 
 import info.blockchain.utils.tryParseBigDecimal
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -37,56 +38,86 @@ private object FiatFormat {
 @Suppress("DataClassPrivateConstructor")
 data class FiatValue private constructor(
     override val currencyCode: String,
-    internal val value: BigDecimal
-) : Money {
+    private val amount: BigDecimal
+) : Money() {
 
     // ALWAYS for display, so use default Locale
     override val symbol: String = Currency.getInstance(currencyCode).getSymbol(Locale.getDefault())
 
     override val maxDecimalPlaces: Int get() = maxDecimalPlaces(currencyCode)
 
-    override val isZero: Boolean get() = value.signum() == 0
+    override val isZero: Boolean get() = amount.signum() == 0
 
-    override val isPositive: Boolean get() = value.signum() == 1
+    override val isPositive: Boolean get() = amount.signum() == 1
 
-    override fun toBigDecimal(): BigDecimal = value
+    override fun toBigDecimal(): BigDecimal = amount
 
-    val valueMinor: Long = value.movePointRight(maxDecimalPlaces).toLong()
+    override fun toBigInteger(): BigInteger =
+        amount.movePointRight(maxDecimalPlaces).toBigInteger()
+
+    override fun toFloat(): Float =
+        toBigDecimal().toFloat()
+
+    @Deprecated(message = "Tech Debt", replaceWith = ReplaceWith("toBigInteger"))
+    val valueMinor: Long = amount.movePointRight(maxDecimalPlaces).toLong()
 
     override fun toStringWithSymbol(): String =
-        FiatFormat[Key(Locale.getDefault(), currencyCode, includeSymbol = true)].format(value)
+        FiatFormat[Key(Locale.getDefault(), currencyCode, includeSymbol = true)].format(amount)
 
     override fun toStringWithoutSymbol(): String =
         FiatFormat[Key(Locale.getDefault(), currencyCode, includeSymbol = false)]
-            .format(value)
+            .format(amount)
             .trim()
 
     override fun toNetworkString(): String =
         FiatFormat[Key(Locale.US, currencyCode, includeSymbol = false)]
-            .format(value)
+            .format(amount)
             .trim()
             .removeComma()
 
-    operator fun plus(other: FiatValue): FiatValue {
-        if (currencyCode != other.currencyCode)
-            throw ValueTypeMismatchException("add", currencyCode, other.currencyCode)
-        return FiatValue(currencyCode, value + other.value)
+    override fun toFiat(
+        exchangeRates: ExchangeRates,
+        fiatCurrency: String
+    ) = fromMajor(fiatCurrency,
+        exchangeRates.getLastPriceOfFiat(
+            sourceFiat = this.currencyCode,
+            targetFiat = fiatCurrency
+        ).toBigDecimal() * toBigDecimal()
+    )
+
+    override fun add(other: Money): FiatValue {
+        require(other is FiatValue)
+        return FiatValue(currencyCode, amount + other.amount)
     }
 
-    operator fun minus(other: FiatValue): FiatValue {
-        if (currencyCode != other.currencyCode)
-            throw ValueTypeMismatchException("subtract", currencyCode, other.currencyCode)
-        return FiatValue(currencyCode, value - other.value)
+    override fun subtract(other: Money): FiatValue {
+        require(other is FiatValue)
+        return FiatValue(currencyCode, amount - other.amount)
+    }
+
+    override fun compare(other: Money): Int {
+        require(other is FiatValue)
+        return amount.compareTo(other.amount)
+    }
+
+    override fun ensureComparable(operation: String, other: Money) {
+        if (other is FiatValue) {
+            if (currencyCode != other.currencyCode) {
+                throw ValueTypeMismatchException(operation, currencyCode, other.currencyCode)
+            }
+        } else {
+            throw ValueTypeMismatchException(operation, currencyCode, other.currencyCode)
+        }
     }
 
     override fun toZero(): FiatValue = fromMajor(currencyCode, BigDecimal.ZERO)
 
     override fun equals(other: Any?): Boolean =
-        (other is FiatValue) && (other.currencyCode == currencyCode) && (other.value.compareTo(value) == 0)
+        (other is FiatValue) && (other.currencyCode == currencyCode) && (other.amount.compareTo(amount) == 0)
 
     override fun hashCode(): Int {
         var result = currencyCode.hashCode()
-        result = 31 * result + value.hashCode()
+        result = 31 * result + amount.hashCode()
         return result
     }
 
@@ -116,44 +147,7 @@ data class FiatValue private constructor(
 
         fun zero(currencyCode: String) = FiatValue(currencyCode, BigDecimal.ZERO)
 
-        private fun maxDecimalPlaces(currencyCode: String) = Currency.getInstance(currencyCode).defaultFractionDigits
+        private fun maxDecimalPlaces(currencyCode: String) =
+            Currency.getInstance(currencyCode).defaultFractionDigits
     }
-}
-
-@Suppress("SameParameterValue")
-private fun ensureComparable(operation: String, currencyCodeA: String, currencyCodeB: String) {
-    if (currencyCodeA != currencyCodeB)
-        throw ValueTypeMismatchException(operation, currencyCodeA, currencyCodeB)
-}
-
-operator fun FiatValue.compareTo(b: FiatValue): Int {
-    ensureComparable("compare", currencyCode, b.currencyCode)
-    return valueMinor.compareTo(b.valueMinor)
-}
-
-fun FiatValue?.percentageDelta(previous: FiatValue?): Double =
-    if (this != null && previous != null && !previous.isZero) {
-        val current = this.toBigDecimal()
-        val prev = previous.toBigDecimal()
-
-        (current - prev)
-            .divide(prev, 4, RoundingMode.HALF_EVEN)
-            .movePointRight(2)
-            .toDouble()
-    } else {
-        Double.NaN
-    }
-
-fun FiatValue?.toFloat(): Float =
-    this?.toBigDecimal()?.toFloat() ?: 0.0f
-
-fun CryptoValue.toFiat(price: FiatValue) =
-    FiatValue.fromMajor(price.currencyCode, price.toBigDecimal() * toBigDecimal())
-
-fun Iterable<FiatValue>.sum(): FiatValue? {
-    if (!iterator().hasNext()) return null
-    var total = FiatValue.zero(first().currencyCode)
-    this.forEach { total += it }
-
-    return total
 }
