@@ -34,6 +34,7 @@ fun Number.satoshi() = CryptoValue.fromMinor(CryptoCurrency.BTC, numberToBigInte
 fun Number.ether() = CryptoValue.fromMajor(CryptoCurrency.ETHER, numberToBigDecimal())
 fun Number.wei() = CryptoValue.fromMinor(CryptoCurrency.ETHER, numberToBigDecimal())
 fun Number.bitcoinCash() = CryptoValue.fromMajor(CryptoCurrency.BCH, numberToBigDecimal())
+fun Number.satoshiCash() = CryptoValue.fromMinor(CryptoCurrency.BCH, numberToBigDecimal())
 fun Number.lumens() = CryptoValue.fromMajor(CryptoCurrency.XLM, numberToBigDecimal())
 fun Number.stroops() = CryptoValue.fromMinor(CryptoCurrency.XLM, numberToBigDecimal().toBigIntegerExact())
 fun Number.usdPax() = CryptoValue.fromMajor(CryptoCurrency.PAX, numberToBigDecimal())

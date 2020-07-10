@@ -72,7 +72,7 @@ data class CryptoValue(
             CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
 
         fun bitcoinCashFromMajor(bitcoinCash: Int) =
-            bitcoinCashFromMajor(bitcoinCash.toBigDecimal())
+            fromMajor(CryptoCurrency.BCH, bitcoinCash.toBigDecimal())
 
         fun bitcoinCashFromMajor(bitcoinCash: BigDecimal) =
             fromMajor(CryptoCurrency.BCH, bitcoinCash)
