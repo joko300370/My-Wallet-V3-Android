@@ -32,13 +32,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"/>
 
-    <piuk.blockchain.android.ui.transfer.widgets.AccountOverview
+    <piuk.blockchain.android.ui.customviews.CryptoAccountInfo
             android:id="@+id/from_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_from"/>
@@ -118,7 +116,7 @@
 
     <piuk.blockchain.android.ui.transfer.widgets.AccountList
         android:id="@+id/wallet_select"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"

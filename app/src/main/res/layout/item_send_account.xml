@@ -6,10 +6,10 @@
     android:layout_height="wrap_content"
     android:id="@+id/item_account_parent"
     android:orientation="vertical"
-    android:paddingTop="@dimen/small_margin"
-    android:paddingBottom="@dimen/small_margin">
+    android:paddingTop="@dimen/tiny_margin"
+    android:paddingBottom="@dimen/tiny_margin">
 
-    <piuk.blockchain.android.ui.transfer.widgets.AccountOverview
+    <piuk.blockchain.android.ui.customviews.CryptoAccountInfo
         android:id="@+id/details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -20,7 +20,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginTop="2dp"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="60dp"
         android:background="@drawable/bkgd_status_expired">

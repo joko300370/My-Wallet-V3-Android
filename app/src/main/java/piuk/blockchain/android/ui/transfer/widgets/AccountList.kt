@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.item_send_account.view.*
 import kotlinx.android.synthetic.main.view_account_list.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 
 class AccountList @JvmOverloads constructor(
@@ -113,6 +114,6 @@ private class ViewHolder(val parent: View) :
         onItemClicked: (BlockchainAccount) -> Unit
     ) {
         itemView.setOnClickListener { onItemClicked(item) }
-        itemView.details.account = item
+        itemView.details.account = item as CryptoAccount
     }
 }
