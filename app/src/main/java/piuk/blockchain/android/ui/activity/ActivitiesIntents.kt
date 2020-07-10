@@ -88,10 +88,23 @@ class ShowActivityDetailsIntent(
 ) : ActivitiesIntent() {
     override fun reduce(oldState: ActivitiesState): ActivitiesState {
         return oldState.copy(
-            bottomSheet = ActivitiesSheet.ACTIVITY_DETAILS,
+            bottomSheet = ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS,
             selectedCryptoCurrency = cryptoCurrency,
             selectedTxId = txHash,
             isCustodial = isCustodial
+        )
+    }
+}
+
+class ShowFiatActivityDetailsIntent(
+    val currency: String,
+    val txHash: String
+) : ActivitiesIntent() {
+    override fun reduce(oldState: ActivitiesState): ActivitiesState {
+        return oldState.copy(
+            bottomSheet = ActivitiesSheet.FIAT_ACTIVITY_DETAILS,
+            selectedFiatCurrency = currency,
+            selectedTxId = txHash
         )
     }
 }

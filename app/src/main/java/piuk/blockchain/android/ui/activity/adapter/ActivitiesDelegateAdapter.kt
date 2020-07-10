@@ -10,15 +10,17 @@ import piuk.blockchain.android.ui.adapters.DelegationAdapter
 class ActivitiesDelegateAdapter(
     disposables: CompositeDisposable,
     prefs: CurrencyPrefs,
-    onItemClicked: (CryptoCurrency, String, Boolean) -> Unit,
+    onCryptoItemClicked: (CryptoCurrency, String, Boolean) -> Unit,
+    onFiatItemClicked: (String, String) -> Unit,
     analytics: Analytics
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
 
     init {
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
-            addAdapterDelegate(NonCustodialActivityItemDelegate(disposables, prefs, onItemClicked))
-            addAdapterDelegate(CustodialActivityItemDelegate(onItemClicked))
+            addAdapterDelegate(NonCustodialActivityItemDelegate(disposables, prefs, onCryptoItemClicked))
+            addAdapterDelegate(CustodialActivityItemDelegate(onCryptoItemClicked))
+            addAdapterDelegate(CustodialFiatActivityItemDelegate(onFiatItemClicked))
         }
     }
 }

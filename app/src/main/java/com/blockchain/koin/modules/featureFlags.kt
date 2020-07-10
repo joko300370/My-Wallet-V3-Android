@@ -7,6 +7,7 @@ import com.blockchain.koin.interestAccount
 import com.blockchain.koin.pitAnnouncementFeatureFlag
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.smsVerifFeatureFlag
 import com.blockchain.koin.sunriver
 import com.blockchain.remoteconfig.RemoteConfig
@@ -28,6 +29,10 @@ val featureFlagsModule = module {
 
     factory(cardPaymentsFeatureFlag) {
         get<RemoteConfig>().featureFlag("simple_buy_method_card_enabled")
+    }
+
+    factory(simpleBuyFundsFeatureFlag) {
+        get<RemoteConfig>().featureFlag("simple_buy_method_funds_enabled")
     }
 
     factory(simpleBuyFeatureFlag) {

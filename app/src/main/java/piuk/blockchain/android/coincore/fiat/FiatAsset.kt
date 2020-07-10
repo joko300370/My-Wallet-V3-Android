@@ -1,6 +1,8 @@
 package piuk.blockchain.android.coincore.fiat
 
-import info.blockchain.balance.FiatValue
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.Asset
@@ -10,27 +12,32 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class FiatAsset : Asset {
+class FiatAsset(
+    labels: DefaultLabels,
+    assetBalancesRepository: AssetBalancesRepository,
+    exchangeRateDataManager: ExchangeRateDataManager,
+    custodialWalletManager: CustodialWalletManager
+) :
+    Asset {
     override fun init(): Completable = Completable.complete()
     override val isEnabled: Boolean = true
 
     private val accounts = listOf(
         FiatCustodialAccount(
-            label = "USD Account",
-            fiatCurrency = "USD",
-            isDefault = true,
-            funds = FiatValue.fromMajor("USD", 1001.99.toBigDecimal())
-        ),
-        FiatCustodialAccount(
-            label = "EUR Account",
+            label = labels.getDefaultCustodialFiatWalletLabel("EUR"),
             fiatCurrency = "EUR",
-            funds = FiatValue.fromMajor("USD", 26.25.toBigDecimal())
+            assetBalancesRepository = assetBalancesRepository,
+            exchangesRatesDataManager = exchangeRateDataManager,
+            custodialWalletManager = custodialWalletManager
         ),
         FiatCustodialAccount(
-            label = "GBP Account",
+            label = labels.getDefaultCustodialFiatWalletLabel("GBP"),
             fiatCurrency = "GBP",
-            funds = FiatValue.fromMajor("GBP", 499.95.toBigDecimal())
+            assetBalancesRepository = assetBalancesRepository,
+            exchangesRatesDataManager = exchangeRateDataManager,
+            custodialWalletManager = custodialWalletManager
         )
     )
 

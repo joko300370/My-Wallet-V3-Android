@@ -23,7 +23,7 @@ internal class XlmCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
-    private var hasFunds = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()

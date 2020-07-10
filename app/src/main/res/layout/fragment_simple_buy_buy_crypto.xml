@@ -79,127 +79,51 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/fiat_currency_symbol"
-        style="@style/Text.Semibold.32"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:text="€"
-        android:textColor="@color/grey_400"
-        app:layout_constraintBottom_toBottomOf="@+id/input_amount"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input_amount" />
-
-    <androidx.appcompat.widget.AppCompatEditText
+    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
         android:id="@+id/input_amount"
-        style="@style/Text.Semibold.32"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/small_margin"
-        android:hint="0.00"
-        android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/fiat_currency_symbol"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header"
-        app:layout_goneMarginEnd="@dimen/small_margin" />
+        app:layout_goneMarginEnd="@dimen/small_margin"
+        tools:layout_height="20dp" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/error_text"
+        android:id="@+id/payment_method"
+        style="@style/Text.Semibold.12"
         android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:background="@drawable/simple_buy_enter_amount_error_message_background"
-        android:textColor="@color/red_400"
+        android:text="@string/payment_method"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="$20,000 Maximum buy" />
+        app:layout_constraintTop_toBottomOf="@+id/input_amount" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/error_fix_action"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/small_margin"
-        android:background="@drawable/fix_error_action_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintBottom_toBottomOf="@+id/fiat_currency"
-        app:layout_constraintEnd_toStartOf="@+id/fiat_currency"
-        app:layout_constraintTop_toTopOf="@+id/fiat_currency"
-        tools:text="Buy Max" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/predefined_amount_1"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="$4" />
-
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/predefined_amount_2"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <View
+        style="@style/Separator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:id="@+id/payment_method_separator"
         android:layout_marginStart="@dimen/tiny_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/predefined_amount_1"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="$4" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/predefined_amount_3"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintStart_toEndOf="@+id/predefined_amount_2"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="$4" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/predefined_amount_4"
-        style="@style/Text.Semibold.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/tiny_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:background="@drawable/predefined_amount_text_background"
-        android:textColor="@color/blue_600"
-        app:layout_constraintStart_toEndOf="@+id/predefined_amount_3"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="$4" />
+        app:layout_constraintBottom_toBottomOf="@+id/payment_method"
+        app:layout_constraintStart_toEndOf="@+id/payment_method"
+        app:layout_constraintTop_toTopOf="@+id/payment_method" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/payment_method_root"
+        android:id="@+id/payment_method_details_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="@dimen/tiny_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:background="@drawable/payment_method_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount">
+        app:layout_constraintTop_toBottomOf="@+id/payment_method">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/payment_method_icon"
@@ -266,23 +190,6 @@
             tools:text="$5,000 USD Limit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/fiat_currency"
-        style="@style/Text.Standard.Centered.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:background="@drawable/simple_buy_currency_indicator_background"
-        android:paddingStart="6dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="6dp"
-        android:paddingBottom="6dp"
-        android:textColor="@color/blue_600"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount"
-        tools:text="USD" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_continue"

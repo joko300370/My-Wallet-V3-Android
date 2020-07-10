@@ -708,11 +708,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(fragment)
     }
 
-    override fun gotoActivityFor(account: BlockchainAccount) {
+    override fun gotoActivityFor(account: BlockchainAccount?) {
         // Once coincore is fully integrated, we won't care about setting the
         // asset dropdown to the currently/active cryptocurrency.
         // For now, we'll only set it if we're actually looking at a crypto asset
-        if (account is CryptoAccount) {
+        if (account != null && account is CryptoAccount) {
             presenter.cryptoCurrency = account.asset
         }
         startActivitiesFragment(account)

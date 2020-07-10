@@ -10,8 +10,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import info.blockchain.balance.CryptoValue
-import kotlinx.android.synthetic.main.fragment_simple_buy_card_payment.*
-import kotlinx.android.synthetic.main.fragment_simple_buy_card_payment.icon
+import kotlinx.android.synthetic.main.fragment_simple_buy_payment.*
+import kotlinx.android.synthetic.main.fragment_simple_buy_payment.icon
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
@@ -22,7 +22,7 @@ import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
-class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
+class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen {
     override val model: SimpleBuyModel by scopedInject()
 
@@ -37,18 +37,18 @@ class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_simple_buy_card_payment)
+    ) = container?.inflate(R.layout.fragment_simple_buy_payment)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity.setupToolbar(R.string.card_payment, false)
+        activity.setupToolbar(R.string.payment, false)
     }
 
     override fun render(newState: SimpleBuyState) {
 
         icon.setImageResource(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
-            model.process(SimpleBuyIntent.MakeCardPayment(newState.id ?: return))
+            model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
             isFirstLoad = false
         }
 
@@ -56,9 +56,9 @@ class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
             renderTitleAndSubtitle(
                 it,
                 newState.isLoading,
-                newState.cardPaymentSucceeded,
+                newState.paymentSucceeded,
                 newState.errorState != null,
-                newState.cardPaymentPending
+                newState.paymentPending
             )
         } ?: renderTitleAndSubtitle(
             null,
@@ -69,7 +69,7 @@ class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
         )
 
         ok_btn.setOnClickListener {
-            if (!newState.cardPaymentPending)
+            if (!newState.paymentPending)
                 navigator().exitSimpleBuyFlow()
             else
                 navigator().goToPendingOrderScreen()
@@ -107,7 +107,7 @@ class SimpleBuyCardPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
             hasError -> {
                 icon.setImageResource(R.drawable.ic_alert)
                 title.text = getString(R.string.card_error_title)
-                subtitle.text = getString(R.string.card_error_subtitle)
+                subtitle.text = getString(R.string.order_error_subtitle)
             }
         }
 
