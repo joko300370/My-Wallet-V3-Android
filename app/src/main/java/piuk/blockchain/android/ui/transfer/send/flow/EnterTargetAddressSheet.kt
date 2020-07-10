@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.dialog_send_address.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
@@ -89,7 +89,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
         }
     }
 
-    private fun setupTransferList(account: CryptoSingleAccount) {
+    private fun setupTransferList(account: CryptoAccount) {
         dialogView.wallet_select.initialise(
             coincore[account.asset].canTransferTo(account)
         )
@@ -100,8 +100,8 @@ class EnterTargetAddressSheet : SendInputSheet() {
         dialogView.wallet_select.gone()
     }
 
-    private fun accountSelected(account: CryptoAccount) {
-        if (account is CryptoSingleAccount) {
+    private fun accountSelected(account: BlockchainAccount) {
+        if (account is CryptoAccount) {
             disposables += account.receiveAddress
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

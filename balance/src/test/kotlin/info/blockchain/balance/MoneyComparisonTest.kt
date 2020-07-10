@@ -101,13 +101,6 @@ class MoneyComparisonTest {
     }
 
     @Test
-    fun `can't compare an unknown Money type to a known one`() {
-        val a: Money = mock()
-        val b: Money = 3.bitcoin();
-        { a > b } `should throw` IllegalArgumentException::class
-    }
-
-    @Test
     fun `crypto fiat - inequality`() {
         val a: Money = 10.ether()
         val b: Money = 10.usd()

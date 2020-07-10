@@ -62,7 +62,8 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
                 CryptoCurrency.XLM -> emailIntent.setupIntentForEmailXlm(payment = uri.fromStellarUri())
                 CryptoCurrency.PAX -> emailIntent.setupIntentForEmailPax(uri)
                 CryptoCurrency.STX -> TODO("STX is not fully supported yet")
-                CryptoCurrency.ALGO -> TODO("ALG is not fully supported yet")
+                CryptoCurrency.ALGO -> TODO("ALGO is not fully supported yet")
+                CryptoCurrency.USDT -> TODO("USDT is not fully supported yet")
             }.exhaustive
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }

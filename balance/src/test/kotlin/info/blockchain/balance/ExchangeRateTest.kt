@@ -24,22 +24,22 @@ class ExchangeRateTest {
             .applyRate(10.usd()) `should equal` CryptoValue.bitcoinFromMajor(200)
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun `crypto to crypto - from miss match`() {
         ExchangeRate.CryptoToCrypto(CryptoCurrency.BCH, CryptoCurrency.BCH, 20.toBigDecimal())
-            .applyRate(CryptoValue.bitcoinFromMajor(10)) `should equal` null
+            .applyRate(CryptoValue.bitcoinFromMajor(10))
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun `crypto to fiat - from miss match`() {
         ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal())
-            .applyRate(CryptoValue.etherFromMajor(10)) `should equal` null
+            .applyRate(CryptoValue.etherFromMajor(10))
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun `fiat to crypto - from miss match`() {
         ExchangeRate.FiatToCrypto("GBP", CryptoCurrency.BTC, 20.toBigDecimal())
-            .applyRate(10.usd()) `should equal` null
+            .applyRate(10.usd())
     }
 
     @Test

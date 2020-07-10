@@ -41,7 +41,6 @@ import piuk.blockchain.android.ui.send.SendConfirmationDetails
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import timber.log.Timber

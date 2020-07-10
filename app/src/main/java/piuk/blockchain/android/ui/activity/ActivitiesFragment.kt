@@ -26,6 +26,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
@@ -47,7 +48,9 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
-    AccountSelectSheet.Host, ActivityDetailsBottomSheet.Host, BankDetailsBottomSheet.Host,
+    AccountSelectSheet.Host,
+    ActivityDetailsBottomSheet.Host,
+    BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
     override val model: ActivitiesModel by scopedInject()
@@ -173,10 +176,9 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             )
     }
 
-    private fun ImageView.setAccountIcon(account: CryptoAccount) {
-        when (account.cryptoCurrencies.size) {
-            0 -> throw IllegalStateException("Account is invalid; no crypto")
-            1 -> setCoinIcon(account.cryptoCurrencies.first())
+    private fun ImageView.setAccountIcon(account: BlockchainAccount) {
+        when (account) {
+            is CryptoAccount -> setCoinIcon(account.asset)
             else -> setImageDrawable(
                 AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_white))
         }
@@ -277,7 +279,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
         model.process(SelectDefaultAccountIntent)
     }
 
-    override fun onAccountSelected(account: CryptoAccount) {
+    override fun onAccountSelected(account: BlockchainAccount) {
         model.process(AccountSelectedIntent(account, false))
     }
 
@@ -309,7 +311,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     }
 
     companion object {
-        fun newInstance(account: CryptoAccount?): ActivitiesFragment {
+        fun newInstance(account: BlockchainAccount?): ActivitiesFragment {
             return ActivitiesFragment().apply {
                 account?.let { onAccountSelected(it) } ?: onShowAllActivity()
             }

@@ -11,7 +11,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.toFiat
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
@@ -21,8 +20,8 @@ import kotlinx.android.synthetic.main.dialog_basic_transfer_to_wallet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.AssetTokens
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.setImageDrawable
@@ -49,7 +48,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
     private val coincore: Coincore by scopedInject()
 
-    private val token: AssetTokens by lazy {
+    private val token: CryptoAsset by lazy {
         coincore[cryptoCurrency]
     }
 
@@ -78,16 +77,16 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
             disposables += Singles.zip(
                 token.exchangeRate(),
-                token.accounts(AssetFilter.Custodial).flatMap { it.balance }
+                token.accountGroup(AssetFilter.Custodial).flatMap { it.balance }
             ) { fiatPrice, custodialBalance ->
-                val custodialFiat = custodialBalance.toFiat(fiatPrice)
+                val custodialFiat = fiatPrice.convert(custodialBalance)
                 Pair(custodialBalance, custodialFiat)
             }
                 .observeOn(uiScheduler)
                 .doOnSubscribe { cta_button.isEnabled = false }
                 .subscribeBy(
                     onSuccess = { (crypto, fiat) ->
-                        valueToSend = crypto
+                        valueToSend = crypto as CryptoValue
                         amount_crypto.text = crypto.toStringWithSymbol()
                         amount_fiat.text = fiat.toStringWithSymbol()
                         checkCtaEnable()

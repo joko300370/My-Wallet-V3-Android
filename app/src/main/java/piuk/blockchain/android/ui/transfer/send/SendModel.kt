@@ -1,12 +1,12 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.compareTo
+import info.blockchain.balance.Money
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingSendTx
@@ -34,10 +34,10 @@ enum class SendErrorState {
 
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
-    val sendingAccount: CryptoSingleAccount = NullAccount,
+    val sendingAccount: CryptoAccount = NullAccount,
     val targetAddress: ReceiveAddress = NullAddress,
-    val sendAmount: CryptoValue = CryptoValue.zero(sendingAccount.asset),
-    val availableBalance: CryptoValue = CryptoValue.zero(sendingAccount.asset),
+    val sendAmount: Money = CryptoValue.zero(sendingAccount.asset),
+    val availableBalance: Money = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,

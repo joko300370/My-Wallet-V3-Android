@@ -31,7 +31,6 @@ import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -77,6 +76,7 @@ class AccountPresenter internal constructor(
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
 
     override fun onViewReady() {
@@ -363,6 +363,7 @@ class AccountPresenter internal constructor(
             CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
     }
 
@@ -538,6 +539,7 @@ class AccountPresenter internal constructor(
             CryptoCurrency.PAX -> false
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> false
+            CryptoCurrency.USDT -> false
         }
 
     companion object {

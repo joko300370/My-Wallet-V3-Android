@@ -21,8 +21,10 @@ class ExchangeRateDataStore(
     private var xlmTickerData: Map<String, PriceDatum>? = null
     private var paxTickerData: Map<String, PriceDatum>? = null
     private var algTickerData: Map<String, PriceDatum>? = null
+    private var usdtTickerData: Map<String, PriceDatum>? = null
 
     fun updateExchangeRates(): Completable = Single.merge(
+        listOf(
             exchangeRateService.getExchangeRateMap(CryptoCurrency.BTC)
                 .doOnSuccess { btcTickerData = it.toMap() },
             exchangeRateService.getExchangeRateMap(CryptoCurrency.BCH)
@@ -30,11 +32,13 @@ class ExchangeRateDataStore(
             exchangeRateService.getExchangeRateMap(CryptoCurrency.ETHER)
                 .doOnSuccess { ethTickerData = it.toMap() },
             exchangeRateService.getExchangeRateMap(CryptoCurrency.XLM)
-            .doOnSuccess { xlmTickerData = it.toMap() }
-        ).mergeWith(exchangeRateService.getExchangeRateMap(CryptoCurrency.PAX)
-            .doOnSuccess { paxTickerData = it.toMap() })
-        .mergeWith(exchangeRateService.getExchangeRateMap(CryptoCurrency.ALGO)
-            .doOnSuccess { algTickerData = it.toMap() }).ignoreElements()
+                .doOnSuccess { xlmTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.PAX)
+                .doOnSuccess { paxTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.ALGO)
+                .doOnSuccess { algTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.USDT)
+                .doOnSuccess { usdtTickerData = it.toMap() })).ignoreElements()
 
     fun getCurrencyLabels(): Array<String> = btcTickerData!!.keys.toTypedArray()
 
@@ -81,6 +85,7 @@ class ExchangeRateDataStore(
             CryptoCurrency.PAX -> paxTickerData
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> algTickerData
+            CryptoCurrency.USDT -> usdtTickerData
         }
 
     fun getHistoricPrice(

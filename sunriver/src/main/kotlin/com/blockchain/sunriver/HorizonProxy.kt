@@ -3,7 +3,6 @@ package com.blockchain.sunriver
 import com.blockchain.account.BalanceAndMin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.compareTo
 import info.blockchain.balance.withMajorValue
 import org.stellar.sdk.AssetTypeNative
 import org.stellar.sdk.CreateAccountOperation
@@ -177,7 +176,7 @@ internal class HorizonProxy {
             return SendResult(
                 success = false,
                 failureReason = FailureReason.InsufficientFunds,
-                failureValue = account.balance - minBalance - fee
+                failureValue = (account.balance - minBalance - fee) as CryptoValue
             )
         }
         return SendResult(
@@ -239,7 +238,7 @@ internal class HorizonProxy {
         Transaction.Builder(source, currentNetwork)
             .setTimeout(timeout)
             .addOperation(buildTransactionOperation(destination, destinationAccountExists, amount.toPlainString()))
-            .setBaseFee((perOperationFee ?: basePerOperationFee).amount.toInt())
+            .setBaseFee((perOperationFee ?: basePerOperationFee).toBigInteger().toInt())
             .addMemo(memo)
             .build()
 

@@ -18,8 +18,8 @@ object NullAddress : ReceiveAddress {
 }
 
 interface AddressFactory {
-    fun parse(address: String): Set<CryptoAddress>
-    fun parse(address: String, ccy: CryptoCurrency): CryptoAddress?
+    fun parse(address: String): Set<ReceiveAddress>
+    fun parse(address: String, ccy: CryptoCurrency): ReceiveAddress?
 }
 
 class AddressFactoryImpl(
@@ -30,11 +30,12 @@ class AddressFactoryImpl(
      * If the string is not a valid address fir any available tokens, then return
      * an empty set
      **/
-    override fun parse(address: String): Set<CryptoAddress> =
-        coincore.tokens.mapNotNull { t: AssetTokens ->
+
+    override fun parse(address: String): Set<ReceiveAddress> =
+        coincore.assets.mapNotNull { t: Asset ->
             t.parseAddress(address)
         }.toSet()
 
-    override fun parse(address: String, ccy: CryptoCurrency): CryptoAddress? =
+    override fun parse(address: String, ccy: CryptoCurrency): ReceiveAddress? =
         coincore[ccy].parseAddress(address)
 }

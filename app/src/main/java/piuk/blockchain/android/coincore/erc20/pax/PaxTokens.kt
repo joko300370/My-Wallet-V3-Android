@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.pax
+package piuk.blockchain.android.coincore.erc20.pax
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
@@ -7,24 +7,20 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.util.FormatsUtil
-import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
-import piuk.blockchain.android.coincore.impl.AssetTokensBase
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-internal class PaxTokens(
+internal class PaxAsset(
     private val paxAccount: Erc20Account,
-    private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -32,38 +28,40 @@ internal class PaxTokens(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger
-) : AssetTokensBase(
+) : Erc20TokensBase(
+    paxAccount,
+    custodialManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
-    custodialManager,
     pitLinking,
     crashLogger
 ) {
 
     override val asset = CryptoCurrency.PAX
 
-    override fun initToken(): Completable =
-        paxAccount.fetchErc20Address().ignoreElements()
-
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(listOf(getNonCustodialPaxAccount()))
 
-    private fun getNonCustodialPaxAccount(): CryptoSingleAccount {
+    private fun getNonCustodialPaxAccount(): CryptoAccount {
         val paxAddress = paxAccount.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No ether wallet found")
 
-        val label = stringUtils.getString(R.string.pax_default_account_label_1)
-
-        return PaxCryptoWalletAccount(label, paxAddress, paxAccount, exchangeRates)
+        return PaxCryptoWalletAccount(
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX), paxAddress, erc20Account,
+            exchangeRates)
     }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
-        null
+        if (isValidAddress(address)) {
+            PaxAddress(address)
+        } else {
+            null
+        }
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)

@@ -18,8 +18,8 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_account.view.*
 import kotlinx.android.synthetic.main.view_account_list.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.SingleAccountList
 
 class AccountList @JvmOverloads constructor(
     ctx: Context,
@@ -35,11 +35,10 @@ class AccountList @JvmOverloads constructor(
             .inflate(R.layout.view_account_list, this, true)
     }
 
-    fun initialise(source: Single<CryptoSingleAccountList>) {
+    fun initialise(source: Single<SingleAccountList>) {
 
         with(list) {
-            val itemList = mutableListOf<CryptoAccount>()
-
+            val itemList = mutableListOf<BlockchainAccount>()
             addItemDecoration(
                 DividerItemDecoration(
                     context,
@@ -74,16 +73,14 @@ class AccountList @JvmOverloads constructor(
     }
 
     var onLoadError: (Throwable) -> Unit = {}
-    var onAccountSelected: (CryptoAccount) -> Unit = {}
+    var onAccountSelected: (BlockchainAccount) -> Unit = {}
     var onEmptyList: () -> Unit = {}
 }
 
 private class Adapter(
-    private val itemsList: MutableList<CryptoAccount> = mutableListOf(),
-    private val onAccountSelected: (CryptoAccount) -> Unit
+    private val itemsList: MutableList<BlockchainAccount> = mutableListOf(),
+    private val onAccountSelected: (BlockchainAccount) -> Unit
 ) : RecyclerView.Adapter<ViewHolder>() {
-
-    private val disposables = CompositeDisposable()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -111,8 +108,8 @@ private class ViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        item: CryptoAccount,
-        onItemClicked: (CryptoAccount) -> Unit
+        item: BlockchainAccount,
+        onItemClicked: (BlockchainAccount) -> Unit
     ) {
         itemView.setOnClickListener { onItemClicked(item) }
         itemView.details.account = item

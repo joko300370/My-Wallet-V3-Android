@@ -751,7 +751,7 @@ class XlmDataManagerSendTransactionTest {
     fun `can send from a specific account`() {
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toLong()
+            on { fee } `it returns` 101.stroops().toBigInteger().toLong()
         }
         val horizonProxy: HorizonProxy = mock {
             on {
@@ -827,7 +827,7 @@ class XlmDataManagerSendTransactionTest {
     fun `can dry run send from a specific account`() {
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 1000.stroops().amount.toLong()
+            on { fee } `it returns` 1000.stroops().toBigInteger().toLong()
         }
         val horizonProxy: HorizonProxy = mock {
             on {
@@ -959,7 +959,7 @@ class XlmDataManagerSendWithMemoTest {
         val memoText = org.stellar.sdk.Memo.text("Hi, this is the memo to add")
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toLong()
+            on { fee } `it returns` 101.stroops().toBigInteger().toLong()
             on { memo } `it returns` memoText
         }
         val horizonProxy: HorizonProxy = mock {
@@ -1006,7 +1006,7 @@ class XlmDataManagerSendWithMemoTest {
         val memoId = org.stellar.sdk.Memo.id(1234L)
         val transaction = mock<Transaction> {
             on { hash() } `it returns` byteArrayOf(0, 1, 2, 3, 255.toByte())
-            on { fee } `it returns` 101.stroops().amount.toLong()
+            on { fee } `it returns` 101.stroops().toBigInteger().toLong()
             on { memo } `it returns` memoId
         }
         val horizonProxy: HorizonProxy = mock {

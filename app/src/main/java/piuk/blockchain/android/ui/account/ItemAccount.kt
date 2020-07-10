@@ -4,7 +4,6 @@ import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 
 data class ItemAccount @JvmOverloads constructor(
     val label: String = "",
