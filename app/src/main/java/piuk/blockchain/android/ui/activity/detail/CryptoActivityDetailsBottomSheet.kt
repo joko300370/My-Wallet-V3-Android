@@ -22,7 +22,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
-class ActivityDetailsBottomSheet :
+class CryptoActivityDetailsBottomSheet :
     MviBottomSheet<ActivityDetailsModel, ActivityDetailsIntents, ActivityDetailState>() {
 
     interface Host : SlidingModalBottomDialog.Host {
@@ -269,8 +269,8 @@ class ActivityDetailsBottomSheet :
             cryptoCurrency: CryptoCurrency,
             txHash: String,
             isCustodial: Boolean
-        ): ActivityDetailsBottomSheet {
-            return ActivityDetailsBottomSheet().apply {
+        ): CryptoActivityDetailsBottomSheet {
+            return CryptoActivityDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                     putString(ARG_TRANSACTION_HASH, txHash)

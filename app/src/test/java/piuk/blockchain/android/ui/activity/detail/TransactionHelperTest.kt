@@ -132,7 +132,7 @@ class TransactionHelperTest {
                 "key1" to cryptoValBtc_1,
                 "key2" to cryptoValBtc_15
             ),
-            cryptoValue = 10.satoshi()
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -165,7 +165,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBtc_1
             ),
-            cryptoValue = 10.satoshi()
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -252,7 +252,7 @@ class TransactionHelperTest {
                 "key1" to cryptoValBch_1,
                 "key2" to cryptoValBch_15
             ),
-            cryptoValue = CryptoValue.bitcoinCashFromSatoshis(10)
+            value = CryptoValue.bitcoinCashFromSatoshis(10)
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -282,7 +282,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBch_1
             ),
-            cryptoValue = 10.satoshi()
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")

@@ -14,6 +14,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_simple_buy_bank_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.BankDetailField
 import piuk.blockchain.android.simplebuy.CopyFieldListener
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -102,8 +103,16 @@ class BankDetailsBottomSheet : SlidingModalBottomDialog() {
 
                 if (state.bankAccount != null) {
                     bank_details.initWithBankDetailsAndAmount(
-                        state.bankAccount.details,
-                        amount,
+                        state.bankAccount.details.map {
+                            BankDetailField(it.title, it.value, it.isCopyable)
+                        }.toMutableList().apply {
+                            add(BankDetailField(
+                                getString(R.string.simple_buy_amount_to_send),
+                                amount.toStringWithSymbol(),
+                                false
+                            )
+                            )
+                        },
                         copyListener
                     )
                 } else {
@@ -112,8 +121,16 @@ class BankDetailsBottomSheet : SlidingModalBottomDialog() {
                         .subscribeBy(
                             onSuccess = {
                                 bank_details.initWithBankDetailsAndAmount(
-                                    it.details,
-                                    amount,
+                                    it.details.map { bankDetails ->
+                                        BankDetailField(bankDetails.title, bankDetails.value, bankDetails.isCopyable)
+                                    }.toMutableList().apply {
+                                        add(
+                                            BankDetailField(getString(R.string.simple_buy_amount_to_send),
+                                                amount.toStringWithSymbol(),
+                                                false
+                                            )
+                                        )
+                                    },
                                     copyListener
                                 )
                             },

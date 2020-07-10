@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
@@ -10,6 +11,16 @@ import piuk.blockchain.androidcore.data.charts.PriceSeries
 import java.math.BigInteger
 
 sealed class DashboardIntent : MviIntent<DashboardState>
+
+class FiatBalanceUpdate(
+    private val balanceList: List<FiatValue>
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            fundsFiatBalances = FundsBalanceState(balanceList)
+        )
+    }
+}
 
 object RefreshAllIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
@@ -160,7 +171,8 @@ class ShowAssetDetails(
 }
 
 class ShowDashboardSheet(
-    private val dashboardSheet: DashboardSheet
+    private val dashboardSheet: DashboardSheet,
+    private val selectedFiatValue: FiatValue? = null
 ) : DashboardIntent() {
     override fun isValidFor(oldState: DashboardState): Boolean =
         dashboardSheet != DashboardSheet.CUSTODY_INTRO
@@ -169,7 +181,8 @@ class ShowDashboardSheet(
         // Custody sheet isn't displayed via this intent, so filter it out
         oldState.copy(
             showDashboardSheet = dashboardSheet,
-            showAssetSheetFor = null
+            showAssetSheetFor = null,
+            selectedFundsBalance = selectedFiatValue
         )
 }
 

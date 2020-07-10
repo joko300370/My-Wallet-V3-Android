@@ -28,7 +28,7 @@ internal class BchCryptoWalletAccount(
     private val networkParams: NetworkParameters
 ) : CryptoNonCustodialAccount(CryptoCurrency.BCH) {
 
-    private var hasFunds = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()

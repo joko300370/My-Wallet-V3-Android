@@ -6,11 +6,12 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
@@ -55,7 +56,8 @@ class ActivityDetailsInteractor(
                 )))
 
             if (custodialActivitySummaryItem.status == OrderState.AWAITING_FUNDS ||
-                custodialActivitySummaryItem.status == OrderState.PENDING_EXECUTION) {
+                custodialActivitySummaryItem.status == OrderState.PENDING_EXECUTION
+            ) {
                 list.add(CancelAction())
             }
             Single.just(list.toList())
@@ -87,6 +89,12 @@ class ActivityDetailsInteractor(
     ): CustodialActivitySummaryItem? =
         assetActivityRepository.findCachedItem(cryptoCurrency, txHash) as? CustodialActivitySummaryItem
 
+    fun getFiatActivityDetails(
+        currency: String,
+        txHash: String
+    ): FiatActivitySummaryItem? =
+        assetActivityRepository.findCachedItem(currency, txHash) as? FiatActivitySummaryItem
+
     fun getNonCustodialActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
@@ -112,7 +120,7 @@ class ActivityDetailsInteractor(
 
     private fun getTransactionsMapForFeeItems(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?
+        fiatValue: Money?
     ) = transactionInputOutputMapper.transformInputAndOutputs(item).map {
         getListOfItemsForFees(item, fiatValue, it)
     }.onErrorReturn {
@@ -121,10 +129,10 @@ class ActivityDetailsInteractor(
 
     private fun getListOfItemsForFees(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?,
+        fiatValue: Money?,
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
-        Amount(item.cryptoValue),
+        Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
         HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
@@ -144,7 +152,7 @@ class ActivityDetailsInteractor(
 
     private fun getTransactionsMapForReceivedItems(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?
+        fiatValue: Money?
     ) = transactionInputOutputMapper.transformInputAndOutputs(item).map {
         getListOfItemsForReceives(item, fiatValue, it)
     }.onErrorReturn {
@@ -153,10 +161,10 @@ class ActivityDetailsInteractor(
 
     private fun getListOfItemsForReceives(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?,
+        fiatValue: Money?,
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
-        Amount(item.cryptoValue),
+        Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
         HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
@@ -176,7 +184,7 @@ class ActivityDetailsInteractor(
 
     private fun getTransactionsMapForTransferItems(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?
+        fiatValue: Money?
     ) = transactionInputOutputMapper.transformInputAndOutputs(item).map {
         getListOfItemsForTransfers(item, fiatValue, it)
     }.onErrorReturn {
@@ -185,10 +193,10 @@ class ActivityDetailsInteractor(
 
     private fun getListOfItemsForTransfers(
         item: NonCustodialActivitySummaryItem,
-        fiatValue: FiatValue?,
+        fiatValue: Money?,
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
-        Amount(item.cryptoValue),
+        Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
         HistoricValue(fiatValue, item.direction),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
@@ -199,7 +207,7 @@ class ActivityDetailsInteractor(
 
     fun loadConfirmedSentItems(
         item: NonCustodialActivitySummaryItem
-    ) = item.fee.single(item.cryptoValue).flatMap { cryptoValue ->
+    ) = item.fee.single(item.value as? CryptoValue).flatMap { cryptoValue ->
         getTotalFiat(item, cryptoValue, currencyPrefs.selectedFiatCurrency)
     }.onErrorResumeNext {
         getTotalFiat(item, null, currencyPrefs.selectedFiatCurrency)
@@ -207,17 +215,17 @@ class ActivityDetailsInteractor(
 
     private fun getTotalFiat(
         item: NonCustodialActivitySummaryItem,
-        cryptoValue: CryptoValue?,
+        value: Money?,
         selectedFiatCurrency: String
     ) = item.totalFiatWhenExecuted(selectedFiatCurrency).flatMap { fiatValue ->
-        getTransactionsMapForConfirmedSentItems(cryptoValue, fiatValue, item)
+        getTransactionsMapForConfirmedSentItems(value, fiatValue, item)
     }.onErrorResumeNext {
-        getTransactionsMapForConfirmedSentItems(cryptoValue, null, item)
+        getTransactionsMapForConfirmedSentItems(value, null, item)
     }
 
     private fun getTransactionsMapForConfirmedSentItems(
-        cryptoValue: CryptoValue?,
-        fiatValue: FiatValue?,
+        cryptoValue: Money?,
+        fiatValue: Money?,
         item: NonCustodialActivitySummaryItem
     ) = transactionInputOutputMapper.transformInputAndOutputs(item)
         .map {
@@ -227,12 +235,12 @@ class ActivityDetailsInteractor(
         }
 
     private fun getListOfItemsForConfirmedSends(
-        cryptoValue: CryptoValue?,
-        fiatValue: FiatValue?,
+        cryptoValue: Money?,
+        fiatValue: Money?,
         item: NonCustodialActivitySummaryItem,
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
-        Amount(item.cryptoValue),
+        Amount(item.value),
         Fee(cryptoValue),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
         HistoricValue(fiatValue, item.direction),
@@ -264,7 +272,7 @@ class ActivityDetailsInteractor(
         cryptoValue: CryptoValue?,
         transactionInOutDetails: TransactionInOutDetails?
     ) = listOfNotNull(
-        Amount(item.cryptoValue),
+        Amount(item.value),
         Fee(cryptoValue),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
@@ -295,7 +303,7 @@ class ActivityDetailsInteractor(
                 relatedItem?.let {
                     FeeForTransaction(
                         item.direction,
-                        it.cryptoValue
+                        it.value
                     )
                 }
             }

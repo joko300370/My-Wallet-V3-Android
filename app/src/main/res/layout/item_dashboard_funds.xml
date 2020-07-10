@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    style="@style/DashboardCard"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/small_margin">
+
+    <piuk.blockchain.android.ui.customviews.FiatCurrencySymbolView
+        android:id="@+id/funds_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_vector_euro" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_title"
+        style="@style/Text.Standard.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        app:layout_constraintStart_toEndOf="@id/funds_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Pounds" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_fiat_ticker"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/funds_title"
+        app:layout_constraintTop_toBottomOf="@id/funds_title"
+        tools:text="GBP" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_balance"
+        style="@style/Text.Standard.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/funds_balance_other_fiat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="£123.45" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/funds_balance_other_fiat"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/funds_balance"
+        tools:visibility="visible"
+        tools:text="$123.45" />
+</androidx.constraintlayout.widget.ConstraintLayout>

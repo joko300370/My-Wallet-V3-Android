@@ -34,13 +34,12 @@ class SimpleBuyModelTest {
     private lateinit var model: SimpleBuyModel
     private val defaultState = SimpleBuyState(
         selectedCryptoCurrency = CryptoCurrency.BTC,
-        enteredAmount = "12.22",
+        amount = FiatValue.fromMinor("USD", 1000),
         fiatCurrency = "USD",
         selectedPaymentMethod = SelectedPaymentMethod(
             id = "123-321",
             paymentMethodType = PaymentMethodType.PAYMENT_CARD
-        )
-    )
+        ))
     private val gson = Gson()
     private val interactor: SimpleBuyInteractor = mock()
     private val prefs: SimpleBuyPrefs = mock {
@@ -175,7 +174,7 @@ class SimpleBuyModelTest {
             ))
 
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.MakeCardPayment("testId"))
+        model.process(SimpleBuyIntent.MakePayment("testId"))
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(isLoading = true))
@@ -188,7 +187,7 @@ class SimpleBuyModelTest {
     }
 
     @Test
-    fun `predefined shoulb be filtered properly based on the buy limits`() {
+    fun `predefined should be filtered properly based on the buy limits`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
             .thenReturn(Single.just(
                 SimpleBuyPairs(listOf(

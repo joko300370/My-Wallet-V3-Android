@@ -12,15 +12,12 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class RemoveCardBottomSheet : SlidingModalBottomDialog() {
-
-    interface Host : SlidingModalBottomDialog.Host {
-        fun onCardRemoved(cardId: String)
-    }
 
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
@@ -48,7 +45,7 @@ class RemoveCardBottomSheet : SlidingModalBottomDialog() {
                         updateUi(false)
                     }
                     .subscribeBy(onComplete = {
-                        (parentFragment as? Host)?.onCardRemoved(card.cardId)
+                        (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onCardRemoved(card.cardId)
                         dismiss()
                         analytics.logEvent(SimpleBuyAnalytics.REMOVE_CARD)
                     }, onError = {})
