@@ -1,5 +1,6 @@
 package com.blockchain.swap.common.exchange.mvi
 
+import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
 import info.blockchain.balance.AccountReference
@@ -20,7 +21,7 @@ class ToggleFromToIntentTest {
                     upToDate(100.gbp())
                 ),
                 to = value(
-                    upToDate(CryptoValue.bitcoinCashFromMajor(25)),
+                    upToDate(25.bitcoinCash()),
                     upToDate(99.gbp())
                 )
             )
@@ -36,7 +37,7 @@ class ToggleFromToIntentTest {
                         upToDate(100.gbp())
                     ),
                     to = value(
-                        userEntered(CryptoValue.bitcoinCashFromMajor(25)),
+                        userEntered(25.bitcoinCash()),
                         upToDate(99.gbp())
                     )
                 )
@@ -55,7 +56,7 @@ class ToggleFromToIntentTest {
                     upToDate(100.gbp())
                 ),
                 to = value(
-                    upToDate(CryptoValue.bitcoinCashFromMajor(25)),
+                    upToDate(25.bitcoinCash()),
                     userEntered(99.gbp())
                 )
             )
@@ -71,7 +72,7 @@ class ToggleFromToIntentTest {
                         userEntered(100.gbp())
                     ),
                     to = value(
-                        upToDate(CryptoValue.bitcoinCashFromMajor(25)),
+                        upToDate(25.bitcoinCash()),
                         upToDate(99.gbp())
                     )
                 )
