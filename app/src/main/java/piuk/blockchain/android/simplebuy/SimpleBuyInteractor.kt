@@ -5,6 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.BillingAddress
 import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
@@ -40,6 +41,9 @@ class SimpleBuyInteractor(
         nabu.fetchNabuToken()
             .flatMap { custodialWalletManager.getBuyLimitsAndSupportedCryptoCurrencies(it, targetCurrency) }
             .trackLoading(appUtil.activityIndicator)
+
+    fun fetchTransactions(currency: String): Single<List<FiatTransaction>> =
+        custodialWalletManager.getTransactions(currency)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         nabu.fetchNabuToken()

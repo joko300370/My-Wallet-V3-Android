@@ -28,6 +28,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -251,6 +252,14 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         currency: String
     ): Single<List<Map<String, List<Long>>>> = service.getPredefinedAmounts(
+        sessionToken.authHeader,
+        currency
+    ).wrapErrorMessage()
+
+    internal fun getTransactions(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ): Single<TransactionsResponse> = service.getTransactions(
         sessionToken.authHeader,
         currency
     ).wrapErrorMessage()

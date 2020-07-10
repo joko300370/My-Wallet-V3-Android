@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -91,6 +92,10 @@ class AccountSelectSheet : SlidingModalBottomDialog() {
                         }
                     )
             }
+
+            itemList.addAll(coincore.assets.filterIsInstance<FiatAsset>().map {
+                it.accounts()
+            }.flatten())
         }
     }
 

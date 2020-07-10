@@ -39,6 +39,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -207,6 +208,13 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("currency") currency: String
     ): Single<List<Map<String, List<Long>>>>
+
+    @GET(NABU_SIMPLE_BUY_TRANSACTIONS)
+    fun getTransactions(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("product") product: String = "SIMPLEBUY"
+    ): Single<TransactionsResponse>
 
     @GET(NABU_SIMPLE_QUOTE)
     fun getSimpleBuyQuote(

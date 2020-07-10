@@ -63,6 +63,10 @@ interface CustodialWalletManager {
         currency: String
     ): Single<List<FiatValue>>
 
+    fun getTransactions(
+        currency: String
+    ): Single<List<FiatTransaction>>
+
     fun getBankAccountDetails(
         currency: String
     ): Single<BankAccount>
@@ -152,6 +156,22 @@ data class LinkedBank(
     val accountDotted: String by unsafeLazy {
         "•••• $account"
     }
+}
+
+data class FiatTransaction(
+    val amount: FiatValue,
+    val id: String,
+    val date: Date,
+    val type: TransactionType,
+    val state: TransactionState
+)
+
+enum class TransactionType {
+    DEPOSIT, WITHDRAWAL, UNKNOWN
+}
+
+enum class TransactionState {
+    COMPLETED, UNKNOWN
 }
 
 data class SimpleBuyPairs(val pairs: List<SimpleBuyPair>)

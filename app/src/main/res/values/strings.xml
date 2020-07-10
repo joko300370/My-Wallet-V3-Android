@@ -632,6 +632,8 @@
     <string name="tx_title_receive">Receive %1s</string>
     <string name="tx_title_sell">Sell %1s</string>
     <string name="tx_title_buy">Buy %1s</string>
+    <string name="tx_title_deposit">Deposit %1s</string>
+    <string name="tx_title_withdraw">Withdraw %1s</string>
     <string name="tx_title_swap">Swap %1s -> %2s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
@@ -1798,6 +1800,7 @@
 
     <!-- Fiat Funds -->
     <string name="fiat_funds_detail_deposit_title">Deposit</string>
+    <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
@@ -1827,6 +1830,7 @@
     <string name="algorand_announcement_title">Say Hello to Algorand!</string>
     <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
     <string name="algorand_announcement_action">Buy Algorand</string>
+    <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="tether_announcement_title">Say Hello to Tether!</string>
     <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>

@@ -4,12 +4,14 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
+import java.lang.IllegalStateException
 import java.math.RoundingMode
 
 /**
@@ -33,8 +35,10 @@ class ExchangeRateDataManager(
     override fun getLastPriceOfFiat(targetFiat: String, sourceFiat: String) =
         exchangeRateDataStore.getFiatLastPrice(targetFiat = targetFiat, sourceFiat = sourceFiat)
 
-    fun getHistoricPrice(value: CryptoValue, fiat: String, timeInSeconds: Long): Single<FiatValue> =
-        exchangeRateDataStore.getHistoricPrice(value.currency, fiat, timeInSeconds)
+    fun getHistoricPrice(value: Money, fiat: String, timeInSeconds: Long): Single<FiatValue> =
+        exchangeRateDataStore.getHistoricPrice(
+            (value as? CryptoValue)?.currency ?: throw IllegalStateException("Fiat is not supported"),
+            fiat, timeInSeconds)
             .map { FiatValue.fromMajor(fiat, it * value.toBigDecimal()) }
             .subscribeOn(Schedulers.io())
 

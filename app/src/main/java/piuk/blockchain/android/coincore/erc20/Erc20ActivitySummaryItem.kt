@@ -37,7 +37,7 @@ internal class Erc20ActivitySummaryItem(
 
     override val timeStampMs: Long = transfer.timestamp * 1000
 
-    override val cryptoValue: CryptoValue by unsafeLazy {
+    override val value: CryptoValue by unsafeLazy {
         CryptoValue.fromMinor(cryptoCurrency, transfer.value)
     }
 

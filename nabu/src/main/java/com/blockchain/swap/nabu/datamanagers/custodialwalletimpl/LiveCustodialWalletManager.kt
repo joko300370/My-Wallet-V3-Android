@@ -11,6 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.BuyOrderList
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
+import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
@@ -22,6 +23,8 @@ import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.TransactionState
+import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
@@ -33,12 +36,14 @@ import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
+import com.blockchain.swap.nabu.models.simplebuy.AmountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.TransactionResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.service.NabuService
@@ -54,8 +59,8 @@ import io.reactivex.rxkotlin.flatMapIterable
 import io.reactivex.rxkotlin.zipWith
 import okhttp3.internal.toLongOrDefault
 import java.math.BigDecimal
-import java.util.Calendar
 import java.util.Date
+import java.util.Calendar
 import java.util.UnknownFormatConversionException
 
 class LiveCustodialWalletManager(
@@ -151,6 +156,24 @@ class LiveCustodialWalletManager(
                 pair.pair.split("-")[1]
             }.distinct()
         }
+
+    override fun getTransactions(currency: String): Single<List<FiatTransaction>> =
+        authenticator.authenticate { token ->
+            nabuService.getTransactions(token, currency).map { response ->
+                response.items.map {
+                    FiatTransaction(
+                        id = it.id,
+                        amount = it.amount.toFiat(),
+                        date = it.insertedAt.fromIso8601ToUtc() ?: Date(),
+                        state = it.state.toTransactionState(),
+                        type = it.type.toTransactionType()
+                    )
+                }.filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
+            }
+        }
+
+    private fun AmountResponse.toFiat() =
+        FiatValue.fromMajor(symbol, value)
 
     override fun getPredefinedAmounts(currency: String): Single<List<FiatValue>> =
         authenticator.authenticate {
@@ -286,7 +309,7 @@ class LiveCustodialWalletManager(
                     id = beneficiary.id,
                     title = "${beneficiary.name} ${beneficiary.agent.account}",
                     // address is returned from the api as ****6810
-                    account = beneficiary.address.removePrefix("****"),
+                    account = beneficiary.address.replace("*", ""),
                     currency = beneficiary.currency
                 )
             }
@@ -535,6 +558,19 @@ class LiveCustodialWalletManager(
         )
     }
 }
+
+private fun String.toTransactionState(): TransactionState =
+    when (this) {
+        TransactionResponse.COMPLETE -> TransactionState.COMPLETED
+        else -> TransactionState.UNKNOWN
+    }
+
+private fun String.toTransactionType(): TransactionType =
+    when (this) {
+        TransactionResponse.DEPOSIT -> TransactionType.DEPOSIT
+        TransactionResponse.WITHDRAWAL -> TransactionType.WITHDRAWAL
+        else -> TransactionType.UNKNOWN
+    }
 
 private fun String.toSupportedPartner(): Partner =
     when (this) {

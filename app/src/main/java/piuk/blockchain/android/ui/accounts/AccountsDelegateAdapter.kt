@@ -26,6 +26,14 @@ class AccountsDelegateAdapter(
                 )
             )
             addAdapterDelegate(
+                FiatAccountDelegate(
+                    disposables = disposables,
+                    onAccountClicked = onAccountClicked,
+                    exchangeRates = exchangeRates,
+                    selectedFiatCurrency = currencyPrefs.selectedFiatCurrency
+                )
+            )
+            addAdapterDelegate(
                 AllWalletsAccountDelegate(
                     disposables,
                     exchangeRates,

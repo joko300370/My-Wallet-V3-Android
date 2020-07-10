@@ -31,7 +31,7 @@ class ActivityDetailsModelTest {
         override val cryptoCurrency: CryptoCurrency = mock(),
         override val txId: String = "123",
         override val timeStampMs: Long = 1L,
-        override val cryptoValue: CryptoValue = mock(),
+        override val value: CryptoValue = mock(),
         override val direction: TransactionSummary.Direction = TransactionSummary.Direction.SENT,
         override val fee: Observable<CryptoValue> = mock(),
         override val inputsMap: Map<String, CryptoValue> = mock(),
@@ -45,7 +45,7 @@ class ActivityDetailsModelTest {
         cryptoCurrency = mock(),
         txId = "123",
         timeStampMs = 1L,
-        cryptoValue = mock(),
+        value = CryptoValue.zero(CryptoCurrency.BTC),
         fundedFiat = mock(),
         status = OrderState.FINISHED,
         fee = mock(),
@@ -100,7 +100,7 @@ class ActivityDetailsModelTest {
         testObserver.assertValueAt(0, state)
         testObserver.assertValueAt(1, state.copy(
             direction = item.direction,
-            amount = item.cryptoValue,
+            amount = item.value,
             isPending = item.isPending,
             isFeeTransaction = item.isFeeTransaction,
             confirmations = item.confirmations,
@@ -116,7 +116,7 @@ class ActivityDetailsModelTest {
         testObserver.assertValueAt(0, state)
         testObserver.assertValueAt(1, state.copy(
             direction = TransactionSummary.Direction.BUY,
-            amount = custodialItem.cryptoValue,
+            amount = custodialItem.value as CryptoValue,
             isPending = false,
             isFeeTransaction = false,
             confirmations = 0,

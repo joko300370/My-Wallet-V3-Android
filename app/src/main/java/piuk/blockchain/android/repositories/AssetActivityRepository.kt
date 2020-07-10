@@ -11,6 +11,8 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
+import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
@@ -51,8 +53,13 @@ class AssetActivityRepository(
     }
 
     fun findCachedItem(cryptoCurrency: CryptoCurrency, txHash: String): ActivitySummaryItem? =
-        transactionCache.find {
+        transactionCache.filterIsInstance<CryptoActivitySummaryItem>().find {
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
+        }
+
+    fun findCachedItem(currency: String, txHash: String): FiatActivitySummaryItem? =
+        transactionCache.filterIsInstance<FiatActivitySummaryItem>().find {
+            it.currency == currency && it.txId == txHash
         }
 
     fun findCachedItemById(txHash: String): ActivitySummaryItem? =

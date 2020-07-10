@@ -187,7 +187,7 @@ class SimpleBuyModelTest {
     }
 
     @Test
-    fun `predefined shoulb be filtered properly based on the buy limits`() {
+    fun `predefined should be filtered properly based on the buy limits`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
             .thenReturn(Single.just(
                 SimpleBuyPairs(listOf(
