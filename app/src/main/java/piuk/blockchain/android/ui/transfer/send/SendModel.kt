@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.compareTo
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -26,6 +27,11 @@ enum class SendStep {
     SEND_COMPLETE
 }
 
+enum class SendErrorState {
+    MAX_EXCEEDED,
+    MIN_REQUIRED
+}
+
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoSingleAccount = NullAccount,
@@ -34,7 +40,8 @@ data class SendState(
     val availableBalance: CryptoValue = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
-    val nextEnabled: Boolean = false
+    val nextEnabled: Boolean = false,
+    val errorState: SendErrorState? = null
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?
@@ -67,6 +74,8 @@ class SendModel(
             is SendIntent.UpdateTransactionAmounts -> null
             is SendIntent.UpdateTransactionComplete -> null
             is SendIntent.ReturnToPreviousStep -> null
+            is SendIntent.MaxAmountExceeded -> null
+            is SendIntent.MinRequired -> null
         }
     }
 
@@ -94,9 +103,9 @@ class SendModel(
             )
 
     private fun processAddressConfirmation(state: SendState): Disposable =
-        // At this point we can build a transactor object from coincore and configure
-        // the state object a bit more; depending on whether it's an internal, external,
-        // bitpay or BTC Url address we can set things like note, amount, fee schedule
+    // At this point we can build a transactor object from coincore and configure
+    // the state object a bit more; depending on whether it's an internal, external,
+    // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
         interactor.initialiseTransaction(state.sendingAccount, state.targetAddress)
             .thenSingle {
@@ -116,13 +125,19 @@ class SendModel(
                 }
             )
 
-        private fun processAmountChanged(amount: CryptoValue, state: SendState): Disposable =
-            interactor.getAvailableBalance(
-                PendingSendTx(amount)
-            )
+    private fun processAmountChanged(amount: CryptoValue, state: SendState): Disposable =
+        interactor.getAvailableBalance(
+            PendingSendTx(amount)
+        )
             .subscribeBy(
                 onSuccess = {
-                    process(SendIntent.UpdateTransactionAmounts(amount, it))
+                    if (amount > it) {
+                        process(SendIntent.MaxAmountExceeded)
+                    } else if (!amount.isPositive) {
+                        process(SendIntent.MinRequired)
+                    } else {
+                        process(SendIntent.UpdateTransactionAmounts(amount, it))
+                    }
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get update available balance")

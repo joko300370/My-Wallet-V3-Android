@@ -1,10 +1,8 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.blockchain.koin.scopedInject
@@ -17,6 +15,7 @@ import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
+import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -83,6 +82,14 @@ class EnterAmountSheet : SendInputSheet() {
                     Timber.e("--- error getting sendingaccount balance $it")
                 }
             )
+
+            newState.errorState?.let {
+                val error = when(it) {
+                    SendErrorState.MAX_EXCEEDED -> "Can't send more than you have"
+                    SendErrorState.MIN_REQUIRED -> "Can't send 0 or negative amount"
+                }
+                amount_sheet_input.showError(error)
+            }
         }
 
         state = newState
@@ -100,9 +107,9 @@ class EnterAmountSheet : SendInputSheet() {
             amount_sheet_input.requestFocus()
         }
 
-        val imm =
+       /* val imm =
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)*/
     }
 
     private val amountTextWatcher = object : AfterTextChangedWatcher() {

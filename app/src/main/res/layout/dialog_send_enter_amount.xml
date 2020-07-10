@@ -52,12 +52,23 @@
         tools:text="From: Loaded account" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/amount_sheet_asset_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/amount_sheet_asset_direction"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:translationX="-4dp"
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
+        android:background="@drawable/bkgd_tx_circle"
+        app:srcCompat="@drawable/ic_tx_sent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/amount_sheet_asset_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
+        app:layout_constraintEnd_toStartOf="@id/amount_sheet_asset_direction"
         app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
         tools:src="@drawable/vector_bitcoin_colored" />
 
