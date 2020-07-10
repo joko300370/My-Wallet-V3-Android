@@ -32,9 +32,9 @@ class CryptoCurrencyFormatterTest {
     @Test
     fun `format Ether from Crypto Value`() {
         CryptoValue.ZeroEth.format(locale) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(locale) `should equal` "1.0"
-        CryptoValue.etherFromMajor(10_000).format(locale) `should equal` "10,000.0"
-        CryptoValue.etherFromMajor(100_000_000).format(locale) `should equal` "100,000,000.0"
+        1.ether().format(locale) `should equal` "1.0"
+        10_000.ether().format(locale) `should equal` "10,000.0"
+        100_000_000.ether().format(locale) `should equal` "100,000,000.0"
     }
 
     @Test
@@ -97,9 +97,9 @@ class CryptoCurrencyFormatterTest {
 
     @Test
     fun `formatWithUnit ETH`() {
-        CryptoValue.etherFromMajor(1).formatWithUnit(locale) `should equal` "1.0 ETH"
-        CryptoValue.etherFromMajor(10_000).formatWithUnit(locale) `should equal` "10,000.0 ETH"
-        CryptoValue.etherFromMajor(1_000_000_000).formatWithUnit(locale) `should equal` "1,000,000,000.0 ETH"
+        1.ether().formatWithUnit(locale) `should equal` "1.0 ETH"
+        10_000.ether().formatWithUnit(locale) `should equal` "10,000.0 ETH"
+        1_000_000_000.ether().formatWithUnit(locale) `should equal` "1,000,000,000.0 ETH"
     }
 
     @Test
@@ -175,17 +175,17 @@ class CryptoCurrencyFormatterTest {
     @Test
     fun `format in another locale`() {
         CryptoValue.ZeroEth.format(Locale.FRANCE) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(Locale.FRANCE) `should equal` "1,0"
-        CryptoValue.etherFromMajor(10_000).format(Locale.FRANCE) `should equal` "10\u00a0000,0"
-        CryptoValue.etherFromMajor(100_000_000).format(Locale.FRANCE) `should equal` "100\u00a0000\u00a0000,0"
+        1.ether().format(Locale.FRANCE) `should equal` "1,0"
+        10_000.ether().format(Locale.FRANCE) `should equal` "10\u00a0000,0"
+        100_000_000.ether().format(Locale.FRANCE) `should equal` "100\u00a0000\u00a0000,0"
     }
 
     @Test
     fun `format in another locale, forced to another`() {
         CryptoValue.ZeroEth.format(locale = Locale.US) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(locale = Locale.US) `should equal` "1.0"
-        CryptoValue.etherFromMajor(10_000).format(locale = Locale.US) `should equal` "10,000.0"
-        CryptoValue.etherFromMajor(100_000_000).format(locale = Locale.US) `should equal` "100,000,000.0"
+        1.ether().format(locale = Locale.US) `should equal` "1.0"
+        10_000.ether().format(locale = Locale.US) `should equal` "10,000.0"
+        100_000_000.ether().format(locale = Locale.US) `should equal` "100,000,000.0"
     }
 
     private fun Long.formatWeiWithUnit() =

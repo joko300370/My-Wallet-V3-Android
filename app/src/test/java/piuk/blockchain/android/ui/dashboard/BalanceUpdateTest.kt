@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import org.junit.Test
@@ -72,7 +73,7 @@ class BalanceUpdateTest {
 
         val subject = BalanceUpdate(
             CryptoCurrency.ETHER,
-            CryptoValue.etherFromMajor(1)
+            1.ether()
         )
 
         val result = subject.reduce(initialState)

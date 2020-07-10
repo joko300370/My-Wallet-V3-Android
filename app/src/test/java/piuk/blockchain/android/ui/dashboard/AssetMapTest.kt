@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -43,7 +44,7 @@ class AssetMapTest {
 
     @Test
     fun `copy with patchBalance works as expected`() {
-        val newBalance = CryptoValue.etherFromMajor(20)
+        val newBalance = 20.ether()
 
         val copy = subject.copy(patchBalance = newBalance)
 

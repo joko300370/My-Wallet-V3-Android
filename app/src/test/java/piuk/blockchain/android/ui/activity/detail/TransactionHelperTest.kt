@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
+import com.blockchain.testutils.satoshi
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -19,8 +20,8 @@ class TransactionHelperTest {
     private val bchDataManager: BchDataManager = mock()
     private val payload: Wallet = mock()
 
-    private val cryptoValBtc_1 = CryptoValue.bitcoinFromSatoshis(1)
-    private val cryptoValBtc_15 = CryptoValue.bitcoinFromSatoshis(15)
+    private val cryptoValBtc_1 = 1.satoshi()
+    private val cryptoValBtc_15 = 15.satoshi()
     private val cryptoValBch_1 = CryptoValue.bitcoinCashFromSatoshis(1)
     private val cryptoValBch_15 = CryptoValue.bitcoinCashFromSatoshis(15)
 
@@ -131,7 +132,7 @@ class TransactionHelperTest {
                 "key1" to cryptoValBtc_1,
                 "key2" to cryptoValBtc_15
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            cryptoValue = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -164,7 +165,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBtc_1
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            cryptoValue = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -281,7 +282,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBch_1
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            cryptoValue = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")

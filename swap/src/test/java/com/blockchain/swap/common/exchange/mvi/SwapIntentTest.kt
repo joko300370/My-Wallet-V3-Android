@@ -1,5 +1,6 @@
 package com.blockchain.swap.common.exchange.mvi
 
+import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -19,7 +20,7 @@ class SwapIntentTest {
                     "xbub123"
                 ),
                 from = value(
-                    userEntered(CryptoValue.etherFromMajor(10)),
+                    userEntered(10.ether()),
                     upToDate(100.gbp())
                 ),
                 to = value(
