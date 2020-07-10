@@ -71,7 +71,7 @@ class PitLinkingImpl(
 
     private fun NabuUser.toLinkingState(): PitLinkingState {
         return PitLinkingState(
-            isLinked = settings != null,
+            isLinked = products.exchange,
             emailVerified = emailVerified,
             email = email
         )

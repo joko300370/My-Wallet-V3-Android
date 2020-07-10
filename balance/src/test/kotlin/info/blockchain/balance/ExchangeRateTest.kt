@@ -33,7 +33,7 @@ class ExchangeRateTest {
     @Test(expected = IllegalArgumentException::class)
     fun `crypto to fiat - from miss match`() {
         ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal())
-            .applyRate(CryptoValue.etherFromMajor(10))
+            .applyRate(10.ether())
     }
 
     @Test(expected = IllegalArgumentException::class)

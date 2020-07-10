@@ -19,6 +19,7 @@ data class NabuUser(
     val address: Address?,
     val state: UserState,
     val kycState: KycState,
+    val products: ProductsUsed = ProductsUsed(),
     val resubmission: Any? = null,
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
@@ -28,7 +29,6 @@ data class NabuUser(
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
     val updatedAt: String? = null,
-    val settings: NabuSettings? = null,
     val tags: Map<String, Map<String, String>>? = null,
     val userName: String? = null,
     val tiers: TierLevels? = null,
@@ -203,3 +203,7 @@ class UserStateAdapter {
         private const val BLOCKED = "BLOCKED"
     }
 }
+
+data class ProductsUsed(
+    val exchange: Boolean = false
+)
