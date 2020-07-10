@@ -1772,4 +1772,6 @@
     <string name="algorand_announcement_title">Say Hello to Algorand!</string>
     <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
     <string name="algorand_announcement_action">Buy Algorand</string>
+    <string name="send_enter_amount_from">From: %1$s</string>
+    <string name="send_enter_amount_to">To: %1$s</string>
 </resources>

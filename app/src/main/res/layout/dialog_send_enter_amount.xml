@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/amount_sheet_indicator"
         android:layout_width="wrap_content"
@@ -86,6 +85,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_separator" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -97,6 +98,7 @@
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="Amount to send:"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_input" />
@@ -105,6 +107,7 @@
         android:id="@+id/enter_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
@@ -113,6 +116,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_block"
         tools:text="0.001 BTC" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/max_available_label"
+        style="@style/Text.Light.12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:text="Available"
+        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintEnd_toStartOf="@+id/use_max"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/enter_amount" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/max_available"
@@ -136,13 +153,12 @@
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="Use Max"
+        android:text="Send Max"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/max_available"
         app:layout_constraintTop_toBottomOf="@id/enter_amount" />
 
-    error_msg
 
     <Button
         android:id="@+id/cta_button"
