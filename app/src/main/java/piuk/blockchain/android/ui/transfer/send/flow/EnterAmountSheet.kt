@@ -30,7 +30,6 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import timber.log.Timber
 
-
 class EnterAmountSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 
@@ -64,7 +63,7 @@ class EnterAmountSheet : SendInputSheet() {
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
-            //max_available.text = newState.availableBalance.toStringWithSymbol()
+            // max_available.text = newState.availableBalance.toStringWithSymbol()
             if (!amount_sheet_input.isConfigured) {
                 amount_sheet_input.configuration = FiatCryptoViewConfiguration(
                     input = CurrencyType.Crypto,
@@ -131,7 +130,6 @@ class EnterAmountSheet : SendInputSheet() {
             requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(enter_amount, InputMethodManager.SHOW_IMPLICIT)
     }
-
 
     private fun onUseMaxClick() {
         amount_sheet_input.showAmount(state.availableBalance)
