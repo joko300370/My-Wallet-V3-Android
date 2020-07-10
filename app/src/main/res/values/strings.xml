@@ -1784,5 +1784,8 @@
 
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
+    <string name="send_enter_amount_title">Amount</string>
+    <string name="send_enter_amount_available">Available</string>
+    <string name="send_enter_amount_max">Send Max</string>
 
 </resources>

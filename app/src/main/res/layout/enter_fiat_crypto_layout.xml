@@ -13,10 +13,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:gravity="center"
+        android:focusable="true"
         android:inputType="numberDecimal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/transparent"
         tools:text="$1241" />
 
     <androidx.appcompat.widget.AppCompatTextView

@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.customviews
 import android.content.Context
 import android.text.Editable
 import android.util.AttributeSet
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -152,6 +153,10 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             it.isEnabled = true
             it.alpha = 1f
         }
+    }
+
+    fun showAmount(money: Money) {
+        enter_amount.setText(money.toStringWithoutSymbol(), TextView.BufferType.EDITABLE)
     }
 
     private fun updateFilters(prefixOrSuffix: String) {
