@@ -15,7 +15,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.*
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
-import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
@@ -45,16 +44,14 @@ class EnterAmountSheet : SendInputSheet() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        compositeDisposable += dialogView.amount_sheet_input.amount.subscribe {
+        compositeDisposable += amount_sheet_input.amount.subscribe {
+            Timber.e("---- setting money $it")
             when (it) {
                 is FiatValue -> model.process(SendIntent.SendAmountChanged(
                     it.toCrypto(exchangeRateDataManager, state.sendingAccount.asset)))
                 else -> model.process(SendIntent.SendAmountChanged(it as CryptoValue))
             }
         }
-
-        dialogView.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(R.id.enter_amount)
-            .requestFocus()
     }
 
     override fun render(newState: SendState) {
@@ -63,7 +60,6 @@ class EnterAmountSheet : SendInputSheet() {
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
-            // max_available.text = newState.availableBalance.toStringWithSymbol()
             if (!amount_sheet_input.isConfigured) {
                 amount_sheet_input.configuration = FiatCryptoViewConfiguration(
                     input = CurrencyType.Crypto,
@@ -116,19 +112,13 @@ class EnterAmountSheet : SendInputSheet() {
             amount_sheet_back.setOnClickListener {
                 model.process(SendIntent.ReturnToPreviousStep)
             }
-
-            /*for(i in 0..amount_sheet_input.childCount) {
-                if(amount_sheet_input.getChildAt(i).id == R.id.enter_amount) {
-                    amount_sheet_input.getChildAt(i).requestFocus()
-                }
-            }
-            amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(R.id.enter_amount)
-                .requestFocus()*/
         }
 
-        val imm =
-            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(enter_amount, InputMethodManager.SHOW_IMPLICIT)
+        val inputView = dialogView.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(R.id.enter_amount)
+        inputView.requestFocus()
+
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun onUseMaxClick() {

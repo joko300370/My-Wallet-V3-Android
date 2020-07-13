@@ -105,6 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
+        android:descendantFocusability="afterDescendants"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_max_available_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -123,14 +124,16 @@
         app:layout_constraintEnd_toStartOf="@+id/amount_sheet_use_max"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_input" />
+        app:layout_constraintTop_toTopOf="@id/amount_sheet_max_available" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/amount_sheet_max_available"
         style="@style/Text.Standard.12"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
+        android:layout_marginEnd="@dimen/tiny_margin"
+        android:ellipsize="end"
+        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_use_max"
         app:layout_constraintEnd_toStartOf="@+id/amount_sheet_use_max"
         app:layout_constraintStart_toStartOf="@id/amount_sheet_max_available_label"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_max_available_label"
@@ -144,11 +147,13 @@
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/very_small_margin"
         android:text="@string/send_enter_amount_max"
-        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_max_available"
+        app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/amount_sheet_max_available"
-        app:layout_constraintTop_toTopOf="@id/amount_sheet_max_available_label" />
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_input"
+        app:layout_constraintVertical_bias="1" />
 
     <Button
         android:id="@+id/amount_sheet_cta_button"
@@ -160,6 +165,7 @@
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
