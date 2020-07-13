@@ -1,8 +1,9 @@
-package piuk.blockchain.android.ui.customviews
+package piuk.blockchain.android.ui.customviews.account
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -11,21 +12,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.util.setCoinIcon
-import kotlinx.android.synthetic.main.dialog_account_selector_item.view.*
+import kotlinx.android.synthetic.main.view_account_group_overview.view.*
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NullAccount
-import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
-class CryptoAccountInfo @JvmOverloads constructor(
+class AccountInfoGroup @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
@@ -37,50 +33,43 @@ class CryptoAccountInfo @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context)
-            .inflate(R.layout.view_crypto_account_overview, this, true)
+            .inflate(R.layout.view_account_group_overview, this, true)
     }
 
-    var account: CryptoAccount = NullAccount
+    var account: AccountGroup? = null
         set(value) {
             field = value
-            updateView(value)
+            updateView(value!!)
         }
 
-    private fun updateView(account: CryptoAccount) {
+    private fun updateView(account: AccountGroup) {
+        // Only supports AllWallets at this time
+        require(account is AllWalletsAccount)
+
         disposables.clear()
 
-        val crypto = account.asset
-        icon.setCoinIcon(crypto)
-        asset_spend_locked.goneIf(account.isCustodial().not())
+        val currency = currencyPrefs.selectedFiatCurrency
+        icon.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_blue))
+
         wallet_name.text = account.label
 
+        asset_name.text = context.getString(R.string.activity_wallet_total_balance)
 
-        icon.visible()
-
-        asset_name.setText(crypto.assetName())
-
-        wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
+        wallet_currency.text = currency
 
-        disposables += account.balance
+        disposables += account.fiatBalance(currency, exchangeRates)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {
-                    wallet_balance_crypto.text = it.toStringWithSymbol()
-                    wallet_balance_fiat.text =
-                        it.toFiat(
-                            exchangeRates,
-                            currencyPrefs.selectedFiatCurrency
-                        ).toStringWithSymbol()
-
-                    wallet_balance_crypto.visible()
+                    onSuccess = {
+                    wallet_balance_fiat.text = it.toStringWithSymbol()
                     wallet_balance_fiat.visible()
                 },
                 onError = {
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
-        }
+    }
 
     override fun onDetachedFromWindow() {
         disposables.clear()
