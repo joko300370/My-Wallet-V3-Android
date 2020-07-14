@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:descendantFocusability="afterDescendants">
+    android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/amount_sheet_indicator"
@@ -105,7 +104,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
-        android:descendantFocusability="afterDescendants"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_max_available_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +126,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/amount_sheet_max_available"
-        style="@style/Text.Standard.12"
+        style="@style/Text.Semibold.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/tiny_margin"
@@ -141,7 +139,7 @@
 
     <Button
         android:id="@+id/amount_sheet_use_max"
-        style="@style/CtaButton.White"
+        style="@style/CtaButton.White.Slim"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
@@ -149,6 +147,7 @@
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/very_small_margin"
         android:text="@string/send_enter_amount_max"
+        android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/amount_sheet_max_available"

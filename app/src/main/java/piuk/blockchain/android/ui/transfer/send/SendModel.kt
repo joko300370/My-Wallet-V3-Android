@@ -133,7 +133,7 @@ class SendModel(
                 onSuccess = {
                     if (amount > it) {
                         process(SendIntent.MaxAmountExceeded)
-                    } else if (!amount.isPositive) {
+                    } else if (!amount.isPositive && !amount.isZero) {
                         process(SendIntent.MinRequired)
                     } else {
                         process(SendIntent.UpdateTransactionAmounts(amount, it))

@@ -1,7 +1,9 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
@@ -12,8 +14,6 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_send_enter_amount.*
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.CurrencyType
@@ -42,18 +42,7 @@ class EnterAmountSheet : SendInputSheet() {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        compositeDisposable += amount_sheet_input.amount.subscribe {
-            Timber.e("---- setting money $it")
-            when (it) {
-                is FiatValue -> model.process(SendIntent.SendAmountChanged(
-                    it.toCrypto(exchangeRateDataManager, state.sendingAccount.asset)))
-                else -> model.process(SendIntent.SendAmountChanged(it as CryptoValue))
-            }
-        }
-    }
-
+    @SuppressLint("SetTextI18n")
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! EnterAmountSheet")
 
@@ -68,18 +57,15 @@ class EnterAmountSheet : SendInputSheet() {
                     cryptoCurrency = newState.sendingAccount.asset,
                     predefinedAmount = FiatValue.zero(currencyPrefs.selectedFiatCurrency)
                 )
+            }
 
-                amount_sheet_input.hideError()
+            if (newState.availableBalance.isPositive) {
+                amount_sheet_input.maxLimit = newState.availableBalance
 
-                compositeDisposable += newState.sendingAccount.balance.subscribeBy(
-                    onSuccess = {
-                        Timber.e("---- max limit set $it")
-                        amount_sheet_input.maxLimit = it
-                    },
-                    onError = {
-                        Timber.e("--- error getting sendingaccount balance $it")
-                    }
-                )
+                amount_sheet_max_available.text =
+                    "${newState.availableBalance.toFiat(exchangeRateDataManager,
+                        currencyPrefs.selectedFiatCurrency)
+                        .toStringWithSymbol()} (${newState.availableBalance.toStringWithSymbol()})"
             }
 
             amount_sheet_asset_icon.setImageDrawable(ContextCompat.getDrawable(context,
@@ -91,15 +77,13 @@ class EnterAmountSheet : SendInputSheet() {
             amount_sheet_to.text =
                 getString(R.string.send_enter_amount_to, newState.targetAddress.label)
 
-            amount_sheet_max_available.text = newState.availableBalance.toStringWithSymbol()
-
             newState.errorState?.let {
                 val error = when (it) {
                     SendErrorState.MAX_EXCEEDED -> "Can't send more than you have"
-                    SendErrorState.MIN_REQUIRED -> "Can't send 0 or negative amount"
+                    SendErrorState.MIN_REQUIRED -> "Can't send a negative amount"
                 }
                 amount_sheet_input.showError(error)
-            }
+            } ?: dialogView.amount_sheet_input.hideError()
         }
 
         state = newState
@@ -114,37 +98,36 @@ class EnterAmountSheet : SendInputSheet() {
             }
         }
 
-        val inputView = dialogView.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(R.id.enter_amount)
-        inputView.requestFocus()
+        // TODO: kill this before shipping, we need to find a better way of showing the keyboard
+        // TODO: tried a ViewTreeObserver - View.post {} - onViewCreated
+        Handler().postDelayed({
+             val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
+                 R.id.enter_amount)
+             inputView?.let {
+                 inputView.requestFocus()
+                 val imm = requireContext().getSystemService(
+                     Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                 imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
+             }
+         }, 200)
 
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
+        compositeDisposable += view.amount_sheet_input.amount.subscribe {
+            when (it) {
+                is FiatValue -> model.process(SendIntent.SendAmountChanged(
+                    it.toCrypto(exchangeRateDataManager, state.sendingAccount.asset)))
+                else -> model.process(SendIntent.SendAmountChanged(it as CryptoValue))
+            }
+        }
     }
 
     private fun onUseMaxClick() {
-        amount_sheet_input.showAmount(state.availableBalance)
-        // dialogView.enter_amount.setText(state.availableBalance.toStringWithoutSymbol())
+        dialogView.amount_sheet_input.showValue(state.availableBalance)
     }
 
-    private fun onCtaClick() =
-        model.process(SendIntent.PrepareTransaction)
+    private fun onCtaClick() = model.process(SendIntent.PrepareTransaction)
 
     companion object {
         fun newInstance(): EnterAmountSheet =
             EnterAmountSheet()
     }
 }
-
-/*
-private fun textToCryptoValue(text: String, ccy: CryptoCurrency): CryptoValue {
-    if (text.isEmpty()) return CryptoValue.zero(ccy)
-
-    val decimalSeparator = DecimalFormatSymbols.getInstance().decimalSeparator.toString()
-
-    val amount = text.trim { it <= ' ' }
-        .replace(" ", "")
-        .replace(decimalSeparator, ".")
-
-    return CryptoValue.fromMajor(ccy, amount.toBigDecimal())
-}
-*/
