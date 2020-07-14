@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
 
     <piuk.blockchain.android.ui.customviews.account.FiatAccountInfo
-        android:id="@+id/item"
+        android:id="@+id/fiat_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

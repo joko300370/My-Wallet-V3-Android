@@ -17,10 +17,15 @@
         android:text="@string/select_account_sheet_title"
         tools:text="Select a Wallet" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/account_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/item_account_select_crypto"/>
+        android:layout_height="match_parent"/>
+
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/account_list"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        tools:listitem="@layout/item_account_select_crypto"/>-->
 
 </LinearLayout>
