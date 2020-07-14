@@ -79,8 +79,10 @@ class EnterAmountSheet : SendInputSheet() {
 
             newState.errorState?.let {
                 val error = when (it) {
-                    SendErrorState.MAX_EXCEEDED -> "Can't send more than you have"
-                    SendErrorState.MIN_REQUIRED -> "Can't send a negative amount"
+                    SendErrorState.MAX_EXCEEDED -> getString(R.string.send_enter_amount_error_max,
+                        newState.sendingAccount.asset.networkTicker)
+                    SendErrorState.MIN_REQUIRED -> getString(R.string.send_enter_amount_error_min,
+                        newState.sendingAccount.asset.networkTicker)
                 }
                 amount_sheet_input.showError(error)
             } ?: dialogView.amount_sheet_input.hideError()
@@ -101,15 +103,15 @@ class EnterAmountSheet : SendInputSheet() {
         // TODO: kill this before shipping, we need to find a better way of showing the keyboard
         // TODO: tried a ViewTreeObserver - View.post {} - onViewCreated
         Handler().postDelayed({
-             val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
-                 R.id.enter_amount)
-             inputView?.let {
-                 inputView.requestFocus()
-                 val imm = requireContext().getSystemService(
-                     Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                 imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
-             }
-         }, 200)
+            val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
+                R.id.enter_amount)
+            inputView?.let {
+                inputView.requestFocus()
+                val imm = requireContext().getSystemService(
+                    Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
+            }
+        }, 200)
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe {
             when (it) {
