@@ -73,17 +73,17 @@ class EnterTargetAddressSheet : SendInputSheet() {
             cta_button.setOnClickListener { onCtaClick() }
 
             wallet_select.apply {
-//                onLoadError = { showErrorToast("Failed getting transfer wallets") }
-//                onAccountSelected = { accountSelected(it) }
-//                onEmptyList = { hideTransferList() }
+                onLoadError = { showErrorToast("Failed getting transfer wallets") }
+                onAccountSelected = { accountSelected(it) }
+                onEmptyList = { hideTransferList() }
             }
         }
     }
 
     private fun setupTransferList(account: CryptoAccount) {
-//        dialogView.wallet_select.initialise(
-//            coincore[account.asset].canTransferTo(account)
-//        )
+        dialogView.wallet_select.initialise(
+            coincore[account.asset].canTransferTo(account).map { it.map { it as BlockchainAccount } }
+        )
     }
 
     private fun hideTransferList() {

@@ -100,7 +100,6 @@
 
     </ViewSwitcher>
 
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title_pick"
         style="@style/Text.Semibold.14"
@@ -114,7 +113,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_switcher"/>
 
-    <piuk.blockchain.android.ui.transfer.widgets.AccountList
+    <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/wallet_select"
         android:layout_width="match_parent"
         android:layout_height="150dp"
