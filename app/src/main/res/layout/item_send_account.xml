@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/tiny_margin"
     android:paddingBottom="@dimen/tiny_margin">
 
-    <piuk.blockchain.android.ui.customviews.account.CryptoAccountInfo
+    <piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
         android:id="@+id/details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

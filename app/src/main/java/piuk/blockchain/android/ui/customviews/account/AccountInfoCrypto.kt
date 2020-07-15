@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NullAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
@@ -24,13 +23,12 @@ import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
-class CryptoAccountInfo @JvmOverloads constructor(
+class AccountInfoCrypto @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
 
-    private val disposables = CompositeDisposable()
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
 
@@ -39,20 +37,19 @@ class CryptoAccountInfo @JvmOverloads constructor(
             .inflate(R.layout.view_account_crypto_overview, this, true)
     }
 
-    var account: CryptoAccount = NullAccount
-        set(value) {
-            field = value
-            updateView(value)
-        }
+    var account: CryptoAccount? = null
+        private set
 
-    private fun updateView(account: CryptoAccount) {
-        disposables.clear()
+    fun updateAccount(account: CryptoAccount, disposables: CompositeDisposable) {
+        this.account = account
+        updateView(account, disposables)
+    }
 
+    private fun updateView(account: CryptoAccount, disposables: CompositeDisposable) {
         val crypto = account.asset
         icon.setCoinIcon(crypto)
         asset_spend_locked.goneIf(account.isCustodial().not())
         wallet_name.text = account.label
-
 
         icon.visible()
 
@@ -80,9 +77,4 @@ class CryptoAccountInfo @JvmOverloads constructor(
                 }
             )
         }
-
-    override fun onDetachedFromWindow() {
-        disposables.clear()
-        super.onDetachedFromWindow()
-    }
 }

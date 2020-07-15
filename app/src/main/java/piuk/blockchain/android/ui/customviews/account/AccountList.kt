@@ -26,7 +26,11 @@ import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+
+typealias StatusDecorator = (BlockchainAccount) -> Single<String>
 
 class AccountList @JvmOverloads constructor(
     ctx: Context,
@@ -37,18 +41,12 @@ class AccountList @JvmOverloads constructor(
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
-    private val theAdapter: AccountsDelegateAdapter by lazy {
-        AccountsDelegateAdapter(
-            onAccountClicked = { onAccountSelected(it) }
-        )
-    }
-
     init {
         LayoutInflater.from(context)
             .inflate(R.layout.view_account_list, this, true)
     }
 
-    fun initialise(source: Single<List<BlockchainAccount>>) {
+    fun initialise(source: Single<List<BlockchainAccount>>, status: StatusDecorator? = null) {
 
         val itemList = mutableListOf<BlockchainAccount>()
 
@@ -66,6 +64,10 @@ class AccountList @JvmOverloads constructor(
                 false
             )
 
+            val theAdapter = AccountsDelegateAdapter(
+                statusDecorator = status,
+                onAccountClicked = { onAccountSelected(it) }
+            )
             adapter = theAdapter
             theAdapter.items = itemList
         }
@@ -76,9 +78,9 @@ class AccountList @JvmOverloads constructor(
                 onSuccess = {
                     itemList.clear()
                     itemList.addAll(it)
-                    theAdapter.notifyDataSetChanged()
+                    list.adapter?.notifyDataSetChanged()
 
-                    if(it.isEmpty()) {
+                    if (it.isEmpty()) {
                         onEmptyList()
                     }
             },
@@ -94,24 +96,27 @@ class AccountList @JvmOverloads constructor(
 }
 
 private class AccountsDelegateAdapter(
+    statusDecorator: StatusDecorator?,
     onAccountClicked: (BlockchainAccount) -> Unit
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
 
     init {
-        // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
             addAdapterDelegate(
                 CryptoAccountDelegate(
+                    statusDecorator,
                     onAccountClicked
                 )
             )
             addAdapterDelegate(
                 FiatAccountDelegate(
-                    onAccountClicked = onAccountClicked
+                    statusDecorator,
+                    onAccountClicked
                 )
             )
             addAdapterDelegate(
                 AllWalletsAccountDelegate(
+                    statusDecorator,
                     onAccountClicked
                 )
             )
@@ -120,6 +125,7 @@ private class AccountsDelegateAdapter(
 }
 
 private class CryptoAccountDelegate<in T>(
+    private val statusDecorator: StatusDecorator?,
     private val onAccountClicked: (CryptoAccount) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -135,6 +141,7 @@ private class CryptoAccountDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as CryptoSingleAccountViewHolder).bind(
         items[position] as CryptoAccount,
+        statusDecorator,
         onAccountClicked
     )
 }
@@ -143,20 +150,39 @@ private class CryptoSingleAccountViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val disposables = CompositeDisposable()
+
     internal fun bind(
         account: CryptoAccount,
+        statusDecorator: StatusDecorator?,
         onAccountClicked: (CryptoAccount) -> Unit
     ) {
         with(itemView) {
-            crypto_account.account = account
+            disposables.clear()
+
+            crypto_account.updateAccount(account, disposables)
+
             setOnClickListener { onAccountClicked(account) }
+
+            itemView.crypto_status.gone()
+
+            statusDecorator?.let { decorator ->
+                disposables += decorator(account).subscribeBy(
+                        onSuccess = { status ->
+                            itemView.crypto_status.status = status
+                            itemView.crypto_status.goneIf(status.isBlank())
+                        }
+                    )
+            }
         }
     }
 }
 
 private class FiatAccountDelegate<in T>(
+    private val statusDecorator: StatusDecorator?,
     private val onAccountClicked: (FiatAccount) -> Unit
 ) : AdapterDelegate<T> {
+
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is FiatAccount
 
@@ -165,27 +191,36 @@ private class FiatAccountDelegate<in T>(
             parent.inflate(R.layout.item_account_select_fiat)
         )
 
-    override fun onBindViewHolder(items: List<T>, position: Int, holder: RecyclerView.ViewHolder) {
-        (holder as FiatAccountViewHolder).bind(items[position] as FiatAccount, onAccountClicked)
-    }
+    override fun onBindViewHolder(items: List<T>, position: Int, holder: RecyclerView.ViewHolder) =
+        (holder as FiatAccountViewHolder).bind(
+            items[position] as FiatAccount,
+            statusDecorator,
+            onAccountClicked
+        )
 }
 
 private class FiatAccountViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val disposables = CompositeDisposable()
+
     internal fun bind(
         account: FiatAccount,
+        statusDecorator: StatusDecorator?,
         onAccountClicked: (FiatAccount) -> Unit
     ) {
         with(itemView) {
-            fiat_account.account = account
+            disposables.clear()
+
+            fiat_account.updateAccount(account, disposables)
             setOnClickListener { onAccountClicked(account) }
         }
     }
 }
 
 private class AllWalletsAccountDelegate<in T>(
+    private val statusDecorator: StatusDecorator?,
     private val onAccountClicked: (BlockchainAccount) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -201,6 +236,7 @@ private class AllWalletsAccountDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as AllWalletsAccountViewHolder).bind(
         items[position] as AllWalletsAccount,
+        statusDecorator,
         onAccountClicked
     )
 }
@@ -209,12 +245,17 @@ private class AllWalletsAccountViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
+    private val disposables = CompositeDisposable()
+
     internal fun bind(
         account: AllWalletsAccount,
+        statusDecorator: StatusDecorator?,
         onAccountClicked: (BlockchainAccount) -> Unit
     ) {
         with(itemView) {
-            account_group.account = account
+            disposables.clear()
+
+            account_group.updateAccount(account, disposables)
             setOnClickListener { onAccountClicked(account) }
         }
     }

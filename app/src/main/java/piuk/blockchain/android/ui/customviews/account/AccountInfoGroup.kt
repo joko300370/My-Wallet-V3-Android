@@ -27,7 +27,6 @@ class AccountInfoGroup @JvmOverloads constructor(
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
 
-    private val disposables = CompositeDisposable()
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
 
@@ -37,12 +36,14 @@ class AccountInfoGroup @JvmOverloads constructor(
     }
 
     var account: AccountGroup? = null
-        set(value) {
-            field = value
-            updateView(value!!)
-        }
+        private set
 
-    private fun updateView(account: AccountGroup) {
+    fun updateAccount(account: AccountGroup, disposables: CompositeDisposable) {
+        this.account = account
+        updateView(account, disposables)
+    }
+
+    private fun updateView(account: AccountGroup, disposables: CompositeDisposable) {
         // Only supports AllWallets at this time
         require(account is AllWalletsAccount)
 
@@ -69,10 +70,5 @@ class AccountInfoGroup @JvmOverloads constructor(
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
-    }
-
-    override fun onDetachedFromWindow() {
-        disposables.clear()
-        super.onDetachedFromWindow()
     }
 }

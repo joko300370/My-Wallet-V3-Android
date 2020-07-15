@@ -28,7 +28,7 @@
         android:ellipsize="middle"
         android:singleLine="true"
         app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintEnd_toStartOf="@id/wallet_balance_crypto"
+        app:layout_constraintEnd_toStartOf="@id/wallet_balance_fiat"
         app:layout_constraintTop_toTopOf="@id/icon" />
 
     <androidx.appcompat.widget.AppCompatTextView

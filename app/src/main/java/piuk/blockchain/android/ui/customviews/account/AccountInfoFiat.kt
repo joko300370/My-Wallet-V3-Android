@@ -19,13 +19,12 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
-class FiatAccountInfo @JvmOverloads constructor(
+class AccountInfoFiat @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
 
-    private val disposables = CompositeDisposable()
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
 
@@ -35,13 +34,14 @@ class FiatAccountInfo @JvmOverloads constructor(
     }
 
     var account: FiatAccount? = null
-        set(value) {
-            field = value
-            updateView(value!!)
-        }
+        private set
 
-    private fun updateView(account: FiatAccount) {
-        disposables.clear()
+    fun updateAccount(account: FiatAccount, disposables: CompositeDisposable) {
+        this.account = account
+        updateView(account, disposables)
+    }
+
+    private fun updateView(account: FiatAccount, disposables: CompositeDisposable) {
 
         val userFiat = currencyPrefs.selectedFiatCurrency
 
@@ -69,9 +69,4 @@ class FiatAccountInfo @JvmOverloads constructor(
                 }
             }
         }
-
-    override fun onDetachedFromWindow() {
-        disposables.clear()
-        super.onDetachedFromWindow()
-    }
 }

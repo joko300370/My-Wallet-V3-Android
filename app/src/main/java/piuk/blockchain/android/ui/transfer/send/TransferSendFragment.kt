@@ -16,6 +16,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
@@ -65,9 +66,26 @@ class TransferSendFragment :
                 coincore.allWallets
                     .accounts
                     .filter(filterFn)
-            )
+            ),
+            status = ::statusDecorator
         )
     }
+
+    private fun statusDecorator(account: BlockchainAccount): Single<String> =
+        if (account is CryptoAccount) {
+            account.sendState
+                .map { sendState ->
+                    when (sendState) {
+                        SendState.NO_FUNDS -> "No funds"
+                        SendState.NOT_SUPPORTED -> "Send not supported on this account"
+                        SendState.NOT_ENOUGH_GAS -> "ETH balance low, unable to pay network fee"
+                        SendState.SEND_IN_FLIGHT -> "Unavailable due to pending transaction."
+                        SendState.CAN_SEND -> ""
+                    }
+                }
+        } else {
+            Single.just("")
+        }
 
     private fun doOnEmptyList() {
         account_list.gone()
