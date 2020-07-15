@@ -511,6 +511,11 @@
     </string>
     <string name="enable_fingerprint">Fingerprint Unlock</string>
 
+    <string name="notification_2fa_summary">2FA Notifications</string>
+    <string name="notification_2fa_description">Notifications related to Two Factor Authentication</string>
+    <string name="notification_payments_summary">Payments Notifications</string>
+    <string name="notification_payments_description">Notifications related to Payments</string>
+
     <string name="two_fa">2-step Verification</string>
     <string name="tor_requests">Block Tor Requests</string>
     <string name="tor_summary">Block IP addresses that are known to be part of the Tor anonymizing
