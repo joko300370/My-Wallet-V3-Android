@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -28,7 +28,7 @@ class AssetMapTest {
     fun `copy with patchAsset works as expected`() {
         val newAsset = AssetState(
             currency = CryptoCurrency.BTC,
-            balance = CryptoValue.bitcoinFromMajor(20),
+            balance = 20.bitcoin(),
             price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),
             price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 400.toBigDecimal()),
             priceTrend = emptyList()
