@@ -77,15 +77,15 @@ class EnterAmountSheet : SendInputSheet() {
             amount_sheet_to.text =
                 getString(R.string.send_enter_amount_to, newState.targetAddress.label)
 
-            newState.errorState?.let {
-                val error = when (it) {
-                    SendErrorState.MAX_EXCEEDED -> getString(R.string.send_enter_amount_error_max,
-                        newState.sendingAccount.asset.networkTicker)
-                    SendErrorState.MIN_REQUIRED -> getString(R.string.send_enter_amount_error_min,
-                        newState.sendingAccount.asset.networkTicker)
-                }
-                amount_sheet_input.showError(error)
-            } ?: dialogView.amount_sheet_input.hideError()
+            when (newState.errorState) {
+                SendErrorState.NONE -> dialogView.amount_sheet_input.hideError()
+                SendErrorState.MAX_EXCEEDED -> amount_sheet_input.showError(
+                    getString(R.string.send_enter_amount_error_max,
+                        newState.sendingAccount.asset.networkTicker))
+                SendErrorState.MIN_REQUIRED -> amount_sheet_input.showError(
+                    getString(R.string.send_enter_amount_error_min,
+                        newState.sendingAccount.asset.networkTicker))
+            }
         }
 
         state = newState

@@ -29,7 +29,8 @@ enum class SendStep {
 
 enum class SendErrorState {
     MAX_EXCEEDED,
-    MIN_REQUIRED
+    MIN_REQUIRED,
+    NONE
 }
 
 data class SendState(
@@ -41,7 +42,7 @@ data class SendState(
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
-    val errorState: SendErrorState? = null
+    val errorState: SendErrorState = SendErrorState.NONE
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?

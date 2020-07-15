@@ -95,7 +95,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 nextEnabled = amount.isPositive,
                 sendAmount = amount,
                 availableBalance = maxAvailable,
-                errorState = null
+                errorState = SendErrorState.NONE
             )
     }
 
