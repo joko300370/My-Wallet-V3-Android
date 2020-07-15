@@ -19,7 +19,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 currentStep = if (passwordRequired) SendStep.ENTER_PASSWORD else SendStep.ENTER_ADDRESS,
                 nextEnabled = passwordRequired
             )
-        }
+    }
 
     class ValidatePassword(
         val password: String
@@ -28,7 +28,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = false
             )
-        }
+    }
 
     class UpdatePasswordIsValidated(
         val password: String
@@ -39,7 +39,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 secondPassword = password,
                 currentStep = SendStep.ENTER_ADDRESS
             )
-        }
+    }
 
     object UpdatePasswordNotValidated : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
@@ -47,7 +47,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 nextEnabled = false,
                 secondPassword = ""
             )
-        }
+    }
 
     class AddressSelected(
         val address: ReceiveAddress
@@ -76,6 +76,16 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
+    object MaxAmountExceeded : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.MAX_EXCEEDED)
+    }
+
+    object MinRequired : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.MIN_REQUIRED)
+    }
+
     class UpdateTransactionAmounts(
         val amount: Money,
         private val maxAvailable: Money
@@ -84,7 +94,8 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = amount.isPositive,
                 sendAmount = amount,
-                availableBalance = maxAvailable
+                availableBalance = maxAvailable,
+                errorState = SendErrorState.NONE
             )
     }
 
@@ -120,5 +131,20 @@ sealed class SendIntent : MviIntent<SendState> {
                 nextEnabled = true,
                 currentStep = SendStep.SEND_COMPLETE
             )
+    }
+
+    object ReturnToPreviousStep : SendIntent() {
+        override fun reduce(oldState: SendState): SendState {
+            val steps = SendStep.values()
+            val currentStep = oldState.currentStep.ordinal
+            if (currentStep == 0) {
+                throw IllegalStateException("Cannot go back")
+            }
+            val previousStep = steps[currentStep - 1]
+
+            return oldState.copy(
+                currentStep = previousStep
+            )
+        }
     }
 }

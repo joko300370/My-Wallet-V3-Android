@@ -1782,5 +1782,12 @@
     <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
     <string name="tether_announcement_action">Buy Tether Now</string>
 
+    <string name="send_enter_amount_from">From: %1$s</string>
+    <string name="send_enter_amount_to">To: %1$s</string>
+    <string name="send_enter_amount_title">Amount</string>
+    <string name="send_enter_amount_available">Available</string>
+    <string name="send_enter_amount_max">Send Max</string>
+    <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
 
 </resources>

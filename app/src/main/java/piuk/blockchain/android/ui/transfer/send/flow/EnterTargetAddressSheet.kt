@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.view.View
+import android.widget.TextView
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,6 +19,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
@@ -49,6 +51,13 @@ class EnterTargetAddressSheet : SendInputSheet() {
                 setupTransferList(newState.sendingAccount)
             }
             cta_button.isEnabled = newState.nextEnabled
+
+            if (newState.targetAddress != NullAddress &&
+                newState.targetAddress.label.isNotEmpty() &&
+                address_entry.text?.isEmpty() == true) {
+                    address_entry.setText(newState.targetAddress.label, TextView.BufferType.EDITABLE)
+                    addressSelected(newState.targetAddress)
+            }
         }
         state = newState
     }
