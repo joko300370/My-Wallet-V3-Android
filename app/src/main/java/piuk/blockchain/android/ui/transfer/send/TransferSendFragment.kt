@@ -57,7 +57,7 @@ class TransferSendFragment :
             disposables = disposables
         )
 
-        account_list.onLoadError = ::doOnLoacError
+        account_list.onLoadError = ::doOnLoadError
         account_list.onEmptyList = ::doOnEmptyList
         account_list.onAccountSelected = ::doOnAccountSelected
 
@@ -76,10 +76,10 @@ class TransferSendFragment :
             account.sendState
                 .map { sendState ->
                     when (sendState) {
-                        SendState.NO_FUNDS -> "No funds"
-                        SendState.NOT_SUPPORTED -> "Send not supported on this account"
-                        SendState.NOT_ENOUGH_GAS -> "ETH balance low, unable to pay network fee"
-                        SendState.SEND_IN_FLIGHT -> "Unavailable due to pending transaction."
+                        SendState.NO_FUNDS -> getString(R.string.send_state_no_funds)
+                        SendState.NOT_SUPPORTED -> getString(R.string.send_state_not_supported)
+                        SendState.NOT_ENOUGH_GAS -> getString(R.string.send_state_not_enough_gas)
+                        SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
                         SendState.CAN_SEND -> ""
                     }
                 }
@@ -96,7 +96,7 @@ class TransferSendFragment :
         }
     }
 
-    private fun doOnLoacError(t: Throwable) {
+    private fun doOnLoadError(t: Throwable) {
         ToastCustom.makeText(
             requireContext(),
             getString(R.string.transfer_wallets_load_error),
