@@ -226,9 +226,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
 
     private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
-
         when (selectedPaymentMethod) {
-            is PaymentMethod.Undefined -> {
+            is PaymentMethod.Undefined,
+            is PaymentMethod.UndefinedFunds -> {
                 payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
             }
             is PaymentMethod.BankTransfer -> renderBankPayment(selectedPaymentMethod)
@@ -239,9 +239,18 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         payment_method.visible()
         payment_method_separator.visible()
         payment_method_details_root.visible()
-        undefined_payment_text.visibleIf { selectedPaymentMethod is PaymentMethod.Undefined }
-        payment_method_title.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
-        payment_method_limit.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
+        undefined_payment_text.visibleIf {
+            selectedPaymentMethod is PaymentMethod.Undefined ||
+                selectedPaymentMethod is PaymentMethod.UndefinedFunds
+        }
+        payment_method_title.visibleIf {
+            selectedPaymentMethod !is PaymentMethod.Undefined &&
+                selectedPaymentMethod !is PaymentMethod.UndefinedFunds
+        }
+        payment_method_limit.visibleIf {
+            selectedPaymentMethod !is PaymentMethod.Undefined &&
+                selectedPaymentMethod !is PaymentMethod.UndefinedFunds
+        }
     }
 
     private fun renderFundsPayment(paymentMethod: PaymentMethod.Funds) {
