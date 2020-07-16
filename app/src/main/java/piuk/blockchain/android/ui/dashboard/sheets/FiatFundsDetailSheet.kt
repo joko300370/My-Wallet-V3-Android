@@ -7,13 +7,13 @@ import android.widget.TextView
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
@@ -52,7 +52,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             funds_balance.text = if (prefs.selectedFiatCurrency == ticker) {
                 fiatValue.toStringWithSymbol()
             } else {
-                fiatValue.toFiatWithCurrency(exchangeRateDataManager,
+                fiatValue.toFiat(exchangeRateDataManager,
                     prefs.selectedFiatCurrency)
                     .toStringWithSymbol()
             }
@@ -73,15 +73,12 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     companion object {
         private const val FIAT_DATA = "fiat_data"
 
-        fun newInstance(fiatValue: FiatValue?): FiatFundsDetailSheet {
-            fiatValue?.let {
-                return FiatFundsDetailSheet().apply {
-                    arguments = Bundle().apply {
-                        putSerializable(FIAT_DATA, fiatValue)
-                    }
+        fun newInstance(fiatValue: Money): FiatFundsDetailSheet {
+            return FiatFundsDetailSheet().apply {
+                arguments = Bundle().apply {
+                    putSerializable(FIAT_DATA, fiatValue)
                 }
-            } ?: throw IllegalStateException(
-                "Fiat value can't be null when displaying Fund details")
+            }
         }
     }
 

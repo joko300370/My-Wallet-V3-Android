@@ -13,7 +13,7 @@ import java.math.BigInteger
 sealed class DashboardIntent : MviIntent<DashboardState>
 
 class FiatBalanceUpdate(
-    private val balanceList: List<FiatValue>
+    private val balanceList: List<Money>
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         return oldState.copy(
@@ -172,7 +172,7 @@ class ShowAssetDetails(
 
 class ShowDashboardSheet(
     private val dashboardSheet: DashboardSheet,
-    private val selectedFiatValue: FiatValue? = null
+    private val selectedFiatValue: Money? = null
 ) : DashboardIntent() {
     override fun isValidFor(oldState: DashboardState): Boolean =
         dashboardSheet != DashboardSheet.CUSTODY_INTRO

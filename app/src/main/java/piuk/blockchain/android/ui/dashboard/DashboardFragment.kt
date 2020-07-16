@@ -17,6 +17,7 @@ import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -212,7 +213,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
                 DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
-                    state.selectedFundsBalance)
+                    state.selectedFundsBalance!!)
                 DashboardSheet.LINK_OR_DEPOSIT -> {
                     state.selectedFundsBalance?.let {
                         LinkBankAccountDetailsBottomSheet.newInstance(
@@ -332,7 +333,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowAssetDetails(cryptoCurrency))
     }
 
-    private fun onFundsClicked(fiat: FiatValue) {
+    private fun onFundsClicked(fiat: Money) {
         model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_DETAILS, fiat))
     }
 

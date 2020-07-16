@@ -673,10 +673,7 @@ val applicationModule = module {
                 payloadManager = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
-                analytics = get(),
-                assetBalancesRepository = get(),
-                currencyPrefs = get(),
-                tierService = get()
+                analytics = get()
             )
         }
 

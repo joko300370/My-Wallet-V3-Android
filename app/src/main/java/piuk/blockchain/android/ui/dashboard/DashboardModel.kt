@@ -18,7 +18,6 @@ import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
@@ -73,7 +72,7 @@ interface BalanceState : DashboardItem {
 }
 
 data class FundsBalanceState(
-    val fiatBalances: List<FiatValue> = emptyList()
+    val fiatBalances: List<Money> = emptyList()
 ) : DashboardItem
 
 enum class DashboardSheet {
@@ -105,7 +104,7 @@ data class DashboardState(
     val custodyIntroSeen: Boolean = false,
     val transferFundsCurrency: CryptoCurrency? = null,
     val fundsFiatBalances: FundsBalanceState? = null,
-    val selectedFundsBalance: FiatValue? = null
+    val selectedFundsBalance: Money? = null
 ) : MviState, BalanceState, KoinComponent {
 
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
@@ -128,9 +127,10 @@ data class DashboardState(
         } ?: addAssetFiatBalances()
     }
 
-    private fun addFundsFiatBalances(fiat: String) = fundsFiatBalances?.fiatBalances?.map {
-        it.toFiatWithCurrency(exchangeRateDataManager, fiat)
-    }?.ifEmpty { null }?.total() ?: FiatValue.zero(fiat)
+    private fun addFundsFiatBalances(fiat: String) =
+        fundsFiatBalances?.fiatBalances?.map {
+            it.toFiat(exchangeRateDataManager, fiat)
+        }?.ifEmpty { null }?.total() ?: FiatValue.zero(fiat)
 
     private fun addAssetFiatBalances() = assets.values
         .filter { !it.isLoading && it.fiatBalance != null }
