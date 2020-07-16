@@ -30,7 +30,6 @@ interface Asset {
 
     fun defaultAccount(): Single<SingleAccount>
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
-    fun accounts(): List<SingleAccount>
 
     fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
 

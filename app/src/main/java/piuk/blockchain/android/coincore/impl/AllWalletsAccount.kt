@@ -17,6 +17,7 @@ import timber.log.Timber
 
 class AllWalletsAccount(
     private val coincore: Coincore,
+    override val accounts: SingleAccountList,
     labels: DefaultLabels
 ) : AccountGroup {
 
@@ -45,7 +46,7 @@ class AllWalletsAccount(
 
     override fun includes(account: BlockchainAccount): Boolean = true
 
-    private fun allTokens() = coincore.assets.filter { it.isEnabled }
+    private fun allTokens() = coincore.allAssets.filter { it.isEnabled }
 
     private fun allAccounts(): Single<List<BlockchainAccount>> =
         Single.zip(
@@ -67,11 +68,4 @@ class AllWalletsAccount(
             .doOnError { e -> Timber.e(e) }
             .toSingle(emptyList())
             .map { it.sorted() }
-
-    override val accounts: SingleAccountList
-        get() = mutableListOf<SingleAccount>().apply {
-            allTokens().forEach {
-                addAll(it.accounts())
-            }
-        }
 }

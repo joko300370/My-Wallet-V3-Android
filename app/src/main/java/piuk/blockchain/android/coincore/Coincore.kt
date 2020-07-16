@@ -12,9 +12,9 @@ import java.lang.IllegalArgumentException
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
-    private val fiatAsset: Asset,
     private val assetMap: Map<CryptoCurrency, CryptoAsset>,
-    private val defaultLabels: DefaultLabels
+    private val defaultLabels: DefaultLabels,
+    fiatAsset: Asset
 ) {
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
@@ -29,12 +29,21 @@ class Coincore internal constructor(
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
-    val assets: Iterable<Asset> = listOf(fiatAsset) + assetMap.values
+    val allAssets: Iterable<Asset> = listOf(fiatAsset) + assetMap.values
+    val cryptoAssets: Iterable<Asset> = assetMap.values
+    val fiatAssets: Asset = fiatAsset
 
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)
 
-    val allWallets: AccountGroup by lazy {
-        AllWalletsAccount(this, defaultLabels)
-    }
+    fun allWallets(): Single<AccountGroup> =
+        Single.zip(
+            allAssets.map { it.accountGroup() }
+        ) { t: Array<Any> ->
+            t.map { it as AccountGroup }
+                .map { it.accounts }
+                .reduce { l, g -> l + g }
+        }.map {
+            AllWalletsAccount(this, it, defaultLabels)
+        }
 }

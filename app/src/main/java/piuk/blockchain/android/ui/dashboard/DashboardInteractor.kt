@@ -11,6 +11,7 @@ import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
@@ -26,7 +27,7 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 
 class DashboardInteractor(
-    private val tokens: Coincore,
+    private val coincore: Coincore,
     private val payloadManager: PayloadManager,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
@@ -48,12 +49,12 @@ class DashboardInteractor(
         CryptoCurrency.activeCurrencies()
             .filter { it != CryptoCurrency.PAX }
             .forEach {
-                cd += tokens[it].accountGroup(balanceFilter)
+                cd += coincore[it].accountGroup(balanceFilter)
                     .flatMap { asset -> asset.balance }
                     .map { balance -> balance as CryptoValue }
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
-                            cd += tokens[CryptoCurrency.PAX].accountGroup(balanceFilter)
+                            cd += coincore[CryptoCurrency.PAX].accountGroup(balanceFilter)
                                 .flatMap { asset -> asset.balance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
@@ -123,8 +124,8 @@ class DashboardInteractor(
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
 
         return Singles.zip(
-            tokens[crypto].exchangeRate(),
-            tokens[crypto].historicRate(oneDayAgo)
+            coincore[crypto].exchangeRate(),
+            coincore[crypto].historicRate(oneDayAgo)
         ) { rate, day -> PriceUpdate(crypto, rate, day) }
             .subscribeBy(
                 onSuccess = { model.process(it) },
@@ -134,7 +135,7 @@ class DashboardInteractor(
 
     fun refreshPriceHistory(model: DashboardModel, crypto: CryptoCurrency): Disposable =
         if (crypto.hasFeature(CryptoCurrency.PRICE_CHARTING)) {
-            tokens[crypto].historicRateSeries(TimeSpan.DAY, TimeInterval.ONE_HOUR)
+            coincore[crypto].historicRateSeries(TimeSpan.DAY, TimeInterval.ONE_HOUR)
         } else {
             Single.just(FLATLINE_CHART)
         }
@@ -145,7 +146,7 @@ class DashboardInteractor(
             )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
-        return tokens[crypto].accountGroup(AssetFilter.Custodial)
+        return coincore[crypto].accountGroup(AssetFilter.Custodial)
             .flatMap { it.balance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },

@@ -52,8 +52,6 @@ class FiatAsset(
             )
         )
 
-    override fun accounts(): SingleAccountList = accounts
-
     override fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList> =
         Single.just(emptyList())
 
