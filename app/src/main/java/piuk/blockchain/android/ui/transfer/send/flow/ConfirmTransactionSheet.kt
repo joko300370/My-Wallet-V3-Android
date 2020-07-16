@@ -32,10 +32,11 @@ class ConfirmTransactionSheet : SendInputSheet() {
 
         detailsAdapter.populate(
             listOf(
-                PendingTxItem("Asset", newState.sendingAccount.asset.displayTicker),
-                PendingTxItem("Account", newState.sendingAccount.label),
+                PendingTxItem("Send", newState.sendAmount.toStringWithSymbol()),
+                PendingTxItem("From", newState.sendingAccount.label),
                 PendingTxItem("To", newState.targetAddress.label),
-                PendingTxItem("Amount", newState.sendAmount.toStringWithSymbol())
+                PendingTxItem("Fee - Regular", 0.00001.toString()), // TODO fee?
+                PendingTxItem("Total", (newState.sendAmount.toFloat() + 0.00001).toString())
             )
         )
     }
