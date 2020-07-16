@@ -180,7 +180,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun handleUpdatedAssetState(index: Int, newState: AssetState): RefreshFn? {
+    private fun handleUpdatedAssetState(index: Int, newState: CryptoAssetState): RefreshFn? {
         if (displayList[index] != newState) {
             displayList[index] = newState
             return { theAdapter.notifyItemChanged(index) }

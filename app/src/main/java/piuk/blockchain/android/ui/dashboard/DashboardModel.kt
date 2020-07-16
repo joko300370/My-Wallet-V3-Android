@@ -22,9 +22,9 @@ import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
-class AssetMap(private val map: Map<CryptoCurrency, AssetState>) :
-    Map<CryptoCurrency, AssetState> by map {
-    override operator fun get(key: CryptoCurrency): AssetState {
+class AssetMap(private val map: Map<CryptoCurrency, CryptoAssetState>) :
+    Map<CryptoCurrency, CryptoAssetState> by map {
+    override operator fun get(key: CryptoCurrency): CryptoAssetState {
         return map.getOrElse(key) {
             throw IllegalArgumentException("$key is not a known CryptoCurrency")
         }
@@ -45,7 +45,7 @@ class AssetMap(private val map: Map<CryptoCurrency, AssetState>) :
         return AssetMap(assets)
     }
 
-    fun copy(patchAsset: AssetState): AssetMap {
+    fun copy(patchAsset: CryptoAssetState): AssetMap {
         val assets = toMutableMap()
         assets[patchAsset.currency] = patchAsset
         return AssetMap(assets)
@@ -59,7 +59,7 @@ class AssetMap(private val map: Map<CryptoCurrency, AssetState>) :
 }
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun mapOfAssets(vararg pairs: Pair<CryptoCurrency, AssetState>) = AssetMap(mapOf(*pairs))
+fun mapOfAssets(vararg pairs: Pair<CryptoCurrency, CryptoAssetState>) = AssetMap(mapOf(*pairs))
 
 interface DashboardItem
 
@@ -67,7 +67,7 @@ interface BalanceState : DashboardItem {
     val isLoading: Boolean
     val fiatBalance: Money?
     val delta: Pair<Money, Double>?
-    operator fun get(currency: CryptoCurrency): AssetState
+    operator fun get(currency: CryptoCurrency): CryptoAssetState
     fun getFundsFiat(fiat: String): Money
     fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
 }
@@ -90,13 +90,13 @@ enum class DashboardSheet {
 
 data class DashboardState(
     val assets: AssetMap = mapOfAssets(
-        CryptoCurrency.BTC to AssetState(CryptoCurrency.BTC),
-        CryptoCurrency.BCH to AssetState(CryptoCurrency.BCH),
-        CryptoCurrency.ETHER to AssetState(CryptoCurrency.ETHER),
-        CryptoCurrency.XLM to AssetState(CryptoCurrency.XLM),
-        CryptoCurrency.PAX to AssetState(CryptoCurrency.PAX),
-        CryptoCurrency.ALGO to AssetState(CryptoCurrency.ALGO),
-        CryptoCurrency.USDT to AssetState(CryptoCurrency.USDT)
+        CryptoCurrency.BTC to CryptoAssetState(CryptoCurrency.BTC),
+        CryptoCurrency.BCH to CryptoAssetState(CryptoCurrency.BCH),
+        CryptoCurrency.ETHER to CryptoAssetState(CryptoCurrency.ETHER),
+        CryptoCurrency.XLM to CryptoAssetState(CryptoCurrency.XLM),
+        CryptoCurrency.PAX to CryptoAssetState(CryptoCurrency.PAX),
+        CryptoCurrency.ALGO to CryptoAssetState(CryptoCurrency.ALGO),
+        CryptoCurrency.USDT to CryptoAssetState(CryptoCurrency.USDT)
     ),
     val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
@@ -155,7 +155,7 @@ data class DashboardState(
         }
     }
 
-    override operator fun get(currency: CryptoCurrency): AssetState =
+    override operator fun get(currency: CryptoCurrency): CryptoAssetState =
         assets[currency]
 
     override fun getFundsFiat(fiat: String): Money = addFundsFiatBalances(fiat)
@@ -164,7 +164,7 @@ data class DashboardState(
         !custodyIntroSeen && get(currency).hasCustodialBalance
 }
 
-data class AssetState(
+data class CryptoAssetState(
     val currency: CryptoCurrency,
     val balance: Money? = null,
     val price: ExchangeRate? = null,
@@ -187,7 +187,7 @@ data class AssetState(
         balance == null || price == null || price24h == null
     }
 
-    fun reset(): AssetState = AssetState(currency)
+    fun reset(): CryptoAssetState = CryptoAssetState(currency)
 }
 
 class DashboardModel(

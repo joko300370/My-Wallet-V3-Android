@@ -51,7 +51,6 @@ class DashboardInteractor(
                 cd += tokens[it].accountGroup(balanceFilter)
                     .flatMap { asset -> asset.balance }
                     .map { balance -> balance as CryptoValue }
-                    // CURRENCY HERE
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
                             cd += tokens[CryptoCurrency.PAX].accountGroup(balanceFilter)

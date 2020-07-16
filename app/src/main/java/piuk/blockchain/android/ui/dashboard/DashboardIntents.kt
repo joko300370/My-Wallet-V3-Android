@@ -105,10 +105,10 @@ class PriceUpdate(
     }
 
     private fun updateAsset(
-        old: AssetState,
+        old: CryptoAssetState,
         latestPrice: ExchangeRate,
         oldPrice: ExchangeRate
-    ): AssetState {
+    ): CryptoAssetState {
         return old.copy(
             price = latestPrice,
             price24h = oldPrice
@@ -128,9 +128,9 @@ class PriceHistoryUpdate(
     }
 
     private fun updateAsset(
-        old: AssetState,
+        old: CryptoAssetState,
         historicPrices: PriceSeries
-    ): AssetState {
+    ): CryptoAssetState {
         val trend = historicPrices.filter { it.price != null }.map { it.price!!.toFloat() }
 
         return old.copy(priceTrend = trend)
