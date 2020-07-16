@@ -44,6 +44,6 @@ class Coincore internal constructor(
                 .map { it.accounts }
                 .reduce { l, g -> l + g }
         }.map {
-            AllWalletsAccount(this, it, defaultLabels)
+            AllWalletsAccount(it, defaultLabels)
         }
 }
