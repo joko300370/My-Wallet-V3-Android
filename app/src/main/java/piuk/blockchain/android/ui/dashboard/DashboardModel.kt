@@ -88,14 +88,8 @@ enum class DashboardSheet {
 }
 
 data class DashboardState(
-    val assets: AssetMap = mapOfAssets(
-        CryptoCurrency.BTC to CryptoAssetState(CryptoCurrency.BTC),
-        CryptoCurrency.BCH to CryptoAssetState(CryptoCurrency.BCH),
-        CryptoCurrency.ETHER to CryptoAssetState(CryptoCurrency.ETHER),
-        CryptoCurrency.XLM to CryptoAssetState(CryptoCurrency.XLM),
-        CryptoCurrency.PAX to CryptoAssetState(CryptoCurrency.PAX),
-        CryptoCurrency.ALGO to CryptoAssetState(CryptoCurrency.ALGO),
-        CryptoCurrency.USDT to CryptoAssetState(CryptoCurrency.USDT)
+    val assets: AssetMap = AssetMap(
+        CryptoCurrency.activeCurrencies().associateBy({ it }, { CryptoAssetState(it) })
     ),
     val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
