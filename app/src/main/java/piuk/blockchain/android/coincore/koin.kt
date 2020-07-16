@@ -120,7 +120,9 @@ val coincoreModule = module {
                 labels = get(),
                 assetBalancesRepository = get(),
                 exchangeRateDataManager = get(),
-                custodialWalletManager = get()
+                custodialWalletManager = get(),
+                tierService = get(),
+                currencyPrefs = get()
             )
         }
 

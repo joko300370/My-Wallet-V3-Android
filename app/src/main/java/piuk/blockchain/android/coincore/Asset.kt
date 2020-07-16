@@ -28,7 +28,6 @@ interface Asset {
     fun init(): Completable
     val isEnabled: Boolean
 
-    fun defaultAccount(): Single<SingleAccount>
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
 
     fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
@@ -39,6 +38,7 @@ interface Asset {
 interface CryptoAsset : Asset {
     val asset: CryptoCurrency
 
+    fun defaultAccount(): Single<SingleAccount>
     fun interestRate(): Single<Double>
 
     // Fetch exchange rate to user's selected/display fiat

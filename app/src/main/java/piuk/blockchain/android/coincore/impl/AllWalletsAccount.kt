@@ -40,6 +40,7 @@ class AllWalletsAccount(
             .flatMapSingle { it.fiatBalance(fiatCurrency, exchangeRates) }
             .reduce { a, v -> a + v }
             .toSingle(FiatValue.zero(fiatCurrency))
+            .doOnError { Timber.d("wtf? $it") }
 
     override fun includes(account: BlockchainAccount): Boolean = true
 

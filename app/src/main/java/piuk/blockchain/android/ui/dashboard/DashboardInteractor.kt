@@ -11,7 +11,6 @@ import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
