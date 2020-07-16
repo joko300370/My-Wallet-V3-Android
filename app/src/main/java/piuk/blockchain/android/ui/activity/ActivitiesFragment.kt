@@ -28,11 +28,13 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
-import piuk.blockchain.android.ui.accounts.AccountSelectSheet
+import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
-import piuk.blockchain.android.ui.activity.detail.ActivityDetailsBottomSheet
+import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
+import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.setCoinIcon
@@ -49,7 +51,7 @@ import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
     AccountSelectSheet.Host,
-    ActivityDetailsBottomSheet.Host,
+    CryptoActivityDetailsBottomSheet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
 
@@ -59,7 +61,8 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
         ActivitiesDelegateAdapter(
             disposables = disposables,
             prefs = get(),
-            onItemClicked = { cc, tx, isCustodial -> onActivityClicked(cc, tx, isCustodial) },
+            onCryptoItemClicked = { cc, tx, isCustodial -> onCryptoActivityClicked(cc, tx, isCustodial) },
+            onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) },
             analytics = get()
         )
     }
@@ -103,11 +106,17 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                     analytics.logEvent(ActivityAnalytics.WALLET_PICKER_SHOWN)
                     showBottomSheet(AccountSelectSheet.newInstance())
                 }
-                ActivitiesSheet.ACTIVITY_DETAILS -> {
+                ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS -> {
                     newState.selectedCryptoCurrency?.let {
                         showBottomSheet(
-                            ActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId,
+                            CryptoActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId,
                                 newState.isCustodial))
+                    }
+                }
+                ActivitiesSheet.FIAT_ACTIVITY_DETAILS -> {
+                    newState.selectedFiatCurrency?.let {
+                        showBottomSheet(
+                            FiatActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId))
                     }
                 }
                 ActivitiesSheet.BANK_TRANSFER_DETAILS -> {
@@ -179,6 +188,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private fun ImageView.setAccountIcon(account: BlockchainAccount) {
         when (account) {
             is CryptoAccount -> setCoinIcon(account.asset)
+            is FiatAccount -> setImageResource(account.icon())
             else -> setImageDrawable(
                 AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_white))
         }
@@ -267,12 +277,19 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
         super.onPause()
     }
 
-    private fun onActivityClicked(
+    private fun onCryptoActivityClicked(
         cryptoCurrency: CryptoCurrency,
         txHash: String,
         isCustodial: Boolean
     ) {
         model.process(ShowActivityDetailsIntent(cryptoCurrency, txHash, isCustodial))
+    }
+
+    private fun onFiatActivityClicked(
+        currency: String,
+        txHash: String
+    ) {
+        model.process(ShowFiatActivityDetailsIntent(currency, txHash))
     }
 
     private fun onShowAllActivity() {
@@ -317,6 +334,12 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             }
         }
     }
+}
+
+private fun FiatAccount.icon(): Int = when (fiatCurrency) {
+    "EUR" -> R.drawable.ic_euro_funds
+    "GBP" -> R.drawable.ic_funds_gbp
+    else -> R.drawable.ic_vector_dollar
 }
 
 /**

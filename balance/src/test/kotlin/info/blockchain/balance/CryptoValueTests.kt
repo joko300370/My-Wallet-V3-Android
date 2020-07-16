@@ -121,7 +121,7 @@ class CryptoValueTests {
 
     @Test
     fun `amount is the total minor part of the currency`() {
-        CryptoValue.etherFromMajor(2L).toBigInteger() `should equal` 2e18.toBigDecimal().toBigIntegerExact()
+        2L.ether().toBigInteger() `should equal` 2e18.toBigDecimal().toBigIntegerExact()
     }
 
     @Test

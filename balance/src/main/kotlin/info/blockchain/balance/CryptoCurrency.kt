@@ -53,8 +53,7 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
-        featureFlags =
-            0L
+        featureFlags = 0L
     ),
     STX(
         networkTicker = "STX",
@@ -79,7 +78,7 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12,
-        featureFlags = CryptoCurrency.PRICE_CHARTING
+        featureFlags = 0L
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))

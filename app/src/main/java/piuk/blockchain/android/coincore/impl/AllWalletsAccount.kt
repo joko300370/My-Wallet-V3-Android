@@ -45,7 +45,7 @@ class AllWalletsAccount(
 
     override fun includes(account: BlockchainAccount): Boolean = true
 
-    private fun allTokens() = coincore.assets
+    private fun allTokens() = coincore.assets.filter { it.isEnabled }
 
     private fun allAccounts(): Single<List<BlockchainAccount>> =
         Single.zip(
@@ -58,7 +58,11 @@ class AllWalletsAccount(
 
     private fun allActivities(): Single<ActivitySummaryList> =
         allAccounts().flattenAsObservable { it }
-            .flatMapSingle { it.activity.onErrorReturn { emptyList() } }
+            .flatMapSingle {
+                it.activity.onErrorReturn {
+                    emptyList()
+                }
+            }
             .reduce { a, l -> a + l }
             .doOnError { e -> Timber.e(e) }
             .toSingle(emptyList())

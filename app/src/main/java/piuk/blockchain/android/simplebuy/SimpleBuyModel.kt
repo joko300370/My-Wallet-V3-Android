@@ -1,9 +1,10 @@
 package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.SimpleBuyPrefs
+import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import info.blockchain.balance.CryptoCurrency
@@ -15,7 +16,6 @@ import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
-import java.lang.IllegalStateException
 
 class SimpleBuyModel(
     private val prefs: SimpleBuyPrefs,
@@ -88,10 +88,9 @@ class SimpleBuyModel(
                     previousState.selectedCryptoCurrency
                         ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
-                    previousState.selectedPaymentMethod?.id?.takeIf {
-                        it != PaymentMethod.BANK_PAYMENT_ID &&
-                                it != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                    },
+                    previousState.selectedPaymentMethod?.takeIf {
+                        it.paymentMethodType == PaymentMethodType.PAYMENT_CARD
+                    }?.id,
                     previousState.selectedPaymentMethod?.paymentMethodType
                         ?: throw IllegalStateException("Missing Payment Method"),
                     true
@@ -144,26 +143,16 @@ class SimpleBuyModel(
                         process(SimpleBuyIntent.ErrorIntent())
                     }
                 )
-            is SimpleBuyIntent.MakeCardPayment ->
+            is SimpleBuyIntent.MakePayment ->
                 interactor.fetchOrder(intent.orderId)
                     .subscribeBy({
                         process(SimpleBuyIntent.ErrorIntent())
                     }, {
                         process(SimpleBuyIntent.OrderPriceUpdated(it.price))
-                        it.attributes?.everypay?.let { attrs ->
-                            if (attrs.paymentState == EverypayPaymentAttrs.WAITING_3DS &&
-                                it.state == OrderState.AWAITING_FUNDS
-                            ) {
-                                process(SimpleBuyIntent.Open3dsAuth(
-                                    attrs.paymentLink,
-                                    EverypayCardActivator.redirectUrl
-                                ))
-                                process(SimpleBuyIntent.ResetEveryPayAuth)
-                            } else {
-                                process(SimpleBuyIntent.CheckOrderStatus)
-                            }
-                        } ?: kotlin.run {
-                            process(SimpleBuyIntent.ErrorIntent()) // todo handle case of partner not supported
+                        if (it.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
+                            handleCardPayment(it)
+                        } else {
+                            pollForOrderStatus()
                         }
                     })
             is SimpleBuyIntent.ConfirmOrder -> interactor.confirmOrder(
@@ -194,6 +183,28 @@ class SimpleBuyModel(
             )
             else -> null
         }
+
+    private fun pollForOrderStatus() {
+        process(SimpleBuyIntent.CheckOrderStatus)
+    }
+
+    private fun handleCardPayment(order: BuyOrder) {
+        order.attributes?.everypay?.let { attrs ->
+            if (attrs.paymentState == EverypayPaymentAttrs.WAITING_3DS &&
+                order.state == OrderState.AWAITING_FUNDS
+            ) {
+                process(SimpleBuyIntent.Open3dsAuth(
+                    attrs.paymentLink,
+                    EverypayCardActivator.redirectUrl
+                ))
+                process(SimpleBuyIntent.ResetEveryPayAuth)
+            } else {
+                process(SimpleBuyIntent.CheckOrderStatus)
+            }
+        } ?: kotlin.run {
+            process(SimpleBuyIntent.ErrorIntent()) // todo handle case of partner not supported
+        }
+    }
 
     private fun getSelectedCryptoCurrency(
         pairs: SimpleBuyPairs,

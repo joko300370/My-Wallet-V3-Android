@@ -1,17 +1,25 @@
 package piuk.blockchain.android.ui.settings;
 
+import android.annotation.SuppressLint;
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
 import io.reactivex.Single;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
+import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
+import com.blockchain.swap.nabu.datamanagers.LinkedBank;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
@@ -63,11 +71,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private final NotificationTokenManager notificationTokenManager;
     private final ExchangeRateDataManager exchangeRateDataManager;
     private final KycStatusHelper kycStatusHelper;
+    private final SimpleBuyPrefs simpleBuyPrefs;
     private final CustodialWalletManager custodialWalletManager;
     @VisibleForTesting
     Settings settings;
     private final PitLinking pitLinking;
     private final FeatureFlag cardsFeatureFlag;
+    private final FeatureFlag fundsFeatureFlag;
     private final Analytics analytics;
     private final FeatureFlag featureFlag;
     private PitLinkingState pitLinkState = new PitLinkingState();
@@ -91,8 +101,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             PitLinking pitLinking,
             Analytics analytics,
             FeatureFlag featureFlag,
-            FeatureFlag cardsFeatureFlag) {
-
+            FeatureFlag cardsFeatureFlag,
+            FeatureFlag fundsFeatureFlag,
+            SimpleBuyPrefs simpleBuyPrefs
+    ) {
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
         this.settingsDataManager = settingsDataManager;
@@ -107,6 +119,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.exchangeRateDataManager = exchangeRateDataManager;
         this.kycStatusHelper = kycStatusHelper;
         this.pitLinking = pitLinking;
+        this.simpleBuyPrefs = simpleBuyPrefs;
+        this.fundsFeatureFlag = fundsFeatureFlag;
         this.analytics = analytics;
         this.featureFlag = featureFlag;
         this.cardsFeatureFlag = cardsFeatureFlag;
@@ -132,6 +146,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                     getView().showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR);
                                 }));
         updateCards();
+        updateBanks();
         getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated, throwable -> {
         }));
         getCompositeDisposable().add(featureFlag.getEnabled().subscribe(this::showPitItem));
@@ -154,7 +169,34 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                         .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
                     getView().cardsEnabled(false);
                     onCardsUpdated(Collections.emptyList());
+                    getView().updateBanks(Collections.emptyList());
                 }).subscribe(this::onCardsUpdated));
+    }
+
+    private void updateBanks() {
+        getCompositeDisposable().add(
+                Single.zip(fundsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
+                        (enabled, kycState) -> new Pair<>(enabled, kycState.isApprovedFor(KycTierLevel.GOLD)))
+                        .flatMap(pair -> {
+                            if (pair.first)
+                                return canLinkBank(getFiatUnits(), pair.second).doOnSuccess(canLink ->
+                                        getView().banksEnabled(canLink)).zipWith(custodialWalletManager.getLinkedBanks(), (canLink, linkedBanks) -> linkedBanks);
+                            else
+                                return Single.just(Collections.<LinkedBank>emptyList());
+                        })
+                        .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
+                    getView().banksEnabled(false);
+                    onBanksUpdated(Collections.emptyList());
+                    getView().updateBanks(Collections.emptyList());
+                }).subscribe(this::onBanksUpdated));
+    }
+
+    private Single<Boolean> canLinkBank(String fiat, boolean isGold) {
+        return custodialWalletManager.getSupportedFundsFiats(fiat, isGold).map(supportedCurrencies -> supportedCurrencies.size() > 0);
+    }
+
+    private void onBanksUpdated(List<LinkedBank> banks) {
+        getView().updateBanks(banks);
     }
 
 
@@ -448,12 +490,8 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                             updateUi();
                         })
                         .subscribe(
-                                () -> {
-                                    getView().showDialogSmsVerified();
-                                },
-                                throwable -> {
-                                    getView().showWarningDialog(R.string.verify_sms_failed);
-                                }));
+                                () -> getView().showDialogSmsVerified(),
+                                throwable -> getView().showWarningDialog(R.string.verify_sms_failed)));
     }
 
     private Completable syncPhoneNumberWithNabu() {
@@ -569,6 +607,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      * @param password         The requested new password as a String
      * @param fallbackPassword The user's current password as a fallback
      */
+    @SuppressLint("CheckResult")
     void updatePassword(@NonNull String password, @NonNull String fallbackPassword) {
         payloadManager.setTempPassword(password);
 
@@ -604,6 +643,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                                     if (prefs.getSelectedFiatCurrency().equals(fiatUnit))
                                         analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency);
                                     prefs.setSelectedFiatCurrency(fiatUnit);
+                                    simpleBuyPrefs.clearState();
                                     this.settings = settings;
                                     analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged.INSTANCE);
                                 },

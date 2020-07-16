@@ -1,10 +1,11 @@
 package piuk.blockchain.android.ui.activity.detail
 
+import com.blockchain.testutils.satoshi
+import com.blockchain.testutils.satoshiCash
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.data.Wallet
 import org.junit.Test
@@ -19,10 +20,10 @@ class TransactionHelperTest {
     private val bchDataManager: BchDataManager = mock()
     private val payload: Wallet = mock()
 
-    private val cryptoValBtc_1 = CryptoValue.bitcoinFromSatoshis(1)
-    private val cryptoValBtc_15 = CryptoValue.bitcoinFromSatoshis(15)
-    private val cryptoValBch_1 = CryptoValue.bitcoinCashFromSatoshis(1)
-    private val cryptoValBch_15 = CryptoValue.bitcoinCashFromSatoshis(15)
+    private val cryptoValBtc_1 = 1.satoshi()
+    private val cryptoValBtc_15 = 15.satoshi()
+    private val cryptoValBch_1 = 1.satoshiCash()
+    private val cryptoValBch_15 = 15.satoshiCash()
 
     private val subject: TransactionHelper =
         TransactionHelper(
@@ -131,7 +132,7 @@ class TransactionHelperTest {
                 "key1" to cryptoValBtc_1,
                 "key2" to cryptoValBtc_15
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -164,7 +165,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBtc_1
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -251,7 +252,7 @@ class TransactionHelperTest {
                 "key1" to cryptoValBch_1,
                 "key2" to cryptoValBch_15
             ),
-            cryptoValue = CryptoValue.bitcoinCashFromSatoshis(10)
+            value = 10.satoshiCash()
         )
 
         val legacyStrings = listOf("key0", "key1")
@@ -281,7 +282,7 @@ class TransactionHelperTest {
             outputsMap = mapOf(
                 "key0" to cryptoValBch_1
             ),
-            cryptoValue = CryptoValue.bitcoinFromSatoshis(10)
+            value = 10.satoshi()
         )
 
         val legacyStrings = listOf("key0", "key1")

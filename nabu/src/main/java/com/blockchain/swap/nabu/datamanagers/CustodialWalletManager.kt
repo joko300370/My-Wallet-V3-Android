@@ -12,6 +12,7 @@ import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.util.Date
 
@@ -62,6 +63,10 @@ interface CustodialWalletManager {
         currency: String
     ): Single<List<FiatValue>>
 
+    fun getTransactions(
+        currency: String
+    ): Single<List<FiatTransaction>>
+
     fun getBankAccountDetails(
         currency: String
     ): Single<BankAccount>
@@ -82,12 +87,16 @@ interface CustodialWalletManager {
 
     fun deleteCard(cardId: String): Completable
 
+    fun deleteBank(bankId: String): Completable
+
     fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Completable
 
     // For test/dev
     fun cancelAllPendingBuys(): Completable
 
     fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
+
+    fun getLinkedBanks(): Single<List<LinkedBank>>
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
@@ -110,6 +119,7 @@ interface CustodialWalletManager {
 
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
 
+    fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 }
 
@@ -135,6 +145,34 @@ typealias BuyOrderList = List<BuyOrder>
 data class OrderInput(private val symbol: String, private val amount: String)
 
 data class OrderOutput(private val symbol: String)
+
+data class LinkedBank(
+    val id: String,
+    val title: String,
+    private val account: String,
+    val currency: String
+) : Serializable {
+
+    val accountDotted: String by unsafeLazy {
+        "•••• $account"
+    }
+}
+
+data class FiatTransaction(
+    val amount: FiatValue,
+    val id: String,
+    val date: Date,
+    val type: TransactionType,
+    val state: TransactionState
+)
+
+enum class TransactionType {
+    DEPOSIT, WITHDRAWAL, UNKNOWN
+}
+
+enum class TransactionState {
+    COMPLETED, UNKNOWN
+}
 
 data class SimpleBuyPairs(val pairs: List<SimpleBuyPair>)
 
@@ -167,13 +205,19 @@ sealed class SimpleBuyError : Throwable() {
     object WithdrawlInsufficientFunds : SimpleBuyError()
 }
 
-sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null)
+sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) : Serializable {
+    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, Integer.MAX_VALUE)
     data class BankTransfer(override val limits: PaymentLimits) :
-        PaymentMethod(BANK_PAYMENT_ID, limits)
+        PaymentMethod(BANK_PAYMENT_ID, limits, 1)
 
     data class UndefinedCard(override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits)
+        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, 3)
+
+    data class Funds(val balance: FiatValue, val fiatCurrency: String, override val limits: PaymentLimits) :
+        PaymentMethod(FUNDS_PAYMENT_ID, limits, 0)
+
+    data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
+        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, 4)
 
     data class Card(
         val cardId: String,
@@ -184,7 +228,7 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Se
         val expireDate: Date,
         val cardType: CardType,
         val status: CardStatus
-    ) : PaymentMethod(cardId, limits), Serializable {
+    ) : PaymentMethod(cardId, limits, 2), Serializable {
         fun uiLabelWithDigits() =
             "${uiLabel()} ${dottedEndDigits()}"
 
@@ -210,6 +254,8 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?) : Se
         const val BANK_PAYMENT_ID = "BANK_PAYMENT_ID"
         const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
+        const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
+        const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
     }
 }
 

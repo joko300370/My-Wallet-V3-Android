@@ -16,25 +16,25 @@ class CryptoCurrencyFormatterTest {
     @Test
     fun `format BTC from Crypto Value`() {
         CryptoValue.ZeroBtc.format(locale) `should equal` "0"
-        CryptoValue.bitcoinFromMajor(1).format(locale) `should equal` "1.0"
-        CryptoValue.bitcoinFromMajor(10_000).format(locale) `should equal` "10,000.0"
-        CryptoValue.bitcoinFromMajor(21_000_000).format(locale) `should equal` "21,000,000.0"
+        1.bitcoin().format(locale) `should equal` "1.0"
+        10_000.bitcoin().format(locale) `should equal` "10,000.0"
+        21_000_000.bitcoin().format(locale) `should equal` "21,000,000.0"
     }
 
     @Test
     fun `format BCH from Crypto Value`() {
         CryptoValue.ZeroBch.format(locale) `should equal` "0"
-        CryptoValue.bitcoinCashFromMajor(1).format(locale) `should equal` "1.0"
-        CryptoValue.bitcoinCashFromMajor(10_000).format(locale) `should equal` "10,000.0"
-        CryptoValue.bitcoinCashFromMajor(21_000_000).format(locale) `should equal` "21,000,000.0"
+        1.bitcoinCash().format(locale) `should equal` "1.0"
+        10_000.bitcoinCash().format(locale) `should equal` "10,000.0"
+        21_000_000.bitcoinCash().format(locale) `should equal` "21,000,000.0"
     }
 
     @Test
     fun `format Ether from Crypto Value`() {
         CryptoValue.ZeroEth.format(locale) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(locale) `should equal` "1.0"
-        CryptoValue.etherFromMajor(10_000).format(locale) `should equal` "10,000.0"
-        CryptoValue.etherFromMajor(100_000_000).format(locale) `should equal` "100,000,000.0"
+        1.ether().format(locale) `should equal` "1.0"
+        10_000.ether().format(locale) `should equal` "10,000.0"
+        100_000_000.ether().format(locale) `should equal` "100,000,000.0"
     }
 
     @Test
@@ -47,22 +47,22 @@ class CryptoCurrencyFormatterTest {
 
     @Test
     fun `formatWithUnit BTC`() {
-        CryptoValue.bitcoinFromMajor(1).formatWithUnit(locale) `should equal` "1.0 BTC"
-        CryptoValue.bitcoinFromMajor(10_000).formatWithUnit(locale) `should equal` "10,000.0 BTC"
-        CryptoValue.bitcoinFromMajor(21_000_000).formatWithUnit(locale) `should equal` "21,000,000.0 BTC"
+        1.bitcoin().formatWithUnit(locale) `should equal` "1.0 BTC"
+        10_000.bitcoin().formatWithUnit(locale) `should equal` "10,000.0 BTC"
+        21_000_000.bitcoin().formatWithUnit(locale) `should equal` "21,000,000.0 BTC"
     }
 
     @Test
     fun `formatWithUnit BTC fractions`() {
-        CryptoValue.bitcoinFromSatoshis(1L).formatWithUnit(locale) `should equal` "0.00000001 BTC"
-        CryptoValue.bitcoinFromSatoshis(10L).formatWithUnit(locale) `should equal` "0.0000001 BTC"
-        CryptoValue.bitcoinFromSatoshis(100L).formatWithUnit(locale) `should equal` "0.000001 BTC"
-        CryptoValue.bitcoinFromSatoshis(1000L).formatWithUnit(locale) `should equal` "0.00001 BTC"
-        CryptoValue.bitcoinFromSatoshis(10000L).formatWithUnit(locale) `should equal` "0.0001 BTC"
-        CryptoValue.bitcoinFromSatoshis(100000L).formatWithUnit(locale) `should equal` "0.001 BTC"
-        CryptoValue.bitcoinFromSatoshis(1000000L).formatWithUnit(locale) `should equal` "0.01 BTC"
-        CryptoValue.bitcoinFromSatoshis(10000000L).formatWithUnit(locale) `should equal` "0.1 BTC"
-        CryptoValue.bitcoinFromSatoshis(120000000L).formatWithUnit(locale) `should equal` "1.2 BTC"
+        1L.satoshi().formatWithUnit(locale) `should equal` "0.00000001 BTC"
+        10L.satoshi().formatWithUnit(locale) `should equal` "0.0000001 BTC"
+        100L.satoshi().formatWithUnit(locale) `should equal` "0.000001 BTC"
+        1000L.satoshi().formatWithUnit(locale) `should equal` "0.00001 BTC"
+        10000L.satoshi().formatWithUnit(locale) `should equal` "0.0001 BTC"
+        100000L.satoshi().formatWithUnit(locale) `should equal` "0.001 BTC"
+        1000000L.satoshi().formatWithUnit(locale) `should equal` "0.01 BTC"
+        10000000L.satoshi().formatWithUnit(locale) `should equal` "0.1 BTC"
+        120000000L.satoshi().formatWithUnit(locale) `should equal` "1.2 BTC"
     }
 
     @Test
@@ -72,22 +72,22 @@ class CryptoCurrencyFormatterTest {
 
     @Test
     fun `formatWithUnit BCH`() {
-        CryptoValue.bitcoinCashFromMajor(1).formatWithUnit(locale) `should equal` "1.0 BCH"
-        CryptoValue.bitcoinCashFromMajor(10_000).formatWithUnit(locale) `should equal` "10,000.0 BCH"
-        CryptoValue.bitcoinCashFromMajor(21_000_000).formatWithUnit(locale) `should equal` "21,000,000.0 BCH"
+        1.bitcoinCash().formatWithUnit(locale) `should equal` "1.0 BCH"
+        10_000.bitcoinCash().formatWithUnit(locale) `should equal` "10,000.0 BCH"
+        21_000_000.bitcoinCash().formatWithUnit(locale) `should equal` "21,000,000.0 BCH"
     }
 
     @Test
     fun `formatWithUnit BCH fractions`() {
-        CryptoValue.bitcoinCashFromSatoshis(1L).formatWithUnit(locale) `should equal` "0.00000001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(10L).formatWithUnit(locale) `should equal` "0.0000001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(100L).formatWithUnit(locale) `should equal` "0.000001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(1000L).formatWithUnit(locale) `should equal` "0.00001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(10000L).formatWithUnit(locale) `should equal` "0.0001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(100000L).formatWithUnit(locale) `should equal` "0.001 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(1000000L).formatWithUnit(locale) `should equal` "0.01 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(10000000L).formatWithUnit(locale) `should equal` "0.1 BCH"
-        CryptoValue.bitcoinCashFromSatoshis(120000000L).formatWithUnit(locale) `should equal` "1.2 BCH"
+        1L.satoshiCash().formatWithUnit(locale) `should equal` "0.00000001 BCH"
+        10L.satoshiCash().formatWithUnit(locale) `should equal` "0.0000001 BCH"
+        100L.satoshiCash().formatWithUnit(locale) `should equal` "0.000001 BCH"
+        1000L.satoshiCash().formatWithUnit(locale) `should equal` "0.00001 BCH"
+        10000L.satoshiCash().formatWithUnit(locale) `should equal` "0.0001 BCH"
+        100000L.satoshiCash().formatWithUnit(locale) `should equal` "0.001 BCH"
+        1000000L.satoshiCash().formatWithUnit(locale) `should equal` "0.01 BCH"
+        10000000L.satoshiCash().formatWithUnit(locale) `should equal` "0.1 BCH"
+        120000000L.satoshiCash().formatWithUnit(locale) `should equal` "1.2 BCH"
     }
 
     @Test
@@ -97,9 +97,9 @@ class CryptoCurrencyFormatterTest {
 
     @Test
     fun `formatWithUnit ETH`() {
-        CryptoValue.etherFromMajor(1).formatWithUnit(locale) `should equal` "1.0 ETH"
-        CryptoValue.etherFromMajor(10_000).formatWithUnit(locale) `should equal` "10,000.0 ETH"
-        CryptoValue.etherFromMajor(1_000_000_000).formatWithUnit(locale) `should equal` "1,000,000,000.0 ETH"
+        1.ether().formatWithUnit(locale) `should equal` "1.0 ETH"
+        10_000.ether().formatWithUnit(locale) `should equal` "10,000.0 ETH"
+        1_000_000_000.ether().formatWithUnit(locale) `should equal` "1,000,000,000.0 ETH"
     }
 
     @Test
@@ -175,17 +175,17 @@ class CryptoCurrencyFormatterTest {
     @Test
     fun `format in another locale`() {
         CryptoValue.ZeroEth.format(Locale.FRANCE) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(Locale.FRANCE) `should equal` "1,0"
-        CryptoValue.etherFromMajor(10_000).format(Locale.FRANCE) `should equal` "10\u00a0000,0"
-        CryptoValue.etherFromMajor(100_000_000).format(Locale.FRANCE) `should equal` "100\u00a0000\u00a0000,0"
+        1.ether().format(Locale.FRANCE) `should equal` "1,0"
+        10_000.ether().format(Locale.FRANCE) `should equal` "10\u00a0000,0"
+        100_000_000.ether().format(Locale.FRANCE) `should equal` "100\u00a0000\u00a0000,0"
     }
 
     @Test
     fun `format in another locale, forced to another`() {
         CryptoValue.ZeroEth.format(locale = Locale.US) `should equal` "0"
-        CryptoValue.etherFromMajor(1).format(locale = Locale.US) `should equal` "1.0"
-        CryptoValue.etherFromMajor(10_000).format(locale = Locale.US) `should equal` "10,000.0"
-        CryptoValue.etherFromMajor(100_000_000).format(locale = Locale.US) `should equal` "100,000,000.0"
+        1.ether().format(locale = Locale.US) `should equal` "1.0"
+        10_000.ether().format(locale = Locale.US) `should equal` "10,000.0"
+        100_000_000.ether().format(locale = Locale.US) `should equal` "100,000,000.0"
     }
 
     private fun Long.formatWeiWithUnit() =

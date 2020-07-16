@@ -37,6 +37,8 @@ internal abstract class CryptoAssetBase(
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
+    override val isEnabled: Boolean
+        get() = !asset.hasFeature(CryptoCurrency.STUB_ASSET)
 
     // Init token, set up accounts and fetch a few activities
     override fun init(): Completable =

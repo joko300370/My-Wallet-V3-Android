@@ -36,7 +36,7 @@ internal class EthActivitySummaryItem(
 
     override val timeStampMs: Long = ethTransaction.timestamp * 1000
 
-    override val cryptoValue: CryptoValue by unsafeLazy {
+    override val value: CryptoValue by unsafeLazy {
         CryptoValue.fromMinor(CryptoCurrency.ETHER,
             when (direction) {
                 TransactionSummary.Direction.RECEIVED -> ethTransaction.value

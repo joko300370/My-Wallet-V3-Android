@@ -62,25 +62,20 @@ data class CryptoValue(
             CryptoCurrency.USDT -> ZeroUsdt
         }
 
+        // These calls are currently (mostly) only used in tests, where we have a second mechanism
+        // [xx.bitcoin(), xx.satoshi() etc] for generating CryptoValues.
+        // So ALL these coin specific calls are deprecated and will be removed once all the tests
+        // are updated to use the other, more readable, mechanism. Use the suggested
+        // replacement in test code. If found in prod code, then it's CryptoValue.fromMajor/fromMinor etc
+        @Deprecated("Historical method", ReplaceWith("satoshi.satoshi()"))
         fun bitcoinFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
 
-        fun bitcoinFromMajor(bitcoin: Int) = bitcoinFromMajor(bitcoin.toBigDecimal())
-        fun bitcoinFromMajor(bitcoin: BigDecimal) = fromMajor(CryptoCurrency.BTC, bitcoin)
-
+        @Deprecated("Historical method", ReplaceWith("satoshi.satoshiCash()"))
         fun bitcoinCashFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
 
-        fun bitcoinCashFromMajor(bitcoinCash: Int) =
-            bitcoinCashFromMajor(bitcoinCash.toBigDecimal())
-
-        fun bitcoinCashFromMajor(bitcoinCash: BigDecimal) =
-            fromMajor(CryptoCurrency.BCH, bitcoinCash)
-
-        fun etherFromMajor(ether: Long) = etherFromMajor(ether.toBigDecimal())
-        fun etherFromMajor(ether: BigDecimal) = fromMajor(CryptoCurrency.ETHER, ether)
-
-        fun lumensFromMajor(lumens: BigDecimal) = fromMajor(CryptoCurrency.XLM, lumens)
+        @Deprecated("Historical method", ReplaceWith("stroop.stroops()"))
         fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
 
         fun fromMajor(

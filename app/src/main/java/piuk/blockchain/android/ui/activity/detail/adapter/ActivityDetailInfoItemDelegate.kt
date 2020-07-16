@@ -94,7 +94,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
     private fun getValueForType(infoType: ActivityDetailsType): String =
         when (infoType) {
             is Created -> infoType.date.toFormattedString()
-            is Amount -> infoType.cryptoValue.toStringWithSymbol()
+            is Amount -> infoType.value.toStringWithSymbol()
             is Fee -> infoType.feeValue?.toStringWithSymbol() ?: parent.context.getString(
                 R.string.activity_details_fee_load_fail)
             is Value -> infoType.currentFiatValue?.toStringWithSymbol() ?: parent.context.getString(

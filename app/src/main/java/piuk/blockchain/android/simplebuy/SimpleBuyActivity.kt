@@ -158,10 +158,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun goToCardPaymentScreen(addToBackStack: Boolean) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, SimpleBuyCardPaymentFragment(), SimpleBuyCardPaymentFragment::class.simpleName)
+            .replace(R.id.content_frame, SimpleBuyPaymentFragment(), SimpleBuyPaymentFragment::class.simpleName)
             .apply {
                 if (addToBackStack) {
-                    addToBackStack(SimpleBuyCardPaymentFragment::class.simpleName)
+                    addToBackStack(SimpleBuyPaymentFragment::class.simpleName)
                 }
             }
             .commitAllowingStateLoss()

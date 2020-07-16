@@ -30,6 +30,7 @@ import com.blockchain.sunriver.XlmTransactionTimeoutFetcher
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
 import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.params.BitcoinMainNetParams
@@ -179,7 +180,7 @@ val coreModule = module {
         factory { WalletOptionsDataManager(get(), get(), get(), get(explorerUrl)) }
             .bind(XlmTransactionTimeoutFetcher::class).bind(XlmHorizonUrlFetcher::class)
 
-        factory { ExchangeRateDataManager(get(), get()) }
+        factory { ExchangeRateDataManager(get(), get()) }.bind(ExchangeRates::class)
 
         scoped { ExchangeRateDataStore(get(), get()) }
 
