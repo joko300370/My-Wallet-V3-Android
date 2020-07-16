@@ -55,6 +55,10 @@ class ConfirmTransactionSheet : SendInputSheet() {
             )
             adapter = detailsAdapter
         }
+
+        view.confirm_sheet_back.setOnClickListener {
+            model.process(SendIntent.ReturnToPreviousStep)
+        }
     }
 
     private fun onCtaClick() {
