@@ -29,7 +29,7 @@ class Coincore internal constructor(
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
-    val assets: Iterable<Asset> = assetMap.values + fiatAsset
+    val assets: Iterable<Asset> = listOf(fiatAsset) + assetMap.values
 
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)

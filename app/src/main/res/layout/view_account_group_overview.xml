@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +8,13 @@
     android:paddingTop="@dimen/small_margin"
     android:paddingBottom="@dimen/small_margin">
 
-    <piuk.blockchain.android.ui.customviews.FiatCurrencySymbolView
+    <ImageView
         android:id="@+id/icon"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="@dimen/standard_margin"
         android:importantForAccessibility="no"
+        tools:srcCompat="@drawable/vector_bitcoin_colored"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,11 +24,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        tools:text="BTC Wallet"
         android:ellipsize="middle"
         android:singleLine="true"
         app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon"
-        tools:text="BTC Wallet" />
+        app:layout_constraintEnd_toStartOf="@id/wallet_balance_fiat"
+        app:layout_constraintTop_toTopOf="@id/icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/asset_name"
@@ -35,7 +38,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@+id/wallet_name"
         app:layout_constraintTop_toBottomOf="@+id/wallet_name"
-        tools:text="GBP" />
+        tools:text="Bitcoin" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/wallet_balance_fiat"
@@ -43,31 +46,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintBottom_toTopOf="@id/wallet_balance_exchange_fiat"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1"
+        app:layout_constraintBottom_toBottomOf="@id/wallet_name"
         tools:text="$15,879.90" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/wallet_balance_exchange_fiat"
+        android:id="@+id/wallet_currency"
         style="@style/Text.Semibold.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintBottom_toBottomOf="@id/asset_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/asset_name"
+        app:layout_constraintBottom_toBottomOf="@id/asset_name"
         tools:text="1.638192 BTC" />
-
-    <ImageView
-        android:id="@+id/asset_spend_locked"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="21dp"
-        app:layout_constraintStart_toStartOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon"
-        app:srcCompat="@drawable/ic_asset_non_custodial_spend" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

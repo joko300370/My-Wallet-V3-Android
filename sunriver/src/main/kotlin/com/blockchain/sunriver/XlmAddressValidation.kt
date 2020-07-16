@@ -1,6 +1,7 @@
 package com.blockchain.sunriver
 
 import com.blockchain.transactions.Memo
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import java.net.URI
 import java.util.regex.Pattern
@@ -22,7 +23,9 @@ fun String.fromStellarUri(): StellarPayment = if (this.contains("web+stellar")) 
         map[matcher.group(1)] = matcher.group(2)
     }
 
-    val amount = map["amount"]?.let { CryptoValue.lumensFromMajor(it.toBigDecimal()) } ?: CryptoValue.ZeroXlm
+    val amount = map["amount"]?.let {
+        CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal())
+    } ?: CryptoValue.ZeroXlm
 
     StellarPayment(HorizonKeyPair.createValidatedPublic(map["pay?destination"]!!), amount, getMemo(map))
 } else {

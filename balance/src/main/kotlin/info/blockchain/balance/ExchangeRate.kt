@@ -106,16 +106,12 @@ sealed class ExchangeRate(var rate: BigDecimal) {
     companion object {
         private fun validateCurrency(expected: CryptoCurrency, got: CryptoCurrency) {
             if (expected != got)
-                throw IllegalArgumentException(
-                    "Currency Mismatch. Expect $expected, got $got"
-                )
+                throw ValueTypeMismatchException("exchange", expected.networkTicker, got.networkTicker)
         }
 
         private fun validateCurrency(expected: String, got: String) {
             if (expected != got)
-                throw IllegalArgumentException(
-                    "Currency Mismatch. Expect $expected, got $got"
-                )
+                throw ValueTypeMismatchException("exchange", expected, got)
         }
     }
 }
