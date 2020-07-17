@@ -6,6 +6,7 @@ import android.text.method.LinkMovementMethod
 import android.view.View
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.bankFieldName
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.link_bank_account_layout.view.bank_deposit
 import kotlinx.android.synthetic.main.link_bank_account_layout.view.title
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.simplebuy.BankDetailField
 import piuk.blockchain.android.simplebuy.CopyFieldListener
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -26,16 +28,16 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import java.lang.IllegalStateException
 
 class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
 
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val stringUtils: StringUtils by inject()
+    private val currencyPrefs: CurrencyPrefs by scopedInject()
 
     private val fiatCurrency: String by unsafeLazy {
-        arguments?.getString(FIAT_CURRENCY) ?: throw IllegalStateException("Fiat currency is missing")
+        arguments?.getString(FIAT_CURRENCY) ?: currencyPrefs.selectedFiatCurrency
     }
 
     private val isForLink: Boolean by unsafeLazy {
@@ -129,12 +131,20 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
         private const val FIAT_CURRENCY = "FIAT_CURRENCY_KEY"
         private const val IS_FOR_LINK = "IS_FOR_LINK"
 
-        fun newInstance(fiatCurrency: String, isForLink: Boolean = true):
-                LinkBankAccountDetailsBottomSheet =
+        fun newInstance(fiatAccount: FiatAccount) =
+            LinkBankAccountDetailsBottomSheet().apply {
+                arguments = Bundle().apply {
+                    putString(FIAT_CURRENCY, fiatAccount.fiatCurrency)
+                    putBoolean(IS_FOR_LINK, !fiatAccount.isFunded)
+                }
+            }
+
+        fun newInstance() = LinkBankAccountDetailsBottomSheet()
+
+        fun newInstance(fiatCurrency: String) =
             LinkBankAccountDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
                     putString(FIAT_CURRENCY, fiatCurrency)
-                    putBoolean(IS_FOR_LINK, isForLink)
                 }
             }
     }

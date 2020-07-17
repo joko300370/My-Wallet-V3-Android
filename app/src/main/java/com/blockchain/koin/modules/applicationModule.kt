@@ -671,6 +671,8 @@ val applicationModule = module {
             DashboardInteractor(
                 coincore = get(),
                 payloadManager = get(),
+                exchangeRates = get(),
+                currencyPrefs = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get()

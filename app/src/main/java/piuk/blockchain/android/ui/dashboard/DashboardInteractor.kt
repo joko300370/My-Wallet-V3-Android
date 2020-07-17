@@ -2,10 +2,12 @@ package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
@@ -17,12 +19,15 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 
 class DashboardInteractor(
     private val coincore: Coincore,
     private val payloadManager: PayloadManager,
+    private val exchangeRates: ExchangeRates,
+    private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics
@@ -98,47 +103,26 @@ class DashboardInteractor(
     private fun checkForFiatBalances(model: DashboardModel): Disposable =
         coincore.fiatAssets.accountGroup()
             .flattenAsObservable { g -> g.accounts }
-            .flatMapSingle { a -> a.balance }
+            .flatMapSingle {
+                    a -> a.balance.map { balance ->
+                        FiatBalanceInfo(
+                            balance,
+                            balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
+                            a as FiatAccount
+                        )
+                }
+            }
             .toList()
             .subscribeBy(
                 onSuccess = { balances ->
                     if (balances.isNotEmpty()) {
                         model.process(FiatBalanceUpdate(balances))
                     }
-            },
-            onError = {
-                Timber.e("Error while loading fiat balances $it")
-            }
-        )
-
-//    private fun checkForFiatBalances(model: DashboardModel): Disposable =
-//        tierService.tiers().flatMap { tier ->
-//            Singles.zip(
-//                assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
-//                assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP")),
-//                custodialWalletManager.getSupportedFundsFiats(
-//                    currencyPrefs.selectedFiatCurrency,
-//                    tier.isApprovedFor(KycTierLevel.GOLD)
-//                )
-//            )
-//        }.subscribeBy(
-//            onSuccess = { (euroValue, gbpValue, supportedFunds) ->
-//                val fiatBalances = supportedFunds.map {
-//                    when (it) {
-//                        "EUR" -> euroValue
-//                        "GBP" -> gbpValue
-//                        else -> FiatValue.zero(it)
-//                    }
-//                }
-//
-//                if (fiatBalances.isNotEmpty()) {
-//                    model.process(FiatBalanceUpdate(fiatBalances))
-//                }
-//            },
-//            onError = {
-//                Timber.e("Error while loading Funds balances $it")
-//            }
-//        )
+                },
+                onError = {
+                    Timber.e("Error while loading fiat balances $it")
+                }
+            )
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY

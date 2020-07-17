@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.DashboardPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -14,10 +13,10 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
@@ -71,9 +70,25 @@ interface BalanceState : DashboardItem {
     fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
 }
 
-data class FundsBalanceState(
-    val fiatBalances: List<Money> = emptyList()
-) : DashboardItem
+data class FiatBalanceInfo(
+    val balance: Money,
+    val userFiat: Money,
+    val account: FiatAccount
+)
+
+data class FiatAssetState(
+    val fiatAccounts: List<FiatBalanceInfo> = emptyList()
+) : DashboardItem {
+
+    val totalBalance: Money? =
+        if (fiatAccounts.isEmpty()) {
+            null
+        } else {
+            fiatAccounts.map {
+                it.userFiat
+            }.total()
+        }
+}
 
 enum class DashboardSheet {
     STX_AIRDROP_COMPLETE,
@@ -89,7 +104,10 @@ enum class DashboardSheet {
 
 data class DashboardState(
     val assets: AssetMap = AssetMap(
-        CryptoCurrency.activeCurrencies().associateBy({ it }, { CryptoAssetState(it) })
+        CryptoCurrency.activeCurrencies().associateBy(
+            keySelector = { it },
+            valueTransform = { CryptoAssetState(it) }
+        )
     ),
     val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
@@ -97,11 +115,9 @@ data class DashboardState(
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
     val transferFundsCurrency: CryptoCurrency? = null,
-    val fundsFiatBalances: FundsBalanceState? = null,
-    val selectedFundsBalance: Money? = null
+    val fiatAssets: FiatAssetState? = null,
+    val selectedFiatAccount: FiatAccount? = null
 ) : MviState, BalanceState, KoinComponent {
-
-    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
 
     // If ALL the assets are refreshing, then report true. Else false
     override val isLoading: Boolean by unsafeLazy {
@@ -109,24 +125,21 @@ data class DashboardState(
     }
 
     override val fiatBalance: Money? by unsafeLazy {
-        fundsFiatBalances?.let { _ ->
-            val assetFiatBalance = addAssetFiatBalances()
+        val cryptoAssetBalance = cryptoAssetFiatBalances()
+        val fiatAssetBalance = fiatAssets?.totalBalance
 
-            val totalBalance = assetFiatBalance?.let { assetFiat ->
-                val fundsBalance = addFundsFiatBalances(assetFiat.currencyCode)
-                assetFiat + fundsBalance
+        if (cryptoAssetBalance != null) {
+            if (fiatAssetBalance != null) {
+                cryptoAssetBalance + fiatAssetBalance
+            } else {
+                cryptoAssetBalance
             }
-
-            totalBalance
-        } ?: addAssetFiatBalances()
+        } else {
+            fiatAssetBalance
+        }
     }
 
-    private fun addFundsFiatBalances(fiat: String) =
-        fundsFiatBalances?.fiatBalances?.map {
-            it.toFiat(exchangeRateDataManager, fiat)
-        }?.ifEmpty { null }?.total() ?: FiatValue.zero(fiat)
-
-    private fun addAssetFiatBalances() = assets.values
+    private fun cryptoAssetFiatBalances() = assets.values
         .filter { !it.isLoading && it.fiatBalance != null }
         .map { it.fiatBalance!! }
         .ifEmpty { null }?.total()
@@ -152,7 +165,8 @@ data class DashboardState(
     override operator fun get(currency: CryptoCurrency): CryptoAssetState =
         assets[currency]
 
-    override fun getFundsFiat(fiat: String): Money = addFundsFiatBalances(fiat)
+    override fun getFundsFiat(fiat: String): Money =
+        fiatAssets?.totalBalance ?: FiatValue.zero(fiat)
 
     override fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean =
         !custodyIntroSeen && get(currency).hasCustodialBalance
@@ -209,7 +223,8 @@ class DashboardModel(
             }
             is CheckForCustodialBalanceIntent -> interactor.checkForCustodialBalance(
                 this,
-                intent.cryptoCurrency)
+                intent.cryptoCurrency
+            )
             is UpdateHasCustodialBalanceIntent -> {
                 process(RefreshPrices(intent.cryptoCurrency))
                 null
@@ -228,7 +243,9 @@ class DashboardModel(
             is PriceHistoryUpdate,
             is ClearAnnouncement,
             is ShowAnnouncement,
-            is ShowAssetDetails,
+            is ShowCryptoAssetDetails,
+            is ShowFiatAssetDetails,
+            is ShowBankLinkingSheet,
             is ShowDashboardSheet,
             is AbortFundsTransfer,
             is TransferFunds,
