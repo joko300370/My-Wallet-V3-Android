@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import info.blockchain.wallet.api.data.FeeOptions
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
@@ -25,26 +26,30 @@ class ConfirmTransactionSheet : SendInputSheet() {
     override val layoutResource: Int = R.layout.dialog_send_confirm
 
     private val detailsAdapter = DetailsAdapter()
+    private var state = SendState()
 
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == SendStep.CONFIRM_DETAIL)
 
+        val fee = FeeOptions.defaultFee(newState.sendingAccount.asset).regularFee
         detailsAdapter.populate(
             listOf(
                 PendingTxItem("Send", newState.sendAmount.toStringWithSymbol()),
                 PendingTxItem("From", newState.sendingAccount.label),
                 PendingTxItem("To", newState.targetAddress.label),
-                PendingTxItem("Fee - Regular", 0.00001.toString()), // TODO fee?
-                PendingTxItem("Total", (newState.sendAmount.toFloat() + 0.00001).toString())
+                PendingTxItem("Fee - Regular", fee.toString()),
+                PendingTxItem("Total", (newState.sendAmount.toFloat() + fee).toString())
             )
         )
+
+        state = newState
     }
 
     override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
+        view.confirm_cta_button.setOnClickListener { onCtaClick() }
 
-        with(view.details_list) {
+        with(view.confirm_details_list) {
             addItemDecoration(
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
             )
@@ -60,6 +65,8 @@ class ConfirmTransactionSheet : SendInputSheet() {
         view.confirm_sheet_back.setOnClickListener {
             model.process(SendIntent.ReturnToPreviousStep)
         }
+
+        // TODO do we need to request fees in the first iteration?
     }
 
     private fun onCtaClick() {

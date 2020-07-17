@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -42,7 +43,8 @@ data class SendState(
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
-    val errorState: SendErrorState = SendErrorState.NONE
+    val errorState: SendErrorState = SendErrorState.NONE,
+    val feeOptions: FeeOptions? = null
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?

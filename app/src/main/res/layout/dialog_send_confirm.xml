@@ -41,14 +41,14 @@
         app:layout_constraintTop_toBottomOf="@id/confirm_sheet_indicator" />
 
     <View
-        app:layout_constraintStart_toStartOf="parent"
         android:id="@+id/confirm_title_separator"
         style="@style/SeparatorWithoutMargins"
         android:layout_marginTop="@dimen/very_small_margin"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_sheet_title" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/details_list"
+        android:id="@+id/confirm_details_list"
         style="@style/Text.Semibold.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,14 +56,14 @@
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_title_separator"
         tools:listitem="@layout/item_send_confirm_details" />
 
     <Button
-        android:id="@+id/cta_button"
+        android:id="@+id/confirm_cta_button"
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
