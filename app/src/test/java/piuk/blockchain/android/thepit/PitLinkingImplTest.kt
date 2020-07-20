@@ -3,11 +3,11 @@ package piuk.blockchain.android.thepit
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.annotations.CommonCode
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuSettings
 import com.blockchain.swap.nabu.models.nabu.NabuUser
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.swap.nabu.models.nabu.ProductsUsed
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.doAnswer
@@ -69,7 +69,7 @@ class PitLinkingImplTest {
     @Test
     fun `fetch user data on subscribe, user is linked`() {
         // Arrange
-        whenever(nabuUser.settings).thenReturn(NabuSettings(true))
+        whenever(nabuUser.products).thenReturn(ProductsUsed(exchange = true))
         whenever(nabu.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
 
         // Act
@@ -87,6 +87,7 @@ class PitLinkingImplTest {
     fun `fetch user data on subscribe, user is not linked`() {
         // Arrange
         whenever(nabuUser.userName).thenReturn(null)
+        whenever(nabuUser.products).thenReturn(ProductsUsed())
         whenever(nabu.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
 
         // Act
@@ -103,7 +104,7 @@ class PitLinkingImplTest {
     @Test
     fun `two subscriptions with isPitLinked() helper function`() {
         // Arrange
-        whenever(nabuUser.settings).thenReturn(NabuSettings(true))
+        whenever(nabuUser.products).thenReturn(ProductsUsed(exchange = true))
         whenever(nabu.getUser(validOfflineToken)).thenReturn(Single.just(nabuUser))
 
         // Act

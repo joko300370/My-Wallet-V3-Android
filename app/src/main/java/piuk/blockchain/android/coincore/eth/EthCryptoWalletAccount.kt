@@ -39,7 +39,7 @@ internal class EthCryptoWalletAccount(
         exchangeRates
     )
 
-    private var hasFunds = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()

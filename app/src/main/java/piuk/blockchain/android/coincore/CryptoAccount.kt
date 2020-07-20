@@ -59,8 +59,8 @@ interface AccountGroup : BlockchainAccount {
 internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
-// Stub invalid account; use as an initialiser to avoid nulls.
-object NullAccount : CryptoAccount {
+// Stub invalid accounts; use as an initialisers to avoid nulls.
+object NullCryptoAccount : CryptoAccount {
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(NullAddress)
 
@@ -69,6 +69,40 @@ object NullAccount : CryptoAccount {
 
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
+
+    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+        Single.error(NotImplementedError("Dummy Account"))
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
+
+    override val label: String = ""
+
+    override val balance: Single<Money>
+        get() = Single.just(CryptoValue.ZeroBtc)
+
+    override val activity: Single<ActivitySummaryList>
+        get() = Single.just(emptyList())
+
+    override val actions: AvailableActions = emptySet()
+    override val isFunded: Boolean = false
+    override val hasTransactions: Boolean = false
+
+    override fun fiatBalance(
+        fiatCurrency: String,
+        exchangeRates: ExchangeRates
+    ): Single<Money> =
+        Single.just(FiatValue.zero(fiatCurrency))
+}
+
+object NullFiatAccount : FiatAccount {
+    override val fiatCurrency: String = "NULL"
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(NullAddress)
+
+    override val isDefault: Boolean
+        get() = false
 
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))

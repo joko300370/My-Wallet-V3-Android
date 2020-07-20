@@ -542,6 +542,7 @@
     <string name="sms_verified">Mobile number verified</string>
     <string name="preferences">Preferences</string>
     <string name="linked_cards">Linked Cards</string>
+    <string name="linked_banks">Linked Banks</string>
     <string name="two_fa_summary">Protect your wallet from unauthorized access by enabling 2-Step
         Verification.
     </string>
@@ -631,6 +632,8 @@
     <string name="tx_title_receive">Receive %1s</string>
     <string name="tx_title_sell">Sell %1s</string>
     <string name="tx_title_buy">Buy %1s</string>
+    <string name="tx_title_deposit">Deposit %1s</string>
+    <string name="tx_title_withdraw">Withdraw %1s</string>
     <string name="tx_title_swap">Swap %1s -> %2s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
@@ -1587,7 +1590,10 @@
     <string name="buy_min">Buy Min</string>
     <string name="buy_max">Buy Max</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
+    <string name="bank_transfer">Bank Transfer</string>
     <string name="credit_or_debit_card">Credit or Debit Card</string>
+    <string name="instantly_buy_crypto_with_card">Instantly buy crypto with any Visa or Mastercard.</string>
+    <string name="send_funds_directly_from_your_bank">Send funds directly from your bank to your Blockchain Wallet. Once we receive the manual transfer, use that cash to buy crypto.</string>
     <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
     <string name="select_payment_method">Select a Payment Method</string>
     <string name="payment_method_limit">%1$s Limit</string>
@@ -1620,6 +1626,11 @@
     <string name="simple_buy_pending_buy_sheet_title">Pending %1s Buy</string>
     <string name="recipient_name_must_match_eur">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.</string>
     <string name="recipient_name_must_match_gbp">Your Recipient name above must match the account holder\'s name on your bank account for your transfer to be successful. Your transfer could be rejected if there is not a match.\n\nBy depositing funds to this account, you agree to <annotation link="modular_terms_and_conditions">Terms &amp; Conditions of Modulr</annotation>, our banking partner.</string>
+    <string name="by_depositing_funds_terms_and_conds">By depositing funds to this account, you agree to <annotation link="modular_terms_and_conditions">Terms &amp; Conditions of Modulr</annotation>, our banking partner.</string>
+    <string name="add_bank_with_currency">Add a %1s Bank </string>
+    <string name="deposit_currency">Deposit %1s</string>
+    <string name="currency_bank_transfer">Bank Transfer</string>
+    <string name="link_transfer_instructions">Please transfer %1s from your personal bank to Blockchain.com. This will securely link your bank account.</string>
     <string name="recipient_name_must_match">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
     <string name="simple_buy_no_currencies_available_title">No currencies available</string>
     <string name="simple_buy_no_currencies_available">Unfortunately, currently there are no currencies that you can trade :( </string>
@@ -1627,7 +1638,7 @@
     <string name="cancel_order">Cancel Order</string>
     <string name="cancel_order_do_cancel">Cancel Order</string>
     <string name="cancel_order_go_back">Go Back</string>
-    <string name="card_payment">Card Payment</string>
+    <string name="payment">Payment</string>
     <string name="cancel_order_do_cancel_dashboard">Yes, Cancel</string>
     <string name="cancel_order_go_back_dashboard">No, Keep Order</string>
     <string name="cancel_token_instruction">This will remove your %1$s Buy order.</string>
@@ -1644,7 +1655,7 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Let’s get your wallet set up. You can quickly buy crypto now or do this later.</string>
-    <string name="buy_now">Buy Now</string>
+    <string name="buy_now_1">Buy %1s</string>
 
     <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
     <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
@@ -1676,11 +1687,13 @@
     <string name="card_not_supported">Card Not Supported</string>
     <string name="privacy_protected_ssl">Privacy protected with 256-Bit SSL encryption.</string>
     <string name="add_card_title">Add a Card</string>
+    <string name="add_bank_title">Add %1s Bank</string>
     <string name="add_card_address_title">Billing Address</string>
     <string name="linking_card_title">Securely Linking Your Card</string>
     <string name="linking_card_subtitle">This could take up to 1 minute.</string>
     <string name="linking_card_error_title">Oops! Something Went Wrong.</string>
     <string name="card_error_subtitle">Please go back and try again.</string>
+    <string name="order_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
     <string name="card_expiry_date">Exp: %1s</string>
     <string name="card_buying">Buying %1s</string>
     <string name="card_in_progress">%1s Buy In Progress</string>
@@ -1706,6 +1719,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
+    <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
     <!-- Activity Details -->
@@ -1765,9 +1779,48 @@
     <string name="order_complete">Complete</string>
     <string name="expired">Expired</string>
     <string name="remove_card">Remove Card</string>
+    <string name="remove_bank">Remove Bank</string>
     <string name="save_my_card">Save My Card</string>
     <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
+
+    <string name="pounds">Pounds</string>
+    <string name="euros">Euros</string>
+    <string name="deposit_cash">Deposit Cash</string>
+    <string name="send_me_instructions">Send Me the Instructions</string>
+    <string name="bank_transfer_only">Bank Transfer Only</string>
+    <string name="bank_transfer_only_subtitle">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
+    <string name="processing_time">Processing Time</string>
+    <string name="processing_time_subtitle_eur">Funds will be credited to your EUR wallet as soon as we receive them. SEPA transfers usually take around 1 business day to reach us.</string>
+    <string name="processing_time_subtitle_gbp">Funds will be credited to your GBP wallet as soon as we receive them. In the UK Faster Payments Network, this can take a couple of hours.</string>
+    <string name="deposit_limits">Deposit Limits</string>
+    <string name="deposit_limits_subtitle">Please be aware that if you deposit more than your daily withdrawal limit, you wil not be able to withdraw all of your funds at once.</string>
+    <string name="unable_to_load_bank_details">We were unable to load our bank deposit details.</string>
+    <string name="most_popular">Most Popular</string>
+
+    <!-- Fiat Funds -->
+    <string name="fiat_funds_detail_deposit_title">Deposit</string>
+    <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
+    <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
+    <string name="fiat_funds_detail_activity_title">Activity</string>
+    <string name="fiat_funds_detail_activity_details">View All Transactions</string>
+    <string name="fiat_funds_no_kyc_announcement_title">Keep Cash in Your Wallet</string>
+    <string name="fiat_funds_no_kyc_announcement_description">Verify your identity to deposit cash into the Wallet and buy crypto.</string>
+    <string name="fiat_funds_no_kyc_sheet_description">Verify your identity to deposit cash into your Wallet. Buy &amp; Sell crypto. Withdraw at any time.</string>
+    <string name="fiat_funds_no_kyc_step_1_title">Verify Your Identity</string>
+    <string name="fiat_funds_no_kyc_step_1_description">We need to make sure it\'s really you to prevent fraud by uploading an ID.</string>
+    <string name="fiat_funds_no_kyc_step_2_title">Deposit Cash</string>
+    <string name="fiat_funds_no_kyc_step_2_description">Transfer cash from your bank and enable your cash balances.</string>
+    <string name="fiat_funds_no_kyc_step_3_title">Buy Crypto with Cash</string>
+    <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Use your cash wallet as a payment method to buy BTC, ETH, XLM & more.]]></string>
+    <string name="fiat_funds_no_kyc_positive_action">Verify My Identity</string>
+    <string name="fiat_funds_no_kyc_negative_action">Not Now</string>
+    <string name="fiat_funds_no_kyc_step_1_label">1</string>
+    <string name="fiat_funds_no_kyc_step_2_label">2</string>
+    <string name="fiat_funds_no_kyc_step_3_label">3</string>
+    <string name="fiat_funds_kyc_announcement_title">Link a Bank to Buy Crypto</string>
+    <string name="fiat_funds_kyc_announcement_description">Hold cash in your Blockchain.com Wallet. Deposit and Withdraw at anytime.</string>
+    <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
     <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
     <string name="transfer_send_crypto">Send crypto</string>
     <string name="transfer_second_pswd_title">2nd Password</string>
@@ -1777,11 +1830,13 @@
     <string name="algorand_announcement_title">Say Hello to Algorand!</string>
     <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
     <string name="algorand_announcement_action">Buy Algorand</string>
+    <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="tether_announcement_title">Say Hello to Tether!</string>
     <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
     <string name="tether_announcement_action">Buy Tether Now</string>
 
+    <!-- new send -->
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
     <string name="send_enter_amount_title">Amount</string>
@@ -1789,5 +1844,10 @@
     <string name="send_enter_amount_max">Send Max</string>
     <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
     <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
+
+    <string name="send_state_no_funds">No funds</string>
+    <string name="send_state_not_supported">Send not supported on this account</string>
+    <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
+    <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
 
 </resources>

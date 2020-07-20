@@ -75,6 +75,7 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
+import piuk.blockchain.android.ui.transfer.TestSendContainerActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -396,6 +397,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
+            R.id.stub_send_test -> TestSendContainerActivity.start(this)
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
@@ -706,11 +708,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(fragment)
     }
 
-    override fun gotoActivityFor(account: BlockchainAccount) {
+    override fun gotoActivityFor(account: BlockchainAccount?) {
         // Once coincore is fully integrated, we won't care about setting the
         // asset dropdown to the currently/active cryptocurrency.
         // For now, we'll only set it if we're actually looking at a crypto asset
-        if (account is CryptoAccount) {
+        if (account != null && account is CryptoAccount) {
             presenter.cryptoCurrency = account.asset
         }
         startActivitiesFragment(account)

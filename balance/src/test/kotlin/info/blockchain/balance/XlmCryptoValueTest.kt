@@ -32,17 +32,6 @@ class XlmCryptoValueTest {
     }
 
     @Test
-    fun `create via lumensFromMajor method`() {
-        CryptoValue.lumensFromMajor(123.45.toBigDecimal()) `should equal`
-            CryptoValue.fromMajor(CryptoCurrency.XLM, 123.45.toBigDecimal())
-    }
-
-    @Test
-    fun `create via lumensFromStroop method`() {
-        CryptoValue.lumensFromStroop(12345678.toBigInteger()) `should equal` 1.2345678.lumens()
-    }
-
-    @Test
     fun `create via constructor`() {
         CryptoValue(CryptoCurrency.XLM, 98765432.toBigInteger()) `should equal` 9.8765432.lumens()
     }

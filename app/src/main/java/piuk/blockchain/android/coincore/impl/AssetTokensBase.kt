@@ -106,9 +106,6 @@ internal abstract class CryptoAssetBase(
             accounts.first { it.isDefault }
         }
 
-    final override fun accounts(): List<SingleAccount> =
-        accounts
-
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
             .doOnSuccess { Timber.d("@@@@ got unfiltered list: $it") }

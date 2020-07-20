@@ -47,7 +47,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
 
         with(dialogView) {
             if (state.sendingAccount != newState.sendingAccount) {
-                from_details.account = newState.sendingAccount
+                from_details.updateAccount(newState.sendingAccount, disposables)
                 setupTransferList(newState.sendingAccount)
             }
             cta_button.isEnabled = newState.nextEnabled
@@ -62,7 +62,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
         state = newState
     }
 
-    // TODO: THis address processing should occur viw the interactor
+    // TODO: This address processing should occur via the interactor
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
             val address = addressFactory.parse(s.toString(), state.sendingAccount.asset)
@@ -91,7 +91,7 @@ class EnterTargetAddressSheet : SendInputSheet() {
 
     private fun setupTransferList(account: CryptoAccount) {
         dialogView.wallet_select.initialise(
-            coincore[account.asset].canTransferTo(account)
+            coincore[account.asset].canTransferTo(account).map { it.map { it as BlockchainAccount } }
         )
     }
 
