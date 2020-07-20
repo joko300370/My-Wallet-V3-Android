@@ -2,19 +2,19 @@ package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
 
-interface ReceiveAddress {
+interface SendTarget {
     val label: String
+}
+
+interface ReceiveAddress : SendTarget
+
+object NullAddress : ReceiveAddress {
+    override val label: String = ""
 }
 
 interface CryptoAddress : ReceiveAddress {
     val asset: CryptoCurrency
     val address: String
-}
-
-typealias AddressList = List<ReceiveAddress>
-
-object NullAddress : ReceiveAddress {
-    override val label: String = ""
 }
 
 interface AddressFactory {

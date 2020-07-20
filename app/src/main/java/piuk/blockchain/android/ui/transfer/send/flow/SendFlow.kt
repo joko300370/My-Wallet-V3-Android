@@ -18,7 +18,6 @@ import piuk.blockchain.android.ui.transfer.send.TransactionInProgressSheet
 import piuk.blockchain.android.ui.transfer.send.closeSendScope
 import piuk.blockchain.android.ui.transfer.send.createSendScope
 import piuk.blockchain.android.ui.transfer.send.sendScope
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
 class SendFlow(
@@ -91,9 +90,8 @@ class SendFlow(
     private fun closeScope() =
         closeSendScope()
 
-    private val model: SendModel by unsafeLazy {
-        sendScope().get<SendModel>()
-    }
+    private val model: SendModel
+        get() = sendScope().get()
 
     private fun onSendComplete() =
         finishFlow()

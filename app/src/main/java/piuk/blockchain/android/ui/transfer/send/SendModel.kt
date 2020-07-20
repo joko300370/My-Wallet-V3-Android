@@ -10,7 +10,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingSendTx
-import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -36,7 +36,7 @@ enum class SendErrorState {
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount,
-    val targetAddress: ReceiveAddress = NullAddress,
+    val sendTarget: SendTarget = NullAddress,
     val sendAmount: Money = CryptoValue.zero(sendingAccount.asset),
     val availableBalance: Money = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
@@ -66,10 +66,10 @@ class SendModel(
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
-            is SendIntent.AddressSelected -> null
+            is SendIntent.TargetSelected -> null
             is SendIntent.PrepareTransaction -> null
             is SendIntent.ExecuteTransaction -> processExecuteTransaction(previousState)
-            is SendIntent.AddressSelectionConfirmed -> processAddressConfirmation(previousState)
+            is SendIntent.TargetSelectionConfirmed -> processAddressConfirmation(previousState)
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount, previousState)
             is SendIntent.UpdateTransactionAmounts -> null
@@ -108,7 +108,7 @@ class SendModel(
     // the state object a bit more; depending on whether it's an internal, external,
     // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
-        interactor.initialiseTransaction(state.sendingAccount, state.targetAddress)
+        interactor.initialiseTransaction(state.sendingAccount, state.sendTarget)
             .thenSingle {
                 interactor.getAvailableBalance(
                     PendingSendTx(

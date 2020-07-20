@@ -34,7 +34,7 @@ class ConfirmTransactionSheet : SendInputSheet() {
             listOf(
                 PendingTxItem("Asset", newState.sendingAccount.asset.displayTicker),
                 PendingTxItem("Account", newState.sendingAccount.label),
-                PendingTxItem("To", newState.targetAddress.label),
+                PendingTxItem("To", newState.sendTarget.label),
                 PendingTxItem("Amount", newState.sendAmount.toStringWithSymbol())
             )
         )

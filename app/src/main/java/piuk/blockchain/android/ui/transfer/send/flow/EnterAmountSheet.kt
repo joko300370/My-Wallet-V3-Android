@@ -75,7 +75,7 @@ class EnterAmountSheet : SendInputSheet() {
             amount_sheet_from.text =
                 getString(R.string.send_enter_amount_from, newState.sendingAccount.label)
             amount_sheet_to.text =
-                getString(R.string.send_enter_amount_to, newState.targetAddress.label)
+                getString(R.string.send_enter_amount_to, newState.sendTarget.label)
 
             when (newState.errorState) {
                 SendErrorState.NONE -> dialogView.amount_sheet_input.hideError()

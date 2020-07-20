@@ -23,6 +23,8 @@ import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
@@ -91,14 +93,24 @@ open class CustodialTradingAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
-        Single.just(
-            CustodialTransferProcessor(
-                sendingAccount = this,
-                address = address as CryptoAddress,
-                walletManager = custodialWalletManager
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+        when (sendTo) {
+            is CryptoAddress -> Single.just(
+                CustodialTransferProcessor(
+                    sendingAccount = this,
+                    address = sendTo,
+                    walletManager = custodialWalletManager
+                )
             )
-        )
+            is CryptoAccount -> sendTo.receiveAddress.map {
+                CustodialTransferProcessor(
+                    sendingAccount = this,
+                    address = it as CryptoAddress,
+                    walletManager = custodialWalletManager
+                )
+            }
+            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
+        }
 
     override val sendState: Single<SendState>
         get() = balance.map { balance ->
@@ -181,7 +193,7 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error<SendProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val sendState: Single<SendState>
@@ -216,7 +228,7 @@ internal class CryptoExchangeAccount(
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error<SendProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
 
     override val activity: Single<ActivitySummaryList>
@@ -241,7 +253,7 @@ abstract class CryptoNonCustodialAccount(
         AssetAction.Swap
     )
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> {
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> {
         TODO("Implement me")
     }
 }

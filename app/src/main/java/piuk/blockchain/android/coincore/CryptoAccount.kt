@@ -24,12 +24,12 @@ interface BlockchainAccount {
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
 
-interface SingleAccount : BlockchainAccount {
+interface SingleAccount : BlockchainAccount, SendTarget {
     val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
 
     val sendState: Single<SendState>
-    fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor>
+    fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor>
 }
 
 enum class SendState {
@@ -70,7 +70,7 @@ object NullCryptoAccount : CryptoAccount {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val sendState: Single<SendState>
@@ -104,7 +104,7 @@ object NullFiatAccount : FiatAccount {
     override val isDefault: Boolean
         get() = false
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val sendState: Single<SendState>
