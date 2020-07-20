@@ -6,70 +6,52 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds_bordered.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.dashboard.FundsBalanceState
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiatWithCurrency
+import piuk.blockchain.android.ui.dashboard.FiatAssetState
+import piuk.blockchain.android.ui.dashboard.FiatBalanceInfo
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class FundsCardDelegate<in T>(
     private val selectedFiat: String,
-    private val onFundsItemClicked: (FiatValue) -> Unit,
-    private val exchangeRateDataManager: ExchangeRateDataManager
+    private val onFundsItemClicked: (FiatAccount) -> Unit
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is FundsBalanceState
+        items[position] is FiatAssetState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        FundsCardViewHolder(parent.inflate(R.layout.item_dashboard_funds_parent),
-            onFundsItemClicked, selectedFiat, exchangeRateDataManager)
+        FundsCardViewHolder(
+            parent.inflate(R.layout.item_dashboard_funds_parent),
+            onFundsItemClicked,
+            selectedFiat
+        )
 
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as FundsCardViewHolder).bind(items[position] as FundsBalanceState)
+    ) = (holder as FundsCardViewHolder).bind(items[position] as FiatAssetState)
 }
 
 private class FundsCardViewHolder(
     itemView: View,
-    private val onFundsItemClicked: (FiatValue) -> Unit,
-    private val selectedFiat: String,
-    private val exchangeRateDataManager: ExchangeRateDataManager
+    private val onFundsItemClicked: (FiatAccount) -> Unit,
+    private val selectedFiat: String
 ) : RecyclerView.ViewHolder(itemView) {
     private val multipleFundsAdapter: MultipleFundsAdapter by lazy {
-        MultipleFundsAdapter(onFundsItemClicked, selectedFiat, exchangeRateDataManager)
+        MultipleFundsAdapter(onFundsItemClicked, selectedFiat)
     }
 
-    fun bind(funds: FundsBalanceState) {
-        if (funds.fiatBalances.size == 1) {
-            val fiatValue = funds.fiatBalances[0]
-            val ticker = fiatValue.currencyCode
-            itemView.apply {
-                funds_balance_other_fiat.visibleIf { selectedFiat != ticker }
-                funds_balance_other_fiat.text = fiatValue.toStringWithSymbol()
-                funds_list.gone()
-                funds_single_item.setOnClickListener {
-                    onFundsItemClicked(fiatValue)
-                }
-                funds_title.setStringFromTicker(context, ticker)
-                funds_fiat_ticker.text = ticker
-                funds_balance.text = if (selectedFiat == ticker) {
-                    fiatValue.toStringWithSymbol()
-                } else {
-                    fiatValue.toFiatWithCurrency(exchangeRateDataManager, selectedFiat)
-                        .toStringWithSymbol()
-                }
-                funds_icon.setIcon(ticker)
-            }
+    fun bind(funds: FiatAssetState) {
+        if (funds.fiatAccounts.size == 1) {
+            showSingleAsset(funds.fiatAccounts[0])
         } else {
             itemView.funds_single_item.gone()
             itemView.funds_list.apply {
@@ -77,17 +59,37 @@ private class FundsCardViewHolder(
                     LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
                 adapter = multipleFundsAdapter
             }
-            multipleFundsAdapter.items = funds.fiatBalances
+            multipleFundsAdapter.items = funds.fiatAccounts
+        }
+    }
+
+    private fun showSingleAsset(assetInfo: FiatBalanceInfo) {
+        val ticker = assetInfo.account.fiatCurrency
+        itemView.apply {
+            funds_user_fiat_balance.visibleIf { selectedFiat != ticker }
+            funds_user_fiat_balance.text = assetInfo.balance.toStringWithSymbol()
+            funds_list.gone()
+            funds_single_item.setOnClickListener {
+                onFundsItemClicked(assetInfo.account)
+            }
+            funds_title.setStringFromTicker(context, ticker)
+            funds_fiat_ticker.text = ticker
+            funds_balance.text = if (selectedFiat == ticker) {
+                assetInfo.balance.toStringWithSymbol()
+            } else {
+                assetInfo.userFiat.toStringWithSymbol()
+            }
+            funds_icon.setIcon(ticker)
         }
     }
 }
 
 private class MultipleFundsAdapter(
-    private val onFundsItemClicked: (FiatValue) -> Unit,
-    private val selectedFiat: String,
-    private val exchangeRateDataManager: ExchangeRateDataManager
+    private val onFundsItemClicked: (FiatAccount) -> Unit,
+    private val selectedFiat: String
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    var items = listOf<FiatValue>()
+
+    var items = listOf<FiatBalanceInfo>()
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -95,7 +97,7 @@ private class MultipleFundsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         SingleFundsViewHolder(parent.inflate(R.layout.item_dashboard_funds_bordered),
-            onFundsItemClicked, selectedFiat, exchangeRateDataManager)
+            onFundsItemClicked, selectedFiat)
 
     override fun getItemCount(): Int = items.size
 
@@ -106,27 +108,25 @@ private class MultipleFundsAdapter(
 
     private class SingleFundsViewHolder(
         itemView: View,
-        private val onFundsItemClicked: (FiatValue) -> Unit,
-        private val selectedFiat: String,
-        private val exchangeRateDataManager: ExchangeRateDataManager
+        private val onFundsItemClicked: (FiatAccount) -> Unit,
+        private val selectedFiat: String
     ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(value: FiatValue) {
-            val ticker = value.currencyCode
+        fun bind(assetInfo: FiatBalanceInfo) {
+            val ticker = assetInfo.account.fiatCurrency
             itemView.apply {
                 bordered_funds_balance_other_fiat.visibleIf { selectedFiat != ticker }
-                bordered_funds_balance_other_fiat.text = value.toStringWithSymbol()
+                bordered_funds_balance_other_fiat.text = assetInfo.balance.toStringWithSymbol()
 
                 bordered_funds_parent.setOnClickListener {
-                    onFundsItemClicked(value)
+                    onFundsItemClicked(assetInfo.account)
                 }
                 bordered_funds_title.setStringFromTicker(context, ticker)
                 bordered_funds_fiat_ticker.text = ticker
                 bordered_funds_balance.text = if (selectedFiat == ticker) {
-                    value.toStringWithSymbol()
+                    assetInfo.balance.toStringWithSymbol()
                 } else {
-                    value.toFiatWithCurrency(exchangeRateDataManager, selectedFiat)
-                        .toStringWithSymbol()
+                    assetInfo.userFiat.toStringWithSymbol()
                 }
                 bordered_funds_icon.setIcon(ticker)
             }

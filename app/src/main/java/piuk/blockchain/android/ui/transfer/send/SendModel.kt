@@ -7,7 +7,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NullAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -29,7 +29,7 @@ enum class SendStep {
 
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
-    val sendingAccount: CryptoAccount = NullAccount,
+    val sendingAccount: CryptoAccount = NullCryptoAccount,
     val targetAddress: ReceiveAddress = NullAddress,
     val sendAmount: Money = CryptoValue.zero(sendingAccount.asset),
     val availableBalance: Money = CryptoValue.zero(sendingAccount.asset),

@@ -62,11 +62,7 @@ class TransferSendFragment :
         account_list.onAccountSelected = ::doOnAccountSelected
 
         account_list.initialise(
-            Single.just(
-                coincore.allWallets
-                    .accounts
-                    .filter(filterFn)
-            ),
+            coincore.allWallets().map { it.accounts.filter(filterFn) },
             status = ::statusDecorator
         )
     }

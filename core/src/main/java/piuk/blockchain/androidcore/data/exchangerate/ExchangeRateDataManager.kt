@@ -67,13 +67,3 @@ fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRateDataManager, c
             )
         }
     }
-
-fun FiatValue.toFiatWithCurrency(
-    exchangeRateDataManager: ExchangeRateDataManager,
-    targetCurrency: String
-) = FiatValue.fromMajor(targetCurrency,
-    exchangeRateDataManager.getLastPriceOfFiat(
-        sourceFiat = this.currencyCode,
-        targetFiat = targetCurrency
-    ).toBigDecimal() * toBigDecimal()
-)

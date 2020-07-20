@@ -26,7 +26,7 @@ class AssetMapTest {
 
     @Test
     fun `copy with patchAsset works as expected`() {
-        val newAsset = AssetState(
+        val newAsset = CryptoAssetState(
             currency = CryptoCurrency.BTC,
             balance = 20.bitcoin(),
             price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),

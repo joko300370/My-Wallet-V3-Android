@@ -669,14 +669,13 @@ val applicationModule = module {
 
         factory {
             DashboardInteractor(
-                tokens = get(),
+                coincore = get(),
                 payloadManager = get(),
+                exchangeRates = get(),
+                currencyPrefs = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
-                analytics = get(),
-                assetBalancesRepository = get(),
-                currencyPrefs = get(),
-                tierService = get()
+                analytics = get()
             )
         }
 
