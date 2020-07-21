@@ -3,9 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:id="@+id/nav_menu_top">
-        <item
-            android:id="@+id/stub_send_test"
-            android:title="TEST NEW SEND"/>
 
         <item
             android:id="@+id/nav_simple_buy"
