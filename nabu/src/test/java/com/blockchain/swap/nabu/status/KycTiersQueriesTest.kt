@@ -149,7 +149,7 @@ private fun emptyNabuUser() =
         state = UserState.None,
         kycState = KycState.None,
         insertedAt = null,
-        products = ProductsUsed()
+        productsUsed = ProductsUsed()
     )
 
 private fun givenTiersState(tier1State: KycTierState, tier2State: KycTierState) =
