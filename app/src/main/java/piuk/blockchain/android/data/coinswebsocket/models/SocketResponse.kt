@@ -24,7 +24,13 @@ data class EthResponse(
     val entity: Entity? = null,
     val tokenTransfer: TokenTransfer? = null,
     val tokenAccount: TokenAccount? = null,
-    val tokenAccountKey: TokenAccountKey? = null
+    val tokenAccountKey: TokenAccountKey? = null,
+    val param: TokenParams? = null
+)
+
+data class TokenParams(
+    val tokenAddress: String? = null,
+    val accountAddress: String? = null
 )
 
 data class BtcTransaction(

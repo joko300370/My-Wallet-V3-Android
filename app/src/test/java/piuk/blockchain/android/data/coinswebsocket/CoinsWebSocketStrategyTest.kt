@@ -48,16 +48,21 @@ class CoinsWebSocketStrategyTest {
     }
 
     val wallet = mock<EthereumWallet> {
-        on { getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME) } `it returns` Erc20TokenData().also {
+        on { getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME) } `it returns`
             Erc20TokenData.createPaxTokenData("")
-        }
+
+        on { getErc20TokenData(Erc20TokenData.USDT_CONTRACT_NAME) } `it returns`
+            Erc20TokenData.createUsdtTokenData("")
     }
 
     private val ethDataManager: EthDataManager = mock {
         on { getEthWallet() } `it returns` wallet
-        on { getErc20TokenData(CryptoCurrency.PAX) } `it returns` Erc20TokenData().also {
+        on { getErc20TokenData(CryptoCurrency.PAX) } `it returns`
             Erc20TokenData.createPaxTokenData("")
-        }
+
+        on { getErc20TokenData(CryptoCurrency.USDT) } `it returns`
+            Erc20TokenData.createUsdtTokenData("")
+
         on { fetchEthAddress() } `it returns` Observable.just(CombinedEthModel(EthAddressResponseMap()))
     }
 
@@ -65,9 +70,15 @@ class CoinsWebSocketStrategyTest {
         on { getString(R.string.app_name) } `it returns` "Blockchain"
         on { getString(R.string.received_ethereum) } `it returns` "Received Ether"
         on { getString(R.string.received_usd_pax_1) } `it returns` "Received USD Digital"
+        on { getString(R.string.received_usdt) } `it returns` "Received Tether"
         on { getString(R.string.from) } `it returns` "From"
     }
-    private val erc20Account: Erc20Account = mock {
+
+    private val paxAccount: Erc20Account = mock {
+        on { fetchAddressCompletable() } `it returns` Completable.complete()
+    }
+
+    private val usdtAccount: Erc20Account = mock {
         on { fetchAddressCompletable() } `it returns` Completable.complete()
     }
 
@@ -106,7 +117,8 @@ class CoinsWebSocketStrategyTest {
         swipeToReceiveHelper = swipeToReceiveHelper,
         stringUtils = stringUtils,
         gson = Gson(),
-        erc20Account = erc20Account,
+        paxAccount = paxAccount,
+        usdtAccount = usdtAccount,
         bchDataManager = bchDataManager,
         payloadDataManager = payloadDataManager,
         accessState = mock(),
@@ -145,7 +157,8 @@ class CoinsWebSocketStrategyTest {
 
         verify(mockWebSocket).open()
         verify(ethDataManager).fetchEthAddress()
-        verify(erc20Account, never()).fetchAddressCompletable()
+        verify(paxAccount, never()).fetchAddressCompletable()
+        verify(usdtAccount, never()).fetchAddressCompletable()
         verify(messagesSocketHandler).sendBroadcast(any())
     }
 
@@ -155,10 +168,23 @@ class CoinsWebSocketStrategyTest {
 
         verify(mockWebSocket).open()
         verify(ethDataManager, never()).fetchEthAddress()
-        verify(erc20Account).fetchAddressCompletable()
+        verify(paxAccount).fetchAddressCompletable()
         verify(messagesSocketHandler).triggerNotification("Blockchain",
             "Received USD Digital 1.21 USD-D",
             "Received USD Digital 1.21 USD-D from 0x4058a004dd718babab47e14dd0d744742e5b9903")
+        verify(messagesSocketHandler).sendBroadcast(any())
+    }
+
+    @Test
+    fun `usdt transaction should be update usdt transactions and broadcasted`() {
+        webSocket.send(usdtTransaction)
+
+        verify(mockWebSocket).open()
+        verify(ethDataManager, never()).fetchEthAddress()
+        verify(usdtAccount).fetchAddressCompletable()
+        verify(messagesSocketHandler).triggerNotification("Blockchain",
+            "Received Tether 1.21 USDT",
+            "Received Tether 1.21 USDT from 0x4058a004dd718babab47e14dd0d744742e5b9903")
         verify(messagesSocketHandler).sendBroadcast(any())
     }
 
@@ -229,12 +255,21 @@ class CoinsWebSocketStrategyTest {
 
     private val paxTransaction =
         "{\"coin\":\"eth\",\"entity\":\"token_account\",\"param\":{\"accountAddress\":\"0x4058a004dd718babab47e14dd0" +
-                "d744742e5b9903\",\"tokenAddress\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\"},\"tokenTransf" +
-                "er\":{\"blockHash\":\"0x1293676c93d91660ca4ec40df09b6ec4fa080138d975c19813b914befc1187c\",\"transact" +
-                "ionHash\":\"0x3cd2e95358c58af6e9ecd2f0af6739c3db945e2259bf2a4bc91fb5e2f397ad89\",\"blockNumber\":83" +
-                "62036,\"tokenHash\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\",\"logIndex\":67,\"from\":\"0x4058" +
-                "a004dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"val" +
-                "ue\":1210000000000000000,\"decimals\":18,\"timestamp\":0}}"
+            "d744742e5b9903\",\"tokenAddress\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\"},\"tokenTransf" +
+            "er\":{\"blockHash\":\"0x1293676c93d91660ca4ec40df09b6ec4fa080138d975c19813b914befc1187c\",\"transact" +
+            "ionHash\":\"0x3cd2e95358c58af6e9ecd2f0af6739c3db945e2259bf2a4bc91fb5e2f397ad89\",\"blockNumber\":83" +
+            "62036,\"tokenHash\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\",\"logIndex\":67,\"from\":\"0x4058" +
+            "a004dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"val" +
+            "ue\":1210000000000000000,\"decimals\":18,\"timestamp\":0}}"
+
+    private val usdtTransaction =
+        "{\"coin\":\"eth\",\"entity\":\"token_account\",\"param\":{\"accountAddress\":\"0x4058a004dd718babab47e14dd0" +
+            "d744742e5b9903\",\"tokenAddress\":\"0xdAC17F958D2ee523a2206206994597C13D831ec7\"},\"tokenTransf" +
+            "er\":{\"blockHash\":\"0x1293676c93d91660ca4ec40df09b6ec4fa080138d975c19813b914befc1187c\",\"transact" +
+            "ionHash\":\"0x3cd2e95358c58af6e9ecd2f0af6739c3db945e2259bf2a4bc91fb5e2f397ad89\",\"blockNumber\":83" +
+            "62036,\"tokenHash\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\",\"logIndex\":67,\"from\":\"0x4058" +
+            "a004dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"val" +
+            "ue\":1210000,\"decimals\":6,\"timestamp\":0}}"
 
     private val btcTransaction = "{\"coin\":\"btc\",\"entity\":\"xpub\",\"transaction\":" +
             "{\"lock_time\":0,\"ver\":1,\"size\":225,\"inputs\":[{\"address\":\"1Cox48WAm4NKTYbSjQ8DEswpaBNCfFwo9x" +
