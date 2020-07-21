@@ -269,6 +269,7 @@
     <string name="received_ethereum">Received Ether</string>
 
     <string name="received_usd_pax_1">Received USD Digital</string>
+    <string name="received_usdt">Received Tether</string>
 
     <string name="received_bitcoin_cash">Received Bitcoin Cash</string>
 
@@ -1650,7 +1651,9 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Let’s get your wallet set up. You can quickly buy crypto now or do this later.</string>
+    <string name="buy_now">Buy Now</string>
     <string name="buy_now_1">Buy %1s</string>
+    <string name="simple_buy_transfer_details_error">Something went wrong while loading the transfer details.\n\nPlease try again later.</string>
 
     <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
     <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
@@ -1830,11 +1833,14 @@
     <string name="tether_announcement_title">Say Hello to Tether!</string>
     <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
     <string name="tether_announcement_action">Buy Tether Now</string>
+    
+    <string name="dashboard_asset_item_label_title">Please note.</string>
+    <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
+    <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
-
 </resources>
