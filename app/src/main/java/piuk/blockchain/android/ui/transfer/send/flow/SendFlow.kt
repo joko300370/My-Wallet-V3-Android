@@ -9,7 +9,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -26,32 +25,39 @@ import timber.log.Timber
 
 interface FlowStep
 
-abstract class DialogFlow(
-    private val fragmentManager: FragmentManager,
-    private val host: FlowHost,
-    private val bottomSheetTag: String = SHEET_FRAGMENT_TAG
-) : SlidingModalBottomDialog.Host {
+abstract class DialogFlow : SlidingModalBottomDialog.Host {
+
+    private var fragmentManager: FragmentManager? = null
+    private var host: FlowHost? = null
+    private var bottomSheetTag: String = SHEET_FRAGMENT_TAG
 
     interface FlowHost {
         fun onFlowFinished()
     }
 
     @CallSuper
-    open fun startFlow() { }
+    open fun startFlow(
+        fragmentManager: FragmentManager,
+        host: FlowHost
+    ) {
+        this.fragmentManager = fragmentManager
+        this.host = host
+    }
 
     @CallSuper
     open fun finishFlow() {
-        host.onFlowFinished()
+        host?.onFlowFinished()
     }
 
     @UiThread
     protected fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment?) {
-        val oldSheet = fragmentManager.findFragmentByTag(bottomSheetTag)
+        val oldSheet = fragmentManager?.findFragmentByTag(bottomSheetTag)
 
-        fragmentManager.beginTransaction()
-            .apply { oldSheet?.let { sheet -> remove(sheet) } }
-            .apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
-            .commitNow()
+        fragmentManager?.beginTransaction()?.run {
+            apply { oldSheet?.let { sheet -> remove(sheet) } }
+            apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
+            commitNow()
+        }
     }
 
     companion object {
@@ -62,21 +68,17 @@ abstract class DialogFlow(
 class SendFlow(
     private val coincore: Coincore,
     private val account: CryptoAccount,
-    private val uiScheduler: Scheduler = AndroidSchedulers.mainThread(),
-    fragmentManager: FragmentManager,
-    host: FlowHost,
-    bottomSheetTag: String = SHEET_FRAGMENT_TAG
-) : DialogFlow(
-    fragmentManager,
-    host,
-    bottomSheetTag
-), KoinComponent {
+    private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
+) : DialogFlow() {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var currentStep: SendStep = SendStep.ZERO
 
-    override fun startFlow() {
-        super.startFlow()
+    override fun startFlow(
+        fragmentManager: FragmentManager,
+        host: FlowHost
+    ) {
+        super.startFlow(fragmentManager, host)
         // Create the send scope
         openScope()
         // Get the model

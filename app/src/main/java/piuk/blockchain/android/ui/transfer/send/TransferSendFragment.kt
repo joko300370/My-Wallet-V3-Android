@@ -82,11 +82,12 @@ class TransferSendFragment :
         if (account is CryptoAccount) {
             flow = SendFlow(
                 account = account,
-                coincore = coincore,
-                fragmentManager = childFragmentManager,
-                host = this
+                coincore = coincore
             ).apply {
-                startFlow()
+                startFlow(
+                    fragmentManager = childFragmentManager,
+                    host = this@TransferSendFragment
+                )
             }
         }
     }

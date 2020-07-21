@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
@@ -246,16 +247,6 @@ class StartCustodialTransfer(
         )
 }
 
-@Deprecated("Moving to new send")
-object AbortFundsTransfer : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState.copy(
-            showDashboardSheet = null,
-            transferFundsCurrency = null,
-            activeFlow = null
-            )
-        }
-
 object CheckBackupStatus : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState
@@ -281,7 +272,20 @@ object TransferFunds : DashboardIntent() {
         oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
     }
 
-class LaunchDialogFlow(
+class LaunchSendFlow(
+    val fromAccount: SingleAccount
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            showDashboardSheet = null,
+            showAssetSheetFor = null,
+            activeFlow = null,
+            pendingAssetSheetFor = null,
+            transferFundsCurrency = null
+        )
+}
+
+class UpdateLaunchDialogFlow(
     private val flow: DialogFlow
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =

@@ -25,8 +25,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -48,7 +46,6 @@ import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -72,8 +69,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
-
-    private val coincore: Coincore by scopedInject() // TEMP
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -129,7 +124,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {
             state?.activeFlow?.finishFlow()
-            newState.activeFlow?.startFlow()
+            newState.activeFlow?.startFlow(childFragmentManager, this)
         }
 
         // Update/show announcement
@@ -426,18 +421,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun launchNewSendFor(account: SingleAccount) {
-        model.process(
-            LaunchDialogFlow(
-                SendFlow(
-                    account = account as CryptoAccount,
-                    coincore = coincore,
-                    fragmentManager = childFragmentManager,
-                    host = this
-                )
-            )
-        )
-    }
+    override fun launchNewSendFor(account: SingleAccount) =
+        model.process(LaunchSendFlow(account))
 
     override fun gotoSendFor(account: SingleAccount) {
         when (account) {
@@ -477,7 +462,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun abortTransferFunds() {
-        model.process(AbortFundsTransfer)
+        model.process(ClearBottomSheet)
     }
 
     companion object {

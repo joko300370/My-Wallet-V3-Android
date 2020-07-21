@@ -241,6 +241,7 @@ class DashboardModel(
             }
             is CheckBackupStatus -> interactor.hasUserBackedUp(this)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
+            is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount)
             is FiatBalanceUpdate,
             is BackupStatusUpdate,
             is BalanceUpdateError,
@@ -251,9 +252,8 @@ class DashboardModel(
             is ShowFiatAssetDetails,
             is ShowBankLinkingSheet,
             is ShowDashboardSheet,
-            is AbortFundsTransfer,
             is TransferFunds,
-            is LaunchDialogFlow,
+            is UpdateLaunchDialogFlow,
             is ClearBottomSheet -> null
         }
     }
