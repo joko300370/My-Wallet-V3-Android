@@ -3,9 +3,6 @@ package piuk.blockchain.android.simplebuy
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
-import com.blockchain.swap.nabu.datamanagers.BankDetail
-import info.blockchain.balance.FiatValue
-import piuk.blockchain.android.R
 import piuk.blockchain.android.util.CopyableTextFormItem
 
 class BankDetailsContainer @JvmOverloads constructor(
@@ -15,8 +12,7 @@ class BankDetailsContainer @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     fun initWithBankDetailsAndAmount(
-        bankDetails: List<BankDetail>,
-        amount: FiatValue,
+        bankDetails: List<BankDetailField>,
         copyFieldListener: CopyFieldListener? = null
     ) {
         if (childCount == 0) {
@@ -35,20 +31,11 @@ class BankDetailsContainer @JvmOverloads constructor(
                     )
                 )
             }
-            addView(
-                CopyableTextFormItem(
-                    context = context,
-                    title = context.getString(R.string.simple_buy_amount_to_send),
-                    value = amount.toStringWithSymbol()
-                ),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT
-                )
-            )
         }
     }
 }
+
+data class BankDetailField(val title: String, val value: String, val isCopyable: Boolean)
 
 interface CopyFieldListener {
     fun onFieldCopied(field: String)

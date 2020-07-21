@@ -103,7 +103,7 @@ class ExchangeConfirmationPresenterTest {
         // Arrange
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "Label", "xPub")
         whenever(payloadDecrypt.isDoubleEncrypted).thenReturn(false)
-        val fee = CryptoValue.bitcoinFromMajor(0.00005.toBigDecimal())
+        val fee = 0.00005.bitcoin()
         whenever(
             transactionExecutor.getFeeForTransaction(
                 1.0.bitcoin(),

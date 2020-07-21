@@ -9,8 +9,8 @@ class MoneyEqualityTests {
 
     @Test
     fun `c2c equality`() {
-        val m1: Money = CryptoValue.bitcoinFromMajor(1)
-        val m2: Money = CryptoValue.bitcoinFromMajor(1)
+        val m1: Money = 1.bitcoin()
+        val m2: Money = 1.bitcoin()
 
         m1 `should not be` m2
         m1 `should equal` m2
@@ -18,8 +18,8 @@ class MoneyEqualityTests {
 
     @Test
     fun `c2c inequality by value`() {
-        val m1: Money = CryptoValue.bitcoinFromMajor(1)
-        val m2: Money = CryptoValue.bitcoinFromMajor(2)
+        val m1: Money = 1.bitcoin()
+        val m2: Money = 2.bitcoin()
 
         m1 `should not be` m2
         m1 `should not equal` m2
@@ -27,8 +27,8 @@ class MoneyEqualityTests {
 
     @Test
     fun `c2c inequality by currency`() {
-        val m1: Money = CryptoValue.bitcoinFromMajor(1)
-        val m2: Money = CryptoValue.bitcoinCashFromMajor(1)
+        val m1: Money = 1.bitcoin()
+        val m2: Money = 1.bitcoinCash()
 
         m1 `should not be` m2
         m1 `should not equal` m2
@@ -36,7 +36,7 @@ class MoneyEqualityTests {
 
     @Test
     fun `c2f inequality`() {
-        val m1: Money = CryptoValue.bitcoinFromMajor(1)
+        val m1: Money = 1.bitcoin()
         val m2: Money = FiatValue.fromMinor("USD", 1)
 
         m1 `should not be` m2

@@ -31,7 +31,7 @@ class AddressFactoryImpl(
      * an empty set
      **/
     override fun parse(address: String): Set<ReceiveAddress> =
-        coincore.assets.mapNotNull { t: Asset ->
+        coincore.allAssets.mapNotNull { t: Asset ->
             t.parseAddress(address)
         }.toSet()
 

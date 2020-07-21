@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.notifications.analytics.eventWithPaymentMethod
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -61,7 +62,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             },
             !isForPendingPayment
         )
-        analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_SHOWN)
         model.process(SimpleBuyIntent.FetchQuote)
         model.process(SimpleBuyIntent.FetchBankAccount)
     }
@@ -76,12 +76,22 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     override fun onBackPressed(): Boolean = true
 
     override fun render(newState: SimpleBuyState) {
-        lastState = newState
+        // Event should be triggered only the first time a state is rendered
+        if (lastState == null) {
+            analytics.logEvent(eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_SHOWN,
+                newState.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""))
+            lastState = newState
+        }
+
         progress.visibleIf { newState.isLoading }
-        purchase_note.text = if (newState.selectedPaymentMethod?.isBank() == true) {
-            getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
-        } else {
-            getString(R.string.purchase_card_note)
+        purchase_note.text = when {
+            newState.selectedPaymentMethod?.isBank() == true -> {
+                getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
+            }
+            newState.selectedPaymentMethod?.isCard() == true -> {
+                getString(R.string.purchase_card_note)
+            }
+            else -> ""
         }
 
         if (newState.errorState != null) {
@@ -98,6 +108,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         configureButtons(newState)
 
         when (newState.order.orderState) {
+            OrderState.FINISHED, // Funds orders are getting finished right after confirmation
             OrderState.AWAITING_FUNDS -> {
                 if (newState.confirmationActionRequested) {
                     if (newState.selectedPaymentMethod?.isBank() == true) {
@@ -172,7 +183,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
             CheckoutItem(getString(R.string.payment_method),
                 state.selectedPaymentMethod?.let {
-                    paymentMethodLabel(it)
+                    paymentMethodLabel(it, state.fiatCurrency)
                 } ?: ""
             )
         )
@@ -188,10 +199,11 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
         button_action.apply {
             if (!isForPendingPayment && !isOrderAwaitingFunds) {
-                text = getString(R.string.buy_now)
+                text = getString(R.string.buy_now_1, state.orderValue?.toStringWithSymbol())
                 setOnClickListener {
                     model.process(SimpleBuyIntent.ConfirmOrder)
-                    analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED)
+                    analytics.logEvent(eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
+                        state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""))
                 }
             } else {
                 text = if (isOrderAwaitingFunds && !isForPendingPayment) {
@@ -217,9 +229,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
     }
 
-    private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod): String =
+    private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod, fiatCurrency: String): String =
         when (selectedPaymentMethod.paymentMethodType) {
             PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
+            PaymentMethodType.FUNDS -> getString(R.string.checkout_funds_transfer_label, fiatCurrency)
             else -> selectedPaymentMethod.label ?: ""
         }
 
@@ -230,7 +243,9 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     override fun cancelOrderConfirmAction(cancelOrder: Boolean, orderId: String?) {
         if (cancelOrder) {
             model.process(SimpleBuyIntent.CancelOrder)
-            analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_CONFIRMED)
+            analytics.logEvent(eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_CONFIRMED,
+                lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString()
+                    ?: ""))
         } else {
             analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_GO_BACK)
         }

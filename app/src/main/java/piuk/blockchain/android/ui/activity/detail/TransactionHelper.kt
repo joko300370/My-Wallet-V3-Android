@@ -77,12 +77,12 @@ class TransactionHelper(
                 // (inputs x and y could send to output y in which case y is not receiving change,
                 // but rather the total amount)
                 if (inputMap.containsKey(outputAddress) &&
-                    outputValue.toBigInteger().abs().compareTo(tx.cryptoValue.toBigInteger()) != 0
+                    outputValue.toBigInteger().abs().compareTo(tx.value.toBigInteger()) != 0
                 ) {
                     continue // change back to same input address
                 }
                 // Output more than tx amount - change
-                if (outputValue.toBigInteger().abs() > tx.cryptoValue.toBigInteger()) {
+                if (outputValue.toBigInteger().abs() > tx.value.toBigInteger()) {
                     continue
                 }
                 outputMap[outputAddress] = outputValue
@@ -157,12 +157,12 @@ class TransactionHelper(
                 // (inputs x and y could send to output y in which case y is not receiving change,
                 // but rather the total amount)
                 if (inputMap.containsKey(outputAddress) &&
-                    outputValue.toBigInteger().abs().compareTo(tx.cryptoValue.toBigInteger()) != 0
+                    outputValue.toBigInteger().abs().compareTo(tx.value.toBigInteger()) != 0
                 ) {
                     continue // change back to same input address
                 }
                 // Output more than tx amount - change
-                if (outputValue.toBigInteger().abs() > tx.cryptoValue.toBigInteger()) {
+                if (outputValue.toBigInteger().abs() > tx.value.toBigInteger()) {
                     continue
                 }
                 outputMap[outputAddress] = outputValue
