@@ -1722,6 +1722,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
+    <string name="checkout_funds_label">Funds</string>
     <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
@@ -1766,7 +1767,7 @@
     <string name="activity_details_description_not_updated">Description failed to update</string>
     <string name="activity_details_transaction_fee_send">Sending %1$s</string>
     <string name="activity_details_transaction_fee_unknown">Unknown</string>
-    <string name="activity_details_payment_load_fail">Couldn\'t load card details</string>
+    <string name="activity_details_payment_load_fail">Couldn\'t load payment details</string>
     <string name="activity_details_fee_load_fail">Couldn\'t load fee information</string>
     <string name="activity_details_value_load_fail">Couldn\'t load value information</string>
     <string name="activity_details_historic_value_load_fail">Couldn\'t load historic value information</string>
