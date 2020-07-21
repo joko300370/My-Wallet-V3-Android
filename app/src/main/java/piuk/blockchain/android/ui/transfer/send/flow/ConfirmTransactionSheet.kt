@@ -40,6 +40,7 @@ class ConfirmTransactionSheet : SendInputSheet() {
         Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == SendStep.CONFIRM_DETAIL)
 
+        val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
         detailsAdapter.populate(
             listOf(
                 PendingTxItem(getString(R.string.common_send),
@@ -47,8 +48,7 @@ class ConfirmTransactionSheet : SendInputSheet() {
                 PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
                 PendingTxItem(getString(R.string.common_to), newState.targetAddress.label),
                 addFeeItem(newState),
-                PendingTxItem(getString(R.string.common_total),
-                    (newState.sendAmount + newState.feeAmount).toStringWithSymbol())
+                PendingTxItem(getString(R.string.common_total), totalAmount)
             )
         )
 
@@ -56,7 +56,7 @@ class ConfirmTransactionSheet : SendInputSheet() {
         showNoteState(newState)
 
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
-            newState.sendAmount.toStringWithSymbol())
+            totalAmount)
 
         state = newState
     }
