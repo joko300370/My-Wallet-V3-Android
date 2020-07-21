@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +25,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -46,6 +47,8 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -63,11 +66,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
-    FiatFundsNoKycDetailsSheet.Host {
+    FiatFundsNoKycDetailsSheet.Host,
+    DialogFlow.FlowHost {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
+
+    private val coincore: Coincore by scopedInject() // TEMP
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -118,6 +124,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
                 showPromoSheet(newState)
             }
+        }
+
+        // Update/show dialog flow
+        if (state?.activeFlow != newState.activeFlow) {
+            state?.activeFlow?.finishFlow()
+            newState.activeFlow?.startFlow()
         }
 
         // Update/show announcement
@@ -410,8 +422,21 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
+    override fun onFlowFinished() {
+        model.process(ClearBottomSheet)
+    }
+
     override fun launchNewSendFor(account: SingleAccount) {
-        Toast.makeText(requireContext(), "This is the new send", Toast.LENGTH_LONG).show()
+        model.process(
+            LaunchDialogFlow(
+                SendFlow(
+                    account = account as CryptoAccount,
+                    coincore = coincore,
+                    fragmentManager = childFragmentManager,
+                    host = this
+                )
+            )
+        )
     }
 
     override fun gotoSendFor(account: SingleAccount) {

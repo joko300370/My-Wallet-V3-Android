@@ -7,10 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -24,7 +20,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
 
 typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
@@ -32,9 +27,7 @@ class TransferSendFragment :
     Fragment(),
     DialogFlow.FlowHost {
 
-    private val disposables = CompositeDisposable()
     private val coincore: Coincore by scopedInject()
-    private val uiScheduler = AndroidSchedulers.mainThread()
 
     private var flow: SendFlow? = null
 
@@ -87,22 +80,14 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
-            disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
-                .subscribeBy(
-                onSuccess = { secondPassword ->
-                    flow = SendFlow(
-                        account = account,
-                        passwordRequired = secondPassword,
-                        disposables = disposables,
-                        fragmentManager = childFragmentManager,
-                        host = this
-                    ).apply {
-                        startFlow()
-                    }
-                }, onError = {
-                    Timber.e("Unable to configure send flow, aborting. e == $it")
-                    activity?.finish()
-                })
+            flow = SendFlow(
+                account = account,
+                coincore = coincore,
+                fragmentManager = childFragmentManager,
+                host = this
+            ).apply {
+                startFlow()
+            }
         }
     }
 
@@ -117,7 +102,6 @@ class TransferSendFragment :
     }
 
     override fun onFlowFinished() {
-        disposables.clear()
         flow = null
     }
 

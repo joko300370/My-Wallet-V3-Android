@@ -4,9 +4,13 @@ import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.core.KoinComponent
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.SendIntent
@@ -56,9 +60,9 @@ abstract class DialogFlow(
 }
 
 class SendFlow(
+    private val coincore: Coincore,
     private val account: CryptoAccount,
-    private val passwordRequired: Boolean,
-    private val disposables: CompositeDisposable,
+    private val uiScheduler: Scheduler = AndroidSchedulers.mainThread(),
     fragmentManager: FragmentManager,
     host: FlowHost,
     bottomSheetTag: String = SHEET_FRAGMENT_TAG
@@ -66,7 +70,9 @@ class SendFlow(
     fragmentManager,
     host,
     bottomSheetTag
-) {
+), KoinComponent {
+
+    private val disposables: CompositeDisposable = CompositeDisposable()
     private var currentStep: SendStep = SendStep.ZERO
 
     override fun startFlow() {
@@ -80,12 +86,24 @@ class SendFlow(
                 onNext = { handleStateChange(it) },
                 onError = { Timber.e("Send state is broken: $it") }
             )
-            process(SendIntent.Initialise(account, passwordRequired))
         }
+
+        disposables += coincore.requireSecondPassword()
+            .observeOn(uiScheduler)
+            .subscribeBy(
+                onSuccess = { passwordRequired ->
+                    model.process(SendIntent.Initialise(account, passwordRequired))
+                },
+                onError = {
+                    Timber.e("Unable to configure send flow, aborting. e == $it")
+                    finishFlow()
+                })
+
     }
 
     override fun finishFlow() {
         currentStep = SendStep.ZERO
+        disposables.clear()
         closeScope()
         super.finishFlow()
     }

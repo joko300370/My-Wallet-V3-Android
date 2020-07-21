@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
@@ -95,6 +96,7 @@ enum class DashboardSheet {
     CUSTODY_INTRO,
     SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
+    @Deprecated("Moving to send v2")
     BASIC_WALLET_TRANSFER,
     SIMPLE_BUY_CANCEL_ORDER,
     FIAT_FUNDS_DETAILS,
@@ -111,9 +113,11 @@ data class DashboardState(
     ),
     val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
+    val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
+    @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
     val selectedFiatAccount: FiatAccount? = null
@@ -249,6 +253,7 @@ class DashboardModel(
             is ShowDashboardSheet,
             is AbortFundsTransfer,
             is TransferFunds,
+            is LaunchDialogFlow,
             is ClearBottomSheet -> null
         }
     }
