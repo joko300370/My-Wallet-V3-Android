@@ -109,7 +109,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
             setOnMenuItemClickListener {
                 val account = detailItem.account
-                val action = mapMenuItemToAction(it.itemId)
+                val action = mapMenuItemToAction(it.itemId, account)
 
                 onActionSelected(action, account)
                 true
@@ -131,10 +131,13 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.grey_000))
     }
 
-    private fun mapMenuItemToAction(menuId: Int): AssetAction =
+    private fun mapMenuItemToAction(menuId: Int, account: BlockchainAccount): AssetAction =
         when (menuId) {
             R.id.action_activity -> AssetAction.ViewActivity
-            R.id.action_send -> AssetAction.Send
+            R.id.action_send -> if (account.actions.contains(AssetAction.Send))
+                AssetAction.Send
+                    else
+                AssetAction.NewSend
             R.id.action_receive -> AssetAction.Receive
             R.id.action_swap -> AssetAction.Swap
             else -> throw IllegalArgumentException("id maps to unknown action")
@@ -143,7 +146,8 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     private fun mapActionToMenuItem(action: AssetAction): Int =
         when (action) {
             AssetAction.ViewActivity -> R.id.action_activity
-            AssetAction.Send -> R.id.action_send
+            AssetAction.Send,
+            AssetAction.NewSend -> R.id.action_send
             AssetAction.Receive -> R.id.action_receive
             AssetAction.Swap -> R.id.action_swap
         }.exhaustive

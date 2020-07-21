@@ -6,7 +6,6 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingSendTx
-import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.androidcore.utils.extensions.then

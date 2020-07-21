@@ -17,7 +17,8 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.ui.transfer.send.SendInputSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -28,7 +29,9 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 
-class EnterTargetAddressSheet : SendInputSheet() {
+class EnterTargetAddressSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_address
 
     private val appUtil: AppUtil by inject()
@@ -141,7 +144,5 @@ class EnterTargetAddressSheet : SendInputSheet() {
 
     companion object {
         const val SCAN_QR_ADDRESS = 2985
-        fun newInstance(): EnterTargetAddressSheet =
-            EnterTargetAddressSheet()
     }
 }

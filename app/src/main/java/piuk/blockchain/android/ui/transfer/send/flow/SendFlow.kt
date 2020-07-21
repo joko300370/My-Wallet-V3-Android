@@ -1,14 +1,14 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
+import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -20,21 +20,57 @@ import piuk.blockchain.android.ui.transfer.send.createSendScope
 import piuk.blockchain.android.ui.transfer.send.sendScope
 import timber.log.Timber
 
-class SendFlow(
-    private val fragmentManager: FragmentManager,
-    private val listener: Listener,
-    private val disposables: CompositeDisposable,
-    private val bottomSheetTag: String = SHEET_FRAGMENT_TAG,
-    private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
-) {
+interface FlowStep
 
-    interface Listener {
-        fun onSendFlowFinished()
+abstract class DialogFlow(
+    private val fragmentManager: FragmentManager,
+    private val host: FlowHost,
+    private val bottomSheetTag: String = SHEET_FRAGMENT_TAG
+) : SlidingModalBottomDialog.Host {
+
+    interface FlowHost {
+        fun onFlowFinished()
     }
 
+    @CallSuper
+    open fun startFlow() { }
+
+    @CallSuper
+    open fun finishFlow() {
+        host.onFlowFinished()
+    }
+
+    @UiThread
+    protected fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment?) {
+        val oldSheet = fragmentManager.findFragmentByTag(bottomSheetTag)
+
+        fragmentManager.beginTransaction()
+            .apply { oldSheet?.let { sheet -> remove(sheet) } }
+            .apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
+            .commitNow()
+    }
+
+    companion object {
+        const val SHEET_FRAGMENT_TAG = "BOTTOM_SHEET"
+    }
+}
+
+class SendFlow(
+    private val account: CryptoAccount,
+    private val passwordRequired: Boolean,
+    private val disposables: CompositeDisposable,
+    fragmentManager: FragmentManager,
+    host: FlowHost,
+    bottomSheetTag: String = SHEET_FRAGMENT_TAG
+) : DialogFlow(
+    fragmentManager,
+    host,
+    bottomSheetTag
+) {
     private var currentStep: SendStep = SendStep.ZERO
 
-    fun startFlow(account: CryptoAccount, passwordRequired: Boolean) {
+    override fun startFlow() {
+        super.startFlow()
         // Create the send scope
         openScope()
         // Get the model
@@ -48,10 +84,10 @@ class SendFlow(
         }
     }
 
-    fun finishFlow() {
-        listener.onSendFlowFinished()
+    override fun finishFlow() {
         currentStep = SendStep.ZERO
         closeScope()
+        super.finishFlow()
     }
 
     private fun handleStateChange(newState: SendState) {
@@ -69,13 +105,13 @@ class SendFlow(
         replaceBottomSheet(
             when (step) {
                 SendStep.ZERO -> null
-                SendStep.ENTER_PASSWORD -> EnterSecondPasswordSheet.newInstance()
-                SendStep.ENTER_ADDRESS -> EnterTargetAddressSheet.newInstance()
-                SendStep.ENTER_AMOUNT -> EnterAmountSheet.newInstance()
-                SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet.newInstance()
-                SendStep.IN_PROGRESS -> TransactionInProgressSheet.newInstance()
-                SendStep.SEND_ERROR -> TransactionErrorSheet.newInstance()
-                SendStep.SEND_COMPLETE -> TransactionCompleteSheet.newInstance()
+                SendStep.ENTER_PASSWORD -> EnterSecondPasswordSheet(this)
+                SendStep.ENTER_ADDRESS -> EnterTargetAddressSheet(this)
+                SendStep.ENTER_AMOUNT -> EnterAmountSheet(this)
+                SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(this)
+                SendStep.IN_PROGRESS -> TransactionInProgressSheet(this)
+                SendStep.SEND_ERROR -> TransactionErrorSheet(this)
+                SendStep.SEND_COMPLETE -> TransactionCompleteSheet(this)
             }
         )
     }
@@ -96,15 +132,7 @@ class SendFlow(
     private fun onSendComplete() =
         finishFlow()
 
-    @UiThread
-    private fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment?) {
-        fragmentManager.findFragmentByTag(bottomSheetTag)?.let {
-            fragmentManager.beginTransaction().remove(it).commitNow()
-        }
-        bottomSheet?.show(fragmentManager, bottomSheetTag)
-    }
-
-    companion object {
-        private const val SHEET_FRAGMENT_TAG = "BOTTOM_SHEET"
+    override fun onSheetClosed() {
+        finishFlow()
     }
 }

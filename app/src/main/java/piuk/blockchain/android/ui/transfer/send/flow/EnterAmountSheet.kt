@@ -1,11 +1,8 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.blockchain.koin.scopedInject
@@ -16,11 +13,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
-import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
-import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.drawableResFilled
@@ -29,7 +26,9 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import timber.log.Timber
 
-class EnterAmountSheet : SendInputSheet() {
+class EnterAmountSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 
     private var state: SendState = SendState()
@@ -100,18 +99,18 @@ class EnterAmountSheet : SendInputSheet() {
             }
         }
 
-        // TODO: kill this before shipping, we need to find a better way of showing the keyboard
-        // TODO: tried a ViewTreeObserver - View.post {} - onViewCreated
-        Handler().postDelayed({
-            val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
-                R.id.enter_amount)
-            inputView?.let {
-                inputView.requestFocus()
-                val imm = requireContext().getSystemService(
-                    Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
-            }
-        }, 200)
+//        // TODO: kill this before shipping, we need to find a better way of showing the keyboard
+//        // TODO: tried a ViewTreeObserver - View.post {} - onViewCreated
+//        Handler().postDelayed({
+//            val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
+//                R.id.enter_amount)
+//            inputView?.let {
+//                inputView.requestFocus()
+//                val imm = requireContext().getSystemService(
+//                    Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//                imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
+//            }
+//        }, 200)
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe {
             when (it) {
@@ -127,9 +126,4 @@ class EnterAmountSheet : SendInputSheet() {
     }
 
     private fun onCtaClick() = model.process(SendIntent.PrepareTransaction)
-
-    companion object {
-        fun newInstance(): EnterAmountSheet =
-            EnterAmountSheet()
-    }
 }

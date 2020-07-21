@@ -125,7 +125,7 @@ open class CustodialTradingAccount(
 
     private val availableActions = setOf(
         AssetAction.ViewActivity,
-        AssetAction.Send
+        AssetAction.NewSend
     )
 
     private fun buyOrderToSummary(buyOrder: BuyOrder): ActivitySummaryItem =
