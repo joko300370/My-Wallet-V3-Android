@@ -344,8 +344,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             PaymentMethodType.FUNDS -> {
                 showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
-                    lastState?.fiatCurrency ?: return,
-                    false
+                    lastState?.fiatCurrency ?: return
                 ))
             }
             else -> {

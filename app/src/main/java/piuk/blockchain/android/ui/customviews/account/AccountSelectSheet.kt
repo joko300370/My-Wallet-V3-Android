@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.customviews.account
 import android.view.View
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
-import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
@@ -45,19 +44,15 @@ class AccountSelectSheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         with(view.account_list) {
 
-            val itemList = mutableListOf<BlockchainAccount>()
-
-            itemList.add(coincore.allWallets)
-            itemList.addAll(coincore.allWallets.accounts)
-
             onAccountSelected = ::doOnAccountSelected
             onEmptyList = ::doOnEmptyList
             onLoadError = ::doOnLoadError
 
-            val allAccounts = listOf(coincore.allWallets) + coincore.allWallets.accounts
-            initialise(
-                Single.just(allAccounts.filter { a -> a.hasTransactions })
-            )
+            val allAccounts = coincore.allWallets()
+                .map { listOf(it) + it.accounts }
+                .map { it.filter { a -> a.hasTransactions } }
+
+            initialise(allAccounts)
         }
     }
 
