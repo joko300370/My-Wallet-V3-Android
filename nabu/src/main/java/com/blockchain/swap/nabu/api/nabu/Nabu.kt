@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.api.nabu
 
+import com.blockchain.swap.nabu.models.cards.BeneficiariesResponse
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountBalanceResponse
@@ -38,6 +39,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -207,6 +209,13 @@ internal interface Nabu {
         @Query("currency") currency: String
     ): Single<List<Map<String, List<Long>>>>
 
+    @GET(NABU_SIMPLE_BUY_TRANSACTIONS)
+    fun getTransactions(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("product") product: String = "SIMPLEBUY"
+    ): Single<TransactionsResponse>
+
     @GET(NABU_SIMPLE_QUOTE)
     fun getSimpleBuyQuote(
         @Header("authorization") authorization: String,
@@ -272,6 +281,12 @@ internal interface Nabu {
         @Path("cardId") cardId: String
     ): Completable
 
+    @DELETE("$NABU_BANKS/{id}")
+    fun deleteBank(
+        @Header("authorization") authHeader: String,
+        @Path("id") id: String
+    ): Completable
+
     @POST("$NABU_CARDS/{cardId}/activate")
     fun activateCard(
         @Header("authorization") authHeader: String,
@@ -291,6 +306,11 @@ internal interface Nabu {
         @Query("currency") currency: String,
         @Query("checkEligibility") checkEligibility: Boolean?
     ): Single<PaymentMethodsResponse>
+
+    @GET(NABU_BENEFICIARIES)
+    fun getLinkedBanks(
+        @Header("authorization") authorization: String
+    ): Single<List<BeneficiariesResponse>>
 
     @GET(NABU_CARDS)
     fun getCards(

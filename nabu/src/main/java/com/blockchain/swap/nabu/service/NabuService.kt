@@ -28,6 +28,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -255,6 +256,14 @@ class NabuService(retrofit: Retrofit) {
         currency
     ).wrapErrorMessage()
 
+    internal fun getTransactions(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ): Single<TransactionsResponse> = service.getTransactions(
+        sessionToken.authHeader,
+        currency
+    ).wrapErrorMessage()
+
     internal fun isEligibleForSimpleBuy(
         sessionToken: NabuSessionTokenResponse,
         fiatCurrency: String,
@@ -312,6 +321,13 @@ class NabuService(retrofit: Retrofit) {
         cardId: String
     ) = service.deleteCard(
         sessionToken.authHeader, cardId
+    ).wrapErrorMessage()
+
+    fun deleteBank(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.deleteBank(
+        sessionToken.authHeader, id
     ).wrapErrorMessage()
 
     fun addNewCard(
@@ -388,8 +404,11 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getPaymentMethods(
         authorization = sessionToken.authHeader,
         currency = currency,
-        checkEligibility = checkEligibility.takeIf { it }
+        checkEligibility = checkEligibility
     ).wrapErrorMessage()
+
+    fun getLinkedBanks(sessionToken: NabuSessionTokenResponse) =
+        service.getLinkedBanks(sessionToken.authHeader).wrapErrorMessage()
 
     fun getCards(
         sessionToken: NabuSessionTokenResponse

@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -14,18 +14,18 @@ import java.util.Date
 
 sealed class ActivityDetailsType
 data class Created(val date: Date) : ActivityDetailsType()
-data class Amount(val cryptoValue: CryptoValue) : ActivityDetailsType()
-data class Fee(val feeValue: CryptoValue?) : ActivityDetailsType()
-data class Value(val currentFiatValue: FiatValue?) : ActivityDetailsType()
+data class Amount(val value: Money) : ActivityDetailsType()
+data class Fee(val feeValue: Money?) : ActivityDetailsType()
+data class Value(val currentFiatValue: Money?) : ActivityDetailsType()
 data class HistoricValue(
-    val fiatAtExecution: FiatValue?,
+    val fiatAtExecution: Money?,
     val direction: TransactionSummary.Direction
 ) : ActivityDetailsType()
 
 data class From(val fromAddress: String?) : ActivityDetailsType()
 data class FeeForTransaction(
     val direction: TransactionSummary.Direction,
-    val cryptoValue: CryptoValue
+    val cryptoValue: Money
 ) : ActivityDetailsType()
 
 data class To(val toAddress: String?) : ActivityDetailsType()
@@ -48,7 +48,7 @@ enum class DescriptionState {
 
 data class ActivityDetailState(
     val direction: TransactionSummary.Direction? = null,
-    val amount: CryptoValue? = null,
+    val amount: Money? = null,
     val isPending: Boolean = false,
     val isPendingExecution: Boolean = false,
     val isFeeTransaction: Boolean = false,
@@ -126,7 +126,7 @@ class ActivityDetailsModel(
                 loadSentItems(nonCustodialActivitySummaryItem)
             }
             direction == TransactionSummary.Direction.BUY ||
-                direction == TransactionSummary.Direction.SELL -> {
+                    direction == TransactionSummary.Direction.SELL -> {
                 // do nothing BUY & SELL are a custodial transaction
             }
             direction == TransactionSummary.Direction.SWAP -> TODO()

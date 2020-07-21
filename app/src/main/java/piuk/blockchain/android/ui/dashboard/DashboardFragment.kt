@@ -25,6 +25,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
@@ -37,7 +38,10 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
+import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
+import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
@@ -56,10 +60,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     ForceBackupForSendSheet.Host,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
-    SimpleBuyCancelOrderBottomSheet.Host {
+    SimpleBuyCancelOrderBottomSheet.Host,
+    FiatFundsDetailSheet.Host,
+    FiatFundsNoKycDetailsSheet.Host {
 
     override val model: DashboardModel by scopedInject()
-
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
 
@@ -67,7 +72,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
-            analytics = get()
+            analytics = get(),
+            onFundsItemClicked = { onFundsClicked(it) }
         )
     }
 
@@ -82,7 +88,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         rxBus.register(ActionEvent::class.java)
     }
 
-    private var state: DashboardState? = null // Hold the 'current' display state, to enable optimising of state updates
+    private var state: DashboardState? =
+        null // Hold the 'current' display state, to enable optimising of state updates
 
     @UiThread
     override fun render(newState: DashboardState) {
@@ -126,6 +133,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         with(displayList) {
             add(IDX_CARD_ANNOUNCE, EmptyDashboardItem()) // Placeholder for announcements
             add(IDX_CARD_BALANCE, newState)
+            add(IDX_FUNDS_BALANCE, EmptyDashboardItem()) // Placeholder for funds
             add(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC])
             add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
             add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
@@ -152,6 +160,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
             modList.removeAll { it == null }
 
+            if (newState.fiatAssets?.fiatAccounts?.isNotEmpty() == true) {
+                set(IDX_FUNDS_BALANCE, newState.fiatAssets)
+                modList.add { theAdapter.notifyItemChanged(IDX_FUNDS_BALANCE) }
+            }
+
             if (modList.isNotEmpty()) {
                 set(IDX_CARD_BALANCE, newState)
                 modList.add { theAdapter.notifyItemChanged(IDX_CARD_BALANCE) }
@@ -161,7 +174,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun handleUpdatedAssetState(index: Int, newState: AssetState): RefreshFn? {
+    private fun handleUpdatedAssetState(index: Int, newState: CryptoAssetState): RefreshFn? {
         if (displayList[index] != newState) {
             displayList[index] = newState
             return { theAdapter.notifyItemChanged(index) }
@@ -181,15 +194,24 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private fun showPromoSheet(state: DashboardState) {
         showBottomSheet(
             when (state.showDashboardSheet) {
-                DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(blockstackCampaignName)
+                DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
+                    blockstackCampaignName)
                 DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
-                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(state.transferFundsCurrency!!)
+                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
+                    state.transferFundsCurrency!!)
                 DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
+                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(state.selectedFiatAccount!!)
+                DashboardSheet.LINK_OR_DEPOSIT -> {
+                    state.selectedFiatAccount?.let {
+                        LinkBankAccountDetailsBottomSheet.newInstance(it)
+                    } ?: LinkBankAccountDetailsBottomSheet.newInstance()
+                }
+                DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
                 null -> null
             }
         )
@@ -204,9 +226,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         analyticsReporter.updateFiatTotal(newState.fiatBalance)
 
         newState.assets.forEach { (cc, s) ->
+
             val newBalance = s.balance
             if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.balance) {
-                analyticsReporter.gotAssetBalance(cc, newBalance) // IF we have the full set, this will fire
+                // IF we have the full set, this will fire
+                analyticsReporter.gotAssetBalance(cc, newBalance)
             }
         }
     }
@@ -265,11 +289,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         (activity as? MainActivity)?.let {
-            compositeDisposable += it.refreshAnnouncements.observeOn(AndroidSchedulers.mainThread()).subscribe {
-                if (announcements.enable()) {
-                    announcements.checkLatest(announcementHost, compositeDisposable)
+            compositeDisposable += it.refreshAnnouncements.observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (announcements.enable()) {
+                        announcements.checkLatest(announcementHost, compositeDisposable)
+                    }
                 }
-            }
         }
 
         announcements.checkLatest(announcementHost, compositeDisposable)
@@ -294,7 +319,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
-        model.process(ShowAssetDetails(cryptoCurrency))
+        model.process(ShowCryptoAssetDetails(cryptoCurrency))
+    }
+
+    private fun onFundsClicked(fiatAccount: FiatAccount) {
+        model.process(ShowFiatAssetDetails(fiatAccount))
     }
 
     private val announcementHost = object : AnnouncementHost {
@@ -312,7 +341,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(targetCurrency = swapTarget)
+        override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(
+            targetCurrency = swapTarget)
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -341,6 +371,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         override fun startSimpleBuy() {
             navigator().startSimpleBuy()
         }
+
+        override fun showFiatFundsKyc() {
+            model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+        }
+
+        override fun showBankLinking() {
+            model.process(ShowBankLinkingSheet())
+        }
     }
 
     override fun startWarnCancelSimpleBuyOrder() {
@@ -356,6 +394,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_GO_BACK)
             model.process(ShowDashboardSheet(DashboardSheet.SIMPLE_BUY_PAYMENT))
         }
+    }
+
+    override fun depositFiat(account: FiatAccount) {
+        model.process(ShowBankLinkingSheet(account))
+    }
+
+    override fun fiatFundsVerifyIdentityCta() {
+        navigator().launchKyc(CampaignType.FiatFunds)
     }
 
     // AssetDetailSheet.Host
@@ -409,13 +455,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1
-        private const val IDX_CARD_BTC = 2
-        private const val IDX_CARD_ETH = 3
-        private const val IDX_CARD_BCH = 4
-        private const val IDX_CARD_XLM = 5
-        private const val IDX_CARD_ALGO = 6
-        private const val IDX_CARD_PAX = 7
-        private const val IDX_CARD_USDT = 8
+        private const val IDX_FUNDS_BALANCE = 2
+        private const val IDX_CARD_BTC = 3
+        private const val IDX_CARD_ETH = 4
+        private const val IDX_CARD_BCH = 5
+        private const val IDX_CARD_XLM = 6
+        private const val IDX_CARD_ALGO = 7
+        private const val IDX_CARD_PAX = 8
+        private const val IDX_CARD_USDT = 9
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }

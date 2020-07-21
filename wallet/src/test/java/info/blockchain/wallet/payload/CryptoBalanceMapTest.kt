@@ -1,6 +1,7 @@
 package info.blockchain.wallet.payload
 
 import com.blockchain.testutils.satoshi
+import com.blockchain.testutils.satoshiCash
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -54,7 +55,7 @@ class CryptoBalanceMapTest {
             legacy = emptySet(),
             watchOnlyLegacy = emptySet()
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(123L)
+            totalSpendable `should equal` 123.satoshi()
             totalSpendableLegacy `should equal` CryptoValue.ZeroBtc
             totalWatchOnly `should equal` CryptoValue.ZeroBtc
         }
@@ -69,7 +70,7 @@ class CryptoBalanceMapTest {
             legacy = emptySet(),
             watchOnlyLegacy = emptySet()
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(579L)
+            totalSpendable `should equal` 579.satoshi()
             totalSpendableLegacy `should equal` CryptoValue.ZeroBtc
             totalWatchOnly `should equal` CryptoValue.ZeroBtc
         }
@@ -101,7 +102,7 @@ class CryptoBalanceMapTest {
         ).apply {
             totalSpendable `should equal` CryptoValue.ZeroBtc
             totalSpendableLegacy `should equal` CryptoValue.ZeroBtc
-            totalWatchOnly `should equal` CryptoValue.bitcoinFromSatoshis(123L)
+            totalWatchOnly `should equal` 123.satoshi()
         }
     }
 
@@ -114,9 +115,9 @@ class CryptoBalanceMapTest {
             legacy = setOf("A", "C"),
             watchOnlyLegacy = setOf("A")
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinFromSatoshis(50L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinFromSatoshis(30L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinFromSatoshis(10L)
+            totalSpendable `should equal` 50.satoshi()
+            totalSpendableLegacy `should equal` 30.satoshi()
+            totalWatchOnly `should equal` 10.satoshi()
         }
     }
 
@@ -148,10 +149,10 @@ class CryptoBalanceMapTest {
             legacy = setOf("B"),
             watchOnlyLegacy = setOf("C")
         ).apply {
-            get("A") `should equal` CryptoValue.bitcoinCashFromSatoshis(100L)
-            get("B") `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
-            get("C") `should equal` CryptoValue.bitcoinCashFromSatoshis(300L)
-            get("Not listed") `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
+            get("A") `should equal` 100.satoshiCash()
+            get("B") `should equal` 200.satoshiCash()
+            get("C") `should equal` 300.satoshiCash()
+            get("Not listed") `should equal` 400.satoshiCash()
             get("Missing") `should equal` CryptoValue.ZeroBch
         }
     }
@@ -189,18 +190,18 @@ class CryptoBalanceMapTest {
             legacy = setOf("B"),
             watchOnlyLegacy = setOf("C")
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinCashFromSatoshis(300L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
+            totalSpendable `should equal` 300.satoshiCash()
+            totalSpendableLegacy `should equal` 200.satoshiCash()
+            totalWatchOnly `should equal` 400.satoshiCash()
         }.run {
-            subtractAmountFromAddress("B", CryptoValue.bitcoinFromSatoshis(50L))
+            subtractAmountFromAddress("B", 50.satoshi())
         }.apply {
-            totalSpendable `should equal` CryptoValue.bitcoinCashFromSatoshis(250L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(150L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
-            get("A") `should equal` CryptoValue.bitcoinCashFromSatoshis(100L)
-            get("B") `should equal` CryptoValue.bitcoinCashFromSatoshis(150L)
-            get("C") `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
+            totalSpendable `should equal` 250.satoshiCash()
+            totalSpendableLegacy `should equal` 150.satoshiCash()
+            totalWatchOnly `should equal` 400.satoshiCash()
+            get("A") `should equal` 100.satoshiCash()
+            get("B") `should equal` 150.satoshiCash()
+            get("C") `should equal` 400.satoshiCash()
         }
     }
 
@@ -213,18 +214,18 @@ class CryptoBalanceMapTest {
             legacy = setOf("B"),
             watchOnlyLegacy = setOf("C", "D")
         ).apply {
-            totalSpendable `should equal` CryptoValue.bitcoinCashFromSatoshis(300L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinCashFromSatoshis(400L)
+            totalSpendable `should equal` 300.satoshiCash()
+            totalSpendableLegacy `should equal` 200.satoshiCash()
+            totalWatchOnly `should equal` 400.satoshiCash()
         }.run {
-            subtractAmountFromAddress("C", 260L.satoshi())
+            subtractAmountFromAddress("C", 260.satoshi())
         }.apply {
-            totalSpendable `should equal` CryptoValue.bitcoinCashFromSatoshis(300L)
-            totalSpendableLegacy `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
-            totalWatchOnly `should equal` CryptoValue.bitcoinCashFromSatoshis(140L)
-            get("A") `should equal` CryptoValue.bitcoinCashFromSatoshis(100L)
-            get("B") `should equal` CryptoValue.bitcoinCashFromSatoshis(200L)
-            get("C") `should equal` CryptoValue.bitcoinCashFromSatoshis(10L)
+            totalSpendable `should equal` 300.satoshiCash()
+            totalSpendableLegacy `should equal` 200.satoshiCash()
+            totalWatchOnly `should equal` 140.satoshiCash()
+            get("A") `should equal` 100.satoshiCash()
+            get("B") `should equal` 200.satoshiCash()
+            get("C") `should equal` 10.satoshiCash()
         }
     }
 

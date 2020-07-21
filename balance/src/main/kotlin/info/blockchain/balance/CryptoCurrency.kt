@@ -53,7 +53,7 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
-        featureFlags = 0L
+        featureFlags = CryptoCurrency.IS_ERC20
     ),
     STX(
         networkTicker = "STX",
@@ -78,7 +78,7 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12,
-        featureFlags = 0L
+        featureFlags = CryptoCurrency.IS_ERC20
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))
@@ -97,6 +97,7 @@ enum class CryptoCurrency(
 
         const val PRICE_CHARTING = 0x00000001L
         const val MULTI_WALLET = 0x00000002L
+        const val IS_ERC20 = 0x00000008L
         const val STUB_ASSET = 0x10000000L
     }
 }

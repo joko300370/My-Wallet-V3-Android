@@ -9,24 +9,24 @@ import io.reactivex.Maybe
 
 class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
-    val cache = TimedCacheRequest(
+    private val cache = TimedCacheRequest(
         cacheLifetimeSeconds = CACHE_LIFETIME,
         refreshFn = { balancesProvider.getBalanceForAllAssets() }
     )
 
     fun getBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
         cache.getCachedSingle().flatMapMaybe {
-            it[ccy]?.let {
-                Maybe.just(CryptoValue.fromMinor(ccy, it.toBigInteger()))
+            it[ccy]?.let { value ->
+                Maybe.just(CryptoValue.fromMinor(ccy, value.toBigInteger()))
             } ?: Maybe.empty()
-        }
+        }.onErrorResumeNext(Maybe.empty())
 
     fun getBalanceForAsset(fiat: String): Maybe<FiatValue> =
         cache.getCachedSingle().flatMapMaybe {
-            it[fiat]?.let {
-                Maybe.just(FiatValue.fromMinor(fiat, it.toLong()))
+            it[fiat]?.let { value ->
+                Maybe.just(FiatValue.fromMinor(fiat, value.toLong()))
             } ?: Maybe.empty()
-        }
+        }.onErrorResumeNext(Maybe.empty())
 
     companion object {
         private const val CACHE_LIFETIME = 10L
