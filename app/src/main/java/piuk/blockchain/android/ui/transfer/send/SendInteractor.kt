@@ -35,4 +35,7 @@ class SendInteractor(
             .then {
                 sendProcessor.execute(tx)
             }
+
+    fun getFeeForTransaction(tx: PendingSendTx) =
+        sendProcessor.absoluteFee(tx)
 }

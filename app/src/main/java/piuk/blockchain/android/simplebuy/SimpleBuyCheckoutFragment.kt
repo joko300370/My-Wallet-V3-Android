@@ -167,7 +167,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 state.fee?.toStringWithSymbol() ?: FiatValue.zero(state.fiatCurrency)
                     .toStringWithSymbol()),
 
-            CheckoutItem(getString(R.string.total),
+            CheckoutItem(getString(R.string.common_total),
                 state.order.amount?.toStringWithSymbol() ?: ""),
 
             CheckoutItem(getString(R.string.payment_method),

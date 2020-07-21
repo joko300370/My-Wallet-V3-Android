@@ -4,6 +4,10 @@
 
     <group android:id="@+id/nav_menu_top">
         <item
+            android:id="@+id/stub_send_test"
+            android:title="TEST NEW SEND"/>
+
+        <item
             android:id="@+id/nav_simple_buy"
             android:icon="@drawable/ic_nav_buy_sell"
             android:title="@string/item_buy"

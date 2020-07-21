@@ -207,7 +207,7 @@ class CoinsWebSocketStrategy(
             val marquee = stringUtils.getString(R.string.received_bitcoin_cash) + amount.toStringWithSymbol()
 
             var text = marquee
-            text += " ${stringUtils.getString(R.string.from).toLowerCase(Locale.US)} $inAddr"
+            text += " ${stringUtils.getString(R.string.common_from).toLowerCase(Locale.US)} $inAddr"
             messagesSocketHandler?.triggerNotification(
                 title, marquee, text
             )
@@ -240,7 +240,7 @@ class CoinsWebSocketStrategy(
                 val marquee = stringUtils.getString(R.string.received_ethereum) + " " +
                         Convert.fromWei(BigDecimal(transaction.value), Convert.Unit.ETHER) + " ETH"
                 val text =
-                    marquee + " " + stringUtils.getString(R.string.from).toLowerCase(Locale.US) + " " + transaction.from
+                    marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) + " " + transaction.from
 
                 messagesSocketHandler?.triggerNotification(
                     title, marquee, text
@@ -259,7 +259,7 @@ class CoinsWebSocketStrategy(
             val marquee = stringUtils.getString(R.string.received_usd_pax_1) + " " +
                     CryptoValue.fromMinor(CryptoCurrency.PAX, tokenTransaction.value).toStringWithSymbol()
             val text =
-                marquee + " " + stringUtils.getString(R.string.from).toLowerCase(Locale.US) +
+                marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) +
                         " " + tokenTransaction.from
 
             messagesSocketHandler?.triggerNotification(

@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">Trao đổi</string>
   <string name="cancel">Hủy bỏ</string>
   <string name="btn_ok">đồng ý</string>
-  <string name="yes">Đúng</string>
-  <string name="no">Không</string>
+  <string name="common_yes">Đúng</string>
+  <string name="common_no">Không</string>
   <string name="polite_no">Không, cám ơn</string>
   <string name="done">Làm xong</string>
   <string name="btn_close">Đóng</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Tiếp tục</string>
   <string name="btn_forgot_password">Quên mật khẩu?\"</string>
   <string name="SEND">Gửi</string>
-  <string name="total">Toàn bộ</string>
+  <string name="common_total">Toàn bộ</string>
   <string name="max_available">Sử dụng tổng số dư chi tiêu:</string>
   <string name="bitpay_remaining_time">Thời gian còn lại</string>
   <string name="bitpay_invoice_expired">Hóa đơn BitPay đã hết hạn</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Mật khẩu được chọn quá yếu để đảm bảo tiền của bạn. Chúng tôi mạnh mẽ 
  đề nghị bạn chọn một cái khác Bạn có muốn xác định một mật khẩu mới? 
 </string>
-  <string name="from">Từ</string>
-  <string name="to">Đến</string>
+  <string name="common_from">Từ</string>
+  <string name="common_to">Đến</string>
   <string name="confirm_details">Xác nhận thanh toán</string>
   <string name="fee">Học phí</string>
   <string name="exit_confirm">Nhấn nút quay lại lần nữa để thoát</string>

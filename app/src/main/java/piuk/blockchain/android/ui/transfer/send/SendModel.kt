@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
-import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
@@ -29,6 +28,7 @@ enum class SendStep {
 }
 
 enum class SendErrorState {
+    FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
     NONE
@@ -44,7 +44,7 @@ data class SendState(
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeOptions: FeeOptions? = null
+    val feeAmount: Money = CryptoValue.zero(sendingAccount.asset)
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?
@@ -79,8 +79,23 @@ class SendModel(
             is SendIntent.ReturnToPreviousStep -> null
             is SendIntent.MaxAmountExceeded -> null
             is SendIntent.MinRequired -> null
+            is SendIntent.RequestFee -> processFeeRequest(previousState.sendAmount)
+            is SendIntent.FeeRequestError -> null
+            is SendIntent.FeeUpdate -> null
         }
     }
+
+    private fun processFeeRequest(amount: Money) : Disposable =
+        interactor.getFeeForTransaction(
+            PendingSendTx(amount)
+        ).subscribeBy (
+            onSuccess = {
+                process(SendIntent.FeeUpdate(it))
+            },
+            onError = {
+                process(SendIntent.FeeRequestError)
+            }
+        )
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("!SEND!> Send Model: loop error -> $t")

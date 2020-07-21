@@ -4,6 +4,14 @@
     <!-- common -->
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
+    <string name="common_send">Send</string>
+    <string name="common_from">From</string>
+    <string name="common_to">To</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_total">Total</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -30,16 +38,12 @@
 
     <!-- toolbar -->
     <string name="toolbar_cmd_home">Home</string>
-    <string name="toolbar_cmd_send">Send</string>
+    <string name="toolbar_cmd_send">@string/send</string>
     <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
     <string name="toolbar_cmd_view_activity">View Activity</string>
     <string name="toolbar_cmd_swap">Swap</string>
 
-    <string name="cancel">Cancel</string>
-    <string name="btn_ok">OK</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="polite_no">No thanks</string>
 
     <string name="done">Done</string>
@@ -179,7 +183,6 @@
     <string name="SEND">Send</string>
 
     <!--BitPay-->
-    <string name="total">Total</string>
     <string name="max_available">Use total spendable balance:</string>
 
     <string name="bitpay_remaining_time">Remaining time</string>
@@ -212,8 +215,6 @@
         suggest you select a different one. Would you like to define a new password?
     </string>
 
-    <string name="from">From</string>
-    <string name="to">To</string>
     <string name="confirm_details">Confirm Payment</string>
 
     <string name="fee">Fee</string>
@@ -1789,5 +1790,7 @@
     <string name="send_enter_amount_max">Send Max</string>
     <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
     <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
+    <string name="send_confirmation_fee">Fee - Regular</string>
+    <string name="send_confirmation_regular_estimation">ETA (60 Minutes)</string>
 
 </resources>

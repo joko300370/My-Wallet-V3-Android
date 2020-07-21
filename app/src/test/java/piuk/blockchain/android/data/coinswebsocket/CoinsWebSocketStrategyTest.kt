@@ -65,7 +65,7 @@ class CoinsWebSocketStrategyTest {
         on { getString(R.string.app_name) } `it returns` "Blockchain"
         on { getString(R.string.received_ethereum) } `it returns` "Received Ether"
         on { getString(R.string.received_usd_pax_1) } `it returns` "Received USD Digital"
-        on { getString(R.string.from) } `it returns` "From"
+        on { getString(R.string.common_from) } `it returns` "From"
     }
     private val erc20Account: Erc20Account = mock {
         on { fetchAddressCompletable() } `it returns` Completable.complete()
