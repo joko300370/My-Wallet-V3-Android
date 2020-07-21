@@ -110,11 +110,10 @@ class SendModel(
                 }
             )
 
-
-    private fun processFeeRequest(amount: Money) : Disposable =
+    private fun processFeeRequest(amount: Money): Disposable =
         interactor.getFeeForTransaction(
             PendingSendTx(amount)
-        ).subscribeBy (
+        ).subscribeBy(
             onSuccess = {
                 process(SendIntent.FeeUpdate(it))
             },

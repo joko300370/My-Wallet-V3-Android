@@ -119,7 +119,7 @@ sealed class SendIntent : MviIntent<SendState> {
 
     class NoteAdded(
         val note: String
-    ): SendIntent() {
+    ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState = oldState.copy(
             note = note,
             noteState = NoteState.UPDATE_SUCCESS
