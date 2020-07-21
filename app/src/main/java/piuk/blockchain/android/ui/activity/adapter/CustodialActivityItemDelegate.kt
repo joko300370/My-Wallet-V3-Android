@@ -48,8 +48,7 @@ private class CustodialActivityItemViewHolder(
     ) {
         with(itemView) {
             icon.setIcon(tx.status)
-            if (tx.status != OrderState.PENDING_EXECUTION &&
-                tx.status != OrderState.AWAITING_FUNDS) {
+            if (tx.status.isPending().not()) {
                 icon.setAssetIconColours(tx.cryptoCurrency, context)
             } else {
                 icon.background = null
@@ -63,7 +62,7 @@ private class CustodialActivityItemViewHolder(
 
             asset_balance_fiat.text = tx.fundedFiat.toStringWithSymbol()
             if (tx.status == OrderState.FINISHED) {
-                asset_balance_crypto.text = tx.cryptoValue.toStringWithSymbol()
+                asset_balance_crypto.text = tx.value.toStringWithSymbol()
             } else {
                 asset_balance_crypto.text =
                     context.getString(R.string.activity_custodial_pending_value)
@@ -88,6 +87,9 @@ private class CustodialActivityItemViewHolder(
         }
     }
 }
+
+private fun OrderState.isPending(): Boolean =
+    this != OrderState.PENDING_CONFIRMATION && this != OrderState.PENDING_EXECUTION && this != OrderState.AWAITING_FUNDS
 
 private fun ImageView.setIcon(status: OrderState) =
     setImageResource(

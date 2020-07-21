@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.models.nabu.Address
 import com.squareup.moshi.Json
 import info.blockchain.balance.CryptoCurrency
+import java.math.BigDecimal
 
 import java.util.Date
 
@@ -165,6 +166,39 @@ data class EverypayPaymentAttrs(
 data class ConfirmOrderRequestBody(
     private val action: String = "confirm",
     private val attributes: CardPartnerAttributes?
+)
+
+data class TransactionsResponse(
+    val items: List<TransactionResponse>
+)
+
+data class TransactionResponse(
+    val id: String,
+    val amount: AmountResponse,
+    val insertedAt: String,
+    val type: String,
+    val state: String
+) {
+    companion object {
+        const val COMPLETE = "COMPLETE"
+        const val CREATED = "CREATED"
+        const val PENDING = "PENDING"
+        const val UNIDENTIFIED = "UNIDENTIFIED"
+        const val FAILED = "FAILED"
+        const val FRAUD_REVIEW = "FRAUD_REVIEW"
+        const val CLEARED = "CLEARED"
+        const val REJECTED = "REJECTED"
+        const val MANUAL_REVIEW = "MANUAL_REVIEW"
+        const val REFUNDED = "REFUNDED"
+
+        const val DEPOSIT = "DEPOSIT"
+        const val WITHDRAWAL = "WITHDRAWAL"
+    }
+}
+
+data class AmountResponse(
+    val symbol: String,
+    val value: BigDecimal
 )
 
 data class CardPartnerAttributes(

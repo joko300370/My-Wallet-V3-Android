@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.bch
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Observable
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -18,7 +19,7 @@ internal class BchActivitySummaryItem(
     override val direction: TransactionSummary.Direction = transactionSummary.direction
     override val timeStampMs: Long = transactionSummary.time * 1000
 
-    override val cryptoValue: CryptoValue = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
+    override val value: Money = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
 
     override val description: String? = null
 

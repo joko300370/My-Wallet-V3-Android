@@ -70,7 +70,7 @@ class SimpleBuySyncFactoryTest {
         whenSimpleBuyIsEnabled()
 
         val localInput = SimpleBuyState(
-            enteredAmount = "1000",
+            amount = FiatValue.fromMinor("EUR", 1000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.INITIALISED,
@@ -406,7 +406,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -454,7 +454,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -502,7 +502,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.PENDING_CONFIRMATION,
@@ -550,7 +550,7 @@ class SimpleBuySyncFactoryTest {
         // We should use the remote
 
         val localInput = SimpleBuyState(
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.INITIALISED,
@@ -613,7 +613,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.INITIALISED,
@@ -640,7 +640,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "100.00",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -680,7 +680,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -719,7 +719,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -758,7 +758,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,
@@ -797,7 +797,7 @@ class SimpleBuySyncFactoryTest {
 
         val localInput = SimpleBuyState(
             id = EXPECTED_ORDER_ID,
-            enteredAmount = "10000",
+            amount = FiatValue.fromMinor("EUR", 10000),
             fiatCurrency = "EUR",
             selectedCryptoCurrency = CryptoCurrency.BTC,
             orderState = OrderState.AWAITING_FUNDS,

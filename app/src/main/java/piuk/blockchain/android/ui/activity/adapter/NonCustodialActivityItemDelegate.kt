@@ -75,7 +75,7 @@ private class NonCustodialActivityItemViewHolder(
             setTextColours(tx.isConfirmed)
 
             asset_balance_fiat.gone()
-            asset_balance_crypto.text = tx.cryptoValue.toStringWithSymbol()
+            asset_balance_crypto.text = tx.value.toStringWithSymbol()
             disposables += tx.totalFiatWhenExecuted(fiatCurrency)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -115,17 +115,17 @@ private fun ImageView.setDirectionIcon(
 ) {
     setImageResource(
         if (isFeeTransaction) {
-                R.drawable.ic_tx_sent
-            } else {
-                when (direction) {
-                    TransactionSummary.Direction.TRANSFERRED -> R.drawable.ic_tx_transfer
-                    TransactionSummary.Direction.RECEIVED -> R.drawable.ic_tx_receive
-                    TransactionSummary.Direction.SENT -> R.drawable.ic_tx_sent
-                    TransactionSummary.Direction.BUY -> R.drawable.ic_tx_buy
-                    TransactionSummary.Direction.SELL -> R.drawable.ic_tx_sell
-                    TransactionSummary.Direction.SWAP -> R.drawable.ic_tx_swap
-                }
+            R.drawable.ic_tx_sent
+        } else {
+            when (direction) {
+                TransactionSummary.Direction.TRANSFERRED -> R.drawable.ic_tx_transfer
+                TransactionSummary.Direction.RECEIVED -> R.drawable.ic_tx_receive
+                TransactionSummary.Direction.SENT -> R.drawable.ic_tx_sent
+                TransactionSummary.Direction.BUY -> R.drawable.ic_tx_buy
+                TransactionSummary.Direction.SELL -> R.drawable.ic_tx_sell
+                TransactionSummary.Direction.SWAP -> R.drawable.ic_tx_swap
             }
+        }
     )
 }
 

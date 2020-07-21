@@ -1,7 +1,6 @@
 package info.blockchain.balance
 
 import java.io.Serializable
-import java.lang.IndexOutOfBoundsException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode

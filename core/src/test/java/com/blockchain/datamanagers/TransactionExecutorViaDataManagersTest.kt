@@ -13,6 +13,7 @@ import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.satoshi
+import com.blockchain.testutils.satoshiCash
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.wei
 import com.blockchain.transactions.Memo
@@ -325,7 +326,7 @@ class TransactionExecutorViaDataManagersTest {
     @Test
     fun `execute bitcoin cash transaction verify entire flow`() {
         // Arrange
-        val amount = CryptoValue.bitcoinCashFromSatoshis(10)
+        val amount = 10.satoshiCash()
         val destination = "DESTINATION"
         val change = "CHANGE"
         val bchAccount = GenericMetadataAccount().apply { xpub = "XPUB" }
@@ -643,7 +644,7 @@ class TransactionExecutorViaDataManagersTest {
         ).test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(10))
+        testObserver.assertValue(10.satoshiCash())
     }
 
     @Test
@@ -812,7 +813,7 @@ class TransactionExecutorViaDataManagersTest {
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(500))
+        testObserver.assertValue(500.satoshiCash())
     }
 
     @Test

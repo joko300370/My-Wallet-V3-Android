@@ -5,6 +5,7 @@ import org.koin.core.qualifier.named
 
 val pitFeatureFlag = StringQualifier("ff_pit_linking")
 val simpleBuyFeatureFlag = StringQualifier("ff_simple_buy")
+val simpleBuyFundsFeatureFlag = StringQualifier("ff_simple_buy_funds")
 val cardPaymentsFeatureFlag = StringQualifier("ff_card_payments")
 val coinifyUsersToKyc = StringQualifier("ff_notify_coinify_users_to_kyc")
 val coinifyFeatureFlag = StringQualifier("ff_coinify")

@@ -105,16 +105,16 @@ fun CryptoCurrency.assetName() =
 @ColorRes
 fun CryptoCurrency.assetTint() =
     when (this) {
-            CryptoCurrency.BTC -> R.color.btc_bkgd
-            CryptoCurrency.BCH -> R.color.bch_bkgd
-            CryptoCurrency.ETHER -> R.color.ether_bkgd
-            CryptoCurrency.PAX -> R.color.pax_bkgd
-            CryptoCurrency.XLM -> R.color.xlm_bkgd
-            CryptoCurrency.ALGO -> R.color.algo_bkgd
-            CryptoCurrency.USDT -> R.color.usdt_bkgd
-            else -> {
-                android.R.color.transparent // STX left, do nothing
-            }
+        CryptoCurrency.BTC -> R.color.btc_bkgd
+        CryptoCurrency.BCH -> R.color.bch_bkgd
+        CryptoCurrency.ETHER -> R.color.ether_bkgd
+        CryptoCurrency.PAX -> R.color.pax_bkgd
+        CryptoCurrency.XLM -> R.color.xlm_bkgd
+        CryptoCurrency.ALGO -> R.color.algo_bkgd
+        CryptoCurrency.USDT -> R.color.usdt_bkgd
+        else -> {
+            android.R.color.transparent // STX left, do nothing
+        }
     }
 
 @ColorRes
@@ -172,4 +172,7 @@ internal class ResourceDefaultLabels(
 
     override fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String =
         resources.getString(R.string.exchange_default_account_label, cryptoCurrency.displayTicker)
+
+    override fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String =
+        resources.getString(R.string.currency_wallet, fiatCurrency)
 }

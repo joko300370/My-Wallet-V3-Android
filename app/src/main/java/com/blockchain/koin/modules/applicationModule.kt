@@ -22,6 +22,7 @@ import com.blockchain.koin.paxStrategy
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.usdtStrategy
@@ -672,8 +673,10 @@ val applicationModule = module {
 
         factory {
             DashboardInteractor(
-                tokens = get(),
+                coincore = get(),
                 payloadManager = get(),
+                exchangeRates = get(),
+                currencyPrefs = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get()
@@ -783,7 +786,9 @@ val applicationModule = module {
                 /* pitLinking = */ get(),
                 /* analytics = */ get(),
                 /*featureFlag = */get(pitFeatureFlag),
-                /*featureFlag = */get(cardPaymentsFeatureFlag)
+                /*featureFlag = */get(cardPaymentsFeatureFlag),
+                /*featureFlag = */get(simpleBuyFundsFeatureFlag),
+                /*simpleBuyPrefs = */get()
             )
         }
 

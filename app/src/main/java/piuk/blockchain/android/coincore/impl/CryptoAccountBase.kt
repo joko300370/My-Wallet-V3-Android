@@ -120,7 +120,7 @@ open class CustodialTradingAccount(
         CustodialActivitySummaryItem(
             exchangeRates = exchangeRates,
             cryptoCurrency = buyOrder.crypto.currency,
-            cryptoValue = buyOrder.crypto,
+            value = buyOrder.crypto,
             fundedFiat = buyOrder.fiat,
             txId = buyOrder.id,
             timeStampMs = buyOrder.created.time,

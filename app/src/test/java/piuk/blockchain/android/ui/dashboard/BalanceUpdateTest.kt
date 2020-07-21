@@ -1,8 +1,9 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -25,7 +26,7 @@ class BalanceUpdateTest {
 
         val subject = BalanceUpdate(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinCashFromMajor(1)
+            1.bitcoinCash()
         )
 
         subject.reduce(initialState)
@@ -45,7 +46,7 @@ class BalanceUpdateTest {
 
         val subject = BalanceUpdate(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinFromMajor(1)
+            1.bitcoin()
         )
 
         val result = subject.reduce(initialState)

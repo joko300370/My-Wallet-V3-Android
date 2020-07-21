@@ -1,5 +1,7 @@
 package piuk.blockchain.android.coincore.fiat
 
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -12,35 +14,62 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class FiatCustodialAccount(
     override val label: String,
     override val fiatCurrency: String,
     override val isDefault: Boolean = false,
-    // STUBS for testing
-    private val funds: FiatValue
+    private val assetBalancesRepository: AssetBalancesRepository,
+    private val custodialWalletManager: CustodialWalletManager,
+    private val exchangesRatesDataManager: ExchangeRateDataManager
 ) : FiatAccount {
+    private val hasFunds = AtomicBoolean(false)
 
     override val balance: Single<Money>
-        // FIXME: this is a temporary workaround, as soon as 6.35.1 is released this should return to
-        // using Single.just(funds)
-        get() = Single.just(FiatValue.zero(fiatCurrency))
+        get() = assetBalancesRepository.getBalanceForAsset(fiatCurrency)
+            .toSingle(FiatValue.zero(fiatCurrency)).map {
+                it as Money
+            }.doOnSuccess {
+                hasFunds.set(it.isPositive)
+            }
+
+    override var hasTransactions: Boolean = false
+        private set
 
     override val activity: Single<ActivitySummaryList>
-        get() = Single.just(emptyList())
+        get() = custodialWalletManager.getTransactions(fiatCurrency).doOnSuccess {
+            setHasTransactions(it.isEmpty().not())
+        }.map {
+            it.map { fiatTransaction ->
+                FiatActivitySummaryItem(
+                    currency = fiatCurrency,
+                    exchangeRates = exchangesRatesDataManager,
+                    txId = fiatTransaction.id,
+                    timeStampMs = fiatTransaction.date.time,
+                    value = fiatTransaction.amount,
+                    account = this,
+                    state = fiatTransaction.state,
+                    type = fiatTransaction.type
+                )
+            }
+        }
 
     override val actions: AvailableActions
         get() = setOf(AssetAction.ViewActivity)
 
     override val isFunded: Boolean
-        get() = !funds.isZero
+        get() = hasFunds.get()
 
-    override val hasTransactions: Boolean
-        get() = false
+    private fun setHasTransactions(hasTransactions: Boolean) {
+        this.hasTransactions = hasTransactions
+    }
 
     override fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money> =
         balance.map { it.toFiat(exchangeRates, fiatCurrency) }

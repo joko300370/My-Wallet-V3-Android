@@ -20,8 +20,6 @@
             android:theme="@style/AppTheme"
             tools:replace="android:allowBackup">
 
-        <activity android:name=".ui.transfer.TestSendContainerActivity"/>
-
         <activity
                 android:name=".ui.launcher.LauncherActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize"
