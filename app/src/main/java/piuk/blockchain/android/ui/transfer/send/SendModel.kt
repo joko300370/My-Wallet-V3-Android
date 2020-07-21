@@ -31,7 +31,14 @@ enum class SendErrorState {
     FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
-    NONE
+    NONE,
+    TRANSACTION_NOTE_SUPPORTED
+}
+
+enum class NoteState {
+    NOT_SET,
+    UPDATE_SUCCESS,
+    UPDATE_ERROR
 }
 
 data class SendState(
@@ -44,7 +51,10 @@ data class SendState(
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeAmount: Money = CryptoValue.zero(sendingAccount.asset)
+    val feeAmount: Money = CryptoValue.zero(sendingAccount.asset),
+    val transactionNoteSupported: Boolean? = null,
+    val noteState: NoteState = NoteState.NOT_SET,
+    val note: String = ""
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?
@@ -82,8 +92,24 @@ class SendModel(
             is SendIntent.RequestFee -> processFeeRequest(previousState.sendAmount)
             is SendIntent.FeeRequestError -> null
             is SendIntent.FeeUpdate -> null
+            is SendIntent.RequestTransactionNoteSupport -> processTransactionNoteSupport()
+            is SendIntent.TransactionNoteSupported -> null
+            is SendIntent.TransactionNoteSupportError -> null
+            is SendIntent.NoteAdded -> null
         }
     }
+
+    private fun processTransactionNoteSupport(): Disposable =
+        interactor.checkIfNoteSupported()
+            .subscribeBy(
+                onSuccess = {
+                    process(SendIntent.TransactionNoteSupported)
+                },
+                onError = {
+                    process(SendIntent.TransactionNoteSupportError)
+                }
+            )
+
 
     private fun processFeeRequest(amount: Money) : Disposable =
         interactor.getFeeForTransaction(
@@ -165,7 +191,7 @@ class SendModel(
 
     private fun processExecuteTransaction(state: SendState): Disposable =
         interactor.verifyAndExecute(
-            PendingSendTx(state.sendAmount)
+            PendingSendTx(state.sendAmount, notes = state.note)
         ).subscribeBy(
             onComplete = {
                 process(SendIntent.UpdateTransactionComplete)

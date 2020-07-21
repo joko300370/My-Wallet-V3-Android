@@ -1791,6 +1791,11 @@
     <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
     <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
-    <string name="send_confirmation_regular_estimation">ETA (60 Minutes)</string>
+    <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
+    <string name="send_confirmation_fee_loading">Loading…</string>
+    <string name="send_confirmation_fee_error">Error loading fee</string>
+    <string name="send_confirmation_add_note_hint">Add a note</string>
+    <string name="send_confirmation_add_note_success">Note successfully added</string>
+    <string name="send_confirmation_cta_button">Send %1$s</string>
 
 </resources>

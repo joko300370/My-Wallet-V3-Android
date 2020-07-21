@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.lang.Exception
 
 class SendValidationError(errorCode: Int) : Exception("Invalid Send Tx: code $errorCode") {
     companion object {
@@ -44,4 +44,13 @@ interface SendProcessor {
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
     // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
     fun execute(pendingTx: PendingSendTx, secondPassword: String = ""): Completable
+
+    fun isNoteSupported(): Single<Boolean> =
+        when (sendingAccount.asset) {
+            CryptoCurrency.BTC,
+            CryptoCurrency.ETHER,
+            CryptoCurrency.USDT,
+            CryptoCurrency.PAX -> Single.just(true)
+            else -> Single.just(false)
+        }
 }
