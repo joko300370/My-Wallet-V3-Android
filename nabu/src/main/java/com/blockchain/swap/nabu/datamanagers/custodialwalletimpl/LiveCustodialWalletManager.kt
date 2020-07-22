@@ -59,8 +59,8 @@ import io.reactivex.rxkotlin.flatMapIterable
 import io.reactivex.rxkotlin.zipWith
 import okhttp3.internal.toLongOrDefault
 import java.math.BigDecimal
-import java.util.Date
 import java.util.Calendar
+import java.util.Date
 import java.util.UnknownFormatConversionException
 
 class LiveCustodialWalletManager(
@@ -525,8 +525,8 @@ class LiveCustodialWalletManager(
             partner = partner.toSupportedPartner(),
             expireDate = card?.let {
                 Calendar.getInstance().apply {
-                    set(it.expireYear,
-                        it.expireMonth,
+                    set(it.expireYear ?: this.get(Calendar.YEAR),
+                        it.expireMonth ?: this.get(Calendar.MONTH),
                         0)
                 }.time
             } ?: Date(),
