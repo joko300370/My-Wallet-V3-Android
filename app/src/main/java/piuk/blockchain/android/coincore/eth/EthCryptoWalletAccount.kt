@@ -132,5 +132,4 @@ internal class EthCryptoWalletAccount(
         AssetAction.Receive,
         AssetAction.Swap
     )
-
 }

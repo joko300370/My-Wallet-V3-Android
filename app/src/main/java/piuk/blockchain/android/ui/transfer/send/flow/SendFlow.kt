@@ -100,7 +100,6 @@ class SendFlow(
                     Timber.e("Unable to configure send flow, aborting. e == $it")
                     finishFlow()
                 })
-
     }
 
     override fun finishFlow() {

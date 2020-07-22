@@ -29,7 +29,6 @@ import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import timber.log.Timber
 
 typealias StatusDecorator = (BlockchainAccount) -> Single<String>
 

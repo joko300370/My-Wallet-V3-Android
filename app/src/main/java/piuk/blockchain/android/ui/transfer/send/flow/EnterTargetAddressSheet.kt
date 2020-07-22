@@ -58,7 +58,6 @@ class EnterTargetAddressSheet(
             } else {
                 showNonCustodialInput(newState)
             }
-
         }
         state = newState
     }
