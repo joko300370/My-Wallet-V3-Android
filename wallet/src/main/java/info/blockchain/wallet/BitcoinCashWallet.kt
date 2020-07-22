@@ -121,7 +121,9 @@ open class BitcoinCashWallet : DeterministicWallet {
                 limit,
                 offset,
                 BCH_FORK_HEIGHT
-            )
+            ).filter {
+                !it.isWatchOnly
+            }.toMutableList()
         }
 
     /**
