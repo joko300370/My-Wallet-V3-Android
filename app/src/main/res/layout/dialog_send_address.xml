@@ -13,7 +13,6 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/large_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:contentDescription="Enter Address"
         android:text="Send"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,7 +73,7 @@
                 android:id="@+id/address_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Bitcoin Address"
+                android:hint="@string/send_enter_asset_address_hint"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
@@ -83,7 +82,7 @@
                 android:id="@+id/error_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Not a valid bitcoin address"
+                android:text="@string/send_error_not_valid_asset_address"
                 app:layout_constraintTop_toBottomOf="@id/address_entry"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -93,7 +92,7 @@
                 android:id="@+id/btn_scan"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:contentDescription="Scan QR Code"
+                android:contentDescription="@string/send_scan_qr_code"
                 android:src="@drawable/icon_qr_inverse"
                 android:layout_marginEnd="@dimen/tiny_margin"
                 app:layout_constraintTop_toTopOf="@id/address_entry"
@@ -113,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Text.Semibold.14"
-                android:text="Internal Send Only"
+                android:text="@string/send_warn_internal_send_only"
                 android:layout_marginStart="@dimen/small_margin"
                 android:layout_marginEnd="@dimen/small_margin"/>
 
@@ -122,7 +121,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 style="@style/Text.Standard.12"
-                android:text="At this time, you can only transfer BTC from your BTC Trade Wallet other. Once BTC is in your Vault Wallet you can transfer to external addresses."
+                android:text="@string/send_internal_transfer_message"
                 android:layout_marginStart="@dimen/small_margin"
                 android:layout_marginEnd="@dimen/small_margin"/>
 
@@ -139,7 +138,7 @@
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
-        android:text="or Select a Wallet"
+        android:text="@string/send_select_a_wallet_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_switcher"/>

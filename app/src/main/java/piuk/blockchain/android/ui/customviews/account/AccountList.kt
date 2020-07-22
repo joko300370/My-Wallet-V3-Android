@@ -74,7 +74,6 @@ class AccountList @JvmOverloads constructor(
         }
 
         disposables += source
-            .doOnSubscribe { Timber.e(">SEND: SUBSCRIBE") }
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {

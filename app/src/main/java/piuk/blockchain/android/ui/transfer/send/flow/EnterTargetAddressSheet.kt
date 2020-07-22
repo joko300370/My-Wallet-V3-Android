@@ -24,6 +24,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -69,10 +70,14 @@ class EnterTargetAddressSheet(
             null
         }
 
+        val asset = newState.asset
+
         with(dialogView) {
             address_entry.setText(address, TextView.BufferType.EDITABLE)
-//            address_entry.setHint()
-
+            address_entry.hint = getString(
+                R.string.send_enter_asset_address_hint,
+                getString(asset.assetName())
+            )
 
             input_switcher.displayedChild = NONCUSTODIAL_INPUT
         }
@@ -80,7 +85,10 @@ class EnterTargetAddressSheet(
 
     private fun showCustodialInput(newState: SendState) {
         with(dialogView) {
-//            internal_warning.setText(address, TextView.BufferType.EDITABLE)
+            internal_warning.text = getString(
+                R.string.send_internal_transfer_message,
+                newState.asset.displayTicker
+            )
 
             title_pick.gone()
             input_switcher.displayedChild = CUSTODIAL_INPUT
@@ -90,11 +98,16 @@ class EnterTargetAddressSheet(
     // TODO: This address processing should occur via the interactor
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
-            val address = addressFactory.parse(s.toString(), state.sendingAccount.asset)
+            val asset = state.asset
+            val address = addressFactory.parse(s.toString(), asset)
             if (address != null) {
                 addressEntered(address)
                 dialogView.error_msg.invisible()
             } else {
+                dialogView.error_msg.text = getString(
+                    R.string.send_error_not_valid_asset_address,
+                    getString(asset.assetName())
+                )
                 dialogView.error_msg.visible()
             }
         }
@@ -107,7 +120,10 @@ class EnterTargetAddressSheet(
             cta_button.setOnClickListener { onCtaClick() }
 
             wallet_select.apply {
-                onLoadError = { showErrorToast("Failed getting transfer wallets") }
+                onLoadError = {
+                    showErrorToast("Failed getting transfer wallets")
+                    hideTransferList()
+                }
                 onAccountSelected = { accountSelected(it) }
                 onEmptyList = { hideTransferList() }
             }

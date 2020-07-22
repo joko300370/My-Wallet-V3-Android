@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Scheduler
@@ -48,6 +49,8 @@ data class SendState(
     // Question: If we scan a bitpay invoice, do we show the amount screen?
     val initialAmount: Single<CryptoValue> = Single.just(CryptoValue.zero(sendingAccount.asset))
     val canEditAmount: Boolean = true // Will be false for URL or BitPay txs
+
+    val asset: CryptoCurrency = sendingAccount.asset
 }
 
 class SendModel(

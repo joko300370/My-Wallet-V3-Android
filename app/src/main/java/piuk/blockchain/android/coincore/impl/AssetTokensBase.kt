@@ -135,10 +135,9 @@ internal abstract class CryptoAssetBase(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
 
-    protected fun getPitLinkingAccount(): Maybe<SingleAccount> =
+    private fun getPitLinkingAccount(): Maybe<SingleAccount> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
-            .doOnError { t -> Timber.e("Send $t")}
             .map { address ->
                 CryptoExchangeAccount(
                     cryptoCurrency = asset,
@@ -156,6 +155,7 @@ internal abstract class CryptoAssetBase(
             is CryptoNonCustodialAccount -> getPitLinkingAccount()
                     .map { listOf(it) }
                     .toSingle(emptyList())
+                    .onErrorReturn { emptyList() }
             else -> Single.just(emptyList())
         }
 }
