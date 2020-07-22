@@ -403,14 +403,9 @@
         Bitcoin address %1$s. Please scan the QR code.
     </string>
     <string name="invalid_private_key">Invalid private key</string>
-    <string name="watch_only_import_warning">You are about to import a non-spendable address, an
-        address (or public key script)
-        stored in the wallet without the corresponding private key. This
-        means that the funds can be spent ONLY if you have the private key stored elsewhere. If you
-        do
-        not have the private key stored, do NOT instruct anyone to send you bitcoin to the
-        non-spendable
-        address.\n\nThese options are recommended for advanced users only. Continue?
+    <string name="watch_only_not_supported">Importing a non-spendable address (an address or public key script
+        without the corresponding private key) is not supported. Please try again with
+        an address and private key.
     </string>
     <string name="scan_private_key">Scan private key</string>
     <string name="private_key_successfully_imported">Private key successfully imported.</string>
