@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class ShowAssetDetailsTest {
 
-    val subject = ShowAssetDetails(CryptoCurrency.ETHER)
+    val subject = ShowCryptoAssetDetails(CryptoCurrency.ETHER)
 
     @Test
     fun `showing asset details, sets asset type and leaves other fields unchanged`() {

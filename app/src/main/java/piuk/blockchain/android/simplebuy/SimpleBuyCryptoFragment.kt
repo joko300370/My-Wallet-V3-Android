@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
@@ -226,9 +227,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
 
     private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
-
         when (selectedPaymentMethod) {
-            is PaymentMethod.Undefined -> {
+            is PaymentMethod.Undefined,
+            is PaymentMethod.UndefinedFunds -> {
                 payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
             }
             is PaymentMethod.BankTransfer -> renderBankPayment(selectedPaymentMethod)
@@ -239,9 +240,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         payment_method.visible()
         payment_method_separator.visible()
         payment_method_details_root.visible()
-        undefined_payment_text.visibleIf { selectedPaymentMethod is PaymentMethod.Undefined }
-        payment_method_title.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
-        payment_method_limit.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
+        undefined_payment_text.showIfPaymentMethodUndefined(selectedPaymentMethod)
+        payment_method_title.showIfPaymentMethodDefined(selectedPaymentMethod)
+        payment_method_limit.showIfPaymentMethodDefined(selectedPaymentMethod)
     }
 
     private fun renderFundsPayment(paymentMethod: PaymentMethod.Funds) {
@@ -335,8 +336,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             PaymentMethodType.FUNDS -> {
                 showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
-                    lastState?.fiatCurrency ?: return,
-                    false
+                    lastState?.fiatCurrency ?: return
                 ))
             }
             else -> {
@@ -353,6 +353,20 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency,
                     (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
                 ))
+        }
+    }
+
+    private fun TextView.showIfPaymentMethodDefined(paymentMethod: PaymentMethod) {
+        visibleIf {
+            paymentMethod !is PaymentMethod.Undefined &&
+                paymentMethod !is PaymentMethod.UndefinedFunds
+        }
+    }
+
+    private fun TextView.showIfPaymentMethodUndefined(paymentMethod: PaymentMethod) {
+        visibleIf {
+            paymentMethod is PaymentMethod.Undefined ||
+                paymentMethod is PaymentMethod.UndefinedFunds
         }
     }
 }

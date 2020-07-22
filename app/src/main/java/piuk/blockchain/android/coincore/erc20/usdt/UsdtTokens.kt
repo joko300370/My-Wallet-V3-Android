@@ -21,7 +21,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal class UsdtAsset(
     override val asset: CryptoCurrency = CryptoCurrency.USDT,
-    erc20Account: Erc20Account,
+    usdtAccount: Erc20Account,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -30,7 +30,7 @@ internal class UsdtAsset(
     crashLogger: CrashLogger,
     pitLinking: PitLinking
 ) : Erc20TokensBase(
-    erc20Account,
+    usdtAccount,
     custodialManager,
     exchangeRates,
     historicRates,

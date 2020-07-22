@@ -76,21 +76,24 @@ class AssetActivityRepository(
     }
 
     override fun getFromNetwork(): Maybe<ActivitySummaryList> =
-        coincore.allWallets.activity.toMaybe().doOnSuccess { activityList ->
+        coincore.allWallets()
+            .flatMap { it.activity }
+            .toMaybe()
+            .doOnSuccess { activityList ->
             // on error of activity returns onSuccess with empty list
-            if (activityList.isNotEmpty()) {
-                transactionCache.clear()
-                transactionCache.addAll(activityList)
+                if (activityList.isNotEmpty()) {
+                    transactionCache.clear()
+                    transactionCache.addAll(activityList)
+                }
+                lastUpdatedTimestamp = System.currentTimeMillis()
+            }.map { list ->
+                // if network comes empty, but we have cache, return cache instead
+                if (list.isEmpty() && transactionCache.isNotEmpty()) {
+                    transactionCache
+                } else {
+                    list
+                }
             }
-            lastUpdatedTimestamp = System.currentTimeMillis()
-        }.map { list ->
-            // if network comes empty, but we have cache, return cache instead
-            if (list.isEmpty() && transactionCache.isNotEmpty()) {
-                transactionCache
-            } else {
-                list
-            }
-        }
 
     override fun getFromCache(): Maybe<ActivitySummaryList> {
         return if (transactionCache.isNotEmpty()) {

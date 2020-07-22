@@ -9,6 +9,7 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 class CredentialsWiper(
     private val payloadManagerWiper: PayloadManagerWiper,
     private val paxAccount: Erc20Account,
+    private val usdtAccount: Erc20Account,
     private val accessState: AccessState,
     private val appUtil: AppUtil
 
@@ -20,6 +21,6 @@ class CredentialsWiper(
         appUtil.restartApp(LauncherActivity::class.java)
         accessState.clearPin()
         paxAccount.clear()
-        paxAccount.clear()
+        usdtAccount.clear()
     }
 }
