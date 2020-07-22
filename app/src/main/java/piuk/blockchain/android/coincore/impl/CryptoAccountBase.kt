@@ -55,7 +55,7 @@ abstract class CryptoAccountBase(
         get() = Single.just(SendState.NOT_SUPPORTED)
 
     override val feeAsset: CryptoCurrency
-        get() = when(asset) {
+        get() = when (asset) {
             CryptoCurrency.BTC -> CryptoCurrency.BTC
             CryptoCurrency.BCH -> CryptoCurrency.BCH
             CryptoCurrency.ETHER,
