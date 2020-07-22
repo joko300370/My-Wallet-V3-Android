@@ -10,19 +10,19 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
@@ -53,6 +53,18 @@ abstract class CryptoAccountBase(
 
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
+
+    override val feeAsset: CryptoCurrency
+        get() = when(asset) {
+            CryptoCurrency.BTC -> CryptoCurrency.BTC
+            CryptoCurrency.BCH -> CryptoCurrency.BCH
+            CryptoCurrency.ETHER,
+            CryptoCurrency.PAX,
+            CryptoCurrency.USDT -> CryptoCurrency.ETHER
+            CryptoCurrency.XLM -> CryptoCurrency.XLM
+            CryptoCurrency.ALGO -> CryptoCurrency.ALGO
+            CryptoCurrency.STX -> CryptoCurrency.STX
+        }
 }
 
 open class CustodialTradingAccount(

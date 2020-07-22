@@ -112,11 +112,6 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(transactionNoteSupported = true)
     }
 
-    object TransactionNoteSupportError : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(errorState = SendErrorState.TRANSACTION_NOTE_SUPPORTED)
-    }
-
     class NoteAdded(
         val note: String
     ) : SendIntent() {

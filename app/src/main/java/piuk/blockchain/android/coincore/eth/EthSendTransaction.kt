@@ -77,6 +77,8 @@ class EthSendTransaction(
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .doOnSuccess { ethDataManager.updateTransactionNotes(it, pendingTx.notes) }
 
+    override fun isNoteSupported(): Single<Boolean> = Single.just(true)
+
     private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),

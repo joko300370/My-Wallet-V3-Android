@@ -31,8 +31,7 @@ enum class SendErrorState {
     FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
-    NONE,
-    TRANSACTION_NOTE_SUPPORTED
+    NONE
 }
 
 enum class NoteState {
@@ -51,7 +50,7 @@ data class SendState(
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeAmount: Money = CryptoValue.zero(sendingAccount.asset),
+    val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset),
     val transactionNoteSupported: Boolean? = null,
     val noteState: NoteState = NoteState.NOT_SET,
     val note: String = ""
@@ -94,7 +93,6 @@ class SendModel(
             is SendIntent.FeeUpdate -> null
             is SendIntent.RequestTransactionNoteSupport -> processTransactionNoteSupport()
             is SendIntent.TransactionNoteSupported -> null
-            is SendIntent.TransactionNoteSupportError -> null
             is SendIntent.NoteAdded -> null
         }
     }
@@ -106,7 +104,7 @@ class SendModel(
                     process(SendIntent.TransactionNoteSupported)
                 },
                 onError = {
-                    process(SendIntent.TransactionNoteSupportError)
+                    Timber.e("Error when getting note supported $it")
                 }
             )
 
