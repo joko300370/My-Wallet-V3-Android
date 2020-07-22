@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
@@ -51,11 +52,39 @@ class EnterTargetAddressSheet(
             }
             cta_button.isEnabled = newState.nextEnabled
 
-            (newState.sendTarget as? CryptoAddress)?.let {
-                address_entry.setText(it.address, TextView.BufferType.EDITABLE)
+            if (newState.sendingAccount.isCustodial()) {
+                showCustodialInput(newState)
+            } else {
+                showNonCustodialInput(newState)
             }
+
         }
         state = newState
+    }
+
+    private fun showNonCustodialInput(newState: SendState) {
+        val address = if (newState.sendTarget is CryptoAddress) {
+            newState.sendTarget.address
+        } else {
+            null
+        }
+
+        with(dialogView) {
+            address_entry.setText(address, TextView.BufferType.EDITABLE)
+//            address_entry.setHint()
+
+
+            input_switcher.displayedChild = NONCUSTODIAL_INPUT
+        }
+    }
+
+    private fun showCustodialInput(newState: SendState) {
+        with(dialogView) {
+//            internal_warning.setText(address, TextView.BufferType.EDITABLE)
+
+            title_pick.gone()
+            input_switcher.displayedChild = CUSTODIAL_INPUT
+        }
     }
 
     // TODO: This address processing should occur via the interactor
@@ -144,5 +173,8 @@ class EnterTargetAddressSheet(
 
     companion object {
         const val SCAN_QR_ADDRESS = 2985
+
+        private const val NONCUSTODIAL_INPUT = 0
+        private const val CUSTODIAL_INPUT = 1
     }
 }

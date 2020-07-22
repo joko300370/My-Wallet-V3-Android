@@ -243,10 +243,7 @@ abstract class CryptoNonCustodialAccount(
 
     override val isFunded: Boolean = true
 
-    override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = setOf(
+    override val actions: AvailableActions = setOf(
         AssetAction.ViewActivity,
         AssetAction.Send,
         AssetAction.Receive,

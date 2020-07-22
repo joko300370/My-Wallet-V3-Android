@@ -8,6 +8,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -123,4 +125,12 @@ internal class EthCryptoWalletAccount(
                     else -> SendState.CAN_SEND
                 }
             }
+
+    override val actions: AvailableActions = setOf(
+        AssetAction.ViewActivity,
+        AssetAction.NewSend,
+        AssetAction.Receive,
+        AssetAction.Swap
+    )
+
 }

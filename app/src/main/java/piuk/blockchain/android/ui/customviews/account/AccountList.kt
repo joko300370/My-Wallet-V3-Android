@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import timber.log.Timber
 
 typealias StatusDecorator = (BlockchainAccount) -> Single<String>
 
@@ -73,6 +74,7 @@ class AccountList @JvmOverloads constructor(
         }
 
         disposables += source
+            .doOnSubscribe { Timber.e(">SEND: SUBSCRIBE") }
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {
@@ -83,11 +85,11 @@ class AccountList @JvmOverloads constructor(
                     if (it.isEmpty()) {
                         onEmptyList()
                     }
-            },
-            onError = {
-                onLoadError(it)
-            }
-        )
+                },
+                onError = {
+                    onLoadError(it)
+                }
+            )
     }
 
     var onLoadError: (Throwable) -> Unit = {}

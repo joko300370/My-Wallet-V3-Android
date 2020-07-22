@@ -138,6 +138,7 @@ internal abstract class CryptoAssetBase(
     protected fun getPitLinkingAccount(): Maybe<SingleAccount> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
+            .doOnError { t -> Timber.e("Send $t")}
             .map { address ->
                 CryptoExchangeAccount(
                     cryptoCurrency = asset,
