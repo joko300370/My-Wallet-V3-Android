@@ -85,7 +85,12 @@ class AccountChooserPresenter(
     private fun Single<List<AccountChooserItem>>.subscribeToUpdateList() =
         addToCompositeDisposable(this@AccountChooserPresenter)
             .subscribe(
-                { view.updateUi(it) },
+                {
+                    view.updateUi(
+                        it.filter { item ->
+                            item !is AccountChooserItem.LegacyAddress || !item.isWatchOnly
+                        })
+                },
                 { Timber.e(it) }
             )
 }

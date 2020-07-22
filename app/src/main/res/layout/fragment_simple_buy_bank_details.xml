@@ -32,6 +32,23 @@
             android:paddingBottom="@dimen/small_margin" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/bank_details_error"
+            style="@style/Text.Semibold.14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:background="@drawable/rounded_box"
+            android:gravity="center"
+            android:paddingTop="@dimen/small_margin"
+            android:paddingBottom="@dimen/small_margin"
+            android:text="@string/simple_buy_transfer_details_error"
+            android:textColor="@color/red_600"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bank_deposit_instruction"
             style="@style/Text.Light.14"
             android:layout_width="match_parent"

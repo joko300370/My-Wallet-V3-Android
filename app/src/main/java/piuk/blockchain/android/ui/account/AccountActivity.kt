@@ -322,11 +322,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.warning)
             .setCancelable(false)
-            .setMessage(getString(R.string.watch_only_import_warning))
-            .setPositiveButton(R.string.dialog_continue) { _, _ ->
-                presenter.confirmImportWatchOnly(address)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setMessage(getString(R.string.watch_only_not_supported))
+            .setPositiveButton(R.string.ok_cap, null)
             .show()
     }
 
