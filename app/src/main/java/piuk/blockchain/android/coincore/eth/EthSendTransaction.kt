@@ -38,8 +38,7 @@ class EthSendTransaction(
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override val isNoteSupported: Boolean
-        get() = true
+    override val isNoteSupported: Boolean = true
 
     override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
         feeOptions().map {

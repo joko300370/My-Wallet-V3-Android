@@ -231,13 +231,15 @@ internal class CryptoExchangeAccount(
 }
 
 abstract class CryptoNonCustodialAccount(
-    cryptoCurrency: CryptoCurrency
+    private val cryptoCurrency: CryptoCurrency
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val isFunded: Boolean = true
 
     override val actions: AvailableActions
         get() = availableActions
+
+    override val feeAsset: CryptoCurrency? = cryptoCurrency
 
     private val availableActions = setOf(
         AssetAction.ViewActivity,

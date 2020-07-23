@@ -13,8 +13,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 internal class AlgoCryptoWalletAccount(
     override val label: String,
     override val isDefault: Boolean = true,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.ALGO
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.ALGO) {
 
     override val balance: Single<Money>
