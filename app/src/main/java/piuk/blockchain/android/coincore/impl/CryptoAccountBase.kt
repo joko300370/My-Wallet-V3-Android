@@ -71,7 +71,8 @@ open class CustodialTradingAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
-    val custodialWalletManager: CustodialWalletManager
+    val custodialWalletManager: CustodialWalletManager,
+    private val isNoteSupported: Boolean = false
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
@@ -106,6 +107,7 @@ open class CustodialTradingAccount(
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.just(
             CustodialTransferProcessor(
+                isNoteSupported = isNoteSupported,
                 sendingAccount = this,
                 address = address as CryptoAddress,
                 walletManager = custodialWalletManager

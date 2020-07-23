@@ -1,7 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
@@ -14,6 +13,7 @@ import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendValidationError
 
 class CustodialTransferProcessor(
+    override val isNoteSupported: Boolean,
     override val sendingAccount: CryptoAccount,
     override val address: CryptoAddress,
     private val walletManager: CustodialWalletManager
@@ -46,12 +46,4 @@ class CustodialTransferProcessor(
     override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
         walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, address.address)
 
-    override fun isNoteSupported(): Single<Boolean> =
-        when (sendingAccount.asset) {
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.USDT,
-            CryptoCurrency.PAX -> Single.just(true)
-            else -> Single.just(false)
-        }
 }

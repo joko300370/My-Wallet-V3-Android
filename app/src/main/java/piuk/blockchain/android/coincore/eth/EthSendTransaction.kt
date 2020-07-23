@@ -38,6 +38,9 @@ class EthSendTransaction(
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
+    override val isNoteSupported: Boolean
+        get() = true
+
     override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
         feeOptions().map {
             CryptoValue.fromMinor(
@@ -76,8 +79,6 @@ class EthSendTransaction(
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .doOnSuccess { ethDataManager.updateTransactionNotes(it, pendingTx.notes) }
-
-    override fun isNoteSupported(): Single<Boolean> = Single.just(true)
 
     private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(

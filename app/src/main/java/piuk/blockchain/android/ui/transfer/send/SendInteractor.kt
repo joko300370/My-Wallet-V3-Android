@@ -37,5 +37,5 @@ class SendInteractor(
 
     fun getFeeForTransaction(tx: PendingSendTx) = sendProcessor.absoluteFee(tx)
 
-    fun checkIfNoteSupported(): Single<Boolean> = sendProcessor.isNoteSupported()
+    fun checkIfNoteSupported(): Single<Boolean> = Single.just(sendProcessor.isNoteSupported)
 }

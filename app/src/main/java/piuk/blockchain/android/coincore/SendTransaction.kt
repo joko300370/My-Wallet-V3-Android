@@ -30,8 +30,10 @@ interface SendProcessor {
     val address: ReceiveAddress
 
     val feeOptions: Set<FeeLevel>
+    val isNoteSupported: Boolean
 
     fun availableBalance(pendingTx: PendingSendTx): Single<Money>
+
     fun absoluteFee(pendingTx: PendingSendTx): Single<Money>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if
@@ -43,6 +45,4 @@ interface SendProcessor {
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
     // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
     fun execute(pendingTx: PendingSendTx, secondPassword: String = ""): Completable
-
-    fun isNoteSupported(): Single<Boolean>
 }
