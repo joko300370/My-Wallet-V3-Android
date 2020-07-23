@@ -60,4 +60,6 @@ abstract class Erc20NonCustodialAccountBase(
                 }
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
+
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
 }

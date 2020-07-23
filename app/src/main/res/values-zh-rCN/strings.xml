@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">取消</string>
   <string name="btn_ok">好</string>
-  <string name="yes">是</string>
-  <string name="no">没有</string>
+  <string name="common_yes">是</string>
+  <string name="common_no">没有</string>
   <string name="polite_no">不用了，谢谢</string>
   <string name="done">完成</string>
   <string name="btn_close">关</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">继续</string>
   <string name="btn_forgot_password">忘记密码？”</string>
   <string name="SEND">发送</string>
-  <string name="total">总</string>
+  <string name="common_total">总</string>
   <string name="max_available">使用总支出余额：</string>
   <string name="bitpay_remaining_time">剩余时间</string>
   <string name="bitpay_invoice_expired">BitPay发票已过期</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">所选密码太弱，无法保护您的资金。我们强烈
 建议您选择其他。您想定义一个新密码吗？ 
 </string>
-  <string name="from">从</string>
-  <string name="to">至</string>
+  <string name="common_from">从</string>
+  <string name="common_to">至</string>
   <string name="confirm_details">确认付款</string>
   <string name="fee">费用</string>
   <string name="exit_confirm">再次按返回按钮退出</string>

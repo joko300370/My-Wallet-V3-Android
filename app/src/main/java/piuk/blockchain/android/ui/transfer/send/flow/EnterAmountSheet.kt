@@ -1,10 +1,13 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoValue
@@ -36,6 +39,10 @@ class EnterAmountSheet(
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
+    private val imm: InputMethodManager by lazy {
+        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
@@ -54,7 +61,7 @@ class EnterAmountSheet(
                     output = CurrencyType.Crypto,
                     fiatCurrency = currencyPrefs.selectedFiatCurrency,
                     cryptoCurrency = newState.sendingAccount.asset,
-                    predefinedAmount = FiatValue.zero(currencyPrefs.selectedFiatCurrency)
+                    predefinedAmount = newState.sendAmount
                 )
             }
 
@@ -84,7 +91,8 @@ class EnterAmountSheet(
                 SendErrorState.MIN_REQUIRED -> amount_sheet_input.showError(
                     getString(R.string.send_enter_amount_error_min,
                         newState.sendingAccount.asset.networkTicker))
-            }
+                SendErrorState.FEE_REQUEST_FAILED -> throw NotImplementedError("Not expected here")
+            }.exhaustive
         }
 
         state = newState
@@ -106,8 +114,6 @@ class EnterAmountSheet(
 //                R.id.enter_amount)
 //            inputView?.let {
 //                inputView.requestFocus()
-//                val imm = requireContext().getSystemService(
-//                    Context.INPUT_METHOD_SERVICE) as InputMethodManager
 //                imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
 //            }
 //        }, 200)
@@ -125,5 +131,8 @@ class EnterAmountSheet(
         dialogView.amount_sheet_input.showValue(state.availableBalance)
     }
 
-    private fun onCtaClick() = model.process(SendIntent.PrepareTransaction)
+    private fun onCtaClick() {
+        imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
+        model.process(SendIntent.PrepareTransaction)
+    }
 }

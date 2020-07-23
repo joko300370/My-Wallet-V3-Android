@@ -86,6 +86,41 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(errorState = SendErrorState.MIN_REQUIRED)
     }
 
+    object RequestFee : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState
+    }
+
+    object FeeRequestError : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.FEE_REQUEST_FAILED)
+    }
+
+    class FeeUpdate(
+        val fee: Money
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(feeAmount = fee)
+    }
+
+    object RequestTransactionNoteSupport : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    object TransactionNoteSupported : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(transactionNoteSupported = true)
+    }
+
+    class NoteAdded(
+        val note: String
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState.copy(
+            note = note,
+            noteState = NoteState.UPDATE_SUCCESS
+        )
+    }
+
     class UpdateTransactionAmounts(
         val amount: Money,
         private val maxAvailable: Money
@@ -143,7 +178,8 @@ sealed class SendIntent : MviIntent<SendState> {
             val previousStep = steps[currentStep - 1]
 
             return oldState.copy(
-                currentStep = previousStep
+                currentStep = previousStep,
+                errorState = SendErrorState.NONE
             )
         }
     }

@@ -3,8 +3,8 @@ package piuk.blockchain.android.coincore.impl
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendProcessor
 

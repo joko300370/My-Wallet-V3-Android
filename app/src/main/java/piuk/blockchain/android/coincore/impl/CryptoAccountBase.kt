@@ -10,21 +10,21 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransferError
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
@@ -61,7 +61,9 @@ open class CustodialTradingAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
-    val custodialWalletManager: CustodialWalletManager
+    val custodialWalletManager: CustodialWalletManager,
+    private val isNoteSupported: Boolean = false,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
@@ -92,21 +94,23 @@ open class CustodialTradingAccount(
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
-
+    
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         when (sendTo) {
             is CryptoAddress -> Single.just(
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     address = sendTo,
-                    walletManager = custodialWalletManager
+                    walletManager = custodialWalletManager,
+                    isNoteSupported = isNoteSupported
                 )
             )
             is CryptoAccount -> sendTo.receiveAddress.map {
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     address = it as CryptoAddress,
-                    walletManager = custodialWalletManager
+                    walletManager = custodialWalletManager,
+                    isNoteSupported = isNoteSupported
                 )
             }
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
@@ -165,7 +169,8 @@ internal class CryptoInterestAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val isConfigured = AtomicBoolean(false)
@@ -210,7 +215,8 @@ internal class CryptoExchangeAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val balance: Single<Money>
@@ -238,10 +244,12 @@ internal class CryptoExchangeAccount(
 }
 
 abstract class CryptoNonCustodialAccount(
-    cryptoCurrency: CryptoCurrency
+    private val cryptoCurrency: CryptoCurrency
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val isFunded: Boolean = true
+
+    override val feeAsset: CryptoCurrency? = cryptoCurrency
 
     override val actions: AvailableActions = setOf(
         AssetAction.ViewActivity,

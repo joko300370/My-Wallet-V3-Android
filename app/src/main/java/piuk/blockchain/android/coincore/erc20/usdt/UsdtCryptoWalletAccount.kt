@@ -13,7 +13,8 @@ internal class UsdtCryptoWalletAccount(
     label: String,
     private val address: String,
     override val erc20Account: Erc20Account,
-    exchangeRates: ExchangeRateDataManager
+    exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
 ) : Erc20NonCustodialAccountBase(
     CryptoCurrency.USDT,
     label,

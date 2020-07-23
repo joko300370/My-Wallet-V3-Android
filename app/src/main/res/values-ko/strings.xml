@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">교환</string>
   <string name="cancel">취소</string>
   <string name="btn_ok">확인</string>
-  <string name="yes">예</string>
-  <string name="no">아니</string>
+  <string name="common_yes">예</string>
+  <string name="common_no">아니</string>
   <string name="polite_no">고맙지 만 사양 할게</string>
   <string name="done">끝난</string>
   <string name="btn_close">닫기</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">계속하다</string>
   <string name="btn_forgot_password">비밀번호를 잊으 셨나요?\"</string>
   <string name="SEND">보내다</string>
-  <string name="total">합계</string>
+  <string name="common_total">합계</string>
   <string name="max_available">총 지출 가능 잔액 사용 :</string>
   <string name="bitpay_remaining_time">남은 시간</string>
   <string name="bitpay_invoice_expired">BitPay 송장 만료</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">선택한 비밀번호가 너무 약해서 자금을 보호 할 수 없습니다. 우리는 강하게 
  다른 것을 선택하도록 제안하십시오. 새 비밀번호를 정의 하시겠습니까? 
 </string>
-  <string name="from">에서</string>
-  <string name="to">에</string>
+  <string name="common_from">에서</string>
+  <string name="common_to">에</string>
   <string name="confirm_details">결제 확인</string>
   <string name="fee">회비</string>
   <string name="exit_confirm">뒤로 버튼을 다시 누르면 종료됩니다</string>

@@ -119,7 +119,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/standard_margin"
-        android:contentDescription="@string/btn_ok"
+        android:contentDescription="@string/common_ok"
         android:text="@string/basic_transfer_cta" />
 
 </LinearLayout>

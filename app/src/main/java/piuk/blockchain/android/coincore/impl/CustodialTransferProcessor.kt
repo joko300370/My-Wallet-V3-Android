@@ -5,14 +5,15 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendValidationError
 
 class CustodialTransferProcessor(
+    override val isNoteSupported: Boolean,
     override val sendingAccount: CryptoAccount,
     override val address: CryptoAddress,
     private val walletManager: CustodialWalletManager

@@ -1,8 +1,12 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,9 +16,14 @@ import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
+import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
+import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
+import piuk.blockchain.android.ui.transfer.send.NoteState
+import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 
 data class PendingTxItem(
@@ -28,25 +37,97 @@ class ConfirmTransactionSheet(
     override val layoutResource: Int = R.layout.dialog_send_confirm
 
     private val detailsAdapter = DetailsAdapter()
+    private var state = SendState()
 
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == SendStep.CONFIRM_DETAIL)
 
+        val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
         detailsAdapter.populate(
             listOf(
-                PendingTxItem("Asset", newState.sendingAccount.asset.displayTicker),
-                PendingTxItem("Account", newState.sendingAccount.label),
-                PendingTxItem("To", newState.sendTarget.label),
-                PendingTxItem("Amount", newState.sendAmount.toStringWithSymbol())
+                PendingTxItem(getString(R.string.common_send), newState.sendAmount.toStringWithSymbol()),
+                PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
+                PendingTxItem(getString(R.string.common_to), newState.sendTarget.label),
+                addFeeItem(newState),
+                PendingTxItem(getString(R.string.common_total), totalAmount)
             )
         )
+
+        showAddNoteIfSupported(newState)
+        showNoteState(newState)
+
+        dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
+            totalAmount)
+
+        state = newState
+    }
+
+    private fun showNoteState(newState: SendState) {
+        if (newState.note.isNotEmpty()) {
+            dialogView.confirm_details_note_input.setText(newState.note,
+                TextView.BufferType.EDITABLE)
+        } else {
+            when (newState.noteState) {
+                NoteState.UPDATE_SUCCESS -> {
+                    Toast.makeText(requireContext(),
+                        getString(R.string.send_confirmation_add_note_success), Toast.LENGTH_SHORT)
+                        .show()
+                }
+                NoteState.UPDATE_ERROR -> {
+                    // can this happen?
+                }
+                NoteState.NOT_SET -> {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    private fun showAddNoteIfSupported(state: SendState) {
+        state.transactionNoteSupported?.let {
+            if (it) {
+                dialogView.confirm_details_note_input.apply {
+                    inputType = INPUT_FIELD_FLAGS
+                    filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
+
+                    setOnEditorActionListener { v, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
+                            model.process(SendIntent.NoteAdded(v.text.toString()))
+                            clearFocus()
+                        }
+
+                        false
+                    }
+                }
+            } else {
+                dialogView.confirm_details_note_holder.gone()
+            }
+        } ?: model.process(SendIntent.RequestTransactionNoteSupport)
+    }
+
+    private fun addFeeItem(state: SendState): PendingTxItem {
+        val feeTitle = getString(R.string.common_spaced_strings,
+            getString(R.string.send_confirmation_fee),
+            getString(R.string.send_confirmation_regular_estimation))
+        return when {
+            state.errorState == SendErrorState.FEE_REQUEST_FAILED -> {
+                PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_error))
+            }
+            state.feeAmount.isZero -> {
+                model.process(SendIntent.RequestFee)
+                PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_loading))
+            }
+            else -> {
+                PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
+            }
+        }
     }
 
     override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
+        view.confirm_cta_button.setOnClickListener { onCtaClick() }
 
-        with(view.details_list) {
+        with(view.confirm_details_list) {
             addItemDecoration(
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
             )
@@ -57,6 +138,10 @@ class ConfirmTransactionSheet(
                 false
             )
             adapter = detailsAdapter
+        }
+
+        view.confirm_sheet_back.setOnClickListener {
+            model.process(SendIntent.ReturnToPreviousStep)
         }
     }
 
@@ -106,7 +191,7 @@ private class DetailsItemVH(val parent: View) :
         get() = itemView
 
     fun bind(label: String, value: String) {
-        itemView.label.text = label
-        itemView.value.text = value
+        itemView.confirmation_item_label.text = label
+        itemView.confirmation_item_value.text = value
     }
 }

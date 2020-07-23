@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">แลกเปลี่ยน</string>
   <string name="cancel">ยกเลิก</string>
   <string name="btn_ok">ตกลง</string>
-  <string name="yes">ใช่</string>
-  <string name="no">ไม่</string>
+  <string name="common_yes">ใช่</string>
+  <string name="common_no">ไม่</string>
   <string name="polite_no">ไม่เป็นไรขอบคุณ</string>
   <string name="done">เสร็จสิ้น</string>
   <string name="btn_close">ปิด</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">ต่อ</string>
   <string name="btn_forgot_password">ลืมรหัสผ่าน?\"</string>
   <string name="SEND">ส่ง</string>
-  <string name="total">รวม</string>
+  <string name="common_total">รวม</string>
   <string name="max_available">ใช้ยอดดุลที่ใช้จ่ายได้ทั้งหมด:</string>
   <string name="bitpay_remaining_time">เวลาที่เหลือ</string>
   <string name="bitpay_invoice_expired">ใบแจ้งหนี้ BitPay หมดอายุแล้ว</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">รหัสผ่านที่เลือกนั้นอ่อนแอเกินไปที่จะทำให้เงินของคุณปลอดภัย พวกเราอย่างยิ่ง 
  แนะนำให้คุณเลือกอันอื่น คุณต้องการกำหนดรหัสผ่านใหม่หรือไม่ 
 </string>
-  <string name="from">จาก</string>
-  <string name="to">ถึง</string>
+  <string name="common_from">จาก</string>
+  <string name="common_to">ถึง</string>
   <string name="confirm_details">ยืนยันการชำระเงิน</string>
   <string name="fee">ค่าธรรมเนียม</string>
   <string name="exit_confirm">กดปุ่มย้อนกลับอีกครั้งเพื่อออก</string>
