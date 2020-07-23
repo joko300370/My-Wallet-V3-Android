@@ -94,7 +94,7 @@ open class CustodialTradingAccount(
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
-    
+
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         when (sendTo) {
             is CryptoAddress -> Single.just(
