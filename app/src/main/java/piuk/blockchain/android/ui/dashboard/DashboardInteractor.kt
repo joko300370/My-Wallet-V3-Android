@@ -19,7 +19,10 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 
@@ -175,6 +178,20 @@ class DashboardInteractor(
                     Timber.e(error)
                 }
             )
+    }
+
+    fun getSendFlow(model: DashboardModel, fromAccount: SingleAccount): Disposable? {
+        if (fromAccount is CryptoAccount) {
+            model.process(
+                UpdateLaunchDialogFlow(
+                    SendFlow(
+                        account = fromAccount,
+                        coincore = coincore
+                    )
+                )
+            )
+        }
+        return null
     }
 
     companion object {

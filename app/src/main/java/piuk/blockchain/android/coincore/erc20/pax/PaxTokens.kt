@@ -11,6 +11,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
@@ -68,8 +69,6 @@ internal class PaxAsset(
 }
 
 internal class PaxAddress(
-    override val address: String,
-    override val label: String = address
-) : CryptoAddress {
-    override val asset: CryptoCurrency = CryptoCurrency.PAX
-}
+    address: String,
+    label: String = address
+) : Erc20Address(CryptoCurrency.PAX, address, label)

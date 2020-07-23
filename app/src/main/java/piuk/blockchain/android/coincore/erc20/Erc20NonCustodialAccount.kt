@@ -9,10 +9,12 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.eth.EthAddress
+import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -73,22 +75,35 @@ abstract class Erc20NonCustodialAccount(
 
     override val actions: AvailableActions = setOf(
         AssetAction.ViewActivity,
-        AssetAction.Send, // TODO: NewSend
+        AssetAction.NewSend,
         AssetAction.Receive,
         AssetAction.Swap
     )
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
-        Single.just(
-            Erc20SendTransaction(
-                asset = asset,
-                erc20Account = erc20Account,
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+        when (sendTo) {
+            is CryptoAddress -> Single.just(
+                Erc20SendTransaction(
+                    asset = asset,
+                    erc20Account = erc20Account,
 //                fees,
-                sendingAccount = this,
-                address = address as EthAddress,
-                requireSecondPassword = ethDataManager.requireSecondPassword
+                    sendingAccount = this,
+                    address = sendTo as Erc20Address,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
+                )
             )
-        )
+            is CryptoAccount -> sendTo.receiveAddress.map {
+                Erc20SendTransaction(
+                    asset = asset,
+                    erc20Account = erc20Account,
+//                fees,
+                    sendingAccount = this,
+                    address = sendTo as Erc20Address,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
+                )
+            }
+            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
+        }
 
     override val sendState: Single<SendState>
         get() = Singles.zip(
@@ -101,4 +116,14 @@ abstract class Erc20NonCustodialAccount(
                 else -> SendState.CAN_SEND
             }
         }
+}
+
+internal open class Erc20Address(
+    final override val asset: CryptoCurrency,
+    override val address: String,
+    override val label: String = address
+) : CryptoAddress {
+    init {
+        require(asset.hasFeature(CryptoCurrency.IS_ERC20))
+    }
 }
