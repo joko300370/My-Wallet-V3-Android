@@ -38,24 +38,22 @@ internal class AddressResolver(
                         AddressPair(from, change)
                     }
             }
-            CryptoCurrency.ETHER -> {
-                val account = accountLookup.getAccountFromAddressOrXPub(reference) as EthereumAccount
-                val address = account.address
-                Single.just(AddressPair(address, address))
-            }
             CryptoCurrency.XLM -> {
                 val receivingAddress = (reference as AccountReference.Xlm).accountId
                 Single.just(AddressPair(receivingAddress, receivingAddress))
             }
-            CryptoCurrency.PAX -> {
-                val account = accountLookup.getAccountFromAddressOrXPub(reference) as EthereumAccount
-                val address = account.address
-                Single.just(AddressPair(address, address))
-            }
+            CryptoCurrency.ETHER,
+            CryptoCurrency.USDT,
+            CryptoCurrency.PAX -> getEthereumAddress(reference)
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
         }
+
+    private fun getEthereumAddress(reference: AccountReference): Single<AddressPair> {
+        val account = accountLookup.getAccountFromAddressOrXPub(reference) as EthereumAccount
+        val address = account.address
+        return Single.just(AddressPair(address, address))
+    }
 
     private fun getReceiveAddress(account: Account): Single<String> =
         payloadDataManager.getNextReceiveAddress(account).singleOrError()

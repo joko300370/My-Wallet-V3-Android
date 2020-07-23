@@ -270,6 +270,7 @@
     <string name="received_ethereum">Received Ether</string>
 
     <string name="received_usd_pax_1">Received USD Digital</string>
+    <string name="received_usdt">Received Tether</string>
 
     <string name="received_bitcoin_cash">Received Bitcoin Cash</string>
 
@@ -403,14 +404,9 @@
         Bitcoin address %1$s. Please scan the QR code.
     </string>
     <string name="invalid_private_key">Invalid private key</string>
-    <string name="watch_only_import_warning">You are about to import a non-spendable address, an
-        address (or public key script)
-        stored in the wallet without the corresponding private key. This
-        means that the funds can be spent ONLY if you have the private key stored elsewhere. If you
-        do
-        not have the private key stored, do NOT instruct anyone to send you bitcoin to the
-        non-spendable
-        address.\n\nThese options are recommended for advanced users only. Continue?
+    <string name="watch_only_not_supported">Importing a non-spendable address (an address or public key script
+        without the corresponding private key) is not supported. Please try again with
+        an address and private key.
     </string>
     <string name="scan_private_key">Scan private key</string>
     <string name="private_key_successfully_imported">Private key successfully imported.</string>
@@ -1656,7 +1652,9 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Let’s get your wallet set up. You can quickly buy crypto now or do this later.</string>
+    <string name="buy_now">Buy Now</string>
     <string name="buy_now_1">Buy %1s</string>
+    <string name="simple_buy_transfer_details_error">Something went wrong while loading the transfer details.\n\nPlease try again later.</string>
 
     <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
     <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
@@ -1720,6 +1718,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
+    <string name="checkout_funds_label">Funds</string>
     <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
@@ -1764,7 +1763,7 @@
     <string name="activity_details_description_not_updated">Description failed to update</string>
     <string name="activity_details_transaction_fee_send">Sending %1$s</string>
     <string name="activity_details_transaction_fee_unknown">Unknown</string>
-    <string name="activity_details_payment_load_fail">Couldn\'t load card details</string>
+    <string name="activity_details_payment_load_fail">Couldn\'t load payment details</string>
     <string name="activity_details_fee_load_fail">Couldn\'t load fee information</string>
     <string name="activity_details_value_load_fail">Couldn\'t load value information</string>
     <string name="activity_details_historic_value_load_fail">Couldn\'t load historic value information</string>
@@ -1836,6 +1835,10 @@
     <string name="tether_announcement_title">Say Hello to Tether!</string>
     <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
     <string name="tether_announcement_action">Buy Tether Now</string>
+    
+    <string name="dashboard_asset_item_label_title">Please note.</string>
+    <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
+    <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
     <string name="send_enter_amount_from">From: %1$s</string>
@@ -1857,5 +1860,4 @@
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
-
 </resources>
