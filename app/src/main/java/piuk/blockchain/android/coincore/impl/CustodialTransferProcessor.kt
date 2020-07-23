@@ -45,5 +45,4 @@ class CustodialTransferProcessor(
 
     override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
         walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, address.address)
-
 }
