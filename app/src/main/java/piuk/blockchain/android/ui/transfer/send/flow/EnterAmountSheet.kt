@@ -36,6 +36,9 @@ class EnterAmountSheet : SendInputSheet() {
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val compositeDisposable = CompositeDisposable()
+    private val imm: InputMethodManager by lazy {
+        requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +58,7 @@ class EnterAmountSheet : SendInputSheet() {
                     output = CurrencyType.Crypto,
                     fiatCurrency = currencyPrefs.selectedFiatCurrency,
                     cryptoCurrency = newState.sendingAccount.asset,
-                    predefinedAmount = FiatValue.zero(currencyPrefs.selectedFiatCurrency)
+                    predefinedAmount = newState.sendAmount
                 )
             }
 
@@ -126,7 +129,10 @@ class EnterAmountSheet : SendInputSheet() {
         dialogView.amount_sheet_input.showValue(state.availableBalance)
     }
 
-    private fun onCtaClick() = model.process(SendIntent.PrepareTransaction)
+    private fun onCtaClick() {
+        imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
+        model.process(SendIntent.PrepareTransaction)
+    }
 
     companion object {
         fun newInstance(): EnterAmountSheet =

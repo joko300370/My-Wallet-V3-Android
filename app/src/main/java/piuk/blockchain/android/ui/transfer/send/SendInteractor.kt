@@ -27,12 +27,15 @@ class SendInteractor(
             .doOnSuccess { sendProcessor = it }
             .ignoreElement()
 
-    fun getAvailableBalance(tx: PendingSendTx): Single<Money> =
-        sendProcessor.availableBalance(tx)
+    fun getAvailableBalance(tx: PendingSendTx): Single<Money> = sendProcessor.availableBalance(tx)
 
     fun verifyAndExecute(tx: PendingSendTx): Completable =
         sendProcessor.validate(tx)
             .then {
                 sendProcessor.execute(tx)
             }
+
+    fun getFeeForTransaction(tx: PendingSendTx) = sendProcessor.absoluteFee(tx)
+
+    fun checkIfNoteSupported(): Single<Boolean> = Single.just(sendProcessor.isNoteSupported)
 }

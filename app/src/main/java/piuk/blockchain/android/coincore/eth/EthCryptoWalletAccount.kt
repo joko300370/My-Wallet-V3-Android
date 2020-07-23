@@ -23,7 +23,8 @@ internal class EthCryptoWalletAccount(
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
 ) : CryptoNonCustodialAccount(CryptoCurrency.ETHER) {
 
     constructor(

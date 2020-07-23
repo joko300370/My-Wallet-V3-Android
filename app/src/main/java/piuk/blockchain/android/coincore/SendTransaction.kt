@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.lang.Exception
 
 class SendValidationError(errorCode: Int) : Exception("Invalid Send Tx: code $errorCode") {
     companion object {
@@ -31,8 +30,10 @@ interface SendProcessor {
     val address: ReceiveAddress
 
     val feeOptions: Set<FeeLevel>
+    val isNoteSupported: Boolean
 
     fun availableBalance(pendingTx: PendingSendTx): Single<Money>
+
     fun absoluteFee(pendingTx: PendingSendTx): Single<Money>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if

@@ -11,7 +11,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 class StxCryptoWalletAccount(
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.STX
 ) : CryptoNonCustodialAccount(CryptoCurrency.STX) {
 
     override val isFunded: Boolean

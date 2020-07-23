@@ -10,19 +10,19 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
@@ -59,7 +59,9 @@ open class CustodialTradingAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
-    val custodialWalletManager: CustodialWalletManager
+    val custodialWalletManager: CustodialWalletManager,
+    private val isNoteSupported: Boolean = false,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
@@ -94,6 +96,7 @@ open class CustodialTradingAccount(
     override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
         Single.just(
             CustodialTransferProcessor(
+                isNoteSupported = isNoteSupported,
                 sendingAccount = this,
                 address = address as CryptoAddress,
                 walletManager = custodialWalletManager
@@ -153,7 +156,8 @@ internal class CryptoInterestAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val isConfigured = AtomicBoolean(false)
@@ -198,7 +202,8 @@ internal class CryptoExchangeAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val balance: Single<Money>
@@ -226,13 +231,15 @@ internal class CryptoExchangeAccount(
 }
 
 abstract class CryptoNonCustodialAccount(
-    cryptoCurrency: CryptoCurrency
+    private val cryptoCurrency: CryptoCurrency
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val isFunded: Boolean = true
 
     override val actions: AvailableActions
         get() = availableActions
+
+    override val feeAsset: CryptoCurrency? = cryptoCurrency
 
     private val availableActions = setOf(
         AssetAction.ViewActivity,

@@ -28,9 +28,16 @@ enum class SendStep {
 }
 
 enum class SendErrorState {
+    FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
     NONE
+}
+
+enum class NoteState {
+    NOT_SET,
+    UPDATE_SUCCESS,
+    UPDATE_ERROR
 }
 
 data class SendState(
@@ -42,7 +49,11 @@ data class SendState(
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
-    val errorState: SendErrorState = SendErrorState.NONE
+    val errorState: SendErrorState = SendErrorState.NONE,
+    val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
+    val transactionNoteSupported: Boolean? = null,
+    val noteState: NoteState = NoteState.NOT_SET,
+    val note: String = ""
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?
@@ -77,8 +88,37 @@ class SendModel(
             is SendIntent.ReturnToPreviousStep -> null
             is SendIntent.MaxAmountExceeded -> null
             is SendIntent.MinRequired -> null
+            is SendIntent.RequestFee -> processFeeRequest(previousState.sendAmount)
+            is SendIntent.FeeRequestError -> null
+            is SendIntent.FeeUpdate -> null
+            is SendIntent.RequestTransactionNoteSupport -> processTransactionNoteSupport()
+            is SendIntent.TransactionNoteSupported -> null
+            is SendIntent.NoteAdded -> null
         }
     }
+
+    private fun processTransactionNoteSupport(): Disposable =
+        interactor.checkIfNoteSupported()
+            .subscribeBy(
+                onSuccess = {
+                    process(SendIntent.TransactionNoteSupported)
+                },
+                onError = {
+                    Timber.e("Error when getting note supported $it")
+                }
+            )
+
+    private fun processFeeRequest(amount: Money): Disposable =
+        interactor.getFeeForTransaction(
+            PendingSendTx(amount)
+        ).subscribeBy(
+            onSuccess = {
+                process(SendIntent.FeeUpdate(it))
+            },
+            onError = {
+                process(SendIntent.FeeRequestError)
+            }
+        )
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("!SEND!> Send Model: loop error -> $t")
@@ -148,7 +188,7 @@ class SendModel(
 
     private fun processExecuteTransaction(state: SendState): Disposable =
         interactor.verifyAndExecute(
-            PendingSendTx(state.sendAmount)
+            PendingSendTx(state.sendAmount, notes = state.note)
         ).subscribeBy(
             onComplete = {
                 process(SendIntent.UpdateTransactionComplete)

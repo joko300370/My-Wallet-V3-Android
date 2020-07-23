@@ -50,8 +50,8 @@
   <string name="toolbar_cmd_swap">schimb</string>
   <string name="cancel">Anulare</string>
   <string name="btn_ok">O.K</string>
-  <string name="yes">da</string>
-  <string name="no">Nu</string>
+  <string name="common_yes">da</string>
+  <string name="common_no">Nu</string>
   <string name="polite_no">Nu multumesc</string>
   <string name="done">Terminat</string>
   <string name="btn_close">Închide</string>
@@ -163,7 +163,7 @@
   <string name="btn_continue">Continua</string>
   <string name="btn_forgot_password">Ați uitat parola?\"</string>
   <string name="SEND">Trimite</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Folosiți soldul total cheltuibil:</string>
   <string name="bitpay_remaining_time">Timp rămas</string>
   <string name="bitpay_invoice_expired">Factura BitPay a expirat</string>
@@ -189,8 +189,8 @@
   <string name="weak_password">Parola selectată este prea slabă pentru a vă asigura fondurile. Noi puternic 
  sugerează să selectezi una diferită. Doriți să definiți o nouă parolă? 
 </string>
-  <string name="from">Din</string>
-  <string name="to">La</string>
+  <string name="common_from">Din</string>
+  <string name="common_to">La</string>
   <string name="confirm_details">Confirma plata</string>
   <string name="fee">taxă</string>
   <string name="exit_confirm">Apăsați din nou butonul pentru a ieși</string>

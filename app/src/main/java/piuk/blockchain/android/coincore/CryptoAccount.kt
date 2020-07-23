@@ -44,6 +44,7 @@ typealias SingleAccountList = List<SingleAccount>
 
 interface CryptoAccount : SingleAccount {
     val asset: CryptoCurrency
+    val feeAsset: CryptoCurrency?
 }
 
 interface FiatAccount : SingleAccount {
@@ -87,6 +88,8 @@ object NullCryptoAccount : CryptoAccount {
     override val actions: AvailableActions = emptySet()
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
+
+    override val feeAsset: CryptoCurrency? = null
 
     override fun fiatBalance(
         fiatCurrency: String,

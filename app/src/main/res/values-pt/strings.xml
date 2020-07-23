@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">Trocar</string>
   <string name="cancel">Cancelar</string>
   <string name="btn_ok">Está bem</string>
-  <string name="yes">sim</string>
-  <string name="no">Não</string>
+  <string name="common_yes">sim</string>
+  <string name="common_no">Não</string>
   <string name="polite_no">Não, obrigado</string>
   <string name="done">Feito</string>
   <string name="btn_close">Fechar</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Continuar</string>
   <string name="btn_forgot_password">Esqueceu a senha?\"</string>
   <string name="SEND">Mandar</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Use o saldo total gastável:</string>
   <string name="bitpay_remaining_time">Tempo restante</string>
   <string name="bitpay_invoice_expired">Fatura BitPay expirada</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">A senha selecionada é muito fraca para proteger seus fundos. Nós fortemente 
  sugiro que você selecione um diferente. Deseja definir uma nova senha? 
 </string>
-  <string name="from">A partir de</string>
-  <string name="to">Para</string>
+  <string name="common_from">A partir de</string>
+  <string name="common_to">Para</string>
   <string name="confirm_details">Confirme o pagamento</string>
   <string name="fee">Taxa</string>
   <string name="exit_confirm">Pressione o botão voltar novamente para sair</string>

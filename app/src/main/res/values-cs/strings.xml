@@ -51,8 +51,8 @@
   <string name="toolbar_cmd_swap">Zaměnit</string>
   <string name="cancel">zrušení</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ano</string>
-  <string name="no">Ne</string>
+  <string name="common_yes">Ano</string>
+  <string name="common_no">Ne</string>
   <string name="polite_no">Ne, díky</string>
   <string name="done">Hotovo</string>
   <string name="btn_close">Zavřít</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Pokračovat</string>
   <string name="btn_forgot_password">Zapomenuté heslo?\"</string>
   <string name="SEND">Poslat</string>
-  <string name="total">Celkový</string>
+  <string name="common_total">Celkový</string>
   <string name="max_available">Použít celkový zůstatek:</string>
   <string name="bitpay_remaining_time">Zbývající čas</string>
   <string name="bitpay_invoice_expired">Platnost faktury BitPay vypršela</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Vybrané heslo je příliš slabé na to, abyste zajistili své prostředky. Jsme silně 
  doporučujeme vybrat jinou. Chcete definovat nové heslo? 
 </string>
-  <string name="from">Z</string>
-  <string name="to">Na</string>
+  <string name="common_from">Z</string>
+  <string name="common_to">Na</string>
   <string name="confirm_details">Potvrďte platbu</string>
   <string name="fee">Poplatek</string>
   <string name="exit_confirm">Opětovným stisknutím tlačítka zpět akci ukončíte</string>

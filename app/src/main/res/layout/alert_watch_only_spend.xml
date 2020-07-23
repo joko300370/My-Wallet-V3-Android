@@ -56,7 +56,7 @@
             <Button
                 android:id="@+id/confirm_cancel"
                 style="@style/CustomDialogButton"
-                android:text="@string/cancel"
+                android:text="@string/common_cancel"
                 android:textColor="@color/primary_grey_dark" />
 
             <Button
