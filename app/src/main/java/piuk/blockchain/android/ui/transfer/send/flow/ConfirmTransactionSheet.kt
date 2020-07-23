@@ -14,11 +14,12 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.transfer.send.NoteState
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
-import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
@@ -30,7 +31,9 @@ data class PendingTxItem(
     val value: String
 )
 
-class ConfirmTransactionSheet : SendInputSheet() {
+class ConfirmTransactionSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_confirm
 
     private val detailsAdapter = DetailsAdapter()
@@ -43,10 +46,9 @@ class ConfirmTransactionSheet : SendInputSheet() {
         val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
         detailsAdapter.populate(
             listOf(
-                PendingTxItem(getString(R.string.common_send),
-                    newState.sendAmount.toStringWithSymbol()),
+                PendingTxItem(getString(R.string.common_send), newState.sendAmount.toStringWithSymbol()),
                 PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
-                PendingTxItem(getString(R.string.common_to), newState.targetAddress.label),
+                PendingTxItem(getString(R.string.common_to), newState.sendTarget.label),
                 addFeeItem(newState),
                 PendingTxItem(getString(R.string.common_total), totalAmount)
             )
@@ -145,11 +147,6 @@ class ConfirmTransactionSheet : SendInputSheet() {
 
     private fun onCtaClick() {
         model.process(SendIntent.ExecuteTransaction)
-    }
-
-    companion object {
-        fun newInstance(): ConfirmTransactionSheet =
-            ConfirmTransactionSheet()
     }
 }
 

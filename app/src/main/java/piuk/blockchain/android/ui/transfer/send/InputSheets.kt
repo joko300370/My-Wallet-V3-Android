@@ -4,19 +4,16 @@ import android.view.View
 import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.dialog_send_prototype.view.cta_button
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
-abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>() {
-    override val model: SendModel by sendInject()
+abstract class FlowInputSheet(
+    override val host: SlidingModalBottomDialog.Host
+) : MviBottomSheet<SendModel, SendIntent, SendState>() {
 
-    override fun onSheetHidden() {
-        super.onSheetHidden()
-        dialog?.let {
-            onCancel(it)
-        }
-    }
+    override val model: SendModel by sendInject()
 
     protected fun showErrorToast(@StringRes msgId: Int) {
         ToastCustom.makeText(
@@ -38,7 +35,9 @@ abstract class SendInputSheet : MviBottomSheet<SendModel, SendIntent, SendState>
     }
 }
 
-class TransactionInProgressSheet : SendInputSheet() {
+class TransactionInProgressSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_in_progress
 
     override fun render(newState: SendState) {
@@ -46,14 +45,11 @@ class TransactionInProgressSheet : SendInputSheet() {
     }
 
     override fun initControls(view: View) {}
-
-    companion object {
-        fun newInstance(): TransactionInProgressSheet =
-            TransactionInProgressSheet()
-    }
 }
 
-class TransactionCompleteSheet : SendInputSheet() {
+class TransactionCompleteSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_complete
 
     override fun render(newState: SendState) {
@@ -66,10 +62,5 @@ class TransactionCompleteSheet : SendInputSheet() {
 
     private fun onCtaClick() {
         dismiss()
-    }
-
-    companion object {
-        fun newInstance(): TransactionCompleteSheet =
-            TransactionCompleteSheet()
     }
 }

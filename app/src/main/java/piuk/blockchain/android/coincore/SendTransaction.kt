@@ -4,7 +4,9 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 
-class SendValidationError(errorCode: Int) : Exception("Invalid Send Tx: code $errorCode") {
+open class TransferError(msg: String) : Exception(msg)
+
+class SendValidationError(errorCode: Int) : TransferError("Invalid Send Tx: code $errorCode") {
     companion object {
         const val HAS_TX_IN_FLIGHT = 1000
         const val INVALID_AMOUNT = 1001
