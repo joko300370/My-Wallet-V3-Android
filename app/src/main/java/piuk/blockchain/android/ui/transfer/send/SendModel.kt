@@ -50,7 +50,7 @@ data class SendState(
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset),
+    val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
     val transactionNoteSupported: Boolean? = null,
     val noteState: NoteState = NoteState.NOT_SET,
     val note: String = ""

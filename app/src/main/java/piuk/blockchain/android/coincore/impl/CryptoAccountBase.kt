@@ -53,18 +53,6 @@ abstract class CryptoAccountBase(
 
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
-
-    override val feeAsset: CryptoCurrency
-        get() = when (asset) {
-            CryptoCurrency.BTC -> CryptoCurrency.BTC
-            CryptoCurrency.BCH -> CryptoCurrency.BCH
-            CryptoCurrency.ETHER,
-            CryptoCurrency.PAX,
-            CryptoCurrency.USDT -> CryptoCurrency.ETHER
-            CryptoCurrency.XLM -> CryptoCurrency.XLM
-            CryptoCurrency.ALGO -> CryptoCurrency.ALGO
-            CryptoCurrency.STX -> CryptoCurrency.STX
-        }
 }
 
 open class CustodialTradingAccount(
@@ -72,7 +60,8 @@ open class CustodialTradingAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
-    private val isNoteSupported: Boolean = false
+    private val isNoteSupported: Boolean = false,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
@@ -167,7 +156,8 @@ internal class CryptoInterestAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     private val isConfigured = AtomicBoolean(false)
@@ -212,7 +202,8 @@ internal class CryptoExchangeAccount(
     cryptoCurrency: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = null
 ) : CryptoAccountBase(cryptoCurrency) {
 
     override val balance: Single<Money>
