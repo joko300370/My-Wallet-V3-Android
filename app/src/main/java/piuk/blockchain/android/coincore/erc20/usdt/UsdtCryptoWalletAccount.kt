@@ -5,7 +5,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccountBase
+import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -15,7 +15,7 @@ internal class UsdtCryptoWalletAccount(
     override val erc20Account: Erc20Account,
     exchangeRates: ExchangeRateDataManager,
     override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
-) : Erc20NonCustodialAccountBase(
+) : Erc20NonCustodialAccount(
     CryptoCurrency.USDT,
     label,
     exchangeRates

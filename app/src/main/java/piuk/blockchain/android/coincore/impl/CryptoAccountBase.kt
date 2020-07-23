@@ -32,9 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
 
-abstract class CryptoAccountBase(
-    final override val asset: CryptoCurrency
-) : CryptoAccount {
+abstract class CryptoAccountBase : CryptoAccount {
 
     protected abstract val exchangeRates: ExchangeRateDataManager
 
@@ -56,13 +54,13 @@ abstract class CryptoAccountBase(
 }
 
 open class CustodialTradingAccount(
-    cryptoCurrency: CryptoCurrency,
+    override val asset: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
     private val isNoteSupported: Boolean = false,
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
+) : CryptoAccountBase() {
 
     private val hasSeenFunds = AtomicBoolean(false)
 
@@ -153,12 +151,12 @@ open class CustodialTradingAccount(
 }
 
 internal class CryptoInterestAccount(
-    cryptoCurrency: CryptoCurrency,
+    final override val asset: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager,
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
+) : CryptoAccountBase() {
 
     private val isConfigured = AtomicBoolean(false)
 
@@ -199,12 +197,12 @@ internal class CryptoInterestAccount(
 
 // To handle Send to PIT
 internal class CryptoExchangeAccount(
-    cryptoCurrency: CryptoCurrency,
+    override val asset: CryptoCurrency,
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager,
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
+) : CryptoAccountBase() {
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
@@ -231,17 +229,14 @@ internal class CryptoExchangeAccount(
 }
 
 abstract class CryptoNonCustodialAccount(
-    private val cryptoCurrency: CryptoCurrency
-) : CryptoAccountBase(cryptoCurrency) {
+    override val asset: CryptoCurrency
+) : CryptoAccountBase() {
 
     override val isFunded: Boolean = true
 
-    override val actions: AvailableActions
-        get() = availableActions
+    override val feeAsset: CryptoCurrency? = asset
 
-    override val feeAsset: CryptoCurrency? = cryptoCurrency
-
-    private val availableActions = setOf(
+    override val actions: AvailableActions = setOf(
         AssetAction.ViewActivity,
         AssetAction.Send,
         AssetAction.Receive,
