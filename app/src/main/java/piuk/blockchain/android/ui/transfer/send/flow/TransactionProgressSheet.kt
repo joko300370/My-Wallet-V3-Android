@@ -5,7 +5,6 @@ import android.view.View
 import kotlinx.android.synthetic.main.dialog_send_in_progress.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
-import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
 import piuk.blockchain.android.ui.transfer.send.TransactionInFlightState
