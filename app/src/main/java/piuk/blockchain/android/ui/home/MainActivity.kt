@@ -692,7 +692,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             presenter.cryptoCurrency = account.asset
             setCurrentTabItem(ITEM_TRANSFER)
             ViewUtils.setElevation(appbar_layout, 0f)
-            //startReceiveFragment()
+            // startReceiveFragment()
         }
     }
 

@@ -31,7 +31,7 @@ class TransferFragment : Fragment() {
         transfer_pager.adapter = pagerAdapter
 
         TabLayoutMediator(transfer_tabs, transfer_pager) { tab, position ->
-            tab.text = when(position) {
+            tab.text = when (position) {
                 0 -> getString(R.string.send)
                 1 -> getString(R.string.receive)
                 else -> ""
@@ -55,11 +55,11 @@ class TransferFragment : Fragment() {
     }
 }
 
-class TransferPagerAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
+class TransferPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =
-        when(position) {
+        when (position) {
         0 -> TransferSendFragment.newInstance()
         1 -> TransferReceiveFragment.newInstance()
         else -> throw IllegalStateException("Only two fragments allowed")
