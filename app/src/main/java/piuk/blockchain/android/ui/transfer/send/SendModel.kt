@@ -40,6 +40,13 @@ enum class NoteState {
     UPDATE_ERROR
 }
 
+enum class TransactionInFlightState {
+    IN_PROGRESS,
+    ERROR,
+    COMPLETED,
+    NOT_STARTED
+}
+
 data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount,
@@ -53,7 +60,8 @@ data class SendState(
     val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
     val transactionNoteSupported: Boolean? = null,
     val noteState: NoteState = NoteState.NOT_SET,
-    val note: String = ""
+    val note: String = "",
+    val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED
 ) : MviState {
     // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
     // Question: If we scan a bitpay invoice, do we show the amount screen?
