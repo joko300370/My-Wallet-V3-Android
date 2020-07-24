@@ -100,7 +100,6 @@ class SendModel(
             is SendIntent.RequestTransactionNoteSupport -> processTransactionNoteSupport()
             is SendIntent.TransactionNoteSupported -> null
             is SendIntent.NoteAdded -> null
-            is SendIntent.ToState -> null
         }
     }
 

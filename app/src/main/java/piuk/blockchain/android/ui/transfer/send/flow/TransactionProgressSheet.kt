@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transfer.send.flow
 
 import android.util.DisplayMetrics
 import android.view.View
-import android.view.ViewGroup
 import kotlinx.android.synthetic.main.dialog_send_in_progress.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
@@ -39,31 +38,21 @@ class TransactionProgressSheet : SendInputSheet() {
                 getString(R.string.send_progress_error_title),
                 getString(R.string.send_progress_error_subtitle)
             )
-            else -> {} // do nothing
+            else -> {
+            } // do nothing
         }
     }
 
     override fun initControls(view: View) {
-        val metrics = DisplayMetrics()
-        requireActivity().windowManager?.defaultDisplay?.getMetrics(metrics)
-
-        showSheetWithHeight(metrics.heightPixels)
-        view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-
         view.send_tx_progress.onCtaClick {
             dismiss()
         }
 
-        view.next.setOnClickListener {
-            model.process(SendIntent.ToState(TransactionInFlightState.COMPLETED))
-        }
-        view.next1.setOnClickListener {
-            model.process(SendIntent.ToState(TransactionInFlightState.ERROR))
-        }
-
-        view.previous.setOnClickListener {
-            model.process(SendIntent.ToState(TransactionInFlightState.IN_PROGRESS))
-        }
+        // this is needed to show the expanded dialog, with space at the top and bottom
+        val metrics = DisplayMetrics()
+        requireActivity().windowManager?.defaultDisplay?.getMetrics(metrics)
+        dialogView.layoutParams.height = (metrics.heightPixels - (48 * metrics.density)).toInt()
+        dialogView.requestLayout()
     }
 
     companion object {

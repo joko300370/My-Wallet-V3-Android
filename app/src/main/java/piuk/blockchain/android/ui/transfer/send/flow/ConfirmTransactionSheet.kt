@@ -145,8 +145,7 @@ class ConfirmTransactionSheet : SendInputSheet() {
     }
 
     private fun onCtaClick() {
-        //model.process(SendIntent.ExecuteTransaction)
-        model.process(SendIntent.ToState(TransactionInFlightState.IN_PROGRESS))
+        model.process(SendIntent.ExecuteTransaction)
     }
 
     companion object {
