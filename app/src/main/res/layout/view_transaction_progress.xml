@@ -21,25 +21,25 @@
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/ic_payment_progress_indeterminate"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintCircle="@+id/tx_icon"
         app:layout_constraintCircleAngle="45"
         app:layout_constraintCircleRadius="47dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/tx_state_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        tools:visibility="visible"
-        tools:src="@drawable/ic_check_circle"
         app:layout_constraintCircle="@+id/tx_icon"
         app:layout_constraintCircleAngle="45"
         app:layout_constraintCircleRadius="44dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_check_circle"
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/tx_guideline"
@@ -53,7 +53,9 @@
         style="@style/Text.Semibold.Centered.20"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tx_icon"
@@ -64,10 +66,15 @@
         style="@style/Text.Standard.Centered.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        app:layout_constraintBottom_toTopOf="@id/tx_ok_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tx_title"
+        app:layout_constraintVertical_bias="0"
         tools:text="Oops! Something Went Wrong." />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -75,10 +82,10 @@
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/small_margin"
-        android:visibility="gone"
+        android:layout_marginBottom="@dimen/standard_margin"
         android:text="@string/ok_cap"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

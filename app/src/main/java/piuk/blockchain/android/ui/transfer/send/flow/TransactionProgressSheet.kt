@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
+import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewGroup
 import kotlinx.android.synthetic.main.dialog_send_in_progress.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.send.SendInputSheet
@@ -8,6 +10,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
 import piuk.blockchain.android.ui.transfer.send.TransactionInFlightState
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
 import timber.log.Timber
 
@@ -22,12 +25,15 @@ class TransactionProgressSheet : SendInputSheet() {
 
         when (newState.transactionInFlight) {
             TransactionInFlightState.IN_PROGRESS -> dialogView.send_tx_progress.showTxInProgress(
-                getString(R.string.send_progress_sending_title),
+                getString(R.string.send_progress_sending_title,
+                    newState.sendAmount.toStringWithSymbol()),
                 getString(R.string.send_progress_sending_subtitle)
             )
             TransactionInFlightState.COMPLETED -> dialogView.send_tx_progress.showTxSuccess(
-                getString(R.string.send_progress_complete_title),
-                getString(R.string.send_progress_complete_subtitle)
+                getString(R.string.send_progress_complete_title,
+                    newState.sendAmount.toStringWithSymbol()),
+                getString(R.string.send_progress_complete_subtitle,
+                    getString(newState.sendingAccount.asset.assetName()))
             )
             TransactionInFlightState.ERROR -> dialogView.send_tx_progress.showTxError(
                 getString(R.string.send_progress_error_title),
@@ -38,6 +44,12 @@ class TransactionProgressSheet : SendInputSheet() {
     }
 
     override fun initControls(view: View) {
+        val metrics = DisplayMetrics()
+        requireActivity().windowManager?.defaultDisplay?.getMetrics(metrics)
+
+        showSheetWithHeight(metrics.heightPixels)
+        view.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+
         view.send_tx_progress.onCtaClick {
             dismiss()
         }
@@ -55,7 +67,6 @@ class TransactionProgressSheet : SendInputSheet() {
     }
 
     companion object {
-        fun newInstance(): TransactionProgressSheet =
-            TransactionProgressSheet()
+        fun newInstance(): TransactionProgressSheet = TransactionProgressSheet()
     }
 }

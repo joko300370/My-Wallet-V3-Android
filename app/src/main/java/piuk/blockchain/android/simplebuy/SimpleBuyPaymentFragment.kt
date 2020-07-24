@@ -44,7 +44,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun render(newState: SimpleBuyState) {
         transaction_progress_view.setAssetIcon(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
-        // icon.setImageResource(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
+
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
             model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
             isFirstLoad = false
@@ -78,7 +78,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 newState.everypayAuthOptions.paymentLink,
                 newState.everypayAuthOptions.exitLink
             )
-            // progress.visibility = View.GONE
         }
     }
 

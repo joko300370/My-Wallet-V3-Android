@@ -3,12 +3,12 @@ package piuk.blockchain.android.ui.base
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import androidx.annotation.CallSuper
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.view.View
+import androidx.annotation.CallSuper
 import com.blockchain.notifications.analytics.Analytics
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
@@ -24,11 +24,12 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     }
 
     protected lateinit var dialogView: View
+    private lateinit var dlg: BottomSheetDialog
 
     protected val analytics: Analytics by inject()
 
     final override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dlg = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dlg = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
         val view = View.inflate(context, layoutResource, null)
         dlg.setContentView(view)
@@ -58,6 +59,10 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
         }
 
         return dlg
+    }
+
+    protected fun showSheetWithHeight(heightInPixels: Int) {
+        dlg.behavior.peekHeight = heightInPixels
     }
 
     @CallSuper
