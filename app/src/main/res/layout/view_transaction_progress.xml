@@ -21,6 +21,7 @@
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/ic_payment_progress_indeterminate"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintCircle="@+id/tx_icon"
         app:layout_constraintCircleAngle="45"
         app:layout_constraintCircleRadius="47dp"
@@ -32,12 +33,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        tools:visibility="visible"
+        tools:src="@drawable/ic_check_circle"
         app:layout_constraintCircle="@+id/tx_icon"
         app:layout_constraintCircleAngle="45"
         app:layout_constraintCircleRadius="44dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/tx_guideline"
@@ -76,6 +78,7 @@
         android:layout_marginBottom="@dimen/small_margin"
         android:visibility="gone"
         android:text="@string/ok_cap"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

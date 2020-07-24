@@ -1860,4 +1860,11 @@
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
+
+    <string name="send_progress_sending_title">Sending %1$s</string>
+    <string name="send_progress_sending_subtitle">We\'re sending your transaction now.</string>
+    <string name="send_progress_complete_title">%1$s Sent</string>
+    <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
+    <string name="send_progress_error_title">Oops! Something Went Wrong.</string>
+    <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
 </resources>

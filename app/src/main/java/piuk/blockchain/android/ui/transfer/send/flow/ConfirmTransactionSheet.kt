@@ -22,6 +22,7 @@ import piuk.blockchain.android.ui.transfer.send.SendInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
+import piuk.blockchain.android.ui.transfer.send.TransactionInFlightState
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 
@@ -144,7 +145,8 @@ class ConfirmTransactionSheet : SendInputSheet() {
     }
 
     private fun onCtaClick() {
-        model.process(SendIntent.ExecuteTransaction)
+        //model.process(SendIntent.ExecuteTransaction)
+        model.process(SendIntent.ToState(TransactionInFlightState.IN_PROGRESS))
     }
 
     companion object {

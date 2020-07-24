@@ -134,6 +134,17 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
+    // todo remove, this is to debug
+    class ToState (
+        val state: TransactionInFlightState
+    ): SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                currentStep = SendStep.IN_PROGRESS,
+                transactionInFlight =  state
+            )
+    }
+
     object PrepareTransaction : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
