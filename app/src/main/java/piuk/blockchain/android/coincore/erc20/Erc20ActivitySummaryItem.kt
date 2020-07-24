@@ -5,7 +5,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Observable
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -21,7 +21,7 @@ internal class Erc20ActivitySummaryItem(
     private val ethDataManager: EthDataManager,
     override val exchangeRates: ExchangeRateDataManager,
     lastBlockNumber: BigInteger,
-    override val account: CryptoSingleAccount
+    override val account: CryptoAccount
 ) : NonCustodialActivitySummaryItem() {
 
     private val transfer: Erc20Transfer = feedTransfer.transfer
@@ -37,7 +37,7 @@ internal class Erc20ActivitySummaryItem(
 
     override val timeStampMs: Long = transfer.timestamp * 1000
 
-    override val cryptoValue: CryptoValue by unsafeLazy {
+    override val value: CryptoValue by unsafeLazy {
         CryptoValue.fromMinor(cryptoCurrency, transfer.value)
     }
 
@@ -46,7 +46,7 @@ internal class Erc20ActivitySummaryItem(
 
     override val fee: Observable<CryptoValue>
         get() = feedTransfer.feeObservable
-            .map { CryptoValue.etherFromWei(it) }
+            .map { CryptoValue.fromMinor(CryptoCurrency.ETHER, it) }
 
     override val txId: String = transfer.transactionHash
 

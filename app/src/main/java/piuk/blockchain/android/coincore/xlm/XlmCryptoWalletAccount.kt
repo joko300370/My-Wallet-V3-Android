@@ -4,6 +4,7 @@ import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -11,30 +12,29 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class XlmCryptoWalletAccount(
     override val label: String = "",
     private val address: String,
     private val xlmManager: XlmDataManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.XLM
 ) : CryptoNonCustodialAccount(CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
-    private var hasFunds = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<CryptoValue>
+    override val balance: Single<Money>
         get() = xlmManager.getBalance()
             .doOnSuccess {
-            if (it.amount > BigInteger.ZERO) {
-                hasFunds.set(true)
+                hasFunds.set(it > CryptoValue.ZeroXlm)
             }
-        }
+            .map { it as Money }
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(

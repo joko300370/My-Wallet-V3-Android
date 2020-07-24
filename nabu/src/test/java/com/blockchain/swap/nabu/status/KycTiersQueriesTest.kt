@@ -8,6 +8,7 @@ import com.blockchain.swap.nabu.models.nabu.NabuUser
 import com.blockchain.swap.nabu.models.nabu.TierResponse
 import com.blockchain.swap.nabu.models.nabu.TierLevels
 import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.nabu.ProductsUsed
 import com.blockchain.swap.nabu.models.nabu.UserState
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.mock
@@ -147,7 +148,8 @@ private fun emptyNabuUser() =
         address = null,
         state = UserState.None,
         kycState = KycState.None,
-        insertedAt = null
+        insertedAt = null,
+        productsUsed = ProductsUsed()
     )
 
 private fun givenTiersState(tier1State: KycTierState, tier2State: KycTierState) =

@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">İptal etmek</string>
   <string name="btn_ok">tamam</string>
-  <string name="yes">Evet</string>
-  <string name="no">Hayır</string>
+  <string name="common_yes">Evet</string>
+  <string name="common_no">Hayır</string>
   <string name="polite_no">Hayır teşekkürler</string>
   <string name="done">Bitti</string>
   <string name="btn_close">Kapat</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Devam et</string>
   <string name="btn_forgot_password">Parolanızı mı unuttunuz?\"</string>
   <string name="SEND">Gönder</string>
-  <string name="total">Toplam</string>
+  <string name="common_total">Toplam</string>
   <string name="max_available">Toplam harcanabilir bakiye kullanın:</string>
   <string name="bitpay_remaining_time">Kalan süre</string>
   <string name="bitpay_invoice_expired">BitPay Faturasının Süresi Doldu</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Seçilen şifre, paranızı korumak için çok zayıf. Şiddetle 
  farklı bir tane seçmenizi öneririz. Yeni bir şifre tanımlamak ister misiniz? 
 </string>
-  <string name="from">itibaren</string>
-  <string name="to">için</string>
+  <string name="common_from">itibaren</string>
+  <string name="common_to">için</string>
   <string name="confirm_details">Ödemeyi Onayla</string>
   <string name="fee">ücret</string>
   <string name="exit_confirm">Çıkmak için geri düğmesine tekrar basın</string>

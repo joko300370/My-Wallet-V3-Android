@@ -2,17 +2,16 @@ package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-interface CryptoAccount {
+interface BlockchainAccount {
     val label: String
 
-    val cryptoCurrencies: Set<CryptoCurrency>
-
-    val balance: Single<CryptoValue>
+    val balance: Single<Money>
 
     val activity: Single<ActivitySummaryList>
 
@@ -22,11 +21,15 @@ interface CryptoAccount {
 
     val hasTransactions: Boolean
 
-    fun fiatBalance(fiat: String, exchangeRates: ExchangeRateDataManager): Single<FiatValue>
+    fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
+}
 
-    fun includes(cryptoAccount: CryptoSingleAccount): Boolean
+interface SingleAccount : BlockchainAccount, SendTarget {
+    val receiveAddress: Single<ReceiveAddress>
+    val isDefault: Boolean
 
     val sendState: Single<SendState>
+    fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor>
 }
 
 enum class SendState {
@@ -37,34 +40,38 @@ enum class SendState {
     NOT_SUPPORTED
 }
 
-interface CryptoSingleAccount : CryptoAccount {
-    val receiveAddress: Single<ReceiveAddress>
-    val isDefault: Boolean
+typealias SingleAccountList = List<SingleAccount>
+
+interface CryptoAccount : SingleAccount {
     val asset: CryptoCurrency
-
-    fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor>
+    val feeAsset: CryptoCurrency?
 }
 
-interface CryptoAccountGroup : CryptoAccount {
-    val accounts: List<CryptoAccount>
+interface FiatAccount : SingleAccount {
+    val fiatCurrency: String
 }
 
-typealias CryptoSingleAccountList = List<CryptoSingleAccount>
+interface AccountGroup : BlockchainAccount {
+    val accounts: SingleAccountList
 
-internal fun CryptoAccount.isCustodial(): Boolean =
+    fun includes(account: BlockchainAccount): Boolean
+}
+
+internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
-// Stub invalid account; use as an initialiser to avoid nulls.
-object NullAccount : CryptoSingleAccount {
+// Stub invalid accounts; use as an initialisers to avoid nulls.
+object NullCryptoAccount : CryptoAccount {
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
         get() = false
+
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val sendState: Single<SendState>
@@ -72,10 +79,43 @@ object NullAccount : CryptoSingleAccount {
 
     override val label: String = ""
 
-    override val cryptoCurrencies: Set<CryptoCurrency>
-        get() = setOf(asset)
+    override val balance: Single<Money>
+        get() = Single.just(CryptoValue.ZeroBtc)
 
-    override val balance: Single<CryptoValue>
+    override val activity: Single<ActivitySummaryList>
+        get() = Single.just(emptyList())
+
+    override val actions: AvailableActions = emptySet()
+    override val isFunded: Boolean = false
+    override val hasTransactions: Boolean = false
+
+    override val feeAsset: CryptoCurrency? = null
+
+    override fun fiatBalance(
+        fiatCurrency: String,
+        exchangeRates: ExchangeRates
+    ): Single<Money> =
+        Single.just(FiatValue.zero(fiatCurrency))
+}
+
+object NullFiatAccount : FiatAccount {
+    override val fiatCurrency: String = "NULL"
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(NullAddress)
+
+    override val isDefault: Boolean
+        get() = false
+
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+        Single.error(NotImplementedError("Dummy Account"))
+
+    override val sendState: Single<SendState>
+        get() = Single.just(SendState.NOT_SUPPORTED)
+
+    override val label: String = ""
+
+    override val balance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)
 
     override val activity: Single<ActivitySummaryList>
@@ -86,12 +126,8 @@ object NullAccount : CryptoSingleAccount {
     override val hasTransactions: Boolean = false
 
     override fun fiatBalance(
-        fiat: String,
-        exchangeRates: ExchangeRateDataManager
-    ): Single<FiatValue> =
-        Single.just(FiatValue.zero(fiat))
-
-    override fun includes(cryptoAccount: CryptoSingleAccount): Boolean {
-        return cryptoAccount == this
-    }
+        fiatCurrency: String,
+        exchangeRates: ExchangeRates
+    ): Single<Money> =
+        Single.just(FiatValue.zero(fiatCurrency))
 }

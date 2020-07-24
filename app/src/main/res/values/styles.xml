@@ -2,8 +2,8 @@
 
     <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
         <!-- Common styles across all res qualifiers resides here, anything specific can inherit from this -->
-        <item name="colorPrimary">@color/primary_navy_medium</item>
-        <item name="colorPrimaryDark">@color/primary_navy_dark</item>
+        <item name="colorPrimary">@color/primary_blue_dark</item>
+        <item name="colorPrimaryDark">@color/primary_blue_dark</item>
         <item name="colorAccent">@color/primary_blue_accent</item>
 
         <item name="android:textColorPrimary">@color/black</item>
@@ -443,5 +443,11 @@
         <item name="colorControlActivated">@color/blue_600</item>
         <item name="colorControlHighlight">@color/blue_600</item>
         <item name="errorTextAppearance">@style/ErrorText</item>
+    </style>
+
+    <style name="DialogStyle" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 </resources>

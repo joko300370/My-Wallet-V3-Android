@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.alg
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import org.apache.commons.lang3.NotImplementedException
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -15,7 +16,7 @@ internal class AlgoCryptoWalletAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.ALGO) {
 
-    override val balance: Single<CryptoValue>
+    override val balance: Single<Money>
         get() = Single.just(CryptoValue.ZeroAlg)
 
     override val receiveAddress: Single<ReceiveAddress>

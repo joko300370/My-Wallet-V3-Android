@@ -15,7 +15,7 @@ enum class CryptoCurrency(
         userDp = 8,
         requiredConfirmations = 3,
         featureFlags =
-            CryptoCurrency.PRICE_CHARTING or
+        CryptoCurrency.PRICE_CHARTING or
             CryptoCurrency.MULTI_WALLET
 
     ),
@@ -26,7 +26,7 @@ enum class CryptoCurrency(
         userDp = 8,
         requiredConfirmations = 12,
         featureFlags =
-            CryptoCurrency.PRICE_CHARTING
+        CryptoCurrency.PRICE_CHARTING
     ),
     BCH(
         networkTicker = "BCH",
@@ -35,8 +35,8 @@ enum class CryptoCurrency(
         userDp = 8,
         requiredConfirmations = 3,
         featureFlags =
-            CryptoCurrency.PRICE_CHARTING or
-                    CryptoCurrency.MULTI_WALLET
+        CryptoCurrency.PRICE_CHARTING or
+            CryptoCurrency.MULTI_WALLET
     ),
     XLM(
         networkTicker = "XLM",
@@ -45,7 +45,7 @@ enum class CryptoCurrency(
         userDp = 7,
         requiredConfirmations = 1,
         featureFlags =
-            CryptoCurrency.PRICE_CHARTING
+        CryptoCurrency.PRICE_CHARTING
     ),
     PAX(
         networkTicker = "PAX",
@@ -53,8 +53,7 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
-        featureFlags =
-            0L
+        featureFlags = CryptoCurrency.IS_ERC20
     ),
     STX(
         networkTicker = "STX",
@@ -63,7 +62,7 @@ enum class CryptoCurrency(
         userDp = 7,
         requiredConfirmations = 12,
         featureFlags =
-            CryptoCurrency.STUB_ASSET
+        CryptoCurrency.STUB_ASSET
     ),
     ALGO(
         networkTicker = "ALGO",
@@ -71,15 +70,15 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12,
-        featureFlags = CryptoCurrency.PRICE_CHARTING
+        featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.CUSTODIAL_ONLY
     ),
     USDT(
         networkTicker = "USDT",
         displayTicker = "USDT",
         dp = 6,
         userDp = 6,
-        requiredConfirmations = 12,
-        featureFlags = CryptoCurrency.PRICE_CHARTING
+        requiredConfirmations = 12, // Same as ETHER
+        featureFlags = CryptoCurrency.CUSTODIAL_ONLY or CryptoCurrency.IS_ERC20
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))
@@ -94,10 +93,15 @@ enum class CryptoCurrency(
         fun fromNetworkTicker(symbol: String?): CryptoCurrency? =
             values().firstOrNull { it.networkTicker.equals(symbol, ignoreCase = true) }
 
-        fun activeCurrencies(): List<CryptoCurrency> = values().filter { !it.hasFeature(STUB_ASSET) }
+        fun activeCurrencies(): List<CryptoCurrency> = values().filter {
+            !it.hasFeature(STUB_ASSET)
+        }
 
         const val PRICE_CHARTING = 0x00000001L
         const val MULTI_WALLET = 0x00000002L
+        const val CUSTODIAL_ONLY = 0x0000004L
+        const val IS_ERC20 = 0x00000008L
+
         const val STUB_ASSET = 0x10000000L
     }
 }

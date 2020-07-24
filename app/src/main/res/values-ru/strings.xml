@@ -51,8 +51,8 @@
   <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">Отмена</string>
   <string name="btn_ok">Ok</string>
-  <string name="yes">да</string>
-  <string name="no">нет</string>
+  <string name="common_yes">да</string>
+  <string name="common_no">нет</string>
   <string name="polite_no">Спасибо, не надо</string>
   <string name="done">Выполнено</string>
   <string name="btn_close">близко</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Продолжить</string>
   <string name="btn_forgot_password">Забыл пароль?\"</string>
   <string name="SEND">послать</string>
-  <string name="total">Общее количество</string>
+  <string name="common_total">Общее количество</string>
   <string name="max_available">Используйте общий расходный баланс:</string>
   <string name="bitpay_remaining_time">Оставшееся время</string>
   <string name="bitpay_invoice_expired">Срок действия счета BitPay истек</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Выбранный пароль слишком слаб для защиты ваших средств. Мы сильно 
  предлагаю вам выбрать другой. Хотите ли вы определить новый пароль? 
 </string>
-  <string name="from">Из</string>
-  <string name="to">к</string>
+  <string name="common_from">Из</string>
+  <string name="common_to">к</string>
   <string name="confirm_details">Подтвердите оплату</string>
   <string name="fee">плата</string>
   <string name="exit_confirm">Нажмите кнопку назад еще раз, чтобы выйти</string>

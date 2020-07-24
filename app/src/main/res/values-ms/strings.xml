@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">Pertukaran</string>
   <string name="cancel">Batalkan</string>
   <string name="btn_ok">okey</string>
-  <string name="yes">Ya</string>
-  <string name="no">Tidak</string>
+  <string name="common_yes">Ya</string>
+  <string name="common_no">Tidak</string>
   <string name="polite_no">Tidak, Terima kasih</string>
   <string name="done">Selesai</string>
   <string name="btn_close">Tutup</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Teruskan</string>
   <string name="btn_forgot_password">Lupa kata laluan?\"</string>
   <string name="SEND">Hantar</string>
-  <string name="total">Jumlah</string>
+  <string name="common_total">Jumlah</string>
   <string name="max_available">Gunakan baki yang boleh dibelanjakan:</string>
   <string name="bitpay_remaining_time">Masa yang tinggal</string>
   <string name="bitpay_invoice_expired">Invois BitPay Tamat tempoh</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Kata laluan yang dipilih terlalu lemah untuk menjamin dana anda. Kami kuat 
  cadangkan anda memilih yang lain. Adakah anda ingin menentukan kata laluan baru? 
 </string>
-  <string name="from">Dari</string>
-  <string name="to">Untuk</string>
+  <string name="common_from">Dari</string>
+  <string name="common_to">Untuk</string>
   <string name="confirm_details">Sahkan Bayaran</string>
   <string name="fee">Bayaran</string>
   <string name="exit_confirm">Tekan butang semula sekali lagi untuk keluar</string>

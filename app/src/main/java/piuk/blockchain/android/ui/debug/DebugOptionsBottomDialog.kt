@@ -2,25 +2,25 @@ package piuk.blockchain.android.ui.debug
 
 import android.app.LauncherActivity
 import android.os.Bundle
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.fragment.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
+import com.blockchain.koin.scopedInject
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_debug_options.*
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.util.AppRate
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.toast
 
 class DebugOptionsBottomDialog : BottomSheetDialogFragment() {
@@ -94,8 +94,8 @@ class DebugOptionsBottomDialog : BottomSheetDialogFragment() {
     }
 
     private fun onResetAnnounce() {
-        val announcementList: AnnouncementList = get()
-        val dismissRecorder: DismissRecorder = get()
+        val announcementList: AnnouncementList by scopedInject()
+        val dismissRecorder: DismissRecorder by scopedInject()
 
         dismissRecorder.undismissAll(announcementList)
 

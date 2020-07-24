@@ -10,4 +10,5 @@ interface DefaultLabels {
     fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String
+    fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String
 }

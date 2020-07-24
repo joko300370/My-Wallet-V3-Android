@@ -2,16 +2,16 @@ package piuk.blockchain.android.coincore.eth
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.CryptoValue.Companion.max
-import info.blockchain.balance.compareTo
+import info.blockchain.balance.Money
+import info.blockchain.balance.Money.Companion.max
 import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendValidationError
@@ -26,7 +26,7 @@ import java.math.BigInteger
 class EthSendTransaction(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
-    sendingAccount: CryptoSingleAccount,
+    sendingAccount: CryptoAccount,
     address: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainSendProcessorBase(
@@ -38,7 +38,9 @@ class EthSendTransaction(
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override val isNoteSupported: Boolean = true
+
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -52,11 +54,11 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<Money> =
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)
-        ) { balance: CryptoValue, fees: CryptoValue ->
+        ) { balance: Money, fees: Money ->
             max(balance - fees, CryptoValue.ZeroEth)
         }
 
@@ -88,7 +90,7 @@ class EthSendTransaction(
                 to = address.address,
                 gasPriceWei = fees.gasPrice,
                 gasLimitGwei = fees.getGasLimit(isContract),
-                weiValue = pendingTx.amount.amount
+                weiValue = pendingTx.amount.toBigInteger()
             )
         }
 
@@ -115,7 +117,7 @@ class EthSendTransaction(
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)
-        ) { balance: CryptoValue, fee: CryptoValue ->
+        ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {
                 throw SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
             } else {

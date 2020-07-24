@@ -13,7 +13,6 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/large_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:contentDescription="Enter Address"
         android:text="Send"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,13 +31,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title"/>
 
-    <piuk.blockchain.android.ui.transfer.widgets.AccountOverview
+    <piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
             android:id="@+id/from_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/title_from"/>
@@ -64,9 +61,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_to">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/external_address"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
@@ -76,51 +72,81 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/address_entry"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:hint="@string/send_enter_asset_address_hint"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
                 android:id="@+id/error_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Invalid Address"
-                android:visibility="invisible"/>
+                android:text="@string/send_error_not_valid_asset_address"
+                app:layout_constraintTop_toBottomOf="@id/address_entry"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"/>
 
-            <Button
+            <ImageView
                 android:id="@+id/btn_scan"
-                android:layout_width="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:contentDescription="@string/send_scan_qr_code"
+                android:src="@drawable/icon_qr_inverse"
+                android:layout_marginEnd="@dimen/tiny_margin"
+                app:layout_constraintTop_toTopOf="@id/address_entry"
+                app:layout_constraintBottom_toBottomOf="@id/address_entry"
+                app:layout_constraintEnd_toEndOf="@id/address_entry"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin">
+
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Scan"
-                android:layout_gravity="center"/>
+                style="@style/Text.Semibold.14"
+                android:text="@string/send_warn_internal_send_only"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginEnd="@dimen/small_margin"/>
+
+            <TextView
+                android:id="@+id/internal_warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Text.Standard.12"
+                android:text="@string/send_internal_transfer_message"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginEnd="@dimen/small_margin"/>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/internal_warning"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
     </ViewSwitcher>
-
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title_pick"
-        style="@style/Text.Semibold.14"
+        style="@style/Text.Semibold.Light.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="or Select a Wallet"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/send_select_a_wallet_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_switcher"/>
 
-    <piuk.blockchain.android.ui.transfer.widgets.AccountList
+    <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/wallet_select"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
         app:layout_constraintTop_toBottomOf="@id/title_pick"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
@@ -132,6 +158,7 @@
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
         android:contentDescription="@string/next"
         android:text="@string/next"

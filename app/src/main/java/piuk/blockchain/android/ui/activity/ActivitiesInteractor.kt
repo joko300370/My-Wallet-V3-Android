@@ -9,8 +9,8 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.repositories.AssetActivityRepository
 import timber.log.Timber
 
@@ -21,11 +21,14 @@ class ActivitiesInteractor(
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics
 ) {
-    fun getActivityForAccount(account: CryptoAccount, isRefreshRequested: Boolean): Observable<ActivitySummaryList> =
+    fun getActivityForAccount(
+        account: BlockchainAccount,
+        isRefreshRequested: Boolean
+    ): Observable<ActivitySummaryList> =
         activityRepository.fetch(account, isRefreshRequested)
 
-    fun getDefaultAccount(): Single<CryptoAccount> =
-        Single.just(coincore.allWallets)
+    fun getDefaultAccount(): Single<BlockchainAccount> =
+        coincore.allWallets().map { it as BlockchainAccount }
 
     fun cancelSimpleBuyOrder(orderId: String): Disposable? {
         return custodialWalletManager.deleteBuyOrder(orderId)

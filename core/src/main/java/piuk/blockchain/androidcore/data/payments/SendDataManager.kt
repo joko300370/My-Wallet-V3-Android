@@ -166,7 +166,7 @@ class SendDataManager(
         useNewCoinSelection: Boolean
     ): SpendableUnspentOutputs = paymentService.getSpendableCoins(
         unspentCoins,
-        paymentAmount.amount,
+        paymentAmount.toBigInteger(),
         feePerKb,
         paymentAmount.currency == CryptoCurrency.BCH,
         useNewCoinSelection

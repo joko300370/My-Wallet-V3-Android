@@ -1,8 +1,9 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
+import info.blockchain.balance.ExchangeRate
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -25,11 +26,11 @@ class AssetMapTest {
 
     @Test
     fun `copy with patchAsset works as expected`() {
-        val newAsset = AssetState(
+        val newAsset = CryptoAssetState(
             currency = CryptoCurrency.BTC,
-            cryptoBalance = CryptoValue.bitcoinFromMajor(20),
-            price = FiatValue.fromMajor(FIAT_CURRENCY, 300.toBigDecimal()),
-            price24h = FiatValue.fromMajor(FIAT_CURRENCY, 400.toBigDecimal()),
+            balance = 20.bitcoin(),
+            price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),
+            price24h = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 400.toBigDecimal()),
             priceTrend = emptyList()
         )
 
@@ -43,13 +44,13 @@ class AssetMapTest {
 
     @Test
     fun `copy with patchBalance works as expected`() {
-        val newBalance = CryptoValue.etherFromMajor(20)
+        val newBalance = 20.ether()
 
         val copy = subject.copy(patchBalance = newBalance)
 
         assertEquals(copy[CryptoCurrency.BTC], subject[CryptoCurrency.BTC])
         assertNotEquals(copy[CryptoCurrency.ETHER], subject[CryptoCurrency.ETHER])
-        assertEquals(copy[CryptoCurrency.ETHER].cryptoBalance, newBalance)
+        assertEquals(copy[CryptoCurrency.ETHER].balance, newBalance)
         assertEquals(copy[CryptoCurrency.XLM], subject[CryptoCurrency.XLM])
     }
 

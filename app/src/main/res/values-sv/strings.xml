@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">Byta</string>
   <string name="cancel">Annullera</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ja</string>
-  <string name="no">Nej</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nej</string>
   <string name="polite_no">Nej tack</string>
   <string name="done">Gjort</string>
   <string name="btn_close">Stänga</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Fortsätta</string>
   <string name="btn_forgot_password">Glömt ditt lösenord?\"</string>
   <string name="SEND">Skicka</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Använd den totala betalningsbara balansen:</string>
   <string name="bitpay_remaining_time">Återstående tid</string>
   <string name="bitpay_invoice_expired">BitPay-faktura har gått ut</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Det valda lösenordet är för svagt för att säkra dina pengar. Vi starkt 
  föreslår att du väljer en annan. Vill du definiera ett nytt lösenord? 
 </string>
-  <string name="from">Från</string>
-  <string name="to">Till</string>
+  <string name="common_from">Från</string>
+  <string name="common_to">Till</string>
   <string name="confirm_details">Bekräfta betalning</string>
   <string name="fee">Avgift</string>
   <string name="exit_confirm">Tryck på bakåtknappen igen för att avsluta</string>

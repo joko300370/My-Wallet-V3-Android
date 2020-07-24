@@ -50,7 +50,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -168,7 +167,7 @@ class AccountEditPresenter constructor(
             // Subtract fee
             val balanceAfterFee = payloadDataManager.getAddressBalance(
                 legacyAddress!!.address
-            ).amount.toLong() - sendDataManager.estimatedFee(
+            ).toBigInteger().toLong() - sendDataManager.estimatedFee(
                 1, 1,
                 BigInteger.valueOf(dynamicFeeCache.btcFeeOptions!!.regularFee * 1000)
             ).toLong()

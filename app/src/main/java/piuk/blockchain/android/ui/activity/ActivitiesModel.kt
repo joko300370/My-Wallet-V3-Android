@@ -5,26 +5,28 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
 
 enum class ActivitiesSheet {
     ACCOUNT_SELECTOR,
-    ACTIVITY_DETAILS,
+    CRYPTO_ACTIVITY_DETAILS,
+    FIAT_ACTIVITY_DETAILS,
     BANK_TRANSFER_DETAILS,
     BANK_ORDER_CANCEL
 }
 
 data class ActivitiesState(
-    val account: CryptoAccount? = null, // CoinCore.getMasterAccountGroup(),
+    val account: BlockchainAccount? = null,
     val activityList: ActivitySummaryList = emptyList(),
     val isLoading: Boolean = false,
     val bottomSheet: ActivitiesSheet? = null,
     val isError: Boolean = false,
     val selectedTxId: String = "",
     val selectedCryptoCurrency: CryptoCurrency? = null,
+    val selectedFiatCurrency: String? = null,
     val isCustodial: Boolean = false
 ) : MviState
 
@@ -61,13 +63,7 @@ class ActivitiesModel(
                         onError = { process(ActivityListUpdatedErrorIntent) }
                     )
             is CancelSimpleBuyOrderIntent -> interactor.cancelSimpleBuyOrder(intent.orderId)
-            is ShowActivityDetailsIntent,
-            is ShowBankTransferDetailsIntent,
-            is ShowCancelOrderIntent,
-            is ClearBottomSheetIntent,
-            is ActivityListUpdatedIntent,
-            is ActivityListUpdatedErrorIntent,
-            is ShowAccountSelectionIntent -> null
+            else -> null
         }
     }
 

@@ -5,7 +5,8 @@ enum class CampaignType {
     Sunriver,
     Resubmission,
     Blockstack,
-    SimpleBuy
+    SimpleBuy,
+    FiatFunds
 }
 
 const val blockstackCampaignName = "BLOCKSTACK"

@@ -16,6 +16,6 @@ data class XlmTransaction(
             if (value.isPositive) {
                 value
             } else {
-                value - fee
+                (value - fee) as CryptoValue
             }
 }

@@ -2,23 +2,24 @@ package piuk.blockchain.android.coincore.bch
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Observable
-import piuk.blockchain.android.coincore.CryptoSingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal class BchActivitySummaryItem(
     private val transactionSummary: TransactionSummary,
     override val exchangeRates: ExchangeRateDataManager,
-    override val account: CryptoSingleAccount
+    override val account: CryptoAccount
 ) : NonCustodialActivitySummaryItem() {
 
     override val cryptoCurrency = CryptoCurrency.BCH
     override val direction: TransactionSummary.Direction = transactionSummary.direction
     override val timeStampMs: Long = transactionSummary.time * 1000
 
-    override val cryptoValue: CryptoValue = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
+    override val value: Money = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
 
     override val description: String? = null
 

@@ -75,12 +75,12 @@ internal class UpgradeWalletActivity : BaseMvpActivity<UpgradeWalletView, Upgrad
             .setMessage(R.string.weak_password)
             .setCancelable(false)
             .setView(pwLayout)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val password1 = (pwLayout.findViewById<View>(R.id.pw1) as EditText).text.toString()
                 val password2 = (pwLayout.findViewById<View>(R.id.pw2) as EditText).text.toString()
                 presenter.submitPasswords(password1, password2)
             }
-            .setNegativeButton(R.string.no) { dialog, whichButton ->
+            .setNegativeButton(R.string.common_no) { dialog, whichButton ->
                 showToast(R.string.password_unchanged,
                     ToastCustom.TYPE_GENERAL)
             }

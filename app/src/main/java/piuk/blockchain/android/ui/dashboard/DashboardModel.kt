@@ -4,22 +4,29 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.preferences.DashboardPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import info.blockchain.balance.percentageDelta
-import info.blockchain.balance.sum
-import info.blockchain.balance.toFiat
+import info.blockchain.balance.total
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
-class AssetMap(private val map: Map<CryptoCurrency, AssetState>) : Map<CryptoCurrency, AssetState> by map {
-    override operator fun get(key: CryptoCurrency): AssetState {
-        return map.getOrElse(key) { throw IllegalArgumentException("$key is not a known CryptoCurrency") }
+class AssetMap(private val map: Map<CryptoCurrency, CryptoAssetState>) :
+    Map<CryptoCurrency, CryptoAssetState> by map {
+    override operator fun get(key: CryptoCurrency): CryptoAssetState {
+        return map.getOrElse(key) {
+            throw IllegalArgumentException("$key is not a known CryptoCurrency")
+        }
     }
 
     // TODO: This is horrendously inefficient. Fix it!
@@ -28,14 +35,16 @@ class AssetMap(private val map: Map<CryptoCurrency, AssetState>) : Map<CryptoCur
         return AssetMap(assets)
     }
 
-    fun copy(patchBalance: CryptoValue): AssetMap {
+    fun copy(patchBalance: Money): AssetMap {
         val assets = toMutableMap()
-        val value = get(patchBalance.currency).copy(cryptoBalance = patchBalance)
-        assets[patchBalance.currency] = value
+        // CURRENCY HERE
+        val balance = patchBalance as CryptoValue
+        val value = get(balance.currency).copy(balance = patchBalance)
+        assets[balance.currency] = value
         return AssetMap(assets)
     }
 
-    fun copy(patchAsset: AssetState): AssetMap {
+    fun copy(patchAsset: CryptoAssetState): AssetMap {
         val assets = toMutableMap()
         assets[patchAsset.currency] = patchAsset
         return AssetMap(assets)
@@ -49,16 +58,37 @@ class AssetMap(private val map: Map<CryptoCurrency, AssetState>) : Map<CryptoCur
 }
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun mapOfAssets(vararg pairs: Pair<CryptoCurrency, AssetState>) = AssetMap(mapOf(*pairs))
+fun mapOfAssets(vararg pairs: Pair<CryptoCurrency, CryptoAssetState>) = AssetMap(mapOf(*pairs))
 
 interface DashboardItem
 
 interface BalanceState : DashboardItem {
     val isLoading: Boolean
-    val fiatBalance: FiatValue?
-    val delta: Pair<FiatValue, Double>?
-    operator fun get(currency: CryptoCurrency): AssetState
+    val fiatBalance: Money?
+    val delta: Pair<Money, Double>?
+    operator fun get(currency: CryptoCurrency): CryptoAssetState
+    fun getFundsFiat(fiat: String): Money
     fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
+}
+
+data class FiatBalanceInfo(
+    val balance: Money,
+    val userFiat: Money,
+    val account: FiatAccount
+)
+
+data class FiatAssetState(
+    val fiatAccounts: List<FiatBalanceInfo> = emptyList()
+) : DashboardItem {
+
+    val totalBalance: Money? =
+        if (fiatAccounts.isEmpty()) {
+            null
+        } else {
+            fiatAccounts.map {
+                it.userFiat
+            }.total()
+        }
 }
 
 enum class DashboardSheet {
@@ -66,48 +96,66 @@ enum class DashboardSheet {
     CUSTODY_INTRO,
     SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
+    @Deprecated("Moving to send v2")
     BASIC_WALLET_TRANSFER,
-    SIMPLE_BUY_CANCEL_ORDER
+    SIMPLE_BUY_CANCEL_ORDER,
+    FIAT_FUNDS_DETAILS,
+    LINK_OR_DEPOSIT,
+    FIAT_FUNDS_NO_KYC
 }
 
 data class DashboardState(
-    val assets: AssetMap = mapOfAssets(
-        CryptoCurrency.BTC to AssetState(CryptoCurrency.BTC),
-        CryptoCurrency.BCH to AssetState(CryptoCurrency.BCH),
-        CryptoCurrency.ETHER to AssetState(CryptoCurrency.ETHER),
-        CryptoCurrency.XLM to AssetState(CryptoCurrency.XLM),
-        CryptoCurrency.PAX to AssetState(CryptoCurrency.PAX),
-        CryptoCurrency.ALGO to AssetState(CryptoCurrency.ALGO),
-        CryptoCurrency.USDT to AssetState(CryptoCurrency.USDT)
+    val assets: AssetMap = AssetMap(
+        CryptoCurrency.activeCurrencies().associateBy(
+            keySelector = { it },
+            valueTransform = { CryptoAssetState(it) }
+        )
     ),
     val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
+    val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
     val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
-    val transferFundsCurrency: CryptoCurrency? = null
-) : MviState, BalanceState {
+    @Deprecated("Moving to new send")
+    val transferFundsCurrency: CryptoCurrency? = null,
+    val fiatAssets: FiatAssetState? = null,
+    val selectedFiatAccount: FiatAccount? = null
+) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
     override val isLoading: Boolean by unsafeLazy {
         assets.values.all { it.isLoading }
     }
 
-    override val fiatBalance: FiatValue? by unsafeLazy {
-        assets.values
-            .filter { !it.isLoading && it.fiatBalance != null }
-            .map { it.fiatBalance!! }
-            .sum()
+    override val fiatBalance: Money? by unsafeLazy {
+        val cryptoAssetBalance = cryptoAssetFiatBalances()
+        val fiatAssetBalance = fiatAssets?.totalBalance
+
+        if (cryptoAssetBalance != null) {
+            if (fiatAssetBalance != null) {
+                cryptoAssetBalance + fiatAssetBalance
+            } else {
+                cryptoAssetBalance
+            }
+        } else {
+            fiatAssetBalance
+        }
     }
 
-    private val fiatBalance24h: FiatValue? by unsafeLazy {
+    private fun cryptoAssetFiatBalances() = assets.values
+        .filter { !it.isLoading && it.fiatBalance != null }
+        .map { it.fiatBalance!! }
+        .ifEmpty { null }?.total()
+
+    private val fiatBalance24h: Money? by unsafeLazy {
         assets.values
             .filter { !it.isLoading && it.fiatBalance24h != null }
             .map { it.fiatBalance24h!! }
-            .sum()
+            .ifEmpty { null }?.total()
     }
 
-    override val delta: Pair<FiatValue, Double>? by unsafeLazy {
+    override val delta: Pair<Money, Double>? by unsafeLazy {
         val current = fiatBalance
         val old = fiatBalance24h
 
@@ -118,37 +166,40 @@ data class DashboardState(
         }
     }
 
-    override operator fun get(currency: CryptoCurrency): AssetState =
+    override operator fun get(currency: CryptoCurrency): CryptoAssetState =
         assets[currency]
+
+    override fun getFundsFiat(fiat: String): Money =
+        fiatAssets?.totalBalance ?: FiatValue.zero(fiat)
 
     override fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean =
         !custodyIntroSeen && get(currency).hasCustodialBalance
 }
 
-data class AssetState(
+data class CryptoAssetState(
     val currency: CryptoCurrency,
-    val cryptoBalance: CryptoValue? = null,
-    val price: FiatValue? = null,
-    val price24h: FiatValue? = null,
+    val balance: Money? = null,
+    val price: ExchangeRate? = null,
+    val price24h: ExchangeRate? = null,
     val priceTrend: List<Float> = emptyList(),
     val hasBalanceError: Boolean = false,
     val hasCustodialBalance: Boolean = false
 ) : DashboardItem {
-    val fiatBalance: FiatValue? by unsafeLazy {
-        price?.let { cryptoBalance?.toFiat(it) ?: FiatValue.zero(it.currencyCode) }
+    val fiatBalance: Money? by unsafeLazy {
+        price?.let { p -> balance?.let { p.convert(it) } }
     }
 
-    val fiatBalance24h: FiatValue? by unsafeLazy {
-        price24h?.let { cryptoBalance?.toFiat(it) ?: FiatValue.zero(it.currencyCode) }
+    val fiatBalance24h: Money? by unsafeLazy {
+        price24h?.let { p -> balance?.let { p.convert(it) } }
     }
 
     val priceDelta: Double by unsafeLazy { price.percentageDelta(price24h) }
 
     val isLoading: Boolean by unsafeLazy {
-        cryptoBalance == null || price == null || price24h == null
+        balance == null || price == null || price24h == null
     }
 
-    fun reset(): AssetState = AssetState(currency)
+    fun reset(): CryptoAssetState = CryptoAssetState(currency)
 }
 
 class DashboardModel(
@@ -160,18 +211,24 @@ class DashboardModel(
     initialState.copy(custodyIntroSeen = persistence.isCustodialIntroSeen),
     mainScheduler
 ) {
-    override fun performAction(previousState: DashboardState, intent: DashboardIntent): Disposable? {
+    override fun performAction(
+        previousState: DashboardState,
+        intent: DashboardIntent
+    ): Disposable? {
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
             is RefreshAllIntent -> {
-                interactor.refreshBalances(this, AssetFilter.Total)
+                interactor.refreshBalances(this, AssetFilter.All)
             }
             is BalanceUpdate -> {
                 process(CheckForCustodialBalanceIntent(intent.cryptoCurrency))
                 null
             }
-            is CheckForCustodialBalanceIntent -> interactor.checkForCustodialBalance(this, intent.cryptoCurrency)
+            is CheckForCustodialBalanceIntent -> interactor.checkForCustodialBalance(
+                this,
+                intent.cryptoCurrency
+            )
             is UpdateHasCustodialBalanceIntent -> {
                 process(RefreshPrices(intent.cryptoCurrency))
                 null
@@ -184,15 +241,19 @@ class DashboardModel(
             }
             is CheckBackupStatus -> interactor.hasUserBackedUp(this)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
+            is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount)
+            is FiatBalanceUpdate,
             is BackupStatusUpdate,
             is BalanceUpdateError,
             is PriceHistoryUpdate,
             is ClearAnnouncement,
             is ShowAnnouncement,
-            is ShowAssetDetails,
+            is ShowCryptoAssetDetails,
+            is ShowFiatAssetDetails,
+            is ShowBankLinkingSheet,
             is ShowDashboardSheet,
-            is AbortFundsTransfer,
             is TransferFunds,
+            is UpdateLaunchDialogFlow,
             is ClearBottomSheet -> null
         }
     }
@@ -205,7 +266,10 @@ class DashboardModel(
         persistence.isCustodialIntroSeen = s.custodyIntroSeen
     }
 
-    override fun distinctIntentFilter(previousIntent: DashboardIntent, nextIntent: DashboardIntent): Boolean {
+    override fun distinctIntentFilter(
+        previousIntent: DashboardIntent,
+        nextIntent: DashboardIntent
+    ): Boolean {
         return when (previousIntent) {
             // Allow consecutive ClearBottomSheet intents
             is ClearBottomSheet -> {

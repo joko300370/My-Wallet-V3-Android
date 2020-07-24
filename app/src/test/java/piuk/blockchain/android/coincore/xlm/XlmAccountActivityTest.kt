@@ -5,6 +5,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.models.XlmTransaction
+import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -57,8 +58,8 @@ class XlmAccountActivityTest {
         val output = BigInteger.valueOf(1000000L)
         val xlmTransaction = XlmTransaction(
             "2018-10-11T12:54:15Z",
-            CryptoValue.lumensFromStroop(output),
-            CryptoValue.lumensFromStroop(BigInteger.valueOf(100)),
+            output.stroops(),
+            100.stroops(),
             "hash",
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
@@ -81,7 +82,7 @@ class XlmAccountActivityTest {
         assertEquals(TransactionSummary.Direction.RECEIVED, activityItem.direction)
         assertEquals(1, activityItem.confirmations.toLong())
         assertFalse(activityItem.isFeeTransaction)
-        assertEquals(output, activityItem.cryptoValue.amount)
+        assertEquals(output, activityItem.value.toBigInteger())
         assertEquals(
             mapOf(HORIZON_ACCOUNT_ID_2 to CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)),
             activityItem.inputsMap

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payment.Payment
 import org.apache.commons.lang3.tuple.Pair
@@ -24,9 +25,9 @@ class TransactionHelper(
      */
     fun filterNonChangeBtcAddresses(
         tx: NonCustodialActivitySummaryItem
-    ): Pair<Map<String, CryptoValue>, Map<String, CryptoValue>> {
-        val inputMap = HashMap<String, CryptoValue>()
-        val outputMap = HashMap<String, CryptoValue>()
+    ): Pair<Map<String, Money>, Map<String, Money>> {
+        val inputMap = HashMap<String, Money>()
+        val outputMap = HashMap<String, Money>()
         val inputXpubList = ArrayList<String>()
 
         // Inputs / From field
@@ -76,12 +77,12 @@ class TransactionHelper(
                 // (inputs x and y could send to output y in which case y is not receiving change,
                 // but rather the total amount)
                 if (inputMap.containsKey(outputAddress) &&
-                    outputValue.amount.abs().compareTo(tx.cryptoValue.amount) != 0
+                    outputValue.toBigInteger().abs().compareTo(tx.value.toBigInteger()) != 0
                 ) {
                     continue // change back to same input address
                 }
                 // Output more than tx amount - change
-                if (outputValue.amount.abs() > tx.cryptoValue.amount) {
+                if (outputValue.toBigInteger().abs() > tx.value.toBigInteger()) {
                     continue
                 }
                 outputMap[outputAddress] = outputValue
@@ -96,14 +97,14 @@ class TransactionHelper(
 
     fun filterNonChangeBchAddresses(
         tx: NonCustodialActivitySummaryItem
-    ): Pair<Map<String, CryptoValue>, Map<String, CryptoValue>> {
-        val inputMap = HashMap<String, CryptoValue>()
-        val outputMap = HashMap<String, CryptoValue>()
+    ): Pair<Map<String, Money>, Map<String, Money>> {
+        val inputMap = HashMap<String, Money>()
+        val outputMap = HashMap<String, Money>()
         val inputXpubList = ArrayList<String>()
         // Inputs / From field
         if (tx.direction == TransactionSummary.Direction.RECEIVED && tx.inputsMap.isNotEmpty()) {
             for ((address, value) in tx.inputsMap) {
-                if (value.amount == Payment.DUST)
+                if (value.toBigInteger() == Payment.DUST)
                     continue
                 inputMap[address] = value
             }
@@ -114,7 +115,7 @@ class TransactionHelper(
                 // The address belongs to us
                 val xpub = bchDataManager.getXpubFromAddress(inputAddress)
                 // Skip dust input
-                if (inputValue.amount == Payment.DUST)
+                if (inputValue.toBigInteger() == Payment.DUST)
                     continue
                 // Address belongs to xpub we own
                 if (xpub != null) { // Only add xpub once
@@ -131,7 +132,7 @@ class TransactionHelper(
         for (outputAddress in tx.outputsMap.keys) {
             val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.ZeroBch
             // Skip dust output
-            if (outputValue.amount == Payment.DUST)
+            if (outputValue.toBigInteger() == Payment.DUST)
                 continue
 
             if (bchDataManager.isOwnAddress(outputAddress)) {
@@ -156,12 +157,12 @@ class TransactionHelper(
                 // (inputs x and y could send to output y in which case y is not receiving change,
                 // but rather the total amount)
                 if (inputMap.containsKey(outputAddress) &&
-                    outputValue.amount.abs().compareTo(tx.cryptoValue.amount) != 0
+                    outputValue.toBigInteger().abs().compareTo(tx.value.toBigInteger()) != 0
                 ) {
                     continue // change back to same input address
                 }
                 // Output more than tx amount - change
-                if (outputValue.amount.abs() > tx.cryptoValue.amount) {
+                if (outputValue.toBigInteger().abs() > tx.value.toBigInteger()) {
                     continue
                 }
                 outputMap[outputAddress] = outputValue

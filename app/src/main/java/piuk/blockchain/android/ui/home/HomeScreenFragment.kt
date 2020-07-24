@@ -1,9 +1,10 @@
 package piuk.blockchain.android.ui.home
 
 import androidx.fragment.app.Fragment
-import piuk.blockchain.android.campaign.CampaignType
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
@@ -11,7 +12,6 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import java.lang.IllegalStateException
 
 interface HomeScreenFragment {
     fun navigator(): HomeNavigator
@@ -45,9 +45,11 @@ interface HomeNavigator {
     fun launchTransfer()
     fun launchIntroTour()
 
+    @Deprecated(message = "Switch to accounts")
     fun gotoSendFor(cryptoCurrency: CryptoCurrency)
-    fun gotoReceiveFor(cryptoCurrency: CryptoCurrency)
-    fun gotoActivityFor(account: CryptoAccount)
+    fun gotoSendFor(account: SingleAccount)
+    fun gotoReceiveFor(account: SingleAccount)
+    fun gotoActivityFor(account: BlockchainAccount?)
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy()

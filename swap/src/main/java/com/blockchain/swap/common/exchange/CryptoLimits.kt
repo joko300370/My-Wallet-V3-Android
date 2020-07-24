@@ -1,7 +1,8 @@
 package com.blockchain.swap.common.exchange
 
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.compareTo
+import info.blockchain.balance.Money.Companion.max
+import info.blockchain.balance.Money.Companion.min
 
 class CryptoLimits(
     private val minCryptoValue: CryptoValue,
@@ -18,6 +19,6 @@ class CryptoLimits(
     fun clamp(value: CryptoValue) =
         when {
             minCryptoValue > maxCryptoValue -> CryptoValue.zero(value.currency)
-            else -> CryptoValue.min(CryptoValue.max(value, minCryptoValue), maxCryptoValue)
+            else -> min(max(value, minCryptoValue), maxCryptoValue)
         }
 }

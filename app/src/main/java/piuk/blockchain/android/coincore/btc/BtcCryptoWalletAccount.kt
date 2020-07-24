@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.btc
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
@@ -14,7 +15,6 @@ import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
-import java.math.BigInteger
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BtcCryptoWalletAccount(
@@ -22,19 +22,20 @@ internal class BtcCryptoWalletAccount(
     private val address: String,
     private val payloadDataManager: PayloadDataManager,
     override val isDefault: Boolean = false,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.BTC
 ) : CryptoNonCustodialAccount(CryptoCurrency.BTC) {
-    private var hasFunds = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<CryptoValue>
-        get() = payloadDataManager.getAddressBalanceRefresh(address).doOnSuccess {
-            if (it.amount > BigInteger.ZERO) {
-                hasFunds.set(true)
+    override val balance: Single<Money>
+        get() = payloadDataManager.getAddressBalanceRefresh(address)
+            .doOnSuccess {
+                hasFunds.set(it > CryptoValue.ZeroBtc)
             }
-        }
+            .map { it as Money }
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = payloadDataManager.getNextReceiveAddress(

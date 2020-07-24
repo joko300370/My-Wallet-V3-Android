@@ -20,7 +20,9 @@ import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class SimpleBuyBankDetailsFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen,
@@ -70,14 +72,25 @@ class SimpleBuyBankDetailsFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent
         val amount = newState.order.amount
         if (newState.bankAccount != null && amount != null) {
             bank_details_container.initWithBankDetailsAndAmount(
-                newState.bankAccount.details,
-                amount,
+                newState.bankAccount.details.map {
+                    BankDetailField(it.title, it.value, it.isCopyable)
+                }.toMutableList().apply {
+                    add(BankDetailField(
+                        getString(R.string.simple_buy_amount_to_send),
+                        amount.toStringWithSymbol(),
+                        false
+                    )
+                    )
+                },
                 this
             )
             secure_transfer.text = getString(
                 R.string.simple_buy_securely_transfer,
                 newState.order.amount?.currencyCode ?: ""
             )
+        } else {
+            bank_details_container.gone()
+            bank_details_error.visible()
         }
     }
 

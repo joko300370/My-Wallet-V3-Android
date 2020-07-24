@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingBottom="8dp"
-                android:text="@string/from"
+                android:text="@string/common_from"
                 android:textColor="@color/primary_grey_dark"
                 android:textSize="14sp" />
 
@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingBottom="8dp"
-                android:text="@string/to"
+                android:text="@string/common_to"
                 android:textColor="@color/primary_grey_medium"
                 android:textSize="14sp" />
 

@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.erc20
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -21,7 +22,7 @@ abstract class Erc20NonCustodialAccountBase(
 
     override val isDefault: Boolean = true // Only one account, so always default
 
-    override val balance: Single<CryptoValue>
+    override val balance: Single<Money>
         get() = erc20Account.getBalance()
             .map { CryptoValue.fromMinor(cryptoCurrency, it) }
 
@@ -59,4 +60,6 @@ abstract class Erc20NonCustodialAccountBase(
                 }
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
+
+    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
 }

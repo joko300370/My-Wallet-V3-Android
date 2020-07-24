@@ -19,6 +19,8 @@ data class NabuUser(
     val address: Address?,
     val state: UserState,
     val kycState: KycState,
+    private val productsUsed: ProductsUsed? = null,
+    private val settings: NabuSettings? = null,
     val resubmission: Any? = null,
     /**
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
@@ -28,7 +30,6 @@ data class NabuUser(
      * ISO-8601 Timestamp w/millis, eg 2018-08-15T17:00:45.129Z
      */
     val updatedAt: String? = null,
-    val settings: NabuSettings? = null,
     val tags: Map<String, Map<String, String>>? = null,
     val userName: String? = null,
     val tiers: TierLevels? = null,
@@ -74,6 +75,9 @@ data class NabuUser(
 
     val isStxAirdropRegistered: Boolean
         get() = tags?.get("BLOCKSTACK") != null
+
+    val exchangeEnabled: Boolean
+        get() = productsUsed?.exchange ?: settings?.MERCURY_EMAIL_VERIFIED ?: false
 }
 
 data class TierLevels(
@@ -203,3 +207,11 @@ class UserStateAdapter {
         private const val BLOCKED = "BLOCKED"
     }
 }
+
+data class ProductsUsed(
+    val exchange: Boolean = false
+)
+
+data class NabuSettings(
+    val MERCURY_EMAIL_VERIFIED: Boolean
+)

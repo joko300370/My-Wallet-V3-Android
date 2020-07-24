@@ -63,7 +63,7 @@ internal class ReceiveQrActivity :
             .setTitle(R.string.app_name)
             .setMessage(R.string.receive_address_to_clipboard)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
                     getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip =
@@ -74,7 +74,7 @@ internal class ReceiveQrActivity :
                     ToastCustom.TYPE_GENERAL)
                 clipboard.primaryClip = clip
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 

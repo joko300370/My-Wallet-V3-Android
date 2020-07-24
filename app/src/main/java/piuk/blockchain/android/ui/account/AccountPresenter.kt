@@ -21,7 +21,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.currency.CurrencyState
@@ -31,7 +30,6 @@ import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -261,34 +259,6 @@ class AccountPresenter internal constructor(
         }
     }
 
-    /**
-     * Create [LegacyAddress] from correctly formatted address string, show rename dialog
-     * after finishing
-     *
-     * @param address The address to be saved
-     */
-    @SuppressLint("CheckResult")
-    internal fun confirmImportWatchOnly(address: String) {
-        val legacyAddress = LegacyAddress()
-        legacyAddress.address = address
-        legacyAddress.createdDeviceName = "android"
-        legacyAddress.createdTime = System.currentTimeMillis()
-        legacyAddress.createdDeviceVersion = BuildConfig.VERSION_NAME
-
-        compositeDisposable += payloadDataManager.addLegacyAddress(legacyAddress)
-            .doOnError { Timber.e(it) }
-            .subscribe(
-                {
-                    analytics.logEvent(AddressAnalytics.ImportBTCAddress)
-                    view.showRenameImportedAddressDialog(legacyAddress)
-                    Logging.logEvent(importEvent(AddressType.WATCH_ONLY))
-                },
-                {
-                    view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR)
-                }
-            )
-    }
-
     private fun importWatchOnlyAddress(address: String) {
         val addressCopy = correctAddressFormatting(address)
 
@@ -404,6 +374,10 @@ class AccountPresenter internal constructor(
         accountsAndImportedList.add(AccountItem(AccountItem.TYPE_IMPORT_ADDRESS_BUTTON))
 
         for (legacyAddress in getLegacyAddresses()) {
+            if (legacyAddress.isWatchOnly) {
+                continue
+            }
+
             var label: String? = legacyAddress.label
             val address: String = legacyAddress.address ?: ""
             val balance = getBtcAddressBalance(address)
@@ -533,14 +507,14 @@ class AccountPresenter internal constructor(
 
     private fun shouldShow(cryptoCurrency: CryptoCurrency): Boolean =
         when (cryptoCurrency) {
-            CryptoCurrency.BTC -> true
+            CryptoCurrency.BTC,
             CryptoCurrency.BCH -> true
-            CryptoCurrency.ETHER -> false
-            CryptoCurrency.XLM -> false
-            CryptoCurrency.PAX -> false
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> false
+            CryptoCurrency.ETHER,
+            CryptoCurrency.XLM,
+            CryptoCurrency.PAX,
+            CryptoCurrency.ALGO,
             CryptoCurrency.USDT -> false
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 
     companion object {

@@ -32,7 +32,7 @@
             android:text="@string/transfer_send_crypto"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <piuk.blockchain.android.ui.customviews.account.AccountList
             android:id="@+id/account_list"
             android:layout_width="0dp"
             android:layout_height="0dp"

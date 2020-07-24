@@ -9,8 +9,8 @@ import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CryptoSingleAccount
-import piuk.blockchain.android.coincore.CryptoSingleAccountList
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
@@ -19,9 +19,8 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-internal class PaxTokens(
-    override val asset: CryptoCurrency = CryptoCurrency.PAX,
-    erc20Account: Erc20Account,
+internal class PaxAsset(
+    private val paxAccount: Erc20Account,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -30,7 +29,7 @@ internal class PaxTokens(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : Erc20TokensBase(
-    erc20Account,
+    paxAccount,
     custodialManager,
     exchangeRates,
     historicRates,
@@ -40,12 +39,14 @@ internal class PaxTokens(
     crashLogger
 ) {
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<CryptoSingleAccountList> =
+    override val asset = CryptoCurrency.PAX
+
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(listOf(getNonCustodialPaxAccount()))
 
-    private fun getNonCustodialPaxAccount(): CryptoSingleAccount {
-        val paxAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
-            ?: throw Exception("No PAX wallet found")
+    private fun getNonCustodialPaxAccount(): CryptoAccount {
+        val paxAddress = paxAccount.ethDataManager.getEthWallet()?.account?.address
+            ?: throw Exception("No ether wallet found")
 
         return PaxCryptoWalletAccount(
             labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX), paxAddress, erc20Account,
@@ -56,7 +57,11 @@ internal class PaxTokens(
         Single.just(emptyList())
 
     override fun parseAddress(address: String): CryptoAddress? =
-        null
+        if (isValidAddress(address)) {
+            PaxAddress(address)
+        } else {
+            null
+        }
 
     private fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)

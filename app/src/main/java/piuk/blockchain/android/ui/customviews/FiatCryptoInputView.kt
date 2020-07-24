@@ -18,17 +18,15 @@ import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
-import piuk.blockchain.androidcore.data.exchangerate.toFiat
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
-import java.lang.IllegalStateException
 import java.text.DecimalFormatSymbols
-import java.util.Locale
 import java.util.Currency
+import java.util.Locale
 import kotlin.properties.Delegates
 
 class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
@@ -49,6 +47,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
         enter_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(s: Editable?) {
+                if (configuration.isInitialised.not())
+                    return
                 if (configuration.input == CurrencyType.Fiat) {
 
                     val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
@@ -152,6 +152,12 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             it.isEnabled = true
             it.alpha = 1f
         }
+    }
+
+    fun showValue(money: Money) {
+        configuration = configuration.copy(
+            predefinedAmount = money
+        )
     }
 
     private fun updateFilters(prefixOrSuffix: String) {

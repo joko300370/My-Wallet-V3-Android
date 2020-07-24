@@ -94,7 +94,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
     private fun getValueForType(infoType: ActivityDetailsType): String =
         when (infoType) {
             is Created -> infoType.date.toFormattedString()
-            is Amount -> infoType.cryptoValue.toStringWithSymbol()
+            is Amount -> infoType.value.toStringWithSymbol()
             is Fee -> infoType.feeValue?.toStringWithSymbol() ?: parent.context.getString(
                 R.string.activity_details_fee_load_fail)
             is Value -> infoType.currentFiatValue?.toStringWithSymbol() ?: parent.context.getString(
@@ -120,18 +120,25 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyTransactionId -> infoType.txId
             is BuyCryptoWallet -> parent.context.getString(R.string.custodial_wallet_default_label,
                 parent.context.getString(infoType.crypto.assetName()))
-            is BuyPaymentMethod ->
-                if (infoType.paymentDetails.paymentMethodId == PaymentMethod.BANK_PAYMENT_ID) {
-                    parent.context.getString(R.string.checkout_bank_transfer_label)
-                } else if (infoType.paymentDetails.endDigits != null &&
-                    infoType.paymentDetails.label != null) {
-                    parent.context.getString(R.string.common_hyphenated_strings,
-                        infoType.paymentDetails.label,
-                        infoType.paymentDetails.endDigits)
-                } else {
-                    parent.context.getString(
-                        R.string.activity_details_payment_load_fail)
+            is BuyPaymentMethod -> {
+                when {
+                    infoType.paymentDetails.paymentMethodId == PaymentMethod.BANK_PAYMENT_ID -> {
+                        parent.context.getString(R.string.checkout_bank_transfer_label)
+                    }
+                    infoType.paymentDetails.endDigits != null &&
+                        infoType.paymentDetails.label != null -> {
+                        parent.context.getString(R.string.common_hyphenated_strings,
+                            infoType.paymentDetails.label,
+                            infoType.paymentDetails.endDigits)
+                    }
+                    infoType.paymentDetails.paymentMethodId == PaymentMethod.FUNDS_PAYMENT_ID -> {
+                        parent.context.getString(R.string.checkout_funds_label)
+                    }
+                    else -> {
+                        parent.context.getString(R.string.activity_details_payment_load_fail)
+                    }
                 }
+            }
             else -> ""
         }
 }

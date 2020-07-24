@@ -45,7 +45,9 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
@@ -73,6 +75,7 @@ import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.TestSendContainerActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -400,6 +403,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
+            R.id.stub_send_test -> TestSendContainerActivity.start(this)
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
@@ -667,6 +671,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startSendFragment(null)
     }
 
+    override fun gotoSendFor(account: SingleAccount) {
+        if (account is CryptoAccount) {
+            presenter.cryptoCurrency = account.asset
+            startSendFragment(null)
+        }
+    }
+
     private fun startSendFragment(input: String?, isDeeplinked: Boolean = false) {
         setCurrentTabItem(ITEM_TRANSFER)
 
@@ -678,11 +689,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(transferFragment)
     }
 
-    override fun gotoReceiveFor(cryptoCurrency: CryptoCurrency) {
-        presenter.cryptoCurrency = cryptoCurrency
-        setCurrentTabItem(ITEM_TRANSFER)
-        ViewUtils.setElevation(appbar_layout, 0f)
-        startReceiveFragment()
+    override fun gotoReceiveFor(account: SingleAccount) {
+        if (account is CryptoAccount) {
+            presenter.cryptoCurrency = account.asset
+            setCurrentTabItem(ITEM_TRANSFER)
+            ViewUtils.setElevation(appbar_layout, 0f)
+            //startReceiveFragment()
+        }
     }
 
     private fun startReceiveFragment() {
@@ -713,8 +726,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(fragment)
     }
 
-    override fun gotoActivityFor(account: CryptoAccount) {
-        presenter.cryptoCurrency = account.cryptoCurrencies.first()
+    override fun gotoActivityFor(account: BlockchainAccount?) {
+        // Once coincore is fully integrated, we won't care about setting the
+        // asset dropdown to the currently/active cryptocurrency.
+        // For now, we'll only set it if we're actually looking at a crypto asset
+        if (account != null && account is CryptoAccount) {
+            presenter.cryptoCurrency = account.asset
+        }
         startActivitiesFragment(account)
     }
 
@@ -736,7 +754,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
-    private fun startActivitiesFragment(account: CryptoAccount? = null) {
+    private fun startActivitiesFragment(account: BlockchainAccount? = null) {
         setCurrentTabItem(ITEM_ACTIVITY)
         val fragment = ActivitiesFragment.newInstance(account)
         replaceContentFragment(fragment)

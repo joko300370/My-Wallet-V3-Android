@@ -1,17 +1,20 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.usdtAccount
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.coincore.alg.AlgoTokens
-import piuk.blockchain.android.coincore.bch.BchTokens
-import piuk.blockchain.android.coincore.btc.BtcTokens
-import piuk.blockchain.android.coincore.erc20.pax.PaxTokens
-import piuk.blockchain.android.coincore.erc20.usdt.UsdtTokens
-import piuk.blockchain.android.coincore.eth.EthTokens
-import piuk.blockchain.android.coincore.stx.StxTokens
-import piuk.blockchain.android.coincore.xlm.XlmTokens
+import piuk.blockchain.android.coincore.alg.AlgoAsset
+import piuk.blockchain.android.coincore.bch.BchAsset
+import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
+import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
+import piuk.blockchain.android.coincore.eth.EthAsset
+import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.stx.StxAsset
+import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
 
 val coincoreModule = module {
@@ -19,7 +22,7 @@ val coincoreModule = module {
     scope(payloadScopeQualifier) {
 
         scoped {
-            StxTokens(
+            StxAsset(
                 payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -32,7 +35,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            BtcTokens(
+            BtcAsset(
                 exchangeRates = get(),
                 environmentSettings = get(),
                 historicRates = get(),
@@ -46,7 +49,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            BchTokens(
+            BchAsset(
                 bchDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -61,7 +64,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            XlmTokens(
+            XlmAsset(
                 xlmDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -74,7 +77,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            EthTokens(
+            EthAsset(
                 ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
@@ -88,8 +91,8 @@ val coincoreModule = module {
         }
 
         scoped {
-            PaxTokens(
-                erc20Account = get(),
+            PaxAsset(
+                paxAccount = get(paxAccount),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -101,7 +104,7 @@ val coincoreModule = module {
         }
 
         scoped {
-            AlgoTokens(
+            AlgoAsset(
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -113,8 +116,19 @@ val coincoreModule = module {
         }
 
         scoped {
-            UsdtTokens(
-                erc20Account = get(),
+            FiatAsset(
+                labels = get(),
+                assetBalancesRepository = get(),
+                exchangeRateDataManager = get(),
+                custodialWalletManager = get(),
+                tierService = get(),
+                currencyPrefs = get()
+            )
+        }
+
+        scoped {
+            UsdtAsset(
+                usdtAccount = get(usdtAccount),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -128,15 +142,16 @@ val coincoreModule = module {
         scoped {
             Coincore(
                 payloadManager = get(),
-                tokenMap = mapOf(
-                    CryptoCurrency.BTC to get<BtcTokens>(),
-                    CryptoCurrency.BCH to get<BchTokens>(),
-                    CryptoCurrency.ETHER to get<EthTokens>(),
-                    CryptoCurrency.XLM to get<XlmTokens>(),
-                    CryptoCurrency.PAX to get<PaxTokens>(),
-                    CryptoCurrency.STX to get<StxTokens>(),
-                    CryptoCurrency.ALGO to get<AlgoTokens>(),
-                    CryptoCurrency.USDT to get<UsdtTokens>()
+                fiatAsset = get<FiatAsset>(),
+                assetMap = mapOf(
+                    CryptoCurrency.BTC to get<BtcAsset>(),
+                    CryptoCurrency.BCH to get<BchAsset>(),
+                    CryptoCurrency.ETHER to get<EthAsset>(),
+                    CryptoCurrency.XLM to get<XlmAsset>(),
+                    CryptoCurrency.PAX to get<PaxAsset>(),
+                    CryptoCurrency.STX to get<StxAsset>(),
+                    CryptoCurrency.ALGO to get<AlgoAsset>(),
+                    CryptoCurrency.USDT to get<UsdtAsset>()
                 ),
                 defaultLabels = get()
             )

@@ -51,8 +51,8 @@
   <string name="toolbar_cmd_swap">Zamiana</string>
   <string name="cancel">Anuluj</string>
   <string name="btn_ok">dobrze</string>
-  <string name="yes">tak</string>
-  <string name="no">Nie</string>
+  <string name="common_yes">tak</string>
+  <string name="common_no">Nie</string>
   <string name="polite_no">Nie, dziękuję</string>
   <string name="done">Gotowy</string>
   <string name="btn_close">Blisko</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Kontyntynuj</string>
   <string name="btn_forgot_password">Zapomniałeś hasła?\"</string>
   <string name="SEND">Wysłać</string>
-  <string name="total">Całkowity</string>
+  <string name="common_total">Całkowity</string>
   <string name="max_available">Użyj całkowitego salda do wydania:</string>
   <string name="bitpay_remaining_time">Pozostały czas</string>
   <string name="bitpay_invoice_expired">Faktura BitPay wygasła</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Wybrane hasło jest zbyt słabe, aby zabezpieczyć twoje środki. My zdecydowanie 
  sugeruję wybrać inny. Czy chcesz zdefiniować nowe hasło? 
 </string>
-  <string name="from">Od</string>
-  <string name="to">Do</string>
+  <string name="common_from">Od</string>
+  <string name="common_to">Do</string>
   <string name="confirm_details">Potwierdź płatność</string>
   <string name="fee">Opłata</string>
   <string name="exit_confirm">Naciśnij ponownie przycisk Wstecz, aby wyjść</string>
