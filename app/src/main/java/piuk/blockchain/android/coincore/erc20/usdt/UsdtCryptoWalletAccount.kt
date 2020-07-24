@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore.erc20.usdt
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account

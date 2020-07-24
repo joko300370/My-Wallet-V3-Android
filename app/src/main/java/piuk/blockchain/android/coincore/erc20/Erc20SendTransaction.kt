@@ -89,14 +89,14 @@ class Erc20SendTransaction(
 
     private fun validateAmount(pendingTx: PendingSendTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.ZeroEth) {
+            if (pendingTx.amount <= CryptoValue.ZeroUsdt) {
                 throw SendValidationError(SendValidationError.INVALID_AMOUNT)
             }
         }
 
     private fun validateSufficientFunds(pendingTx: PendingSendTx): Completable =
         sendingAccount.balance
-            .map{ balance ->
+            .map { balance ->
                 if (pendingTx.amount > balance) {
                     throw SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
                 } else {
@@ -105,14 +105,16 @@ class Erc20SendTransaction(
             }.ignoreElement()
 
     private fun validateSufficientGas(pendingTx: PendingSendTx): Completable =
-        getEthAccountBalance()
-            .map{ balance ->
-                if (pendingTx.amount > balance) {
-                    throw SendValidationError(SendValidationError.INSUFFICIENT_GAS)
-                } else {
-                    true
-                }
-            }.ignoreElement()
+        Singles.zip(
+            getEthAccountBalance(),
+            absoluteFee(pendingTx)
+        ) { balance, fee ->
+            if (fee > balance) {
+                throw SendValidationError(SendValidationError.INSUFFICIENT_GAS)
+            } else {
+                true
+            }
+        }.ignoreElement()
 
     private fun validateNoPendingTx() =
         ethDataManager.isLastTxPending()

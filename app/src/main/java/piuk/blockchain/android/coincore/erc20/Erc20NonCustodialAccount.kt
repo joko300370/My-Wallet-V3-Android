@@ -91,7 +91,7 @@ abstract class Erc20NonCustodialAccount(
                     erc20Account = erc20Account,
                     feeManager = fees,
                     sendingAccount = this,
-                    sendTarget =  sendTo as Erc20Address,
+                    sendTarget = sendTo as Erc20Address,
                     requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             )
