@@ -22,9 +22,7 @@ enum class SendStep {
     ENTER_ADDRESS,
     ENTER_AMOUNT,
     CONFIRM_DETAIL,
-    IN_PROGRESS,
-    SEND_ERROR,
-    SEND_COMPLETE
+    IN_PROGRESS
 }
 
 enum class SendErrorState {

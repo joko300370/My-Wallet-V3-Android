@@ -44,7 +44,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun render(newState: SimpleBuyState) {
         transaction_progress_view.setAssetIcon(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
-        //icon.setImageResource(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
+        // icon.setImageResource(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
             model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
             isFirstLoad = false
@@ -78,7 +78,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 newState.everypayAuthOptions.paymentLink,
                 newState.everypayAuthOptions.exitLink
             )
-            //progress.visibility = View.GONE
+            // progress.visibility = View.GONE
         }
     }
 
@@ -93,17 +93,18 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             paymentSucceeded && value != null -> {
                 transaction_progress_view.showTxSuccess(
                     getString(R.string.card_purchased, value.formatOrSymbolForZero()),
-                getString(R.string.card_purchased_available_now, getString(value.currency.assetName())))
+                    getString(R.string.card_purchased_available_now,
+                        getString(value.currency.assetName())))
             }
             loading && value != null -> {
                 transaction_progress_view.showTxInProgress(
-                 getString(R.string.card_buying, value.formatOrSymbolForZero()),
-                 getString(R.string.completing_card_buy))
+                    getString(R.string.card_buying, value.formatOrSymbolForZero()),
+                    getString(R.string.completing_card_buy))
             }
             pending && value != null -> {
                 transaction_progress_view.showTxPending(
-                 getString(R.string.card_in_progress, value.formatOrSymbolForZero()),
-                getString(R.string.we_will_notify_order_complete))
+                    getString(R.string.card_in_progress, value.formatOrSymbolForZero()),
+                    getString(R.string.we_will_notify_order_complete))
             }
             hasError -> {
                 transaction_progress_view.showTxError(
@@ -130,7 +131,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     }
 
     override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator) ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+        (activity as? SimpleBuyNavigator) ?: throw IllegalStateException(
+            "Parent must implement SimpleBuyNavigator")
 
     override fun onBackPressed(): Boolean = true
 

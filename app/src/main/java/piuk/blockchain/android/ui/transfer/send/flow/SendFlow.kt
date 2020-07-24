@@ -13,8 +13,6 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
-import piuk.blockchain.android.ui.transfer.send.TransactionCompleteSheet
-import piuk.blockchain.android.ui.transfer.send.TransactionInProgressSheet
 import piuk.blockchain.android.ui.transfer.send.closeSendScope
 import piuk.blockchain.android.ui.transfer.send.createSendScope
 import piuk.blockchain.android.ui.transfer.send.sendScope
@@ -74,9 +72,7 @@ class SendFlow(
                 SendStep.ENTER_ADDRESS -> EnterTargetAddressSheet.newInstance()
                 SendStep.ENTER_AMOUNT -> EnterAmountSheet.newInstance()
                 SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet.newInstance()
-                SendStep.IN_PROGRESS -> TransactionInProgressSheet.newInstance()
-                SendStep.SEND_ERROR -> TransactionErrorSheet.newInstance()
-                SendStep.SEND_COMPLETE -> TransactionCompleteSheet.newInstance()
+                SendStep.IN_PROGRESS -> TransactionProgressSheet.newInstance()
             }
         )
     }

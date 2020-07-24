@@ -30,7 +30,7 @@ class TransactionProgressView(context: Context, attrs: AttributeSet)
         tx_progress.visible()
         tx_state_indicator.gone()
         tx_title.text = title
-        tx_subtitle.text= subtitle
+        tx_subtitle.text = subtitle
     }
 
     fun showTxPending(title: String, subtitle: String) {
@@ -38,7 +38,7 @@ class TransactionProgressView(context: Context, attrs: AttributeSet)
         tx_state_indicator.visible()
         tx_state_indicator.setImageResource(R.drawable.ic_pending_clock)
         tx_title.text = title
-        tx_subtitle.text= subtitle
+        tx_subtitle.text = subtitle
     }
 
     fun showTxSuccess(title: String, subtitle: String) {
@@ -46,7 +46,7 @@ class TransactionProgressView(context: Context, attrs: AttributeSet)
         tx_state_indicator.gone()
         tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_title.text = title
-        tx_subtitle.text= subtitle
+        tx_subtitle.text = subtitle
     }
 
     fun showTxError(title: String, subtitle: String) {
@@ -54,6 +54,6 @@ class TransactionProgressView(context: Context, attrs: AttributeSet)
         tx_state_indicator.gone()
         tx_icon.setImageResource(R.drawable.ic_alert)
         tx_title.text = title
-        tx_subtitle.text= subtitle
+        tx_subtitle.text = subtitle
     }
 }
