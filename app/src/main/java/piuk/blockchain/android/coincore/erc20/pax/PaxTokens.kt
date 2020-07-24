@@ -19,9 +19,11 @@ import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 internal class PaxAsset(
-    private val paxAccount: Erc20Account,
+    paxAccount: Erc20Account,
+    feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -31,6 +33,7 @@ internal class PaxAsset(
     crashLogger: CrashLogger
 ) : Erc20TokensBase(
     paxAccount,
+    feeDataManager,
     custodialManager,
     exchangeRates,
     historicRates,
@@ -46,12 +49,16 @@ internal class PaxAsset(
         Single.just(listOf(getNonCustodialPaxAccount()))
 
     private fun getNonCustodialPaxAccount(): CryptoAccount {
-        val paxAddress = paxAccount.ethDataManager.getEthWallet()?.account?.address
+        val paxAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No ether wallet found")
 
         return PaxCryptoWalletAccount(
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX), paxAddress, erc20Account,
-            exchangeRates)
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
+            paxAddress,
+            erc20Account,
+            feeDataManager,
+            exchangeRates
+        )
     }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =

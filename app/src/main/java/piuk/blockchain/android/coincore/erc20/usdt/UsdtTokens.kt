@@ -19,10 +19,11 @@ import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 internal class UsdtAsset(
-    override val asset: CryptoCurrency = CryptoCurrency.USDT,
     usdtAccount: Erc20Account,
+    feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -32,6 +33,7 @@ internal class UsdtAsset(
     pitLinking: PitLinking
 ) : Erc20TokensBase(
     usdtAccount,
+    feeDataManager,
     custodialManager,
     exchangeRates,
     historicRates,
@@ -40,6 +42,8 @@ internal class UsdtAsset(
     pitLinking,
     crashLogger
 ) {
+    override val asset: CryptoCurrency = CryptoCurrency.USDT
+
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(listOf(getNonCustodialUsdtAccount()))
 
@@ -47,8 +51,13 @@ internal class UsdtAsset(
         val usdtAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No USDT wallet found")
 
-        return UsdtCryptoWalletAccount(labels.getDefaultNonCustodialWalletLabel(asset), usdtAddress,
-            erc20Account, exchangeRates)
+        return UsdtCryptoWalletAccount(
+            labels.getDefaultNonCustodialWalletLabel(asset),
+            usdtAddress,
+            erc20Account,
+            feeDataManager,
+            exchangeRates
+        )
     }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =

@@ -11,6 +11,8 @@ class SendValidationError(errorCode: Int) : TransferError("Invalid Send Tx: code
         const val HAS_TX_IN_FLIGHT = 1000
         const val INVALID_AMOUNT = 1001
         const val INSUFFICIENT_FUNDS = 1002
+        const val INSUFFICIENT_GAS = 1003
+        const val INVALID_ADDRESS = 1004
     }
 }
 
@@ -29,7 +31,7 @@ data class PendingSendTx(
 
 interface SendProcessor {
     val sendingAccount: CryptoAccount
-    val address: ReceiveAddress
+    val sendTarget: ReceiveAddress
 
     val feeOptions: Set<FeeLevel>
     val isNoteSupported: Boolean

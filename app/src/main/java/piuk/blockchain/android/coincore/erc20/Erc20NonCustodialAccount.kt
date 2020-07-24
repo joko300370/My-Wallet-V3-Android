@@ -20,13 +20,18 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 
 abstract class Erc20NonCustodialAccount(
     asset: CryptoCurrency,
     override val label: String,
+    private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(asset) {
+
+    final override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
+
     abstract val erc20Account: Erc20Account
 
     private val ethDataManager: EthDataManager
@@ -71,8 +76,6 @@ abstract class Erc20NonCustodialAccount(
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
-
     override val actions: AvailableActions = setOf(
         AssetAction.ViewActivity,
         AssetAction.NewSend,
@@ -86,9 +89,9 @@ abstract class Erc20NonCustodialAccount(
                 Erc20SendTransaction(
                     asset = asset,
                     erc20Account = erc20Account,
-//                fees,
+                    feeManager = fees,
                     sendingAccount = this,
-                    address = sendTo as Erc20Address,
+                    sendTarget =  sendTo as Erc20Address,
                     requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             )
@@ -96,9 +99,9 @@ abstract class Erc20NonCustodialAccount(
                 Erc20SendTransaction(
                     asset = asset,
                     erc20Account = erc20Account,
-//                fees,
+                    feeManager = fees,
                     sendingAccount = this,
-                    address = sendTo as Erc20Address,
+                    sendTarget = sendTo as Erc20Address,
                     requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             }

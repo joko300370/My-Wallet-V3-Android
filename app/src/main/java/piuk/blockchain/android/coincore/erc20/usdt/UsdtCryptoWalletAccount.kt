@@ -8,16 +8,18 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 internal class UsdtCryptoWalletAccount(
     label: String,
     private val address: String,
     override val erc20Account: Erc20Account,
-    exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
+    feeDataManager: FeeDataManager,
+    exchangeRates: ExchangeRateDataManager
 ) : Erc20NonCustodialAccount(
     CryptoCurrency.USDT,
     label,
+    feeDataManager,
     exchangeRates
 ) {
     override val receiveAddress: Single<ReceiveAddress>
@@ -25,11 +27,9 @@ internal class UsdtCryptoWalletAccount(
             UsdtAddress(address, label)
         )
 
-    override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = setOf(
+    override val actions = setOf(
         AssetAction.ViewActivity,
+        AssetAction.NewSend,
         AssetAction.Swap
     )
 }

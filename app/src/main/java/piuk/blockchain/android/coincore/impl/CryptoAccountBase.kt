@@ -60,9 +60,10 @@ open class CustodialTradingAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
-    private val isNoteSupported: Boolean = false,
-    override val feeAsset: CryptoCurrency? = null
+    private val isNoteSupported: Boolean = false
 ) : CryptoAccountBase() {
+
+    override val feeAsset: CryptoCurrency? = null
 
     private val hasSeenFunds = AtomicBoolean(false)
 
@@ -98,7 +99,7 @@ open class CustodialTradingAccount(
             is CryptoAddress -> Single.just(
                 CustodialTransferProcessor(
                     sendingAccount = this,
-                    address = sendTo,
+                    sendTarget = sendTo,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -106,7 +107,7 @@ open class CustodialTradingAccount(
             is CryptoAccount -> sendTo.receiveAddress.map {
                 CustodialTransferProcessor(
                     sendingAccount = this,
-                    address = it as CryptoAddress,
+                    sendTarget = it as CryptoAddress,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -167,9 +168,10 @@ internal class CryptoInterestAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = null
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
+
+    override val feeAsset: CryptoCurrency? = null
 
     private val isConfigured = AtomicBoolean(false)
 
@@ -213,9 +215,10 @@ internal class CryptoExchangeAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = null
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
+
+    override val feeAsset: CryptoCurrency? = null
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))

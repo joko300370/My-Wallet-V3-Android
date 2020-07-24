@@ -12,15 +12,15 @@ class SendError(msg: String) : Exception(msg)
 
 abstract class OnChainSendProcessorBase(
     final override val sendingAccount: CryptoAccount,
-    final override val address: CryptoAddress,
+    final override val sendTarget: CryptoAddress,
     private val requireSecondPassword: Boolean
 ) : SendProcessor {
 
     protected abstract val asset: CryptoCurrency
 
     init {
-        require(address.address.isNotEmpty())
-        require(sendingAccount.asset == address.asset)
+        require(sendTarget.address.isNotEmpty())
+        require(sendingAccount.asset == sendTarget.asset)
     }
 
     final override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =

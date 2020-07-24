@@ -22,8 +22,7 @@ internal class BtcCryptoWalletAccount(
     private val address: String,
     private val payloadDataManager: PayloadDataManager,
     override val isDefault: Boolean = false,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.BTC
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.BTC) {
     private val hasFunds = AtomicBoolean(false)
 
