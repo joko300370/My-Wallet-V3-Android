@@ -1,40 +1,35 @@
-package piuk.blockchain.android.ui.transfer.send
+package piuk.blockchain.android.ui.transfer.receive
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.fragment_transfer_send.*
+import kotlinx.android.synthetic.main.fragment_transfer_receive.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
-class TransferSendFragment :
-    Fragment(),
-    DialogFlow.FlowHost {
+class TransferReceiveFragment : Fragment() {
 
     private val coincore: Coincore by scopedInject()
-
-    private var flow: SendFlow? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = inflater.inflate(R.layout.fragment_transfer_send, container, false)
+    ) = inflater.inflate(R.layout.fragment_transfer_receive, container, false)
 
     private val filterFn: AccountListFilterFn =
         { account -> (account is CryptoAccount) && account.isFunded }
@@ -42,14 +37,14 @@ class TransferSendFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-            send_account_list.onLoadError = ::doOnLoadError
-            send_account_list.onEmptyList = ::doOnEmptyList
-            send_account_list.onAccountSelected = ::doOnAccountSelected
+        receive_account_list.onLoadError = ::doOnLoadError
+        receive_account_list.onEmptyList = ::doOnEmptyList
+        receive_account_list.onAccountSelected = ::doOnAccountSelected
 
-            send_account_list.initialise(
-                coincore.allWallets().map { it.accounts.filter(filterFn) },
-                status = ::statusDecorator
-            )
+        receive_account_list.initialise(
+            coincore.allWallets().map { it.accounts.filter(filterFn) },
+            status = ::statusDecorator
+        )
     }
 
     private fun statusDecorator(account: BlockchainAccount): Single<String> =
@@ -69,25 +64,18 @@ class TransferSendFragment :
         }
 
     private fun doOnEmptyList() {
-        send_account_list.gone()
-        send_blurb.gone()
-        send_empty_view.visible()
-        send_button_buy_crypto.setOnClickListener {
+        receive_account_list.gone()
+        receive_blurb.gone()
+        receive_empty_view.visible()
+        receive_button_buy_crypto.setOnClickListener {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))
         }
     }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
-            flow = SendFlow(
-                account = account,
-                coincore = coincore
-            ).apply {
-                startFlow(
-                    fragmentManager = childFragmentManager,
-                    host = this@TransferSendFragment
-                )
-            }
+            Toast.makeText(requireContext(), "TODO: Implement on account selected",
+                Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -101,11 +89,7 @@ class TransferSendFragment :
         doOnEmptyList()
     }
 
-    override fun onFlowFinished() {
-        flow = null
-    }
-
     companion object {
-        fun newInstance() = TransferSendFragment()
+        fun newInstance() = TransferReceiveFragment()
     }
 }

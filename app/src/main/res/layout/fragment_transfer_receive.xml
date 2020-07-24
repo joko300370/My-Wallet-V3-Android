@@ -8,26 +8,26 @@
     android:background="@color/white">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/send_blurb"
+        android:id="@+id/receive_blurb"
         style="@style/Text.Semibold.20"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/standard_margin"
         android:paddingBottom="@dimen/standard_margin"
-        android:text="@string/transfer_send_crypto"
+        android:text="@string/transfer_receive_crypto"
         app:layout_constraintTop_toTopOf="parent" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
-        android:id="@+id/send_account_list"
+        android:id="@+id/receive_account_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/send_blurb" />
+        app:layout_constraintTop_toBottomOf="@id/receive_blurb" />
 
     <LinearLayout
-        android:id="@+id/send_empty_view"
+        android:id="@+id/receive_empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -58,7 +58,7 @@
             app:srcCompat="@drawable/ic_wallet_intro_image" />
 
         <Button
-            android:id="@+id/send_button_buy_crypto"
+            android:id="@+id/receive_button_buy_crypto"
             style="@style/CtaButton.Blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -9,13 +9,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.receive.ReceiveFragment
-import piuk.blockchain.android.ui.send.SendFragment
+import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
+import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
-    private val viewPagerAdapter: TransferPagerAdapter by lazy {
+    private val pagerAdapter by lazy {
         TransferPagerAdapter(this)
     }
 
@@ -27,7 +27,9 @@ class TransferFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        transfer_pager.adapter = viewPagerAdapter
+
+        transfer_pager.adapter = pagerAdapter
+
         TabLayoutMediator(transfer_tabs, transfer_pager) { tab, position ->
             tab.text = when(position) {
                 0 -> getString(R.string.send)
@@ -53,14 +55,13 @@ class TransferFragment : Fragment() {
     }
 }
 
-private class TransferPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
+class TransferPagerAdapter(fragment: Fragment): FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =
-        when (position) {
-            0 -> SendFragment.newInstance(null)
-            1 -> ReceiveFragment.newInstance(0)
-            else -> throw IllegalStateException("Only two available fragments")
-        }
+        when(position) {
+        0 -> TransferSendFragment.newInstance()
+        1 -> TransferReceiveFragment.newInstance()
+        else -> throw IllegalStateException("Only two fragments allowed")
+    }
 }

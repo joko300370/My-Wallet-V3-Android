@@ -1824,6 +1824,7 @@
     <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
     <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
     <string name="transfer_send_crypto">Send crypto</string>
+    <string name="transfer_receive_crypto">Receive crypto</string>
     <string name="transfer_second_pswd_title">2nd Password</string>
     <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
     <string name="transfer_second_pswd_hint">2nd password</string>
