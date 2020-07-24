@@ -7,10 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -18,26 +14,22 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
 
 typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
 class TransferSendFragment :
     Fragment(),
-    SlidingModalBottomDialog.Host,
-    SendFlow.Listener {
+    DialogFlow.FlowHost {
 
-    private val disposables = CompositeDisposable()
     private val coincore: Coincore by scopedInject()
-    private val uiScheduler = AndroidSchedulers.mainThread()
 
-    private lateinit var flow: SendFlow
+    private var flow: SendFlow? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,12 +42,6 @@ class TransferSendFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        flow = SendFlow(
-            fragmentManager = childFragmentManager,
-            listener = this,
-            disposables = disposables
-        )
 
         account_list.onLoadError = ::doOnLoadError
         account_list.onEmptyList = ::doOnEmptyList
@@ -94,13 +80,15 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
-            disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
-                .subscribeBy(onSuccess = { secondPassword ->
-                    flow.startFlow(account, secondPassword)
-                }, onError = {
-                    Timber.e("Unable to configure send flow, aborting. e == $it")
-                    activity?.finish()
-                })
+            flow = SendFlow(
+                account = account,
+                coincore = coincore
+            ).apply {
+                startFlow(
+                    fragmentManager = childFragmentManager,
+                    host = this@TransferSendFragment
+                )
+            }
         }
     }
 
@@ -114,12 +102,8 @@ class TransferSendFragment :
         doOnEmptyList()
     }
 
-    override fun onSendFlowFinished() {
-        disposables.clear()
-    }
-
-    override fun onSheetClosed() {
-        flow.finishFlow()
+    override fun onFlowFinished() {
+        flow = null
     }
 
     companion object {

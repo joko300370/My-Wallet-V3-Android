@@ -14,9 +14,13 @@ import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.ui.urllinks.makeBlockExplorerUrl
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -58,6 +62,9 @@ class CryptoActivityDetailsBottomSheet :
 
     private lateinit var currentState: ActivityDetailState
 
+    private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
+
     override fun initControls(view: View) {
         view.details_list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -92,8 +99,12 @@ class CryptoActivityDetailsBottomSheet :
                         getString(R.string.activity_details_buy_again)
                     custodial_tx_button.setOnClickListener {
                         analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
-                        startActivity(SimpleBuyActivity.newInstance(requireContext()))
-                        dismiss()
+                        compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
+                            AndroidSchedulers.mainThread())
+                            .subscribe {
+                                startActivity(SimpleBuyActivity.newInstance(requireContext(), true))
+                                dismiss()
+                            }
                     }
                 }
 

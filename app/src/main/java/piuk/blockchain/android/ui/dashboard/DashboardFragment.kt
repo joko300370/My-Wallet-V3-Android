@@ -45,6 +45,7 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -62,7 +63,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
-    FiatFundsNoKycDetailsSheet.Host {
+    FiatFundsNoKycDetailsSheet.Host,
+    DialogFlow.FlowHost {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
@@ -117,6 +119,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
                 showPromoSheet(newState)
             }
+        }
+
+        // Update/show dialog flow
+        if (state?.activeFlow != newState.activeFlow) {
+            state?.activeFlow?.finishFlow()
+            newState.activeFlow?.startFlow(childFragmentManager, this)
         }
 
         // Update/show announcement
@@ -409,6 +417,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
+    override fun onFlowFinished() {
+        model.process(ClearBottomSheet)
+    }
+
+    override fun launchNewSendFor(account: SingleAccount) =
+        model.process(LaunchSendFlow(account))
+
     override fun gotoSendFor(account: SingleAccount) {
         when (account) {
             is CryptoNonCustodialAccount -> navigator().gotoSendFor(account)
@@ -447,7 +462,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun abortTransferFunds() {
-        model.process(AbortFundsTransfer)
+        model.process(ClearBottomSheet)
     }
 
     companion object {

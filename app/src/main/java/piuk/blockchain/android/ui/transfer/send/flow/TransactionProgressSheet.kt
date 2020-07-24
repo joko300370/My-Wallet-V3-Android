@@ -4,7 +4,8 @@ import android.util.DisplayMetrics
 import android.view.View
 import kotlinx.android.synthetic.main.dialog_send_in_progress.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.transfer.send.SendInputSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
 import piuk.blockchain.android.ui.transfer.send.TransactionInFlightState
@@ -12,7 +13,9 @@ import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
 import timber.log.Timber
 
-class TransactionProgressSheet : SendInputSheet() {
+class TransactionProgressSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_in_progress
 
     override fun render(newState: SendState) {
@@ -52,9 +55,5 @@ class TransactionProgressSheet : SendInputSheet() {
         requireActivity().windowManager?.defaultDisplay?.getMetrics(metrics)
         dialogView.layoutParams.height = (metrics.heightPixels - (48 * metrics.density)).toInt()
         dialogView.requestLayout()
-    }
-
-    companion object {
-        fun newInstance(): TransactionProgressSheet = TransactionProgressSheet()
     }
 }

@@ -7,10 +7,7 @@ import android.view.View
 import android.widget.TextView
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_send_address.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -19,20 +16,24 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.ui.transfer.send.SendInputSheet
+import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 
-class EnterTargetAddressSheet : SendInputSheet() {
+class EnterTargetAddressSheet(
+    host: SlidingModalBottomDialog.Host
+) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_address
 
     private val appUtil: AppUtil by inject()
@@ -52,24 +53,60 @@ class EnterTargetAddressSheet : SendInputSheet() {
             }
             cta_button.isEnabled = newState.nextEnabled
 
-            if (newState.targetAddress != NullAddress &&
-                newState.targetAddress.label.isNotEmpty() &&
-                address_entry.text?.isEmpty() == true) {
-                    address_entry.setText(newState.targetAddress.label, TextView.BufferType.EDITABLE)
-                    addressSelected(newState.targetAddress)
+            if (newState.sendingAccount.isCustodial()) {
+                showCustodialInput(newState)
+            } else {
+                showNonCustodialInput(newState)
             }
         }
         state = newState
     }
 
+    private fun showNonCustodialInput(newState: SendState) {
+        val address = if (newState.sendTarget is CryptoAddress) {
+            newState.sendTarget.address
+        } else {
+            null
+        }
+
+        val asset = newState.asset
+
+        with(dialogView) {
+            address_entry.setText(address, TextView.BufferType.EDITABLE)
+            address_entry.hint = getString(
+                R.string.send_enter_asset_address_hint,
+                getString(asset.assetName())
+            )
+
+            input_switcher.displayedChild = NONCUSTODIAL_INPUT
+        }
+    }
+
+    private fun showCustodialInput(newState: SendState) {
+        with(dialogView) {
+            internal_warning.text = getString(
+                R.string.send_internal_transfer_message,
+                newState.asset.displayTicker
+            )
+
+            title_pick.gone()
+            input_switcher.displayedChild = CUSTODIAL_INPUT
+        }
+    }
+
     // TODO: This address processing should occur via the interactor
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
-            val address = addressFactory.parse(s.toString(), state.sendingAccount.asset)
+            val asset = state.asset
+            val address = addressFactory.parse(s.toString(), asset)
             if (address != null) {
-                addressSelected(address)
+                addressEntered(address)
                 dialogView.error_msg.invisible()
             } else {
+                dialogView.error_msg.text = getString(
+                    R.string.send_error_not_valid_asset_address,
+                    getString(asset.assetName())
+                )
                 dialogView.error_msg.visible()
             }
         }
@@ -82,7 +119,10 @@ class EnterTargetAddressSheet : SendInputSheet() {
             cta_button.setOnClickListener { onCtaClick() }
 
             wallet_select.apply {
-                onLoadError = { showErrorToast("Failed getting transfer wallets") }
+                onLoadError = {
+                    showErrorToast("Failed getting transfer wallets")
+                    hideTransferList()
+                }
                 onAccountSelected = { accountSelected(it) }
                 onEmptyList = { hideTransferList() }
             }
@@ -101,19 +141,9 @@ class EnterTargetAddressSheet : SendInputSheet() {
     }
 
     private fun accountSelected(account: BlockchainAccount) {
-        if (account is CryptoAccount) {
-            disposables += account.receiveAddress
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                onSuccess = {
-                    if (it is CryptoAddress) {
-                        dialogView.address_entry.setText(it.address)
-                    } else {
-                        Timber.e("!SEND!> Unsupported address type selected")
-                    }
-                }
-            )
-        }
+        require(account is CryptoAccount)
+        model.process(SendIntent.TargetSelected(account))
+        model.process(SendIntent.TargetSelectionConfirmed)
     }
 
     private fun onLaunchAddressScan() {
@@ -127,8 +157,8 @@ class EnterTargetAddressSheet : SendInputSheet() {
         }
     }
 
-    private fun addressSelected(address: ReceiveAddress) {
-        model.process(SendIntent.AddressSelected(address))
+    private fun addressEntered(address: ReceiveAddress) {
+        model.process(SendIntent.TargetSelected(address))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
@@ -147,18 +177,19 @@ class EnterTargetAddressSheet : SendInputSheet() {
                 if (address == null) {
                     showErrorToast("Invalid ETH address!!")
                 } else {
-                    addressSelected(address)
+                    addressEntered(address)
                 }
             }
         }
     }
 
     private fun onCtaClick() =
-        model.process(SendIntent.AddressSelectionConfirmed)
+        model.process(SendIntent.TargetSelectionConfirmed)
 
     companion object {
         const val SCAN_QR_ADDRESS = 2985
-        fun newInstance(): EnterTargetAddressSheet =
-            EnterTargetAddressSheet()
+
+        private const val NONCUSTODIAL_INPUT = 0
+        private const val CUSTODIAL_INPUT = 1
     }
 }

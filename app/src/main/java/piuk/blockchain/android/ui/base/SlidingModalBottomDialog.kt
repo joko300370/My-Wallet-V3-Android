@@ -59,10 +59,9 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
 
         return dlg
     }
-    
+
     @CallSuper
     protected open fun onSheetHidden() {
-        host.onSheetClosed()
         dismiss()
     }
 
