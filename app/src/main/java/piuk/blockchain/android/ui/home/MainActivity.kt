@@ -707,6 +707,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     private fun startTransferFragment() {
         setCurrentTabItem(ITEM_TRANSFER)
+        toolbar_general.title = getString(R.string.transfer)
 
         ViewUtils.setElevation(appbar_layout, 0f)
         val transferFragment = TransferFragment.newInstance()
