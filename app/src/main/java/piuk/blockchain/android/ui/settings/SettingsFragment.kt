@@ -33,6 +33,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.notifications.analytics.linkBankEventWithCurrency
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -413,6 +415,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun linkBankWithCurrency(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, "BOTTOM_SHEET")
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -456,6 +459,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     private fun addNewCard() {
         val intent = Intent(activity, CardDetailsActivity::class.java)
         startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
+        analytics.logEvent(SimpleBuyAnalytics.SETTINGS_ADD_CARD)
     }
 
     override fun setScreenshotsEnabled(enabled: Boolean) {
