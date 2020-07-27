@@ -146,7 +146,8 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
-                currentStep = SendStep.IN_PROGRESS
+                currentStep = SendStep.IN_PROGRESS,
+                transactionInFlight = TransactionInFlightState.IN_PROGRESS
             )
     }
 
@@ -156,7 +157,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                currentStep = SendStep.SEND_ERROR
+                transactionInFlight = TransactionInFlightState.ERROR
             )
     }
 
@@ -164,7 +165,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                currentStep = SendStep.SEND_COMPLETE
+                transactionInFlight = TransactionInFlightState.COMPLETED
             )
     }
 
