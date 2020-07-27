@@ -127,11 +127,6 @@ class SendFlow(
                 SendStep.ENTER_AMOUNT -> EnterAmountSheet(this)
                 SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(this)
                 SendStep.IN_PROGRESS -> TransactionProgressSheet(this)
-                SendStep.ENTER_PASSWORD -> EnterSecondPasswordSheet(this)
-                SendStep.ENTER_ADDRESS -> EnterTargetAddressSheet(this)
-                SendStep.ENTER_AMOUNT -> EnterAmountSheet(this)
-                SendStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(this)
-                SendStep.IN_PROGRESS -> TransactionProgressSheet(this)
             }
         )
     }

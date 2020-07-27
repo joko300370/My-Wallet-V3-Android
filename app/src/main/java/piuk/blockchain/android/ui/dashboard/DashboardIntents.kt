@@ -285,6 +285,33 @@ class LaunchSendFlow(
         )
 }
 
+class LaunchAssetDetailsFlow(
+    val cryptoCurrency: CryptoCurrency
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            showDashboardSheet = null,
+            showAssetSheetFor = null,
+            activeFlow = null,
+            pendingAssetSheetFor = null,
+            transferFundsCurrency = null
+        )
+}
+
+object ShowAssetDetailsIntent: DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            assetDetailsCurrentStep = DashboardStep.ASSET_DETAILS
+        )
+}
+
+object ShowAssetActionsIntent: DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS
+        )
+}
+
 class UpdateLaunchDialogFlow(
     private val flow: DialogFlow
 ) : DashboardIntent() {

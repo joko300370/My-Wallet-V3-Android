@@ -194,6 +194,18 @@ class DashboardInteractor(
         return null
     }
 
+    fun getAssetDetailsFlow(model: DashboardModel, cryptoCurrency: CryptoCurrency): Disposable? {
+        model.process(
+            UpdateLaunchDialogFlow(
+                DashboardFlow(
+                    cryptoCurrency = cryptoCurrency,
+                    model = model
+                )
+            )
+        )
+        return null
+    }
+
     companion object {
         private const val ONE_DAY = 24 * 60 * 60L
         private val FLATLINE_CHART = listOf(

@@ -120,7 +120,8 @@ data class DashboardState(
     @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
-    val selectedFiatAccount: FiatAccount? = null
+    val selectedFiatAccount: FiatAccount? = null,
+    val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -242,6 +243,7 @@ class DashboardModel(
             is CheckBackupStatus -> interactor.hasUserBackedUp(this)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount)
+            is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is FiatBalanceUpdate,
             is BackupStatusUpdate,
             is BalanceUpdateError,
@@ -254,7 +256,9 @@ class DashboardModel(
             is ShowDashboardSheet,
             is TransferFunds,
             is UpdateLaunchDialogFlow,
-            is ClearBottomSheet -> null
+            is ClearBottomSheet,
+            is ShowAssetDetailsIntent,
+            is ShowAssetActionsIntent -> null
         }
     }
 
