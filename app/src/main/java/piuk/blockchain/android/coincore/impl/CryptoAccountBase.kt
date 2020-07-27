@@ -253,12 +253,20 @@ abstract class CryptoNonCustodialAccount(
     override val feeAsset: CryptoCurrency?
         get() = asset
 
-    override val actions: AvailableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.Send,
-        AssetAction.Receive,
-        AssetAction.Swap
-    )
+    override val actions: AvailableActions
+        get() = if (isFunded) {
+            setOf(
+                AssetAction.ViewActivity,
+                AssetAction.Send,
+                AssetAction.Receive,
+                AssetAction.Swap
+            )
+        } else {
+            setOf(
+                AssetAction.ViewActivity,
+                AssetAction.Receive
+            )
+        }
 
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> {
         TODO("Implement me")
