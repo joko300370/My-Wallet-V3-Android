@@ -11,16 +11,15 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_send_address.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.erc20.usdt.UsdtAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
+import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -39,7 +38,6 @@ class EnterTargetAddressSheet(
 
     private val appUtil: AppUtil by inject()
     private val coincore: Coincore by scopedInject()
-    private val addressFactory: AddressFactory by scopedInject()
 
     private val disposables = CompositeDisposable()
     private var state: SendState = SendState()
@@ -58,6 +56,19 @@ class EnterTargetAddressSheet(
                 showCustodialInput(newState)
             } else {
                 showNonCustodialInput(newState)
+            }
+
+            when (newState.errorState) {
+                SendErrorState.NONE -> error_msg.invisible()
+                SendErrorState.INVALID_PASSWORD ->
+                    error_msg.apply {
+                        text = getString(
+                            R.string.send_error_not_valid_asset_address,
+                            getString(newState.asset.assetName())
+                        )
+                        visible()
+                    }
+                else -> throw NotImplementedError("Not expected here")
             }
         }
         state = newState
@@ -101,22 +112,9 @@ class EnterTargetAddressSheet(
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
             val asset = state.asset
+            val address = s.toString()
 
-            model.process(SendIntent.TargetSelected(
-                UsdtAddress("0xc859f5B7d396363F560d97c978D83314C959a89c")
-            ))
-
-            val address = addressFactory.parse(s.toString(), asset)
-            if (address != null) {
-                addressEntered(address)
-                dialogView.error_msg.invisible()
-            } else {
-                dialogView.error_msg.text = getString(
-                    R.string.send_error_not_valid_asset_address,
-                    getString(asset.assetName())
-                )
-                dialogView.error_msg.visible()
-            }
+            addressEntered(address, asset)
         }
     }
 
@@ -150,8 +148,7 @@ class EnterTargetAddressSheet(
 
     private fun accountSelected(account: BlockchainAccount) {
         require(account is CryptoAccount)
-        model.process(SendIntent.TargetSelected(account))
-        model.process(SendIntent.TargetSelectionConfirmed)
+        model.process(SendIntent.TargetSelectionConfirmed(account))
     }
 
     private fun onLaunchAddressScan() {
@@ -165,8 +162,8 @@ class EnterTargetAddressSheet(
         }
     }
 
-    private fun addressEntered(address: ReceiveAddress) {
-        model.process(SendIntent.TargetSelected(address))
+    private fun addressEntered(address: String, asset: CryptoCurrency) {
+        model.process(SendIntent.ValidateInputTargetAddress(address, asset))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
@@ -179,20 +176,21 @@ class EnterTargetAddressSheet(
         Timber.d("Got QR scan result!")
         if (resultCode == Activity.RESULT_OK && data != null) {
             data.getStringExtra(CaptureActivity.SCAN_RESULT)?.let {
-                // Just supporting ETH in this pass,
-                // TODO: Replace this with a full scanning parser?
-                val address = addressFactory.parse(it, CryptoCurrency.ETHER)
-                if (address == null) {
-                    showErrorToast("Invalid ETH address!!")
-                } else {
-                    addressEntered(address)
-                }
+                val asset = state.asset
+                val address = it
+
+                addressEntered(address, asset)
             }
         }
     }
 
-    private fun onCtaClick() =
-        model.process(SendIntent.TargetSelectionConfirmed)
+    private fun onCtaClick() {
+        val account = state.sendTarget
+        require(account is CryptoAccount)
+        require(account != NullCryptoAccount)
+
+        model.process(SendIntent.TargetSelectionConfirmed(account))
+    }
 
     companion object {
         const val SCAN_QR_ADDRESS = 2985

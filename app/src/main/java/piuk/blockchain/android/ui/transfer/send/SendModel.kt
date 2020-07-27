@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -27,6 +28,8 @@ enum class SendStep {
 }
 
 enum class SendErrorState {
+    INVALID_PASSWORD,
+    INVALID_ADDRESS,
     FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
@@ -86,12 +89,15 @@ class SendModel(
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
-            is SendIntent.TargetSelected -> null
             is SendIntent.PrepareTransaction -> null
             is SendIntent.ExecuteTransaction -> processExecuteTransaction(previousState)
+            is SendIntent.ValidateInputTargetAddress ->
+                processValidateAddress(intent.targetAddress, intent.expectedCrypto)
+            is SendIntent.TargetAddressValidated -> null
+            is SendIntent.TargetAddressInvalid -> null
             is SendIntent.TargetSelectionConfirmed -> processAddressConfirmation(previousState)
             is SendIntent.FatalTransactionError -> null
-            is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount, previousState)
+            is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
             is SendIntent.UpdateTransactionAmounts -> null
             is SendIntent.UpdateTransactionComplete -> null
             is SendIntent.ReturnToPreviousStep -> null
@@ -152,6 +158,23 @@ class SendModel(
                 onError = { /* Error! What to do? Abort? Or... */ }
             )
 
+    private fun processValidateAddress(
+        address: String,
+        expectedAsset: CryptoCurrency
+    ): Disposable =
+        interactor.validateTargetAddress(address, expectedAsset)
+            .subscribeBy(
+                onSuccess = {
+                    process(SendIntent.TargetAddressValidated(it))
+                },
+                onError = {
+                    when (it) {
+                        is SendValidationError -> process(SendIntent.TargetAddressInvalid)
+                        else -> process(SendIntent.FatalTransactionError(it))
+                    }
+                }
+            )
+
     private fun processAddressConfirmation(state: SendState): Disposable =
     // At this point we can build a transactor object from coincore and configure
     // the state object a bit more; depending on whether it's an internal, external,
@@ -175,25 +198,25 @@ class SendModel(
                 }
             )
 
-    private fun processAmountChanged(amount: CryptoValue, state: SendState): Disposable =
+    private fun processAmountChanged(amount: CryptoValue): Disposable =
         interactor.getAvailableBalance(
             PendingSendTx(amount)
         )
-            .subscribeBy(
-                onSuccess = {
-                    if (amount > it) {
-                        process(SendIntent.MaxAmountExceeded)
-                    } else if (!amount.isPositive && !amount.isZero) {
-                        process(SendIntent.MinRequired)
-                    } else {
-                        process(SendIntent.UpdateTransactionAmounts(amount, it))
-                    }
-                },
-                onError = {
-                    Timber.e("!SEND!> Unable to get update available balance")
-                    process(SendIntent.FatalTransactionError(it))
+        .subscribeBy(
+            onSuccess = {
+                if (amount > it) {
+                    process(SendIntent.MaxAmountExceeded)
+                } else if (!amount.isPositive && !amount.isZero) {
+                    process(SendIntent.MinRequired)
+                } else {
+                    process(SendIntent.UpdateTransactionAmounts(amount, it))
                 }
-            )
+            },
+            onError = {
+                Timber.e("!SEND!> Unable to get update available balance")
+                process(SendIntent.FatalTransactionError(it))
+            }
+        )
 
     private fun processExecuteTransaction(state: SendState): Disposable =
         interactor.verifyAndExecute(
