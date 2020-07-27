@@ -3,12 +3,12 @@ package piuk.blockchain.android.ui.base
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import androidx.annotation.CallSuper
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import android.view.View
+import androidx.annotation.CallSuper
 import com.blockchain.notifications.analytics.Analytics
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
 abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
