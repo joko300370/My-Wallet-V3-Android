@@ -74,6 +74,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 setOnClickListenerDebounced { doShowMenu(item, onActionSelected, analytics) }
             }*/
 
+            // TODO should we show the interest badge here?
             asset_spend_locked.goneIf {
                 item.assetFilter == AssetFilter.NonCustodial || item.assetFilter == AssetFilter.Interest
             }

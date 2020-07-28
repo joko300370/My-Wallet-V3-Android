@@ -21,6 +21,10 @@ class DashboardFlow(
     val model: DashboardModel
 ) : DialogFlow() {
 
+    init {
+        Timber.e("----- starting dashboard flow for $cryptoCurrency")
+    }
+
     private var currentStep: DashboardStep = DashboardStep.ZERO
     private val disposables = CompositeDisposable()
 
@@ -28,7 +32,6 @@ class DashboardFlow(
         super.startFlow(fragmentManager, host)
 
         model.apply {
-            // Trigger intent to set initial state: source account & password required
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
                 onError = { Timber.e("Send state is broken: $it") }
@@ -37,6 +40,7 @@ class DashboardFlow(
 
         model.process(ShowAssetDetailsIntent)
     }
+
     private fun handleStateChange(newState: DashboardState) {
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
@@ -57,7 +61,8 @@ class DashboardFlow(
             }
         )
     }
+
     override fun onSheetClosed() {
-        TODO("Not yet implemented")
+        finishFlow()
     }
 }

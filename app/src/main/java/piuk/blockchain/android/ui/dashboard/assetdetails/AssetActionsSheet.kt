@@ -20,13 +20,12 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
+import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
-import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.DashboardModel
@@ -36,6 +35,7 @@ import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
@@ -72,7 +72,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
 
         view.asset_actions_list.apply {
             layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(
                 DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
             )
@@ -92,50 +92,56 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         account: BlockchainAccount
     ): List<AssetActionItem> =
         when (account) {
-            is CryptoInterestAccount -> {
-                view.asset_actions_title.text = labels.getDefaultInterestWalletLabel(account.asset)
-                view.asset_actions_asset_icon.setImageResource(account.asset.drawableResFilled())
-                disposables += coincore[account.asset].interestRate().observeOn(uiScheduler)
-                    .subscribeBy(
-                        onSuccess = {
-                            view.asset_actions_details.text =
-                                getString(R.string.dashboard_asset_balance_interest, it)
-                        },
-                        onError = {
-                            Timber.e("----- error loading interest rate $it")
+            is CryptoAccountCustodialGroup -> {
+                when (val firstAccount = account.accounts.first()) {
+                    is CryptoInterestAccount -> {
+                        view.asset_actions_title.text =
+                            labels.getDefaultInterestWalletLabel(firstAccount.asset)
+                        view.asset_actions_asset_icon.setImageResource(
+                            firstAccount.asset.drawableResFilled())
+                        view.asset_actions_acc_icon.setImageResource(
+                            R.drawable.ic_account_badge_interest)
+                        disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
+                            .subscribeBy(
+                                onSuccess = {
+                                    view.asset_actions_details.text =
+                                        getString(R.string.dashboard_asset_balance_interest, it)
+                                },
+                                onError = {
+                                    Timber.e("----- error loading interest rate $it")
+                                }
+                            )
+                        account.actions.map {
+                            mapAction(it, firstAccount.asset)
                         }
-                    )
-                account.actions.map {
-                    mapAction(it, account.asset)
+                    }
+                    is CustodialTradingAccount -> {
+                        view.asset_actions_title.text = getString(firstAccount.asset.assetName())
+                        view.asset_actions_details.text =
+                            labels.getDefaultCustodialWalletLabel(firstAccount.asset)
+                        view.asset_actions_asset_icon.setImageResource(
+                            firstAccount.asset.drawableResFilled())
+                        view.asset_actions_acc_icon.setImageResource(
+                            R.drawable.ic_account_badge_custodial)
+                        account.actions.map {
+                            mapAction(it, firstAccount.asset)
+                        }
+                    }
+                    else -> {
+                        Timber.e("------- CryptoAccountCustodialGroup uncatered $account")
+                        emptyList()
+                    }
                 }
             }
-            is CustodialTradingAccount -> {
-                view.asset_actions_title.text = getString(account.asset.assetName())
-                view.asset_actions_details.text =
-                    labels.getDefaultCustodialWalletLabel(account.asset)
-                view.asset_actions_asset_icon.setImageResource(account.asset.drawableResFilled())
-                account.actions.map {
-                    mapAction(it, account.asset)
-                }
-            }
-            is CryptoNonCustodialAccount -> {
+            is CryptoAccountNonCustodialGroup -> {
+                view.asset_actions_acc_icon.gone()
                 view.asset_actions_title.text = getString(account.asset.assetName())
                 view.asset_actions_details.text =
                     labels.getDefaultNonCustodialWalletLabel(account.asset)
-                view.asset_actions_asset_icon.setImageResource(account.asset.drawableResFilled())
+                view.asset_actions_asset_icon.setImageResource(
+                    account.asset.drawableResFilled())
                 account.actions.map {
                     mapAction(it, account.asset)
-                }
-            }
-            is AccountGroup -> {
-                val sampleAccount = account.accounts.first() as CryptoAccount
-                view.asset_actions_title.text = getString(sampleAccount.asset.assetName())
-                view.asset_actions_details.text =
-                    labels.getDefaultNonCustodialWalletLabel(sampleAccount.asset)
-                view.asset_actions_asset_icon.setImageResource(
-                    sampleAccount.asset.drawableResFilled())
-                account.actions.map {
-                    mapAction(it, sampleAccount.asset)
                 }
             }
             else -> {
@@ -227,7 +233,8 @@ private class AssetActionAdapter : RecyclerView.Adapter<AssetActionAdapter.Actio
             view.item_action_label.text = item.description
         }
 
-        private fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency, context: Context) {
+        private fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency,
+                                                  context: Context) {
             setBackgroundResource(R.drawable.bkgd_tx_circle)
             background.setTint(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
             setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))

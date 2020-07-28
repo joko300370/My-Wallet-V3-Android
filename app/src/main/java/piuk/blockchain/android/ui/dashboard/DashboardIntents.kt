@@ -232,7 +232,9 @@ object ClearBottomSheet : DashboardIntent() {
             showDashboardSheet = null,
             activeFlow = null,
             showAssetSheetFor = oldState.pendingAssetSheetFor,
-            pendingAssetSheetFor = null
+            pendingAssetSheetFor = null,
+            selectedAccount = null,
+            assetDetailsCurrentStep = DashboardStep.ZERO
         )
 }
 
@@ -297,7 +299,8 @@ class LaunchAssetDetailsFlow(
             showAssetSheetFor = null,
             activeFlow = null,
             pendingAssetSheetFor = null,
-            transferFundsCurrency = null
+            transferFundsCurrency = null,
+            selectedAccount = null
         )
 }
 
@@ -327,7 +330,8 @@ class UpdateLaunchDialogFlow(
             showAssetSheetFor = null,
             activeFlow = flow,
             pendingAssetSheetFor = null,
-            transferFundsCurrency = null
+            transferFundsCurrency = null,
+            selectedAccount = null
         )
 }
 
