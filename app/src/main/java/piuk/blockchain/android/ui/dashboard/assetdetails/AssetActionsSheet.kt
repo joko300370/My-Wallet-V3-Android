@@ -20,9 +20,11 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
@@ -53,6 +55,19 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         AssetActionAdapter()
     }
 
+    interface Host : SlidingModalBottomDialog.Host {
+        fun launchNewSendFor(account: SingleAccount)
+        fun gotoSendFor(account: SingleAccount)
+        fun goToReceiveFor(account: SingleAccount)
+        fun gotoActivityFor(account: BlockchainAccount)
+        fun gotoSwap(account: SingleAccount)
+    }
+
+    override val host: Host by lazy {
+        super.host as? Host ?: throw IllegalStateException(
+            "Host fragment is not a AssetActionsSheet.Host")
+    }
+
     override val layoutResource: Int
         get() = R.layout.sheet_asset_actions
 
@@ -66,7 +81,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 view.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
             },
             onError = {
-                Timber.e("---- error with zips $it")
+                Timber.e("ActionSheet error loading balances: $it")
             }
         )
 
@@ -93,7 +108,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     ): List<AssetActionItem> =
         when (account) {
             is CryptoAccountCustodialGroup -> {
-                when (val firstAccount = account.accounts.first()) {
+                when (val firstAccount = selectAccount(account)) {
                     is CryptoInterestAccount -> {
                         view.asset_actions_title.text =
                             labels.getDefaultInterestWalletLabel(firstAccount.asset)
@@ -108,11 +123,11 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                                         getString(R.string.dashboard_asset_balance_interest, it)
                                 },
                                 onError = {
-                                    Timber.e("----- error loading interest rate $it")
+                                    Timber.e("AssetActions error loading Interest rate: $it")
                                 }
                             )
                         account.actions.map {
-                            mapAction(it, firstAccount.asset)
+                            mapAction(it, firstAccount.asset, firstAccount)
                         }
                     }
                     is CustodialTradingAccount -> {
@@ -124,12 +139,13 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                         view.asset_actions_acc_icon.setImageResource(
                             R.drawable.ic_account_badge_custodial)
                         account.actions.map {
-                            mapAction(it, firstAccount.asset)
+                            mapAction(it, firstAccount.asset, firstAccount)
                         }
                     }
                     else -> {
-                        Timber.e("------- CryptoAccountCustodialGroup uncatered $account")
-                        emptyList()
+                        throw IllegalStateException(
+                            "AssetActions un-catered CryptoAccountCustodialGroup type: $account"
+                        )
                     }
                 }
             }
@@ -141,60 +157,77 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 view.asset_actions_asset_icon.setImageResource(
                     account.asset.drawableResFilled())
                 account.actions.map {
-                    mapAction(it, account.asset)
+                    mapAction(it, account.asset, selectAccount(account))
                 }
             }
             else -> {
-                Timber.e("---- mapping failed, type? $account")
-                emptyList()
+                throw IllegalStateException("AssetActions un-catered account type: $account")
             }
         }
 
-    private fun mapAction(action: AssetAction, asset: CryptoCurrency): AssetActionItem =
+    private fun mapAction(action: AssetAction, asset: CryptoCurrency, account: SingleAccount): AssetActionItem =
         when (action) {
             AssetAction.ViewActivity ->
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
-                    Timber.e("----- activity clicked")
+                    dismiss()
+                    host.gotoActivityFor(account)
                 }
             AssetAction.Send ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
                     asset) {
-                    Timber.e("----- send clicked")
+                    dismiss()
+                    host.gotoSendFor(account)
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
-                    Timber.e("----- new send clicked")
+                    // TODO do we want this to continue as one flow with send?
+                    dismiss()
+                    host.launchNewSendFor(account)
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
-                    Timber.e("----- receive clicked")
+                    dismiss()
+                    host.goToReceiveFor(account)
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset) {
-                Timber.e("----- swap clicked")
+                dismiss()
+                host.gotoSwap(account)
             }
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
                 R.drawable.ic_tx_interest,
                 getString(R.string.dashboard_asset_actions_summary_dsc, asset.networkTicker),
                 asset) {
+                // TODO in upcoming story
                 Timber.e("---- summary clicked")
             }
             AssetAction.Deposit -> AssetActionItem(getString(R.string.common_deposit),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
+                // TODO in upcoming story
                 Timber.e("----- deposit clicked")
             }
+        }
+
+    private fun selectAccount(account: BlockchainAccount): SingleAccount =
+        when (account) {
+            is SingleAccount -> account
+            is AccountGroup -> account.accounts
+                .firstOrNull { a -> a.isDefault }
+                ?: account.accounts.firstOrNull()
+                ?: throw IllegalStateException("No SingleAccount found")
+            else -> throw IllegalStateException("Unknown account base")
         }
 
     companion object {

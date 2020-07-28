@@ -43,9 +43,9 @@
         style="@style/Text.Semibold.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintBottom_toBottomOf="@id/asset_name"
-        app:layout_constraintEnd_toStartOf="@id/action_menu"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="$15,879.90" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -53,24 +53,14 @@
         style="@style/Text.Light.12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintBottom_toBottomOf="@id/status_date"
-        app:layout_constraintEnd_toStartOf="@id/action_menu"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/status_date"
         tools:text="1.638192 BTC" />
 
     <ImageView
-        android:id="@+id/action_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="@dimen/small_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_asset_action_menu" />
-
-    <ImageView
-        android:id="@+id/asset_spend_locked"
+        android:id="@+id/asset_account_icon"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_marginStart="23dp"

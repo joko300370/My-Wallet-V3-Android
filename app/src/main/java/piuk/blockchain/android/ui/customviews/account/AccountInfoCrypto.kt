@@ -48,7 +48,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private fun updateView(account: CryptoAccount, disposables: CompositeDisposable) {
         val crypto = account.asset
         icon.setCoinIcon(crypto)
-        asset_spend_locked.goneIf(account.isCustodial().not())
+        asset_account_icon.goneIf(account.isCustodial().not())
         wallet_name.text = account.label
 
         icon.visible()

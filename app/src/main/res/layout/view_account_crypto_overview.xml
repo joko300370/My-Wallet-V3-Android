@@ -62,7 +62,7 @@
         tools:text="1.638192 BTC" />
 
     <ImageView
-        android:id="@+id/asset_spend_locked"
+        android:id="@+id/asset_account_icon"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_marginStart="23dp"

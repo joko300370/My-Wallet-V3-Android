@@ -7,8 +7,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -27,13 +27,12 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AccountGroup
-import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.ShowAssetActionsIntent
@@ -61,19 +60,6 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private val assetDetailsViewModel: AssetDetailsCalculator by scopedInject()
     private val model: DashboardModel by scopedInject()
     private val locale = Locale.getDefault()
-
-    interface Host : SlidingModalBottomDialog.Host {
-        fun launchNewSendFor(account: SingleAccount)
-        fun gotoSendFor(account: SingleAccount)
-        fun goToReceiveFor(account: SingleAccount)
-        fun gotoActivityFor(account: BlockchainAccount)
-        fun gotoSwap(account: SingleAccount)
-    }
-
-    override val host: Host by lazy {
-        super.host as? Host ?: throw IllegalStateException(
-            "Host fragment is not a AssetDetailSheet.Host")
-    }
 
     private val cryptoCurrency: CryptoCurrency by lazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
@@ -192,36 +178,17 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
                 )
             }
 
-            asset_list.adapter = AssetDetailAdapter(itemList, ::onAssetActionSelected, ::onAccountSelected, analytics,
+            asset_list.adapter = AssetDetailAdapter(itemList, ::onAccountSelected,
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token)
         }
     }
 
     private fun onAccountSelected(account: BlockchainAccount) {
+        if (account is CryptoAccount && account is CustodialTradingAccount) {
+            analytics.logEvent(CustodialBalanceClicked(account.asset))
+        }
         model.process(ShowAssetActionsIntent(account))
     }
-
-    private fun onAssetActionSelected(action: AssetAction, account: BlockchainAccount) {
-        dismiss()
-        when (action) {
-            AssetAction.ViewActivity -> host.gotoActivityFor(selectAccount(account))
-            AssetAction.Send -> host.gotoSendFor(selectAccount(account))
-            AssetAction.NewSend -> host.launchNewSendFor(selectAccount(account))
-            AssetAction.Receive -> host.goToReceiveFor(selectAccount(account))
-            AssetAction.Swap -> host.gotoSwap(selectAccount(account))
-            else -> { TODO() }
-        }.exhaustive
-    }
-
-    private fun selectAccount(account: BlockchainAccount): SingleAccount =
-        when (account) {
-            is SingleAccount -> account
-            is AccountGroup -> account.accounts
-                    .firstOrNull { a -> a.isDefault }
-                ?: account.accounts.firstOrNull()
-                ?: throw IllegalStateException("No SingleAccount found")
-            else -> throw IllegalStateException("Unknown account base")
-        }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {
         chart.apply {
