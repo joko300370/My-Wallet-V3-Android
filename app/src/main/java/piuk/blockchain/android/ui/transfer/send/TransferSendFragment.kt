@@ -1,55 +1,33 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.fragment_transfer_send.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-
-typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
 class TransferSendFragment :
-    Fragment(),
+    AccountSelectorFragment(),
     DialogFlow.FlowHost {
 
     private val coincore: Coincore by scopedInject()
-
     private var flow: SendFlow? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = inflater.inflate(R.layout.fragment_transfer_send, container, false)
-
-    private val filterFn: AccountListFilterFn =
-        { account -> (account is CryptoAccount) && account.isFunded }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-            send_account_list.onLoadError = ::doOnLoadError
-            send_account_list.onEmptyList = ::doOnEmptyList
-            send_account_list.onAccountSelected = ::doOnAccountSelected
-
-            send_account_list.initialise(
-                coincore.allWallets().map { it.accounts.filter(filterFn) },
-                status = ::statusDecorator
-            )
+        setBlurbText(getString(R.string.transfer_send_crypto))
+        initialiseAccountSelector(
+            statusDecorator = ::statusDecorator,
+            onAccountSelected = ::doOnAccountSelected
+        )
     }
 
     private fun statusDecorator(account: BlockchainAccount): Single<String> =
@@ -68,15 +46,6 @@ class TransferSendFragment :
             Single.just("")
         }
 
-    private fun doOnEmptyList() {
-        send_account_list.gone()
-        send_blurb.gone()
-        send_empty_view.visible()
-        send_button_buy_crypto.setOnClickListener {
-            startActivity(SimpleBuyActivity.newInstance(requireContext()))
-        }
-    }
-
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
             flow = SendFlow(
@@ -89,16 +58,6 @@ class TransferSendFragment :
                 )
             }
         }
-    }
-
-    private fun doOnLoadError(t: Throwable) {
-        ToastCustom.makeText(
-            requireContext(),
-            getString(R.string.transfer_wallets_load_error),
-            ToastCustom.LENGTH_SHORT,
-            ToastCustom.TYPE_ERROR
-        )
-        doOnEmptyList()
     }
 
     override fun onFlowFinished() {
