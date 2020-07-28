@@ -124,12 +124,15 @@ open class CustodialTradingAccount(
             }
 
     override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend
-    )
+        get() =
+            mutableSetOf(
+                AssetAction.ViewActivity,
+                AssetAction.NewSend
+            ).apply {
+                if (!isFunded) {
+                    remove(AssetAction.NewSend)
+                }
+            }
 
     private fun buyOrderToSummary(buyOrder: BuyOrder): ActivitySummaryItem =
         CustodialActivitySummaryItem(
@@ -204,10 +207,7 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = emptySet<AssetAction>()
+    override val actions: AvailableActions = emptySet()
 }
 
 // To handle Send to PIT
@@ -243,7 +243,6 @@ internal class CryptoExchangeAccount(
 
     override val actions: AvailableActions = emptySet()
 }
-
 abstract class CryptoNonCustodialAccount(
     override val asset: CryptoCurrency
 ) : CryptoAccountBase() {
@@ -254,24 +253,24 @@ abstract class CryptoNonCustodialAccount(
         get() = asset
 
     override val actions: AvailableActions
-        get() = if (isFunded) {
-            setOf(
+        get() =
+            mutableSetOf(
                 AssetAction.ViewActivity,
                 AssetAction.Send,
                 AssetAction.Receive,
                 AssetAction.Swap
-            )
-        } else {
-            setOf(
-                AssetAction.ViewActivity,
-                AssetAction.Receive
-            )
-        }
+            ).apply {
+                if (!isFunded) {
+                    remove(AssetAction.Swap)
+                    remove(AssetAction.Send)
+                }
+            }
 
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> {
         TODO("Implement me")
     }
 }
+
 
 // Currently only one custodial account is supported for each asset,
 // so all the methods on this can just delegate directly
@@ -350,7 +349,7 @@ class CryptoAccountNonCustodialGroup(
         get() = if (accounts.isEmpty()) {
             emptySet()
         } else {
-            accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+            accounts.map { it.actions }.reduce { a, b -> a.union(b) }
         }
 
     // if _any_ of the accounts have transactions

@@ -62,8 +62,7 @@ internal class FiatCustodialAccount(
             }
         }
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: AvailableActions = setOf(AssetAction.ViewActivity)
 
     override val isFunded: Boolean
         get() = hasFunds.get()

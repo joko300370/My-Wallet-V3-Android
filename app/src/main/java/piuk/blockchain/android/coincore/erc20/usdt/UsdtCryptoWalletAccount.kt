@@ -26,9 +26,5 @@ internal class UsdtCryptoWalletAccount(
             UsdtAddress(address, label)
         )
 
-    override val actions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend,
-        AssetAction.Swap
-    )
+    override val actions = super.actions.toMutableSet().apply { remove(AssetAction.Receive) }
 }

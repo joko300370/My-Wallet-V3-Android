@@ -14,10 +14,5 @@ class AlgoCustodialTradingAccount(
     custodialWalletManager: CustodialWalletManager
 ) : CustodialTradingAccount(cryptoCurrency, label, exchangeRates, custodialWalletManager) {
 
-    override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = setOf(
-        AssetAction.ViewActivity
-    )
+    override val actions: AvailableActions = setOf(AssetAction.ViewActivity)
 }

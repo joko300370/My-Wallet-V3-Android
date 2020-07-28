@@ -76,12 +76,17 @@ abstract class Erc20NonCustodialAccount(
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 
-    override val actions: AvailableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend,
-        AssetAction.Receive,
-        AssetAction.Swap
-    )
+    override val actions: AvailableActions
+        get() = super.actions.let {
+            if (it.contains(AssetAction.Send)) {
+                it.toMutableSet().apply {
+                    remove(AssetAction.Send)
+                    add(AssetAction.NewSend)
+                }
+            } else {
+                it
+            }
+        }
 
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         when (sendTo) {
