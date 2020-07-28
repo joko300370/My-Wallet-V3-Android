@@ -7,6 +7,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
@@ -65,11 +66,13 @@ internal class BchAsset(
             }
         }
 
-    override fun parseAddress(address: String): ReceiveAddress? =
-        if (isValidAddress(address)) {
-            BchAddress(address)
-        } else {
-            null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Maybe.fromCallable {
+            if (isValidAddress(address)) {
+                BchAddress(address)
+            } else {
+                null
+            }
         }
 
     private fun isValidAddress(address: String): Boolean =

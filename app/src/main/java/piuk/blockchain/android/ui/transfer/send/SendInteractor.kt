@@ -5,6 +5,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressFactory
+import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingSendTx
@@ -24,9 +25,17 @@ class SendInteractor(
         Single.just(coincore.validateSecondPassword(password))
 
     fun validateTargetAddress(address: String, asset: CryptoCurrency): Single<ReceiveAddress> =
-        Single.fromCallable {
-            addressFactory.parse(address, asset) ?: throw SendValidationError(SendValidationError.INVALID_ADDRESS)
-        }
+        addressFactory.parse(address, asset)
+            .switchIfEmpty(
+                Single.error<ReceiveAddress>(SendValidationError(SendValidationError.INVALID_ADDRESS))
+            )
+            .onErrorResumeNext { e ->
+                if (e.isUnexpectedContractError) {
+                    Single.error(SendValidationError(SendValidationError.ADDRESS_IS_CONTRACT))
+                } else {
+                    Single.error(e)
+                }
+            }
 
     fun initialiseTransaction(
         sourceAccount: CryptoAccount,
@@ -48,3 +57,6 @@ class SendInteractor(
 
     fun checkIfNoteSupported(): Single<Boolean> = Single.just(sendProcessor!!.isNoteSupported)
 }
+
+private val Throwable.isUnexpectedContractError
+    get() = (this is AddressParseError && this.error == AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)

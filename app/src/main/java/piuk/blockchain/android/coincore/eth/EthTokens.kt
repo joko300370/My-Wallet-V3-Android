@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
@@ -7,8 +8,13 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AddressParseError
+import piuk.blockchain.android.coincore.AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
@@ -59,11 +65,24 @@ internal class EthAsset(
             )
         )
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            EthAddress(address)
-        } else {
-            null
+    @CommonCode("Exists in UsdtAsset and PaxAsset")
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Singles.zip(
+            Single.just(isValidAddress(address)),
+            ethDataManager.isContractAddress(address)
+        ) { isValid, isContract ->
+                when {
+                    isContract -> throw AddressParseError(ETH_UNEXPECTED_CONTRACT_ADDRESS)
+                    isValid -> address
+                    else -> ""
+                }
+
+        }.flatMapMaybe { a ->
+            if (a.isEmpty()) {
+                Maybe.empty<ReceiveAddress>()
+            } else {
+                Maybe.just(EthAddress(address))
+            }
         }
 
     private fun isValidAddress(address: String): Boolean =

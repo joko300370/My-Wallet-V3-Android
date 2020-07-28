@@ -92,6 +92,7 @@ class EnterAmountSheet(
                     getString(R.string.send_enter_amount_error_min,
                         newState.sendingAccount.asset.networkTicker))
                 SendErrorState.INVALID_ADDRESS,
+                SendErrorState.ADDRESS_IS_CONTRACT,
                 SendErrorState.INVALID_PASSWORD,
                 SendErrorState.FEE_REQUEST_FAILED -> throw NotImplementedError("Not expected here")
             }.exhaustive

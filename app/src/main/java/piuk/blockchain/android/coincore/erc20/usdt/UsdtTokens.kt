@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20.usdt
 
+import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
@@ -7,12 +8,17 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.util.FormatsUtil
+import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
+import piuk.blockchain.android.coincore.erc20.pax.PaxAddress
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -63,11 +69,24 @@ internal class UsdtAsset(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         Single.just(emptyList())
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            UsdtAddress(address)
-        } else {
-            null
+    @CommonCode("Exists in EthAsset and PaxAsset")
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Singles.zip(
+            Single.just(isValidAddress(address)),
+            erc20Account.ethDataManager.isContractAddress(address)
+        ) { isValid, isContract ->
+            when {
+                isContract -> throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
+                isValid -> address
+                else -> ""
+            }
+
+        }.flatMapMaybe { a ->
+            if (a.isEmpty()) {
+                Maybe.empty<ReceiveAddress>()
+            } else {
+                Maybe.just(UsdtAddress(address))
+            }
         }
 
     private fun isValidAddress(address: String): Boolean =

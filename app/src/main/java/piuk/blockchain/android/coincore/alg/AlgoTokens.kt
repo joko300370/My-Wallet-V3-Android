@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
@@ -62,7 +63,7 @@ internal class AlgoAsset(
             ))
         )
 
-    override fun parseAddress(address: String): ReceiveAddress? = null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()
 }
 
 internal class AlgoAddress(

@@ -6,13 +6,14 @@ import io.reactivex.Single
 
 open class TransferError(msg: String) : Exception(msg)
 
-class SendValidationError(errorCode: Int) : TransferError("Invalid Send Tx: code $errorCode") {
+class SendValidationError(val errorCode: Int) : TransferError("Invalid Send Tx: code $errorCode") {
     companion object {
         const val HAS_TX_IN_FLIGHT = 1000
         const val INVALID_AMOUNT = 1001
         const val INSUFFICIENT_FUNDS = 1002
         const val INSUFFICIENT_GAS = 1003
         const val INVALID_ADDRESS = 1004
+        const val ADDRESS_IS_CONTRACT = 1005
     }
 }
 

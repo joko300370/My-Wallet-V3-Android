@@ -30,6 +30,7 @@ enum class SendStep {
 enum class SendErrorState {
     INVALID_PASSWORD,
     INVALID_ADDRESS,
+    ADDRESS_IS_CONTRACT,
     FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
@@ -169,7 +170,7 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is SendValidationError -> process(SendIntent.TargetAddressInvalid)
+                        is SendValidationError -> process(SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }

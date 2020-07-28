@@ -68,6 +68,11 @@ class EnterTargetAddressSheet(
                         )
                         visible()
                     }
+                SendErrorState.ADDRESS_IS_CONTRACT ->
+                    error_msg.apply {
+                        text = getString(R.string.send_error_address_is_eth_contract)
+                        visible()
+                    }
                 else -> throw NotImplementedError("Not expected here")
             }
         }

@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.Asset
 import piuk.blockchain.android.coincore.AssetFilter
@@ -14,6 +15,7 @@ import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -66,5 +68,5 @@ class FiatAsset(
     override fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList> =
         Single.just(emptyList())
 
-    override fun parseAddress(address: String): CryptoAddress? = null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()
 }

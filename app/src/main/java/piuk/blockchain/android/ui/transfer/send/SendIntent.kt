@@ -6,6 +6,7 @@ import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -72,14 +73,17 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    object TargetAddressInvalid : SendIntent() {
+    class TargetAddressInvalid(private val error: SendValidationError) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                errorState = SendErrorState.INVALID_ADDRESS,
+                errorState = when (error.errorCode) {
+                    SendValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
+                    else -> SendErrorState.INVALID_ADDRESS
+                },
                 sendTarget = NullCryptoAccount,
                 nextEnabled = false
             )
-    }
+        }
 
     class TargetSelectionConfirmed(
         val sendTarget: SendTarget
