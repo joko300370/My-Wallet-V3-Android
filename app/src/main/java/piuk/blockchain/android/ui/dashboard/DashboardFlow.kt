@@ -21,10 +21,6 @@ class DashboardFlow(
     val model: DashboardModel
 ) : DialogFlow() {
 
-    init {
-        Timber.e("----- starting dashboard flow for $cryptoCurrency")
-    }
-
     private var currentStep: DashboardStep = DashboardStep.ZERO
     private val disposables = CompositeDisposable()
 
