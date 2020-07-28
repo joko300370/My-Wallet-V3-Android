@@ -662,7 +662,7 @@ val applicationModule = module {
 
         factory { ConfirmPaymentPresenter() }
 
-        factory {
+        scoped {
             DashboardModel(
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
@@ -671,7 +671,7 @@ val applicationModule = module {
             )
         }
 
-        factory {
+        scoped {
             DashboardInteractor(
                 coincore = get(),
                 payloadManager = get(),

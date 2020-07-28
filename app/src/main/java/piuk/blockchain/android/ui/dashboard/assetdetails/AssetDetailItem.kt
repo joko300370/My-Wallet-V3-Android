@@ -26,9 +26,6 @@ import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
-import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 data class AssetDetailItem(
     val assetFilter: AssetFilter,
@@ -44,6 +41,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     fun bind(
         item: AssetDetailItem,
         onActionSelected: AssetActionHandler,
+        onAccountSelected: (BlockchainAccount) -> Unit,
         analytics: Analytics
     ) {
         with(itemView) {
@@ -65,12 +63,16 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 )
             }
 
-            if (item.actions.isEmpty()) {
+            rootView.setOnClickListener {
+                onAccountSelected(item.account)
+            }
+
+           /* if (item.actions.isEmpty()) {
                 action_menu.invisible()
             } else {
                 action_menu.visible()
                 setOnClickListenerDebounced { doShowMenu(item, onActionSelected, analytics) }
-            }
+            }*/
 
             asset_spend_locked.goneIf {
                 item.assetFilter == AssetFilter.NonCustodial || item.assetFilter == AssetFilter.Interest
@@ -172,6 +174,7 @@ typealias AssetActionHandler = (action: AssetAction, account: BlockchainAccount)
 internal class AssetDetailAdapter(
     private val itemList: List<AssetDetailItem>,
     private val onActionSelected: AssetActionHandler,
+    private val onAccountSelected: (BlockchainAccount) -> Unit,
     private val analytics: Analytics,
     private val showBanner: Boolean,
     private val token: CryptoAsset
@@ -199,7 +202,7 @@ internal class AssetDetailAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is AssetDetailViewHolder) {
-            holder.bind(itemList[position], onActionSelected, analytics)
+            holder.bind(itemList[position], onActionSelected, onAccountSelected, analytics)
         } else {
             (holder as LabelViewHolder).bind(token)
         }

@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
@@ -43,17 +44,17 @@ class DashboardFlow(
             if (currentStep == DashboardStep.ZERO) {
                 //onSendComplete()
             } else {
-                showFlowStep(currentStep)
+                showFlowStep(currentStep, newState)
             }
         }
     }
 
-    private fun showFlowStep(step: DashboardStep) {
+    private fun showFlowStep(step: DashboardStep, newState: DashboardState) {
         replaceBottomSheet(
             when (step) {
                 DashboardStep.ZERO -> null
                 DashboardStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                DashboardStep.ASSET_ACTIONS -> TODO()//EnterTargetAddressSheet(this)
+                DashboardStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!)
             }
         )
     }

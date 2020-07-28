@@ -13,6 +13,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
@@ -121,6 +122,7 @@ data class DashboardState(
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
     val selectedFiatAccount: FiatAccount? = null,
+    val selectedAccount: BlockchainAccount? = null,
     val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO
 ) : MviState, BalanceState, KoinComponent {
 
@@ -258,7 +260,8 @@ class DashboardModel(
             is UpdateLaunchDialogFlow,
             is ClearBottomSheet,
             is ShowAssetDetailsIntent,
-            is ShowAssetActionsIntent -> null
+            is ShowAssetActionsIntent,
+            is ReturnToPreviousStep -> null
         }
     }
 

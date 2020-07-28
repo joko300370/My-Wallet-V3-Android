@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -36,7 +37,9 @@ class BalanceUpdate(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         val balance = newBalance as CryptoValue
-        require(cryptoCurrency == balance.currency) { throw IllegalStateException("CryptoCurrency mismatch") }
+        require(cryptoCurrency == balance.currency) {
+            throw IllegalStateException("CryptoCurrency mismatch")
+        }
 
         val oldAsset = oldState[cryptoCurrency]
         val newAsset = oldAsset.copy(balance = newBalance, hasBalanceError = false)
@@ -270,7 +273,7 @@ object TransferFunds : DashboardIntent() {
 
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
-    }
+}
 
 class LaunchSendFlow(
     val fromAccount: SingleAccount
@@ -298,16 +301,19 @@ class LaunchAssetDetailsFlow(
         )
 }
 
-object ShowAssetDetailsIntent: DashboardIntent() {
+object ShowAssetDetailsIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             assetDetailsCurrentStep = DashboardStep.ASSET_DETAILS
         )
 }
 
-object ShowAssetActionsIntent: DashboardIntent() {
+class ShowAssetActionsIntent(
+    val account: BlockchainAccount
+) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
+            selectedAccount = account,
             assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS
         )
 }
@@ -323,4 +329,19 @@ class UpdateLaunchDialogFlow(
             pendingAssetSheetFor = null,
             transferFundsCurrency = null
         )
+}
+
+object ReturnToPreviousStep : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        val steps = DashboardStep.values()
+        val currentStep = oldState.assetDetailsCurrentStep.ordinal
+        if (currentStep == 0) {
+            throw IllegalStateException("Cannot go back")
+        }
+        val previousStep = steps[currentStep - 1]
+
+        return oldState.copy(
+            assetDetailsCurrentStep = previousStep
+        )
+    }
 }

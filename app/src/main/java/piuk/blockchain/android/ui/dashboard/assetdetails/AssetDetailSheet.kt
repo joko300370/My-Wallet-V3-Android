@@ -35,6 +35,8 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.dashboard.DashboardModel
+import piuk.blockchain.android.ui.dashboard.ShowAssetActionsIntent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -54,9 +56,10 @@ import java.util.Locale
 class AssetDetailSheet : SlidingModalBottomDialog() {
 
     val compositeDisposable = CompositeDisposable()
-
     private val currencyPrefs: CurrencyPrefs by inject()
+
     private val assetDetailsViewModel: AssetDetailsCalculator by scopedInject()
+    private val model : DashboardModel by scopedInject()
     private val locale = Locale.getDefault()
 
     interface Host : SlidingModalBottomDialog.Host {
@@ -189,9 +192,13 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
                 )
             }
 
-            asset_list.adapter = AssetDetailAdapter(itemList, ::onAssetActionSelected, analytics,
+            asset_list.adapter = AssetDetailAdapter(itemList, ::onAssetActionSelected, ::onAccountSelected, analytics,
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token)
         }
+    }
+
+    private fun onAccountSelected(account: BlockchainAccount) {
+        model.process(ShowAssetActionsIntent(account))
     }
 
     private fun onAssetActionSelected(action: AssetAction, account: BlockchainAccount) {
