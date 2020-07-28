@@ -271,7 +271,6 @@ abstract class CryptoNonCustodialAccount(
     }
 }
 
-
 // Currently only one custodial account is supported for each asset,
 // so all the methods on this can just delegate directly
 // to the (required) CryptoSingleAccountCustodialBase
