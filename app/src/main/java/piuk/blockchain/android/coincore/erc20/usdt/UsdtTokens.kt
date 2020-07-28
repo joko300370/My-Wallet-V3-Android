@@ -13,12 +13,10 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
-import piuk.blockchain.android.coincore.erc20.pax.PaxAddress
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -80,7 +78,6 @@ internal class UsdtAsset(
                 isValid -> address
                 else -> ""
             }
-
         }.flatMapMaybe { a ->
             if (a.isEmpty()) {
                 Maybe.empty<ReceiveAddress>()

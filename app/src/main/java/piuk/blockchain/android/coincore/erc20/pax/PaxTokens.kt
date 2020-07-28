@@ -79,7 +79,6 @@ internal class PaxAsset(
                 isValid -> address
                 else -> ""
             }
-
         }.flatMapMaybe { a ->
             if (a.isEmpty()) {
                 Maybe.empty<ReceiveAddress>()

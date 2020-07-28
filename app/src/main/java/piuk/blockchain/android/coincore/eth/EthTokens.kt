@@ -76,7 +76,6 @@ internal class EthAsset(
                     isValid -> address
                     else -> ""
                 }
-
         }.flatMapMaybe { a ->
             if (a.isEmpty()) {
                 Maybe.empty<ReceiveAddress>()
