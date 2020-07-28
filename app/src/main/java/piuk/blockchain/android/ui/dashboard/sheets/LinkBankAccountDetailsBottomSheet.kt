@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.bankFieldName
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.notifications.analytics.linkBankEventWithCurrency
+import com.blockchain.notifications.analytics.linkBankFieldCopied
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
@@ -58,9 +60,22 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                         copyListener
                     )
                     configureUi(fiatCurrency, view)
+
+                    analytics.logEvent(
+                        linkBankEventWithCurrency(
+                            SimpleBuyAnalytics.LINK_BANK_SCREEN_SHOWN,
+                            fiatCurrency
+                        )
+                    )
                 },
                 onError = {
                     renderErrorUi(view)
+                    analytics.logEvent(
+                        linkBankEventWithCurrency(
+                            SimpleBuyAnalytics.LINK_BANK_LOADING_ERROR,
+                            fiatCurrency
+                        )
+                    )
                 }
             )
     }
@@ -117,7 +132,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
 
     private val copyListener = object : CopyFieldListener {
         override fun onFieldCopied(field: String) {
-            analytics.logEvent(bankFieldName(field))
+            analytics.logEvent(linkBankFieldCopied(field, fiatCurrency))
             ToastCustom.makeText(
                 requireContext(),
                 resources.getString(R.string.simple_buy_copied_to_clipboard, field),
