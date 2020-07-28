@@ -89,7 +89,7 @@ class Erc20SendTransaction(
 
     private fun validateAmount(pendingTx: PendingSendTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.ZeroUsdt) {
+            if (pendingTx.amount <= CryptoValue.zero(asset)) {
                 throw SendValidationError(SendValidationError.INVALID_AMOUNT)
             }
         }
@@ -133,7 +133,7 @@ class Erc20SendTransaction(
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-    //            .doOnSuccess { ethDataManager.updateTransactionNotes(it, pendingTx.notes) }
+            .doOnSuccess { ethDataManager.updateErc20TransactionNotes(it, pendingTx.notes) }
 
     private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(
