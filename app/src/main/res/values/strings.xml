@@ -5,6 +5,8 @@
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
     <string name="common_send">Send</string>
+    <string name="common_receive">Receive</string>
+    <string name="common_swap">Swap</string>
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_yes">Yes</string>
@@ -12,6 +14,7 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_total">Total</string>
+    <string name="common_deposit">Deposit</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -42,7 +45,6 @@
     <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
     <string name="toolbar_cmd_view_activity">View Activity</string>
-    <string name="toolbar_cmd_swap">Swap</string>
 
     <string name="polite_no">No thanks</string>
 
@@ -855,6 +857,13 @@
     <string name="dashboard_asset_balance_custodial">Trading Wallet</string>
     <string name="dashboard_asset_balance_interest">Earn %1$.1f%% APY</string>
 
+    <string name="dashboard_asset_actions_send_dsc">Transfer %1$s to any Wallet</string>
+    <string name="dashboard_asset_actions_receive_dsc">Accept or Share Your %1$s Address</string>
+    <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
+    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Wallet</string>
+    <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
+    <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
+
     <string name="more">More</string>
 
     <string name="force_upgrade_message">The version of the app you are using is no longer
@@ -982,7 +991,6 @@
         due to market activity. Once an order starts, we are unable to stop it
     </string>
     <string name="send_to">Send To</string>
-    <string name="receive">Receive</string>
     <string name="value">Value</string>
     <string name="status">Status</string>
 
@@ -1799,7 +1807,6 @@
     <string name="most_popular">Most Popular</string>
 
     <!-- Fiat Funds -->
-    <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>

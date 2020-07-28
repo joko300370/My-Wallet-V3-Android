@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">Nhận được</string>
   <string name="toolbar_cmd_activity">Hoạt động</string>
   <string name="toolbar_cmd_view_activity">Xem hoạt động</string>
-  <string name="toolbar_cmd_swap">Trao đổi</string>
+  <string name="common_swap">Trao đổi</string>
   <string name="cancel">Hủy bỏ</string>
   <string name="btn_ok">đồng ý</string>
   <string name="common_yes">Đúng</string>
@@ -826,7 +826,7 @@
  do hoạt động thị trường. Khi một đơn đặt hàng bắt đầu, chúng tôi không thể dừng nó 
 </string>
   <string name="send_to">Gửi đến</string>
-  <string name="receive">Nhận được</string>
+  <string name="common_receive">Nhận được</string>
   <string name="fees">Lệ phí</string>
   <string name="value">Giá trị</string>
   <string name="status">Trạng thái</string>

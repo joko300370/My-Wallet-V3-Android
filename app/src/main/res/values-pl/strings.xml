@@ -48,7 +48,7 @@
   <string name="toolbar_cmd_receive_crypto">Otrzymać</string>
   <string name="toolbar_cmd_activity">Czynność</string>
   <string name="toolbar_cmd_view_activity">Wyświetl aktywność</string>
-  <string name="toolbar_cmd_swap">Zamiana</string>
+  <string name="common_swap">Zamiana</string>
   <string name="cancel">Anuluj</string>
   <string name="btn_ok">dobrze</string>
   <string name="common_yes">tak</string>
@@ -829,7 +829,7 @@
  z powodu aktywności rynkowej. Po rozpoczęciu zamówienia nie możemy go zatrzymać 
 </string>
   <string name="send_to">Wysłać do</string>
-  <string name="receive">Otrzymać</string>
+  <string name="common_receive">Otrzymać</string>
   <string name="fees">Opłaty</string>
   <string name="value">Wartość</string>
   <string name="status">Status</string>

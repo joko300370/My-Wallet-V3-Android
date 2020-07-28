@@ -47,7 +47,7 @@
   <string name="toolbar_cmd_receive_crypto">A primi</string>
   <string name="toolbar_cmd_activity">Activitate</string>
   <string name="toolbar_cmd_view_activity">Vizualizare activitate</string>
-  <string name="toolbar_cmd_swap">schimb</string>
+  <string name="common_swap">schimb</string>
   <string name="cancel">Anulare</string>
   <string name="btn_ok">O.K</string>
   <string name="common_yes">da</string>
@@ -828,7 +828,7 @@
  datorită activității pieței. Odată ce începe o comandă, nu putem să o oprim 
 </string>
   <string name="send_to">Trimite catre</string>
-  <string name="receive">A primi</string>
+  <string name="common_receive">A primi</string>
   <string name="fees">Taxe</string>
   <string name="value">Valoare</string>
   <string name="status">stare</string>

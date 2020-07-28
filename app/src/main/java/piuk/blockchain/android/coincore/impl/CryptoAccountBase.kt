@@ -23,8 +23,8 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
@@ -207,7 +207,8 @@ internal class CryptoInterestAccount(
     override val actions: AvailableActions
         get() = availableActions
 
-    private val availableActions = emptySet<AssetAction>()
+    private val availableActions =
+        setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
 }
 
 // To handle Send to PIT

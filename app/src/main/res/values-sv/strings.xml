@@ -46,7 +46,7 @@
   <string name="toolbar_cmd_receive_crypto">Motta</string>
   <string name="toolbar_cmd_activity">Aktivitet</string>
   <string name="toolbar_cmd_view_activity">Visa aktivitet</string>
-  <string name="toolbar_cmd_swap">Byta</string>
+  <string name="common_swap">Byta</string>
   <string name="cancel">Annullera</string>
   <string name="btn_ok">OK</string>
   <string name="common_yes">Ja</string>
@@ -827,7 +827,7 @@
  på grund av marknadsaktivitet. När en beställning startar kan vi inte stoppa den 
 </string>
   <string name="send_to">Skicka till</string>
-  <string name="receive">Motta</string>
+  <string name="common_receive">Motta</string>
   <string name="fees">avgifter</string>
   <string name="value">Värde</string>
   <string name="status">Status</string>

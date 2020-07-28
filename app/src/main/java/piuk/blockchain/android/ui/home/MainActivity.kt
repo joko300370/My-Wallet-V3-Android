@@ -810,7 +810,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 R.drawable.ic_vector_toolbar_activity,
                 R.color.white
             ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_swap,
+                R.string.common_swap,
                 R.drawable.ic_vector_toolbar_swap,
                 R.color.white
             ), AHBottomNavigationItem(

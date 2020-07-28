@@ -46,7 +46,7 @@
   <string name="toolbar_cmd_receive_crypto">Teslim almak</string>
   <string name="toolbar_cmd_activity">Aktivite</string>
   <string name="toolbar_cmd_view_activity">Etkinliği görüntüle</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">İptal etmek</string>
   <string name="btn_ok">tamam</string>
   <string name="common_yes">Evet</string>
@@ -827,7 +827,7 @@
  piyasa faaliyeti nedeniyle. Bir sipariş başladıktan sonra durduramayız 
 </string>
   <string name="send_to">Gönderildi</string>
-  <string name="receive">Teslim almak</string>
+  <string name="common_receive">Teslim almak</string>
   <string name="fees">harç</string>
   <string name="value">değer</string>
   <string name="status">durum</string>

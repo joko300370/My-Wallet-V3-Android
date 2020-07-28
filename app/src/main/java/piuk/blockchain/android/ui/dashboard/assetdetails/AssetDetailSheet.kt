@@ -209,6 +209,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             AssetAction.NewSend -> host.launchNewSendFor(selectAccount(account))
             AssetAction.Receive -> host.goToReceiveFor(selectAccount(account))
             AssetAction.Swap -> host.gotoSwap(selectAccount(account))
+            else -> { TODO() }
         }.exhaustive
     }
 

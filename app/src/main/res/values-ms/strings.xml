@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">Terima</string>
   <string name="toolbar_cmd_activity">Aktiviti</string>
   <string name="toolbar_cmd_view_activity">Lihat Aktiviti</string>
-  <string name="toolbar_cmd_swap">Pertukaran</string>
+  <string name="common_swap">Pertukaran</string>
   <string name="cancel">Batalkan</string>
   <string name="btn_ok">okey</string>
   <string name="common_yes">Ya</string>
@@ -826,7 +826,7 @@
  disebabkan oleh aktiviti pasaran. Sebaik sahaja pesanan dimulakan, kami tidak dapat menghentikannya 
 </string>
   <string name="send_to">Hantar kepada</string>
-  <string name="receive">Terima</string>
+  <string name="common_receive">Terima</string>
   <string name="fees">Bayaran</string>
   <string name="value">Nilai</string>
   <string name="status">Status</string>

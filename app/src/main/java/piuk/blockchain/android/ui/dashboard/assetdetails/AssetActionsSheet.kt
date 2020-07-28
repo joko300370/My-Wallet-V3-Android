@@ -1,14 +1,23 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import android.content.Context
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.item_asset_action.view.*
 import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
@@ -22,9 +31,12 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.ReturnToPreviousStep
+import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
 class AssetActionsSheet : SlidingModalBottomDialog() {
@@ -37,14 +49,14 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     private val model: DashboardModel by scopedInject()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
+    private val itemAdapter: AssetActionAdapter by lazy {
+        AssetActionAdapter()
+    }
+
     override val layoutResource: Int
         get() = R.layout.sheet_asset_actions
 
     override fun initControls(view: View) {
-        mapInfo(view, account)
-
-        mapAccountIcon(view)
-
         disposables += Singles.zip(
             account.balance,
             account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
@@ -58,20 +70,25 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             }
         )
 
-        account.actions.forEach {
-            mapAction(it)
+        view.asset_actions_list.apply {
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            addItemDecoration(
+                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+            )
+            adapter = itemAdapter
         }
+
+        val actionItems = mapDetailsAndActions(view, account)
+        itemAdapter.itemList = actionItems
 
         view.asset_actions_back.setOnClickListener {
             model.process(ReturnToPreviousStep)
         }
     }
 
-    private fun mapAccountIcon(view: View) {
-
-    }
-
-    private fun mapInfo(view: View, account: BlockchainAccount) {
+    private fun mapDetailsAndActions(view: View,
+                                     account: BlockchainAccount): List<AssetActionItem> =
         when (account) {
             is CryptoInterestAccount -> {
                 view.asset_actions_title.text = labels.getDefaultInterestWalletLabel(account.asset)
@@ -86,42 +103,140 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                             Timber.e("----- error loading interest rate $it")
                         }
                     )
+                account.actions.map {
+                    mapAction(it, account.asset)
+                }
             }
             is CustodialTradingAccount -> {
                 view.asset_actions_title.text = getString(account.asset.assetName())
                 view.asset_actions_details.text =
                     labels.getDefaultCustodialWalletLabel(account.asset)
                 view.asset_actions_asset_icon.setImageResource(account.asset.drawableResFilled())
-
+                account.actions.map {
+                    mapAction(it, account.asset)
+                }
             }
             is CryptoNonCustodialAccount -> {
                 view.asset_actions_title.text = getString(account.asset.assetName())
                 view.asset_actions_details.text =
                     labels.getDefaultNonCustodialWalletLabel(account.asset)
                 view.asset_actions_asset_icon.setImageResource(account.asset.drawableResFilled())
+                account.actions.map {
+                    mapAction(it, account.asset)
+                }
+            }
+            is AccountGroup -> {
+                val sampleAccount = account.accounts.first() as CryptoAccount
+                view.asset_actions_title.text = getString(sampleAccount.asset.assetName())
+                view.asset_actions_details.text =
+                    labels.getDefaultNonCustodialWalletLabel(sampleAccount.asset)
+                view.asset_actions_asset_icon.setImageResource(
+                    sampleAccount.asset.drawableResFilled())
+                account.actions.map {
+                    mapAction(it, sampleAccount.asset)
+                }
+            }
+            else -> {
+                Timber.e("---- mapping failed, type? $account")
+                emptyList()
             }
         }
-    }
 
-    private fun mapAction(action: AssetAction) {
+    private fun mapAction(action: AssetAction, asset: CryptoCurrency): AssetActionItem =
         when (action) {
-            AssetAction.ViewActivity -> R.id.action_activity
-            AssetAction.Send,
-            AssetAction.NewSend -> R.id.action_send
-            AssetAction.Receive -> R.id.action_receive
-            AssetAction.Swap -> R.id.action_swap
+            AssetAction.ViewActivity ->
+                AssetActionItem(getString(R.string.activities_title),
+                    R.drawable.ic_tx_activity_clock,
+                    getString(R.string.fiat_funds_detail_activity_details), asset) {
+                    Timber.e("----- activity clicked")
+                }
+            AssetAction.Send ->
+                AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
+                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
+                    asset) {
+                    Timber.e("----- send clicked")
+                }
+            AssetAction.NewSend ->
+                AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
+                    getString(R.string.dashboard_asset_actions_send_dsc,
+                        asset.displayTicker), asset) {
+                    Timber.e("----- new send clicked")
+                }
+            AssetAction.Receive ->
+                AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
+                    getString(R.string.dashboard_asset_actions_receive_dsc,
+                        asset.displayTicker), asset) {
+                    Timber.e("----- receive clicked")
+                }
+            AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
+                R.drawable.ic_tx_swap,
+                getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
+                asset) {
+                Timber.e("----- swap clicked")
+            }
+            AssetAction.Summary -> AssetActionItem(
+                getString(R.string.dashboard_asset_actions_summary_title),
+                R.drawable.ic_tx_interest,
+                getString(R.string.dashboard_asset_actions_summary_dsc, asset.networkTicker),
+                asset) {
+                Timber.e("---- summary clicked")
+            }
+            AssetAction.Deposit -> AssetActionItem(getString(R.string.common_deposit),
+                R.drawable.ic_tx_deposit_arrow,
+                getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
+                asset) {
+                Timber.e("----- deposit clicked")
+            }
         }
-    }
 
     companion object {
         fun newInstance(blockchainAccount: BlockchainAccount): AssetActionsSheet {
             return AssetActionsSheet().apply {
-                account = if (blockchainAccount is AccountGroup) {
-                    blockchainAccount.accounts.first()
-                } else {
-                    blockchainAccount as CryptoAccount
-                }
+                account = blockchainAccount
             }
         }
     }
 }
+
+private class AssetActionAdapter : RecyclerView.Adapter<AssetActionAdapter.ActionItemViewHolder>() {
+    var itemList: List<AssetActionItem> = emptyList()
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActionItemViewHolder =
+        ActionItemViewHolder(parent.inflate(R.layout.item_asset_action))
+
+    override fun getItemCount(): Int = itemList.size
+
+    override fun onBindViewHolder(holder: ActionItemViewHolder, position: Int) =
+        holder.bind(itemList[position])
+
+    private class ActionItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        fun bind(item: AssetActionItem) {
+            view.item_action_holder.setOnClickListener {
+                item.actionCta()
+            }
+
+            view.item_action_icon.setImageResource(item.icon)
+            view.item_action_icon.setAssetIconColours(item.asset, view.context)
+            view.item_action_title.text = item.title
+            view.item_action_label.text = item.description
+        }
+
+        private fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency, context: Context) {
+            setBackgroundResource(R.drawable.bkgd_tx_circle)
+            background.setTint(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
+            setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))
+        }
+    }
+}
+
+private data class AssetActionItem(
+    val title: String,
+    val icon: Int,
+    val description: String,
+    val asset: CryptoCurrency,
+    val actionCta: () -> Unit
+)

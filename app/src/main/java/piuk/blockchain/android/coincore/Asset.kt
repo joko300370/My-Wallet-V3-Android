@@ -20,7 +20,9 @@ enum class AssetAction {
     Send,
     NewSend,
     Receive,
-    Swap
+    Swap,
+    Summary,
+    Deposit
 }
 
 typealias AvailableActions = Set<AssetAction>

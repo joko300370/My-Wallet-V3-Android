@@ -103,7 +103,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/asset_actions_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"

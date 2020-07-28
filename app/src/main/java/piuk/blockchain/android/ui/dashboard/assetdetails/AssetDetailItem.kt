@@ -156,6 +156,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             AssetAction.NewSend -> R.id.action_send
             AssetAction.Receive -> R.id.action_receive
             AssetAction.Swap -> R.id.action_swap
+            else -> { TODO() }
         }.exhaustive
 }
 

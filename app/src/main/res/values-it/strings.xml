@@ -46,7 +46,7 @@
   <string name="toolbar_cmd_receive_crypto">Ricevere</string>
   <string name="toolbar_cmd_activity">Attività</string>
   <string name="toolbar_cmd_view_activity">Vedi attività</string>
-  <string name="toolbar_cmd_swap">Scambiare</string>
+  <string name="common_swap">Scambiare</string>
   <string name="cancel">Annulla</string>
   <string name="btn_ok">ok</string>
   <string name="common_yes">sì</string>
@@ -827,7 +827,7 @@
  a causa dell\'attività di mercato. Una volta avviato un ordine, non siamo in grado di fermarlo 
 </string>
   <string name="send_to">Inviare a</string>
-  <string name="receive">Ricevere</string>
+  <string name="common_receive">Ricevere</string>
   <string name="fees">tasse</string>
   <string name="value">Valore</string>
   <string name="status">Stato</string>
