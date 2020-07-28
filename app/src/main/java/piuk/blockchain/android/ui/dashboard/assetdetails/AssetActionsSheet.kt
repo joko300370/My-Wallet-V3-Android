@@ -233,8 +233,10 @@ private class AssetActionAdapter : RecyclerView.Adapter<AssetActionAdapter.Actio
             view.item_action_label.text = item.description
         }
 
-        private fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency,
-                                                  context: Context) {
+        private fun ImageView.setAssetIconColours(
+            cryptoCurrency: CryptoCurrency,
+            context: Context
+        ) {
             setBackgroundResource(R.drawable.bkgd_tx_circle)
             background.setTint(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
             setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))

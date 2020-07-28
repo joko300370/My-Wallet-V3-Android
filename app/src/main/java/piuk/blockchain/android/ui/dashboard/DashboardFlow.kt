@@ -34,7 +34,7 @@ class DashboardFlow(
         model.apply {
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
-                onError = { Timber.e("Send state is broken: $it") }
+                onError = { Timber.e("Dashboard state is broken: $it") }
             )
         }
 
@@ -45,7 +45,7 @@ class DashboardFlow(
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
             if (currentStep == DashboardStep.ZERO) {
-                // onSendComplete()
+                finishFlow()
             } else {
                 showFlowStep(currentStep, newState)
             }
@@ -60,6 +60,12 @@ class DashboardFlow(
                 DashboardStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!)
             }
         )
+    }
+
+    override fun finishFlow() {
+        disposables.clear()
+        currentStep = DashboardStep.ZERO
+        super.finishFlow()
     }
 
     override fun onSheetClosed() {
