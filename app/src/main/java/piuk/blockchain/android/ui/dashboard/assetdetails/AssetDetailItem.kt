@@ -67,7 +67,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 onAccountSelected(item.account)
             }
 
-           /* if (item.actions.isEmpty()) {
+            /* if (item.actions.isEmpty()) {
                 action_menu.invisible()
             } else {
                 action_menu.visible()

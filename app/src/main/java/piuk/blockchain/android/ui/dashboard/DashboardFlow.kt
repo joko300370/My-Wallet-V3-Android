@@ -10,7 +10,6 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
 
-
 enum class DashboardStep {
     ZERO,
     ASSET_DETAILS,
@@ -42,7 +41,7 @@ class DashboardFlow(
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
             if (currentStep == DashboardStep.ZERO) {
-                //onSendComplete()
+                // onSendComplete()
             } else {
                 showFlowStep(currentStep, newState)
             }
@@ -61,5 +60,4 @@ class DashboardFlow(
     override fun onSheetClosed() {
         TODO("Not yet implemented")
     }
-
 }

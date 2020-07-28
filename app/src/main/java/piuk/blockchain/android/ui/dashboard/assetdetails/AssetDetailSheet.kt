@@ -59,7 +59,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private val currencyPrefs: CurrencyPrefs by inject()
 
     private val assetDetailsViewModel: AssetDetailsCalculator by scopedInject()
-    private val model : DashboardModel by scopedInject()
+    private val model: DashboardModel by scopedInject()
     private val locale = Locale.getDefault()
 
     interface Host : SlidingModalBottomDialog.Host {

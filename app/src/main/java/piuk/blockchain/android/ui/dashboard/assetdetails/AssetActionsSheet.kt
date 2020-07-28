@@ -87,8 +87,10 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
     }
 
-    private fun mapDetailsAndActions(view: View,
-                                     account: BlockchainAccount): List<AssetActionItem> =
+    private fun mapDetailsAndActions(
+        view: View,
+        account: BlockchainAccount
+    ): List<AssetActionItem> =
         when (account) {
             is CryptoInterestAccount -> {
                 view.asset_actions_title.text = labels.getDefaultInterestWalletLabel(account.asset)
