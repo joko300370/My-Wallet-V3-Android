@@ -247,6 +247,7 @@ val applicationModule = module {
                 xlmDataManager = get(),
                 environmentSettings = get(),
                 paxAccount = get(paxAccount),
+                usdtAccount = get(usdtAccount),
                 crashLogger = get()
             )
         }
