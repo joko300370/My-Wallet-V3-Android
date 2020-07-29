@@ -253,7 +253,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     override fun onPause() {
         super.onPause()
-        model.process(SimpleBuyIntent.ConfirmationHandled)
+        model.process(SimpleBuyIntent.NavigationHandled)
     }
 
     override fun onSheetClosed() {

@@ -338,13 +338,13 @@ class LiveCustodialWalletManager(
     ) = authenticator.authenticate {
         Singles.zip(
             assetBalancesRepository.getBalanceForAsset(fiatCurrency)
-                .toSingle(FiatValue.zero(fiatCurrency)),
+                .map { balance -> CustodialFiatBalance(fiatCurrency, true, balance) }
+                .toSingle(CustodialFiatBalance(fiatCurrency, false, null)),
             nabuService.getCards(it).onErrorReturn { emptyList() },
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
                 updateSupportedCards(it)
-            }
-        )
-    }.map { (fiatBalance, cardsResponse, paymentMethods) ->
+            })
+    }.map { (custodialFiatBalance, cardsResponse, paymentMethods) ->
         val availablePaymentMethods = mutableListOf<PaymentMethod>()
 
         paymentMethods.methods.forEach {
@@ -354,20 +354,22 @@ class LiveCustodialWalletManager(
                     ?.forEach { cardResponse: CardResponse ->
                         availablePaymentMethods.add(cardResponse.toCardPaymentMethod(cardLimits))
                     }
-            } else if (it.type == PaymentMethodResponse.FUNDS &&
+            } else if (
+                it.type == PaymentMethodResponse.FUNDS &&
                 it.currency == fiatCurrency &&
                 SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) &&
                 fundsEnabled
             ) {
-                val fundsLimits =
-                    PaymentLimits(it.limits.min,
-                        it.limits.max.coerceAtMost(fiatBalance.valueMinor), it.currency)
-                availablePaymentMethods.add(PaymentMethod.Funds(
-                    fiatBalance,
-                    it.currency,
-                    fundsLimits
-                ))
-
+                custodialFiatBalance.balance?.let { balance ->
+                    val fundsLimits =
+                        PaymentLimits(it.limits.min,
+                            it.limits.max.coerceAtMost(balance.toBigInteger().toLong()), it.currency)
+                    availablePaymentMethods.add(PaymentMethod.Funds(
+                        balance,
+                        it.currency,
+                        fundsLimits
+                    ))
+                }
                 availablePaymentMethods.add(PaymentMethod.UndefinedFunds(
                     it.currency,
                     PaymentLimits(it.limits.min, it.limits.max, it.currency)))
@@ -380,9 +382,12 @@ class LiveCustodialWalletManager(
             availablePaymentMethods.add(PaymentMethod.UndefinedCard(PaymentLimits(it.limits.min,
                 it.limits.max,
                 fiatCurrency)))
-            if (cardsResponse.isEmpty() && isTier2Approved) {
-                availablePaymentMethods.add(PaymentMethod.Undefined)
-            }
+        }
+
+        if (!availablePaymentMethods.any {
+                it is PaymentMethod.Card || it is PaymentMethod.Funds
+            }) {
+            availablePaymentMethods.add(PaymentMethod.Undefined)
         }
 
         availablePaymentMethods.sortedBy { it.order }.toList()
@@ -484,24 +489,30 @@ class LiveCustodialWalletManager(
                 }
             }
 
-    override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean) =
-        fundsFeatureFlag.enabled.flatMap { enabled ->
+    override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>> {
+
+        val custodialBalances = Single.zip(SUPPORTED_FUNDS_CURRENCIES.map { currency ->
+            assetBalancesRepository.getBalanceForAsset(currency)
+                .map { balance -> CustodialFiatBalance(currency, true, balance) }
+                .toSingle(CustodialFiatBalance(currency, false, null))
+        }) { array: Array<Any> ->
+            array.map { it as CustodialFiatBalance }
+        }
+
+        return fundsFeatureFlag.enabled.flatMap { enabled ->
             if (enabled) {
-                authenticator.authenticate {
-                    nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
-                }.map { paymentMethodsResponse ->
-                    paymentMethodsResponse.methods.filter {
-                        it.type == PaymentMethodResponse.FUNDS &&
-                                SUPPORTED_FUNDS_CURRENCIES.contains(
-                                    it.currency)
-                    }.mapNotNull {
-                        it.currency
+                if (!isTier2Approved) { // return all supported currencies in case of non KYC'ed user
+                    Single.just(SUPPORTED_FUNDS_CURRENCIES)
+                } else { // otherwise show all currencies that there is a balance returned from the API
+                    custodialBalances.map { balances ->
+                        balances.filter { it.available }.map { it.currency }
                     }
                 }
             } else {
                 Single.just(emptyList())
             }
         }
+    }
 
     override fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String> =
         authenticator.authenticateMaybe { sessionToken ->
@@ -665,3 +676,5 @@ private fun String.toPaymentMethodType(): PaymentMethodType =
 interface PaymentAccountMapper {
     fun map(bankAccountResponse: BankAccountResponse): BankAccount?
 }
+
+private data class CustodialFiatBalance(val currency: String, val available: Boolean, val balance: FiatValue?)

@@ -163,12 +163,12 @@ class SimpleBuyInteractor(
                 SimpleBuyIntent.PaymentMethodsUpdated(
                     availablePaymentMethods = paymentMethods,
                     canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkFunds = paymentMethods.firstOrNull { it is PaymentMethod.UndefinedFunds } != null,
+                    canLinkFunds = tier.isApprovedFor(KycTierLevel.GOLD),
                     preselectedId = if (tier.isApprovedFor(
                             KycTierLevel.GOLD) || preselectedId != null) {
                         preselectedId
                     } else {
-                        PaymentMethod.UNDEFINED_FUNDS_PAYMENT_ID
+                        PaymentMethod.UNDEFINED_PAYMENT_ID
                     }
                 )
             }
