@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
@@ -126,11 +127,14 @@ open class CustodialTradingAccount(
     override val actions: AvailableActions
         get() =
             mutableSetOf(
-                AssetAction.ViewActivity,
-                AssetAction.NewSend
+                AssetAction.ViewActivity
             ).apply {
-                if (!isFunded) {
-                    remove(AssetAction.NewSend)
+                if (isFunded) {
+                    if (ENABLE_NEW_SEND_ACTION) {
+                        add(AssetAction.NewSend)
+                    } else {
+                        add(AssetAction.Send)
+                    }
                 }
             }
 
