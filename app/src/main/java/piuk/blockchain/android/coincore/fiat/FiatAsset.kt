@@ -12,7 +12,6 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.Asset
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AccountGroup
-import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
