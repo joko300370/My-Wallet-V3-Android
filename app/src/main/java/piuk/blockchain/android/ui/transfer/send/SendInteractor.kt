@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.androidcore.utils.extensions.then
 
 class SendInteractor(
@@ -41,7 +42,7 @@ class SendInteractor(
             }
 
     fun initialiseTransaction(
-        sourceAccount: CryptoAccount,
+        sourceAccount: SingleAccount,
         targetAddress: SendTarget
     ): Completable =
         sourceAccount.createSendProcessor(targetAddress)
