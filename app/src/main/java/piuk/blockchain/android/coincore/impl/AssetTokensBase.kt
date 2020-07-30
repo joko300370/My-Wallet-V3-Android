@@ -10,6 +10,7 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -88,13 +89,33 @@ internal abstract class CryptoAssetBase(
 
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            listOf(CustodialTradingAccount(
+            CustodialTradingAccount(
                 asset,
                 labels.getDefaultCustodialWalletLabel(asset),
                 exchangeRates,
                 custodialManager
-            ))
-        )
+            )
+        ).flatMap { account ->
+            account.balance.map {
+                if (account.hasSeenFunds) {
+                    listOf(account)
+                } else {
+                    emptyList()
+                }
+            }
+        }
+
+//    open fun loadCustodialAccount(): Single<SingleAccountList> =
+//        Single.just(
+//            listOf(
+//                CustodialTradingAccount(
+//                    asset,
+//                    labels.getDefaultCustodialWalletLabel(asset),
+//                    exchangeRates,
+//                    custodialManager
+//                )
+//            )
+//        )
 
     final override fun accountGroup(filter: AssetFilter): Single<AccountGroup> =
         Single.fromCallable {
@@ -108,9 +129,7 @@ internal abstract class CryptoAssetBase(
 
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
-            .doOnSuccess { Timber.d("@@@@ got unfiltered list: $it") }
             .map { group -> group.accounts.mapNotNull { it as? SingleAccount } }
-            .doOnSuccess { Timber.d("@@@@ got list: $it") }
 
     final override fun exchangeRate(): Single<ExchangeRate> =
         exchangeRates.fetchExchangeRate(asset, currencyPrefs.selectedFiatCurrency)
