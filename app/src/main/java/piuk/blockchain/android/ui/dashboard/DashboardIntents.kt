@@ -305,12 +305,12 @@ class LaunchAssetDetailsFlow(
         )
 }
 
-object ShowAssetDetailsIntent : DashboardIntent() {
+/*object ShowAssetDetailsIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             assetDetailsCurrentStep = DashboardStep.ASSET_DETAILS
         )
-}
+}*/
 
 class ShowAssetActionsIntent(
     val account: BlockchainAccount,

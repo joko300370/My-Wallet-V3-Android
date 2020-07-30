@@ -198,8 +198,7 @@ class DashboardInteractor(
         model.process(
             UpdateLaunchDialogFlow(
                 DashboardFlow(
-                    cryptoCurrency = cryptoCurrency,
-                    model = model
+                    cryptoCurrency = cryptoCurrency
                 )
             )
         )

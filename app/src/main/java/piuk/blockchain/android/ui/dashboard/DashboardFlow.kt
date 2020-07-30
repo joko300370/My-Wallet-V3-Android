@@ -1,12 +1,17 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.fragment.app.FragmentManager
+import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
+import piuk.blockchain.android.ui.dashboard.assetdetails.ShowAssetDetailsIntent
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
 
@@ -17,12 +22,12 @@ enum class DashboardStep {
 }
 
 class DashboardFlow(
-    val cryptoCurrency: CryptoCurrency,
-    val model: DashboardModel
-) : DialogFlow() {
+    val cryptoCurrency: CryptoCurrency
+) : DialogFlow(), KoinComponent {
 
     private var currentStep: DashboardStep = DashboardStep.ZERO
     private val disposables = CompositeDisposable()
+    private val model: AssetDetailsModel by scopedInject()
 
     override fun startFlow(fragmentManager: FragmentManager, host: FlowHost) {
         super.startFlow(fragmentManager, host)
@@ -37,7 +42,7 @@ class DashboardFlow(
         model.process(ShowAssetDetailsIntent)
     }
 
-    private fun handleStateChange(newState: DashboardState) {
+    private fun handleStateChange(newState: AssetDetailsState) {
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
             if (currentStep == DashboardStep.ZERO) {
@@ -48,7 +53,7 @@ class DashboardFlow(
         }
     }
 
-    private fun showFlowStep(step: DashboardStep, newState: DashboardState) {
+    private fun showFlowStep(step: DashboardStep, newState: AssetDetailsState) {
         replaceBottomSheet(
             when (step) {
                 DashboardStep.ZERO -> null

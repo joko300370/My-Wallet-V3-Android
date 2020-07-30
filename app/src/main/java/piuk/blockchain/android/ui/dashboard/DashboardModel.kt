@@ -260,7 +260,7 @@ class DashboardModel(
             is TransferFunds,
             is UpdateLaunchDialogFlow,
             is ClearBottomSheet,
-            is ShowAssetDetailsIntent,
+         //   is ShowAssetDetailsIntent,
             is ShowAssetActionsIntent,
             is ReturnToPreviousStep -> null
         }

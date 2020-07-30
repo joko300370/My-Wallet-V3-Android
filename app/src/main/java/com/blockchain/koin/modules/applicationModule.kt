@@ -96,6 +96,8 @@ import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.fingerprint.FingerprintPresenter
 import piuk.blockchain.android.ui.home.CacheCredentialsWiper
@@ -662,7 +664,7 @@ val applicationModule = module {
 
         factory { ConfirmPaymentPresenter() }
 
-        scoped {
+        factory {
             DashboardModel(
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
@@ -671,7 +673,7 @@ val applicationModule = module {
             )
         }
 
-        scoped {
+        factory {
             DashboardInteractor(
                 coincore = get(),
                 payloadManager = get(),
@@ -680,6 +682,13 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get()
+            )
+        }
+
+        factory {
+            AssetDetailsModel(
+                initialState = AssetDetailsState(),
+                mainScheduler = AndroidSchedulers.mainThread()
             )
         }
 
