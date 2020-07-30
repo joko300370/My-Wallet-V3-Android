@@ -21,6 +21,9 @@ class SendInteractor(
 ) {
     private var sendProcessor: SendProcessor? = null
 
+    val processorConfigured: Boolean
+        get() = sendProcessor != null
+
     fun validatePassword(password: String): Single<Boolean> =
         Single.just(coincore.validateSecondPassword(password))
 
@@ -45,7 +48,8 @@ class SendInteractor(
             .doOnSuccess { sendProcessor = it }
             .ignoreElement()
 
-    fun getAvailableBalance(tx: PendingSendTx): Single<Money> = sendProcessor!!.availableBalance(tx)
+    fun getAvailableBalance(tx: PendingSendTx): Single<Money> =
+        sendProcessor!!.availableBalance(tx)
 
     fun verifyAndExecute(tx: PendingSendTx): Completable =
         sendProcessor!!.validate(tx)

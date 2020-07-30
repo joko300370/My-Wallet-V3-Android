@@ -1841,6 +1841,7 @@
     <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
+    <string name="send_select_target_title">Destination</string>
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
     <string name="send_enter_amount_title">Amount</string>
@@ -1872,4 +1873,5 @@
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
     <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %1$s Trade Wallet to your Vault Wallets. Once %1$s is in your Vault Wallet you can transfer to external addresses.</string>
+
 </resources>

@@ -25,6 +25,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import timber.log.Timber
@@ -74,8 +75,7 @@ class EnterAmountSheet(
                         .toStringWithSymbol()} (${newState.availableBalance.toStringWithSymbol()})"
             }
 
-            amount_sheet_asset_icon.setImageDrawable(ContextCompat.getDrawable(context,
-                newState.sendingAccount.asset.drawableResFilled()))
+            amount_sheet_asset_icon.setCoinIcon(newState.sendingAccount.asset)
             amount_sheet_asset_direction.setAssetIconColours(newState.sendingAccount.asset, context)
 
             amount_sheet_from.text =
