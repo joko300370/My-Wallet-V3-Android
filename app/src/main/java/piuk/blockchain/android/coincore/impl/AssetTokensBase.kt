@@ -10,10 +10,9 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -105,18 +104,6 @@ internal abstract class CryptoAssetBase(
             }
         }
 
-//    open fun loadCustodialAccount(): Single<SingleAccountList> =
-//        Single.just(
-//            listOf(
-//                CustodialTradingAccount(
-//                    asset,
-//                    labels.getDefaultCustodialWalletLabel(asset),
-//                    exchangeRates,
-//                    custodialManager
-//                )
-//            )
-//        )
-
     final override fun accountGroup(filter: AssetFilter): Single<AccountGroup> =
         Single.fromCallable {
             filterTokenAccounts(asset, labels, accounts, filter)
@@ -166,17 +153,21 @@ internal abstract class CryptoAssetBase(
                 )
             }
 
-    final override fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList> =
-        when (account) {
+    final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
+        require(account is CryptoAccount)
+        require(account.asset == asset)
+
+        return when (account) {
             is CustodialTradingAccount -> getNonCustodialAccountList()
             is CryptoInterestAccount -> Single.just(emptyList())
             is CryptoExchangeAccount -> Single.just(emptyList())
             is CryptoNonCustodialAccount -> getPitLinkingAccount()
-                    .map { listOf(it) }
-                    .toSingle(emptyList())
-                    .onErrorReturn { emptyList() }
+                .map { listOf(it) }
+                .toSingle(emptyList())
+                .onErrorReturn { emptyList() }
             else -> Single.just(emptyList())
         }
+    }
 }
 
 fun ExchangeRateDataManager.fetchExchangeRate(

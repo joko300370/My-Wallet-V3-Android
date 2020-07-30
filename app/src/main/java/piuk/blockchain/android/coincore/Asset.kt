@@ -35,7 +35,7 @@ interface Asset {
 
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
 
-    fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
+    fun transferList(account: SingleAccount): Single<SingleAccountList>
 
     fun parseAddress(address: String): Maybe<ReceiveAddress>
 }
