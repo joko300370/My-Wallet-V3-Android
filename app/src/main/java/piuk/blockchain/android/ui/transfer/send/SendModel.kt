@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.transfer.send
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
-import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -203,28 +202,24 @@ class SendModel(
             )
 
     private fun processAmountChanged(amount: CryptoValue): Disposable =
-        if (!interactor.processorConfigured) {
-            Completable.complete().subscribe()
-        } else {
-            interactor.getAvailableBalance(
-                PendingSendTx(amount)
-            )
-            .subscribeBy(
-                onSuccess = {
-                    if (amount > it) {
-                        process(SendIntent.MaxAmountExceeded)
-                    } else if (!amount.isPositive && !amount.isZero) {
-                        process(SendIntent.MinRequired)
-                    } else {
-                        process(SendIntent.UpdateTransactionAmounts(amount, it))
-                    }
-                },
-                onError = {
-                    Timber.e("!SEND!> Unable to get update available balance")
-                    process(SendIntent.FatalTransactionError(it))
+        interactor.getAvailableBalance(
+            PendingSendTx(amount)
+        )
+        .subscribeBy(
+            onSuccess = {
+                if (amount > it) {
+                    process(SendIntent.MaxAmountExceeded)
+                } else if (!amount.isPositive && !amount.isZero) {
+                    process(SendIntent.MinRequired)
+                } else {
+                    process(SendIntent.UpdateTransactionAmounts(amount, it))
                 }
-            )
-        }
+            },
+            onError = {
+                Timber.e("!SEND!> Unable to get update available balance")
+                process(SendIntent.FatalTransactionError(it))
+            }
+        )
 
     private fun processExecuteTransaction(state: SendState): Disposable =
         interactor.verifyAndExecute(

@@ -91,7 +91,6 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 errorState = SendErrorState.NONE,
                 nextEnabled = false,
-                sendTarget = sendTarget,
                 currentStep = SendStep.ENTER_AMOUNT
             )
     }
