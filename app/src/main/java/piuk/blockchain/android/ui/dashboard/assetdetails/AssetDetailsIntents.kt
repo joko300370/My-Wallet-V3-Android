@@ -1,8 +1,11 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.androidcore.data.charts.TimeSpan
 
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
@@ -14,15 +17,73 @@ class ShowAssetActionsIntent(
         oldState.copy(
             selectedAccount = account,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
-            assetFilter = assetFilter
+            assetFilter = assetFilter/*,
+            asset = null,
+            assetDisplayMap = emptyMap(),
+            assetFiatValue = "",
+            chartData = emptyList(),
+            timeSpan = TimeSpan.DAY*/
+        )
+}
+
+class LoadAsset(
+    val asset: CryptoAsset
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(asset = asset)
+}
+
+object LoadAssetDisplayDetails : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
+}
+
+object LoadAssetFiatValue : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
+}
+
+object LoadHistoricPrices : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
+}
+
+class UpdateTimeSpan(
+    val updatedTimeSpan: TimeSpan
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(timeSpan = updatedTimeSpan)
+}
+
+object ChartLoading : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(chartLoading = true)
+}
+
+class AssetExchangeRateLoaded(
+    val exchangeRate: String
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(assetFiatValue = exchangeRate)
+}
+
+class AssetDisplayDetailsLoaded(
+    val assetDisplayMap: AssetDisplayMap
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(assetDisplayMap = assetDisplayMap)
+}
+
+class ChartDataLoaded(
+    val chartData: List<PriceDatum>
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            chartData = chartData,
+            chartLoading = false
         )
 }
 
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState.copy(
-            assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS
-        )
+        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
 }
 
 object ReturnToPreviousStep : AssetDetailsIntent() {

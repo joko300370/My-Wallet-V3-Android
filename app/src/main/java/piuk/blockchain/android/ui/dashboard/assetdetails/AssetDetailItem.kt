@@ -20,6 +20,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import kotlin.properties.Delegates
 
 data class AssetDetailItem(
     val assetFilter: AssetFilter,
@@ -99,11 +100,16 @@ class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 }
 
 internal class AssetDetailAdapter(
-    private val itemList: List<AssetDetailItem>,
     private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,
     private val token: CryptoAsset
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    var itemList: List<AssetDetailItem> by Delegates.observable(emptyList()) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            notifyDataSetChanged()
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_CRYPTO) {

@@ -3,7 +3,7 @@ package com.blockchain.koin.modules
 import com.blockchain.koin.cardPaymentsFeatureFlag
 import com.blockchain.koin.coinifyFeatureFlag
 import com.blockchain.koin.coinifyUsersToKyc
-import com.blockchain.koin.interestAccount
+import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.pitAnnouncementFeatureFlag
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.simpleBuyFeatureFlag
@@ -51,7 +51,7 @@ val featureFlagsModule = module {
         get<RemoteConfig>().featureFlag("android_sunriver_airdrop_enabled")
     }
 
-    factory(interestAccount) {
+    factory(interestAccountFeatureFlag) {
         get<RemoteConfig>().featureFlag("interest_account_enabled")
     }
 }

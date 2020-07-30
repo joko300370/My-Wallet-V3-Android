@@ -14,7 +14,7 @@ import com.blockchain.koin.etherStrategy
 import com.blockchain.koin.eur
 import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
-import com.blockchain.koin.interestAccount
+import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
@@ -96,6 +96,7 @@ import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsInteractor
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
@@ -234,10 +235,6 @@ val applicationModule = module {
                 qrGenerator = get(),
                 swipeToReceiveHelper = get()
             )
-        }
-
-        factory {
-            AssetDetailsCalculator(get(interestAccount))
         }
 
         factory {
@@ -688,7 +685,18 @@ val applicationModule = module {
         scoped {
             AssetDetailsModel(
                 initialState = AssetDetailsState(),
-                mainScheduler = AndroidSchedulers.mainThread()
+                mainScheduler = AndroidSchedulers.mainThread(),
+                interactor = get()
+            )
+        }
+
+        factory {
+            AssetDetailsCalculator(get(interestAccountFeatureFlag))
+        }
+
+        factory {
+            AssetDetailsInteractor(
+                interestFeatureFlag = get(interestAccountFeatureFlag)
             )
         }
 
