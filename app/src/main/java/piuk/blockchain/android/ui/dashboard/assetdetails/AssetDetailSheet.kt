@@ -183,11 +183,11 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         }
     }
 
-    private fun onAccountSelected(account: BlockchainAccount) {
-        if (account is CryptoAccount && account is CustodialTradingAccount) {
+    private fun onAccountSelected(account: BlockchainAccount, assetFilter: AssetFilter) {
+        if (account is CryptoAccount && assetFilter == AssetFilter.Custodial) {
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }
-        model.process(ShowAssetActionsIntent(account))
+        model.process(ShowAssetActionsIntent(account, assetFilter))
     }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {

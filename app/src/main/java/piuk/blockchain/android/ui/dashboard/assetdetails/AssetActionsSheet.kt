@@ -22,13 +22,11 @@ import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
-import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
-import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.ReturnToPreviousStep
@@ -43,6 +41,7 @@ import timber.log.Timber
 
 class AssetActionsSheet : SlidingModalBottomDialog() {
     private lateinit var account: BlockchainAccount
+    private lateinit var accountType: AssetFilter
     private val disposables = CompositeDisposable()
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
@@ -94,7 +93,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             adapter = itemAdapter
         }
 
-        val actionItems = mapDetailsAndActions(view, account)
+        val actionItems = mapDetailsAndActions(view, account, accountType)
         itemAdapter.itemList = actionItems
 
         view.asset_actions_back.setOnClickListener {
@@ -104,66 +103,60 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
 
     private fun mapDetailsAndActions(
         view: View,
-        account: BlockchainAccount
-    ): List<AssetActionItem> =
-        when (account) {
-            is CryptoAccountCustodialGroup -> {
-                when (val firstAccount = selectAccount(account)) {
-                    is CryptoInterestAccount -> {
-                        view.asset_actions_title.text =
-                            labels.getDefaultInterestWalletLabel(firstAccount.asset)
-                        view.asset_actions_asset_icon.setImageResource(
-                            firstAccount.asset.drawableResFilled())
-                        view.asset_actions_acc_icon.setImageResource(
-                            R.drawable.ic_account_badge_interest)
-                        disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
-                            .subscribeBy(
-                                onSuccess = {
-                                    view.asset_actions_details.text =
-                                        getString(R.string.dashboard_asset_balance_interest, it)
-                                },
-                                onError = {
-                                    Timber.e("AssetActions error loading Interest rate: $it")
-                                }
-                            )
-                        account.actions.map {
-                            mapAction(it, firstAccount.asset, firstAccount)
-                        }
-                    }
-                    is CustodialTradingAccount -> {
-                        view.asset_actions_title.text = getString(firstAccount.asset.assetName())
-                        view.asset_actions_details.text =
-                            labels.getDefaultCustodialWalletLabel(firstAccount.asset)
-                        view.asset_actions_asset_icon.setImageResource(
-                            firstAccount.asset.drawableResFilled())
-                        view.asset_actions_acc_icon.setImageResource(
-                            R.drawable.ic_account_badge_custodial)
-                        account.actions.map {
-                            mapAction(it, firstAccount.asset, firstAccount)
-                        }
-                    }
-                    else -> {
-                        throw IllegalStateException(
-                            "AssetActions un-catered CryptoAccountCustodialGroup type: $account"
-                        )
-                    }
+        account: BlockchainAccount,
+        accountType: AssetFilter
+    ): List<AssetActionItem> {
+        val firstAccount = selectAccount(account)
+        return when (accountType) {
+            AssetFilter.Custodial -> {
+                view.asset_actions_title.text = getString(firstAccount.asset.assetName())
+                view.asset_actions_details.text =
+                    labels.getDefaultCustodialWalletLabel(firstAccount.asset)
+                view.asset_actions_asset_icon.setImageResource(
+                    firstAccount.asset.drawableResFilled())
+                view.asset_actions_acc_icon.setImageResource(
+                    R.drawable.ic_account_badge_custodial)
+                account.actions.map {
+                    mapAction(it, firstAccount.asset, firstAccount)
                 }
             }
-            is CryptoAccountNonCustodialGroup -> {
-                view.asset_actions_acc_icon.gone()
-                view.asset_actions_title.text = getString(account.asset.assetName())
-                view.asset_actions_details.text =
-                    labels.getDefaultNonCustodialWalletLabel(account.asset)
+            AssetFilter.Interest -> {
+                view.asset_actions_title.text =
+                    labels.getDefaultInterestWalletLabel(firstAccount.asset)
                 view.asset_actions_asset_icon.setImageResource(
-                    account.asset.drawableResFilled())
+                    firstAccount.asset.drawableResFilled())
+                view.asset_actions_acc_icon.setImageResource(
+                    R.drawable.ic_account_badge_interest)
+                disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
+                    .subscribeBy(
+                        onSuccess = {
+                            view.asset_actions_details.text =
+                                getString(R.string.dashboard_asset_balance_interest, it)
+                        },
+                        onError = {
+                            Timber.e("AssetActions error loading Interest rate: $it")
+                        }
+                    )
                 account.actions.map {
-                    mapAction(it, account.asset, selectAccount(account))
+                    mapAction(it, firstAccount.asset, firstAccount)
+                }
+            }
+            AssetFilter.NonCustodial -> {
+                view.asset_actions_acc_icon.gone()
+                view.asset_actions_title.text = getString(firstAccount.asset.assetName())
+                view.asset_actions_details.text =
+                    labels.getDefaultNonCustodialWalletLabel(firstAccount.asset)
+                view.asset_actions_asset_icon.setImageResource(
+                    firstAccount.asset.drawableResFilled())
+                account.actions.map {
+                    mapAction(it, firstAccount.asset, firstAccount)
                 }
             }
             else -> {
                 throw IllegalStateException("AssetActions un-catered account type: $account")
             }
         }
+    }
 
     private fun mapAction(action: AssetAction, asset: CryptoCurrency, account: SingleAccount): AssetActionItem =
         when (action) {
@@ -220,20 +213,30 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             }
         }
 
-    private fun selectAccount(account: BlockchainAccount): SingleAccount =
-        when (account) {
-            is SingleAccount -> account
-            is AccountGroup -> account.accounts
-                .firstOrNull { a -> a.isDefault }
-                ?: account.accounts.firstOrNull()
-                ?: throw IllegalStateException("No SingleAccount found")
-            else -> throw IllegalStateException("Unknown account base")
-        }
+    private fun selectAccount(account: BlockchainAccount): CryptoAccount {
+        val selectedAccount = when (account) {
+                is SingleAccount -> account
+                is AccountGroup -> account.accounts
+                    .firstOrNull { a -> a.isDefault }
+                    ?: account.accounts.firstOrNull()
+                    ?: throw IllegalStateException("No SingleAccount found")
+                else -> throw IllegalStateException("Unknown account base")
+            }
+
+        return selectedAccount as CryptoAccount
+    }
 
     companion object {
         fun newInstance(blockchainAccount: BlockchainAccount): AssetActionsSheet {
             return AssetActionsSheet().apply {
                 account = blockchainAccount
+            }
+        }
+
+        fun newInstance(blockchainAccount: BlockchainAccount, assetFilter: AssetFilter): AssetActionsSheet {
+            return AssetActionsSheet().apply {
+                account = blockchainAccount
+                accountType = assetFilter
             }
         }
     }

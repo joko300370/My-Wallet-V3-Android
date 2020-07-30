@@ -1,14 +1,15 @@
-package piuk.blockchain.android.ui.dashboard
+/*
+package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.android.ui.dashboard.DashboardStep
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -313,14 +314,12 @@ object ShowAssetDetailsIntent : DashboardIntent() {
 }
 
 class ShowAssetActionsIntent(
-    val account: BlockchainAccount,
-    val assetFilter: AssetFilter
+    val account: BlockchainAccount
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             selectedAccount = account,
-            assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS,
-            assetFilter = assetFilter
+            assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS
         )
 }
 
@@ -352,3 +351,4 @@ object ReturnToPreviousStep : DashboardIntent() {
         )
     }
 }
+*/

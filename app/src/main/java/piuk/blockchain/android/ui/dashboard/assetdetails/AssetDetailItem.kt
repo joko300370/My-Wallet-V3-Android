@@ -34,7 +34,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
     fun bind(
         item: AssetDetailItem,
-        onAccountSelected: (BlockchainAccount) -> Unit
+        onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit
     ) {
         with(itemView) {
             val asset = getAsset(item.account)
@@ -56,7 +56,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             }
 
             rootView.setOnClickListener {
-                onAccountSelected(item.account)
+                onAccountSelected(item.account, item.assetFilter)
             }
 
             when (item.assetFilter) {
@@ -100,7 +100,7 @@ class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
 internal class AssetDetailAdapter(
     private val itemList: List<AssetDetailItem>,
-    private val onAccountSelected: (BlockchainAccount) -> Unit,
+    private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,
     private val token: CryptoAsset
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

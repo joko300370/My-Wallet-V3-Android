@@ -1,4 +1,5 @@
-package piuk.blockchain.android.ui.dashboard
+/*
+package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.preferences.DashboardPrefs
@@ -105,26 +106,9 @@ enum class DashboardSheet {
     FIAT_FUNDS_NO_KYC
 }
 
-data class DashboardState(
-    val assets: AssetMap = AssetMap(
-        CryptoCurrency.activeCurrencies().associateBy(
-            keySelector = { it },
-            valueTransform = { CryptoAssetState(it) }
-        )
-    ),
-    val showAssetSheetFor: CryptoCurrency? = null,
-    val showDashboardSheet: DashboardSheet? = null,
-    val activeFlow: DialogFlow? = null,
-    val announcement: AnnouncementCard? = null,
-    val pendingAssetSheetFor: CryptoCurrency? = null,
-    val custodyIntroSeen: Boolean = false,
-    @Deprecated("Moving to new send")
-    val transferFundsCurrency: CryptoCurrency? = null,
-    val fiatAssets: FiatAssetState? = null,
-    val selectedFiatAccount: FiatAccount? = null,
+data class AssetDetailsState(
     val selectedAccount: BlockchainAccount? = null,
-    val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO,
-    val assetFilter: AssetFilter? = null
+    val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -290,3 +274,4 @@ class DashboardModel(
         }
     }
 }
+*/

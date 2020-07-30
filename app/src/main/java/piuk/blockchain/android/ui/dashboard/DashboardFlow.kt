@@ -53,7 +53,7 @@ class DashboardFlow(
             when (step) {
                 DashboardStep.ZERO -> null
                 DashboardStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                DashboardStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!)
+                DashboardStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
             }
         )
     }
