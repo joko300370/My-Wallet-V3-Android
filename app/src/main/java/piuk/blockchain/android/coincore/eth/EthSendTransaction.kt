@@ -27,11 +27,11 @@ class EthSendTransaction(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
     sendingAccount: CryptoAccount,
-    address: CryptoAddress,
+    sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainSendProcessorBase(
         sendingAccount,
-        address,
+        sendTarget,
         requireSecondPassword
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.ETHER
@@ -82,12 +82,12 @@ class EthSendTransaction(
     private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),
-            ethDataManager.isContractAddress(address.address),
+            ethDataManager.isContractAddress(sendTarget.address),
             feeOptions()
         ).map { (nonce, isContract, fees) ->
             ethDataManager.createEthTransaction(
                 nonce = nonce,
-                to = address.address,
+                to = sendTarget.address,
                 gasPriceWei = fees.gasPrice,
                 gasLimitGwei = fees.getGasLimit(isContract),
                 weiValue = pendingTx.amount.toBigInteger()

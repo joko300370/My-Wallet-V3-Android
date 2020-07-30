@@ -34,9 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
 
-abstract class CryptoAccountBase(
-    final override val asset: CryptoCurrency
-) : CryptoAccount {
+abstract class CryptoAccountBase : CryptoAccount {
 
     protected abstract val exchangeRates: ExchangeRateDataManager
 
@@ -58,13 +56,14 @@ abstract class CryptoAccountBase(
 }
 
 open class CustodialTradingAccount(
-    cryptoCurrency: CryptoCurrency,
+    override val asset: CryptoCurrency,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
-    private val isNoteSupported: Boolean = false,
+    private val isNoteSupported: Boolean = false
+) : CryptoAccountBase() {
+
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
 
     private val hasSeenFunds = AtomicBoolean(false)
 
@@ -100,7 +99,7 @@ open class CustodialTradingAccount(
             is CryptoAddress -> Single.just(
                 CustodialTransferProcessor(
                     sendingAccount = this,
-                    address = sendTo,
+                    sendTarget = sendTo,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -108,7 +107,7 @@ open class CustodialTradingAccount(
             is CryptoAccount -> sendTo.receiveAddress.map {
                 CustodialTransferProcessor(
                     sendingAccount = this,
-                    address = it as CryptoAddress,
+                    sendTarget = it as CryptoAddress,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -125,12 +124,15 @@ open class CustodialTradingAccount(
             }
 
     override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend
-    )
+        get() =
+            mutableSetOf(
+                AssetAction.ViewActivity,
+                AssetAction.NewSend
+            ).apply {
+                if (!isFunded) {
+                    remove(AssetAction.NewSend)
+                }
+            }
 
     private fun buyOrderToSummary(buyOrder: BuyOrder): ActivitySummaryItem =
         CustodialActivitySummaryItem(
@@ -166,12 +168,13 @@ open class CustodialTradingAccount(
 }
 
 internal class CryptoInterestAccount(
-    cryptoCurrency: CryptoCurrency,
+    override val asset: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager,
+    override val exchangeRates: ExchangeRateDataManager
+) : CryptoAccountBase() {
+
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
 
     private val isConfigured = AtomicBoolean(false)
 
@@ -204,20 +207,18 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions
-        get() = availableActions
-
-    private val availableActions = emptySet<AssetAction>()
+    override val actions: AvailableActions = emptySet()
 }
 
 // To handle Send to PIT
 internal class CryptoExchangeAccount(
-    cryptoCurrency: CryptoCurrency,
+    override val asset: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager,
+    override val exchangeRates: ExchangeRateDataManager
+) : CryptoAccountBase() {
+
     override val feeAsset: CryptoCurrency? = null
-) : CryptoAccountBase(cryptoCurrency) {
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
@@ -242,21 +243,28 @@ internal class CryptoExchangeAccount(
 
     override val actions: AvailableActions = emptySet()
 }
-
 abstract class CryptoNonCustodialAccount(
-    private val cryptoCurrency: CryptoCurrency
-) : CryptoAccountBase(cryptoCurrency) {
+    override val asset: CryptoCurrency
+) : CryptoAccountBase() {
 
     override val isFunded: Boolean = true
 
-    override val feeAsset: CryptoCurrency? = cryptoCurrency
+    override val feeAsset: CryptoCurrency?
+        get() = asset
 
-    override val actions: AvailableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.Send,
-        AssetAction.Receive,
-        AssetAction.Swap
-    )
+    override val actions: AvailableActions
+        get() =
+            mutableSetOf(
+                AssetAction.ViewActivity,
+                AssetAction.Send,
+                AssetAction.Receive,
+                AssetAction.Swap
+            ).apply {
+                if (!isFunded) {
+                    remove(AssetAction.Swap)
+                    remove(AssetAction.Send)
+                }
+            }
 
     override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> {
         TODO("Implement me")
@@ -340,7 +348,7 @@ class CryptoAccountNonCustodialGroup(
         get() = if (accounts.isEmpty()) {
             emptySet()
         } else {
-            accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+            accounts.map { it.actions }.reduce { a, b -> a.union(b) }
         }
 
     // if _any_ of the accounts have transactions

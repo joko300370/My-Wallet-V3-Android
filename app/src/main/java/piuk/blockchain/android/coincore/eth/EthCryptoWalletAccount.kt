@@ -28,8 +28,7 @@ internal class EthCryptoWalletAccount(
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.ETHER) {
 
     constructor(
@@ -127,10 +126,15 @@ internal class EthCryptoWalletAccount(
                 }
             }
 
-    override val actions: AvailableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend,
-        AssetAction.Receive,
-        AssetAction.Swap
-    )
+    override val actions: AvailableActions
+        get() = super.actions.let {
+            if (it.contains(AssetAction.Send)) {
+                it.toMutableSet().apply {
+                    remove(AssetAction.Send)
+                    add(AssetAction.NewSend)
+                }
+            } else {
+                it
+            }
+        }
 }

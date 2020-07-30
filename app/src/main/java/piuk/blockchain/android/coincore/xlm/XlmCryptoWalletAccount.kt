@@ -18,8 +18,7 @@ internal class XlmCryptoWalletAccount(
     override val label: String = "",
     private val address: String,
     private val xlmManager: XlmDataManager,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.XLM
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default

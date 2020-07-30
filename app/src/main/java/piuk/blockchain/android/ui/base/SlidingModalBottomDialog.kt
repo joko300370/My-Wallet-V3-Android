@@ -75,12 +75,19 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     protected abstract fun initControls(view: View)
 
     override fun onCancel(dialog: DialogInterface) {
+        resetSheetParent()
         host.onSheetClosed()
         super.onCancel(dialog)
     }
 
     override fun dismiss() {
+        resetSheetParent()
         host.onSheetClosed()
         super.dismiss()
+    }
+
+    private fun resetSheetParent() {
+        val bottomSheetBehavior = BottomSheetBehavior.from(dialogView.parent as View)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }

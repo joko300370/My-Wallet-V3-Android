@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -33,7 +34,7 @@ interface Asset {
 
     fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
 
-    fun parseAddress(address: String): ReceiveAddress?
+    fun parseAddress(address: String): Maybe<ReceiveAddress>
 }
 
 interface CryptoAsset : Asset {

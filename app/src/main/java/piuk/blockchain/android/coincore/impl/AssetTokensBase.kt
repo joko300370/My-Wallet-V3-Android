@@ -140,7 +140,7 @@ internal abstract class CryptoAssetBase(
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
             .map { address ->
                 CryptoExchangeAccount(
-                    cryptoCurrency = asset,
+                    asset = asset,
                     label = labels.getDefaultExchangeWalletLabel(asset),
                     address = address,
                     exchangeRates = exchangeRates

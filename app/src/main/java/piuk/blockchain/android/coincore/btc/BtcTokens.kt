@@ -7,9 +7,11 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
@@ -73,18 +75,20 @@ internal class BtcAsset(
             }
         }
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            BtcAddress(address)
-        } else {
-            null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Maybe.fromCallable {
+            if (isValidAddress(address)) {
+                BtcAddress(address)
+            } else {
+                null
+            }
         }
 
-    private fun isValidAddress(address: String): Boolean =
-        FormatsUtil.isValidBitcoinAddress(
-            environmentSettings.bitcoinNetworkParameters,
-            address
-        )
+        private fun isValidAddress(address: String): Boolean =
+            FormatsUtil.isValidBitcoinAddress(
+                environmentSettings.bitcoinNetworkParameters,
+                address
+            )
 }
 
 internal class BtcAddress(

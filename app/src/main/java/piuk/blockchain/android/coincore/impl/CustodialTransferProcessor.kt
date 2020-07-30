@@ -15,12 +15,12 @@ import piuk.blockchain.android.coincore.SendValidationError
 class CustodialTransferProcessor(
     override val isNoteSupported: Boolean,
     override val sendingAccount: CryptoAccount,
-    override val address: CryptoAddress,
+    override val sendTarget: CryptoAddress,
     private val walletManager: CustodialWalletManager
 ) : SendProcessor {
 
     init {
-        require(sendingAccount.asset == address.asset)
+        require(sendingAccount.asset == sendTarget.asset)
     }
 
     override val feeOptions = setOf(FeeLevel.None)
@@ -44,5 +44,5 @@ class CustodialTransferProcessor(
             }
 
     override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
-        walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, address.address)
+        walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, sendTarget.address)
 }
