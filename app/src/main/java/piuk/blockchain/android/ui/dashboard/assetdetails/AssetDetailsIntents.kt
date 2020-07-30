@@ -1,31 +1,34 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
-import piuk.blockchain.android.ui.dashboard.DashboardStep
+import piuk.blockchain.android.ui.dashboard.AssetDetailsStep
 
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
 class ShowAssetActionsIntent(
-    val account: BlockchainAccount
+    val account: BlockchainAccount,
+    val assetFilter: AssetFilter
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             selectedAccount = account,
-            assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS
+            assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
+            assetFilter = assetFilter
         )
 }
 
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
-            assetDetailsCurrentStep = DashboardStep.ASSET_DETAILS
+            assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS
         )
 }
 
 object ReturnToPreviousStep : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState {
-        val steps = DashboardStep.values()
+        val steps = AssetDetailsStep.values()
         val currentStep = oldState.assetDetailsCurrentStep.ordinal
         if (currentStep == 0) {
             throw IllegalStateException("Cannot go back")

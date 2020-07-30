@@ -32,10 +32,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.ui.dashboard.DashboardModel
-import piuk.blockchain.android.ui.dashboard.ShowAssetActionsIntent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -58,7 +55,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private val currencyPrefs: CurrencyPrefs by inject()
 
     private val assetDetailsViewModel: AssetDetailsCalculator by scopedInject()
-    private val model: DashboardModel by scopedInject()
+    private val model: AssetDetailsModel by scopedInject()
     private val locale = Locale.getDefault()
 
     private val cryptoCurrency: CryptoCurrency by lazy {

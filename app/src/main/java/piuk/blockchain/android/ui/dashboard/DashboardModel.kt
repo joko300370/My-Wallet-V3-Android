@@ -13,7 +13,6 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
@@ -121,10 +120,7 @@ data class DashboardState(
     @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
-    val selectedFiatAccount: FiatAccount? = null,
-    val selectedAccount: BlockchainAccount? = null,
-    val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO,
-    val assetFilter: AssetFilter? = null
+    val selectedFiatAccount: FiatAccount? = null
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -259,10 +255,7 @@ class DashboardModel(
             is ShowDashboardSheet,
             is TransferFunds,
             is UpdateLaunchDialogFlow,
-            is ClearBottomSheet,
-         //   is ShowAssetDetailsIntent,
-            is ShowAssetActionsIntent,
-            is ReturnToPreviousStep -> null
+            is ClearBottomSheet -> null
         }
     }
 

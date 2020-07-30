@@ -6,12 +6,12 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import piuk.blockchain.android.ui.dashboard.DashboardStep
+import piuk.blockchain.android.ui.dashboard.AssetDetailsStep
 import timber.log.Timber
 
 data class AssetDetailsState(
     val selectedAccount: BlockchainAccount? = null,
-    val assetDetailsCurrentStep: DashboardStep = DashboardStep.ZERO,
+    val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
     val assetFilter: AssetFilter? = null
 ) : MviState
 

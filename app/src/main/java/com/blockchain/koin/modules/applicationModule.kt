@@ -685,7 +685,7 @@ val applicationModule = module {
             )
         }
 
-        factory {
+        scoped {
             AssetDetailsModel(
                 initialState = AssetDetailsState(),
                 mainScheduler = AndroidSchedulers.mainThread()

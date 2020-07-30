@@ -233,9 +233,7 @@ object ClearBottomSheet : DashboardIntent() {
             showDashboardSheet = null,
             activeFlow = null,
             showAssetSheetFor = oldState.pendingAssetSheetFor,
-            pendingAssetSheetFor = null,
-            selectedAccount = null,
-            assetDetailsCurrentStep = DashboardStep.ZERO
+            pendingAssetSheetFor = null
         )
 }
 
@@ -300,27 +298,7 @@ class LaunchAssetDetailsFlow(
             showAssetSheetFor = null,
             activeFlow = null,
             pendingAssetSheetFor = null,
-            transferFundsCurrency = null,
-            selectedAccount = null
-        )
-}
-
-/*object ShowAssetDetailsIntent : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState.copy(
-            assetDetailsCurrentStep = DashboardStep.ASSET_DETAILS
-        )
-}*/
-
-class ShowAssetActionsIntent(
-    val account: BlockchainAccount,
-    val assetFilter: AssetFilter
-) : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState.copy(
-            selectedAccount = account,
-            assetDetailsCurrentStep = DashboardStep.ASSET_ACTIONS,
-            assetFilter = assetFilter
+            transferFundsCurrency = null
         )
 }
 
@@ -333,22 +311,6 @@ class UpdateLaunchDialogFlow(
             showAssetSheetFor = null,
             activeFlow = flow,
             pendingAssetSheetFor = null,
-            transferFundsCurrency = null,
-            selectedAccount = null
+            transferFundsCurrency = null
         )
-}
-
-object ReturnToPreviousStep : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState {
-        val steps = DashboardStep.values()
-        val currentStep = oldState.assetDetailsCurrentStep.ordinal
-        if (currentStep == 0) {
-            throw IllegalStateException("Cannot go back")
-        }
-        val previousStep = steps[currentStep - 1]
-
-        return oldState.copy(
-            assetDetailsCurrentStep = previousStep
-        )
-    }
 }

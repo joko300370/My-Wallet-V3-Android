@@ -29,7 +29,6 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.DashboardModel
-import piuk.blockchain.android.ui.dashboard.ReturnToPreviousStep
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.assetTint
@@ -47,7 +46,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val labels: DefaultLabels by scopedInject()
-    private val model: DashboardModel by scopedInject()
+    private val model: AssetDetailsModel by scopedInject()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
     private val itemAdapter: AssetActionAdapter by lazy {

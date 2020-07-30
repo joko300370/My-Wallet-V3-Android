@@ -15,17 +15,17 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.ShowAssetDetailsIntent
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
 
-enum class DashboardStep {
+enum class AssetDetailsStep {
     ZERO,
     ASSET_DETAILS,
     ASSET_ACTIONS
 }
 
-class DashboardFlow(
+class AssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency
 ) : DialogFlow(), KoinComponent {
 
-    private var currentStep: DashboardStep = DashboardStep.ZERO
+    private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
     private val disposables = CompositeDisposable()
     private val model: AssetDetailsModel by scopedInject()
 
@@ -45,7 +45,7 @@ class DashboardFlow(
     private fun handleStateChange(newState: AssetDetailsState) {
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
-            if (currentStep == DashboardStep.ZERO) {
+            if (currentStep == AssetDetailsStep.ZERO) {
                 finishFlow()
             } else {
                 showFlowStep(currentStep, newState)
@@ -53,19 +53,19 @@ class DashboardFlow(
         }
     }
 
-    private fun showFlowStep(step: DashboardStep, newState: AssetDetailsState) {
+    private fun showFlowStep(step: AssetDetailsStep, newState: AssetDetailsState) {
         replaceBottomSheet(
             when (step) {
-                DashboardStep.ZERO -> null
-                DashboardStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                DashboardStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
+                AssetDetailsStep.ZERO -> null
+                AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
+                AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
             }
         )
     }
 
     override fun finishFlow() {
         disposables.clear()
-        currentStep = DashboardStep.ZERO
+        currentStep = AssetDetailsStep.ZERO
         super.finishFlow()
     }
 

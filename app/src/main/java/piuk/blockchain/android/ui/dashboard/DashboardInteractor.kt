@@ -197,7 +197,7 @@ class DashboardInteractor(
     fun getAssetDetailsFlow(model: DashboardModel, cryptoCurrency: CryptoCurrency): Disposable? {
         model.process(
             UpdateLaunchDialogFlow(
-                DashboardFlow(
+                AssetDetailsFlow(
                     cryptoCurrency = cryptoCurrency
                 )
             )
