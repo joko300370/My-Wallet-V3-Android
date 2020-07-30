@@ -40,7 +40,7 @@ class EthSendTransaction(
 
     override val isNoteSupported: Boolean = true
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -54,13 +54,13 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<Money> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)
         ) { balance: Money, fees: Money ->
             max(balance - fees, CryptoValue.ZeroEth)
-        }
+        }.map { it as CryptoValue }
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid

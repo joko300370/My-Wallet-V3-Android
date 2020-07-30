@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
@@ -127,7 +126,7 @@ sealed class SendIntent : MviIntent<SendState> {
     }
 
     class FeeUpdate(
-        val fee: Money
+        val fee: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(feeAmount = fee)
@@ -152,8 +151,8 @@ sealed class SendIntent : MviIntent<SendState> {
     }
 
     class UpdateTransactionAmounts(
-        val amount: Money,
-        private val maxAvailable: Money
+        val amount: CryptoValue,
+        private val maxAvailable: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(

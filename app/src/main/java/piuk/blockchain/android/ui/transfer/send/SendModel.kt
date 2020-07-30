@@ -16,7 +16,6 @@ import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import timber.log.Timber
 
 enum class SendStep {
@@ -55,13 +54,13 @@ data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount,
     val sendTarget: SendTarget = NullAddress,
-    val sendAmount: Money = CryptoValue.zero(sendingAccount.asset),
-    val availableBalance: Money = CryptoValue.zero(sendingAccount.asset),
+    val sendAmount: CryptoValue = CryptoValue.zero(sendingAccount.asset),
+    val availableBalance: CryptoValue = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeAmount: Money = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
+    val feeAmount: CryptoValue = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
     val transactionNoteSupported: Boolean? = null,
     val noteState: NoteState = NoteState.NOT_SET,
     val note: String = "",
@@ -182,22 +181,20 @@ class SendModel(
                 }
             )
 
-    private fun processAddressConfirmation(sourceAccount: SingleAccount, amount: Money, sendTarget: SendTarget): Disposable =
+    private fun processAddressConfirmation(
+        sourceAccount: SingleAccount,
+        amount: CryptoValue,
+        sendTarget: SendTarget
+    ): Disposable =
         // At this point we can build a transactor object from coincore and configure
         // the state object a bit more; depending on whether it's an internal, external,
         // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
         interactor.initialiseTransaction(sourceAccount, sendTarget)
-            .thenSingle {
-                interactor.getAvailableBalance(
-                    PendingSendTx(
-                        amount = amount
-                    )
-                )
-            }
             .subscribeBy(
-                onSuccess = {
-                    process(SendIntent.UpdateTransactionAmounts(amount, it))
+                onComplete = {
+                    process(SendIntent.TargetAddressValidated(sendTarget))
+                    process(SendIntent.SendAmountChanged(amount))
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get transaction processor: $it")

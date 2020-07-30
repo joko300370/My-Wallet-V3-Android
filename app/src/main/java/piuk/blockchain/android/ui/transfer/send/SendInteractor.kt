@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -49,7 +50,7 @@ class SendInteractor(
             .doOnSuccess { sendProcessor = it }
             .ignoreElement()
 
-    fun getAvailableBalance(tx: PendingSendTx): Single<Money> =
+    fun getAvailableBalance(tx: PendingSendTx): Single<CryptoValue> =
         sendProcessor!!.availableBalance(tx)
 
     fun verifyAndExecute(tx: PendingSendTx): Completable =
