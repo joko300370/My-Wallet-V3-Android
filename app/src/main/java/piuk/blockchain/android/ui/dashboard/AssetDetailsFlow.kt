@@ -58,7 +58,8 @@ class AssetDetailsFlow(
             when (step) {
                 AssetDetailsStep.ZERO -> null
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
+                AssetDetailsStep.ASSET_ACTIONS ->
+                    AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
             }
         )
     }

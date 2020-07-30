@@ -26,8 +26,6 @@ class AssetDetailsModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-
-           // is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is ShowAssetDetailsIntent,
             is ShowAssetActionsIntent,
             is ReturnToPreviousStep -> null
