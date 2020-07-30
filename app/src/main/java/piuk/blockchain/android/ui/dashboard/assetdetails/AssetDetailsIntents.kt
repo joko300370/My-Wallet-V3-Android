@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
-import piuk.blockchain.android.ui.dashboard.AssetDetailsStep
 
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 

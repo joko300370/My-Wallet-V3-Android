@@ -6,7 +6,6 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import piuk.blockchain.android.ui.dashboard.AssetDetailsStep
 import timber.log.Timber
 
 data class AssetDetailsState(

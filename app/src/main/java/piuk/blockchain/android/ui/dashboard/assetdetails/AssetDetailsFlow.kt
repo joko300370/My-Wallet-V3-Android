@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.dashboard
+package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
@@ -7,16 +7,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
-import piuk.blockchain.android.ui.dashboard.assetdetails.ShowAssetDetailsIntent
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
 
 enum class AssetDetailsStep {
     ZERO,
+    CUSTODY_INTRO_SHEET,
     ASSET_DETAILS,
     ASSET_ACTIONS
 }
@@ -25,7 +21,8 @@ class AssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency
 ) : DialogFlow(), KoinComponent {
 
-    private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
+    private var currentStep: AssetDetailsStep =
+        AssetDetailsStep.ZERO
     private val disposables = CompositeDisposable()
     private val model: AssetDetailsModel by scopedInject()
 
@@ -57,6 +54,7 @@ class AssetDetailsFlow(
         replaceBottomSheet(
             when (step) {
                 AssetDetailsStep.ZERO -> null
+                AssetDetailsStep.CUSTODY_INTRO_SHEET -> TODO()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS ->
                     AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
@@ -66,7 +64,8 @@ class AssetDetailsFlow(
 
     override fun finishFlow() {
         disposables.clear()
-        currentStep = AssetDetailsStep.ZERO
+        currentStep =
+            AssetDetailsStep.ZERO
         super.finishFlow()
     }
 

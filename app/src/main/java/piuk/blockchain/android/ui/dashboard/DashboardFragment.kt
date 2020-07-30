@@ -194,7 +194,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private fun showAssetSheet(sheetFor: CryptoCurrency?) {
         if (sheetFor != null) {
             model.process(LaunchAssetDetailsFlow(sheetFor))
-            // showBottomSheet(AssetDetailSheet.newInstance(sheetFor))
         } else {
             // Nothing, unless we need to remove the sheet? TODO
         }
