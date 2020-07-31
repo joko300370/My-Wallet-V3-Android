@@ -1815,9 +1815,6 @@
     <string name="fiat_funds_no_kyc_step_3_description">Use your cash wallet as a payment method to buy BTC, ETH, XLM &amp; more.</string>
     <string name="fiat_funds_no_kyc_positive_action">Verify My Identity</string>
     <string name="fiat_funds_no_kyc_negative_action">Not Now</string>
-    <string name="fiat_funds_no_kyc_step_1_label">1</string>
-    <string name="fiat_funds_no_kyc_step_2_label">2</string>
-    <string name="fiat_funds_no_kyc_step_3_label">3</string>
     <string name="fiat_funds_kyc_announcement_title">Link a Bank to Buy Crypto</string>
     <string name="fiat_funds_kyc_announcement_description">Hold cash in your Blockchain.com Wallet. Deposit and Withdraw at anytime.</string>
     <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>

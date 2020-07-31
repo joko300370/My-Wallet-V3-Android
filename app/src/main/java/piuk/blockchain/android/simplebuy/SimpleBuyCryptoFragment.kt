@@ -178,10 +178,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {
-                    model.process(SimpleBuyIntent.ConfirmationHandled)
-                    model.process(SimpleBuyIntent.KycStarted)
-                    navigator().startKyc()
-                    analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
+                    startKyc()
                 }
                 // Awaiting results state
                 KycState.IN_REVIEW,
@@ -202,6 +199,38 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
             }.exhaustive
         }
+
+        if (
+            newState.depositFundsRequested &&
+            newState.kycVerificationState != null
+        ) {
+            when (newState.kycVerificationState) {
+                // Kyc state unknown because error, or gold docs unsubmitted
+                KycState.PENDING -> {
+                    startKyc()
+                }
+                // Awaiting results state
+                KycState.IN_REVIEW,
+                KycState.UNDECIDED,
+                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
+                KycState.FAILED -> {
+                    navigator().goToKycVerificationScreen()
+                }
+                // We have done kyc and are verified
+                KycState.VERIFIED_AND_ELIGIBLE -> {
+                    showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
+                        lastState?.fiatCurrency ?: return
+                    ))
+                }
+            }.exhaustive
+        }
+    }
+
+    private fun startKyc() {
+        model.process(SimpleBuyIntent.NavigationHandled)
+        model.process(SimpleBuyIntent.KycStarted)
+        navigator().startKyc()
+        analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
     }
 
     private fun goToAddNewPaymentMethod(selectedPaymentMethodId: String) {
@@ -224,12 +253,11 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun canContinue(state: SimpleBuyState) =
-        state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
+        state.isAmountValid && state.selectedPaymentMethod?.id != PaymentMethod.UNDEFINED_PAYMENT_ID && !state.isLoading
 
     private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
         when (selectedPaymentMethod) {
-            is PaymentMethod.Undefined,
-            is PaymentMethod.UndefinedFunds -> {
+            is PaymentMethod.Undefined -> {
                 payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
             }
             is PaymentMethod.BankTransfer -> renderBankPayment(selectedPaymentMethod)
@@ -309,7 +337,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onPause() {
         super.onPause()
-        model.process(SimpleBuyIntent.ConfirmationHandled)
+        model.process(SimpleBuyIntent.NavigationHandled)
     }
 
     override fun onSheetClosed() {
@@ -345,6 +373,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
     }
 
+    override fun depositFundsRequested() {
+        model.process(SimpleBuyIntent.DepositFundsRequested)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -358,15 +390,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     private fun TextView.showIfPaymentMethodDefined(paymentMethod: PaymentMethod) {
         visibleIf {
-            paymentMethod !is PaymentMethod.Undefined &&
-                paymentMethod !is PaymentMethod.UndefinedFunds
+            paymentMethod !is PaymentMethod.Undefined
         }
     }
 
     private fun TextView.showIfPaymentMethodUndefined(paymentMethod: PaymentMethod) {
         visibleIf {
-            paymentMethod is PaymentMethod.Undefined ||
-                paymentMethod is PaymentMethod.UndefinedFunds
+            paymentMethod is PaymentMethod.Undefined
         }
     }
 }
@@ -374,6 +404,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 interface PaymentMethodChangeListener {
     fun onPaymentMethodChanged(paymentMethod: PaymentMethod)
     fun addPaymentMethod(type: PaymentMethodType)
+    fun depositFundsRequested()
 }
 
 interface ChangeCurrencyHost : SimpleBuyScreen {

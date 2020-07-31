@@ -4,15 +4,14 @@ import androidx.lifecycle.ViewModel
 import com.blockchain.accounts.AsyncAllAccountList
 import com.blockchain.datamanagers.MaximumSpendableCalculator
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.common.exchange.mvi.EnoughFeesLimit
 import com.blockchain.swap.common.exchange.mvi.ExchangeDialog
 import com.blockchain.swap.common.exchange.mvi.ExchangeIntent
-import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
-import com.blockchain.swap.common.exchange.mvi.EnoughFeesLimit
 import com.blockchain.swap.common.exchange.mvi.ExchangeRateIntent
+import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
 import com.blockchain.swap.common.exchange.mvi.FiatExchangeRateIntent
-import com.blockchain.swap.nabu.service.Fix
 import com.blockchain.swap.common.exchange.mvi.IsUserEligiableForFreeEthIntent
-import com.blockchain.swap.nabu.service.Quote
 import com.blockchain.swap.common.exchange.mvi.SetEthTransactionInFlight
 import com.blockchain.swap.common.exchange.mvi.SetFixIntent
 import com.blockchain.swap.common.exchange.mvi.SetTierLimit
@@ -24,11 +23,12 @@ import com.blockchain.swap.common.exchange.mvi.initial
 import com.blockchain.swap.common.exchange.mvi.toIntent
 import com.blockchain.swap.common.exchange.service.QuoteService
 import com.blockchain.swap.common.exchange.service.QuoteServiceFactory
-import com.blockchain.swap.nabu.service.TradeLimitService
 import com.blockchain.swap.common.quote.ExchangeQuoteRequest
 import com.blockchain.swap.nabu.CurrentTier
 import com.blockchain.swap.nabu.EthEligibility
-import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.service.Fix
+import com.blockchain.swap.nabu.service.Quote
+import com.blockchain.swap.nabu.service.TradeLimitService
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -39,8 +39,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.rxkotlin.withLatestFrom
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.ReplaySubject
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataStore
@@ -192,7 +192,7 @@ class ExchangeModel(
         dialogDisposable += exchangeRateDataStore.updateExchangeRates().subscribeBy {
                 inputEventSink.onNext(
                     ExchangeRateIntent(
-                        CryptoCurrency.values().map {
+                        CryptoCurrency.activeCurrencies().map {
                             ExchangeRate.CryptoToFiat(
                                 it,
                                 currencyPrefs.selectedFiatCurrency,
