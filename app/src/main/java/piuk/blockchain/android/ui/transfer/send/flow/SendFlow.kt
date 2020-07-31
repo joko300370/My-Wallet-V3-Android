@@ -21,8 +21,6 @@ import piuk.blockchain.android.ui.transfer.send.createSendScope
 import piuk.blockchain.android.ui.transfer.send.sendScope
 import timber.log.Timber
 
-interface FlowStep
-
 abstract class DialogFlow : SlidingModalBottomDialog.Host {
 
     private var fragmentManager: FragmentManager? = null

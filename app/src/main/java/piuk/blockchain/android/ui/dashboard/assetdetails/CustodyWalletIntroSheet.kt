@@ -17,7 +17,7 @@ class CustodyWalletIntroSheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         analytics.logEvent(SimpleBuyAnalytics.CUSTODY_WALLET_CARD_SHOWN)
         view.cta_button.setOnClickListener { onCtaClick() }
-        //dashboardPrefs.isCustodialIntroSeen = true
+        // dashboardPrefs.isCustodialIntroSeen = true
     }
 
     override fun onSheetHidden() {
@@ -30,12 +30,11 @@ class CustodyWalletIntroSheet : SlidingModalBottomDialog() {
 
     private fun onCtaClick() {
         analytics.logEvent(SimpleBuyAnalytics.CUSTODY_WALLET_CARD_CLICKED)
-        dismiss()
+        // dismiss()
         model.process(ShowAssetDetailsIntent)
     }
 
     companion object {
-        fun newInstance(): CustodyWalletIntroSheet =
-            CustodyWalletIntroSheet()
+        fun newInstance(): CustodyWalletIntroSheet = CustodyWalletIntroSheet()
     }
 }

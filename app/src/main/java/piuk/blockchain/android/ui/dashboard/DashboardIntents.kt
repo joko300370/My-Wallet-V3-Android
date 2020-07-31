@@ -185,7 +185,6 @@ class ShowFiatAssetDetails(
         oldState.copy(
             showAssetSheetFor = null,
             pendingAssetSheetFor = null,
-            activeFlow = null,
             showDashboardSheet = DashboardSheet.FIAT_FUNDS_DETAILS,
             selectedFiatAccount = fiatAccount
         )
@@ -206,9 +205,6 @@ class ShowBankLinkingSheet(
 class ShowDashboardSheet(
     private val dashboardSheet: DashboardSheet
 ) : DashboardIntent() {
-    override fun isValidFor(oldState: DashboardState): Boolean =
-        dashboardSheet != DashboardSheet.CUSTODY_INTRO
-
     override fun reduce(oldState: DashboardState): DashboardState =
         // Custody sheet isn't displayed via this intent, so filter it out
         oldState.copy(

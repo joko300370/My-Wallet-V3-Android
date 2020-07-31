@@ -21,8 +21,7 @@ class AssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency
 ) : DialogFlow(), KoinComponent {
 
-    private var currentStep: AssetDetailsStep =
-        AssetDetailsStep.ZERO
+    private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
     private val disposables = CompositeDisposable()
     private val model: AssetDetailsModel by scopedInject()
 
@@ -69,6 +68,6 @@ class AssetDetailsFlow(
     }
 
     override fun onSheetClosed() {
-        finishFlow()
+        //finishFlow()
     }
 }

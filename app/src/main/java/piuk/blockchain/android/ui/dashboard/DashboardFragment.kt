@@ -36,7 +36,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
-import piuk.blockchain.android.ui.dashboard.assetdetails.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
@@ -204,7 +203,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             when (state.showDashboardSheet) {
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
-                DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
+                // DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
                 DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
@@ -413,9 +412,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         navigator().launchKyc(CampaignType.FiatFunds)
     }
 
-    // AssetDetailSheet.Host
+    // DialogBottomSheet.Host
     override fun onSheetClosed() {
-        model.process(ClearBottomSheet)
+        // TODO this closes the active flow when the Custody sheet is dismissed and breaks the
+        //  Asset details Flow
+        // if(this.state?.activeFlow == null) {
+            model.process(ClearBottomSheet)
+        // }
     }
 
     override fun onFlowFinished() {
