@@ -7,11 +7,21 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
+
+typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
+data class AssetDisplayInfo(
+    val account: BlockchainAccount,
+    val amount: Money,
+    val fiatValue: Money,
+    val actions: Set<AssetAction>,
+    val interestRate: Double = AssetDetailsInteractor.NOT_USED
+)
 
 class AssetDetailsInteractor(
     private val interestFeatureFlag: FeatureFlag
@@ -65,7 +75,6 @@ class AssetDetailsInteractor(
             )
         }
     }
-
     private fun makeAssetDisplayMap(
         fiatRate: ExchangeRate,
         total: Details,
@@ -108,5 +117,9 @@ class AssetDetailsInteractor(
                 )
             }
         }
+    }
+
+    companion object {
+        const val NOT_USED: Double = -99.0
     }
 }

@@ -95,7 +95,6 @@ import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsInteractor
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
@@ -688,10 +687,6 @@ val applicationModule = module {
                 mainScheduler = AndroidSchedulers.mainThread(),
                 interactor = get()
             )
-        }
-
-        factory {
-            AssetDetailsCalculator(get(interestAccountFeatureFlag))
         }
 
         factory {

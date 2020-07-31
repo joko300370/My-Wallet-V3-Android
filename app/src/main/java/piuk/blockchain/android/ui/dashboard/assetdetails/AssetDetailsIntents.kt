@@ -17,12 +17,7 @@ class ShowAssetActionsIntent(
         oldState.copy(
             selectedAccount = account,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
-            assetFilter = assetFilter/*,
-            asset = null,
-            assetDisplayMap = emptyMap(),
-            assetFiatValue = "",
-            chartData = emptyList(),
-            timeSpan = TimeSpan.DAY*/
+            assetFilter = assetFilter
         )
 }
 

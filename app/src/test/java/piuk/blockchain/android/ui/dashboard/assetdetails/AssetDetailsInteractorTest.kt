@@ -21,7 +21,7 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import java.util.Locale
 
-class AssetDetailsCalculatorTest {
+class AssetDetailsInteractorTest {
 
     @get:Rule
     val rx = rxInit {
@@ -29,25 +29,26 @@ class AssetDetailsCalculatorTest {
         computationTrampoline()
     }
 
-    private lateinit var calculator: AssetDetailsCalculator
+    private lateinit var interactor: AssetDetailsInteractor
 
-    private val token: CryptoAsset = mock()
     private val totalGroup: AccountGroup = mock()
     private val nonCustodialGroup: AccountGroup = mock()
     private val custodialGroup: AccountGroup = mock()
     private val interestGroup: AccountGroup = mock()
     private val interestRate: Double = 5.0
     private val interestEnabled: Boolean = true
+    private val asset: CryptoAsset = mock()
+    private val featureFlagMock: FeatureFlag = mock()
 
     @Before
     fun setUp() {
-        val featureFlagMock: FeatureFlag = mock()
-        calculator = AssetDetailsCalculator(featureFlagMock)
+        interactor = AssetDetailsInteractor(featureFlagMock)
 
-        whenever(token.accountGroup(AssetFilter.All)).thenReturn(Single.just(totalGroup))
-        whenever(token.accountGroup(AssetFilter.NonCustodial)).thenReturn(Single.just(nonCustodialGroup))
-        whenever(token.accountGroup(AssetFilter.Custodial)).thenReturn(Single.just(custodialGroup))
-        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Single.just(interestGroup))
+        whenever(asset.accountGroup(AssetFilter.All)).thenReturn(Single.just(totalGroup))
+        whenever(asset.accountGroup(AssetFilter.NonCustodial)).thenReturn(
+            Single.just(nonCustodialGroup))
+        whenever(asset.accountGroup(AssetFilter.Custodial)).thenReturn(Single.just(custodialGroup))
+        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Single.just(interestGroup))
         whenever(featureFlagMock.enabled).thenReturn(Single.just(interestEnabled))
 
         Locale.setDefault(Locale.US)
@@ -71,21 +72,24 @@ class AssetDetailsCalculatorTest {
         val expectedResult = mapOf(
             AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto, walletFiat, emptySet(),
+            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
+                walletFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED),
-            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto, custodialFiat, emptySet(),
+            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
+                custodialFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED),
-            AssetFilter.Interest to AssetDisplayInfo(interestGroup, interestCrypto, interestFiat, emptySet(),
+            AssetFilter.Interest to AssetDisplayInfo(interestGroup, interestCrypto, interestFiat,
+                emptySet(),
                 interestRate)
         )
 
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))
         whenever(nonCustodialGroup.accounts).thenReturn(listOf(mock()))
@@ -95,9 +99,7 @@ class AssetDetailsCalculatorTest {
         whenever(interestGroup.accounts).thenReturn(listOf(mock()))
         whenever(interestGroup.isFunded).thenReturn(true)
 
-        calculator.token.accept(token)
-
-        val v = calculator.assetDisplayDetails
+        val v = interactor.loadAssetDetails(asset)
             .test()
             .values()
 
@@ -126,16 +128,17 @@ class AssetDetailsCalculatorTest {
 
         val expectedResult = mapOf(
             AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet()),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto, walletFiat, emptySet())
+            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
+                walletFiat, emptySet())
         )
 
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(nonCustodialGroup.accounts).thenReturn(listOf(mock()))
         whenever(nonCustodialGroup.isFunded).thenReturn(true)
@@ -143,9 +146,7 @@ class AssetDetailsCalculatorTest {
         whenever(custodialGroup.isFunded).thenReturn(false)
         whenever(interestGroup.isFunded).thenReturn(false)
 
-        calculator.token.accept(token)
-
-        val v = calculator.assetDisplayDetails
+        val v = interactor.loadAssetDetails(asset)
             .test()
             .values()
 
@@ -175,19 +176,21 @@ class AssetDetailsCalculatorTest {
         val expectedResult = mapOf(
             AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto, walletFiat, emptySet(),
+            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
+                walletFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED),
-            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto, custodialFiat, emptySet(),
+            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
+                custodialFiat, emptySet(),
                 AssetDetailsCalculator.NOT_USED)
         )
 
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))
         whenever(nonCustodialGroup.accounts).thenReturn(listOf(mock()))
@@ -195,9 +198,7 @@ class AssetDetailsCalculatorTest {
         whenever(custodialGroup.isFunded).thenReturn(true)
         whenever(interestGroup.isFunded).thenReturn(false)
 
-        calculator.token.accept(token)
-
-        val v = calculator.assetDisplayDetails
+        val v = interactor.loadAssetDetails(asset)
             .test()
             .values()
 
@@ -211,9 +212,7 @@ class AssetDetailsCalculatorTest {
 
     @Test
     fun `cryptoBalance, fiatBalance & interestBalance are never returned if exchange rate fails`() {
-        val token: CryptoAsset = mock()
-
-        whenever(token.exchangeRate()).thenReturn(Single.error(Throwable()))
+        whenever(asset.exchangeRate()).thenReturn(Single.error(Throwable()))
 
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
         val custodialCrypto = CryptoValue.ZeroBtc
@@ -224,118 +223,90 @@ class AssetDetailsCalculatorTest {
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
-        calculator.token.accept(token)
+        val testObserver = interactor.loadAssetDetails(asset)
+            .test()
 
-        val testObserver = calculator.assetDisplayDetails.test()
         testObserver.assertNoValues()
     }
 
     @Test
-    fun`cryptoBalance & fiatBalance never return if interest fails`() {
-        val token: CryptoAsset = mock()
-
+    fun `cryptoBalance & fiatBalance never return if interest fails`() {
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
         val custodialCrypto = CryptoValue.ZeroBtc
         val totalCrypto = walletCrypto + custodialCrypto
 
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
 
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
-        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Single.error(Throwable()))
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
+        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Single.error(Throwable()))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
-        calculator.token.accept(token)
-
-        val testObserver = calculator.assetDisplayDetails.test()
+        val testObserver = interactor.loadAssetDetails(asset)
+            .test()
         testObserver.assertNoValues()
     }
 
     @Test
     fun `cryptoBalance, fiatBalance & interestBalance are never returned if totalBalance fails`() {
-        val token: CryptoAsset = mock()
-
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
         val custodialCrypto = CryptoValue.ZeroBtc
         val interestCrypto = CryptoValue.ZeroBtc
 
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.balance).thenReturn(Single.error(Throwable()))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(token.interestRate()).thenReturn(Single.just(interestRate))
+        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
-        calculator.token.accept(token)
-
-        val testObserver = calculator.assetDisplayDetails.test()
+        val testObserver = interactor.loadAssetDetails(asset)
+            .test()
         testObserver.assertNoValues()
     }
 
     @Test
     fun `exchange rate is the right one`() {
-        val token: CryptoAsset = mock()
-
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 56478.99.toBigDecimal())
 
-        whenever(token.exchangeRate()).thenReturn(Single.just(price))
-        calculator.token.accept(token)
+        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
-        val testObserver = calculator.exchangeRate.test()
+        val testObserver = interactor.loadExchangeRate(asset).test()
         testObserver.assertValue("$56,478.99").assertValueCount(1)
     }
 
     @Test
     fun `historic prices are returned properly`() {
-        val token: CryptoAsset = mock()
-
-        whenever(token.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
+        whenever(asset.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
             .thenReturn(Single.just(listOf(
                 PriceDatum(5556, 2.toDouble(), volume24h = 0.toDouble()),
                 PriceDatum(587, 22.toDouble(), volume24h = 0.toDouble()),
                 PriceDatum(6981, 23.toDouble(), volume24h = 4.toDouble())
             )))
 
-        calculator.token.accept(token)
-
-        val loadingTestObserver = calculator.chartLoading.test()
-        val testObserver = calculator.historicPrices.test()
+        val testObserver = interactor.loadHistoricPrices(asset, TimeSpan.DAY).test()
 
         testObserver.assertValue(listOf(
             PriceDatum(5556, 2.toDouble(), volume24h = 0.toDouble()),
             PriceDatum(587, 22.toDouble(), volume24h = 0.toDouble()),
             PriceDatum(6981, 23.toDouble(), volume24h = 4.toDouble())
         )).assertValueCount(1)
-
-        loadingTestObserver.assertValueAt(0, false)
-            .assertValueAt(1, true)
-            .assertValueAt(2, false)
-            .assertValueCount(3)
     }
 
     @Test
     fun `when historic prices api returns error, empty list should be returned`() {
-        val token: CryptoAsset = mock()
-        whenever(token.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
+        whenever(asset.historicRateSeries(TimeSpan.DAY, TimeInterval.FIFTEEN_MINUTES))
             .thenReturn(Single.error(Throwable()))
 
-        calculator.token.accept(token)
-
-        val loadingTestObserver = calculator.chartLoading.test()
-        val testObserver = calculator.historicPrices.test()
+        val testObserver = interactor.loadHistoricPrices(asset, TimeSpan.DAY).test()
 
         testObserver.assertValue(emptyList()).assertValueCount(1)
-
-        loadingTestObserver.assertValueAt(0, false)
-            .assertValueAt(1, true)
-            .assertValueAt(2, false)
-            .assertValueCount(3)
     }
 }
