@@ -12,7 +12,7 @@ import timber.log.Timber
 
 enum class AssetDetailsStep {
     ZERO,
-    //  CUSTODY_INTRO_SHEET,
+    CUSTODY_INTRO_SHEET,
     ASSET_DETAILS,
     ASSET_ACTIONS
 }
@@ -32,11 +32,11 @@ class AssetDetailsFlow(
         model.apply {
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
-                onError = { Timber.e("Dashboard state is broken: $it") }
+                onError = { Timber.e("Asset details state is broken: $it") }
             )
         }
 
-        model.process(ShowAssetDetailsIntent)
+        model.process(ShowRelevantAssetDetailsSheet(cryptoCurrency))
     }
 
     private fun handleStateChange(newState: AssetDetailsState) {
@@ -54,7 +54,7 @@ class AssetDetailsFlow(
         replaceBottomSheet(
             when (step) {
                 AssetDetailsStep.ZERO -> null
-                // AssetDetailsStep.CUSTODY_INTRO_SHEET -> TODO()
+                AssetDetailsStep.CUSTODY_INTRO_SHEET -> CustodyWalletIntroSheet.newInstance()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS ->
                     AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)

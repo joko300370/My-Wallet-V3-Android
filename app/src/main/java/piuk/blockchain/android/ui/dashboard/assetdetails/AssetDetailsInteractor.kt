@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.remoteconfig.FeatureFlag
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.TimeInterval
@@ -11,6 +13,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
@@ -24,7 +27,9 @@ data class AssetDisplayInfo(
 )
 
 class AssetDetailsInteractor(
-    private val interestFeatureFlag: FeatureFlag
+    private val interestFeatureFlag: FeatureFlag,
+    private val dashboardPrefs: DashboardPrefs,
+    private val coincore: Coincore
 ) {
 
     fun loadAssetDetails(asset: CryptoAsset) =
@@ -38,6 +43,15 @@ class AssetDetailsInteractor(
     fun loadHistoricPrices(asset: CryptoAsset, timeSpan: TimeSpan) =
         asset.historicRateSeries(timeSpan, TimeInterval.FIFTEEN_MINUTES)
             .onErrorResumeNext(Single.just(emptyList()))
+
+    fun shouldShowCustody(cryptoCurrency: CryptoCurrency) :Single<Boolean> {
+        return coincore[cryptoCurrency].accountGroup(AssetFilter.Custodial)
+            .flatMap { it.balance }
+            .map {
+                !dashboardPrefs.isCustodialIntroSeen && !it.isZero
+            }
+    }
+
 
     private data class Details(
         val account: BlockchainAccount,

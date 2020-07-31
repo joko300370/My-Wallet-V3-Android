@@ -36,6 +36,19 @@ class AssetDetailsModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
+            is ShowRelevantAssetDetailsSheet -> interactor.shouldShowCustody(intent.cryptoCurrency)
+                .subscribeBy(
+                    onSuccess = {
+                        if(it) {
+                            process(ShowCustodyIntroSheetIntent)
+                        } else {
+                            process(ShowAssetDetailsIntent)
+                        }
+                    },
+                    onError = {
+
+                    }
+                )
             is LoadAssetDisplayDetails -> interactor.loadAssetDetails(previousState.asset!!)
                 .subscribeBy(
                     onSuccess = {
@@ -58,6 +71,7 @@ class AssetDetailsModel(
             is AssetExchangeRateLoaded,
             is ShowAssetDetailsIntent,
             is ShowAssetActionsIntent,
+            is ShowCustodyIntroSheetIntent,
             is ReturnToPreviousStep -> null
         }
     }

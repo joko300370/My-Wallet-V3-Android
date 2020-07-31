@@ -691,7 +691,9 @@ val applicationModule = module {
 
         factory {
             AssetDetailsInteractor(
-                interestFeatureFlag = get(interestAccountFeatureFlag)
+                interestFeatureFlag = get(interestAccountFeatureFlag),
+                dashboardPrefs = get(),
+                coincore = get()
             )
         }
 

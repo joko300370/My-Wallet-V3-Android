@@ -36,8 +36,8 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
+import piuk.blockchain.android.ui.dashboard.assetdetails.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
-import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
@@ -112,14 +112,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             updateDisplayList(newState)
         }
 
-        // Update/show bottom sheet
+      /*  // Update/show bottom sheet
         if (this.state?.showAssetSheetFor != newState.showAssetSheetFor) {
             showAssetSheet(newState.showAssetSheetFor)
-        } else {
+        } else {*/
             if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
                 showPromoSheet(newState)
             }
-        }
+        //}
 
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {
@@ -327,7 +327,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
-        model.process(ShowCryptoAssetDetails(cryptoCurrency))
+        model.process(LaunchAssetDetailsFlow(cryptoCurrency))
+       // model.process(ShowCryptoAssetDetails(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {

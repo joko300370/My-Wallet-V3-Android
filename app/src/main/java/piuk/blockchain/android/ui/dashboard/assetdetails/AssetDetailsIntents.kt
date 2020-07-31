@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -76,9 +77,20 @@ class ChartDataLoaded(
         )
 }
 
+object ShowCustodyIntroSheetIntent : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.CUSTODY_INTRO_SHEET)
+}
+
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
+}
+
+class ShowRelevantAssetDetailsSheet(
+    val cryptoCurrency: CryptoCurrency
+): AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 
 object ReturnToPreviousStep : AssetDetailsIntent() {

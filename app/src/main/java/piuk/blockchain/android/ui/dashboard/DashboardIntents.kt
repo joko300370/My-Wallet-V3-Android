@@ -156,8 +156,8 @@ object ClearAnnouncement : DashboardIntent() {
 class ShowCryptoAssetDetails(
     private val cryptoCurrency: CryptoCurrency
 ) : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        when {
+    override fun reduce(oldState: DashboardState): DashboardState = oldState
+       /* when {
             oldState.showAssetSheetFor != null -> oldState
             oldState.shouldShowCustodialIntro(cryptoCurrency) ->
                 oldState.copy(
@@ -175,7 +175,7 @@ class ShowCryptoAssetDetails(
                 activeFlow = null,
                 selectedFiatAccount = null
             )
-        }
+        }*/
 }
 
 class ShowFiatAssetDetails(
