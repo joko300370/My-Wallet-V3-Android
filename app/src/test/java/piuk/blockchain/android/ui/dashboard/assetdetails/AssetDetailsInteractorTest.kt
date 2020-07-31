@@ -71,13 +71,13 @@ class AssetDetailsInteractorTest {
 
         val expectedResult = mapOf(
             AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED),
+                AssetDetailsInteractor.NOT_USED),
             AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
                 walletFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED),
+                AssetDetailsInteractor.NOT_USED),
             AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
                 custodialFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED),
+                AssetDetailsInteractor.NOT_USED),
             AssetFilter.Interest to AssetDisplayInfo(interestGroup, interestCrypto, interestFiat,
                 emptySet(),
                 interestRate)
@@ -175,13 +175,13 @@ class AssetDetailsInteractorTest {
 
         val expectedResult = mapOf(
             AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED),
+                AssetDetailsInteractor.NOT_USED),
             AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
                 walletFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED),
+                AssetDetailsInteractor.NOT_USED),
             AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
                 custodialFiat, emptySet(),
-                AssetDetailsCalculator.NOT_USED)
+                AssetDetailsInteractor.NOT_USED)
         )
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
