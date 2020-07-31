@@ -29,6 +29,13 @@
         <item name="android:layout_marginEnd">@dimen/standard_margin</item>
     </style>
 
+    <style name="CtaButton.White.Slim">
+        <item name="android:minHeight">40dp</item>
+        <item name="android:maxHeight">40dp</item>
+        <item name="android:paddingStart">@dimen/tiny_margin</item>
+        <item name="android:paddingEnd">@dimen/tiny_margin</item>
+    </style>
+
     <style name="CtaButton.Black">
         <item name="android:background">@drawable/bkgd_button_black_selector</item>
         <item name="android:textColor">@color/white</item>

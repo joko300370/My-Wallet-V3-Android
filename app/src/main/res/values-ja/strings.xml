@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">スワップ</string>
   <string name="cancel">キャンセル</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">はい</string>
-  <string name="no">番号</string>
+  <string name="common_yes">はい</string>
+  <string name="common_no">番号</string>
   <string name="polite_no">結構です</string>
   <string name="done">完了</string>
   <string name="btn_close">閉じる</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">継続する</string>
   <string name="btn_forgot_password">パスワードをお忘れですか？\"</string>
   <string name="SEND">送る</string>
-  <string name="total">合計</string>
+  <string name="common_total">合計</string>
   <string name="max_available">支出可能な合計残高を使用：</string>
   <string name="bitpay_remaining_time">残り時間</string>
   <string name="bitpay_invoice_expired">期限切れのBitPay請求書</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">選択したパスワードは弱すぎて資金を確保できません。強く
 別のものを選択することをお勧めします。新しいパスワードを定義しますか？ 
 </string>
-  <string name="from">から</string>
-  <string name="to">に</string>
+  <string name="common_from">から</string>
+  <string name="common_to">に</string>
   <string name="confirm_details">支払いを確認</string>
   <string name="fee">費用</string>
   <string name="exit_confirm">もう一度戻るボタンを押して終了します</string>

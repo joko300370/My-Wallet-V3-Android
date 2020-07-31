@@ -4,6 +4,7 @@
     <dimen name="list_item_height">80dp</dimen>
 
     <dimen name="huge_margin">40dp</dimen>
+    <dimen name="xlarge_margin">36dp</dimen>
     <dimen name="large_margin">32dp</dimen>
     <dimen name="medium_margin">20dp</dimen>
     <dimen name="standard_margin">24dp</dimen>

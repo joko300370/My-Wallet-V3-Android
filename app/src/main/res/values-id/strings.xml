@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">Menukar</string>
   <string name="cancel">Membatalkan</string>
   <string name="btn_ok">baik</string>
-  <string name="yes">Iya</string>
-  <string name="no">Tidak</string>
+  <string name="common_yes">Iya</string>
+  <string name="common_no">Tidak</string>
   <string name="polite_no">Tidak, terima kasih</string>
   <string name="done">Selesai</string>
   <string name="btn_close">Menutup</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Terus</string>
   <string name="btn_forgot_password">Tidak ingat kata sandi?\"</string>
   <string name="SEND">Kirim</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Gunakan total saldo yang bisa dihabiskan:</string>
   <string name="bitpay_remaining_time">Waktu yang tersisa</string>
   <string name="bitpay_invoice_expired">Faktur BitPay Berakhir</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Kata sandi yang dipilih terlalu lemah untuk mengamankan dana Anda. Kami sangat 
  sarankan Anda memilih yang berbeda. Apakah Anda ingin menetapkan kata sandi baru? 
 </string>
-  <string name="from">Dari</string>
-  <string name="to">Untuk</string>
+  <string name="common_from">Dari</string>
+  <string name="common_to">Untuk</string>
   <string name="confirm_details">Konfirmasi pembayaran</string>
   <string name="fee">Biaya</string>
   <string name="exit_confirm">Tekan kembali tombol untuk keluar</string>

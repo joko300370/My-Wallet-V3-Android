@@ -83,11 +83,11 @@ class AccountList @JvmOverloads constructor(
                     if (it.isEmpty()) {
                         onEmptyList()
                     }
-            },
-            onError = {
-                onLoadError(it)
-            }
-        )
+                },
+                onError = {
+                    onLoadError(it)
+                }
+            )
     }
 
     var onLoadError: (Throwable) -> Unit = {}

@@ -632,7 +632,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 } else {
                     REQUEST_CODE_BCH_SENDING
                 },
-                getString(R.string.from)
+                getString(R.string.common_from)
             )
         }
     }
@@ -649,7 +649,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                 } else {
                     REQUEST_CODE_BCH_RECEIVING
                 },
-                getString(R.string.to)
+                getString(R.string.common_to)
             )
         }
     }
@@ -1230,7 +1230,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
             bitpayInvoiceExpiredDialog = dialogBuilder.setView(dialogView)
                 .setMessage(R.string.bitpay_invoice_expired_message)
                 .setTitle(R.string.bitpay_invoice_expired)
-                .setPositiveButton(getString(R.string.btn_ok), null)
+                .setPositiveButton(getString(R.string.common_ok), null)
                 .create()
 
             bitpayInvoiceExpiredDialog?.apply {
@@ -1349,7 +1349,7 @@ class SendFragment : HomeScreenMvpFragment<SendView, SendPresenter<SendView>>(),
                     title = getString(R.string.pax_need_more_eth_error_title),
                     description = body,
                     icon = CryptoCurrency.ETHER.errorIcon(),
-                    dismissText = R.string.btn_ok
+                    dismissText = R.string.common_ok
                 )
             ).show(it, "BottomDialog")
         }

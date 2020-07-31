@@ -88,9 +88,9 @@ class FiatActivityDetailsBottomSheet :
             FiatDetailItem(getString(R.string.date), Date(item.timeStampMs).toFormattedString()),
             FiatDetailItem(
                 if (item.type == TransactionType.DEPOSIT) {
-                    getString(R.string.to)
+                    getString(R.string.common_to)
                 } else {
-                    getString(R.string.from)
+                    getString(R.string.common_from)
                 }, item.account.label),
             FiatDetailItem(getString(R.string.amount), item.value.toStringWithSymbol()))
 

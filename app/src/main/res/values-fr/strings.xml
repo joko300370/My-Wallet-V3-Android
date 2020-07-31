@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">Annuler</string>
   <string name="btn_ok">D\'accord</string>
-  <string name="yes">Oui</string>
-  <string name="no">Non</string>
+  <string name="common_yes">Oui</string>
+  <string name="common_no">Non</string>
   <string name="polite_no">Non merci</string>
   <string name="done">Terminé</string>
   <string name="btn_close">Fermer</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Continuer</string>
   <string name="btn_forgot_password">Mot de passe oublié?\"</string>
   <string name="SEND">Envoyer</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Utilisez le solde total dépensable:</string>
   <string name="bitpay_remaining_time">Temps restant</string>
   <string name="bitpay_invoice_expired">La facture BitPay a expiré</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Le mot de passe sélectionné est trop faible pour sécuriser vos fonds. Nous fortement 
  vous suggérons d\'en sélectionner un autre. Souhaitez-vous définir un nouveau mot de passe? 
 </string>
-  <string name="from">De</string>
-  <string name="to">À</string>
+  <string name="common_from">De</string>
+  <string name="common_to">À</string>
   <string name="confirm_details">Confirmer le paiement</string>
   <string name="fee">Frais</string>
   <string name="exit_confirm">Appuyez à nouveau sur le bouton de retour pour quitter</string>

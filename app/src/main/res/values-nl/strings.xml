@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">ruil</string>
   <string name="cancel">annuleren</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ja</string>
-  <string name="no">Nee</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nee</string>
   <string name="polite_no">Nee, dank u wel</string>
   <string name="done">Gedaan</string>
   <string name="btn_close">Dichtbij</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Doorgaan met</string>
   <string name="btn_forgot_password">Wachtwoord vergeten?\"</string>
   <string name="SEND">Sturen</string>
-  <string name="total">Totaal</string>
+  <string name="common_total">Totaal</string>
   <string name="max_available">Totaal besteedbaar saldo gebruiken:</string>
   <string name="bitpay_remaining_time">Overgebleven tijd</string>
   <string name="bitpay_invoice_expired">BitPay-factuur verlopen</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Het geselecteerde wachtwoord is te zwak om uw geld te beveiligen. We zijn sterk 
  stel voor dat u een andere kiest. Wilt u een nieuw wachtwoord definiëren? 
 </string>
-  <string name="from">Van</string>
-  <string name="to">Naar</string>
+  <string name="common_from">Van</string>
+  <string name="common_to">Naar</string>
   <string name="confirm_details">Bevestig betaling</string>
   <string name="fee">Vergoeding</string>
   <string name="exit_confirm">Druk nogmaals op de terug-knop om af te sluiten</string>

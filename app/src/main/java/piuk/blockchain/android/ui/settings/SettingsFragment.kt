@@ -489,7 +489,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_disable_message)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 settingsPresenter.setFingerprintUnlockEnabled(
                     false
                 )
@@ -506,7 +506,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_no_fingerprints_added)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
                     Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
                     0
@@ -668,7 +668,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.guid_to_clipboard)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
                     activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
@@ -676,7 +676,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 showCustomToast(R.string.copied_to_clipboard)
                 analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 
@@ -859,7 +859,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                                     .setTitle(R.string.app_name)
                                     .setMessage(R.string.weak_password)
                                     .setCancelable(false)
-                                    .setPositiveButton(R.string.yes) { _, _ ->
+                                    .setPositiveButton(R.string.common_yes) { _, _ ->
                                         newPasswordConfirmation.setText("")
                                         newPasswordConfirmation.requestFocus()
                                         newPassword.setText("")

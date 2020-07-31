@@ -49,8 +49,8 @@
   <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">Stornieren</string>
   <string name="btn_ok">in Ordnung</string>
-  <string name="yes">Ja</string>
-  <string name="no">Nein</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nein</string>
   <string name="polite_no">Nein Danke</string>
   <string name="done">Erledigt</string>
   <string name="btn_close">Schließen</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Fortsetzen</string>
   <string name="btn_forgot_password">Passwort vergessen?\"</string>
   <string name="SEND">Senden</string>
-  <string name="total">Gesamt</string>
+  <string name="common_total">Gesamt</string>
   <string name="max_available">Verwenden Sie das gesamte Guthaben:</string>
   <string name="bitpay_remaining_time">Verbleibende Zeit</string>
   <string name="bitpay_invoice_expired">BitPay-Rechnung abgelaufen</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Das ausgewählte Passwort ist zu schwach, um Ihr Geld zu sichern. Wir stark 
  schlagen vor, dass Sie eine andere auswählen. Möchten Sie ein neues Passwort definieren? 
 </string>
-  <string name="from">Von</string>
-  <string name="to">Zu</string>
+  <string name="common_from">Von</string>
+  <string name="common_to">Zu</string>
   <string name="confirm_details">Bestätige Zahlung</string>
   <string name="fee">Gebühr</string>
   <string name="exit_confirm">Drücken Sie die Zurück-Taste erneut, um den Vorgang zu beenden</string>

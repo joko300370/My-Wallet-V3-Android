@@ -4,6 +4,14 @@
     <!-- common -->
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
+    <string name="common_send">Send</string>
+    <string name="common_from">From</string>
+    <string name="common_to">To</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_total">Total</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -30,16 +38,12 @@
 
     <!-- toolbar -->
     <string name="toolbar_cmd_home">Home</string>
-    <string name="toolbar_cmd_send">Send</string>
+    <string name="toolbar_cmd_send">@string/send</string>
     <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
     <string name="toolbar_cmd_view_activity">View Activity</string>
     <string name="toolbar_cmd_swap">Swap</string>
 
-    <string name="cancel">Cancel</string>
-    <string name="btn_ok">OK</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="polite_no">No thanks</string>
 
     <string name="done">Done</string>
@@ -179,7 +183,6 @@
     <string name="SEND">Send</string>
 
     <!--BitPay-->
-    <string name="total">Total</string>
     <string name="max_available">Use total spendable balance:</string>
 
     <string name="bitpay_remaining_time">Remaining time</string>
@@ -212,8 +215,6 @@
         suggest you select a different one. Would you like to define a new password?
     </string>
 
-    <string name="from">From</string>
-    <string name="to">To</string>
     <string name="confirm_details">Confirm Payment</string>
 
     <string name="fee">Fee</string>
@@ -1811,7 +1812,7 @@
     <string name="fiat_funds_no_kyc_step_2_title">Deposit Cash</string>
     <string name="fiat_funds_no_kyc_step_2_description">Transfer cash from your bank and enable your cash balances.</string>
     <string name="fiat_funds_no_kyc_step_3_title">Buy Crypto with Cash</string>
-    <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Use your cash wallet as a payment method to buy BTC, ETH, XLM & more.]]></string>
+    <string name="fiat_funds_no_kyc_step_3_description">Use your cash wallet as a payment method to buy BTC, ETH, XLM &amp; more.</string>
     <string name="fiat_funds_no_kyc_positive_action">Verify My Identity</string>
     <string name="fiat_funds_no_kyc_negative_action">Not Now</string>
     <string name="fiat_funds_kyc_announcement_title">Link a Bank to Buy Crypto</string>
@@ -1837,8 +1838,37 @@
     <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
+    <string name="send_select_target_title">Destination</string>
+    <string name="send_enter_amount_from">From: %1$s</string>
+    <string name="send_enter_amount_to">To: %1$s</string>
+    <string name="send_enter_amount_title">Amount</string>
+    <string name="send_enter_amount_available">Available</string>
+    <string name="send_enter_amount_max">Send Max</string>
+    <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
+    <string name="send_confirmation_fee">Fee - Regular</string>
+    <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
+    <string name="send_confirmation_fee_loading">Loading…</string>
+    <string name="send_confirmation_fee_error">Error loading fee</string>
+    <string name="send_confirmation_add_note_hint">Add a note</string>
+    <string name="send_confirmation_add_note_success">Note successfully added</string>
+    <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
+    <string name="send_progress_sending_title">Sending %1$s</string>
+    <string name="send_progress_sending_subtitle">We\'re sending your transaction now.</string>
+    <string name="send_progress_complete_title">%1$s Sent</string>
+    <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
+    <string name="send_progress_error_title">Oops! Something Went Wrong.</string>
+    <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
+    <string name="send_enter_asset_address_hint">%1s Address</string>
+    <string name="send_warn_internal_send_only">Internal Send Only</string>
+    <string name="send_scan_qr_code">Scan QR Code</string>
+    <string name="send_error_not_valid_asset_address">Not a valid %1s address</string>
+    <string name="send_error_address_is_eth_contract">Address is not a user address</string>
+    <string name="send_select_a_wallet_title">or Select a Wallet</string>
+    <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %1$s Trade Wallet to your Vault Wallets. Once %1$s is in your Vault Wallet you can transfer to external addresses.</string>
+
 </resources>
