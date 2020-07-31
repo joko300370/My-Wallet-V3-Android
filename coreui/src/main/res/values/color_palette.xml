@@ -7,6 +7,7 @@
     <!-- in future -->
 
     <color name="white">#FFFFFF</color>
+    <color name="faded_white">#99FFFFFF</color>
     <color name="black">#000000</color>
 
     <color name="red_000">#FFECEB</color>
