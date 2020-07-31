@@ -110,17 +110,10 @@ class ConfirmTransactionSheet(
         val feeTitle = getString(R.string.common_spaced_strings,
             getString(R.string.send_confirmation_fee),
             getString(R.string.send_confirmation_regular_estimation))
-        return when {
-            state.errorState == SendErrorState.FEE_REQUEST_FAILED -> {
-                PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_error))
-            }
-            state.feeAmount.isZero -> {
-                model.process(SendIntent.RequestFee)
-                PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_loading))
-            }
-            else -> {
-                PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
-            }
+        return if (state.errorState == SendErrorState.FEE_REQUEST_FAILED) {
+            PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_error))
+        } else {
+            PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
         }
     }
 
@@ -143,6 +136,8 @@ class ConfirmTransactionSheet(
         view.confirm_sheet_back.setOnClickListener {
             model.process(SendIntent.ReturnToPreviousStep)
         }
+
+        model.process(SendIntent.RequestFee)
     }
 
     private fun onCtaClick() {

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore
 
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -37,9 +38,9 @@ interface SendProcessor {
     val feeOptions: Set<FeeLevel>
     val isNoteSupported: Boolean
 
-    fun availableBalance(pendingTx: PendingSendTx): Single<Money>
+    fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue>
 
-    fun absoluteFee(pendingTx: PendingSendTx): Single<Money>
+    fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if
     // it is not. Since the UI and Address objects should validate where possible, an error should

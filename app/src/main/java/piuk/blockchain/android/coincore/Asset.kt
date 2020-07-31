@@ -16,6 +16,9 @@ enum class AssetFilter {
     Interest
 }
 
+// TEMP flag to enable/disable new send from actions
+const val ENABLE_NEW_SEND_ACTION = true
+
 enum class AssetAction {
     ViewActivity,
     Send,
@@ -32,7 +35,7 @@ interface Asset {
 
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
 
-    fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
+    fun transferList(account: SingleAccount): Single<SingleAccountList>
 
     fun parseAddress(address: String): Maybe<ReceiveAddress>
 }

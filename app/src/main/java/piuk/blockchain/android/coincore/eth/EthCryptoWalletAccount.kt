@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
@@ -130,8 +131,10 @@ internal class EthCryptoWalletAccount(
         get() = super.actions.let {
             if (it.contains(AssetAction.Send)) {
                 it.toMutableSet().apply {
-                    remove(AssetAction.Send)
-                    add(AssetAction.NewSend)
+                    if (ENABLE_NEW_SEND_ACTION) {
+                        remove(AssetAction.Send)
+                        add(AssetAction.NewSend)
+                    }
                 }
             } else {
                 it

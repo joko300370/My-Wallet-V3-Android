@@ -4,6 +4,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
@@ -14,7 +15,7 @@ class Coincore internal constructor(
     private val payloadManager: PayloadDataManager,
     private val assetMap: Map<CryptoCurrency, CryptoAsset>,
     private val defaultLabels: DefaultLabels,
-    fiatAsset: Asset
+    private val fiatAsset: Asset
 ) {
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
@@ -45,5 +46,15 @@ class Coincore internal constructor(
                 .reduce { l, g -> l + g }
         }.map {
             AllWalletsAccount(it, defaultLabels)
+        }
+
+    fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
+        // We only support transfers between similar assets and (soon; to - but not from - fiat)
+        // at this time. If and when, say, swap is supported this will need revisiting
+        Singles.zip(
+            get(sourceAccount.asset).transferList(sourceAccount),
+            fiatAsset.transferList(sourceAccount)
+        ) { crypto, fiat ->
+            crypto + fiat
         }
 }

@@ -2,7 +2,6 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -25,10 +24,11 @@ class CustodialTransferProcessor(
 
     override val feeOptions = setOf(FeeLevel.None)
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<Money> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         sendingAccount.balance
+            .map { it as CryptoValue }
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         Single.just(CryptoValue.zero(sendingAccount.asset))
 
     override fun validate(pendingTx: PendingSendTx): Completable =

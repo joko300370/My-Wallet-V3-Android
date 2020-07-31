@@ -41,7 +41,7 @@ class Erc20SendTransaction(
 
     override val isNoteSupported: Boolean = true
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -55,8 +55,9 @@ class Erc20SendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<Money> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         sendingAccount.balance
+            .map { it as CryptoValue }
 
     // In an ideal world, we'd get this via a CryptoAccount object.
     // However accessing one for Eth here would break the abstractions, so:

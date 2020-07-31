@@ -15,7 +15,6 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
@@ -142,7 +141,7 @@ class EnterTargetAddressSheet(
 
     private fun setupTransferList(account: CryptoAccount) {
         dialogView.wallet_select.initialise(
-            coincore[account.asset].canTransferTo(account).map { it.map { it as BlockchainAccount } }
+            coincore.canTransferTo(account).map { it.map { it as BlockchainAccount } }
         )
     }
 
@@ -189,13 +188,8 @@ class EnterTargetAddressSheet(
         }
     }
 
-    private fun onCtaClick() {
-        val account = state.sendTarget
-        require(account is CryptoAccount)
-        require(account != NullCryptoAccount)
-
-        model.process(SendIntent.TargetSelectionConfirmed(account))
-    }
+    private fun onCtaClick() =
+        model.process(SendIntent.TargetSelectionConfirmed(state.sendTarget))
 
     companion object {
         const val SCAN_QR_ADDRESS = 2985
