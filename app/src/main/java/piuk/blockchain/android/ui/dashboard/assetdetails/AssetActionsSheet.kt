@@ -240,8 +240,10 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
 
     companion object {
-        fun newInstance(blockchainAccount: BlockchainAccount,
-                        assetFilter: AssetFilter): AssetActionsSheet {
+        fun newInstance(
+            blockchainAccount: BlockchainAccount,
+            assetFilter: AssetFilter
+        ): AssetActionsSheet {
             return AssetActionsSheet().apply {
                 account = blockchainAccount
                 accountType = assetFilter
