@@ -89,7 +89,7 @@ object ShowAssetDetailsIntent : AssetDetailsIntent() {
 
 class ShowRelevantAssetDetailsSheet(
     val cryptoCurrency: CryptoCurrency
-): AssetDetailsIntent() {
+) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 

@@ -110,11 +110,9 @@ data class DashboardState(
             valueTransform = { CryptoAssetState(it) }
         )
     ),
-    val showAssetSheetFor: CryptoCurrency? = null,
     val showDashboardSheet: DashboardSheet? = null,
     val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
-    val pendingAssetSheetFor: CryptoCurrency? = null,
     val custodyIntroSeen: Boolean = false,
     @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
@@ -248,7 +246,6 @@ class DashboardModel(
             is PriceHistoryUpdate,
             is ClearAnnouncement,
             is ShowAnnouncement,
-            is ShowCryptoAssetDetails,
             is ShowFiatAssetDetails,
             is ShowBankLinkingSheet,
             is ShowDashboardSheet,

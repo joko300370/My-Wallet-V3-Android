@@ -39,14 +39,13 @@ class AssetDetailsModel(
             is ShowRelevantAssetDetailsSheet -> interactor.shouldShowCustody(intent.cryptoCurrency)
                 .subscribeBy(
                     onSuccess = {
-                        if(it) {
+                        if (it) {
                             process(ShowCustodyIntroSheetIntent)
                         } else {
                             process(ShowAssetDetailsIntent)
                         }
                     },
                     onError = {
-
                     }
                 )
             is LoadAssetDisplayDetails -> interactor.loadAssetDetails(previousState.asset!!)

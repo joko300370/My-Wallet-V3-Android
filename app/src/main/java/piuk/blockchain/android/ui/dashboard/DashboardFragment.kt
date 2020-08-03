@@ -111,11 +111,9 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             updateDisplayList(newState)
         }
 
-
         if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
             showPromoSheet(newState)
         }
-
 
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {

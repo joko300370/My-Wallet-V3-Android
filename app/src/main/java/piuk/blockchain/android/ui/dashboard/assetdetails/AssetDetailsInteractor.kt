@@ -44,14 +44,13 @@ class AssetDetailsInteractor(
         asset.historicRateSeries(timeSpan, TimeInterval.FIFTEEN_MINUTES)
             .onErrorResumeNext(Single.just(emptyList()))
 
-    fun shouldShowCustody(cryptoCurrency: CryptoCurrency) :Single<Boolean> {
+    fun shouldShowCustody(cryptoCurrency: CryptoCurrency): Single<Boolean> {
         return coincore[cryptoCurrency].accountGroup(AssetFilter.Custodial)
             .flatMap { it.balance }
             .map {
                 !dashboardPrefs.isCustodialIntroSeen && !it.isZero
             }
     }
-
 
     private data class Details(
         val account: BlockchainAccount,

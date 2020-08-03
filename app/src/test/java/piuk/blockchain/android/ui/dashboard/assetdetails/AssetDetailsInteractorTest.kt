@@ -42,7 +42,7 @@ class AssetDetailsInteractorTest {
 
     @Before
     fun setUp() {
-        interactor = AssetDetailsInteractor(featureFlagMock)
+        interactor = AssetDetailsInteractor(featureFlagMock, mock(), mock())
 
         whenever(asset.accountGroup(AssetFilter.All)).thenReturn(Single.just(totalGroup))
         whenever(asset.accountGroup(AssetFilter.NonCustodial)).thenReturn(
