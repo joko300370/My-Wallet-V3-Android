@@ -49,6 +49,13 @@ class UpdateTimeSpan(
         oldState.copy(timeSpan = updatedTimeSpan)
 }
 
+class HandleActionIntent(
+    private val action: AssetDetailsAction
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(hostAction = action)
+}
+
 object ChartLoading : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(chartLoading = true)
@@ -78,7 +85,7 @@ class ChartDataLoaded(
         )
 }
 
-object ChartDataLoadFailed: AssetDetailsIntent() {
+object ChartDataLoadFailed : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             chartData = emptyList(),
@@ -87,14 +94,14 @@ object ChartDataLoadFailed: AssetDetailsIntent() {
         )
 }
 
-object AssetDisplayDetailsFailed: AssetDetailsIntent() {
+object AssetDisplayDetailsFailed : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             errorState = AssetDetailsError.NO_ASSET_DETAILS
         )
 }
 
-object AssetExchangeRateFailed: AssetDetailsIntent() {
+object AssetExchangeRateFailed : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             errorState = AssetDetailsError.NO_EXCHANGE_RATE

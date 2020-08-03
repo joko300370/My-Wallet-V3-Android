@@ -35,7 +35,7 @@ import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetActionsSheet
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
@@ -56,14 +56,14 @@ class EmptyDashboardItem : DashboardItem
 private typealias RefreshFn = () -> Unit
 
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
-    AssetActionsSheet.Host,
     ForceBackupForSendSheet.Host,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
     FiatFundsNoKycDetailsSheet.Host,
-    DialogFlow.FlowHost {
+    DialogFlow.FlowHost,
+    AssetDetailsFlow.AssetDetailsHost {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()

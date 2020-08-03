@@ -22,7 +22,8 @@ data class AssetDetailsState(
     val timeSpan: TimeSpan = TimeSpan.DAY,
     val chartLoading: Boolean = false,
     val chartData: List<PriceDatum> = emptyList(),
-    val errorState: AssetDetailsError = AssetDetailsError.NONE
+    val errorState: AssetDetailsError = AssetDetailsError.NONE,
+    val hostAction: AssetDetailsAction = AssetDetailsAction.NONE
 ) : MviState
 
 enum class AssetDetailsError {
@@ -30,6 +31,17 @@ enum class AssetDetailsError {
     NO_CHART_DATA,
     NO_ASSET_DETAILS,
     NO_EXCHANGE_RATE
+}
+
+enum class AssetDetailsAction {
+    NONE,
+    ACTIVITY,
+    SEND,
+    NEW_SEND,
+    RECEIVE,
+    SWAP,
+    INTEREST,
+    DEPOSIT
 }
 
 class AssetDetailsModel(
@@ -75,6 +87,7 @@ class AssetDetailsModel(
                     })
             is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
             is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
+            is HandleActionIntent,
             is LoadAsset,
             is ChartLoading,
             is ChartDataLoaded,

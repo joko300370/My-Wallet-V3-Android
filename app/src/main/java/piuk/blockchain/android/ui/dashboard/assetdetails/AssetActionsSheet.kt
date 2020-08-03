@@ -20,12 +20,10 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.assetFilter
@@ -41,28 +39,16 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     private lateinit var account: BlockchainAccount
     private lateinit var accountType: AssetFilter
     private val disposables = CompositeDisposable()
+    private val uiScheduler = AndroidSchedulers.mainThread()
+
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val labels: DefaultLabels by scopedInject()
     private val model: AssetDetailsModel by scopedInject()
-    private val uiScheduler = AndroidSchedulers.mainThread()
 
     private val itemAdapter: AssetActionAdapter by lazy {
         AssetActionAdapter()
-    }
-
-    interface Host : SlidingModalBottomDialog.Host {
-        fun launchNewSendFor(account: SingleAccount)
-        fun gotoSendFor(account: SingleAccount)
-        fun goToReceiveFor(account: SingleAccount)
-        fun gotoActivityFor(account: BlockchainAccount)
-        fun gotoSwap(account: SingleAccount)
-    }
-
-    override val host: Host by lazy {
-        super.host as? Host ?: throw IllegalStateException(
-            "Host fragment is not a AssetActionsSheet.Host")
     }
 
     override val layoutResource: Int
@@ -104,7 +90,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         account: BlockchainAccount,
         accountType: AssetFilter
     ): List<AssetActionItem> {
-        val firstAccount = selectAccount(account)
+        val firstAccount = account.selectFirstAccount()
         return when (accountType) {
             AssetFilter.Custodial -> {
                 view.asset_actions_title.text = getString(firstAccount.asset.assetName())
@@ -162,37 +148,37 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
+                    model.process(HandleActionIntent(AssetDetailsAction.ACTIVITY))
                     dismiss()
-                    host.gotoActivityFor(account)
                 }
             AssetAction.Send ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
                     asset) {
+                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
                     dismiss()
-                    host.gotoSendFor(account)
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
+                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
                     // TODO do we want this to continue as one flow with send?
                     dismiss()
-                    host.launchNewSendFor(account)
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
+                    model.process(HandleActionIntent(AssetDetailsAction.RECEIVE))
                     dismiss()
-                    host.goToReceiveFor(account)
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset) {
+                model.process(HandleActionIntent(AssetDetailsAction.SWAP))
                 dismiss()
-                host.gotoSwap(account)
             }
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
@@ -211,26 +197,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             }
         }
 
-    private fun selectAccount(account: BlockchainAccount): CryptoAccount {
-        val selectedAccount = when (account) {
-                is SingleAccount -> account
-                is AccountGroup -> account.accounts
-                    .firstOrNull { a -> a.isDefault }
-                    ?: account.accounts.firstOrNull()
-                    ?: throw IllegalStateException("No SingleAccount found")
-                else -> throw IllegalStateException("Unknown account base")
-            }
-
-        return selectedAccount as CryptoAccount
-    }
-
     companion object {
-        fun newInstance(blockchainAccount: BlockchainAccount): AssetActionsSheet {
-            return AssetActionsSheet().apply {
-                account = blockchainAccount
-            }
-        }
-
         fun newInstance(blockchainAccount: BlockchainAccount, assetFilter: AssetFilter): AssetActionsSheet {
             return AssetActionsSheet().apply {
                 account = blockchainAccount
