@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +25,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
@@ -93,48 +94,13 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         val firstAccount = account.selectFirstAccount()
         return when (accountType) {
             AssetFilter.Custodial -> {
-                view.asset_actions_title.text = getString(firstAccount.asset.assetName())
-                view.asset_actions_details.text =
-                    labels.getDefaultCustodialWalletLabel(firstAccount.asset)
-                view.asset_actions_asset_icon.setImageResource(
-                    firstAccount.asset.drawableResFilled())
-                view.asset_actions_acc_icon.setImageResource(
-                    R.drawable.ic_account_badge_custodial)
-                account.actions.map {
-                    mapAction(it, firstAccount.asset, firstAccount)
-                }
+                showAndMapCustodialUi(view, firstAccount, account)
             }
             AssetFilter.Interest -> {
-                view.asset_actions_title.text =
-                    labels.getDefaultInterestWalletLabel(firstAccount.asset)
-                view.asset_actions_asset_icon.setImageResource(
-                    firstAccount.asset.drawableResFilled())
-                view.asset_actions_acc_icon.setImageResource(
-                    R.drawable.ic_account_badge_interest)
-                disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
-                    .subscribeBy(
-                        onSuccess = {
-                            view.asset_actions_details.text =
-                                getString(R.string.dashboard_asset_balance_interest, it)
-                        },
-                        onError = {
-                            Timber.e("AssetActions error loading Interest rate: $it")
-                        }
-                    )
-                account.actions.map {
-                    mapAction(it, firstAccount.asset, firstAccount)
-                }
+                showAndMapInterestUi(view, firstAccount, account)
             }
             AssetFilter.NonCustodial -> {
-                view.asset_actions_acc_icon.gone()
-                view.asset_actions_title.text = getString(firstAccount.asset.assetName())
-                view.asset_actions_details.text =
-                    labels.getDefaultNonCustodialWalletLabel(firstAccount.asset)
-                view.asset_actions_asset_icon.setImageResource(
-                    firstAccount.asset.drawableResFilled())
-                account.actions.map {
-                    mapAction(it, firstAccount.asset, firstAccount)
-                }
+                showAndMapNonCustodialUi(view, firstAccount, account)
             }
             else -> {
                 throw IllegalStateException("AssetActions un-catered account type: $account")
@@ -142,7 +108,83 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
     }
 
-    private fun mapAction(action: AssetAction, asset: CryptoCurrency, account: SingleAccount): AssetActionItem =
+    private fun showAndMapNonCustodialUi(
+        view: View,
+        firstAccount: CryptoAccount,
+        account: BlockchainAccount
+    ): List<AssetActionItem> {
+        view.asset_actions_acc_icon.gone()
+
+        showTextAndAssetIcon(view, getString(firstAccount.asset.assetName()),
+            labels.getDefaultNonCustodialWalletLabel(firstAccount.asset),
+            firstAccount.asset.drawableResFilled())
+
+        return account.actions.map {
+            mapAction(it, firstAccount.asset)
+        }
+    }
+
+    private fun showAndMapInterestUi(
+        view: View,
+        firstAccount: CryptoAccount,
+        account: BlockchainAccount
+    ): List<AssetActionItem> {
+        view.asset_actions_acc_icon.setImageResource(
+            R.drawable.ic_account_badge_interest)
+
+        disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
+            .subscribeBy(
+                onSuccess = {
+                    showTextAndAssetIcon(view,
+                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                        getString(R.string.dashboard_asset_balance_interest, it),
+                        firstAccount.asset.drawableResFilled()
+                    )
+                },
+                onError = {
+                    showTextAndAssetIcon(view,
+                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                        getString(R.string.dashboard_asset_actions_interest_dsc_failed),
+                        firstAccount.asset.drawableResFilled()
+                    )
+                    Timber.e("AssetActions error loading Interest rate: $it")
+                }
+            )
+
+        return account.actions.map {
+            mapAction(it, firstAccount.asset)
+        }
+    }
+
+    private fun showAndMapCustodialUi(
+        view: View,
+        firstAccount: CryptoAccount,
+        account: BlockchainAccount
+    ): List<AssetActionItem> {
+        view.asset_actions_acc_icon.setImageResource(
+            R.drawable.ic_account_badge_custodial)
+
+        showTextAndAssetIcon(view, getString(firstAccount.asset.assetName()),
+            labels.getDefaultCustodialWalletLabel(firstAccount.asset),
+            firstAccount.asset.drawableResFilled())
+
+        return account.actions.map {
+            mapAction(it, firstAccount.asset)
+        }
+    }
+
+    private fun showTextAndAssetIcon(
+        view: View,
+        title: String,
+        subtitle: String,
+        @DrawableRes icon: Int
+    ) {
+        view.asset_actions_title.text = title
+        view.asset_actions_details.text = subtitle
+        view.asset_actions_asset_icon.setImageResource(icon)
+    }
+
+    private fun mapAction(action: AssetAction, asset: CryptoCurrency): AssetActionItem =
         when (action) {
             AssetAction.ViewActivity ->
                 AssetActionItem(getString(R.string.activities_title),
@@ -198,7 +240,8 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
 
     companion object {
-        fun newInstance(blockchainAccount: BlockchainAccount, assetFilter: AssetFilter): AssetActionsSheet {
+        fun newInstance(blockchainAccount: BlockchainAccount,
+                        assetFilter: AssetFilter): AssetActionsSheet {
             return AssetActionsSheet().apply {
                 account = blockchainAccount
                 accountType = assetFilter
