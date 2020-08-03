@@ -11,12 +11,13 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
 class ShowAssetActionsIntent(
-    val account: BlockchainAccount,
-    val assetFilter: AssetFilter
+    private val account: BlockchainAccount,
+    private val assetFilter: AssetFilter
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             selectedAccount = account,
+            errorState = AssetDetailsError.NONE,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
             assetFilter = assetFilter
         )
@@ -61,19 +62,42 @@ class AssetExchangeRateLoaded(
 }
 
 class AssetDisplayDetailsLoaded(
-    val assetDisplayMap: AssetDisplayMap
+    private val assetDisplayMap: AssetDisplayMap
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDisplayMap = assetDisplayMap)
 }
 
 class ChartDataLoaded(
-    val chartData: List<PriceDatum>
+    private val chartData: List<PriceDatum>
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             chartData = chartData,
             chartLoading = false
+        )
+}
+
+object ChartDataLoadFailed: AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            chartData = emptyList(),
+            chartLoading = false,
+            errorState = AssetDetailsError.NO_CHART_DATA
+        )
+}
+
+object AssetDisplayDetailsFailed: AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NO_ASSET_DETAILS
+        )
+}
+
+object AssetExchangeRateFailed: AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NO_EXCHANGE_RATE
         )
 }
 
@@ -85,6 +109,10 @@ object ShowCustodyIntroSheetIntent : AssetDetailsIntent() {
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
+}
+
+object ClearSheetDataIntent : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = AssetDetailsState()
 }
 
 class ShowRelevantAssetDetailsSheet(

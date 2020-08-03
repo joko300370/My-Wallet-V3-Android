@@ -863,6 +863,9 @@
     <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Wallet</string>
     <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
     <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
+    <string name="asset_details_chart_load_failed_toast">Failed to load chart details, please try again</string>
+    <string name="asset_details_load_failed_toast">Failed to load wallet details, please try again</string>
+    <string name="asset_details_exchange_load_failed_toast">Failed to exchange rate information, please try again</string>
 
     <string name="more">More</string>
 

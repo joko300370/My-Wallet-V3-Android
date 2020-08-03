@@ -21,8 +21,16 @@ data class AssetDetailsState(
     val assetFiatValue: String = "",
     val timeSpan: TimeSpan = TimeSpan.DAY,
     val chartLoading: Boolean = false,
-    val chartData: List<PriceDatum> = emptyList()
+    val chartData: List<PriceDatum> = emptyList(),
+    val errorState: AssetDetailsError = AssetDetailsError.NONE
 ) : MviState
+
+enum class AssetDetailsError {
+    NONE,
+    NO_CHART_DATA,
+    NO_ASSET_DETAILS,
+    NO_EXCHANGE_RATE
+}
 
 class AssetDetailsModel(
     initialState: AssetDetailsState,
@@ -46,6 +54,8 @@ class AssetDetailsModel(
                         }
                     },
                     onError = {
+                        // fail silently, try to show AssetSheet instead
+                        process(ShowAssetDetailsIntent)
                     }
                 )
             is LoadAssetDisplayDetails -> interactor.loadAssetDetails(previousState.asset!!)
@@ -54,24 +64,30 @@ class AssetDetailsModel(
                         process(AssetDisplayDetailsLoaded(it))
                     },
                     onError = {
+                        process(AssetDisplayDetailsFailed)
                     })
             is LoadAssetFiatValue -> interactor.loadExchangeRate(previousState.asset!!)
                 .subscribeBy(
                     onSuccess = {
                         process(AssetExchangeRateLoaded(it))
                     }, onError = {
-                })
+                        process(AssetExchangeRateFailed)
+                    })
             is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
             is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
             is LoadAsset,
             is ChartLoading,
             is ChartDataLoaded,
+            is ChartDataLoadFailed,
             is AssetDisplayDetailsLoaded,
+            is AssetDisplayDetailsFailed,
             is AssetExchangeRateLoaded,
+            is AssetExchangeRateFailed,
             is ShowAssetDetailsIntent,
             is ShowAssetActionsIntent,
             is ShowCustodyIntroSheetIntent,
-            is ReturnToPreviousStep -> null
+            is ReturnToPreviousStep,
+            is ClearSheetDataIntent -> null
         }
     }
 
@@ -83,7 +99,7 @@ class AssetDetailsModel(
                 process(ChartDataLoaded(it))
             },
             onError = {
-                // TODO
+                process(ChartDataLoadFailed)
             }
         )
 

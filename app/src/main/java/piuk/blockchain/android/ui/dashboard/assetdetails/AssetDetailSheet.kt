@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
@@ -33,6 +34,8 @@ import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -75,6 +78,8 @@ class AssetDetailSheet :
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
+        handleErrorState(newState.errorState)
+
         newState.assetDisplayMap?.let {
             onGotAssetDetails(it)
         }
@@ -211,6 +216,25 @@ class AssetDetailSheet :
                 )
             })
             animateX(500)
+        }
+    }
+
+    private fun handleErrorState(error: AssetDetailsError) {
+        when (error) {
+            AssetDetailsError.NO_CHART_DATA -> ToastCustom.makeText(requireContext(),
+                getString(R.string.asset_details_chart_load_failed_toast), Toast.LENGTH_SHORT,
+                TYPE_ERROR)
+            AssetDetailsError.NO_ASSET_DETAILS ->
+                ToastCustom.makeText(requireContext(),
+                    getString(R.string.asset_details_load_failed_toast), Toast.LENGTH_SHORT,
+                    TYPE_ERROR)
+            AssetDetailsError.NO_EXCHANGE_RATE ->
+                ToastCustom.makeText(requireContext(),
+                    getString(R.string.asset_details_exchange_load_failed_toast), Toast.LENGTH_SHORT,
+                    TYPE_ERROR)
+            else -> {
+                // do nothing
+            }
         }
     }
 

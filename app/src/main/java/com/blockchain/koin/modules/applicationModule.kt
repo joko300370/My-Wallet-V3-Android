@@ -664,8 +664,7 @@ val applicationModule = module {
             DashboardModel(
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get(),
-                persistence = get()
+                interactor = get()
             )
         }
 

@@ -68,11 +68,14 @@ class AssetDetailsFlow(
     }
 
     override fun onSheetClosed() {
-        resetFow()
+        if(currentStep == AssetDetailsStep.ZERO) {
+            finishFlow()
+        }
     }
 
     private fun resetFow() {
         disposables.clear()
         currentStep = AssetDetailsStep.ZERO
+        model.process(ClearSheetDataIntent)
     }
 }

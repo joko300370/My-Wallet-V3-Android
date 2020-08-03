@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.preferences.DashboardPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -68,7 +67,6 @@ interface BalanceState : DashboardItem {
     val delta: Pair<Money, Double>?
     operator fun get(currency: CryptoCurrency): CryptoAssetState
     fun getFundsFiat(fiat: String): Money
-    fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean
 }
 
 data class FiatBalanceInfo(
@@ -113,7 +111,6 @@ data class DashboardState(
     val showDashboardSheet: DashboardSheet? = null,
     val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
-    val custodyIntroSeen: Boolean = false,
     @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
@@ -168,9 +165,6 @@ data class DashboardState(
 
     override fun getFundsFiat(fiat: String): Money =
         fiatAssets?.totalBalance ?: FiatValue.zero(fiat)
-
-    override fun shouldShowCustodialIntro(currency: CryptoCurrency): Boolean =
-        !custodyIntroSeen && get(currency).hasCustodialBalance
 }
 
 data class CryptoAssetState(
@@ -202,10 +196,9 @@ data class CryptoAssetState(
 class DashboardModel(
     initialState: DashboardState,
     mainScheduler: Scheduler,
-    private val interactor: DashboardInteractor,
-    private val persistence: DashboardPrefs
+    private val interactor: DashboardInteractor
 ) : MviModel<DashboardState, DashboardIntent>(
-    initialState.copy(custodyIntroSeen = persistence.isCustodialIntroSeen),
+    initialState,
     mainScheduler
 ) {
     override fun performAction(
@@ -257,10 +250,6 @@ class DashboardModel(
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("***> Scan loop failed: $t")
-    }
-
-    override fun onStateUpdate(s: DashboardState) {
-        persistence.isCustodialIntroSeen = s.custodyIntroSeen
     }
 
     override fun distinctIntentFilter(
