@@ -66,6 +66,8 @@ class AssetDetailSheet :
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token)
     }
 
+    private var state = AssetDetailsState()
+
     override val model: AssetDetailsModel by scopedInject()
 
     override val layoutResource: Int
@@ -88,10 +90,14 @@ class AssetDetailSheet :
         }
 
         dialogView.chart.apply {
-            updateChart(chart, newState.chartData)
+            if (newState.chartData != state.chartData) {
+                updateChart(this, newState.chartData)
+            }
         }
 
         updatePriceChange(dialogView.price_change, newState.chartData)
+
+        state = newState
     }
 
     override fun initControls(view: View) {
@@ -174,10 +180,6 @@ class AssetDetailSheet :
     }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {
-        if (chart.data == data) {
-            return
-        }
-
         chart.apply {
             visible()
             clear()

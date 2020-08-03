@@ -111,14 +111,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             updateDisplayList(newState)
         }
 
-      /*  // Update/show bottom sheet
-        if (this.state?.showAssetSheetFor != newState.showAssetSheetFor) {
-            showAssetSheet(newState.showAssetSheetFor)
-        } else {*/
-            if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
-                showPromoSheet(newState)
-            }
-        //}
+
+        if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
+            showPromoSheet(newState)
+        }
+
 
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {
@@ -190,20 +187,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun showAssetSheet(sheetFor: CryptoCurrency?) {
-        if (sheetFor != null) {
-            model.process(LaunchAssetDetailsFlow(sheetFor))
-        } else {
-            // Nothing, unless we need to remove the sheet? TODO
-        }
-    }
-
     private fun showPromoSheet(state: DashboardState) {
         showBottomSheet(
             when (state.showDashboardSheet) {
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
-                // DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
                 DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
@@ -327,7 +315,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
         model.process(LaunchAssetDetailsFlow(cryptoCurrency))
-       // model.process(ShowCryptoAssetDetails(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {
@@ -414,11 +401,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     // DialogBottomSheet.Host
     override fun onSheetClosed() {
-        // TODO this closes the active flow when the Custody sheet is dismissed and breaks the
-        //  Asset details Flow
-        // if(this.state?.activeFlow == null) {
-            model.process(ClearBottomSheet)
-        // }
+        model.process(ClearBottomSheet)
     }
 
     override fun onFlowFinished() {

@@ -93,7 +93,6 @@ data class FiatAssetState(
 
 enum class DashboardSheet {
     STX_AIRDROP_COMPLETE,
-    // CUSTODY_INTRO,
     SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
     @Deprecated("Moving to send v2")

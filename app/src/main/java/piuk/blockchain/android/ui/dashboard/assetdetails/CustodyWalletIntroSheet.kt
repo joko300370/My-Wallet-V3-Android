@@ -5,19 +5,20 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.DashboardPrefs
 import kotlinx.android.synthetic.main.dialog_custodial_intro.view.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
 class CustodyWalletIntroSheet : SlidingModalBottomDialog() {
 
     override val layoutResource: Int = R.layout.dialog_custodial_intro
-    private val dashboardPrefs: DashboardPrefs by scopedInject()
+    private val dashboardPrefs: DashboardPrefs by inject()
     private val model: AssetDetailsModel by scopedInject()
 
     override fun initControls(view: View) {
         analytics.logEvent(SimpleBuyAnalytics.CUSTODY_WALLET_CARD_SHOWN)
         view.cta_button.setOnClickListener { onCtaClick() }
-        // dashboardPrefs.isCustodialIntroSeen = true
+        dashboardPrefs.isCustodialIntroSeen = true
     }
 
     override fun onSheetHidden() {
@@ -30,7 +31,6 @@ class CustodyWalletIntroSheet : SlidingModalBottomDialog() {
 
     private fun onCtaClick() {
         analytics.logEvent(SimpleBuyAnalytics.CUSTODY_WALLET_CARD_CLICKED)
-        // dismiss()
         model.process(ShowAssetDetailsIntent)
     }
 

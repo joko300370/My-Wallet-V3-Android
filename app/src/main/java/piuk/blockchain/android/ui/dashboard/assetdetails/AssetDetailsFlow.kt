@@ -56,18 +56,23 @@ class AssetDetailsFlow(
                 AssetDetailsStep.CUSTODY_INTRO_SHEET -> CustodyWalletIntroSheet.newInstance()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS ->
-                    AssetActionsSheet.newInstance(newState.selectedAccount!!, newState.assetFilter!!)
+                    AssetActionsSheet.newInstance(newState.selectedAccount!!,
+                        newState.assetFilter!!)
             }
         )
     }
 
     override fun finishFlow() {
-        disposables.clear()
-        currentStep = AssetDetailsStep.ZERO
+        resetFow()
         super.finishFlow()
     }
 
     override fun onSheetClosed() {
-        //finishFlow()
+        resetFow()
+    }
+
+    private fun resetFow() {
+        disposables.clear()
+        currentStep = AssetDetailsStep.ZERO
     }
 }
