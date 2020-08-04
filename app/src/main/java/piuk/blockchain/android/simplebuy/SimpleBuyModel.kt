@@ -3,6 +3,7 @@ package piuk.blockchain.android.simplebuy
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.BuyOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
@@ -89,7 +90,8 @@ class SimpleBuyModel(
                         ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
                     previousState.selectedPaymentMethod?.takeIf {
-                        it.paymentMethodType == PaymentMethodType.PAYMENT_CARD
+                        it.paymentMethodType == PaymentMethodType.PAYMENT_CARD &&
+                                it.id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
                     }?.id,
                     previousState.selectedPaymentMethod?.paymentMethodType
                         ?: throw IllegalStateException("Missing Payment Method"),
@@ -142,6 +144,11 @@ class SimpleBuyModel(
                     onError = {
                         process(SimpleBuyIntent.ErrorIntent())
                     }
+                )
+            is SimpleBuyIntent.DepositFundsRequested -> interactor.checkTierLevel(previousState.fiatCurrency)
+                .subscribeBy(
+                    onSuccess = { process(it) },
+                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
             is SimpleBuyIntent.MakePayment ->
                 interactor.fetchOrder(intent.orderId)

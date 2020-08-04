@@ -1,16 +1,20 @@
 package piuk.blockchain.android.coincore
 
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 
 open class TransferError(msg: String) : Exception(msg)
 
-class SendValidationError(errorCode: Int) : TransferError("Invalid Send Tx: code $errorCode") {
+class SendValidationError(val errorCode: Int) : TransferError("Invalid Send Tx: code $errorCode") {
     companion object {
         const val HAS_TX_IN_FLIGHT = 1000
         const val INVALID_AMOUNT = 1001
         const val INSUFFICIENT_FUNDS = 1002
+        const val INSUFFICIENT_GAS = 1003
+        const val INVALID_ADDRESS = 1004
+        const val ADDRESS_IS_CONTRACT = 1005
     }
 }
 
@@ -29,14 +33,14 @@ data class PendingSendTx(
 
 interface SendProcessor {
     val sendingAccount: CryptoAccount
-    val address: ReceiveAddress
+    val sendTarget: ReceiveAddress
 
     val feeOptions: Set<FeeLevel>
     val isNoteSupported: Boolean
 
-    fun availableBalance(pendingTx: PendingSendTx): Single<Money>
+    fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue>
 
-    fun absoluteFee(pendingTx: PendingSendTx): Single<Money>
+    fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if
     // it is not. Since the UI and Address objects should validate where possible, an error should

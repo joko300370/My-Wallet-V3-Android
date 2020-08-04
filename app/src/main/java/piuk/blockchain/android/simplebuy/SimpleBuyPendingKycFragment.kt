@@ -72,7 +72,7 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             if (newState.selectedPaymentMethod?.id == PaymentMethod.UNDEFINED_CARD_PAYMENT_ID) {
                 addCard()
             } else {
-                navigator().goToCheckOutScreen()
+                navigator().pop()
             }
         }
 

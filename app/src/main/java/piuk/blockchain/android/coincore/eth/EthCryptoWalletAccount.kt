@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
@@ -28,8 +29,7 @@ internal class EthCryptoWalletAccount(
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
-    override val exchangeRates: ExchangeRateDataManager,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(CryptoCurrency.ETHER) {
 
     constructor(
@@ -127,10 +127,17 @@ internal class EthCryptoWalletAccount(
                 }
             }
 
-    override val actions: AvailableActions = setOf(
-        AssetAction.ViewActivity,
-        AssetAction.NewSend,
-        AssetAction.Receive,
-        AssetAction.Swap
-    )
+    override val actions: AvailableActions
+        get() = super.actions.let {
+            if (it.contains(AssetAction.Send)) {
+                it.toMutableSet().apply {
+                    if (ENABLE_NEW_SEND_ACTION) {
+                        remove(AssetAction.Send)
+                        add(AssetAction.NewSend)
+                    }
+                }
+            } else {
+                it
+            }
+        }
 }

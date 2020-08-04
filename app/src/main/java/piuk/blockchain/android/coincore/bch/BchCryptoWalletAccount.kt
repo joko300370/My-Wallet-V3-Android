@@ -25,8 +25,7 @@ internal class BchCryptoWalletAccount(
     private val bchManager: BchDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
-    private val networkParams: NetworkParameters,
-    override val feeAsset: CryptoCurrency? = CryptoCurrency.BCH
+    private val networkParams: NetworkParameters
 ) : CryptoNonCustodialAccount(CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)

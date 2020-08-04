@@ -27,11 +27,11 @@ class EthSendTransaction(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
     sendingAccount: CryptoAccount,
-    address: CryptoAddress,
+    sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainSendProcessorBase(
         sendingAccount,
-        address,
+        sendTarget,
         requireSecondPassword
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.ETHER
@@ -40,7 +40,7 @@ class EthSendTransaction(
 
     override val isNoteSupported: Boolean = true
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<Money> =
+    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -54,13 +54,13 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<Money> =
+    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)
         ) { balance: Money, fees: Money ->
             max(balance - fees, CryptoValue.ZeroEth)
-        }
+        }.map { it as CryptoValue }
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid
@@ -82,12 +82,12 @@ class EthSendTransaction(
     private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),
-            ethDataManager.isContractAddress(address.address),
+            ethDataManager.isContractAddress(sendTarget.address),
             feeOptions()
         ).map { (nonce, isContract, fees) ->
             ethDataManager.createEthTransaction(
                 nonce = nonce,
-                to = address.address,
+                to = sendTarget.address,
                 gasPriceWei = fees.gasPrice,
                 gasLimitGwei = fees.getGasLimit(isContract),
                 weiValue = pendingTx.amount.toBigInteger()

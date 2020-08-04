@@ -25,7 +25,6 @@ import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.NotificationAppOpened
-import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.SwapAnalyticsEvents
@@ -75,7 +74,7 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
-import piuk.blockchain.android.ui.transfer.TestSendContainerActivity
+import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -119,13 +118,14 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             if (!wasSelected) {
                 when (position) {
+                    /*  TODO remove this, leaving in for reference of events etc
                     ITEM_SEND -> if (currentFragment !is SendFragment) {
                         // This is a bit of a hack to allow the selection of the correct button
                         // On the bottom nav bar, but without starting the fragment again
                         startSendFragment(null)
                         ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(SendAnalytics.SendTabItem)
-                    }
+                    }*/
                     ITEM_HOME -> {
                         startDashboardFragment()
                         ViewUtils.setElevation(appbar_layout, 4f)
@@ -135,14 +135,19 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
+                    /* TODO remove this, leaving in for reference of events etc
                     ITEM_RECEIVE -> {
                         startReceiveFragment()
                         ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
-                    }
+                    }*/
                     ITEM_SWAP -> {
                         presenter.startSwapOrKyc(null, null)
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
+                    }
+                    ITEM_TRANSFER -> {
+                        startTransferFragment()
+                        ViewUtils.setElevation(appbar_layout, 0f)
                     }
                 }
             }
@@ -397,7 +402,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
-            R.id.stub_send_test -> TestSendContainerActivity.start(this)
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
             R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
@@ -470,7 +474,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun launchTransfer() {
-        bottom_navigation.getViewAtPosition(ITEM_RECEIVE).performClick()
+        bottom_navigation.getViewAtPosition(ITEM_TRANSFER).performClick()
     }
 
     private fun showLogoutDialog() {
@@ -498,8 +502,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             when (currentFragment) {
                 is DashboardFragment -> currentItem = ITEM_HOME
                 is ActivitiesFragment -> currentItem = ITEM_ACTIVITY
-                is SendFragment -> currentItem = ITEM_SEND
-                is ReceiveFragment -> currentItem = ITEM_RECEIVE
+                is TransferFragment -> currentItem = ITEM_TRANSFER
             }
         }
     }
@@ -674,29 +677,41 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     private fun startSendFragment(input: String?, isDeeplinked: Boolean = false) {
-        setCurrentTabItem(ITEM_SEND)
+        setCurrentTabItem(ITEM_TRANSFER)
 
         ViewUtils.setElevation(appbar_layout, 0f)
 
-        val sendFragment = SendFragment.newInstance(input, isDeeplinked)
-        replaceContentFragment(sendFragment)
+        val transferFragment = TransferFragment.newInstance()
+        replaceContentFragment(transferFragment)
     }
 
     override fun gotoReceiveFor(account: SingleAccount) {
         if (account is CryptoAccount) {
             presenter.cryptoCurrency = account.asset
-            setCurrentTabItem(ITEM_RECEIVE)
+            setCurrentTabItem(ITEM_TRANSFER)
             ViewUtils.setElevation(appbar_layout, 0f)
-            startReceiveFragment()
+            // startReceiveFragment()
         }
     }
 
     private fun startReceiveFragment() {
-        setCurrentTabItem(ITEM_RECEIVE)
+        setCurrentTabItem(ITEM_TRANSFER)
 
         ViewUtils.setElevation(appbar_layout, 0f)
-        val receiveFragment = ReceiveFragment.newInstance(selectedAccountFromFragments)
-        replaceContentFragment(receiveFragment)
+        // TODO remove
+        // val receiveFragment = ReceiveFragment.newInstance(selectedAccountFromFragments)
+        val transferFragment =
+            TransferFragment.newInstance(TransferFragment.Companion.StartingView.SHOW_RECEIVE)
+        replaceContentFragment(transferFragment)
+    }
+
+    private fun startTransferFragment() {
+        setCurrentTabItem(ITEM_TRANSFER)
+        toolbar_general.title = getString(R.string.transfer)
+
+        ViewUtils.setElevation(appbar_layout, 0f)
+        val transferFragment = TransferFragment.newInstance()
+        replaceContentFragment(transferFragment)
     }
 
     override fun gotoDashboard() {
@@ -801,8 +816,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         private const val ITEM_ACTIVITY = 0
         private const val ITEM_SWAP = 1
         private const val ITEM_HOME = 2
-        private const val ITEM_SEND = 3
-        private const val ITEM_RECEIVE = 4
+        private const val ITEM_TRANSFER = 3
 
         private fun toolbarNavigationItems(): List<AHBottomNavigationItem> =
             listOf(AHBottomNavigationItem(
@@ -818,12 +832,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 R.drawable.ic_vector_toolbar_home,
                 R.color.white
             ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_send,
-                R.drawable.ic_vector_toolbar_send,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_receive_crypto,
-                R.drawable.ic_vector_toolbar_receive,
+                R.string.toolbar_cmd_transfer,
+                R.drawable.ic_vector_toolbar_transfer,
                 R.color.white
             ))
 
@@ -851,9 +861,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 msgBody = R.string.tour_step_one_body_1,
                 msgButton = R.string.tour_step_one_btn
             ),
+            // TODO how will we show these two steps in the future?
             IntroTourStep(
                 name = "Step_Two",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_SEND) },
+                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_TRANSFER) },
                 analyticsEvent = IntroTourAnalyticsEvent.IntroSendViewedAnalytics,
                 msgIcon = R.drawable.ic_vector_toolbar_send,
                 msgTitle = R.string.tour_step_two_title,
@@ -862,7 +873,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             ),
             IntroTourStep(
                 name = "Step_Three",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_RECEIVE) },
+                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_TRANSFER) },
                 analyticsEvent = IntroTourAnalyticsEvent.IntroRequestViewedAnalytics,
                 msgIcon = R.drawable.ic_vector_toolbar_receive,
                 msgTitle = R.string.tour_step_three_title,

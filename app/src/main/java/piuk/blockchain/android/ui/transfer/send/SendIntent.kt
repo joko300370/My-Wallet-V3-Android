@@ -1,9 +1,11 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -15,6 +17,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             SendState(
                 sendingAccount = account,
+                errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
                 currentStep = if (passwordRequired) SendStep.ENTER_PASSWORD else SendStep.ENTER_ADDRESS,
                 nextEnabled = passwordRequired
@@ -26,7 +29,8 @@ sealed class SendIntent : MviIntent<SendState> {
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false
+                nextEnabled = false,
+                errorState = SendErrorState.NONE
             )
     }
 
@@ -45,23 +49,47 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
+                errorState = SendErrorState.INVALID_PASSWORD,
                 secondPassword = ""
             )
     }
 
-    class TargetSelected(
+    class ValidateInputTargetAddress(
+        val targetAddress: String,
+        val expectedCrypto: CryptoCurrency
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class TargetAddressValidated(
         val sendTarget: SendTarget
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = true,
-                sendTarget = sendTarget
+                errorState = SendErrorState.NONE,
+                sendTarget = sendTarget,
+                nextEnabled = true
             )
     }
 
-    object TargetSelectionConfirmed : SendIntent() {
+    class TargetAddressInvalid(private val error: SendValidationError) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
+                errorState = when (error.errorCode) {
+                    SendValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
+                    else -> SendErrorState.INVALID_ADDRESS
+                },
+                sendTarget = NullCryptoAccount,
+                nextEnabled = false
+            )
+        }
+
+    class TargetSelectionConfirmed(
+        val sendTarget: SendTarget
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                errorState = SendErrorState.NONE,
                 nextEnabled = false,
                 currentStep = SendStep.ENTER_AMOUNT
             )
@@ -97,7 +125,7 @@ sealed class SendIntent : MviIntent<SendState> {
     }
 
     class FeeUpdate(
-        val fee: Money
+        val fee: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(feeAmount = fee)
@@ -122,8 +150,8 @@ sealed class SendIntent : MviIntent<SendState> {
     }
 
     class UpdateTransactionAmounts(
-        val amount: Money,
-        private val maxAvailable: Money
+        val amount: CryptoValue,
+        private val maxAvailable: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(

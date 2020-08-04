@@ -20,6 +20,10 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
             ?: emptyList()
     }
 
+    private val canAddCard: Boolean by unsafeLazy {
+        arguments?.getBoolean(CAN_ADD_CARD_KEY) ?: false
+    }
+
     override val layoutResource: Int
         get() = R.layout.simple_buy_payment_method_chooser
 
@@ -43,17 +47,20 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
     private fun PaymentMethod.clickAction(): () -> Unit = when (this) {
         is PaymentMethod.UndefinedCard -> {
             {
-                (parentFragment as? PaymentMethodChangeListener)?.addPaymentMethod(
-                    PaymentMethodType.PAYMENT_CARD
-                )
+                if (canAddCard)
+                    (parentFragment as? PaymentMethodChangeListener)?.addPaymentMethod(
+                        PaymentMethodType.PAYMENT_CARD
+                    )
+                else
+                    (parentFragment as? PaymentMethodChangeListener)?.onPaymentMethodChanged(
+                        this
+                    )
                 dismiss()
             }
         }
         is PaymentMethod.UndefinedFunds -> {
             {
-                (parentFragment as? PaymentMethodChangeListener)?.addPaymentMethod(
-                    PaymentMethodType.FUNDS
-                )
+                (parentFragment as? PaymentMethodChangeListener)?.depositFundsRequested()
                 dismiss()
             }
         }

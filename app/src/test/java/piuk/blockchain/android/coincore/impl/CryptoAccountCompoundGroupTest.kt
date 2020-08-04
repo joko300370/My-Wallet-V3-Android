@@ -87,7 +87,7 @@ class CryptoAccountCompoundGroupTest {
     }
 
     @Test
-    fun `group with three accounts returns the intersection of possible actions`() {
+    fun `group with three accounts returns the union of possible actions`() {
         // Arrange
         val accountActions1 = setOf(
             AssetAction.Send,
@@ -104,7 +104,11 @@ class CryptoAccountCompoundGroupTest {
             AssetAction.Receive
         )
 
-        val expectedResult = setOf(AssetAction.Send)
+        val expectedResult = setOf(
+            AssetAction.Send,
+            AssetAction.Swap,
+            AssetAction.Receive
+        )
 
         val account1: CryptoAccount = mock {
             on { actions } itReturns accountActions1

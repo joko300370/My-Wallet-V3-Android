@@ -93,6 +93,7 @@ val coincoreModule = module {
         scoped {
             PaxAsset(
                 paxAccount = get(paxAccount),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -129,6 +130,7 @@ val coincoreModule = module {
         scoped {
             UsdtAsset(
                 usdtAccount = get(usdtAccount),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),

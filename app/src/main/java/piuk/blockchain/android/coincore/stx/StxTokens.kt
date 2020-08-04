@@ -7,9 +7,11 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
@@ -64,11 +66,13 @@ internal class StxAsset(
         )
     }
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            StxAddress(address)
-        } else {
-            null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Maybe.fromCallable {
+            if (isValidAddress(address)) {
+                StxAddress(address)
+            } else {
+                null
+            }
         }
 
     private fun isValidAddress(address: String): Boolean =

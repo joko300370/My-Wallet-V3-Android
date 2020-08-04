@@ -149,6 +149,8 @@ android {
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-dev'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            applicationId "piuk.blockchain.android.dev"
+            resValue "string", "app_name", "BlockDev"
         }
         envStaging {
             dimension "environment"
@@ -173,6 +175,7 @@ android {
             versionNameSuffix '-staging'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             applicationId "piuk.blockchain.android.staging"
+            resValue "string", "app_name", "BlockStaging"
         }
         envTestnet {
             dimension "environment"
