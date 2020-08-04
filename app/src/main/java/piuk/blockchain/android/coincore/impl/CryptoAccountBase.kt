@@ -19,7 +19,6 @@ import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccountList
-import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 internal const val transactionFetchCount = 50
