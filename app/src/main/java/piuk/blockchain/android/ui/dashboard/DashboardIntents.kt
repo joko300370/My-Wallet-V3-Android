@@ -247,6 +247,18 @@ class LaunchSendFlow(
         )
 }
 
+class LaunchDepositFlow(
+    val toAccount: SingleAccount,
+    val shouldShowPicker: Boolean
+): DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            showDashboardSheet = null,
+            activeFlow = null,
+            transferFundsCurrency = null
+        )
+}
+
 class LaunchAssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency
 ) : DashboardIntent() {

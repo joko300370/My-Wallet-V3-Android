@@ -11,6 +11,8 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
@@ -63,7 +65,8 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 
 class SendFlow(
     private val coincore: Coincore,
-    private val account: CryptoAccount,
+    private val sourceAccount: CryptoAccount = NullCryptoAccount,
+    private val targetAccount: SendTarget = NullCryptoAccount,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : DialogFlow() {
 
@@ -90,7 +93,11 @@ class SendFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    model.process(SendIntent.Initialise(account, passwordRequired))
+                    if(sourceAccount != NullCryptoAccount) {
+                        model.process(SendIntent.Initialise(sourceAccount, passwordRequired))
+                    } else if(targetAccount != NullCryptoAccount) {
+
+                    }
                 },
                 onError = {
                     Timber.e("Unable to configure send flow, aborting. e == $it")

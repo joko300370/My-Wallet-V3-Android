@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransferError
+import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -103,6 +104,15 @@ internal class EthCryptoWalletAccount(
                     ethDataManager.requireSecondPassword
                 )
             )
+            is CryptoInterestAccount -> sendTo.receiveAddress.map {
+                EthSendTransaction(
+                    ethDataManager,
+                    fees,
+                    this,
+                    it as CryptoAddress,
+                    ethDataManager.requireSecondPassword
+                )
+            }
             is CryptoAccount -> sendTo.receiveAddress.map {
                 EthSendTransaction(
                     ethDataManager,

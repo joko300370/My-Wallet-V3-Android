@@ -18,13 +18,16 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -437,6 +440,16 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             )
             else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")
         }.exhaustive
+
+    override fun goToDeposit(depositAccount: SingleAccount, cryptoAsset: CryptoAsset) {
+        // at the moment we only support non-custodial interest deposits
+        compositeDisposable += cryptoAsset.accountGroup(AssetFilter.NonCustodial).subscribeBy {
+            Timber.e("------ depositing for: $depositAccount - ${it.accounts.size > 1}")
+        }
+
+        //  coincore[depositAccount.asset]
+        // model.process(LaunchSendFlow())
+    }
 
     override fun startBackupForTransfer() {
         navigator().launchBackupFunds(this, BACKUP_FUNDS_REQUEST_CODE)

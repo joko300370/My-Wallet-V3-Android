@@ -40,7 +40,7 @@ enum class AssetDetailsAction {
     NEW_SEND,
     RECEIVE,
     SWAP,
-    INTEREST,
+    INTEREST_SUMMARY,
     DEPOSIT
 }
 

@@ -153,6 +153,9 @@ internal abstract class CryptoAssetBase(
                 )
             }
 
+    private fun getInterestAccount() : Maybe<SingleAccount> =
+        TODO("if KYC && interest then return acc otherwise return empty")
+
     final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)

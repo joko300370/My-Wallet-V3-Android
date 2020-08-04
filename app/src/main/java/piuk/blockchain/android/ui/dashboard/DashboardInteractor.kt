@@ -206,6 +206,17 @@ class DashboardInteractor(
         return null
     }
 
+    fun getDepositFlow(model: DashboardModel, shouldShowAccountPicker: Boolean,
+                       toAccount: SingleAccount): Disposable? {
+        model.process(
+            UpdateLaunchDialogFlow(
+                SendFlow(
+                )
+            )
+        )
+        return null
+    }
+
     companion object {
         private const val ONE_DAY = 24 * 60 * 60L
         private val FLATLINE_CHART = listOf(

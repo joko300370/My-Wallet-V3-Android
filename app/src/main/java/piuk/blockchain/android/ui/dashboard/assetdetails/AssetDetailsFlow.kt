@@ -10,6 +10,7 @@ import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
@@ -31,6 +32,7 @@ class AssetDetailsFlow(
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
+        fun goToDeposit(depositAccount: SingleAccount, cryptoAsset: CryptoAsset)
     }
 
     private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
@@ -93,8 +95,8 @@ class AssetDetailsFlow(
             AssetDetailsAction.NEW_SEND -> host.launchNewSendFor(account)
             AssetDetailsAction.RECEIVE -> host.goToReceiveFor(account)
             AssetDetailsAction.SWAP -> host.gotoSwap(account)
-            AssetDetailsAction.INTEREST -> TODO()
-            AssetDetailsAction.DEPOSIT -> TODO()
+            AssetDetailsAction.INTEREST_SUMMARY -> TODO()
+            AssetDetailsAction.DEPOSIT -> host.goToDeposit(account, newState.asset!!)
             AssetDetailsAction.NONE -> {
                 // do nothing
             }

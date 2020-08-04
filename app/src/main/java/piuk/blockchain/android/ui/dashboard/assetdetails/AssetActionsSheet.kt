@@ -234,8 +234,8 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
-                // TODO in upcoming story
-                Timber.e("----- deposit clicked")
+                model.process(HandleActionIntent(AssetDetailsAction.DEPOSIT))
+                dismiss()
             }
         }
 

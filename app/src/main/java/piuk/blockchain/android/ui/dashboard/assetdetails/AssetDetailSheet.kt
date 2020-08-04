@@ -181,6 +181,9 @@ class AssetDetailSheet :
         if (account is CryptoAccount && assetFilter == AssetFilter.Custodial) {
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }
+        if (assetFilter == AssetFilter.Interest) {
+            // TODO must check if user has KYC'd - if not launch info sheet about KYC (screen 0.1 of Earn flow)
+        }
         model.process(ShowAssetActionsIntent(account, assetFilter))
     }
 
