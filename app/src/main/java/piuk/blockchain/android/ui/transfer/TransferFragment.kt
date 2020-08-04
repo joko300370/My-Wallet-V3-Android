@@ -33,7 +33,7 @@ class TransferFragment : Fragment() {
         TabLayoutMediator(transfer_tabs, transfer_pager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.send)
-                1 -> getString(R.string.receive)
+                1 -> getString(R.string.common_receive)
                 else -> ""
             }
         }.attach()
