@@ -59,7 +59,10 @@ class TransferFragment : Fragment() {
 
         private const val START_AT_VIEW = "START_AT_VIEW"
         private const val STARTING_ACCOUNT = "STARTING_ACCOUNT"
-        fun newInstance(startAt: StartingView = StartingView.SHOW_SEND, account: CryptoAccount? = null): TransferFragment {
+        fun newInstance(
+            startAt: StartingView = StartingView.SHOW_SEND,
+            account: CryptoAccount? = null
+        ): TransferFragment {
             return TransferFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(START_AT_VIEW, startAt)
@@ -72,7 +75,10 @@ class TransferFragment : Fragment() {
     }
 }
 
-class TransferPagerAdapter(fragment: Fragment, private val startingAccount: CryptoAccount?) : FragmentStateAdapter(fragment) {
+class TransferPagerAdapter(
+    fragment: Fragment,
+    private val startingAccount: CryptoAccount?
+) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =

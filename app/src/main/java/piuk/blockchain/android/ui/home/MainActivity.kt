@@ -676,8 +676,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    private fun startSendFragment(input: String? = "", isDeeplinked: Boolean = false,
-                                  account: CryptoAccount? = null) {
+    private fun startSendFragment(
+        input: String? = "",
+        isDeeplinked: Boolean = false,
+        account: CryptoAccount? = null
+    ) {
         setCurrentTabItem(ITEM_TRANSFER)
 
         ViewUtils.setElevation(appbar_layout, 0f)

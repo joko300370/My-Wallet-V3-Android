@@ -93,10 +93,9 @@ class SendFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    if(sourceAccount != NullCryptoAccount) {
+                    if (sourceAccount != NullCryptoAccount) {
                         model.process(SendIntent.Initialise(sourceAccount, passwordRequired))
-                    } else if(targetAccount != NullCryptoAccount) {
-
+                    } else if (targetAccount != NullCryptoAccount) {
                     }
                 },
                 onError = {
