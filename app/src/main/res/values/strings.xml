@@ -1812,6 +1812,7 @@
     <string name="fiat_funds_no_kyc_step_2_title">Deposit Cash</string>
     <string name="fiat_funds_no_kyc_step_2_description">Transfer cash from your bank and enable your cash balances.</string>
     <string name="fiat_funds_no_kyc_step_3_title">Buy Crypto with Cash</string>
+
     <string name="fiat_funds_no_kyc_step_3_description">Use your cash wallet as a payment method to buy BTC, ETH, XLM &amp; more.</string>
     <string name="fiat_funds_no_kyc_positive_action">Verify My Identity</string>
     <string name="fiat_funds_no_kyc_negative_action">Not Now</string>

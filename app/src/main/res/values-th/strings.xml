@@ -15,14 +15,14 @@
     <item>คำที่สิบสอง</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ สตริง / xlm_memo_text</item>
-    <item>\@ สตริง / xlm_memo_id</item>
-    <item>\@ สตริง / xlm_memo_hash</item>
-    <item>\@ สตริง / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ สตริง / xlm_memo_text</item>
-    <item>\@ สตริง / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d ที่อยู่ที่นำเข้า</item>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">ยืนยันอีเมลของคุณ</string>
   <string name="kyc_email_message">เราจำเป็นต้องยืนยันที่อยู่อีเมลของคุณเพื่อเพิ่มระดับความปลอดภัย</string>
   <string name="kyc_email_hint_focused">อีเมลของคุณ</string>
-  <string name="kyc_email_hint_unfocused">\@ สตริง / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">เกิดข้อผิดพลาดในการบันทึกอีเมลโปรดลองอีกครั้ง</string>
   <string name="kyc_email_send_verification">ส่งอีเมล</string>
   <string name="kyc_email_validation_header">ตรวจสอบกล่องจดหมายของคุณ.</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">เกิดข้อผิดพลาดในการยืนยัน ID โปรดลองอีกครั้ง</string>
   <string name="kyc_veriff_splash_country_supported_header">ประเทศของฉันรองรับหรือไม่</string>
   <string name="kyc_veriff_splash_country_supported_subheader">ไม่รองรับทุกประเทศในขณะนี้ ตรวจสอบ <annotation link="country_list"> รายการประเทศ </annotation> ก่อนดำเนินการต่อ</string>
-  <string name="kyc_veriff_splash_title">\@ สตริง / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ตรวจสอบเงินแล้ว</string>
   <string name="kyc_veriff_splash_header">มายืนยันกันเถอะ</string>
   <string name="kyc_veriff_splash_subtitle">คุณจะต้องมี 1 ประเภท ID ด้านล่างนี้เพื่อดำเนินการต่อ</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">ตรวจสอบอุปกรณ์แล้ว</string>
   <string name="kyc_complete_id_uploaded">อัปโหลด ID</string>
   <string name="kyc_complete_video_uploaded">วิดีโอที่อัปโหลด</string>
-  <string name="kyc_help_dialog_need_some_help">\@ สตริง / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ทีมสนับสนุน Blockchain ของเราได้เขียนคำแนะนำช่วยเหลืออธิบายว่าทำไมเราต้องยืนยันตัวตนของคุณ</string>
   <string name="kyc_help_dialog_read_now">อ่านตอนนี้</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ สตริง / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">การยืนยันตัวตน</string>
   <string name="kyc_settings_status_none">ไม่สอบ</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">ระดับทอง - อยู่ระหว่างการตรวจสอบ</string>
   <string name="kyc_settings_gold_level_approved">ระดับทอง - ได้รับการอนุมัติ</string>
   <string name="kyc_settings_silver_level_approved">ระดับเงิน - อนุมัติแล้ว</string>
-  <string name="kyc_settings_tier_status_failed">\@ สตริง / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">เกิดข้อผิดพลาดในการดึงสถานะ KYC</string>
   <string name="kyc_status_title_in_progress">กำลังตรวจสอบความคืบหน้า</string>
   <string name="kyc_status_title_approved">บัญชีได้รับการอนุมัติ</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">เลือกสถานที่ที่คุณค้างไว้และทำการยืนยันตัวตนให้เสร็จสมบูรณ์</string>
   <string name="kyc_drop_off_card_button">ทำการตรวจสอบต่อ</string>
   <string name="kyc_documents_needed">เอกสารที่จำเป็น</string>
-  <string name="kyc_resubmission_card_title">\@ สตริง / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">เรามีปัญหากับเอกสารที่คุณให้มา โปรดลองอัปโหลดเอกสารอีกครั้งเพื่อดำเนินการยืนยันต่อ</string>
   <string name="kyc_resubmission_card_button">อัพโหลดเอกสาร</string>
-  <string name="kyc_resubmission_splash_title">\@ สตริง / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">เราไม่สามารถยืนยันตัวตนของคุณและต้องการให้คุณอัปโหลดเอกสารที่จำเป็นอีกครั้ง</string>
   <string name="kyc_resubmission_splash_description_2">สาเหตุหลักที่ทำให้สิ่งนี้เกิดขึ้น:</string>
   <string name="kyc_resubmission_splash_description_3">ภาพถ่ายที่ต้องการหายไป</string>

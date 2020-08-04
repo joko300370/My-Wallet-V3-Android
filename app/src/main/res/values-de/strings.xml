@@ -15,14 +15,14 @@
     <item>zwölftes Wort</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importierte Adresse</item>
@@ -1232,7 +1232,7 @@
   <string name="kyc_email_title">Bestätigen Sie Ihre E-Mail</string>
   <string name="kyc_email_message">Wir müssen Ihre E-Mail-Adresse als zusätzliche Sicherheitsebene überprüfen.</string>
   <string name="kyc_email_hint_focused">Deine E-Mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fehler beim Speichern der E-Mail, versuchen Sie es erneut</string>
   <string name="kyc_email_send_verification">E-Mail senden</string>
   <string name="kyc_email_validation_header">Überprüfe deinen Posteingang.</string>
@@ -1257,7 +1257,7 @@
   <string name="kyc_onfido_splash_verification_error">Fehler beim Überprüfen der ID, versuchen Sie es erneut</string>
   <string name="kyc_veriff_splash_country_supported_header">Wird mein Land unterstützt?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link="country_list"> Liste der Länder </annotation> bevor Sie</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILBER ÜBERPRÜFT</string>
   <string name="kyc_veriff_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
   <string name="kyc_veriff_splash_subtitle">Sie benötigen einen der folgenden ID-Typen, um fortzufahren.</string>
@@ -1279,11 +1279,11 @@
   <string name="kyc_complete_device_verified">Gerät verifiziert</string>
   <string name="kyc_complete_id_uploaded">ID hochgeladen</string>
   <string name="kyc_complete_video_uploaded">Video hochgeladen</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Unser Blockchain-Support-Team hat Hilfehandbücher verfasst, in denen erläutert wird, warum wir Ihre Identität überprüfen müssen.</string>
   <string name="kyc_help_dialog_read_now">Lies jetzt</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitätsprüfung</string>
   <string name="kyc_settings_status_none">Nicht überprüft</string>
@@ -1295,7 +1295,7 @@
   <string name="kyc_settings_gold_level_in_review">Gold Level - Im Rückblick</string>
   <string name="kyc_settings_gold_level_approved">Gold Level - Genehmigt</string>
   <string name="kyc_settings_silver_level_approved">Silberstufe - Genehmigt</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fehler beim Abrufen des KYC-Status</string>
   <string name="kyc_status_title_in_progress">Überprüfung läuft</string>
   <string name="kyc_status_title_approved">Konto genehmigt</string>
@@ -1319,10 +1319,10 @@
   <string name="kyc_drop_off_card_description">Fahren Sie dort fort, wo Sie aufgehört haben, und führen Sie Ihre Identitätsprüfung durch.</string>
   <string name="kyc_drop_off_card_button">Setzen Sie die Überprüfung fort</string>
   <string name="kyc_documents_needed">Erforderliche Dokumente</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Wir hatten einige Probleme mit den von Ihnen gelieferten Dokumenten. Bitte versuchen Sie erneut, die Dokumente hochzuladen, um mit Ihrer Überprüfung fortzufahren.</string>
   <string name="kyc_resubmission_card_button">Dokumente hochladen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Wir können Ihre Identität nicht überprüfen und müssen die erforderlichen Dokumente erneut hochladen.</string>
   <string name="kyc_resubmission_splash_description_2">Hauptgründe dafür:</string>
   <string name="kyc_resubmission_splash_description_3">Die erforderlichen Fotos fehlen.</string>

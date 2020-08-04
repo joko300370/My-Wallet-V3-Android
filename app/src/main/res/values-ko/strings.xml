@@ -15,14 +15,14 @@
     <item>열두 번째 단어</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ 문자열 / xlm_memo_text</item>
-    <item>\@ 문자열 / xlm_memo_id</item>
-    <item>\@ 문자열 / xlm_memo_hash</item>
-    <item>\@ 문자열 / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ 문자열 / xlm_memo_text</item>
-    <item>\@ 문자열 / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">가져온 주소 %d</item>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">이메일 확인</string>
   <string name="kyc_email_message">추가 보안 계층으로 이메일 주소를 확인해야합니다.</string>
   <string name="kyc_email_hint_focused">귀하의 이메일</string>
-  <string name="kyc_email_hint_unfocused">\@ 문자열 / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">이메일 저장 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_email_send_verification">이메일을 보내</string>
   <string name="kyc_email_validation_header">받은 편지함을 확인.</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">ID 확인 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_veriff_splash_country_supported_header">우리나라가 지원 되나요?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">현재 모든 국가가 지원되는 것은 아닙니다. 계속하기 전에 최신 <annotation link="country_list"> 국가 목록 </annotation> 을 확인하십시오.</string>
-  <string name="kyc_veriff_splash_title">\@ 문자열 / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">은색 검증</string>
   <string name="kyc_veriff_splash_header">당신인지 확인합시다</string>
   <string name="kyc_veriff_splash_subtitle">계속하려면 아래의 ID 유형 중 하나가 필요합니다.</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">장치 확인</string>
   <string name="kyc_complete_id_uploaded">ID 업로드</string>
   <string name="kyc_complete_video_uploaded">비디오 업로드</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">당사의 블록 체인 지원 팀은 신원 확인이 필요한 이유를 설명하는 도움말 가이드를 작성했습니다.</string>
   <string name="kyc_help_dialog_read_now">지금 읽어라</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ 문자열 / 연락처 _support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">신원 확인</string>
   <string name="kyc_settings_status_none">미확인</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">골드 레벨-검토 중</string>
   <string name="kyc_settings_gold_level_approved">골드 레벨-승인</string>
   <string name="kyc_settings_silver_level_approved">실버 레벨-승인</string>
-  <string name="kyc_settings_tier_status_failed">\@ 문자열 / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYC 상태를 가져 오는 중 오류가 발생했습니다.</string>
   <string name="kyc_status_title_in_progress">확인 진행 중</string>
   <string name="kyc_status_title_approved">계정 승인</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">중단 한 곳을 찾아 신원 확인을 완료합니다.</string>
   <string name="kyc_drop_off_card_button">확인 계속</string>
   <string name="kyc_documents_needed">필요한 서류</string>
-  <string name="kyc_resubmission_card_title">\@ 문자열 / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">제공하신 문서에 문제가있었습니다. 확인을 계속하려면 문서를 다시 업로드하십시오.</string>
   <string name="kyc_resubmission_card_button">문서 업로드</string>
-  <string name="kyc_resubmission_splash_title">\@ 문자열 / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">신원을 확인할 수 없으므로 필요한 문서를 다시 업로드해야합니다.</string>
   <string name="kyc_resubmission_splash_description_2">이것이 일어나는 주된 이유 :</string>
   <string name="kyc_resubmission_splash_description_3">필요한 사진이 없습니다.</string>
