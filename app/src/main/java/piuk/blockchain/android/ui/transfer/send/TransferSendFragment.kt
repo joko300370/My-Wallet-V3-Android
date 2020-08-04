@@ -20,6 +20,10 @@ class TransferSendFragment :
     private val coincore: Coincore by scopedInject()
     private var flow: SendFlow? = null
 
+    private val startingAccount by lazy {
+        arguments?.getSerializable(STARTING_ACCOUNT)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -28,6 +32,10 @@ class TransferSendFragment :
             statusDecorator = ::statusDecorator,
             onAccountSelected = ::doOnAccountSelected
         )
+
+        if (startingAccount != null) {
+            startFlowForAccount(startingAccount as CryptoAccount)
+        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): Single<String> =
@@ -48,15 +56,19 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
-            flow = SendFlow(
-                account = account,
-                coincore = coincore
-            ).apply {
-                startFlow(
-                    fragmentManager = childFragmentManager,
-                    host = this@TransferSendFragment
-                )
-            }
+            startFlowForAccount(account)
+        }
+    }
+
+    private fun startFlowForAccount(account: CryptoAccount) {
+        flow = SendFlow(
+            sourceAccount = account,
+            coincore = coincore
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@TransferSendFragment
+            )
         }
     }
 
@@ -65,6 +77,12 @@ class TransferSendFragment :
     }
 
     companion object {
-        fun newInstance() = TransferSendFragment()
+        private const val STARTING_ACCOUNT = "STARTING_ACCOUNT"
+
+        fun newInstance(startingAccount: CryptoAccount?) = TransferSendFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(STARTING_ACCOUNT, startingAccount)
+            }
+        }
     }
 }

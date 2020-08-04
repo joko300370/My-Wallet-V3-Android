@@ -3,14 +3,15 @@ package piuk.blockchain.android.coincore.stx
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -28,7 +29,8 @@ internal class StxAsset(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService
 ) : CryptoAssetBase(
     exchangeRates,
     historicRates,
@@ -36,7 +38,8 @@ internal class StxAsset(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService
 ) {
 
     override val asset: CryptoCurrency

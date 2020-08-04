@@ -64,7 +64,7 @@ class EnterAmountSheet(
                 )
             }
 
-            if (newState.availableBalance.isPositive) {
+            if (newState.availableBalance.isPositive || newState.availableBalance.isZero) {
                 amount_sheet_input.maxLimit = newState.availableBalance
 
                 amount_sheet_max_available.text =

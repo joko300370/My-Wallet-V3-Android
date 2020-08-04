@@ -9,6 +9,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -16,7 +17,15 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 class TransferFragment : Fragment() {
 
     private val pagerAdapter by lazy {
-        TransferPagerAdapter(this)
+        TransferPagerAdapter(this, startingAccount as? CryptoAccount)
+    }
+
+    private val startingView by lazy {
+        arguments?.getSerializable(START_AT_VIEW)
+    }
+
+    private val startingAccount by lazy {
+        arguments?.getSerializable(STARTING_ACCOUNT)
     }
 
     override fun onCreateView(
@@ -37,6 +46,10 @@ class TransferFragment : Fragment() {
                 else -> ""
             }
         }.attach()
+
+        if (startingView != StartingView.SHOW_SEND) {
+            transfer_pager.setCurrentItem(1, true)
+        }
     }
     companion object {
         enum class StartingView {
@@ -45,23 +58,27 @@ class TransferFragment : Fragment() {
         }
 
         private const val START_AT_VIEW = "START_AT_VIEW"
-        fun newInstance(startAt: StartingView = StartingView.SHOW_SEND): TransferFragment {
+        private const val STARTING_ACCOUNT = "STARTING_ACCOUNT"
+        fun newInstance(startAt: StartingView = StartingView.SHOW_SEND, account: CryptoAccount? = null): TransferFragment {
             return TransferFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(START_AT_VIEW, startAt)
+                    account?.let {
+                        putSerializable(STARTING_ACCOUNT, account)
+                    }
                 }
             }
         }
     }
 }
 
-class TransferPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class TransferPagerAdapter(fragment: Fragment, private val startingAccount: CryptoAccount?) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =
         when (position) {
-        0 -> TransferSendFragment.newInstance()
-        1 -> TransferReceiveFragment.newInstance()
+        0 -> TransferSendFragment.newInstance(startingAccount)
+        1 -> TransferReceiveFragment.newInstance(startingAccount)
         else -> throw IllegalStateException("Only two fragments allowed")
     }
 }

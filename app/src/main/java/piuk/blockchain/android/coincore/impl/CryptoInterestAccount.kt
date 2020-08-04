@@ -7,6 +7,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
@@ -26,7 +27,13 @@ internal class CryptoInterestAccount(
     private val isConfigured = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
+        get() = custodialWalletManager.getInterestAccountAddress(asset).map {
+            InterestAddress(
+                address = it,
+                label = label,
+                asset = asset
+            )
+        }
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
@@ -56,3 +63,9 @@ internal class CryptoInterestAccount(
 
     override val actions: AvailableActions = emptySet()
 }
+
+internal class InterestAddress(
+    override val address: String,
+    override val label: String = address,
+    override val asset: CryptoCurrency
+) : CryptoAddress

@@ -4,6 +4,7 @@ import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
@@ -34,7 +35,8 @@ internal class UsdtAsset(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     crashLogger: CrashLogger,
-    pitLinking: PitLinking
+    pitLinking: PitLinking,
+    tierService: TierService
 ) : Erc20TokensBase(
     usdtAccount,
     feeDataManager,
@@ -44,7 +46,8 @@ internal class UsdtAsset(
     currencyPrefs,
     labels,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tierService
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.USDT
 

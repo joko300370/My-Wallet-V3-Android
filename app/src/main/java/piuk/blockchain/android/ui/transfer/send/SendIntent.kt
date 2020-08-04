@@ -72,6 +72,17 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
+    class SelectionTargetAddressValidated(
+        val sendTarget: SendTarget
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                errorState = SendErrorState.NONE,
+                sendTarget = sendTarget,
+                currentStep = SendStep.ENTER_AMOUNT
+            )
+    }
+
     class TargetAddressInvalid(private val error: SendValidationError) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
@@ -90,8 +101,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 errorState = SendErrorState.NONE,
-                nextEnabled = false,
-                currentStep = SendStep.ENTER_AMOUNT
+                nextEnabled = false
             )
     }
 

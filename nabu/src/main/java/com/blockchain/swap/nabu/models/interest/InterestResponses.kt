@@ -10,3 +10,7 @@ data class InterestResponse(
 data class InterestAccountBalanceResponse(
     val balance: Long
 )
+
+data class InterestAddressResponse(
+    val accountRef: String
+)

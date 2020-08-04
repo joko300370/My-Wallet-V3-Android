@@ -672,16 +672,17 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override fun gotoSendFor(account: SingleAccount) {
         if (account is CryptoAccount) {
             presenter.cryptoCurrency = account.asset
-            startSendFragment(null)
+            startSendFragment(account = account)
         }
     }
 
-    private fun startSendFragment(input: String?, isDeeplinked: Boolean = false) {
+    private fun startSendFragment(input: String? = "", isDeeplinked: Boolean = false,
+                                  account: CryptoAccount? = null) {
         setCurrentTabItem(ITEM_TRANSFER)
 
         ViewUtils.setElevation(appbar_layout, 0f)
 
-        val transferFragment = TransferFragment.newInstance()
+        val transferFragment = TransferFragment.newInstance(account = account)
         replaceContentFragment(transferFragment)
     }
 
@@ -690,18 +691,17 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             presenter.cryptoCurrency = account.asset
             setCurrentTabItem(ITEM_TRANSFER)
             ViewUtils.setElevation(appbar_layout, 0f)
-            // startReceiveFragment()
+            startReceiveFragment(account)
         }
     }
 
-    private fun startReceiveFragment() {
+    private fun startReceiveFragment(account: CryptoAccount? = null) {
         setCurrentTabItem(ITEM_TRANSFER)
 
         ViewUtils.setElevation(appbar_layout, 0f)
-        // TODO remove
-        // val receiveFragment = ReceiveFragment.newInstance(selectedAccountFromFragments)
+
         val transferFragment =
-            TransferFragment.newInstance(TransferFragment.Companion.StartingView.SHOW_RECEIVE)
+            TransferFragment.newInstance(TransferFragment.Companion.StartingView.SHOW_RECEIVE, account)
         replaceContentFragment(transferFragment)
     }
 

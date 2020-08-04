@@ -186,7 +186,7 @@ class DashboardInteractor(
             model.process(
                 UpdateLaunchDialogFlow(
                     SendFlow(
-                        account = fromAccount,
+                        sourceAccount = fromAccount,
                         coincore = coincore
                     )
                 )
@@ -208,12 +208,12 @@ class DashboardInteractor(
 
     fun getDepositFlow(model: DashboardModel, shouldShowAccountPicker: Boolean,
                        toAccount: SingleAccount): Disposable? {
-        model.process(
+        /*model.process(
             UpdateLaunchDialogFlow(
                 SendFlow(
                 )
             )
-        )
+        )*/
         return null
     }
 

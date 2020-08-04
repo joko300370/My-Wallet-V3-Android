@@ -7,8 +7,8 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingSendTx
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SendValidationError
@@ -101,6 +101,7 @@ class SendModel(
                     previousState.sendAmount,
                     intent.sendTarget
                 )
+            is SendIntent.SelectionTargetAddressValidated -> null
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
             is SendIntent.UpdateTransactionAmounts -> null
@@ -192,8 +193,8 @@ class SendModel(
         interactor.initialiseTransaction(sourceAccount, sendTarget)
             .subscribeBy(
                 onComplete = {
-                    process(SendIntent.TargetAddressValidated(sendTarget))
                     process(SendIntent.SendAmountChanged(amount))
+                    process(SendIntent.SelectionTargetAddressValidated(sendTarget))
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get transaction processor: $it")

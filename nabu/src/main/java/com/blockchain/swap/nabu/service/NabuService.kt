@@ -436,6 +436,12 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
+    fun getInterestAddress(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAddress(authorization = sessionToken.authHeader, currency = currency)
+    .wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }

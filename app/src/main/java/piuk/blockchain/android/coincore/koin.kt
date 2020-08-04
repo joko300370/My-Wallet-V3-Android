@@ -30,7 +30,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 crashLogger = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -44,7 +45,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -59,7 +61,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 environmentSettings = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -72,7 +75,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -86,7 +90,8 @@ val coincoreModule = module {
                 crashLogger = get(),
                 custodialManager = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -100,7 +105,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -112,7 +118,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get()
             )
         }
 
@@ -137,7 +144,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 crashLogger = get(),
                 labels = get(),
-                pitLinking = get()
+                pitLinking = get(),
+                tierService = get()
             )
         }
 

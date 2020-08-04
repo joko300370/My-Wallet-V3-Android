@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -25,7 +26,8 @@ internal class XlmAsset(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService
 ) : CryptoAssetBase(
     exchangeRates,
     historicRates,
@@ -33,7 +35,8 @@ internal class XlmAsset(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService
 ) {
 
     override val asset: CryptoCurrency

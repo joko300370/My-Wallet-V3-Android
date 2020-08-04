@@ -3,6 +3,8 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -10,10 +12,12 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.thepit.PitLinking
@@ -32,7 +36,8 @@ internal abstract class CryptoAssetBase(
     protected val labels: DefaultLabels,
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
-    protected val crashLogger: CrashLogger
+    protected val crashLogger: CrashLogger,
+    private val tiersService: TierService
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -153,8 +158,16 @@ internal abstract class CryptoAssetBase(
                 )
             }
 
-    private fun getInterestAccount() : Maybe<SingleAccount> =
-        TODO("if KYC && interest then return acc otherwise return empty")
+    private fun getInterestAccount(): Maybe<SingleAccount> =
+        tiersService.tiers().flatMapMaybe { tier ->
+            val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
+
+            if (tier.isApprovedFor(KycTierLevel.GOLD) && interestAccounts.isNotEmpty()) {
+                Maybe.just(interestAccounts.first())
+            } else {
+                Maybe.empty()
+            }
+        }
 
     final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
@@ -164,9 +177,23 @@ internal abstract class CryptoAssetBase(
             is CustodialTradingAccount -> getNonCustodialAccountList()
             is CryptoInterestAccount -> Single.just(emptyList())
             is CryptoExchangeAccount -> Single.just(emptyList())
-            is CryptoNonCustodialAccount -> getPitLinkingAccount()
-                .map { listOf(it) }
-                .toSingle(emptyList())
+            is CryptoNonCustodialAccount ->
+                Singles.zip(
+                    getPitLinkingAccount().toSingle(NullCryptoAccount),
+                    getInterestAccount().toSingle(NullCryptoAccount))
+                    .map { accounts ->
+                        when {
+                            accounts.first is NullCryptoAccount && accounts.second is NullCryptoAccount -> {
+                                emptyList()
+                            }
+                            accounts.first is NullCryptoAccount && accounts.second !is NullCryptoAccount -> {
+                                listOf(accounts.second)
+                            }
+                            else -> {
+                                listOf(accounts.first, accounts.second)
+                            }
+                        }
+                    }
                 .onErrorReturn { emptyList() }
             else -> Single.just(emptyList())
         }
