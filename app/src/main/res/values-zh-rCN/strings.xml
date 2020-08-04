@@ -15,14 +15,14 @@
     <item>第十二字</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d导入的地址</item>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">验证您的电子邮件</string>
   <string name="kyc_email_message">我们需要验证您的电子邮件地址，以增加安全性。</string>
   <string name="kyc_email_hint_focused">你的邮件</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">保存电子邮件时出错，请重试</string>
   <string name="kyc_email_send_verification">发送电子邮件</string>
   <string name="kyc_email_validation_header">检查你的收件箱。</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">验证ID出错，请重试</string>
   <string name="kyc_veriff_splash_country_supported_header">支持我的国家吗？</string>
   <string name="kyc_veriff_splash_country_supported_subheader">目前，并非所有国家都支持。在继续之前，请检查我们最新的<annotation link="country_list">国家</annotation>列表&lt;/annotation&gt; 。</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">银色验证</string>
   <string name="kyc_veriff_splash_header">让我们确认是你</string>
   <string name="kyc_veriff_splash_subtitle">您需要以下ID类型之一才能继续。</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">设备验证</string>
   <string name="kyc_complete_id_uploaded">ID已上传</string>
   <string name="kyc_complete_video_uploaded">视频已上传</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">我们的区块链支持团队已编写了帮助指南，解释了为什么我们需要验证您的身份。</string>
   <string name="kyc_help_dialog_read_now">现在读</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/zh-CN/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/zh-CN/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">身份验证</string>
   <string name="kyc_settings_status_none">未验证</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">黄金级-审核中</string>
   <string name="kyc_settings_gold_level_approved">金级-已批准</string>
   <string name="kyc_settings_silver_level_approved">银级-已批准</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">提取KYC状态时出错</string>
   <string name="kyc_status_title_in_progress">正在进行验证</string>
   <string name="kyc_status_title_approved">帐户已批准</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">从您上次停下来的地方取走并完成身份验证。</string>
   <string name="kyc_drop_off_card_button">继续验证</string>
   <string name="kyc_documents_needed">所需文件</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">您提供的文档有一些问题。请尝试再次上传文档，以继续进行验证。</string>
   <string name="kyc_resubmission_card_button">上传文件</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">我们无法验证您的身份，需要您重新上传所需的文档。</string>
   <string name="kyc_resubmission_splash_description_2">发生这种情况的主要原因：</string>
   <string name="kyc_resubmission_splash_description_3">所需的照片丢失。</string>

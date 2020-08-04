@@ -15,14 +15,14 @@
     <item>дванадцяте слово</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">%d імпортна адреса</item>
@@ -1234,7 +1234,7 @@
   <string name="kyc_email_title">Підтвердьте свою електронну пошту</string>
   <string name="kyc_email_message">Нам потрібно підтвердити вашу електронну адресу як додатковий рівень безпеки.</string>
   <string name="kyc_email_hint_focused">Твій емейл</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Помилка збереження електронної пошти. Повторіть спробу</string>
   <string name="kyc_email_send_verification">Відправити лист</string>
   <string name="kyc_email_validation_header">Перевірити свою поштову скриньку.</string>
@@ -1259,7 +1259,7 @@
   <string name="kyc_onfido_splash_verification_error">Помилка підтвердження ідентифікатора. Повторіть спробу</string>
   <string name="kyc_veriff_splash_country_supported_header">Чи підтримується моя країна?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Наразі підтримують не всі країни. Перегляньте наш оновлений <annotation link="country_list"> список країн </annotation> перш ніж продовжувати.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">СЕРВІР ПЕРЕВІРЕНО</string>
   <string name="kyc_veriff_splash_header">Давайте підтвердимо, що це ти</string>
   <string name="kyc_veriff_splash_subtitle">Щоб продовжити, вам знадобиться 1 із типів ідентифікаторів нижче.</string>
@@ -1281,11 +1281,11 @@
   <string name="kyc_complete_device_verified">Пристрій перевірено</string>
   <string name="kyc_complete_id_uploaded">Ідентифікатор завантажено</string>
   <string name="kyc_complete_video_uploaded">Відео завантажено</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Наша команда служби підтримки Blockchain написала довідники з поясненням, чому нам потрібно підтвердити вашу особу.</string>
   <string name="kyc_help_dialog_read_now">Читайте зараз</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Підтвердження особи</string>
   <string name="kyc_settings_status_none">Неперевірений</string>
@@ -1297,7 +1297,7 @@
   <string name="kyc_settings_gold_level_in_review">Рівень золота - в огляді</string>
   <string name="kyc_settings_gold_level_approved">Рівень золота - затверджено</string>
   <string name="kyc_settings_silver_level_approved">Рівень срібла - затверджено</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Помилка під час отримання статусу KYC</string>
   <string name="kyc_status_title_in_progress">Перевірка триває</string>
   <string name="kyc_status_title_approved">Рахунок затверджено</string>
@@ -1321,10 +1321,10 @@
   <string name="kyc_drop_off_card_description">Виберіть місце, де ви зупинилися, і завершіть підтвердження особи.</string>
   <string name="kyc_drop_off_card_button">Продовжуйте перевірку</string>
   <string name="kyc_documents_needed">Необхідні документи</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">У нас були деякі проблеми з наданими вами документами. Спробуйте знову завантажити документи, щоб продовжити перевірку.</string>
   <string name="kyc_resubmission_card_button">Завантажити документи</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Ми не можемо підтвердити вашу особу, і вам потрібно перезавантажити необхідні документи.</string>
   <string name="kyc_resubmission_splash_description_2">Основні причини цього:</string>
   <string name="kyc_resubmission_splash_description_3">Потрібні фотографії відсутні.</string>
