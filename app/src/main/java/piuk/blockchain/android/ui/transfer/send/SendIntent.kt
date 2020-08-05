@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.transfer.send
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SendValidationError
@@ -19,7 +20,31 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendingAccount = account,
                 errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
-                currentStep = if (passwordRequired) SendStep.ENTER_PASSWORD else SendStep.ENTER_ADDRESS,
+                currentStep = if (passwordRequired) {
+                    SendStep.ENTER_PASSWORD
+                } else {
+                    SendStep.ENTER_ADDRESS
+                },
+                nextEnabled = passwordRequired
+            )
+    }
+
+    class InitialiseWithTarget(
+        private val fromAccount: CryptoAccount,
+        private val toAccount: SendTarget,
+        private val passwordRequired: Boolean
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            SendState(
+                sendingAccount = fromAccount,
+                sendTarget = toAccount,
+                errorState = SendErrorState.NONE,
+                passwordRequired = passwordRequired,
+                currentStep = if (passwordRequired) {
+                    SendStep.ENTER_PASSWORD
+                } else {
+                    SendStep.ENTER_AMOUNT
+                },
                 nextEnabled = passwordRequired
             )
     }
@@ -41,7 +66,11 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = true,
                 secondPassword = password,
-                currentStep = SendStep.ENTER_ADDRESS
+                currentStep = if (oldState.sendTarget == NullAddress) {
+                    SendStep.ENTER_ADDRESS
+                } else {
+                    SendStep.ENTER_AMOUNT
+                }
             )
     }
 
@@ -93,7 +122,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendTarget = NullCryptoAccount,
                 nextEnabled = false
             )
-        }
+    }
 
     class TargetSelectionConfirmed(
         val sendTarget: SendTarget

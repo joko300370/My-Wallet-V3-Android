@@ -110,7 +110,11 @@ class AssetDetailsFlow(
             AssetDetailsAction.RECEIVE -> host.goToReceiveFor(account)
             AssetDetailsAction.SWAP -> host.gotoSwap(account)
             AssetDetailsAction.INTEREST_SUMMARY -> TODO()
-            AssetDetailsAction.DEPOSIT -> getInterestAccountAndNavigate(account as SingleAccount)
+            AssetDetailsAction.DEPOSIT -> {
+                newState.asset!!.accountGroup(AssetFilter.NonCustodial).subscribeBy {
+                    getInterestAccountAndNavigate(it.accounts.first())
+                }
+            }
             AssetDetailsAction.NONE -> {
                 // do nothing
             }

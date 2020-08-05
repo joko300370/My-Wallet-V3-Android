@@ -86,6 +86,7 @@ class SendModel(
 
         return when (intent) {
             is SendIntent.Initialise -> null
+            is SendIntent.InitialiseWithTarget -> null
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null

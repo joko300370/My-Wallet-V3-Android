@@ -208,15 +208,20 @@ class DashboardInteractor(
 
     fun getDepositFlow(
         model: DashboardModel,
-        toAccount: SingleAccount,
-        fromAccount: SingleAccount
+        sourceAccount: SingleAccount,
+        targetAccount: SingleAccount
     ): Disposable? {
-        /*model.process(
-            UpdateLaunchDialogFlow(
-                SendFlow(
+        if (sourceAccount is CryptoAccount) {
+            model.process(
+                UpdateLaunchDialogFlow(
+                    SendFlow(
+                        coincore = coincore,
+                        sourceAccount = sourceAccount,
+                        targetAccount = targetAccount
+                    )
                 )
             )
-        )*/
+        }
         return null
     }
 

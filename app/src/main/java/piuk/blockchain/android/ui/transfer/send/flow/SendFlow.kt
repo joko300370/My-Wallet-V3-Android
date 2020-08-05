@@ -93,9 +93,15 @@ class SendFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    if (sourceAccount != NullCryptoAccount) {
+                    if (targetAccount != NullCryptoAccount &&
+                        sourceAccount != NullCryptoAccount) {
+                        model.process(SendIntent.InitialiseWithTarget(sourceAccount, targetAccount,
+                            passwordRequired))
+                    } else if (sourceAccount != NullCryptoAccount) {
                         model.process(SendIntent.Initialise(sourceAccount, passwordRequired))
-                    } else if (targetAccount != NullCryptoAccount) {
+                    } else {
+                        throw IllegalStateException(
+                            "Send flow initialised without at least one target")
                     }
                 },
                 onError = {
