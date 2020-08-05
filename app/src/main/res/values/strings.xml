@@ -1103,6 +1103,11 @@
     <string name="two_fa_card_body">Protect your wallet from unauthorized access by enabling 2-Step Verification.</string>
     <string name="two_fa_card_cta">Enable 2-Step Verification</string>
 
+    <!-- Cloud backup announcement -->
+    <string name="cloud_backup_card_title">Introducing Cloud Backups</string>
+    <string name="cloud_backup_card_body">You can now backup your wallet securely to the cloud. You can opt-out of backups in your wallet settings.</string>
+    <string name="cloud_backup_card_cta">Learn More</string>
+
     <!-- Buy Bitcoin announcement -->
     <string name="buy_btc_card_title">Buy Bitcoin</string>
     <string name="buy_btc_card_body">Buy Bitcoin with your credit card or bank account to kickstart your crypto portfolio.</string>

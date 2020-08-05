@@ -45,6 +45,7 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -384,9 +385,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
         }
 
-        override fun showBankLinking() {
+        override fun showBankLinking() =
             model.process(ShowBankLinkingSheet())
-        }
+
+        override fun openBrowserLink(url: String) =
+            requireContext().launchUrlInBrowser(url)
     }
 
     override fun startWarnCancelSimpleBuyOrder() {
