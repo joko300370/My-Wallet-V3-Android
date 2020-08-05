@@ -56,7 +56,7 @@ class HandleActionIntent(
         oldState.copy(hostAction = action)
 }
 
-object SelectSendingAccount: AssetDetailsIntent() {
+object SelectSendingAccount : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.SELECT_ACCOUNT)
 }

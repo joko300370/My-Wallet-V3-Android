@@ -235,7 +235,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
                 disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
-                    if(it.accounts.size > 1) {
+                    if (it.accounts.size > 1) {
                         model.process(SelectSendingAccount)
                     } else {
                         // TODO launch send flow with pre-selected accounts

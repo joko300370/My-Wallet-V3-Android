@@ -430,9 +430,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
 
-    override fun goToDeposit(fromAccount: SingleAccount,
-                             toAccount: BlockchainAccount,
-                             cryptoAsset: CryptoAsset) {
+    override fun goToDeposit(
+        fromAccount: SingleAccount,
+        toAccount: BlockchainAccount,
+        cryptoAsset: CryptoAsset
+    ) {
         // TODO in next story
         Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
     }

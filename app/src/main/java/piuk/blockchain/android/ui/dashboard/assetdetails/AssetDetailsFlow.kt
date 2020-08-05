@@ -34,9 +34,11 @@ class AssetDetailsFlow(
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
-        fun goToDeposit(fromAccount: SingleAccount,
-                        toAccount: BlockchainAccount,
-                        cryptoAsset: CryptoAsset)
+        fun goToDeposit(
+            fromAccount: SingleAccount,
+            toAccount: BlockchainAccount,
+            cryptoAsset: CryptoAsset
+        )
     }
 
     private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
@@ -48,8 +50,8 @@ class AssetDetailsFlow(
     override fun startFlow(fragmentManager: FragmentManager, host: FlowHost) {
         super.startFlow(fragmentManager, host)
 
-        assetFlowHost = host as? AssetDetailsHost ?:
-            throw IllegalStateException("Flow Host is not an AssetDetailsHost")
+        assetFlowHost = host as? AssetDetailsHost
+            ?: throw IllegalStateException("Flow Host is not an AssetDetailsHost")
 
         model.apply {
             disposables += state.subscribeBy(

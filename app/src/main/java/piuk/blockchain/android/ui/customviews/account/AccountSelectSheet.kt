@@ -81,7 +81,7 @@ class AccountSelectSheet(
         }
     }
 
-    private fun allowedInterestWallets() : Single<List<BlockchainAccount>> =
+    private fun allowedInterestWallets(): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial) // TODO add custodial here later
             .map { it.accounts }
             .map { it.filter { a -> a.isFunded } }
@@ -100,9 +100,11 @@ class AccountSelectSheet(
         fun newInstance(host: Host): AccountSelectSheet =
             AccountSelectSheet(host)
 
-        fun newInstance(assetFilter: AssetFilter,
-                        cryptoCurrency: CryptoCurrency,
-                        host: Host): AccountSelectSheet =
+        fun newInstance(
+            assetFilter: AssetFilter,
+            cryptoCurrency: CryptoCurrency,
+            host: Host
+        ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
                 this.assetFilter = assetFilter
                 this.cryptoCurrency = cryptoCurrency
