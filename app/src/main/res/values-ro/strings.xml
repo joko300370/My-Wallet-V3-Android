@@ -15,14 +15,14 @@
     <item>al douăsprezecelea cuvânt</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
-    <item>\@ String / xlm_memo_hash</item>
-    <item>\@ String / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 adresă importată</item>
@@ -50,8 +50,8 @@
   <string name="toolbar_cmd_swap">schimb</string>
   <string name="cancel">Anulare</string>
   <string name="btn_ok">O.K</string>
-  <string name="yes">da</string>
-  <string name="no">Nu</string>
+  <string name="common_yes">da</string>
+  <string name="common_no">Nu</string>
   <string name="polite_no">Nu multumesc</string>
   <string name="done">Terminat</string>
   <string name="btn_close">Închide</string>
@@ -163,7 +163,7 @@
   <string name="btn_continue">Continua</string>
   <string name="btn_forgot_password">Ați uitat parola?\"</string>
   <string name="SEND">Trimite</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Folosiți soldul total cheltuibil:</string>
   <string name="bitpay_remaining_time">Timp rămas</string>
   <string name="bitpay_invoice_expired">Factura BitPay a expirat</string>
@@ -189,8 +189,8 @@
   <string name="weak_password">Parola selectată este prea slabă pentru a vă asigura fondurile. Noi puternic 
  sugerează să selectezi una diferită. Doriți să definiți o nouă parolă? 
 </string>
-  <string name="from">Din</string>
-  <string name="to">La</string>
+  <string name="common_from">Din</string>
+  <string name="common_to">La</string>
   <string name="confirm_details">Confirma plata</string>
   <string name="fee">taxă</string>
   <string name="exit_confirm">Apăsați din nou butonul pentru a ieși</string>
@@ -1233,7 +1233,7 @@
   <string name="kyc_email_title">Verifica-ți email-ul</string>
   <string name="kyc_email_message">Trebuie să verificăm adresa de e-mail ca un nivel suplimentar de securitate.</string>
   <string name="kyc_email_hint_focused">Email-ul tau</string>
-  <string name="kyc_email_hint_unfocused">\@ String / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Eroare la salvarea e-mailului, încercați din nou</string>
   <string name="kyc_email_send_verification">Trimite email</string>
   <string name="kyc_email_validation_header">Verifica-ti casuta.</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">Eroare la verificarea ID-ului, încercați din nou</string>
   <string name="kyc_veriff_splash_country_supported_header">Este țara mea susținută?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Nu toate țările sunt sprijinite în acest moment. Verificați lista noastră actualizată <annotation link="country_list"> țări </annotation> înainte de a continua.</string>
-  <string name="kyc_veriff_splash_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFICAT</string>
   <string name="kyc_veriff_splash_header">Să confirmăm că ești tu</string>
   <string name="kyc_veriff_splash_subtitle">Pentru a continua, veți avea nevoie de 1 dintre tipurile de identificare</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">Verificat dispozitiv</string>
   <string name="kyc_complete_id_uploaded">ID încărcat</string>
   <string name="kyc_complete_video_uploaded">Videoclipul încărcat</string>
-  <string name="kyc_help_dialog_need_some_help">\@ String / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Echipa noastră de asistență Blockchain a scris Ghiduri de ajutor care explică de ce trebuie să vă verificăm identitatea.</string>
   <string name="kyc_help_dialog_read_now">Citeste acum</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ String / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Verificarea identității</string>
   <string name="kyc_settings_status_none">neverificat</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">Nivelul de aur - în revizuire</string>
   <string name="kyc_settings_gold_level_approved">Nivel de aur - aprobat</string>
   <string name="kyc_settings_silver_level_approved">Nivel de argint - aprobat</string>
-  <string name="kyc_settings_tier_status_failed">\@ String / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Eroare la preluarea stării KYC</string>
   <string name="kyc_status_title_in_progress">Verificare în curs</string>
   <string name="kyc_status_title_approved">Cont aprobat</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">Alege locul unde ai plecat și completează verificarea identității.</string>
   <string name="kyc_drop_off_card_button">Continuați verificarea</string>
   <string name="kyc_documents_needed">Documente necesare</string>
-  <string name="kyc_resubmission_card_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Am avut câteva probleme cu documentele furnizate. Încercați să încărcați din nou documentele pentru a continua verificarea.</string>
   <string name="kyc_resubmission_card_button">Încărcați documente</string>
-  <string name="kyc_resubmission_splash_title">\@ String / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nu putem să vă verificăm identitatea și avem nevoie să vă încărcați documentele necesare.</string>
   <string name="kyc_resubmission_splash_description_2">Motivele principale pentru ca acest lucru să se întâmple:</string>
   <string name="kyc_resubmission_splash_description_3">Fotografiile solicitate lipsesc.</string>

@@ -60,6 +60,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
     private val locale = Locale.getDefault()
 
     interface Host : SlidingModalBottomDialog.Host {
+        fun launchNewSendFor(account: SingleAccount)
         fun gotoSendFor(account: SingleAccount)
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
@@ -198,6 +199,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         when (action) {
             AssetAction.ViewActivity -> host.gotoActivityFor(selectAccount(account))
             AssetAction.Send -> host.gotoSendFor(selectAccount(account))
+            AssetAction.NewSend -> host.launchNewSendFor(selectAccount(account))
             AssetAction.Receive -> host.goToReceiveFor(selectAccount(account))
             AssetAction.Swap -> host.gotoSwap(selectAccount(account))
         }.exhaustive
@@ -299,12 +301,17 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
         val difference = lastPrice - firstPrice
 
         val percentChange = (difference / firstPrice) * 100
+        val percentChangeTxt = if (percentChange.isNaN()) {
+            "--"
+        } else {
+            String.format("%.1f", percentChange)
+        }
 
         percentageView.text =
             FiatValue.fromMajor(
                 currencyPrefs.selectedFiatCurrency,
                 difference.toBigDecimal()
-            ).toStringWithSymbol() + " (${String.format("%.1f", percentChange)}%)"
+            ).toStringWithSymbol() + " ($percentChangeTxt%)"
 
         percentageView.setDeltaColour(
             delta = difference,

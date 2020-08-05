@@ -15,14 +15,14 @@
     <item>perkataan yang kedua belas</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d alamat yang diimport</item>
@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">Pertukaran</string>
   <string name="cancel">Batalkan</string>
   <string name="btn_ok">okey</string>
-  <string name="yes">Ya</string>
-  <string name="no">Tidak</string>
+  <string name="common_yes">Ya</string>
+  <string name="common_no">Tidak</string>
   <string name="polite_no">Tidak, Terima kasih</string>
   <string name="done">Selesai</string>
   <string name="btn_close">Tutup</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Teruskan</string>
   <string name="btn_forgot_password">Lupa kata laluan?\"</string>
   <string name="SEND">Hantar</string>
-  <string name="total">Jumlah</string>
+  <string name="common_total">Jumlah</string>
   <string name="max_available">Gunakan baki yang boleh dibelanjakan:</string>
   <string name="bitpay_remaining_time">Masa yang tinggal</string>
   <string name="bitpay_invoice_expired">Invois BitPay Tamat tempoh</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Kata laluan yang dipilih terlalu lemah untuk menjamin dana anda. Kami kuat 
  cadangkan anda memilih yang lain. Adakah anda ingin menentukan kata laluan baru? 
 </string>
-  <string name="from">Dari</string>
-  <string name="to">Untuk</string>
+  <string name="common_from">Dari</string>
+  <string name="common_to">Untuk</string>
   <string name="confirm_details">Sahkan Bayaran</string>
   <string name="fee">Bayaran</string>
   <string name="exit_confirm">Tekan butang semula sekali lagi untuk keluar</string>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">Sahkan E-mel anda</string>
   <string name="kyc_email_message">Kami perlu mengesahkan alamat e-mel anda sebagai lapisan tambahan keselamatan.</string>
   <string name="kyc_email_hint_focused">Emel anda</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Ralat menyimpan e-mel, sila cuba lagi</string>
   <string name="kyc_email_send_verification">Menghantar e-mel</string>
   <string name="kyc_email_validation_header">Semak peti masuk anda.</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">Ralat mengesahkan ID, sila cuba lagi</string>
   <string name="kyc_veriff_splash_country_supported_header">Adakah negara saya disokong?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Tidak semua negara disokong pada masa ini. Semak up to date kami <annotation link="country_list"> senarai negara </annotation> sebelum meneruskan.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
   <string name="kyc_veriff_splash_header">Katakanlah Ia Anda</string>
   <string name="kyc_veriff_splash_subtitle">Anda memerlukan 1 jenis ID di bawah untuk meneruskan.</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">Peranti yang Disahkan</string>
   <string name="kyc_complete_id_uploaded">ID yang Dimuat naik</string>
   <string name="kyc_complete_video_uploaded">Video dimuat naik</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Pasukan Sokongan Blockchain kami telah menulis Panduan Bantuan yang menjelaskan mengapa kami perlu mengesahkan identiti anda.</string>
   <string name="kyc_help_dialog_read_now">Baca Sekarang</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Pengesahan Identiti</string>
   <string name="kyc_settings_status_none">Tidak dapat disahkan</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">Tahap Emas - Dalam kajian</string>
   <string name="kyc_settings_gold_level_approved">Tahap Emas - Diluluskan</string>
   <string name="kyc_settings_silver_level_approved">Tahap Perak - Diluluskan</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Ralat mengambil status KYC</string>
   <string name="kyc_status_title_in_progress">Pengesahan dalam Kemajuan</string>
   <string name="kyc_status_title_approved">Akaun Diluluskan</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">Ambil tempat yang anda tinggalkan dan lengkapkan pengesahan identiti anda.</string>
   <string name="kyc_drop_off_card_button">Teruskan pengesahan</string>
   <string name="kyc_documents_needed">Dokumen yang diperlukan</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Kami mempunyai beberapa isu dengan dokumen yang anda berikan. Sila cuba muat naik semula dokumen untuk meneruskan pengesahan anda.</string>
   <string name="kyc_resubmission_card_button">Muat naik Dokumen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Kami tidak dapat mengesahkan identiti anda dan memerlukan anda memuat semula dokumen yang diperlukan.</string>
   <string name="kyc_resubmission_splash_description_2">Sebab utama untuk ini berlaku:</string>
   <string name="kyc_resubmission_splash_description_3">Gambar yang diperlukan hilang.</string>

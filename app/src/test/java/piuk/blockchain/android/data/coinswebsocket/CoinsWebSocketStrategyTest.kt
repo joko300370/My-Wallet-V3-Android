@@ -71,7 +71,7 @@ class CoinsWebSocketStrategyTest {
         on { getString(R.string.received_ethereum) } `it returns` "Received Ether"
         on { getString(R.string.received_usd_pax_1) } `it returns` "Received USD Digital"
         on { getString(R.string.received_usdt) } `it returns` "Received Tether"
-        on { getString(R.string.from) } `it returns` "From"
+        on { getString(R.string.common_from) } `it returns` "From"
     }
 
     private val paxAccount: Erc20Account = mock {

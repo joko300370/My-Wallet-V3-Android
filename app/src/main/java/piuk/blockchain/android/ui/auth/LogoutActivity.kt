@@ -6,19 +6,21 @@ import androidx.appcompat.app.AppCompatActivity
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import org.koin.android.ext.android.inject
+import org.koin.core.qualifier.StringQualifier
+import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
+import piuk.blockchain.android.util.OSUtil
+import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.android.util.OSUtil
-import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 
 class LogoutActivity : AppCompatActivity() {
 
     private val ethDataManager: EthDataManager by scopedInject()
-    private val paxAccount: Erc20Account by scopedInject()
+    private val paxAccount: Erc20Account by scopedInject(StringQualifier("paxAccount"))
+    private val usdtAccount: Erc20Account by scopedInject(StringQualifier("usdtAccount"))
     private val bchDataManager: BchDataManager by scopedInject()
     private val walletOptionsState: WalletOptionsState by scopedInject()
     private val nabuDataManager: NabuDataManager by scopedInject()
@@ -39,9 +41,8 @@ class LogoutActivity : AppCompatActivity() {
                 stopService(intent)
             }
 
-            // TODO: 21/02/2018 I'm not sure this is a great way to reset things, but it'll
-            // do for now until we've had a rethink. Should individual datamanagers get
-            // Rx events and handle their own state during logout?
+            // TODO: 30/06/20 We shouldn't need this any more now we have koin scopes
+            // TODO: see Jira AND-3312
             clearData()
         }
     }
@@ -49,6 +50,7 @@ class LogoutActivity : AppCompatActivity() {
     private fun clearData() {
         ethDataManager.clearEthAccountDetails()
         paxAccount.clear()
+        usdtAccount.clear()
         bchDataManager.clearBchAccountDetails()
         nabuDataManager.clearAccessToken()
 

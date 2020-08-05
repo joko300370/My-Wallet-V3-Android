@@ -109,7 +109,7 @@ internal class OnboardingActivity : BaseMvpActivity<OnboardingView, OnboardingPr
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.fingerprint_no_fingerprints_added)
                 .setCancelable(true)
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.common_yes) { _, _ ->
                     startActivityForResult(
                         Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
                         0

@@ -219,8 +219,8 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
             .setTitle(title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ -> presenter.archiveAccount() }
-            .setNegativeButton(R.string.no, null)
+            .setPositiveButton(R.string.common_yes) { _, _ -> presenter.archiveAccount() }
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 

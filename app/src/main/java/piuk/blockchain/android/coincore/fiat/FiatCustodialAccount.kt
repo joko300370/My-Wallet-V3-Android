@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.util.concurrent.atomic.AtomicBoolean
@@ -61,8 +62,7 @@ internal class FiatCustodialAccount(
             }
         }
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: AvailableActions = setOf(AssetAction.ViewActivity)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -80,7 +80,7 @@ internal class FiatCustodialAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
         Single.error(NotImplementedError("Send to fiat not supported"))
 }
 

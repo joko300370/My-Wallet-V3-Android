@@ -178,7 +178,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 state.fee?.toStringWithSymbol() ?: FiatValue.zero(state.fiatCurrency)
                     .toStringWithSymbol()),
 
-            CheckoutItem(getString(R.string.total),
+            CheckoutItem(getString(R.string.common_total),
                 state.order.amount?.toStringWithSymbol() ?: ""),
 
             CheckoutItem(getString(R.string.payment_method),
@@ -253,7 +253,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     override fun onPause() {
         super.onPause()
-        model.process(SimpleBuyIntent.ConfirmationHandled)
+        model.process(SimpleBuyIntent.NavigationHandled)
     }
 
     override fun onSheetClosed() {

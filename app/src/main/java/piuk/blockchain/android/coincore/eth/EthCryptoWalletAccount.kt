@@ -8,10 +8,16 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -86,20 +92,28 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
-        // Check type of Address here, and create Custodial or Swap or Sell or
-        // however this is going to work.
-        //
-        // For now, while I prototype this, just make the eth -> on chain eth object
-        Single.just(
-            EthSendTransaction(
-                ethDataManager,
-                fees,
-                this,
-                address as CryptoAddress,
-                ethDataManager.requireSecondPassword
+    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+        when (sendTo) {
+            is CryptoAddress -> Single.just(
+                EthSendTransaction(
+                    ethDataManager,
+                    fees,
+                    this,
+                    sendTo,
+                    ethDataManager.requireSecondPassword
+                )
             )
-        )
+            is CryptoAccount -> sendTo.receiveAddress.map {
+                EthSendTransaction(
+                    ethDataManager,
+                    fees,
+                    this,
+                    it as CryptoAddress,
+                    ethDataManager.requireSecondPassword
+                )
+            }
+            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
+        }
 
     override val sendState: Single<SendState>
         get() = Singles.zip(
@@ -112,4 +126,18 @@ internal class EthCryptoWalletAccount(
                     else -> SendState.CAN_SEND
                 }
             }
+
+    override val actions: AvailableActions
+        get() = super.actions.let {
+            if (it.contains(AssetAction.Send)) {
+                it.toMutableSet().apply {
+                    if (ENABLE_NEW_SEND_ACTION) {
+                        remove(AssetAction.Send)
+                        add(AssetAction.NewSend)
+                    }
+                }
+            } else {
+                it
+            }
+        }
 }

@@ -15,14 +15,14 @@
     <item>12番目の単語</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%dインポートされたアドレス</item>
@@ -48,8 +48,8 @@
   <string name="toolbar_cmd_swap">スワップ</string>
   <string name="cancel">キャンセル</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">はい</string>
-  <string name="no">番号</string>
+  <string name="common_yes">はい</string>
+  <string name="common_no">番号</string>
   <string name="polite_no">結構です</string>
   <string name="done">完了</string>
   <string name="btn_close">閉じる</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">継続する</string>
   <string name="btn_forgot_password">パスワードをお忘れですか？\"</string>
   <string name="SEND">送る</string>
-  <string name="total">合計</string>
+  <string name="common_total">合計</string>
   <string name="max_available">支出可能な合計残高を使用：</string>
   <string name="bitpay_remaining_time">残り時間</string>
   <string name="bitpay_invoice_expired">期限切れのBitPay請求書</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">選択したパスワードは弱すぎて資金を確保できません。強く
 別のものを選択することをお勧めします。新しいパスワードを定義しますか？ 
 </string>
-  <string name="from">から</string>
-  <string name="to">に</string>
+  <string name="common_from">から</string>
+  <string name="common_to">に</string>
   <string name="confirm_details">支払いを確認</string>
   <string name="fee">費用</string>
   <string name="exit_confirm">もう一度戻るボタンを押して終了します</string>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">あなたの電子メールを確認します</string>
   <string name="kyc_email_message">セキュリティの追加レイヤーとして、メールアドレスを確認する必要があります。</string>
   <string name="kyc_email_hint_focused">あなたのメール</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">メールの保存中にエラーが発生しました。もう一度お試しください</string>
   <string name="kyc_email_send_verification">メールを送る</string>
   <string name="kyc_email_validation_header">メールチェックしてみて。</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">IDの確認中にエラーが発生しました。もう一度お試しください</string>
   <string name="kyc_veriff_splash_country_supported_header">私の国はサポートされていますか？</string>
   <string name="kyc_veriff_splash_country_supported_subheader">現在、すべての国がサポートされているわけではありません。先に進む前に、最新の<annotation link="country_list">国のリスト</annotation>確認してください。</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">シルバー検証済み</string>
   <string name="kyc_veriff_splash_header">それがあなたであることを確認しましょう</string>
   <string name="kyc_veriff_splash_subtitle">続行するには、以下のいずれかのIDタイプが必要です。</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">デバイス検証済み</string>
   <string name="kyc_complete_id_uploaded">アップロードされたID</string>
   <string name="kyc_complete_video_uploaded">動画をアップロードしました</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ブロックチェーンサポートチームは、お客様の身元を確認する必要がある理由を説明するヘルプガイドを作成しました。</string>
   <string name="kyc_help_dialog_read_now">今すぐ読む</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">本人確認</string>
   <string name="kyc_settings_status_none">未確認</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">ゴールドレベル-レビュー中</string>
   <string name="kyc_settings_gold_level_approved">ゴールドレベル-承認済み</string>
   <string name="kyc_settings_silver_level_approved">シルバーレベル-承認済み</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYCステータスの取得エラー</string>
   <string name="kyc_status_title_in_progress">検証中</string>
   <string name="kyc_status_title_approved">アカウントが承認されました</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">中断したところから始めて、本人確認を完了します。</string>
   <string name="kyc_drop_off_card_button">確認を続ける</string>
   <string name="kyc_documents_needed">必要な書類</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">提供されたドキュメントに問題がありました。確認を続行するには、ドキュメントをもう一度アップロードしてください。</string>
   <string name="kyc_resubmission_card_button">ドキュメントをアップロードする</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">本人確認ができないため、必要な書類を再度アップロードする必要があります。</string>
   <string name="kyc_resubmission_splash_description_2">これが起こる主な理由：</string>
   <string name="kyc_resubmission_splash_description_3">必要な写真がありません。</string>

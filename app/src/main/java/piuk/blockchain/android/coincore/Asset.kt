@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -15,9 +16,13 @@ enum class AssetFilter {
     Interest
 }
 
+// TEMP flag to enable/disable new send from actions
+const val ENABLE_NEW_SEND_ACTION = false
+
 enum class AssetAction {
     ViewActivity,
     Send,
+    NewSend,
     Receive,
     Swap
 }
@@ -30,9 +35,9 @@ interface Asset {
 
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
 
-    fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
+    fun transferList(account: SingleAccount): Single<SingleAccountList>
 
-    fun parseAddress(address: String): ReceiveAddress?
+    fun parseAddress(address: String): Maybe<ReceiveAddress>
 }
 
 interface CryptoAsset : Asset {

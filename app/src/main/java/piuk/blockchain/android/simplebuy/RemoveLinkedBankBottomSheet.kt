@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -45,6 +46,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
                         updateUi(false)
                     }
                     .subscribeBy(onComplete = {
+                        analytics.logEvent(SimpleBuyAnalytics.REMOVE_BANK)
                         (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onLinkedBankRemoved(bank.id)
                         dismiss()
                     }, onError = {})

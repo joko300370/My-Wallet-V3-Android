@@ -18,6 +18,7 @@ interface SimpleBuyNavigator {
     fun goToBankDetailsScreen(addToBackStack: Boolean = true)
     fun goToPendingOrderScreen()
     fun startKyc()
+    fun pop()
     fun hasMoreThanOneFragmentInTheStack(): Boolean
     fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()

@@ -33,6 +33,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.notifications.analytics.linkBankEventWithCurrency
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -132,6 +134,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
+    }
+    private val cloudBackupPref by lazy {
+        findPreference<SwitchPreferenceCompat>("cloud_backup")
     }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
@@ -239,6 +244,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             true
         }
 
+        cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
+            settingsPresenter.updateCloudData(newValue as Boolean)
+            analytics.logEvent(SettingsAnalyticsEvents.CloudBackupSwitch)
+            true
+        }
+
         // App
         findPreference<Preference>("about")?.apply {
             summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
@@ -257,8 +268,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {
-            }
+            intent == null -> {}
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
@@ -413,6 +423,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun linkBankWithCurrency(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, "BOTTOM_SHEET")
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -456,6 +467,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     private fun addNewCard() {
         val intent = Intent(activity, CardDetailsActivity::class.java)
         startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
+        analytics.logEvent(SimpleBuyAnalytics.SETTINGS_ADD_CARD)
     }
 
     override fun setScreenshotsEnabled(enabled: Boolean) {
@@ -485,7 +497,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_disable_message)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 settingsPresenter.setFingerprintUnlockEnabled(
                     false
                 )
@@ -502,7 +514,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_no_fingerprints_added)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
                     Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
                     0
@@ -664,7 +676,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.guid_to_clipboard)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
                     activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
@@ -672,7 +684,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 showCustomToast(R.string.copied_to_clipboard)
                 analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 
@@ -855,7 +867,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                                     .setTitle(R.string.app_name)
                                     .setMessage(R.string.weak_password)
                                     .setCancelable(false)
-                                    .setPositiveButton(R.string.yes) { _, _ ->
+                                    .setPositiveButton(R.string.common_yes) { _, _ ->
                                         newPasswordConfirmation.setText("")
                                         newPasswordConfirmation.requestFocus()
                                         newPassword.setText("")
