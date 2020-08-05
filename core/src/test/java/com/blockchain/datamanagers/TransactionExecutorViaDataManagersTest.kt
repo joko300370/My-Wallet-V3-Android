@@ -13,6 +13,7 @@ import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.satoshi
+import com.blockchain.testutils.satoshiCash
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.wei
 import com.blockchain.transactions.Memo
@@ -58,7 +59,8 @@ class TransactionExecutorViaDataManagersTest {
     private lateinit var subject: TransactionExecutor
     private val payloadDataManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
-    private val erc20Account: Erc20Account = mock()
+    private val paxAccount: Erc20Account = mock()
+    private val usdtAccount: Erc20Account = mock()
     private val sendDataManager: SendDataManager = mock()
     private val defaultAccountDataManager: DefaultAccountDataManager = mock()
     private val ethereumAccountWrapper: EthereumAccountWrapper = mock()
@@ -82,7 +84,8 @@ class TransactionExecutorViaDataManagersTest {
         subject = TransactionExecutorViaDataManagers(
             payloadDataManager,
             ethDataManager,
-            erc20Account,
+            paxAccount,
+            usdtAccount,
             sendDataManager,
             addressResolver,
             accountLookup,
@@ -192,7 +195,8 @@ class TransactionExecutorViaDataManagersTest {
             .thenReturn(Observable.just(txHash))
 
         // Act
-        subject.executeTransaction(amount, destination, accountReference, ethereumNetworkFee, FeeType.Priority)
+        subject.executeTransaction(amount, destination, accountReference, ethereumNetworkFee,
+            FeeType.Priority)
             .test()
             .assertComplete()
 
@@ -322,7 +326,7 @@ class TransactionExecutorViaDataManagersTest {
     @Test
     fun `execute bitcoin cash transaction verify entire flow`() {
         // Arrange
-        val amount = CryptoValue.bitcoinCashFromSatoshis(10)
+        val amount = 10.satoshiCash()
         val destination = "DESTINATION"
         val change = "CHANGE"
         val bchAccount = GenericMetadataAccount().apply { xpub = "XPUB" }
@@ -453,7 +457,8 @@ class TransactionExecutorViaDataManagersTest {
                 )
             )
         )
-        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        whenever(accountLookup.getAccountFromAddressOrXPub(
+            accountReference)) `it throws` IllegalArgumentException()
         // Act
         val testObserver =
             subject.executeTransaction(
@@ -493,10 +498,12 @@ class TransactionExecutorViaDataManagersTest {
                 )
             )
         )
-        whenever(accountLookup.getAccountFromAddressOrXPub(accountReference)) `it throws` IllegalArgumentException()
+        whenever(accountLookup.getAccountFromAddressOrXPub(
+            accountReference)) `it throws` IllegalArgumentException()
         // Act
         val testObserver =
-            subject.executeTransaction(amount, destination, accountReference, XlmFees(100.stroops(), 1.stroops()))
+            subject.executeTransaction(amount, destination, accountReference,
+                XlmFees(100.stroops(), 1.stroops()))
                 .test()
         // Assert
         testObserver.assertNotComplete().assertError(SendException::class.java)
@@ -548,14 +555,29 @@ class TransactionExecutorViaDataManagersTest {
         // Arrange
         val account = AccountReference.Pax("", "", "")
 
-        whenever(erc20Account.getBalance()).thenReturn(Single.just(100.toBigInteger()))
+        whenever(paxAccount.getBalance()).thenReturn(Single.just(100.toBigInteger()))
 
         // Act
         val testObserver = subject.getMaximumSpendable(account, mock())
-                .test()
+            .test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertValue(CryptoValue(CryptoCurrency.PAX, 100.toBigInteger()))
+    }
+
+    @Test
+    fun `get maximum spendable USDT`() {
+        // Arrange
+        val account = AccountReference.Usdt("", "", "")
+
+        whenever(usdtAccount.getBalance()).thenReturn(Single.just(100.toBigInteger()))
+
+        // Act
+        val testObserver = subject.getMaximumSpendable(account, mock())
+            .test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertValue(CryptoValue(CryptoCurrency.USDT, 100.toBigInteger()))
     }
 
     @Test
@@ -622,7 +644,7 @@ class TransactionExecutorViaDataManagersTest {
         ).test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(10))
+        testObserver.assertValue(10.satoshiCash())
     }
 
     @Test
@@ -658,7 +680,7 @@ class TransactionExecutorViaDataManagersTest {
         testObserver.assertValue(
             CryptoValue.fromMinor(CryptoCurrency.ETHER,
                 1_000_000_000_000_000_000L.toBigInteger() -
-                        ethereumNetworkFee.absoluteRegularFeeInWei.toBigInteger()
+                    ethereumNetworkFee.absoluteRegularFeeInWei.toBigInteger()
             )
         )
     }
@@ -791,7 +813,7 @@ class TransactionExecutorViaDataManagersTest {
             .test()
         // Assert
         testObserver.assertComplete()
-        testObserver.assertValue(CryptoValue.bitcoinCashFromSatoshis(500))
+        testObserver.assertValue(500.satoshiCash())
     }
 
     @Test
@@ -813,8 +835,9 @@ class TransactionExecutorViaDataManagersTest {
         val amount = 150.stroops()
         val account = AccountReference.Xlm("", "")
         // Act
-        val testObserver = subject.getFeeForTransaction(amount, account, XlmFees(200.stroops(), 250.stroops()))
-            .test()
+        val testObserver =
+            subject.getFeeForTransaction(amount, account, XlmFees(200.stroops(), 250.stroops()))
+                .test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertValue(200.stroops())

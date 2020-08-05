@@ -1,9 +1,11 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -15,20 +17,22 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             SendState(
                 sendingAccount = account,
+                errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
                 currentStep = if (passwordRequired) SendStep.ENTER_PASSWORD else SendStep.ENTER_ADDRESS,
                 nextEnabled = passwordRequired
             )
-        }
+    }
 
     class ValidatePassword(
         val password: String
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = false
+                nextEnabled = false,
+                errorState = SendErrorState.NONE
             )
-        }
+    }
 
     class UpdatePasswordIsValidated(
         val password: String
@@ -39,29 +43,53 @@ sealed class SendIntent : MviIntent<SendState> {
                 secondPassword = password,
                 currentStep = SendStep.ENTER_ADDRESS
             )
-        }
+    }
 
     object UpdatePasswordNotValidated : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
+                errorState = SendErrorState.INVALID_PASSWORD,
                 secondPassword = ""
-            )
-        }
-
-    class AddressSelected(
-        val address: ReceiveAddress
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(
-                nextEnabled = true,
-                targetAddress = address
             )
     }
 
-    object AddressSelectionConfirmed : SendIntent() {
+    class ValidateInputTargetAddress(
+        val targetAddress: String,
+        val expectedCrypto: CryptoCurrency
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class TargetAddressValidated(
+        val sendTarget: SendTarget
+    ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
+                errorState = SendErrorState.NONE,
+                sendTarget = sendTarget,
+                nextEnabled = true
+            )
+    }
+
+    class TargetAddressInvalid(private val error: SendValidationError) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                errorState = when (error.errorCode) {
+                    SendValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
+                    else -> SendErrorState.INVALID_ADDRESS
+                },
+                sendTarget = NullCryptoAccount,
+                nextEnabled = false
+            )
+        }
+
+    class TargetSelectionConfirmed(
+        val sendTarget: SendTarget
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                errorState = SendErrorState.NONE,
                 nextEnabled = false,
                 currentStep = SendStep.ENTER_AMOUNT
             )
@@ -76,15 +104,61 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
+    object MaxAmountExceeded : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.MAX_EXCEEDED)
+    }
+
+    object MinRequired : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.MIN_REQUIRED)
+    }
+
+    object RequestFee : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState
+    }
+
+    object FeeRequestError : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(errorState = SendErrorState.FEE_REQUEST_FAILED)
+    }
+
+    class FeeUpdate(
+        val fee: CryptoValue
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(feeAmount = fee)
+    }
+
+    object RequestTransactionNoteSupport : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    object TransactionNoteSupported : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(transactionNoteSupported = true)
+    }
+
+    class NoteAdded(
+        val note: String
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState.copy(
+            note = note,
+            noteState = NoteState.UPDATE_SUCCESS
+        )
+    }
+
     class UpdateTransactionAmounts(
-        val amount: Money,
-        private val maxAvailable: Money
+        val amount: CryptoValue,
+        private val maxAvailable: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = amount.isPositive,
                 sendAmount = amount,
-                availableBalance = maxAvailable
+                availableBalance = maxAvailable,
+                errorState = SendErrorState.NONE
             )
     }
 
@@ -100,7 +174,8 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false,
-                currentStep = SendStep.IN_PROGRESS
+                currentStep = SendStep.IN_PROGRESS,
+                transactionInFlight = TransactionInFlightState.IN_PROGRESS
             )
     }
 
@@ -110,7 +185,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                currentStep = SendStep.SEND_ERROR
+                transactionInFlight = TransactionInFlightState.ERROR
             )
     }
 
@@ -118,7 +193,23 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                currentStep = SendStep.SEND_COMPLETE
+                transactionInFlight = TransactionInFlightState.COMPLETED
             )
+    }
+
+    object ReturnToPreviousStep : SendIntent() {
+        override fun reduce(oldState: SendState): SendState {
+            val steps = SendStep.values()
+            val currentStep = oldState.currentStep.ordinal
+            if (currentStep == 0) {
+                throw IllegalStateException("Cannot go back")
+            }
+            val previousStep = steps[currentStep - 1]
+
+            return oldState.copy(
+                currentStep = previousStep,
+                errorState = SendErrorState.NONE
+            )
+        }
     }
 }

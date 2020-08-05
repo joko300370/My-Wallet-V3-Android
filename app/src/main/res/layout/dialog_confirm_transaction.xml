@@ -77,7 +77,7 @@
                         <!-- FROM -->
                         <TextView
                             style="@style/ConfirmPaymentTitle"
-                            android:text="@string/from" />
+                            android:text="@string/common_from" />
 
                         <TextView
                             android:id="@+id/from_address"
@@ -92,7 +92,7 @@
                         <!-- TO -->
                         <TextView
                             style="@style/ConfirmPaymentTitle"
-                            android:text="@string/to" />
+                            android:text="@string/common_to" />
 
                         <TextView
                             android:id="@+id/to_address"
@@ -184,7 +184,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:layout_margin="8dp"
-                                android:text="@string/total"
+                                android:text="@string/common_total"
                                 android:textColor="@color/product_red_medium"
                                 android:textSize="14sp"
                                 tools:ignore="MissingPrefix" />

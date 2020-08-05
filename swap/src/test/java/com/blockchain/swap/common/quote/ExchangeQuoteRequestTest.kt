@@ -1,20 +1,18 @@
 package com.blockchain.swap.common.quote
 
 import com.blockchain.morph.CoinPair
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.bitcoinCash
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import org.amshove.kluent.`should be`
 import org.junit.Test
-import java.math.BigDecimal
 
 class ExchangeQuoteRequestTest {
 
     @Test
     fun `selling pair btc eth`() {
         ExchangeQuoteRequest.Selling(
-            CryptoValue.bitcoinFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoin(),
             CryptoCurrency.ETHER
         ).pair `should be` CoinPair.BTC_TO_ETH
     }
@@ -22,9 +20,7 @@ class ExchangeQuoteRequestTest {
     @Test
     fun `selling pair btc eth with fiat symbol`() {
         ExchangeQuoteRequest.Selling(
-            CryptoValue.bitcoinFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoin(),
             CryptoCurrency.ETHER,
             indicativeFiatSymbol = "USD"
         ).fiatSymbol `should be` "USD"
@@ -33,9 +29,7 @@ class ExchangeQuoteRequestTest {
     @Test
     fun `selling pair bch btc`() {
         ExchangeQuoteRequest.Selling(
-            CryptoValue.bitcoinCashFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoinCash(),
             CryptoCurrency.BTC
         ).pair `should be` CoinPair.BCH_TO_BTC
     }
@@ -43,9 +37,7 @@ class ExchangeQuoteRequestTest {
     @Test
     fun `selling pair bch btc with fiat symbol`() {
         ExchangeQuoteRequest.Selling(
-            CryptoValue.bitcoinCashFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoinCash(),
             CryptoCurrency.BTC,
             indicativeFiatSymbol = "CAD"
         ).fiatSymbol `should be` "CAD"
@@ -55,9 +47,7 @@ class ExchangeQuoteRequestTest {
     fun `buying pair btc eth`() {
         ExchangeQuoteRequest.Buying(
             CryptoCurrency.ETHER,
-            CryptoValue.bitcoinFromMajor(
-                BigDecimal.valueOf(1.234)
-            )
+            1.234.bitcoin()
         ).pair `should be` CoinPair.ETH_TO_BTC
     }
 
@@ -65,9 +55,7 @@ class ExchangeQuoteRequestTest {
     fun `buying pair btc eth with fiat symbol`() {
         ExchangeQuoteRequest.Buying(
             CryptoCurrency.ETHER,
-            CryptoValue.bitcoinFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoin(),
             indicativeFiatSymbol = "JPY"
         ).fiatSymbol `should be` "JPY"
     }
@@ -76,9 +64,7 @@ class ExchangeQuoteRequestTest {
     fun `buying pair bch btc`() {
         ExchangeQuoteRequest.Buying(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinCashFromMajor(
-                BigDecimal.valueOf(1.234)
-            )
+            1.234.bitcoinCash()
         ).pair `should be` CoinPair.BTC_TO_BCH
     }
 
@@ -86,9 +72,7 @@ class ExchangeQuoteRequestTest {
     fun `buying pair bch btc with fiat symbol`() {
         ExchangeQuoteRequest.Buying(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinCashFromMajor(
-                BigDecimal.valueOf(1.234)
-            ),
+            1.234.bitcoinCash(),
             indicativeFiatSymbol = "GBP"
         ).fiatSymbol `should be` "GBP"
     }

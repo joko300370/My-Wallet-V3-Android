@@ -204,7 +204,7 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
                 } else {
                     REQUEST_CODE_RECEIVE_BITCOIN_CASH
                 },
-                getString(R.string.to)
+                getString(R.string.common_to)
             )
         }
 
@@ -460,8 +460,8 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.receive_address_to_share)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes) { _, _ -> presenter.onShowBottomShareSheetSelected() }
-                .setNegativeButton(R.string.no, null)
+                .setPositiveButton(R.string.common_yes) { _, _ -> presenter.onShowBottomShareSheetSelected() }
+                .setNegativeButton(R.string.common_no, null)
                 .show()
         }
     }
@@ -504,13 +504,13 @@ class ReceiveFragment : HomeScreenMvpFragment<ReceiveView, ReceivePresenter>(),
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.receive_address_to_clipboard)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.common_yes) { _, _ ->
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
                     clipboard.primaryClip = clip
                 }
-                .setNegativeButton(R.string.no, null)
+                .setNegativeButton(R.string.common_no, null)
                 .show()
         }
     }

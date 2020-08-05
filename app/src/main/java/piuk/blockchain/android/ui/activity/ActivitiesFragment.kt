@@ -31,7 +31,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
-import piuk.blockchain.android.ui.accounts.AccountSelectSheet
+import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet

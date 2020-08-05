@@ -1,8 +1,33 @@
 package info.blockchain.wallet.payload;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.tuple.Pair;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spongycastle.crypto.InvalidCipherTextException;
+import org.spongycastle.util.encoders.Hex;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import info.blockchain.api.data.Balance;
-import info.blockchain.balance.CryptoCurrency;
-import info.blockchain.balance.CryptoValue;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.bip44.HDAccount;
@@ -28,36 +53,8 @@ import info.blockchain.wallet.payload.data.WalletWrapper;
 import info.blockchain.wallet.util.DoubleEncryptionFactory;
 import info.blockchain.wallet.util.Tools;
 import okhttp3.ResponseBody;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang3.tuple.Pair;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongycastle.crypto.InvalidCipherTextException;
-import org.spongycastle.util.encoders.Hex;
-
 import retrofit2.Call;
 import retrofit2.Response;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("ALL")
 public class PayloadManager {
@@ -644,7 +641,16 @@ public class PayloadManager {
     public List<TransactionSummary> getAllTransactions(int limit, int offset) throws
             IOException,
             ApiException {
-        return getAccountTransactions(null, limit, offset);
+
+        List<TransactionSummary> txs = getAccountTransactions(null, limit, offset);
+
+        ListIterator<TransactionSummary> iter = txs.listIterator();
+        while(iter.hasNext()){
+            if(iter.next().isWatchOnly()){
+                iter.remove();
+            }
+        }
+        return txs;
     }
 
     /**

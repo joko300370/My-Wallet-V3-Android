@@ -1,5 +1,6 @@
 package com.blockchain.swap.common.exchange.mvi
 
+import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gbp
 import info.blockchain.balance.AccountReference
@@ -24,7 +25,7 @@ class SwapIntentTest {
                     upToDate(100.gbp())
                 ),
                 to = value(
-                    upToDate(CryptoValue.bitcoinCashFromMajor(25)),
+                    upToDate(25.bitcoinCash()),
                     upToDate(99.gbp())
                 )
             )

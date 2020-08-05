@@ -9,7 +9,7 @@ import piuk.blockchain.android.util.setCoinIcon
 import com.blockchain.preferences.CurrencyPrefs
 import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.dashboard.AssetState
+import piuk.blockchain.android.ui.dashboard.CryptoAssetState
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import com.robinhood.spark.SparkAdapter
@@ -31,7 +31,7 @@ class AssetCardDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is AssetState
+        items[position] is CryptoAssetState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AssetCardViewHolder(parent.inflate(R.layout.item_dashboard_asset_card))
@@ -41,7 +41,7 @@ class AssetCardDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AssetCardViewHolder).bind(
-        items[position] as AssetState,
+        items[position] as CryptoAssetState,
         prefs.selectedFiatCurrency,
         onCardClicked
     )
@@ -51,7 +51,7 @@ private class AssetCardViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(state: AssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    internal fun bind(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
         with(itemView) {
             icon.setCoinIcon(state.currency)
             currency.setText(state.currency.assetName())
@@ -80,7 +80,7 @@ private class AssetCardViewHolder(
         }
     }
 
-    private fun renderLoaded(state: AssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    private fun renderLoaded(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
         with(itemView) {
             cardLayout.isEnabled = true
             setOnClickListenerDebounced { onCardClicked(state.currency) }
@@ -105,7 +105,7 @@ private class AssetCardViewHolder(
         }
     }
 
-    private fun renderError(state: AssetState) {
+    private fun renderError(state: CryptoAssetState) {
         showError()
 
         with(itemView) {

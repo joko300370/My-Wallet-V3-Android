@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
@@ -177,10 +178,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {
-                    model.process(SimpleBuyIntent.ConfirmationHandled)
-                    model.process(SimpleBuyIntent.KycStarted)
-                    navigator().startKyc()
-                    analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
+                    startKyc()
                 }
                 // Awaiting results state
                 KycState.IN_REVIEW,
@@ -201,6 +199,38 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
             }.exhaustive
         }
+
+        if (
+            newState.depositFundsRequested &&
+            newState.kycVerificationState != null
+        ) {
+            when (newState.kycVerificationState) {
+                // Kyc state unknown because error, or gold docs unsubmitted
+                KycState.PENDING -> {
+                    startKyc()
+                }
+                // Awaiting results state
+                KycState.IN_REVIEW,
+                KycState.UNDECIDED,
+                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
+                KycState.FAILED -> {
+                    navigator().goToKycVerificationScreen()
+                }
+                // We have done kyc and are verified
+                KycState.VERIFIED_AND_ELIGIBLE -> {
+                    showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
+                        lastState?.fiatCurrency ?: return
+                    ))
+                }
+            }.exhaustive
+        }
+    }
+
+    private fun startKyc() {
+        model.process(SimpleBuyIntent.NavigationHandled)
+        model.process(SimpleBuyIntent.KycStarted)
+        navigator().startKyc()
+        analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
     }
 
     private fun goToAddNewPaymentMethod(selectedPaymentMethodId: String) {
@@ -223,10 +253,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun canContinue(state: SimpleBuyState) =
-        state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
+        state.isAmountValid && state.selectedPaymentMethod?.id != PaymentMethod.UNDEFINED_PAYMENT_ID && !state.isLoading
 
     private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
-
         when (selectedPaymentMethod) {
             is PaymentMethod.Undefined -> {
                 payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
@@ -239,9 +268,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         payment_method.visible()
         payment_method_separator.visible()
         payment_method_details_root.visible()
-        undefined_payment_text.visibleIf { selectedPaymentMethod is PaymentMethod.Undefined }
-        payment_method_title.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
-        payment_method_limit.visibleIf { (selectedPaymentMethod is PaymentMethod.Undefined).not() }
+        undefined_payment_text.showIfPaymentMethodUndefined(selectedPaymentMethod)
+        payment_method_title.showIfPaymentMethodDefined(selectedPaymentMethod)
+        payment_method_limit.showIfPaymentMethodDefined(selectedPaymentMethod)
     }
 
     private fun renderFundsPayment(paymentMethod: PaymentMethod.Funds) {
@@ -308,7 +337,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onPause() {
         super.onPause()
-        model.process(SimpleBuyIntent.ConfirmationHandled)
+        model.process(SimpleBuyIntent.NavigationHandled)
     }
 
     override fun onSheetClosed() {
@@ -335,14 +364,17 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             PaymentMethodType.FUNDS -> {
                 showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
-                    lastState?.fiatCurrency ?: return,
-                    false
+                    lastState?.fiatCurrency ?: return
                 ))
             }
             else -> {
             }
         }
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
+    }
+
+    override fun depositFundsRequested() {
+        model.process(SimpleBuyIntent.DepositFundsRequested)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -355,11 +387,24 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 ))
         }
     }
+
+    private fun TextView.showIfPaymentMethodDefined(paymentMethod: PaymentMethod) {
+        visibleIf {
+            paymentMethod !is PaymentMethod.Undefined
+        }
+    }
+
+    private fun TextView.showIfPaymentMethodUndefined(paymentMethod: PaymentMethod) {
+        visibleIf {
+            paymentMethod is PaymentMethod.Undefined
+        }
+    }
 }
 
 interface PaymentMethodChangeListener {
     fun onPaymentMethodChanged(paymentMethod: PaymentMethod)
     fun addPaymentMethod(type: PaymentMethodType)
+    fun depositFundsRequested()
 }
 
 interface ChangeCurrencyHost : SimpleBuyScreen {

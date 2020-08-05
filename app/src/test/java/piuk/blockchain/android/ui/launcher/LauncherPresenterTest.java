@@ -132,6 +132,7 @@ public class LauncherPresenterTest {
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(extras.getBoolean(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);
@@ -164,6 +165,7 @@ public class LauncherPresenterTest {
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(extras.getBoolean(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);
@@ -199,6 +201,7 @@ public class LauncherPresenterTest {
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(extras.getBoolean(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);
@@ -231,6 +234,7 @@ public class LauncherPresenterTest {
         when(intent.getExtras()).thenReturn(extras);
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(false);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);
@@ -253,6 +257,7 @@ public class LauncherPresenterTest {
         when(intent.getExtras()).thenReturn(extras);
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(false);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);
@@ -300,7 +305,7 @@ public class LauncherPresenterTest {
         when(intent.getExtras()).thenReturn(extras);
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(false);
         when(prefsUtil.getValue(eq(PersistentPrefs.KEY_WALLET_GUID), anyString())).thenReturn("1234567890");
-        when(prefsUtil.getValue(eq(PersistentPrefs.KEY_PIN_IDENTIFIER), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         // Act
         subject.onViewReady();
         // Assert
@@ -317,6 +322,7 @@ public class LauncherPresenterTest {
         when(intent.getExtras()).thenReturn(extras);
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(false);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(appUtil.isSane()).thenReturn(false);
         // Act
         subject.onViewReady();
@@ -336,6 +342,7 @@ public class LauncherPresenterTest {
         when(extras.containsKey(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(extras.getBoolean(AppUtil.INTENT_EXTRA_VERIFIED)).thenReturn(true);
         when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(prefsUtil.isLoggedOut()).thenReturn(false);
         when(appUtil.isSane()).thenReturn(true);
         when(payloadDataManager.getWallet()).thenReturn(wallet);

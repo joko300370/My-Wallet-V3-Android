@@ -23,7 +23,6 @@ import com.blockchain.swap.nabu.datamanagers.LinkedBank;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
-import com.blockchain.swap.nabu.models.nabu.KycTiersKt;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
 
@@ -597,7 +596,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS);
-        prefs.removeValue(PersistentPrefs.KEY_PIN_IDENTIFIER);
+        prefs.setPinId("");
 
         getView().goToPinEntryPage();
     }
@@ -664,6 +663,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     void clearSwipeToReceiveData() {
         swipeToReceiveHelper.clearStoredData();
+    }
+
+    void updateCloudData(boolean newValue) {
+        if(newValue) {
+            swipeToReceiveHelper.clearStoredData();
+        }
+        prefs.setBackupEnabled(newValue);
     }
 
     boolean arePushNotificationEnabled() {

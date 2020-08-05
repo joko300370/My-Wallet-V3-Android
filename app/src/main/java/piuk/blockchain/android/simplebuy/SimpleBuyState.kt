@@ -50,7 +50,8 @@ data class SimpleBuyState(
     val paymentSucceeded: Boolean = false,
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
-    @Transient val confirmationActionRequested: Boolean = false
+    @Transient val confirmationActionRequested: Boolean = false,
+    @Transient val depositFundsRequested: Boolean = false
 ) : MviState {
 
     @delegate:Transient

@@ -3,8 +3,9 @@ package piuk.blockchain.android.coincore
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
-import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 import java.lang.IllegalArgumentException
@@ -12,9 +13,9 @@ import java.lang.IllegalArgumentException
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
-    private val fiatAsset: Asset,
     private val assetMap: Map<CryptoCurrency, CryptoAsset>,
-    private val defaultLabels: DefaultLabels
+    private val defaultLabels: DefaultLabels,
+    private val fiatAsset: Asset
 ) {
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
@@ -29,12 +30,31 @@ class Coincore internal constructor(
     fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
-    val assets: Iterable<Asset> = assetMap.values + fiatAsset
+    val fiatAssets: Asset = fiatAsset
+    val cryptoAssets: Iterable<Asset> = assetMap.values.filter { it.isEnabled }
+    val allAssets: Iterable<Asset> = listOf(fiatAsset) + cryptoAssets
 
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)
 
-    val allWallets: AccountGroup by lazy {
-        AllWalletsAccount(this, defaultLabels)
-    }
+    fun allWallets(): Single<AccountGroup> =
+        Single.zip(
+            allAssets.map { it.accountGroup() }
+        ) { t: Array<Any> ->
+            t.map { it as AccountGroup }
+                .map { it.accounts }
+                .reduce { l, g -> l + g }
+        }.map {
+            AllWalletsAccount(it, defaultLabels)
+        }
+
+    fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
+        // We only support transfers between similar assets and (soon; to - but not from - fiat)
+        // at this time. If and when, say, swap is supported this will need revisiting
+        Singles.zip(
+            get(sourceAccount.asset).transferList(sourceAccount),
+            fiatAsset.transferList(sourceAccount)
+        ) { crypto, fiat ->
+            crypto + fiat
+        }
 }

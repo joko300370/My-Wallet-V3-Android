@@ -5,8 +5,8 @@ import info.blockchain.balance.CryptoCurrency
 const val URL_BLOCKCHAIN_SUPPORT_PORTAL =
     "https://support.blockchain.com/"
 
-const val URL_BLOCKCHAIN_PAX_FAQ =
-    "https://support.blockchain.com/hc/en-us/sections/360004368351-USD-Pax-FAQ"
+const val URL_BLOCKCHAIN_SUPPORT_CLOUD_BACKUP_INFO =
+    "https://support.blockchain.com/hc/en-us/articles/360046143432"
 
 const val URL_BLOCKCHAIN_PAX_NEEDS_ETH_FAQ =
     "https://support.blockchain.com/hc/en-us/articles/360027492092-Why-do-I-need-ETH-to-send-my-PAX-"
@@ -56,11 +56,11 @@ fun makeBlockExplorerUrl(
     transactionHash: String
 ) = when (cryptoCurrency) {
     CryptoCurrency.BTC -> "https://www.blockchain.com/btc/tx/"
-    CryptoCurrency.ETHER -> "https://www.blockchain.com/eth/tx/"
     CryptoCurrency.BCH -> "https://www.blockchain.com/bch/tx/"
     CryptoCurrency.XLM -> "https://stellarchain.io/tx/"
-    CryptoCurrency.PAX -> "https://www.blockchain.com/eth/tx/"
+    CryptoCurrency.ETHER,
+    CryptoCurrency.PAX,
+    CryptoCurrency.USDT -> "https://www.blockchain.com/eth/tx/"
+    CryptoCurrency.ALGO -> "https://algoexplorer.io/tx/"
     CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-    CryptoCurrency.ALGO -> TODO("Unknown URL here - https://www.blockchain.com/alg/tx/ ?")
-    CryptoCurrency.USDT -> TODO("Unknown URL here - https://www.blockchain.com/usdt/tx/ ?")
 } + transactionHash

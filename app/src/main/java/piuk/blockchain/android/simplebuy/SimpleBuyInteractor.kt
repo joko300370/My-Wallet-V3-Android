@@ -25,7 +25,6 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.util.AppUtil
-import java.lang.IllegalStateException
 import java.util.concurrent.TimeUnit
 
 class SimpleBuyInteractor(
@@ -164,8 +163,13 @@ class SimpleBuyInteractor(
                 SimpleBuyIntent.PaymentMethodsUpdated(
                     availablePaymentMethods = paymentMethods,
                     canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkFunds = paymentMethods.firstOrNull { it is PaymentMethod.UndefinedFunds } != null,
-                    preselectedId = preselectedId
+                    canLinkFunds = tier.isApprovedFor(KycTierLevel.GOLD),
+                    preselectedId = if (tier.isApprovedFor(
+                            KycTierLevel.GOLD) || preselectedId != null) {
+                        preselectedId
+                    } else {
+                        PaymentMethod.UNDEFINED_PAYMENT_ID
+                    }
                 )
             }
         }

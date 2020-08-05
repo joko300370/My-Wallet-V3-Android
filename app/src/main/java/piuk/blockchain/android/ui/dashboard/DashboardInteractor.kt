@@ -5,12 +5,9 @@ import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.FiatValue
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
@@ -22,18 +19,21 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 
 class DashboardInteractor(
-    private val tokens: Coincore,
+    private val coincore: Coincore,
     private val payloadManager: PayloadManager,
+    private val exchangeRates: ExchangeRates,
+    private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
-    private val analytics: Analytics,
-    private val assetBalancesRepository: AssetBalancesRepository,
-    private val currencyPrefs: CurrencyPrefs,
-    private val tierService: TierService
+    private val analytics: Analytics
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -46,15 +46,14 @@ class DashboardInteractor(
         val cd = CompositeDisposable()
 
         CryptoCurrency.activeCurrencies()
-            .filter { it != CryptoCurrency.PAX }
+            .filter { !it.hasFeature(CryptoCurrency.IS_ERC20) }
             .forEach {
-                cd += tokens[it].accountGroup(balanceFilter)
+                cd += coincore[it].accountGroup(balanceFilter)
                     .flatMap { asset -> asset.balance }
                     .map { balance -> balance as CryptoValue }
-                    // CURRENCY HERE
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
-                            cd += tokens[CryptoCurrency.PAX].accountGroup(balanceFilter)
+                            cd += coincore[CryptoCurrency.PAX].accountGroup(balanceFilter)
                                 .flatMap { asset -> asset.balance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
@@ -66,12 +65,25 @@ class DashboardInteractor(
                                         model.process(BalanceUpdateError(CryptoCurrency.PAX))
                                     }
                                 )
+                            cd += coincore[CryptoCurrency.USDT].accountGroup(balanceFilter)
+                                .flatMap { asset -> asset.balance }
+                                .subscribeBy(
+                                    onSuccess = { balance ->
+                                        Timber.d("*****> Got balance for USDT")
+                                        model.process(BalanceUpdate(CryptoCurrency.USDT, balance))
+                                    },
+                                    onError = { e ->
+                                        Timber.e("Failed getting balance for USDT: $e")
+                                        model.process(BalanceUpdateError(CryptoCurrency.USDT))
+                                    }
+                                )
                         }
                     }
                     .doOnError { _ ->
                         if (it == CryptoCurrency.ETHER) {
-                            // If we can't get ETH, then we can't get PAX... so...
+                            // If we can't get ETH, then we can't get erc20 tokens... so...
                             model.process(BalanceUpdateError(CryptoCurrency.PAX))
+                            model.process(BalanceUpdateError(CryptoCurrency.USDT))
                         }
                     }
                     .subscribeBy(
@@ -92,40 +104,35 @@ class DashboardInteractor(
     }
 
     private fun checkForFiatBalances(model: DashboardModel): Disposable =
-        tierService.tiers().flatMap { tier ->
-            Singles.zip(
-                assetBalancesRepository.getBalanceForAsset("EUR").toSingle(FiatValue.zero("EUR")),
-                assetBalancesRepository.getBalanceForAsset("GBP").toSingle(FiatValue.zero("GBP")),
-                custodialWalletManager.getSupportedFundsFiats(
-                    currencyPrefs.selectedFiatCurrency,
-                    tier.isApprovedFor(KycTierLevel.GOLD)
-                )
-            )
-        }.subscribeBy(
-            onSuccess = { (euroValue, gbpValue, supportedFunds) ->
-                val fiatBalances = supportedFunds.map {
-                    when (it) {
-                        "EUR" -> euroValue
-                        "GBP" -> gbpValue
-                        else -> FiatValue.zero(it)
-                    }
+        coincore.fiatAssets.accountGroup()
+            .flattenAsObservable { g -> g.accounts }
+            .flatMapSingle {
+                    a -> a.balance.map { balance ->
+                        FiatBalanceInfo(
+                            balance,
+                            balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
+                            a as FiatAccount
+                        )
                 }
-
-                if (fiatBalances.isNotEmpty()) {
-                    model.process(FiatBalanceUpdate(fiatBalances))
-                }
-            },
-            onError = {
-                Timber.e("Error while loading Funds balances $it")
             }
-        )
+            .toList()
+            .subscribeBy(
+                onSuccess = { balances ->
+                    if (balances.isNotEmpty()) {
+                        model.process(FiatBalanceUpdate(balances))
+                    }
+                },
+                onError = {
+                    Timber.e("Error while loading fiat balances $it")
+                }
+            )
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
         val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
 
         return Singles.zip(
-            tokens[crypto].exchangeRate(),
-            tokens[crypto].historicRate(oneDayAgo)
+            coincore[crypto].exchangeRate(),
+            coincore[crypto].historicRate(oneDayAgo)
         ) { rate, day -> PriceUpdate(crypto, rate, day) }
             .subscribeBy(
                 onSuccess = { model.process(it) },
@@ -135,7 +142,7 @@ class DashboardInteractor(
 
     fun refreshPriceHistory(model: DashboardModel, crypto: CryptoCurrency): Disposable =
         if (crypto.hasFeature(CryptoCurrency.PRICE_CHARTING)) {
-            tokens[crypto].historicRateSeries(TimeSpan.DAY, TimeInterval.ONE_HOUR)
+            coincore[crypto].historicRateSeries(TimeSpan.DAY, TimeInterval.ONE_HOUR)
         } else {
             Single.just(FLATLINE_CHART)
         }
@@ -146,7 +153,7 @@ class DashboardInteractor(
             )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
-        return tokens[crypto].accountGroup(AssetFilter.Custodial)
+        return coincore[crypto].accountGroup(AssetFilter.Custodial)
             .flatMap { it.balance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },
@@ -171,6 +178,20 @@ class DashboardInteractor(
                     Timber.e(error)
                 }
             )
+    }
+
+    fun getSendFlow(model: DashboardModel, fromAccount: SingleAccount): Disposable? {
+        if (fromAccount is CryptoAccount) {
+            model.process(
+                UpdateLaunchDialogFlow(
+                    SendFlow(
+                        account = fromAccount,
+                        coincore = coincore
+                    )
+                )
+            )
+        }
+        return null
     }
 
     companion object {

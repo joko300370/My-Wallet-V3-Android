@@ -68,16 +68,14 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         val shouldShow: Boolean
     )
 
-    private fun Single<AccountGroup>.mapDetails(
-        showUnfunded: Boolean = false
-    ): Single<Details> =
+    private fun Single<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
             grp.balance.map { balance ->
                 Details(
                     grp,
                     balance,
                     grp.actions,
-                    grp.accounts.isNotEmpty() && (showUnfunded || grp.isFunded)
+                    grp.accounts.isNotEmpty()
                 )
             }
         }

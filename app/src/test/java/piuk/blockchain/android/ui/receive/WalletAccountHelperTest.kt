@@ -37,6 +37,7 @@ class WalletAccountHelperTest {
     private val xlmDataManager: XlmDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentConfig = mock()
     private val paxAccount: Erc20Account = mock()
+    private val usdtAccount: Erc20Account = mock()
     private val crashLogger: CrashLogger = mock()
 
     @Before
@@ -48,6 +49,7 @@ class WalletAccountHelperTest {
             stringUtils,
             ethDataManager,
             paxAccount,
+            usdtAccount,
             bchDataManager,
             xlmDataManager,
             environmentSettings,

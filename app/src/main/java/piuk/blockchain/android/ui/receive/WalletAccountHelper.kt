@@ -27,6 +27,7 @@ class WalletAccountHelper(
     private val stringUtils: StringUtils,
     private val ethDataManager: EthDataManager,
     private val paxAccount: Erc20Account,
+    private val usdtAccount: Erc20Account,
     private val bchDataManager: BchDataManager,
     private val xlmDataManager: XlmDataManager,
     private val environmentSettings: EnvironmentConfig,
@@ -49,7 +50,7 @@ class WalletAccountHelper(
                 CryptoCurrency.PAX -> getPaxAccount()
                 CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
                 CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-                CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+                CryptoCurrency.USDT -> getUsdtAccount()
             }
         } catch (t: Throwable) {
             crashLogger.logException(t)
@@ -192,7 +193,7 @@ class WalletAccountHelper(
             CryptoCurrency.PAX -> getDefaultPaxAccount()
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            CryptoCurrency.USDT -> getDefaultUsdtAccount()
         }
 
     fun getEthAccount() =
@@ -200,6 +201,9 @@ class WalletAccountHelper(
 
     fun getPaxAccount() =
         getDefaultPaxAccount()?.let { listOf(it) } ?: emptyList()
+
+    fun getUsdtAccount() =
+        getDefaultUsdtAccount()?.let { listOf(it) } ?: emptyList()
 
     fun getXlmAccount(): Single<List<ItemAccount>> =
         getDefaultXlmAccountItem().map { listOf(it) }
@@ -298,6 +302,24 @@ class WalletAccountHelper(
         }
     }
 
+    private fun getDefaultUsdtAccount(): ItemAccount? {
+        val erc20DataModel = usdtAccount.getErc20Model()
+        val ethAccount = ethDataManager.getEthWallet()?.account
+        val balance = erc20DataModel?.totalBalance ?: CryptoValue.ZeroUsdt
+
+        return if (ethAccount == null) {
+            Timber.e("Invalid USDT account: no account")
+            null
+        } else {
+            ItemAccount(
+                label = ethAccount.label,
+                balance = balance,
+                accountObject = ethAccount,
+                address = ethAccount.address
+            )
+        }
+    }
+
     private fun getDefaultXlmAccountItem() =
         xlmDataManager.defaultAccount()
             .zipWith(xlmDataManager.getBalance())
@@ -319,12 +341,12 @@ class WalletAccountHelper(
     fun hasMultipleEntries(cryptoCurrency: CryptoCurrency) =
         when (cryptoCurrency) {
             CryptoCurrency.BTC -> allBtcAccountItems().size + getAddressBookEntries().size
-            CryptoCurrency.ETHER -> getEthAccount().size
             CryptoCurrency.BCH -> allBchAccountItems().size
             CryptoCurrency.XLM -> 1 // TODO("AND-1511") Ideally we're getting real account count here, even if one
-            CryptoCurrency.PAX -> getEthAccount().size
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            CryptoCurrency.ETHER,
+            CryptoCurrency.PAX,
+            CryptoCurrency.USDT -> getEthAccount().size
         } > 1
 }

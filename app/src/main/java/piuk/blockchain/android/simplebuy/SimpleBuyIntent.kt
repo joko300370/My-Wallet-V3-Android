@@ -109,6 +109,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     when (paymentMethod) {
                         is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT
                         is PaymentMethod.Funds -> PaymentMethodType.FUNDS
+                        is PaymentMethod.UndefinedFunds -> PaymentMethodType.FUNDS
                         else -> PaymentMethodType.PAYMENT_CARD
                     }
                 ))
@@ -234,9 +235,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object FetchBankAccount : SimpleBuyIntent()
 
-    object ConfirmationHandled : SimpleBuyIntent() {
+    object NavigationHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(confirmationActionRequested = false)
+            oldState.copy(confirmationActionRequested = false, depositFundsRequested = false)
     }
 
     object KycStarted : SimpleBuyIntent() {
@@ -346,5 +347,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object CardPaymentPending : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(paymentPending = true, isLoading = false)
+    }
+
+    object DepositFundsRequested : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(depositFundsRequested = true)
     }
 }

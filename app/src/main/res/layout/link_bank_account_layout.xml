@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:requiresFadingEdge="vertical"
+    android:fadingEdgeLength="@dimen/very_small_margin"
+    android:fadingEdge="vertical"
     android:layout_height="match_parent"
     android:fillViewport="true">
 
@@ -10,6 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/very_small_margin"
+            app:srcCompat="@drawable/vector_sheet_indicator_small" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/title"
@@ -47,6 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            tools:visibility="visible"
             app:image="@drawable/ic_transfer_bank"
             app:subtitle="@string/bank_transfer_only_subtitle"
             app:title="@string/bank_transfer_only" />
@@ -55,7 +67,9 @@
             android:id="@+id/processing_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/standard_margin"
             android:visibility="gone"
+            tools:visibility="visible"
             app:image="@drawable/ic_clock"
             app:title="@string/processing_time" />
 
@@ -63,13 +77,15 @@
             android:id="@+id/bank_deposit_instruction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/standard_margin"
             android:gravity="center"
-            android:layout_marginTop="@dimen/standard_margin"
             tools:text="Please transfer or more from your personal bank to Blockchain.com. This will securely link your bank account." />
 
         <include
             android:id="@+id/bank_details_error"
-            layout="@layout/bank_details_error_layout" />
+            layout="@layout/bank_details_error_layout"
+            tools:visibility="gone" />
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

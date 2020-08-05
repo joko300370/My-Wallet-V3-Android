@@ -15,7 +15,7 @@ val TEST_ASSETS = listOf(
     CryptoCurrency.XLM
 )
 
-val initialBtcState = AssetState(
+val initialBtcState = CryptoAssetState(
     currency = CryptoCurrency.BTC,
     balance = CryptoValue.zero(CryptoCurrency.BTC),
     price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, FIAT_CURRENCY, 300.toBigDecimal()),
@@ -23,7 +23,7 @@ val initialBtcState = AssetState(
     priceTrend = emptyList()
 )
 
-val initialEthState = AssetState(
+val initialEthState = CryptoAssetState(
     currency = CryptoCurrency.ETHER,
     balance = CryptoValue.zero(CryptoCurrency.ETHER),
     price = ExchangeRate.CryptoToFiat(CryptoCurrency.ETHER, FIAT_CURRENCY, 200.toBigDecimal()),
@@ -31,7 +31,7 @@ val initialEthState = AssetState(
     priceTrend = emptyList()
 )
 
-val initialXlmState = AssetState(
+val initialXlmState = CryptoAssetState(
     currency = CryptoCurrency.XLM,
     balance = CryptoValue.zero(CryptoCurrency.XLM),
     price = ExchangeRate.CryptoToFiat(CryptoCurrency.XLM, FIAT_CURRENCY, 100.toBigDecimal()),

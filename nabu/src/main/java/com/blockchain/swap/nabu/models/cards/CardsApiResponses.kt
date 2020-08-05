@@ -50,8 +50,8 @@ data class CardResponse(
 
 data class CardDetailsResponse(
     val number: String,
-    val expireYear: Int,
-    val expireMonth: Int,
+    val expireYear: Int?,
+    val expireMonth: Int?,
     val type: CardType,
     val label: String
 )
