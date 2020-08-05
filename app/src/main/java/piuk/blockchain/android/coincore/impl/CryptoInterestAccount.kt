@@ -56,7 +56,7 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions = if(ENABLE_INTEREST_ACTIONS) {
+    override val actions: AvailableActions = if (ENABLE_INTEREST_ACTIONS) {
         setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
     } else {
         emptySet()
