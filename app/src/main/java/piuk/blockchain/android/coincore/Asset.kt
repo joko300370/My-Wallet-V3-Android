@@ -6,6 +6,7 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
@@ -18,6 +19,7 @@ enum class AssetFilter {
 
 // TEMP flag to enable/disable new send from actions
 const val ENABLE_NEW_SEND_ACTION = false
+val ENABLE_INTEREST_ACTIONS = if (BuildConfig.DEBUG) { true } else { false }
 
 enum class AssetAction {
     ViewActivity,

@@ -30,6 +30,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.ENABLE_INTEREST_ACTIONS
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -181,7 +182,12 @@ class AssetDetailSheet :
         if (account is CryptoAccount && assetFilter == AssetFilter.Custodial) {
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }
-        model.process(ShowAssetActionsIntent(account, assetFilter))
+        if (assetFilter == AssetFilter.Interest && !ENABLE_INTEREST_ACTIONS) {
+            // do nothing
+            // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
+        } else {
+            model.process(ShowAssetActionsIntent(account, assetFilter))
+        }
     }
 
     private fun updateChart(chart: LineChart, data: List<PriceDatum>) {
