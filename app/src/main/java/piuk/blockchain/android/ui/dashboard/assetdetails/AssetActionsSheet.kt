@@ -240,6 +240,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                         model.process(SelectSendingAccount)
                     } else {
                         model.process(HandleActionIntent(AssetDetailsAction.DEPOSIT))
+                        dismiss()
                     }
                 }
             }

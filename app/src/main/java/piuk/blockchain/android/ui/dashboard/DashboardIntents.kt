@@ -249,7 +249,7 @@ class LaunchSendFlow(
 
 class LaunchDepositFlow(
     val toAccount: SingleAccount,
-    val shouldShowPicker: Boolean
+    val fromAccount: SingleAccount
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(

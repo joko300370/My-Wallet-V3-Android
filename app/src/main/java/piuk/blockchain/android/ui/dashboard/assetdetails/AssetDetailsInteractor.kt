@@ -120,6 +120,7 @@ class AssetDetailsInteractor(
                 )
             }
 
+            if (interest.shouldShow && interestEnabled) {
                 put(
                     AssetFilter.Interest,
                     AssetDisplayInfo(interest.account, interest.balance, interestFiat,

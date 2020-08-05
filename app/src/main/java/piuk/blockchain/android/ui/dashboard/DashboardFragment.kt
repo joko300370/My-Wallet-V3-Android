@@ -432,11 +432,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun goToDeposit(
         fromAccount: SingleAccount,
-        toAccount: BlockchainAccount,
+        toAccount: SingleAccount,
         cryptoAsset: CryptoAsset
     ) {
-        // TODO in next story
         Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
+       // model.process(LaunchDepositFlow(toAccount as SingleAccount, fromAccount))
     }
 
     override fun gotoSwap(account: SingleAccount) =

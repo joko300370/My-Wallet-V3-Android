@@ -208,8 +208,8 @@ class DashboardInteractor(
 
     fun getDepositFlow(
         model: DashboardModel,
-        shouldShowAccountPicker: Boolean,
-        toAccount: SingleAccount
+        toAccount: SingleAccount,
+        fromAccount: SingleAccount
     ): Disposable? {
         /*model.process(
             UpdateLaunchDialogFlow(
