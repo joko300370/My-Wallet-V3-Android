@@ -4,6 +4,7 @@ import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -23,7 +24,7 @@ data class AssetDetailsState(
     val chartLoading: Boolean = false,
     val chartData: List<PriceDatum> = emptyList(),
     val errorState: AssetDetailsError = AssetDetailsError.NONE,
-    val hostAction: AssetDetailsAction = AssetDetailsAction.NONE
+    val hostAction: AssetAction? = null
 ) : MviState
 
 enum class AssetDetailsError {

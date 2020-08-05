@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -50,7 +51,7 @@ class UpdateTimeSpan(
 }
 
 class HandleActionIntent(
-    private val action: AssetDetailsAction
+    private val action: AssetAction
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(hostAction = action)

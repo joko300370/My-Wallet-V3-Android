@@ -8,6 +8,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -76,7 +77,7 @@ class AssetDetailsFlow(
             }
         }
 
-        if (newState.hostAction != AssetDetailsAction.NONE) {
+        if (newState.hostAction != null) {
             handleHostAction(newState, assetFlowHost)
         }
     }
@@ -102,17 +103,14 @@ class AssetDetailsFlow(
     ) {
         val account = newState.selectedAccount.selectFirstAccount()
         when (newState.hostAction) {
-            AssetDetailsAction.ACTIVITY -> host.gotoActivityFor(account)
-            AssetDetailsAction.SEND -> host.gotoSendFor(account)
-            AssetDetailsAction.NEW_SEND -> host.launchNewSendFor(account)
-            AssetDetailsAction.RECEIVE -> host.goToReceiveFor(account)
-            AssetDetailsAction.SWAP -> host.gotoSwap(account)
-            AssetDetailsAction.INTEREST -> TODO()
-            AssetDetailsAction.DEPOSIT -> host.goToDeposit(account,
+            AssetAction.ViewActivity -> host.gotoActivityFor(account)
+            AssetAction.Send -> host.gotoSendFor(account)
+            AssetAction.NewSend -> host.launchNewSendFor(account)
+            AssetAction.Receive -> host.goToReceiveFor(account)
+            AssetAction.Swap -> host.gotoSwap(account)
+            AssetAction.Summary -> TODO()
+            AssetAction.Deposit -> host.goToDeposit(account,
                 localState.selectedAccount!! as SingleAccount, newState.asset!!)
-            AssetDetailsAction.NONE -> {
-                // do nothing
-            }
         }
     }
 

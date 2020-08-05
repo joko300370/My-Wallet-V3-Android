@@ -190,36 +190,35 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.ACTIVITY))
+                    model.process(HandleActionIntent(AssetAction.ViewActivity))
                     dismiss()
                 }
             AssetAction.Send ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
                     asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
+                    model.process(HandleActionIntent(AssetAction.Send))
                     dismiss()
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
-                    // TODO do we want this to continue as one flow with send?
+                    model.process(HandleActionIntent(AssetAction.NewSend))
                     dismiss()
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.RECEIVE))
+                    model.process(HandleActionIntent(AssetAction.Receive))
                     dismiss()
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset) {
-                model.process(HandleActionIntent(AssetDetailsAction.SWAP))
+                model.process(HandleActionIntent(AssetAction.Swap))
                 dismiss()
             }
             AssetAction.Summary -> AssetActionItem(
