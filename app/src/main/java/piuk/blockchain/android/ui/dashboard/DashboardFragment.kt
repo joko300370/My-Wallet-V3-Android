@@ -25,6 +25,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -428,6 +429,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
+
+    override fun goToDeposit(fromAccount: SingleAccount,
+                             toAccount: BlockchainAccount,
+                             cryptoAsset: CryptoAsset) {
+        // TODO in next story
+        Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
+    }
 
     override fun gotoSwap(account: SingleAccount) =
         when (account) {

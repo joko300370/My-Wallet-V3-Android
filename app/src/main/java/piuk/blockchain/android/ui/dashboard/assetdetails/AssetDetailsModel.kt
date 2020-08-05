@@ -99,6 +99,7 @@ class AssetDetailsModel(
             is ShowAssetDetailsIntent,
             is ShowAssetActionsIntent,
             is ShowCustodyIntroSheetIntent,
+            is SelectSendingAccount,
             is ReturnToPreviousStep,
             is ClearSheetDataIntent -> null
         }

@@ -234,8 +234,13 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
-                // TODO in upcoming story
-                Timber.e("----- deposit clicked")
+                disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
+                    if(it.accounts.size > 1) {
+                        model.process(SelectSendingAccount)
+                    } else {
+                        // TODO launch send flow with pre-selected accounts
+                    }
+                }
             }
         }
 

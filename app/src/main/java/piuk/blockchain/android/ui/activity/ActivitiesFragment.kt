@@ -31,10 +31,10 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
-import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
+import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.setCoinIcon
@@ -104,7 +104,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             when (newState.bottomSheet) {
                 ActivitiesSheet.ACCOUNT_SELECTOR -> {
                     analytics.logEvent(ActivityAnalytics.WALLET_PICKER_SHOWN)
-                    showBottomSheet(AccountSelectSheet.newInstance())
+                    showBottomSheet(AccountSelectSheet.newInstance(this))
                 }
                 ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS -> {
                     newState.selectedCryptoCurrency?.let {
@@ -298,6 +298,10 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     override fun onAccountSelected(account: BlockchainAccount) {
         model.process(AccountSelectedIntent(account, false))
+    }
+
+    override fun onAccountSelectorBack() {
+        // do nothing
     }
 
     override fun onShowBankDetailsSelected() {
