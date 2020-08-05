@@ -15,14 +15,14 @@
     <item>twaalfde woord</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 geïmporteerd adres</item>
@@ -1124,7 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><![CDATA[Ga akkoord met de <a href=\"ignored\"> algemene voorwaarden </a> <a href=\"ignored\">]]></string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Ga akkoord met de <a href="ignored"> algemene voorwaarden </a></string>
   <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
@@ -1232,7 +1232,7 @@
   <string name="kyc_email_title">Controleer je email</string>
   <string name="kyc_email_message">We moeten uw e-mailadres verifiëren als een extra beveiligingslaag.</string>
   <string name="kyc_email_hint_focused">Jouw email</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fout bij het opslaan van e-mail. Probeer het opnieuw</string>
   <string name="kyc_email_send_verification">E-mail verzenden</string>
   <string name="kyc_email_validation_header">Controleer je inbox.</string>
@@ -1257,7 +1257,7 @@
   <string name="kyc_onfido_splash_verification_error">Fout bij het verifiëren van ID. Probeer het opnieuw</string>
   <string name="kyc_veriff_splash_country_supported_header">Wordt mijn land ondersteund?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Op dit moment worden niet alle landen ondersteund. Bekijk onze actuele <annotation link="country_list"> lijst met landen </annotation> voordat u doorgaat.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ZILVER GECONTROLEERD</string>
   <string name="kyc_veriff_splash_header">Laten we bevestigen dat u het bent</string>
   <string name="kyc_veriff_splash_subtitle">U heeft één van de onderstaande ID-typen nodig om door te gaan.</string>
@@ -1279,11 +1279,11 @@
   <string name="kyc_complete_device_verified">Apparaat geverifieerd</string>
   <string name="kyc_complete_id_uploaded">ID geüpload</string>
   <string name="kyc_complete_video_uploaded">Video geüpload</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Ons Blockchain-ondersteuningsteam heeft Help-handleidingen geschreven waarin wordt uitgelegd waarom we uw identiteit moeten verifiëren.</string>
   <string name="kyc_help_dialog_read_now">Lees nu</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">identiteit verificatie</string>
   <string name="kyc_settings_status_none">Niet geverifieerd</string>
@@ -1295,7 +1295,7 @@
   <string name="kyc_settings_gold_level_in_review">Goudniveau - wordt beoordeeld</string>
   <string name="kyc_settings_gold_level_approved">Gold Level - Goedgekeurd</string>
   <string name="kyc_settings_silver_level_approved">Silver Level - Goedgekeurd</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fout bij ophalen van KYC-status</string>
   <string name="kyc_status_title_in_progress">Verificatie wordt uitgevoerd</string>
   <string name="kyc_status_title_approved">Account goedgekeurd</string>
@@ -1319,10 +1319,10 @@
   <string name="kyc_drop_off_card_description">Ga verder waar je was gebleven en voltooi je identiteitsverificatie.</string>
   <string name="kyc_drop_off_card_button">Ga door met verificatie</string>
   <string name="kyc_documents_needed">Documenten nodig</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">We hadden enkele problemen met de documenten die u heeft verstrekt. Probeer de documenten opnieuw te uploaden om door te gaan met uw verificatie.</string>
   <string name="kyc_resubmission_card_button">Upload documenten</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">We kunnen uw identiteit niet verifiëren en hebben u nodig om de vereiste documenten opnieuw te uploaden.</string>
   <string name="kyc_resubmission_splash_description_2">De belangrijkste redenen hiervoor zijn:</string>
   <string name="kyc_resubmission_splash_description_3">De benodigde foto\'s ontbreken.</string>

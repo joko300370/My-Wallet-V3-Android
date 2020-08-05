@@ -234,8 +234,14 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
-                model.process(HandleActionIntent(AssetDetailsAction.DEPOSIT))
-                dismiss()
+
+                disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
+                    if (it.accounts.size > 1) {
+                        model.process(SelectSendingAccount)
+                    } else {
+                        model.process(HandleActionIntent(AssetDetailsAction.DEPOSIT))
+                    }
+                }
             }
         }
 

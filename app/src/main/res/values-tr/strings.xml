@@ -15,14 +15,14 @@
     <item>onikinci kelime</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
-    <item>\@ String / xlm_memo_hash</item>
-    <item>\@ String / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 içe aktarılmış adres</item>
@@ -1232,7 +1232,7 @@
   <string name="kyc_email_title">Eposta adresinizi doğrulayın</string>
   <string name="kyc_email_message">Ek güvenlik katmanı olarak e-posta adresinizi doğrulamamız gerekiyor.</string>
   <string name="kyc_email_hint_focused">E-posta adresiniz</string>
-  <string name="kyc_email_hint_unfocused">\@ String / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">E-posta kaydedilirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_email_send_verification">Eposta gönder</string>
   <string name="kyc_email_validation_header">Gelen kutunu kontrol et.</string>
@@ -1255,7 +1255,7 @@
   <string name="kyc_onfido_splash_verification_error">Kimlik doğrulanırken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_veriff_splash_country_supported_header">Ülkem destekleniyor mu?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Şu anda tüm ülkeler desteklenmemektedir. <annotation link="country_list"> etmeden önce güncel </annotation> ülke listemize.</string>
-  <string name="kyc_veriff_splash_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">GÜMÜŞ DOĞRULANDI</string>
   <string name="kyc_veriff_splash_header">Sizin Olduğunuzu Onaylayalım</string>
   <string name="kyc_veriff_splash_subtitle">Devam etmek için aşağıdaki kimlik türlerinden birine ihtiyacınız olacak.</string>
@@ -1277,11 +1277,11 @@
   <string name="kyc_complete_device_verified">Cihaz Onaylandı</string>
   <string name="kyc_complete_id_uploaded">Yüklenen Kimlik</string>
   <string name="kyc_complete_video_uploaded">Video yüklendi</string>
-  <string name="kyc_help_dialog_need_some_help">\@ String / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Blockchain Destek Ekibimiz, kimliğinizi neden doğrulamamız gerektiğini açıklayan Yardım Kılavuzları yazdı.</string>
   <string name="kyc_help_dialog_read_now">Şimdi Oku</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ String / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">kimlik doğrulama</string>
   <string name="kyc_settings_status_none">doğrulanmamış</string>
@@ -1293,7 +1293,7 @@
   <string name="kyc_settings_gold_level_in_review">Altın Seviyesi - İnceleniyor</string>
   <string name="kyc_settings_gold_level_approved">Altın Seviyesi - Onaylandı</string>
   <string name="kyc_settings_silver_level_approved">Gümüş Seviyesi - Onaylı</string>
-  <string name="kyc_settings_tier_status_failed">\@ String / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYC durumu getirilirken hata oluştu</string>
   <string name="kyc_status_title_in_progress">Doğrulama Sürüyor</string>
   <string name="kyc_status_title_approved">Hesap Onaylandı</string>
@@ -1317,10 +1317,10 @@
   <string name="kyc_drop_off_card_description">Kaldığınız yerden devam edin ve kimlik doğrulama işleminizi tamamlayın.</string>
   <string name="kyc_drop_off_card_button">Doğrulamaya devam et</string>
   <string name="kyc_documents_needed">Gerekli belgeler</string>
-  <string name="kyc_resubmission_card_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Verdiğiniz belgelerle ilgili bazı sorunlar yaşadık. Doğrulamanıza devam etmek için lütfen belgeleri tekrar yüklemeyi deneyin.</string>
   <string name="kyc_resubmission_card_button">Belgeleri Yükle</string>
-  <string name="kyc_resubmission_splash_title">\@ String / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Kimliğinizi doğrulayamıyoruz ve gerekli belgeleri yeniden yüklemenizi istiyoruz.</string>
   <string name="kyc_resubmission_splash_description_2">Bunun gerçekleşmesinin ana nedenleri:</string>
   <string name="kyc_resubmission_splash_description_3">Gerekli fotoğraflar eksik.</string>

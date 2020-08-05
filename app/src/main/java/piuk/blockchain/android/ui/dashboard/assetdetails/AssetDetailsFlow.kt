@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
 
@@ -19,12 +20,13 @@ enum class AssetDetailsStep {
     ZERO,
     CUSTODY_INTRO_SHEET,
     ASSET_DETAILS,
-    ASSET_ACTIONS
+    ASSET_ACTIONS,
+    SELECT_ACCOUNT
 }
 
 class AssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency
-) : DialogFlow(), KoinComponent {
+) : DialogFlow(), KoinComponent, AccountSelectSheet.Host {
 
     interface AssetDetailsHost : FlowHost {
         fun launchNewSendFor(account: SingleAccount)
@@ -32,19 +34,28 @@ class AssetDetailsFlow(
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
-        fun goToDeposit(depositAccount: SingleAccount, cryptoAsset: CryptoAsset)
+        fun goToDeposit(
+            fromAccount: SingleAccount,
+            toAccount: BlockchainAccount,
+            cryptoAsset: CryptoAsset
+        )
     }
 
     private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
+    private var localState: AssetDetailsState = AssetDetailsState()
     private val disposables = CompositeDisposable()
     private val model: AssetDetailsModel by scopedInject()
+    private lateinit var assetFlowHost: AssetDetailsHost
 
     override fun startFlow(fragmentManager: FragmentManager, host: FlowHost) {
         super.startFlow(fragmentManager, host)
 
+        assetFlowHost = host as? AssetDetailsHost
+            ?: throw IllegalStateException("Flow Host is not an AssetDetailsHost")
+
         model.apply {
             disposables += state.subscribeBy(
-                onNext = { handleStateChange(it, host) },
+                onNext = { handleStateChange(it) },
                 onError = { Timber.e("Asset details state is broken: $it") }
             )
         }
@@ -53,9 +64,9 @@ class AssetDetailsFlow(
     }
 
     private fun handleStateChange(
-        newState: AssetDetailsState,
-        host: FlowHost
+        newState: AssetDetailsState
     ) {
+        localState = newState
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
             if (currentStep == AssetDetailsStep.ZERO) {
@@ -66,8 +77,7 @@ class AssetDetailsFlow(
         }
 
         if (newState.hostAction != AssetDetailsAction.NONE) {
-            handleHostAction(newState, host as? AssetDetailsHost
-            ?: throw IllegalStateException("Flow Host is not an AssetDetailsHost"))
+            handleHostAction(newState, assetFlowHost)
         }
     }
 
@@ -80,6 +90,8 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_ACTIONS ->
                     AssetActionsSheet.newInstance(newState.selectedAccount!!,
                         newState.assetFilter!!)
+                AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(newState.assetFilter!!,
+                    cryptoCurrency, this)
             }
         )
     }
@@ -96,7 +108,8 @@ class AssetDetailsFlow(
             AssetDetailsAction.RECEIVE -> host.goToReceiveFor(account)
             AssetDetailsAction.SWAP -> host.gotoSwap(account)
             AssetDetailsAction.INTEREST_SUMMARY -> TODO()
-            AssetDetailsAction.DEPOSIT -> host.goToDeposit(account, newState.asset!!)
+            AssetDetailsAction.DEPOSIT -> host.goToDeposit(account,
+                localState.selectedAccount!! as SingleAccount, newState.asset!!)
             AssetDetailsAction.NONE -> {
                 // do nothing
             }
@@ -106,6 +119,17 @@ class AssetDetailsFlow(
     override fun finishFlow() {
         resetFow()
         super.finishFlow()
+    }
+
+    override fun onAccountSelected(account: BlockchainAccount) {
+        assetFlowHost.goToDeposit(
+            account as SingleAccount,
+            localState.selectedAccount!!,
+            localState.asset!!)
+    }
+
+    override fun onAccountSelectorBack() {
+        model.process(ReturnToPreviousStep)
     }
 
     override fun onSheetClosed() {

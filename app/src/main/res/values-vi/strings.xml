@@ -15,14 +15,14 @@
     <item>từ thứ mười hai</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ chuỗi / xlm_memo bản</item>
-    <item>\@ chuỗi / xlm_memo_id</item>
-    <item>\@ chuỗi / xlm_memo_hash</item>
-    <item>\@ chuỗi / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ chuỗi / xlm_memo bản</item>
-    <item>\@ chuỗi / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d địa chỉ đã nhập</item>
@@ -1231,7 +1231,7 @@
   <string name="kyc_email_title">Xác nhận email của bạn</string>
   <string name="kyc_email_message">Chúng tôi cần xác minh địa chỉ email của bạn dưới dạng một lớp bảo mật được thêm vào.</string>
   <string name="kyc_email_hint_focused">Email của bạn</string>
-  <string name="kyc_email_hint_unfocused">\@ chuỗi / kyc_email_hint_f Focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Lỗi lưu email, vui lòng thử lại</string>
   <string name="kyc_email_send_verification">Gửi email</string>
   <string name="kyc_email_validation_header">Kiểm tra hộp thư của bạn.</string>
@@ -1256,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">Lỗi khi xác minh ID, vui lòng thử lại</string>
   <string name="kyc_veriff_splash_country_supported_header">Đất nước tôi có được hỗ trợ không?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Không phải tất cả các quốc gia được hỗ trợ tại thời điểm này. Kiểm tra của chúng tôi được cập nhật <annotation link="country_list"> danh sách các nước </annotation> trước khi tiếp tục.</string>
-  <string name="kyc_veriff_splash_title">\@ chuỗi / kyc_document_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">BẠC XÁC MINH</string>
   <string name="kyc_veriff_splash_header">Hãy xác nhận đó là bạn</string>
   <string name="kyc_veriff_splash_subtitle">Bạn sẽ cần 1 trong số các loại ID dưới đây để tiếp tục.</string>
@@ -1278,11 +1278,11 @@
   <string name="kyc_complete_device_verified">Đã xác minh thiết bị</string>
   <string name="kyc_complete_id_uploaded">Đã tải lên ID</string>
   <string name="kyc_complete_video_uploaded">Video được tải lên</string>
-  <string name="kyc_help_dialog_need_some_help">\@ chuỗi / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Nhóm hỗ trợ Blockchain của chúng tôi đã viết Hướng dẫn trợ giúp giải thích lý do tại sao chúng tôi cần xác minh danh tính của bạn.</string>
   <string name="kyc_help_dialog_read_now">Đọc ngay</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/c chuyên mục000001135512-Ententity -Verifying</string>
-  <string name="kyc_help_dialog_contact_support">\@ chuỗi / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Xác minh danh tính</string>
   <string name="kyc_settings_status_none">Chưa được xác minh</string>
@@ -1294,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">Cấp vàng - Đang xem xét</string>
   <string name="kyc_settings_gold_level_approved">Cấp vàng - Đã được phê duyệt</string>
   <string name="kyc_settings_silver_level_approved">Cấp bạc - Đã được phê duyệt</string>
-  <string name="kyc_settings_tier_status_failed">\@ chuỗi / kyc_sinstall_status_Vjection</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Lỗi khi tìm nạp trạng thái KYC</string>
   <string name="kyc_status_title_in_progress">Đang xác minh</string>
   <string name="kyc_status_title_approved">Tài khoản được phê duyệt</string>
@@ -1318,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">Chọn nơi bạn rời đi và hoàn thành xác minh danh tính của bạn.</string>
   <string name="kyc_drop_off_card_button">Tiếp tục xác minh</string>
   <string name="kyc_documents_needed">Tài liệu cần thiết</string>
-  <string name="kyc_resubmission_card_title">\@ chuỗi / kyc_document_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Chúng tôi đã có một số vấn đề với các tài liệu bạn đã cung cấp. Vui lòng thử tải lên các tài liệu một lần nữa để tiếp tục xác minh của bạn.</string>
   <string name="kyc_resubmission_card_button">Tải lên Tài liệu</string>
-  <string name="kyc_resubmission_splash_title">\@ chuỗi / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Chúng tôi không thể xác minh danh tính của bạn và cần bạn tải lên lại các tài liệu cần thiết.</string>
   <string name="kyc_resubmission_splash_description_2">Lý do chính cho điều này xảy ra:</string>
   <string name="kyc_resubmission_splash_description_3">Những bức ảnh yêu cầu bị thiếu.</string>
