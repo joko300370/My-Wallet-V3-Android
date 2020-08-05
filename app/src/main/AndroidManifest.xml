@@ -12,13 +12,14 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
-            android:name=".BlockchainApplication"
-            android:allowBackup="false"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/AppTheme"
-            tools:replace="android:allowBackup">
+        android:name=".BlockchainApplication"
+        android:allowBackup="true"
+        android:backupAgent="piuk.blockchain.androidcore.utils.CloudBackupAgent"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
 
         <activity
                 android:name=".ui.launcher.LauncherActivity"
@@ -182,6 +183,10 @@
         <meta-data
                 android:name="preloaded_fonts"
                 android:resource="@array/preloaded_fonts" />
+
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="${BACKUP_API_KEY}" />
 
         <provider
                 android:name="androidx.core.content.FileProvider"

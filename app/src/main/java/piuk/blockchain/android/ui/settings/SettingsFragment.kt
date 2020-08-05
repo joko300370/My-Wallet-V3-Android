@@ -135,6 +135,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
     }
+    private val cloudBackupPref by lazy {
+        findPreference<SwitchPreferenceCompat>("cloud_backup")
+    }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
     private val analytics: Analytics by inject()
@@ -241,6 +244,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             true
         }
 
+        cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
+            settingsPresenter.updateCloudData(newValue as Boolean)
+            analytics.logEvent(SettingsAnalyticsEvents.CloudBackupSwitch)
+            true
+        }
+
         // App
         findPreference<Preference>("about")?.apply {
             summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
@@ -259,8 +268,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {
-            }
+            intent == null -> {}
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->

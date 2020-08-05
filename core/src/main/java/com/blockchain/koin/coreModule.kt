@@ -73,8 +73,10 @@ import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
+import piuk.blockchain.androidcore.utils.CloudBackupAgent
 import piuk.blockchain.androidcore.utils.DeviceIdGenerator
 import piuk.blockchain.androidcore.utils.DeviceIdGeneratorImpl
+import piuk.blockchain.androidcore.utils.EncryptedPrefs
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.UUIDGenerator
@@ -233,6 +235,7 @@ val coreModule = module {
     single {
         PrefsUtil(
             store = get(),
+            backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),
             uuidGenerator = get()
         )
@@ -244,6 +247,7 @@ val coreModule = module {
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
         .bind(WalletStatus::class)
+        .bind(EncryptedPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 

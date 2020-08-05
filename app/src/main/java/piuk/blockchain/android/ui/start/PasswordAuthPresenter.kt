@@ -201,7 +201,7 @@ abstract class PasswordAuthPresenter<T : PasswordAuthView> : MvpPresenter<T>() {
                 appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
                 prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, payloadDataManager.wallet!!.guid)
                 prefs.setValue(PersistentPrefs.KEY_EMAIL_VERIFIED, true)
-                prefs.removeValue(PersistentPrefs.KEY_PIN_IDENTIFIER)
+                prefs.pinId = ""
             }
             .subscribeBy(
                 onComplete = {

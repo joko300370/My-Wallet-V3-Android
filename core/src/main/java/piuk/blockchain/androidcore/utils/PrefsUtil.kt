@@ -1,9 +1,13 @@
 package piuk.blockchain.androidcore.utils
 
+import android.annotation.SuppressLint
+import android.app.backup.BackupManager
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import info.blockchain.wallet.crypto.AESUtil
+import piuk.blockchain.androidcore.BuildConfig
 import java.util.Currency
 import java.util.Locale
 
@@ -13,6 +17,7 @@ interface UUIDGenerator {
 
 class PrefsUtil(
     private val store: SharedPreferences,
+    private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
     private val uuidGenerator: UUIDGenerator
 ) : PersistentPrefs {
@@ -38,6 +43,16 @@ class PrefsUtil(
                 }
                 deviceId
             }
+        }
+
+    override var pinId: String
+        get() = getValue(KEY_PIN_IDENTIFIER) ?: backupStore.getString(KEY_PIN_IDENTIFIER, null) ?: ""
+
+        @SuppressLint("ApplySharedPref")
+        set(value) {
+            setValue(KEY_PIN_IDENTIFIER, value)
+            backupStore.edit().putString(KEY_PIN_IDENTIFIER, value).commit()
+            BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
         }
 
     override var devicePreIDVCheckFailed: Boolean
@@ -195,6 +210,89 @@ class PrefsUtil(
         get() = getValue(KEY_FIREBASE_TOKEN, "")
         set(v) = setValue(KEY_FIREBASE_TOKEN, v)
 
+    @SuppressLint("ApplySharedPref")
+    override fun backupCurrentPrefs(encryptionKey: String, aes: AESUtilWrapper) {
+        backupStore.edit()
+            .clear()
+            .putString(KEY_PIN_IDENTIFIER, getValue(KEY_PIN_IDENTIFIER, ""))
+            .putString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""))
+            .putString(
+                KEY_ENCRYPTED_GUID,
+                aes.encrypt(
+                    getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
+                    encryptionKey,
+                    AESUtil.PIN_PBKDF2_ITERATIONS_GUID
+                )
+            )
+            .putString(
+                KEY_ENCRYPTED_SHARED_KEY,
+                aes.encrypt(
+                    getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
+                    encryptionKey,
+                    AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY
+                )
+            )
+            .commit()
+
+        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+    }
+
+    override fun restoreFromBackup(decryptionKey: String, aes: AESUtilWrapper) {
+        // Pull in the values from the backup, we don't have local state
+        setValue(
+            KEY_PIN_IDENTIFIER,
+            backupStore.getString(KEY_PIN_IDENTIFIER, "") ?: ""
+        )
+        setValue(
+            PersistentPrefs.KEY_ENCRYPTED_PASSWORD,
+            backupStore.getString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "") ?: ""
+        )
+        setValue(
+            PersistentPrefs.KEY_WALLET_GUID,
+            aes.decrypt(
+                backupStore.getString(KEY_ENCRYPTED_GUID, ""),
+                decryptionKey,
+                AESUtil.PIN_PBKDF2_ITERATIONS_GUID
+            )
+        )
+        setValue(
+            PersistentPrefs.KEY_SHARED_KEY,
+            aes.decrypt(
+                backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, ""),
+                decryptionKey,
+                AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY
+            )
+        )
+    }
+
+    override var backupEnabled: Boolean
+        get() = getValue(KEY_CLOUD_BACKUP_ENABLED, true)
+        set(value) {
+            setValue(KEY_CLOUD_BACKUP_ENABLED, value)
+            if (!value) {
+                clearBackup()
+            }
+        }
+
+    override fun hasBackup(): Boolean =
+        backupEnabled &&
+            backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
+
+    @SuppressLint("ApplySharedPref")
+    override fun clearBackup() {
+        // We need to set all the backed values here and not just clear(), since that deletes the
+        // prefs files, so there is nothing to back up, so the next restore will return the wallet
+        // we just logged out of.
+        backupStore.edit()
+            .putString(KEY_PIN_IDENTIFIER, "")
+            .putString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+            .putString(KEY_ENCRYPTED_GUID, "")
+            .putString(KEY_ENCRYPTED_SHARED_KEY, "")
+            .commit()
+
+        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+    }
+
     // Raw accessors
     override fun getValue(name: String): String? =
         store.getString(name, null)
@@ -239,6 +337,7 @@ class PrefsUtil(
 
     override fun clear() {
         store.edit().clear().apply()
+        clearBackup()
     }
 
     /**
@@ -270,11 +369,17 @@ class PrefsUtil(
         const val KEY_PRE_IDV_FAILED = "pre_idv_check_failed"
 
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+        const val KEY_PIN_IDENTIFIER = "pin_kookup_key" // Historical misspelling. DO NOT FIX.
+
+        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_SELECTED_FIAT = "ccurrency" // Historical misspelling, don't update
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_PRE_IDV_DEVICE_ID = "pre_idv_device_id"
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_LOGGED_OUT = "logged_out"
+
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_SELECTED_CRYPTO = "KEY_CURRENCY_CRYPTO_STATE"
 
@@ -293,11 +398,17 @@ class PrefsUtil(
         private const val SWAP_DATE_KEY = "SWAP_DATE_KEY"
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
+
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_IS_DEVICE_ID_RANDOMISED = "random_device_id"
 
         private const val KEY_FIREBASE_TOKEN = "firebase_token"
         private const val KEY_PUSH_NOTIFICATION_ENABLED = "push_notification_enabled"
+
+        // Cloud backup keys
+        private const val KEY_ENCRYPTED_GUID = "encrypted_guid"
+        private const val KEY_ENCRYPTED_SHARED_KEY = "encrypted_shared_key"
+        private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
     }
 }
