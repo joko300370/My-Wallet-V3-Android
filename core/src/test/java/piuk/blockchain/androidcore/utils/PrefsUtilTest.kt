@@ -9,18 +9,18 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import junit.framework.Assert.assertEquals
 import org.junit.After
-import org.junit.Test
-
 import org.junit.Before
+import org.junit.Test
 
 class PrefsUtilTest {
 
     private val store: SharedPreferences = mock()
+    private val backupStore: SharedPreferences = mock()
     private val editor: SharedPreferences.Editor = mock()
     private val idGenerator: DeviceIdGenerator = mock()
     private val uuidGenerator: UUIDGenerator = mock()
 
-    private val subject: PrefsUtil = PrefsUtil(store, idGenerator, uuidGenerator)
+    private val subject: PrefsUtil = PrefsUtil(store, backupStore, idGenerator, uuidGenerator)
 
     @Before
     fun setUpSharedPrefs() {
