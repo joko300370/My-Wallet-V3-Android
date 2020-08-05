@@ -206,18 +206,18 @@ sealed class SimpleBuyError : Throwable() {
 }
 
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, Integer.MAX_VALUE)
+    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
     data class BankTransfer(override val limits: PaymentLimits) :
-        PaymentMethod(BANK_PAYMENT_ID, limits, 1)
+        PaymentMethod(BANK_PAYMENT_ID, limits, BANK_PAYMENT_METHOD_ORDER)
 
     data class UndefinedCard(override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, 3)
+        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER)
 
     data class Funds(val balance: FiatValue, val fiatCurrency: String, override val limits: PaymentLimits) :
-        PaymentMethod(FUNDS_PAYMENT_ID, limits, 0)
+        PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER)
 
     data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, 4)
+        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER)
 
     data class Card(
         val cardId: String,
@@ -228,7 +228,7 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         val expireDate: Date,
         val cardType: CardType,
         val status: CardStatus
-    ) : PaymentMethod(cardId, limits, 2), Serializable {
+    ) : PaymentMethod(cardId, limits, CARD_PAYMENT_METHOD_ORDER), Serializable {
         fun uiLabelWithDigits() =
             "${uiLabel()} ${dottedEndDigits()}"
 
@@ -256,6 +256,13 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
         const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
+
+        private const val UNDEFINED_PAYMENT_METHOD_ORDER = 0
+        private const val FUNDS_PAYMENT_METHOD_ORDER = 1
+        private const val BANK_PAYMENT_METHOD_ORDER = 2
+        private const val CARD_PAYMENT_METHOD_ORDER = 3
+        private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 4
+        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 5
     }
 }
 

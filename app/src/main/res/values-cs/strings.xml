@@ -15,14 +15,14 @@
     <item>dvanácté slovo</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importovaná adresa</item>
@@ -51,8 +51,8 @@
   <string name="toolbar_cmd_swap">Zaměnit</string>
   <string name="cancel">zrušení</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ano</string>
-  <string name="no">Ne</string>
+  <string name="common_yes">Ano</string>
+  <string name="common_no">Ne</string>
   <string name="polite_no">Ne, díky</string>
   <string name="done">Hotovo</string>
   <string name="btn_close">Zavřít</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Pokračovat</string>
   <string name="btn_forgot_password">Zapomenuté heslo?\"</string>
   <string name="SEND">Poslat</string>
-  <string name="total">Celkový</string>
+  <string name="common_total">Celkový</string>
   <string name="max_available">Použít celkový zůstatek:</string>
   <string name="bitpay_remaining_time">Zbývající čas</string>
   <string name="bitpay_invoice_expired">Platnost faktury BitPay vypršela</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Vybrané heslo je příliš slabé na to, abyste zajistili své prostředky. Jsme silně 
  doporučujeme vybrat jinou. Chcete definovat nové heslo? 
 </string>
-  <string name="from">Z</string>
-  <string name="to">Na</string>
+  <string name="common_from">Z</string>
+  <string name="common_to">Na</string>
   <string name="confirm_details">Potvrďte platbu</string>
   <string name="fee">Poplatek</string>
   <string name="exit_confirm">Opětovným stisknutím tlačítka zpět akci ukončíte</string>
@@ -1234,7 +1234,7 @@
   <string name="kyc_email_title">Ověřte svůj email</string>
   <string name="kyc_email_message">Jako dodatečnou vrstvu zabezpečení musíme ověřit vaši e-mailovou adresu.</string>
   <string name="kyc_email_hint_focused">Tvůj e-mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Při ukládání e-mailu došlo k chybě, zkuste to znovu</string>
   <string name="kyc_email_send_verification">Poslat e-mailem</string>
   <string name="kyc_email_validation_header">Zkontrolujte doručenou poštu.</string>
@@ -1259,7 +1259,7 @@
   <string name="kyc_onfido_splash_verification_error">Při ověřování ID došlo k chybě, zkuste to znovu</string>
   <string name="kyc_veriff_splash_country_supported_header">Je moje země podporována?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">V současné době nejsou podporovány všechny země. Než budete pokračovat, zkontrolujte náš aktuální seznam <annotation link="country_list"> zemí </annotation> .</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">STŘÍBRO OVĚŘENO</string>
   <string name="kyc_veriff_splash_header">Potvrďte, že jste to vy</string>
   <string name="kyc_veriff_splash_subtitle">Pro pokračování budete potřebovat 1 z níže uvedených typů ID.</string>
@@ -1281,11 +1281,11 @@
   <string name="kyc_complete_device_verified">Zařízení bylo ověřeno</string>
   <string name="kyc_complete_id_uploaded">ID nahráno</string>
   <string name="kyc_complete_video_uploaded">Video bylo nahráno</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Náš tým podpory blockchainu napsal písemné příručky s vysvětlením, proč potřebujeme ověřit vaši totožnost.</string>
   <string name="kyc_help_dialog_read_now">Přečtěte si nyní</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Ověření identity</string>
   <string name="kyc_settings_status_none">Neověřeno</string>
@@ -1297,7 +1297,7 @@
   <string name="kyc_settings_gold_level_in_review">Zlatá úroveň - probíhá kontrola</string>
   <string name="kyc_settings_gold_level_approved">Zlatá úroveň - schváleno</string>
   <string name="kyc_settings_silver_level_approved">Silver Level - Schváleno</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Při načítání stavu KYC došlo k chybě</string>
   <string name="kyc_status_title_in_progress">Probíhá ověřování</string>
   <string name="kyc_status_title_approved">Účet schválen</string>
@@ -1321,10 +1321,10 @@
   <string name="kyc_drop_off_card_description">Zjistěte, kde jste skončili, a dokončete ověření identity.</string>
   <string name="kyc_drop_off_card_button">Pokračujte v ověřování</string>
   <string name="kyc_documents_needed">Potřebné dokumenty</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Měli jsme nějaké problémy s dodanými dokumenty. Zkuste prosím znovu nahrát dokumenty a pokračovat v ověřování.</string>
   <string name="kyc_resubmission_card_button">Nahrajte dokumenty</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nemůžeme ověřit vaši totožnost a potřebujeme znovu nahrát požadované dokumenty.</string>
   <string name="kyc_resubmission_splash_description_2">Hlavní důvody, proč k tomu došlo:</string>
   <string name="kyc_resubmission_splash_description_3">Chybí požadované fotografie.</string>

@@ -175,14 +175,14 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.receive_address_to_clipboard)
                 .setCancelable(false)
-                .setPositiveButton(R.string.yes) { _, _ ->
+                .setPositiveButton(R.string.common_yes) { _, _ ->
                     val clipboard =
                         getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
                     clipboard.primaryClip = clip
                 }
-                .setNegativeButton(R.string.no, null)
+                .setNegativeButton(R.string.common_no, null)
                 .show()
         }
     }

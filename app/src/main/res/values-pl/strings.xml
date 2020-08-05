@@ -15,14 +15,14 @@
     <item>dwunaste słowo</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 zaimportowany adres</item>
@@ -51,8 +51,8 @@
   <string name="toolbar_cmd_swap">Zamiana</string>
   <string name="cancel">Anuluj</string>
   <string name="btn_ok">dobrze</string>
-  <string name="yes">tak</string>
-  <string name="no">Nie</string>
+  <string name="common_yes">tak</string>
+  <string name="common_no">Nie</string>
   <string name="polite_no">Nie, dziękuję</string>
   <string name="done">Gotowy</string>
   <string name="btn_close">Blisko</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Kontyntynuj</string>
   <string name="btn_forgot_password">Zapomniałeś hasła?\"</string>
   <string name="SEND">Wysłać</string>
-  <string name="total">Całkowity</string>
+  <string name="common_total">Całkowity</string>
   <string name="max_available">Użyj całkowitego salda do wydania:</string>
   <string name="bitpay_remaining_time">Pozostały czas</string>
   <string name="bitpay_invoice_expired">Faktura BitPay wygasła</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Wybrane hasło jest zbyt słabe, aby zabezpieczyć twoje środki. My zdecydowanie 
  sugeruję wybrać inny. Czy chcesz zdefiniować nowe hasło? 
 </string>
-  <string name="from">Od</string>
-  <string name="to">Do</string>
+  <string name="common_from">Od</string>
+  <string name="common_to">Do</string>
   <string name="confirm_details">Potwierdź płatność</string>
   <string name="fee">Opłata</string>
   <string name="exit_confirm">Naciśnij ponownie przycisk Wstecz, aby wyjść</string>
@@ -1234,7 +1234,7 @@
   <string name="kyc_email_title">Zweryfikuj swój email</string>
   <string name="kyc_email_message">Musimy zweryfikować Twój adres e-mail jako dodatkową warstwę bezpieczeństwa.</string>
   <string name="kyc_email_hint_focused">Twój email</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Błąd zapisywania wiadomości e-mail, spróbuj ponownie</string>
   <string name="kyc_email_send_verification">Wysłać email</string>
   <string name="kyc_email_validation_header">Sprawdź swoją skrzynkę odbiorczą.</string>
@@ -1259,7 +1259,7 @@
   <string name="kyc_onfido_splash_verification_error">Błąd podczas weryfikacji ID, spróbuj ponownie</string>
   <string name="kyc_veriff_splash_country_supported_header">Czy mój kraj jest obsługiwany?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Obecnie nie wszystkie kraje są obsługiwane. Sprawdź naszą aktualną <annotation link="country_list"> listę krajów </annotation> przed kontynuowaniem.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SREBRNA WERYFIKOWANA</string>
   <string name="kyc_veriff_splash_header">Potwierdźmy, że to ty</string>
   <string name="kyc_veriff_splash_subtitle">Aby kontynuować, musisz 1 z poniższych typów identyfikatorów.</string>
@@ -1281,11 +1281,11 @@
   <string name="kyc_complete_device_verified">Zweryfikowano urządzenie</string>
   <string name="kyc_complete_id_uploaded">Przesłano identyfikator</string>
   <string name="kyc_complete_video_uploaded">Przesłane wideo</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Nasz zespół wsparcia Blockchain napisał Przewodniki pomocnicze wyjaśniające, dlaczego musimy zweryfikować Twoją tożsamość.</string>
   <string name="kyc_help_dialog_read_now">Czytaj teraz</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">weryfikacja tożsamości</string>
   <string name="kyc_settings_status_none">Niesprawdzony</string>
@@ -1297,7 +1297,7 @@
   <string name="kyc_settings_gold_level_in_review">Poziom złota - w trakcie przeglądu</string>
   <string name="kyc_settings_gold_level_approved">Poziom złota - zatwierdzony</string>
   <string name="kyc_settings_silver_level_approved">Poziom srebra - zatwierdzony</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Błąd podczas pobierania statusu KYC</string>
   <string name="kyc_status_title_in_progress">Weryfikacja w toku</string>
   <string name="kyc_status_title_approved">Konto zatwierdzone</string>
@@ -1321,10 +1321,10 @@
   <string name="kyc_drop_off_card_description">Wybierz miejsce, w którym przerwałeś i dokończ weryfikację tożsamości.</string>
   <string name="kyc_drop_off_card_button">Kontynuuj weryfikację</string>
   <string name="kyc_documents_needed">Potrzebne dokumenty</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Wystąpiły problemy z dostarczonymi dokumentami. Spróbuj ponownie przesłać dokumenty, aby kontynuować weryfikację.</string>
   <string name="kyc_resubmission_card_button">Prześlij dokumenty</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nie możemy zweryfikować Twojej tożsamości i musisz ponownie przesłać wymagane dokumenty.</string>
   <string name="kyc_resubmission_splash_description_2">Główne przyczyny takiego stanu rzeczy:</string>
   <string name="kyc_resubmission_splash_description_3">Brak wymaganych zdjęć.</string>
