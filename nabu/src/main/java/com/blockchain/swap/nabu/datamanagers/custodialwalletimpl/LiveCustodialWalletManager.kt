@@ -360,7 +360,12 @@ class LiveCustodialWalletManager(
                 SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) &&
                 fundsEnabled
             ) {
-                custodialFiatBalance.balance?.let { balance ->
+                custodialFiatBalance.balance?.takeIf { balance ->
+                    balance > FiatValue.fromMinor(
+                        it.currency,
+                        it.limits.min
+                    )
+                }?.let { balance ->
                     val fundsLimits =
                         PaymentLimits(it.limits.min,
                             it.limits.max.coerceAtMost(balance.toBigInteger().toLong()), it.currency)
@@ -491,23 +496,20 @@ class LiveCustodialWalletManager(
 
     override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>> {
 
-        val custodialBalances = Single.zip(SUPPORTED_FUNDS_CURRENCIES.map { currency ->
-            assetBalancesRepository.getBalanceForAsset(currency)
-                .map { balance -> CustodialFiatBalance(currency, true, balance) }
-                .toSingle(CustodialFiatBalance(currency, false, null))
-        }) { array: Array<Any> ->
-            array.map { it as CustodialFiatBalance }
+        val supportedFundCurrencies = authenticator.authenticate {
+            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
+        }.map { paymentMethodsResponse ->
+            paymentMethodsResponse.methods.filter {
+                it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
+                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+            }.mapNotNull {
+                it.currency
+            }
         }
 
         return fundsFeatureFlag.enabled.flatMap { enabled ->
             if (enabled) {
-                if (!isTier2Approved) { // return all supported currencies in case of non KYC'ed user
-                    Single.just(SUPPORTED_FUNDS_CURRENCIES)
-                } else { // otherwise show all currencies that there is a balance returned from the API
-                    custodialBalances.map { balances ->
-                        balances.filter { it.available }.map { it.currency }
-                    }
-                }
+                supportedFundCurrencies
             } else {
                 Single.just(emptyList())
             }
