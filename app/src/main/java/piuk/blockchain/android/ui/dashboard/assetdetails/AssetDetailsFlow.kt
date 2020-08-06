@@ -88,9 +88,7 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ZERO -> null
                 AssetDetailsStep.CUSTODY_INTRO_SHEET -> CustodyWalletIntroSheet.newInstance()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                AssetDetailsStep.ASSET_ACTIONS ->
-                    AssetActionsSheet.newInstance(newState.selectedAccount!!,
-                        newState.assetFilter!!)
+                AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(newState.assetFilter!!,
                     cryptoCurrency, this)
             }

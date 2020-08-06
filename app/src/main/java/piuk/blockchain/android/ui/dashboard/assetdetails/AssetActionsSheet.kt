@@ -26,7 +26,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.assetTint
@@ -36,9 +36,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class AssetActionsSheet : SlidingModalBottomDialog() {
-    private lateinit var account: BlockchainAccount
-    private lateinit var accountType: AssetFilter
+class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
@@ -46,7 +44,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val labels: DefaultLabels by scopedInject()
-    private val model: AssetDetailsModel by scopedInject()
+    override val model: AssetDetailsModel by scopedInject()
 
     private val itemAdapter: AssetActionAdapter by lazy {
         AssetActionAdapter()
@@ -55,20 +53,25 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     override val layoutResource: Int
         get() = R.layout.sheet_asset_actions
 
-    override fun initControls(view: View) {
+    override fun render(newState: AssetDetailsState) {
         disposables += Singles.zip(
-            account.balance,
-            account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+            newState.selectedAccount!!.balance,
+            newState.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
         ).observeOn(uiScheduler).subscribeBy(
             onSuccess = { (balance, fiatBalance) ->
-                view.asset_actions_crypto_value.text = balance.toStringWithSymbol()
-                view.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
+                dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
+                dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
             },
             onError = {
                 Timber.e("ActionSheet error loading balances: $it")
             }
         )
 
+        val actionItems = mapDetailsAndActions(dialogView, newState.selectedAccount!!, newState.assetFilter!!)
+        itemAdapter.itemList = actionItems
+    }
+
+    override fun initControls(view: View) {
         view.asset_actions_list.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -77,9 +80,6 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             )
             adapter = itemAdapter
         }
-
-        val actionItems = mapDetailsAndActions(view, account, accountType)
-        itemAdapter.itemList = actionItems
 
         view.asset_actions_back.setOnClickListener {
             model.process(ReturnToPreviousStep)
@@ -244,15 +244,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
 
     companion object {
-        fun newInstance(
-            blockchainAccount: BlockchainAccount,
-            assetFilter: AssetFilter
-        ): AssetActionsSheet {
-            return AssetActionsSheet().apply {
-                account = blockchainAccount
-                accountType = assetFilter
-            }
-        }
+        fun newInstance(): AssetActionsSheet = AssetActionsSheet()
     }
 }
 
