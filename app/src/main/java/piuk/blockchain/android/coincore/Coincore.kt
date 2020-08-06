@@ -3,12 +3,12 @@ package piuk.blockchain.android.coincore
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
@@ -18,7 +18,8 @@ class Coincore internal constructor(
     private val fiatAsset: Asset
 ) {
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
-        assetMap[ccy] ?: throw IllegalArgumentException("Unknown CryptoCurrency ${ccy.networkTicker}")
+        assetMap[ccy] ?: throw IllegalArgumentException(
+            "Unknown CryptoCurrency ${ccy.networkTicker}")
 
     fun init(): Completable =
         Completable.concat(
@@ -49,7 +50,7 @@ class Coincore internal constructor(
         }
 
     fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
-        // We only support transfers between similar assets and (soon; to - but not from - fiat)
+    // We only support transfers between similar assets and (soon; to - but not from - fiat)
         // at this time. If and when, say, swap is supported this will need revisiting
         Singles.zip(
             get(sourceAccount.asset).transferList(sourceAccount),
@@ -57,4 +58,39 @@ class Coincore internal constructor(
         ) { crypto, fiat ->
             crypto + fiat
         }
+
+    fun findAccountByAddress(address: String): Maybe<SingleAccount> =
+        filterAccountsByAddress(allWallets(), address)
+
+    fun findAccountByAddress(cryptoCurrency: CryptoCurrency,
+                             address: String): Maybe<SingleAccount> =
+        filterAccountsByAddress(assetMap.getValue(cryptoCurrency).accountGroup(AssetFilter.All),
+            address)
+
+    private fun filterAccountsByAddress(accountGroup: Single<AccountGroup>,
+                                        address: String): Maybe<SingleAccount> =
+        accountGroup.map {
+            it.accounts
+        }
+            .flattenAsObservable { it }
+            .flatMapSingle { a ->
+                a.receiveAddress
+                    .map { it as CryptoAddress }
+                    .onErrorReturn { NullCryptoAddress }
+                    .map { ca ->
+                        if (ca.address.equals(address, true)) {
+                            a
+                        } else {
+                            NullCryptoAccount
+                        }
+                    }
+            }
+            .filter { it != NullCryptoAccount }
+            .toList()
+            .flatMapMaybe {
+                if (it.isEmpty())
+                    Maybe.empty<SingleAccount>()
+                else
+                    Maybe.just(it.first())
+            }
 }

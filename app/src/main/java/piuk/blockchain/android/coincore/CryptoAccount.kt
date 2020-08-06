@@ -61,6 +61,15 @@ interface AccountGroup : BlockchainAccount {
 internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
+object NullCryptoAddress: CryptoAddress {
+    override val asset: CryptoCurrency
+        get() = CryptoCurrency.BTC
+    override val address: String
+        get() = ""
+    override val label: String
+        get() = ""
+}
+
 // Stub invalid accounts; use as an initialisers to avoid nulls.
 object NullCryptoAccount : CryptoAccount {
     override val receiveAddress: Single<ReceiveAddress>
