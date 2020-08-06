@@ -32,7 +32,7 @@ enum class AssetDetailsStep {
 class AssetDetailsFlow(
     val cryptoCurrency: CryptoCurrency,
     val coincore: Coincore
-) : DialogFlow(), KoinComponent, AccountSelectSheet.Host {
+) : DialogFlow(), KoinComponent, AccountSelectSheet.SelectAndBackHost {
 
     interface AssetDetailsHost : FlowHost {
         fun launchNewSendFor(account: SingleAccount)
@@ -95,8 +95,7 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
-                    this, interestAccountsFilter(), R.string.select_deposit_source_title,
-                    AssetFilter.Interest)
+                    this, interestAccountsFilter(), R.string.select_deposit_source_title)
             }
         )
     }

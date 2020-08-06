@@ -8,7 +8,6 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -19,8 +18,11 @@ class AccountSelectSheet(
     override val host: Host
 ) : SlidingModalBottomDialog() {
 
-    interface Host : SlidingModalBottomDialog.Host {
+    interface SelectionHost : Host {
         fun onAccountSelected(account: BlockchainAccount)
+    }
+
+    interface SelectAndBackHost : SelectionHost {
         fun onAccountSelectorBack()
     }
 
@@ -36,11 +38,10 @@ class AccountSelectSheet(
             .map { it.filter { a -> a.hasTransactions } }
 
     private var sheetTitle: Int = R.string.select_account_sheet_title
-    private var assetFilter: AssetFilter = AssetFilter.All
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         analytics.logEvent(activityShown(account.label))
-        host.onAccountSelected(account)
+        (host as SelectionHost).onAccountSelected(account)
         dismiss()
     }
 
@@ -61,15 +62,10 @@ class AccountSelectSheet(
 
             view.account_list_title.text = getString(sheetTitle)
 
-            when (assetFilter) {
-                AssetFilter.All,
-                AssetFilter.NonCustodial,
-                AssetFilter.Custodial -> {
-                    view.account_list_back.gone()
-                }
-                AssetFilter.Interest -> {
-                    showBackArrow(view)
-                }
+            if(host is SelectAndBackHost) {
+                showBackArrow(view)
+            } else {
+                view.account_list_back.gone()
             }
 
             initialise(accountFilter)
@@ -79,7 +75,7 @@ class AccountSelectSheet(
     private fun showBackArrow(view: View) {
         view.account_list_back.visible()
         view.account_list_back.setOnClickListener {
-            host.onAccountSelectorBack()
+            (host as SelectAndBackHost).onAccountSelectorBack()
         }
     }
 
@@ -94,13 +90,11 @@ class AccountSelectSheet(
         fun newInstance(
             host: Host,
             accountFilter: Single<List<BlockchainAccount>>,
-            @StringRes sheetTitle: Int,
-            assetFilter: AssetFilter
+            @StringRes sheetTitle: Int
         ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
                 this.accountFilter = accountFilter
                 this.sheetTitle = sheetTitle
-                this.assetFilter = assetFilter
             }
     }
 }

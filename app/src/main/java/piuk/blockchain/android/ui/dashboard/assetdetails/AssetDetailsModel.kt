@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -19,12 +20,14 @@ data class AssetDetailsState(
     val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
     val assetFilter: AssetFilter? = null,
     val assetDisplayMap: AssetDisplayMap? = null,
-    val assetFiatValue: String = "",
+    val assetFiatPrice: String = "",
     val timeSpan: TimeSpan = TimeSpan.DAY,
     val chartLoading: Boolean = false,
     val chartData: List<PriceDatum> = emptyList(),
     val errorState: AssetDetailsError = AssetDetailsError.NONE,
-    val hostAction: AssetAction? = null
+    val hostAction: AssetAction? = null,
+    val selectedAccountCryptoBalance: Money? = null,
+    val selectedAccountFiatBalance: Money? = null
 ) : MviState
 
 enum class AssetDetailsError {
@@ -32,17 +35,6 @@ enum class AssetDetailsError {
     NO_CHART_DATA,
     NO_ASSET_DETAILS,
     NO_EXCHANGE_RATE
-}
-
-enum class AssetDetailsAction {
-    NONE,
-    ACTIVITY,
-    SEND,
-    NEW_SEND,
-    RECEIVE,
-    SWAP,
-    INTEREST,
-    DEPOSIT
 }
 
 class AssetDetailsModel(

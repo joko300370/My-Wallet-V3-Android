@@ -36,7 +36,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
+class AssetActionsSheet :
+    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
@@ -54,20 +55,10 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         get() = R.layout.sheet_asset_actions
 
     override fun render(newState: AssetDetailsState) {
-        disposables += Singles.zip(
-            newState.selectedAccount!!.balance,
-            newState.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
-        ).observeOn(uiScheduler).subscribeBy(
-            onSuccess = { (balance, fiatBalance) ->
-                dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
-                dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
-            },
-            onError = {
-                Timber.e("ActionSheet error loading balances: $it")
-            }
-        )
+        showAssetBalances(newState)
 
-        val actionItems = mapDetailsAndActions(dialogView, newState.selectedAccount!!, newState.assetFilter!!)
+        val actionItems =
+            mapDetailsAndActions(dialogView, newState.selectedAccount!!, newState.assetFilter!!)
         itemAdapter.itemList = actionItems
     }
 
@@ -83,6 +74,28 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
         view.asset_actions_back.setOnClickListener {
             model.process(ReturnToPreviousStep)
+        }
+    }
+
+    private fun showAssetBalances(state: AssetDetailsState) {
+        if (state.selectedAccountCryptoBalance != null && state.selectedAccountFiatBalance != null) {
+            dialogView.asset_actions_crypto_value.text =
+                state.selectedAccountCryptoBalance.toStringWithSymbol()
+            dialogView.asset_actions_fiat_value.text =
+                state.selectedAccountFiatBalance.toStringWithSymbol()
+        } else {
+            disposables += Singles.zip(
+                state.selectedAccount!!.balance,
+                state.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+            ).observeOn(uiScheduler).subscribeBy(
+                onSuccess = { (balance, fiatBalance) ->
+                    dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
+                    dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
+                },
+                onError = {
+                    Timber.e("ActionSheet error loading balances: $it")
+                }
+            )
         }
     }
 

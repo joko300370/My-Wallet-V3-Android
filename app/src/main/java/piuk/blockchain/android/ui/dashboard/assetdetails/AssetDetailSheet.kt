@@ -85,7 +85,7 @@ class AssetDetailSheet :
             onGotAssetDetails(it)
         }
 
-        dialogView.current_price.text = newState.assetFiatValue
+        dialogView.current_price.text = newState.assetFiatPrice
 
         configureTimespanSelectionUI(dialogView, newState.timeSpan)
 
@@ -186,7 +186,12 @@ class AssetDetailSheet :
             // do nothing
             // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
         } else {
-            model.process(ShowAssetActionsIntent(account, assetFilter))
+            state.assetDisplayMap!![assetFilter]?.let {
+                val currentBalance = it.amount
+                val currentFiatBalance = it.fiatValue
+                model.process(ShowAssetActionsIntent(account, assetFilter, currentBalance,
+                    currentFiatBalance))
+            }
         }
     }
 
@@ -236,7 +241,8 @@ class AssetDetailSheet :
                     TYPE_ERROR)
             AssetDetailsError.NO_EXCHANGE_RATE ->
                 ToastCustom.makeText(requireContext(),
-                    getString(R.string.asset_details_exchange_load_failed_toast), Toast.LENGTH_SHORT,
+                    getString(R.string.asset_details_exchange_load_failed_toast),
+                    Toast.LENGTH_SHORT,
                     TYPE_ERROR)
             else -> {
                 // do nothing

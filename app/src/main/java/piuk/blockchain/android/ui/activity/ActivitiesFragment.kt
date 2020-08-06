@@ -50,7 +50,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
-    AccountSelectSheet.Host,
+    AccountSelectSheet.SelectionHost,
     CryptoActivityDetailsBottomSheet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
@@ -298,10 +298,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     override fun onAccountSelected(account: BlockchainAccount) {
         model.process(AccountSelectedIntent(account, false))
-    }
-
-    override fun onAccountSelectorBack() {
-        // do nothing
     }
 
     override fun onShowBankDetailsSelected() {
