@@ -513,6 +513,11 @@
     </string>
     <string name="enable_fingerprint">Fingerprint Unlock</string>
 
+    <string name="notification_2fa_summary">2FA Notifications</string>
+    <string name="notification_2fa_description">Notifications related to Two Factor Authentication</string>
+    <string name="notification_payments_summary">Payments Notifications</string>
+    <string name="notification_payments_description">Notifications related to Payments</string>
+
     <string name="two_fa">2-step Verification</string>
     <string name="tor_requests">Block Tor Requests</string>
     <string name="tor_summary">Block IP addresses that are known to be part of the Tor anonymizing
@@ -1117,6 +1122,11 @@
     <string name="two_fa_card_title">Enable 2-Step Verification</string>
     <string name="two_fa_card_body">Protect your wallet from unauthorized access by enabling 2-Step Verification.</string>
     <string name="two_fa_card_cta">Enable 2-Step Verification</string>
+
+    <!-- Cloud backup announcement -->
+    <string name="cloud_backup_card_title">Introducing Cloud Backups</string>
+    <string name="cloud_backup_card_body">You can now backup your wallet securely to the cloud. You can opt-out of backups in your wallet settings.</string>
+    <string name="cloud_backup_card_cta">Learn More</string>
 
     <!-- Buy Bitcoin announcement -->
     <string name="buy_btc_card_title">Buy Bitcoin</string>
