@@ -86,7 +86,18 @@ class SendModel(
 
         return when (intent) {
             is SendIntent.Initialise -> null
-            is SendIntent.InitialiseWithTarget -> null
+            is SendIntent.InitialiseWithTarget -> interactor.initialiseTransaction(
+                intent.fromAccount, intent.toAccount)
+                .subscribeBy(
+                    onComplete = {
+                        process(SendIntent.StartWithDefinedAccounts(intent.fromAccount, intent.toAccount,
+                            intent.passwordRequired, intent.balance))
+                    },
+                    onError = {
+                        Timber.e("----  Unable to get transaction processor: $it")
+                        process(SendIntent.FatalTransactionError(it))
+                    }
+                )
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
@@ -116,6 +127,7 @@ class SendModel(
             is SendIntent.RequestTransactionNoteSupport -> processTransactionNoteSupport()
             is SendIntent.TransactionNoteSupported -> null
             is SendIntent.NoteAdded -> null
+            is SendIntent.StartWithDefinedAccounts -> null
         }
     }
 
@@ -187,9 +199,9 @@ class SendModel(
         amount: CryptoValue,
         sendTarget: SendTarget
     ): Disposable =
-        // At this point we can build a transactor object from coincore and configure
-        // the state object a bit more; depending on whether it's an internal, external,
-        // bitpay or BTC Url address we can set things like note, amount, fee schedule
+    // At this point we can build a transactor object from coincore and configure
+    // the state object a bit more; depending on whether it's an internal, external,
+    // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
         interactor.initialiseTransaction(sourceAccount, sendTarget)
             .subscribeBy(
@@ -207,21 +219,21 @@ class SendModel(
         interactor.getAvailableBalance(
             PendingSendTx(amount)
         )
-        .subscribeBy(
-            onSuccess = {
-                if (amount > it) {
-                    process(SendIntent.MaxAmountExceeded)
-                } else if (!amount.isPositive && !amount.isZero) {
-                    process(SendIntent.MinRequired)
-                } else {
-                    process(SendIntent.UpdateTransactionAmounts(amount, it))
+            .subscribeBy(
+                onSuccess = {
+                    if (amount > it) {
+                        process(SendIntent.MaxAmountExceeded)
+                    } else if (!amount.isPositive && !amount.isZero) {
+                        process(SendIntent.MinRequired)
+                    } else {
+                        process(SendIntent.UpdateTransactionAmounts(amount, it))
+                    }
+                },
+                onError = {
+                    Timber.e("!SEND!> Unable to get update available balance")
+                    process(SendIntent.FatalTransactionError(it))
                 }
-            },
-            onError = {
-                Timber.e("!SEND!> Unable to get update available balance")
-                process(SendIntent.FatalTransactionError(it))
-            }
-        )
+            )
 
     private fun processExecuteTransaction(state: SendState): Disposable =
         interactor.verifyAndExecute(

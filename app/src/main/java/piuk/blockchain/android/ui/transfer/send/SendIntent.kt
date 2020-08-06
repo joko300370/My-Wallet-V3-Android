@@ -30,9 +30,19 @@ sealed class SendIntent : MviIntent<SendState> {
     }
 
     class InitialiseWithTarget(
+        val fromAccount: CryptoAccount,
+        val toAccount: SendTarget,
+        val passwordRequired: Boolean,
+        val balance: CryptoValue
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class StartWithDefinedAccounts(
         private val fromAccount: CryptoAccount,
         private val toAccount: SendTarget,
-        private val passwordRequired: Boolean
+        private val passwordRequired: Boolean,
+        private val balance: CryptoValue
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
@@ -40,6 +50,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendTarget = toAccount,
                 errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
+                availableBalance = balance,
                 currentStep = if (passwordRequired) {
                     SendStep.ENTER_PASSWORD
                 } else {
