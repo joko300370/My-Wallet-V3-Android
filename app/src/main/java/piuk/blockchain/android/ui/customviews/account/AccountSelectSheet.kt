@@ -62,7 +62,7 @@ class AccountSelectSheet(
 
             view.account_list_title.text = getString(sheetTitle)
 
-            if(host is SelectAndBackHost) {
+            if (host is SelectAndBackHost) {
                 showBackArrow(view)
             } else {
                 view.account_list_back.gone()
