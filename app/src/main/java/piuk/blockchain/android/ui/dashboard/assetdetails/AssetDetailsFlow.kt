@@ -3,13 +3,17 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
@@ -26,7 +30,8 @@ enum class AssetDetailsStep {
 }
 
 class AssetDetailsFlow(
-    val cryptoCurrency: CryptoCurrency
+    val cryptoCurrency: CryptoCurrency,
+    val coincore: Coincore
 ) : DialogFlow(), KoinComponent, AccountSelectSheet.Host {
 
     interface AssetDetailsHost : FlowHost {
@@ -89,11 +94,17 @@ class AssetDetailsFlow(
                 AssetDetailsStep.CUSTODY_INTRO_SHEET -> CustodyWalletIntroSheet.newInstance()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
-                AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(newState.assetFilter!!,
-                    cryptoCurrency, this)
+                AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
+                    this, interestAccountsFilter(), R.string.select_deposit_source_title,
+                    AssetFilter.Interest)
             }
         )
     }
+
+    private fun interestAccountsFilter(): Single<List<BlockchainAccount>> =
+        coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
+            .map { it.accounts }
+            .map { it.filter { a -> a.isFunded } }
 
     private fun handleHostAction(
         newState: AssetDetailsState,

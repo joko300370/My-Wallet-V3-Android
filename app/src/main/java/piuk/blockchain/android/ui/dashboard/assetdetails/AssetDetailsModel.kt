@@ -102,7 +102,8 @@ class AssetDetailsModel(
             is ShowCustodyIntroSheetIntent,
             is SelectSendingAccount,
             is ReturnToPreviousStep,
-            is ClearSheetDataIntent -> null
+            is ClearSheetDataIntent,
+            is CustodialSheetFinished -> null
         }
     }
 

@@ -124,6 +124,11 @@ object ShowAssetDetailsIntent : AssetDetailsIntent() {
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
 }
 
+object CustodialSheetFinished : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
+}
+
 object ClearSheetDataIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState = AssetDetailsState()
 }

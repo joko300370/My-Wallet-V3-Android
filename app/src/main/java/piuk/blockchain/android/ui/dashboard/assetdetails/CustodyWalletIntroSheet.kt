@@ -30,7 +30,7 @@ class CustodyWalletIntroSheet : SlidingModalBottomDialog() {
     private fun onCtaClick() {
         dashboardPrefs.isCustodialIntroSeen = true
         analytics.logEvent(SimpleBuyAnalytics.CUSTODY_WALLET_CARD_CLICKED)
-        model.process(ShowAssetDetailsIntent)
+        model.process(CustodialSheetFinished)
     }
 
     companion object {
