@@ -104,8 +104,8 @@ internal abstract class CryptoAssetBase(
             }
         }
 
-    final override fun accountGroup(filter: AssetFilter): Single<AccountGroup> =
-        Single.fromCallable {
+    final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
+        Maybe.fromCallable {
             filterTokenAccounts(asset, labels, accounts, filter)
         }
 
@@ -117,6 +117,7 @@ internal abstract class CryptoAssetBase(
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
             .map { group -> group.accounts.mapNotNull { it as? SingleAccount } }
+            .toSingle(emptyList())
 
     final override fun exchangeRate(): Single<ExchangeRate> =
         exchangeRates.fetchExchangeRate(asset, currencyPrefs.selectedFiatCurrency)

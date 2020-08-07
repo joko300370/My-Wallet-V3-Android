@@ -9,6 +9,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
+import io.reactivex.Maybe
 import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import org.amshove.kluent.mock
@@ -44,10 +45,10 @@ class AssetDetailsCalculatorTest {
         val featureFlagMock: FeatureFlag = mock()
         calculator = AssetDetailsCalculator(featureFlagMock)
 
-        whenever(token.accountGroup(AssetFilter.All)).thenReturn(Single.just(totalGroup))
-        whenever(token.accountGroup(AssetFilter.NonCustodial)).thenReturn(Single.just(nonCustodialGroup))
-        whenever(token.accountGroup(AssetFilter.Custodial)).thenReturn(Single.just(custodialGroup))
-        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Single.just(interestGroup))
+        whenever(token.accountGroup(AssetFilter.All)).thenReturn(Maybe.just(totalGroup))
+        whenever(token.accountGroup(AssetFilter.NonCustodial)).thenReturn(Maybe.just(nonCustodialGroup))
+        whenever(token.accountGroup(AssetFilter.Custodial)).thenReturn(Maybe.just(custodialGroup))
+        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.just(interestGroup))
         whenever(featureFlagMock.enabled).thenReturn(Single.just(interestEnabled))
 
         Locale.setDefault(Locale.US)
@@ -243,7 +244,7 @@ class AssetDetailsCalculatorTest {
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
 
         whenever(token.exchangeRate()).thenReturn(Single.just(price))
-        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Single.error(Throwable()))
+        whenever(token.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.error(Throwable()))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))

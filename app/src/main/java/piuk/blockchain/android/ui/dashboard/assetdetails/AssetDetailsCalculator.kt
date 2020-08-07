@@ -2,10 +2,12 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import com.blockchain.remoteconfig.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -17,6 +19,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
 data class AssetDisplayInfo(
@@ -64,21 +67,25 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
     private data class Details(
         val account: BlockchainAccount,
         val balance: Money,
-        val actions: AvailableActions,
-        val shouldShow: Boolean
+        val actions: AvailableActions
     )
 
-    private fun Single<AccountGroup>.mapDetails(): Single<Details> =
+    private val noDetails = Details(
+        account = NullCryptoAccount,
+        balance = CryptoValue.ZeroBtc,
+        actions = emptySet()
+    )
+
+    private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.balance.map { balance ->
+            grp.balance.toMaybe().map { balance ->
                 Details(
                     grp,
                     balance,
-                    grp.actions,
-                    grp.accounts.isNotEmpty()
+                    grp.actions
                 )
             }
-        }
+        }.toSingle(noDetails)
 
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
@@ -113,21 +120,21 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         return mutableMapOf(
             AssetFilter.All to AssetDisplayInfo(total.account, total.balance, totalFiat, total.actions)
         ).apply {
-            if (nonCustodial.shouldShow) {
+            if (nonCustodial != noDetails) {
                 put(
                     AssetFilter.NonCustodial,
                     AssetDisplayInfo(nonCustodial.account, nonCustodial.balance, walletFiat, nonCustodial.actions)
                 )
             }
 
-            if (custodial.shouldShow) {
+            if (nonCustodial != noDetails) {
                 put(
                     AssetFilter.Custodial,
                     AssetDisplayInfo(custodial.account, custodial.balance, custodialFiat, custodial.actions)
                 )
             }
 
-            if (interest.shouldShow && interestEnabled) {
+            if ((nonCustodial != noDetails) && interestEnabled) {
                 put(
                     AssetFilter.Interest,
                     AssetDisplayInfo(interest.account, interest.balance, interestFiat, interest.actions, interestRate)
