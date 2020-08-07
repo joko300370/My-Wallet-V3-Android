@@ -61,7 +61,7 @@ interface AccountGroup : BlockchainAccount {
 internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
-object NullCryptoAddress: CryptoAddress {
+object NullCryptoAddress : CryptoAddress {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
     override val address: String

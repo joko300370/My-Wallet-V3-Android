@@ -62,13 +62,17 @@ class Coincore internal constructor(
     fun findAccountByAddress(address: String): Maybe<SingleAccount> =
         filterAccountsByAddress(allWallets(), address)
 
-    fun findAccountByAddress(cryptoCurrency: CryptoCurrency,
-                             address: String): Maybe<SingleAccount> =
+    fun findAccountByAddress(
+        cryptoCurrency: CryptoCurrency,
+        address: String
+    ): Maybe<SingleAccount> =
         filterAccountsByAddress(assetMap.getValue(cryptoCurrency).accountGroup(AssetFilter.All),
             address)
 
-    private fun filterAccountsByAddress(accountGroup: Single<AccountGroup>,
-                                        address: String): Maybe<SingleAccount> =
+    private fun filterAccountsByAddress(
+        accountGroup: Single<AccountGroup>,
+        address: String
+    ): Maybe<SingleAccount> =
         accountGroup.map {
             it.accounts
         }

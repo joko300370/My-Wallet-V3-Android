@@ -36,7 +36,8 @@ class TransactionInOutMapper(
 ) {
 
     fun transformInputAndOutputs(
-        item: NonCustodialActivitySummaryItem): Single<TransactionInOutDetails> =
+        item: NonCustodialActivitySummaryItem
+    ): Single<TransactionInOutDetails> =
         when (item.cryptoCurrency) {
             CryptoCurrency.BTC -> handleBtcToAndFrom(item)
             CryptoCurrency.BCH -> handleBchToAndFrom(item)
@@ -75,7 +76,8 @@ class TransactionInOutMapper(
             }
 
     private fun handleErc20ToAndFrom(
-        activitySummaryItem: NonCustodialActivitySummaryItem): Single<TransactionInOutDetails> {
+        activitySummaryItem: NonCustodialActivitySummaryItem
+    ): Single<TransactionInOutDetails> {
 
         val fromAddress = activitySummaryItem.inputsMap.keys.first()
         val toAddress = activitySummaryItem.outputsMap.keys.first()
@@ -85,8 +87,7 @@ class TransactionInOutMapper(
                 .toSingle(EmptyAccount(fromAddress)),
             coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, toAddress)
                 .toSingle(EmptyAccount(toAddress))
-        )
-        { a, b ->
+        ) { a, b ->
             TransactionInOutDetails(
                 inputs = listOf(
                     TransactionDetailModel(
