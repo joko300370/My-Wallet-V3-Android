@@ -26,6 +26,7 @@ internal class CryptoInterestAccount(
     override val feeAsset: CryptoCurrency? = null
 
     private val isConfigured = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
@@ -34,6 +35,7 @@ internal class CryptoInterestAccount(
         get() = custodialWalletManager.getInterestAccountDetails(asset)
             .doOnSuccess {
                 isConfigured.set(true)
+                hasFunds.set(it.isPositive)
             }.doOnComplete {
                 isConfigured.set(false)
             }.switchIfEmpty(
@@ -45,7 +47,7 @@ internal class CryptoInterestAccount(
         get() = Single.just(emptyList())
 
     override val isFunded: Boolean
-        get() = isConfigured.get()
+        get() = hasFunds.get()
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.

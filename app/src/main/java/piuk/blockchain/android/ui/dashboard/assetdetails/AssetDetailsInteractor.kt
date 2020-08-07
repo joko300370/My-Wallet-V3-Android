@@ -66,7 +66,7 @@ class AssetDetailsInteractor(
                     grp,
                     balance,
                     grp.actions,
-                    grp.accounts.isNotEmpty() && grp.isFunded
+                    grp.accounts.isNotEmpty()
                 )
             }
         }
