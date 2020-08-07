@@ -72,7 +72,7 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
 
     private val noDetails = Details(
         account = NullCryptoAccount,
-        balance = CryptoValue.ZeroBtc,
+        balance = CryptoValue.ZeroEth,
         actions = emptySet()
     )
 
@@ -113,31 +113,31 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         interestEnabled: Boolean
     ): AssetDisplayMap {
         val totalFiat = fiatRate.convert(total.balance)
-        val walletFiat = fiatRate.convert(nonCustodial.balance)
-        val custodialFiat = fiatRate.convert(custodial.balance)
-        val interestFiat = fiatRate.convert(interest.balance)
 
         return mutableMapOf(
             AssetFilter.All to AssetDisplayInfo(total.account, total.balance, totalFiat, total.actions)
         ).apply {
             if (nonCustodial != noDetails) {
+                val fiat = fiatRate.convert(nonCustodial.balance)
                 put(
                     AssetFilter.NonCustodial,
-                    AssetDisplayInfo(nonCustodial.account, nonCustodial.balance, walletFiat, nonCustodial.actions)
+                    AssetDisplayInfo(nonCustodial.account, nonCustodial.balance, fiat, nonCustodial.actions)
                 )
             }
 
-            if (nonCustodial != noDetails) {
+            if (custodial != noDetails) {
+                val fiat = fiatRate.convert(custodial.balance)
                 put(
                     AssetFilter.Custodial,
-                    AssetDisplayInfo(custodial.account, custodial.balance, custodialFiat, custodial.actions)
+                    AssetDisplayInfo(custodial.account, custodial.balance, fiat, custodial.actions)
                 )
             }
 
-            if ((nonCustodial != noDetails) && interestEnabled) {
+            if ((interest != noDetails) && interestEnabled) {
+                val fiat = fiatRate.convert(interest.balance)
                 put(
                     AssetFilter.Interest,
-                    AssetDisplayInfo(interest.account, interest.balance, interestFiat, interest.actions, interestRate)
+                    AssetDisplayInfo(interest.account, interest.balance, fiat, interest.actions, interestRate)
                 )
             }
         }

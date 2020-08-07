@@ -50,7 +50,6 @@ class DashboardInteractor(
             .forEach {
                 cd += coincore[it].accountGroup(balanceFilter)
                     .flatMapSingle { group -> group.balance }
-//                    .switchIfEmpty(Single.just(CryptoValue.zero(it)))
                     .map { balance -> balance as CryptoValue }
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
@@ -147,18 +146,18 @@ class DashboardInteractor(
         } else {
             Single.just(FLATLINE_CHART)
         }
-            .map { PriceHistoryUpdate(crypto, it) }
-            .subscribeBy(
-                onSuccess = { model.process(it) },
-                onError = { Timber.e(it) }
-            )
+        .map { PriceHistoryUpdate(crypto, it) }
+        .subscribeBy(
+            onSuccess = { model.process(it) },
+            onError = { Timber.e(it) }
+        )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
         return coincore[crypto].accountGroup(AssetFilter.Custodial)
             .flatMapSingle { it.balance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },
-                onError = { Timber.e(it) }
+                onError = { model.process(UpdateHasCustodialBalanceIntent(crypto, false)) }
             )
     }
 

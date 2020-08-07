@@ -44,6 +44,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
 import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnTabSelectedListener
+import timber.log.Timber
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -101,7 +102,7 @@ class AssetDetailSheet : SlidingModalBottomDialog() {
             compositeDisposable += assetDetailsViewModel.assetDisplayDetails
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onError = { },
+                    onError = { e -> Timber.e("Can't load asset details: $e") },
                     onNext = { map ->
                         onGotAssetDetails(view, map)
                     }

@@ -73,15 +73,21 @@ internal abstract class CryptoAssetBase(
     abstract fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>
 
     private fun loadInterestAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.fromCallable {
-            listOf(
-                CryptoInterestAccount(
-                    asset,
-                    labels.getDefaultInterestWalletLabel(asset),
-                    custodialManager,
-                    exchangeRates
-                )
+        Single.just(
+            CryptoInterestAccount(
+                asset,
+                labels.getDefaultInterestWalletLabel(asset),
+                custodialManager,
+                exchangeRates
             )
+        ).flatMap { account ->
+            account.balance.map {
+                if (account.isConfigured) {
+                    listOf(account)
+                } else {
+                    emptyList()
+                }
+            }
         }
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
@@ -96,7 +102,7 @@ internal abstract class CryptoAssetBase(
             )
         ).flatMap { account ->
             account.balance.map {
-                if (account.hasSeenFunds) {
+                if (account.isConfigured) {
                     listOf(account)
                 } else {
                     emptyList()
