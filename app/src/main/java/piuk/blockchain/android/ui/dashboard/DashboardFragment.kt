@@ -404,7 +404,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun onFlowFinished() {
-        model.process(ClearBottomSheet)
+        // do nothing, dismissing the sheet already clears the flow
     }
 
     override fun launchNewSendFor(account: SingleAccount) =

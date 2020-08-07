@@ -205,7 +205,6 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
                     model.process(HandleActionIntent(AssetDetailsAction.SEND))
-                    // TODO do we want this to continue as one flow with send?
                     dismiss()
                 }
             AssetAction.Receive ->
