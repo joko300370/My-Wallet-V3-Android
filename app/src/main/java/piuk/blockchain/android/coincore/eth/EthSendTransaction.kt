@@ -13,8 +13,10 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.PendingSendTx
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -38,9 +40,18 @@ class EthSendTransaction(
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override val isNoteSupported: Boolean = true
+    override var pendingTx: PendingTx =
+        PendingTx(
+            amount = CryptoValue.ZeroEth,
+            feeLevel = FeeLevel.Regular,
+            options = setOf(
+                TxOptionValue.TxTextOption(
+                    option = TxOption.DESCRIPTION
+                )
+            )
+        )
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override fun absoluteFee(pendingTx: PendingTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -54,7 +65,7 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override fun availableBalance(pendingTx: PendingTx): Single<CryptoValue> =
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)
@@ -64,22 +75,26 @@ class EthSendTransaction(
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid
-    override fun validate(pendingTx: PendingSendTx): Completable =
+    override fun validate(pendingTx: PendingTx): Completable =
         validateAmount(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
             .then { validateNoPendingTx() }
             .doOnError { Timber.e("Validation failed: $it") }
 
-    override fun executeTransaction(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
+    override fun executeTransaction(pendingTx: PendingTx, secondPassword: String): Single<String> =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-            .doOnSuccess { ethDataManager.updateTransactionNotes(it, pendingTx.notes) }
+            .doOnSuccess { hash ->
+                pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)?.let { notes ->
+                    ethDataManager.updateErc20TransactionNotes(hash, notes.text)
+                }
+            }
 
-    private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
+    private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),
             ethDataManager.isContractAddress(sendTarget.address),
@@ -106,14 +121,14 @@ class EthSendTransaction(
             if (isContract) gasLimitContract else gasLimit
         )
 
-    private fun validateAmount(pendingTx: PendingSendTx): Completable =
+    private fun validateAmount(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             if (pendingTx.amount <= CryptoValue.ZeroEth) {
                 throw SendValidationError(SendValidationError.INVALID_AMOUNT)
             }
         }
 
-    private fun validateSufficientFunds(pendingTx: PendingSendTx): Completable =
+    private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Singles.zip(
             sendingAccount.balance,
             absoluteFee(pendingTx)

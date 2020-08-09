@@ -11,8 +11,10 @@ import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.PendingSendTx
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -22,7 +24,7 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class Erc20SendTransaction(
+class Erc20OnChainTransaction(
     override val asset: CryptoCurrency,
     private val erc20Account: Erc20Account,
     private val feeManager: FeeDataManager,
@@ -39,9 +41,17 @@ class Erc20SendTransaction(
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override val isNoteSupported: Boolean = true
+    override var pendingTx = PendingTx(
+        amount = CryptoValue.zero(asset),
+        feeLevel = FeeLevel.Regular,
+        options = setOf(
+            TxOptionValue.TxTextOption(
+                option = TxOption.DESCRIPTION
+            )
+        )
+    )
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override fun absoluteFee(pendingTx: PendingTx): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -55,7 +65,7 @@ class Erc20SendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override fun availableBalance(pendingTx: PendingTx): Single<CryptoValue> =
         sendingAccount.balance
             .map { it as CryptoValue }
 
@@ -67,13 +77,16 @@ class Erc20SendTransaction(
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .map { it as Money }
 
-    override fun validate(pendingTx: PendingSendTx): Completable =
+    override fun validate(pendingTx: PendingTx): Completable =
         validateAddresses()
+//            .then { validateFees(pendingTx) }
             .then { validateAmount(pendingTx) }
             .then { validateSufficientFunds(pendingTx) }
             .then { validateSufficientGas(pendingTx) }
             .then { validateNoPendingTx() }
             .doOnError { Timber.e("Validation failed: $it") }
+
+//    private fun validateFees(pendingTx: PendingTx) {}
 
     // This should have already been checked, but we'll check again because
     // burning tokens by sending them to the contract address is probably not what we
@@ -88,14 +101,14 @@ class Erc20SendTransaction(
                 }
             }.ignoreElement()
 
-    private fun validateAmount(pendingTx: PendingSendTx): Completable =
+    private fun validateAmount(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             if (pendingTx.amount <= CryptoValue.zero(asset)) {
                 throw SendValidationError(SendValidationError.INVALID_AMOUNT)
             }
         }
 
-    private fun validateSufficientFunds(pendingTx: PendingSendTx): Completable =
+    private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         sendingAccount.balance
             .map { balance ->
                 if (pendingTx.amount > balance) {
@@ -105,7 +118,7 @@ class Erc20SendTransaction(
                 }
             }.ignoreElement()
 
-    private fun validateSufficientGas(pendingTx: PendingSendTx): Completable =
+    private fun validateSufficientGas(pendingTx: PendingTx): Completable =
         Singles.zip(
             getEthAccountBalance(),
             absoluteFee(pendingTx)
@@ -127,16 +140,20 @@ class Erc20SendTransaction(
                 }
             }
 
-    override fun executeTransaction(pendingTx: PendingSendTx, secondPassword: String): Single<String> =
+    override fun executeTransaction(pendingTx: PendingTx, secondPassword: String): Single<String> =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-            .doOnSuccess { ethDataManager.updateErc20TransactionNotes(it, pendingTx.notes) }
+            .doOnSuccess { hash ->
+                pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)?.let { notes ->
+                    ethDataManager.updateErc20TransactionNotes(hash, notes.text)
+                }
+            }
 
-    private fun createTransaction(pendingTx: PendingSendTx): Single<RawTransaction> =
+    private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> =
         Singles.zip(
             ethDataManager.getNonce(),
             feeOptions()

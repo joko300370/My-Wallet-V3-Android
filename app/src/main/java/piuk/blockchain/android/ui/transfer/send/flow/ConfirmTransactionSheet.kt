@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,11 +13,13 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
-import piuk.blockchain.android.ui.transfer.send.NoteState
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -43,6 +44,9 @@ class ConfirmTransactionSheet(
         Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == SendStep.CONFIRM_DETAIL)
 
+        // We _should_ always have a pending Tx when we get here
+        require(newState.pendingTx != null)
+
         val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
         detailsAdapter.populate(
             listOf(
@@ -54,8 +58,9 @@ class ConfirmTransactionSheet(
             )
         )
 
-        showAddNoteIfSupported(newState)
-        showNoteState(newState)
+        newState.pendingTx?.let {
+            updateOptions(it)
+        }
 
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
             totalAmount)
@@ -63,47 +68,28 @@ class ConfirmTransactionSheet(
         state = newState
     }
 
-    private fun showNoteState(newState: SendState) {
-        if (newState.note.isNotEmpty()) {
-            dialogView.confirm_details_note_input.setText(newState.note,
-                TextView.BufferType.EDITABLE)
-        } else {
-            when (newState.noteState) {
-                NoteState.UPDATE_SUCCESS -> {
-                    Toast.makeText(requireContext(),
-                        getString(R.string.send_confirmation_add_note_success), Toast.LENGTH_SHORT)
-                        .show()
-                }
-                NoteState.UPDATE_ERROR -> {
-                    // can this happen?
-                }
-                NoteState.NOT_SET -> {
-                    // do nothing
-                }
-            }
-        }
-    }
+    private fun updateOptions(pendingTx: PendingTx) {
+        // Current iteration only supports notes/description. But this is where all and any other
+        // options - ie agreements, t&c confirmations etc are added and updated
 
-    private fun showAddNoteIfSupported(state: SendState) {
-        state.transactionNoteSupported?.let {
-            if (it) {
-                dialogView.confirm_details_note_input.apply {
-                    inputType = INPUT_FIELD_FLAGS
-                    filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
+        val note = pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
+        note?.let { opt ->
+            // Option exists. Show and update the field
+            dialogView.confirm_details_note_input.apply {
+                inputType = INPUT_FIELD_FLAGS
+                filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
 
-                    setOnEditorActionListener { v, actionId, _ ->
-                        if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
-                            model.process(SendIntent.NoteAdded(v.text.toString()))
-                            clearFocus()
-                        }
-
-                        false
+                setOnEditorActionListener { v, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
+                        model.process(SendIntent.ModifyTxOption(opt.copy(text = v.text.toString())))
+                        clearFocus()
                     }
+                    false
                 }
-            } else {
-                dialogView.confirm_details_note_holder.gone()
+
+                setText(opt.text, TextView.BufferType.EDITABLE)
             }
-        } ?: model.process(SendIntent.RequestTransactionNoteSupport)
+        } ?: dialogView.confirm_details_note_holder.gone()
     }
 
     private fun addFeeItem(state: SendState): PendingTxItem {

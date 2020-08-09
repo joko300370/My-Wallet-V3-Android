@@ -5,16 +5,40 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.PendingSendTx
-import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.TxOptionValue
 
 class SendError(msg: String) : Exception(msg)
+
+abstract class TransactionProcessorBase : TransactionProcessor {
+
+    protected abstract var pendingTx: PendingTx
+
+    override fun createPendingTx(): Single<PendingTx> =
+        Single.just(pendingTx)
+
+    final override fun setOption(newOption: TxOptionValue): Single<PendingTx> {
+        val pendingTx = this.pendingTx
+        return if (pendingTx.hasOption(newOption.option)) {
+            val opts = pendingTx.options.toMutableSet()
+            val old = opts.find { it.option == newOption.option }
+            opts.remove(old)
+            opts.add(newOption)
+            this.pendingTx = pendingTx.copy(options = opts)
+            Single.just(this.pendingTx)
+        } else {
+            Single.error(SendValidationError(SendValidationError.UNSUPPORTED_OPTION))
+        }
+    }
+}
 
 abstract class OnChainSendProcessorBase(
     final override val sendingAccount: CryptoAccount,
     final override val sendTarget: CryptoAddress,
     private val requireSecondPassword: Boolean
-) : SendProcessor {
+) : TransactionProcessorBase() {
 
     protected abstract val asset: CryptoCurrency
 
@@ -23,7 +47,7 @@ abstract class OnChainSendProcessorBase(
         require(sendingAccount.asset == sendTarget.asset)
     }
 
-    final override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
+    final override fun execute(pendingTx: PendingTx, secondPassword: String): Completable =
         if (requireSecondPassword && secondPassword.isEmpty()) {
             Completable.error(SendError("Second password not supplied"))
         } else {
@@ -32,7 +56,7 @@ abstract class OnChainSendProcessorBase(
         }
 
     protected abstract fun executeTransaction(
-        pendingTx: PendingSendTx,
+        pendingTx: PendingTx,
         secondPassword: String
     ): Single<String>
 }

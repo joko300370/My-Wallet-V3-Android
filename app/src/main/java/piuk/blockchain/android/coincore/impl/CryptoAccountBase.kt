@@ -15,7 +15,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -70,8 +70,8 @@ internal class CryptoExchangeAccount(
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
-        Single.error<SendProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+        Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
@@ -102,7 +102,7 @@ abstract class CryptoNonCustodialAccount(
                 }
             }
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> {
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> {
         TODO("Implement me")
     }
 }

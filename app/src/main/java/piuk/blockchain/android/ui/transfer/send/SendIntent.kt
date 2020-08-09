@@ -4,8 +4,10 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
@@ -131,22 +133,10 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(feeAmount = fee)
     }
 
-    object RequestTransactionNoteSupport : SendIntent() {
-        override fun reduce(oldState: SendState): SendState = oldState
-    }
-
-    object TransactionNoteSupported : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(transactionNoteSupported = true)
-    }
-
-    class NoteAdded(
-        val note: String
+    class ModifyTxOption(
+        val option: TxOptionValue
     ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState = oldState.copy(
-            note = note,
-            noteState = NoteState.UPDATE_SUCCESS
-        )
+        override fun reduce(oldState: SendState): SendState = oldState
     }
 
     class UpdateTransactionAmounts(
@@ -159,6 +149,15 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendAmount = amount,
                 availableBalance = maxAvailable,
                 errorState = SendErrorState.NONE
+            )
+    }
+
+    class PendingTxUpdated(
+        private val pendingTx: PendingTx
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                pendingTx = pendingTx
             )
     }
 
