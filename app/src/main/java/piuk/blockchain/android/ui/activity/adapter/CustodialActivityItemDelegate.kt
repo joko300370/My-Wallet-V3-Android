@@ -89,7 +89,9 @@ private class CustodialActivityItemViewHolder(
 }
 
 private fun OrderState.isPending(): Boolean =
-    this != OrderState.PENDING_CONFIRMATION && this != OrderState.PENDING_EXECUTION && this != OrderState.AWAITING_FUNDS
+    this == OrderState.PENDING_CONFIRMATION ||
+        this == OrderState.PENDING_EXECUTION ||
+        this == OrderState.AWAITING_FUNDS
 
 private fun ImageView.setIcon(status: OrderState) =
     setImageResource(
