@@ -234,5 +234,6 @@ class SendModel(
             .subscribeBy(
                 onNext = { process(SendIntent.CryptoRateUpdated(it)) },
                 onComplete = { Timber.d("Target exchange Rate completed") },
-                onError = { Timber.e("Failed getting target exchange rate") }            )
+                onError = { Timber.e("Failed getting target exchange rate") }
+            )
 }
