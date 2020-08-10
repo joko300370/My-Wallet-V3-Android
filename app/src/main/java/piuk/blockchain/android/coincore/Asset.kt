@@ -6,7 +6,6 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
