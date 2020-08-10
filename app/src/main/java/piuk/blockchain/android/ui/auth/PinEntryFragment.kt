@@ -312,7 +312,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     }
 
     fun allowExit(): Boolean {
-        return presenter.allowExit()
+        return presenter?.allowExit() ?: true
     }
 
     override fun restartPageAndClearTop() {
@@ -341,7 +341,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             val password = AppCompatEditText(context!!)
             password.inputType =
                 InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
             password.setHint(R.string.password)
 
             AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
@@ -438,7 +438,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         if (isForced) {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
                 if (canTriggerAnUpdateOfType(AppUpdateType.IMMEDIATE,
-                        appUpdateInfoTask) && activity != null) {
+                        appUpdateInfoTask) && activity != null
+                ) {
                     updateForcedNatively(appUpdateManager, appUpdateInfoTask.result)
                 } else {
                     handleForcedUpdateFromStore()
@@ -447,7 +448,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         } else {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
                 if (canTriggerAnUpdateOfType(AppUpdateType.FLEXIBLE,
-                        appUpdateInfoTask) && activity != null) {
+                        appUpdateInfoTask) && activity != null
+                ) {
                     updateFlexibleNatively(appUpdateManager, appUpdateInfoTask.result)
                 }
             })
@@ -465,10 +467,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         appUpdateInfoTask: Task<AppUpdateInfo>
     ): Boolean {
         return (appUpdateInfoTask.result.updateAvailability() ==
-            UpdateAvailability.UPDATE_AVAILABLE ||
-            appUpdateInfoTask.result.updateAvailability() ==
-            UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
-            appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
+                UpdateAvailability.UPDATE_AVAILABLE ||
+                appUpdateInfoTask.result.updateAvailability() ==
+                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+                appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
     }
 
     @Throws(IntentSender.SendIntentException::class)
@@ -497,9 +499,9 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     private fun shouldBeUnregistered(installStatus: Int): Boolean {
         return installStatus == InstallStatus.CANCELED ||
-            installStatus == InstallStatus.DOWNLOADED ||
-            installStatus == InstallStatus.INSTALLED ||
-            installStatus == InstallStatus.FAILED
+                installStatus == InstallStatus.DOWNLOADED ||
+                installStatus == InstallStatus.INSTALLED ||
+                installStatus == InstallStatus.FAILED
     }
 
     @Throws(IntentSender.SendIntentException::class)
