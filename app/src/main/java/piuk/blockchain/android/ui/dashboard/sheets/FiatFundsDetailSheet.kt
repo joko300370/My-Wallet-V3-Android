@@ -3,9 +3,13 @@ package piuk.blockchain.android.ui.dashboard.sheets
 import android.content.Context
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.ExchangeRates
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
@@ -17,8 +21,10 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import timber.log.Timber
 
 class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
@@ -34,6 +40,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRates by scopedInject()
+    private val tierService: TierService by scopedInject()
     private val disposables = CompositeDisposable()
 
     private var account: FiatAccount = NullFiatAccount
@@ -54,25 +61,49 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             disposables += Singles.zip(
                 account.balance,
                 account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
-            ).subscribeBy(
+            ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onSuccess = { (fiatBalance, userFiatBalance) ->
                     funds_user_fiat_balance.visibleIf { prefs.selectedFiatCurrency != ticker }
                     funds_user_fiat_balance.text = userFiatBalance.toStringWithSymbol()
 
                     funds_balance.text = fiatBalance.toStringWithSymbol()
+                },
+                onError = {
+                    Timber.e("Error getting fiat funds balances: $it")
+                    showErrorToast()
                 }
             )
 
-            funds_deposit_holder.setOnClickListener {
-                dismiss()
-                host.depositFiat(account)
-            }
+            disposables += tierService.tiers()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        if (!it.isApprovedFor(KycTierLevel.GOLD)) {
+                            funds_deposit_holder.gone()
+                            funds_deposit_separator.gone()
+                        } else {
+                            funds_deposit_holder.setOnClickListener {
+                                dismiss()
+                                host.depositFiat(account)
+                            }
+                        }
+                    },
+                    onError = {
+                        Timber.e("Error getting fiat funds tiers: $it")
+                        showErrorToast()
+                    }
+                )
 
             funds_activity_holder.setOnClickListener {
                 dismiss()
                 host.gotoActivityFor(account)
             }
         }
+    }
+
+    private fun showErrorToast() {
+        ToastCustom.makeText(requireContext(), getString(R.string.common_error), Toast.LENGTH_SHORT,
+            ToastCustom.TYPE_ERROR)
     }
 
     companion object {

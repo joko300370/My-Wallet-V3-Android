@@ -15,6 +15,7 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_total">Total</string>
     <string name="common_deposit">Deposit</string>
+    <string name="common_error">Something went wrong, please try again</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
