@@ -32,12 +32,11 @@ data class PendingTx(
     val feeLevel: FeeLevel = FeeLevel.Regular,
     val options: Set<TxOptionValue> = emptySet()
 ) {
-    @Suppress("UNCHECKED_CAST")
-    fun <T : TxOptionValue> getOption(option: TxOption): T? =
-        options.find { it.option == option } as? T
-
     fun hasOption(option: TxOption): Boolean =
         options.find { it.option == option } != null
+
+    inline fun <reified T : TxOptionValue> getOption(option: TxOption): T? =
+        options.find { it.option == option } as? T
 }
 
 enum class TxOption {
