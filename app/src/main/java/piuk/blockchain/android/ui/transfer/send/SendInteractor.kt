@@ -11,7 +11,7 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.androidcore.utils.extensions.then
@@ -28,11 +28,11 @@ class SendInteractor(
     fun validateTargetAddress(address: String, asset: CryptoCurrency): Single<ReceiveAddress> =
         addressFactory.parse(address, asset)
             .switchIfEmpty(
-                Single.error<ReceiveAddress>(SendValidationError(SendValidationError.INVALID_ADDRESS))
+                Single.error<ReceiveAddress>(TransactionValidationError(TransactionValidationError.INVALID_ADDRESS))
             )
             .onErrorResumeNext { e ->
                 if (e.isUnexpectedContractError) {
-                    Single.error(SendValidationError(SendValidationError.ADDRESS_IS_CONTRACT))
+                    Single.error(TransactionValidationError(TransactionValidationError.ADDRESS_IS_CONTRACT))
                 } else {
                     Single.error(e)
                 }
@@ -46,16 +46,12 @@ class SendInteractor(
             .doOnSuccess { transactionProcessor = it }
             .flatMap { it.createPendingTx() }
 
-    fun getAvailableBalance(tx: PendingTx): Single<CryptoValue> =
-        transactionProcessor.availableBalance(tx)
+    fun updateTransactionAmount(amount: CryptoValue): Single<PendingTx> =
+        transactionProcessor.updateAmount(amount)
 
-    fun verifyAndExecute(tx: PendingTx): Completable =
-        transactionProcessor.validate(tx)
-            .then {
-                transactionProcessor.execute(tx)
-            }
-
-    fun getFeeForTransaction(tx: PendingTx) = transactionProcessor.absoluteFee(tx)
+    fun verifyAndExecute(): Completable =
+        transactionProcessor.validate()
+            .then { transactionProcessor.execute() }
 
     fun modifyOptionValue(newOption: TxOptionValue): Single<PendingTx> =
         transactionProcessor.setOption(newOption)

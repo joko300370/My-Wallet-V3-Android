@@ -6,8 +6,8 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.SendValidationError
 import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
 
 class SendError(msg: String) : Exception(msg)
@@ -29,7 +29,7 @@ abstract class TransactionProcessorBase : TransactionProcessor {
             this.pendingTx = pendingTx.copy(options = opts)
             Single.just(this.pendingTx)
         } else {
-            Single.error(SendValidationError(SendValidationError.UNSUPPORTED_OPTION))
+            Single.error(TransactionValidationError(TransactionValidationError.UNSUPPORTED_OPTION))
         }
     }
 }
@@ -47,16 +47,15 @@ abstract class OnChainSendProcessorBase(
         require(sendingAccount.asset == sendTarget.asset)
     }
 
-    final override fun execute(pendingTx: PendingTx, secondPassword: String): Completable =
+    final override fun execute(secondPassword: String): Completable =
         if (requireSecondPassword && secondPassword.isEmpty()) {
             Completable.error(SendError("Second password not supplied"))
         } else {
-            executeTransaction(pendingTx, secondPassword)
+            executeTransaction(secondPassword)
                 .ignoreElement()
         }
 
     protected abstract fun executeTransaction(
-        pendingTx: PendingTx,
         secondPassword: String
     ): Single<String>
 }

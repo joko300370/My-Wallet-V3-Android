@@ -12,7 +12,7 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
@@ -43,6 +43,8 @@ class Erc20OnChainTransaction(
 
     override var pendingTx = PendingTx(
         amount = CryptoValue.zero(asset),
+        available = CryptoValue.zero(asset),
+        fees = CryptoValue.ZeroEth,
         feeLevel = FeeLevel.Regular,
         options = setOf(
             TxOptionValue.TxTextOption(
@@ -51,7 +53,7 @@ class Erc20OnChainTransaction(
         )
     )
 
-    override fun absoluteFee(pendingTx: PendingTx): Single<CryptoValue> =
+    private fun absoluteFee(): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -65,9 +67,22 @@ class Erc20OnChainTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingTx): Single<CryptoValue> =
-        sendingAccount.balance
-            .map { it as CryptoValue }
+    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
+        Singles.zip(
+            sendingAccount.balance.map { it as CryptoValue },
+                absoluteFee()
+        ) { available, fee ->
+                if (amount <= available) {
+                    pendingTx.copy(
+                        amount = amount,
+                        available = available,
+                        fees = fee
+                    )
+                } else {
+                    throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
+                }
+            }
+            .doOnSuccess { this.pendingTx = it }
 
     // In an ideal world, we'd get this via a CryptoAccount object.
     // However accessing one for Eth here would break the abstractions, so:
@@ -77,7 +92,7 @@ class Erc20OnChainTransaction(
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .map { it as Money }
 
-    override fun validate(pendingTx: PendingTx): Completable =
+    override fun validate(): Completable =
         validateAddresses()
 //            .then { validateFees(pendingTx) }
             .then { validateAmount(pendingTx) }
@@ -95,7 +110,7 @@ class Erc20OnChainTransaction(
         ethDataManager.isContractAddress(sendTarget.address)
             .map { isContract ->
                 if (isContract || sendTarget !is Erc20Address) {
-                    throw SendValidationError(SendValidationError.INVALID_ADDRESS)
+                    throw TransactionValidationError(TransactionValidationError.INVALID_ADDRESS)
                 } else {
                     isContract
                 }
@@ -104,7 +119,7 @@ class Erc20OnChainTransaction(
     private fun validateAmount(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             if (pendingTx.amount <= CryptoValue.zero(asset)) {
-                throw SendValidationError(SendValidationError.INVALID_AMOUNT)
+                throw TransactionValidationError(TransactionValidationError.INVALID_AMOUNT)
             }
         }
 
@@ -112,7 +127,7 @@ class Erc20OnChainTransaction(
         sendingAccount.balance
             .map { balance ->
                 if (pendingTx.amount > balance) {
-                    throw SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
+                    throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
                 } else {
                     true
                 }
@@ -121,10 +136,10 @@ class Erc20OnChainTransaction(
     private fun validateSufficientGas(pendingTx: PendingTx): Completable =
         Singles.zip(
             getEthAccountBalance(),
-            absoluteFee(pendingTx)
+            absoluteFee()
         ) { balance, fee ->
             if (fee > balance) {
-                throw SendValidationError(SendValidationError.INSUFFICIENT_GAS)
+                throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_GAS)
             } else {
                 true
             }
@@ -134,13 +149,13 @@ class Erc20OnChainTransaction(
         ethDataManager.isLastTxPending()
             .flatMapCompletable { hasUnconfirmed: Boolean ->
                 if (hasUnconfirmed) {
-                    Completable.error(SendValidationError(SendValidationError.HAS_TX_IN_FLIGHT))
+                    Completable.error(TransactionValidationError(TransactionValidationError.HAS_TX_IN_FLIGHT))
                 } else {
                     Completable.complete()
                 }
             }
 
-    override fun executeTransaction(pendingTx: PendingTx, secondPassword: String): Single<String> =
+    override fun executeTransaction(secondPassword: String): Single<String> =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)

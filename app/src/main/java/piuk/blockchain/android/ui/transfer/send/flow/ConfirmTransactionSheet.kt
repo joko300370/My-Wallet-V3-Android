@@ -122,8 +122,6 @@ class ConfirmTransactionSheet(
         view.confirm_sheet_back.setOnClickListener {
             model.process(SendIntent.ReturnToPreviousStep)
         }
-
-        model.process(SendIntent.RequestFee)
     }
 
     private fun onCtaClick() {

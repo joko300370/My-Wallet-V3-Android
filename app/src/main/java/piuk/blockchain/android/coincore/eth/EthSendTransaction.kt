@@ -14,7 +14,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
@@ -43,6 +43,8 @@ class EthSendTransaction(
     override var pendingTx: PendingTx =
         PendingTx(
             amount = CryptoValue.ZeroEth,
+            available = CryptoValue.ZeroEth,
+            fees = CryptoValue.ZeroEth,
             feeLevel = FeeLevel.Regular,
             options = setOf(
                 TxOptionValue.TxTextOption(
@@ -51,7 +53,7 @@ class EthSendTransaction(
             )
         )
 
-    override fun absoluteFee(pendingTx: PendingTx): Single<CryptoValue> =
+    private fun absoluteFee(): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
@@ -65,23 +67,31 @@ class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun availableBalance(pendingTx: PendingTx): Single<CryptoValue> =
+    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
         Singles.zip(
-            sendingAccount.balance,
-            absoluteFee(pendingTx)
-        ) { balance: Money, fees: Money ->
-            max(balance - fees, CryptoValue.ZeroEth)
-        }.map { it as CryptoValue }
+            sendingAccount.balance.map { it as CryptoValue },
+            absoluteFee()
+        ) { available, fees ->
+            if (amount + fees <= available) {
+                pendingTx.copy(
+                    amount = amount,
+                    available = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
+                    fees = fees
+                )
+            } else {
+                throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
+            }
+        }.doOnSuccess { pendingTx = it }
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid
-    override fun validate(pendingTx: PendingTx): Completable =
+    override fun validate(): Completable =
         validateAmount(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
             .then { validateNoPendingTx() }
             .doOnError { Timber.e("Validation failed: $it") }
 
-    override fun executeTransaction(pendingTx: PendingTx, secondPassword: String): Single<String> =
+    override fun executeTransaction(secondPassword: String): Single<String> =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
@@ -124,17 +134,17 @@ class EthSendTransaction(
     private fun validateAmount(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             if (pendingTx.amount <= CryptoValue.ZeroEth) {
-                throw SendValidationError(SendValidationError.INVALID_AMOUNT)
+                throw TransactionValidationError(TransactionValidationError.INVALID_AMOUNT)
             }
         }
 
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Singles.zip(
             sendingAccount.balance,
-            absoluteFee(pendingTx)
+            absoluteFee()
         ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {
-                throw SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
+                throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
             } else {
                 true
             }
@@ -144,7 +154,7 @@ class EthSendTransaction(
         ethDataManager.isLastTxPending()
             .flatMapCompletable { hasUnconfirmed: Boolean ->
                 if (hasUnconfirmed) {
-                    Completable.error(SendValidationError(SendValidationError.HAS_TX_IN_FLIGHT))
+                    Completable.error(TransactionValidationError(TransactionValidationError.HAS_TX_IN_FLIGHT))
                 } else {
                     Completable.complete()
                 }

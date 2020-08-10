@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -12,12 +11,13 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
+import java.lang.IllegalStateException
 
 enum class SendStep {
     ZERO,
@@ -29,13 +29,15 @@ enum class SendStep {
 }
 
 enum class SendErrorState {
+    NONE,
     INVALID_PASSWORD,
     INVALID_ADDRESS,
     ADDRESS_IS_CONTRACT,
     FEE_REQUEST_FAILED,
     MAX_EXCEEDED,
     MIN_REQUIRED,
-    NONE
+    NOT_ENOUGH_GAS,
+    UNEXPECTED_ERROR
 }
 
 enum class TransactionInFlightState {
@@ -50,22 +52,24 @@ data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount,
     val sendTarget: SendTarget = NullAddress,
-    val sendAmount: CryptoValue = CryptoValue.zero(sendingAccount.asset),
-    val availableBalance: CryptoValue = CryptoValue.zero(sendingAccount.asset),
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val feeAmount: CryptoValue = CryptoValue.zero(sendingAccount.feeAsset ?: sendingAccount.asset),
     val pendingTx: PendingTx? = null,
     val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED
 ) : MviState {
-    // Placeholders - these will make more sense when BitPay and/or URL based sends are in place
-    // Question: If we scan a bitpay invoice, do we show the amount screen?
-//    val initialAmount: Single<CryptoValue> = Single.just(CryptoValue.zero(sendingAccount.asset))
-//    val canEditAmount: Boolean = true // Will be false for URL or BitPay txs
 
     val asset: CryptoCurrency = sendingAccount.asset
+
+    val sendAmount: CryptoValue
+        get() = pendingTx?.amount ?: CryptoValue.zero(asset)
+
+    val availableBalance: CryptoValue
+        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset)
+
+    val feeAmount: CryptoValue
+        get() = pendingTx?.fees ?: throw IllegalStateException("No pending tx, fees unavailable")
 }
 
 class SendModel(
@@ -85,7 +89,7 @@ class SendModel(
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
             is SendIntent.PrepareTransaction -> null
-            is SendIntent.ExecuteTransaction -> processExecuteTransaction(previousState)
+            is SendIntent.ExecuteTransaction -> processExecuteTransaction()
             is SendIntent.ValidateInputTargetAddress ->
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
             is SendIntent.TargetAddressValidated -> null
@@ -96,18 +100,13 @@ class SendModel(
                     previousState.sendAmount,
                     intent.sendTarget
                 )
-            is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
-            is SendIntent.UpdateTransactionAmounts -> null
-            is SendIntent.UpdateTransactionComplete -> null
-            is SendIntent.ReturnToPreviousStep -> null
-            is SendIntent.MaxAmountExceeded -> null
-            is SendIntent.MinRequired -> null
-            is SendIntent.RequestFee -> processFeeRequest(previousState.sendAmount)
-            is SendIntent.FeeRequestError -> null
-            is SendIntent.FeeUpdate -> null
-            is SendIntent.PendingTxUpdated -> null
             is SendIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
+            is SendIntent.PendingTxUpdated -> null
+            is SendIntent.UpdateTransactionComplete -> null
+            is SendIntent.InputValidationError -> null
+            is SendIntent.FatalTransactionError -> null
+            is SendIntent.ReturnToPreviousStep -> null
         }
     }
 
@@ -145,7 +144,7 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is SendValidationError -> process(SendIntent.TargetAddressInvalid(it))
+                        is TransactionValidationError -> process(SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }
@@ -156,9 +155,9 @@ class SendModel(
         amount: CryptoValue,
         sendTarget: SendTarget
     ): Disposable =
-    // At this point we can build a transactor object from coincore and configure
-    // the state object a bit more; depending on whether it's an internal, external,
-    // bitpay or BTC Url address we can set things like note, amount, fee schedule
+        // At this point we can build a transactor object from coincore and configure
+        // the state object a bit more; depending on whether it's an internal, external,
+        // bitpay or BTC Url address we can set things like note, amount, fee schedule
         // and hook up the correct processor to execute the transaction.
         interactor.initialiseTransaction(sourceAccount, sendTarget)
             .subscribeBy(
@@ -174,28 +173,24 @@ class SendModel(
             )
 
     private fun processAmountChanged(amount: CryptoValue): Disposable =
-        interactor.getAvailableBalance(
-            PendingTx(amount)
-        )
+        interactor.updateTransactionAmount(amount)
             .subscribeBy(
-                onSuccess = {
-                    if (amount > it) {
-                        process(SendIntent.MaxAmountExceeded)
-                    } else if (!amount.isPositive && !amount.isZero) {
-                        process(SendIntent.MinRequired)
-                    } else {
-                        process(SendIntent.UpdateTransactionAmounts(amount, it))
-                    }
+                onSuccess = { pendingTx ->
+                    process(SendIntent.PendingTxUpdated(pendingTx))
                 },
                 onError = {
-                    Timber.e("!SEND!> Unable to get update available balance")
-                    process(SendIntent.FatalTransactionError(it))
-                }
-            )
+                    if (it is TransactionValidationError) {
+                        process(SendIntent.InputValidationError(it))
+                    } else {
+                        Timber.e("!SEND!> Unable to get update available balance")
+                        process(SendIntent.FatalTransactionError(it))
+                    }
+            }
+        )
 
-    private fun processExecuteTransaction(state: SendState): Disposable? =
-        state.pendingTx?.let {
-            interactor.verifyAndExecute(it).subscribeBy(
+    private fun processExecuteTransaction(): Disposable? =
+        interactor.verifyAndExecute()
+            .subscribeBy(
                 onComplete = {
                     process(SendIntent.UpdateTransactionComplete)
                 },
@@ -204,19 +199,6 @@ class SendModel(
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
-        }
-
-    private fun processFeeRequest(amount: Money): Disposable =
-        interactor.getFeeForTransaction(
-            PendingTx(amount)
-        ).subscribeBy(
-            onSuccess = {
-                process(SendIntent.FeeUpdate(it))
-            },
-            onError = {
-                process(SendIntent.FeeRequestError)
-            }
-        )
 
     private fun processModifyTxOptionRequest(newOption: TxOptionValue): Disposable? =
         interactor.modifyOptionValue(

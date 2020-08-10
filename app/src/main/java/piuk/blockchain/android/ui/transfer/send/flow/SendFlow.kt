@@ -9,6 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -92,7 +93,13 @@ class SendFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    model.process(SendIntent.Initialise(account, passwordRequired))
+                    model.process(
+                        SendIntent.Initialise(
+                            AssetAction.NewSend, // TODO: Get this from init
+                            account,
+                            passwordRequired
+                        )
+                    )
                 },
                 onError = {
                     Timber.e("Unable to configure send flow, aborting. e == $it")
