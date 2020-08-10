@@ -33,7 +33,7 @@ data class PendingTx(
     val options: Set<TxOptionValue> = emptySet()
 ) {
     @Suppress("UNCHECKED_CAST")
-    fun <T : TxOptionValue> getOption(option:TxOption): T? =
+    fun <T : TxOptionValue> getOption(option: TxOption): T? =
         options.find { it.option == option } as? T
 
     fun hasOption(option: TxOption): Boolean =
@@ -65,8 +65,6 @@ interface TransactionProcessor {
     fun setOption(newOption: TxOptionValue): Single<PendingTx>
 
     fun updateAmount(amount: CryptoValue): Single<PendingTx>
-
-//    fun absoluteFee(pendingTx: PendingTx): Single<CryptoValue>
 
     // Check the tx is complete, well formed and possible. Complete if it is, throw an error if
     // it is not. Since the UI and Address objects should validate where possible, an error should

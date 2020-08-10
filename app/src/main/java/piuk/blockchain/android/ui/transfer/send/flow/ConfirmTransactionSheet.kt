@@ -13,6 +13,7 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
@@ -20,7 +21,6 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
-import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
@@ -48,19 +48,22 @@ class ConfirmTransactionSheet(
         require(newState.pendingTx != null)
 
         val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
-        detailsAdapter.populate(
-            listOf(
-                PendingTxItem(getString(R.string.common_send), newState.sendAmount.toStringWithSymbol()),
-                PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
-                PendingTxItem(getString(R.string.common_to), newState.sendTarget.label),
-                addFeeItem(newState),
-                PendingTxItem(getString(R.string.common_total), totalAmount)
-            )
+
+        val itemList = mutableListOf(
+            PendingTxItem(getString(R.string.common_send), newState.sendAmount.toStringWithSymbol()),
+            PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
+            PendingTxItem(getString(R.string.common_to), newState.sendTarget.label)
         )
 
-        newState.pendingTx?.let {
-            updateOptions(it)
+        getFeeItem(newState)?.let {
+            itemList.add(it)
         }
+
+        itemList.add(PendingTxItem(getString(R.string.common_total), totalAmount))
+
+        updateOptions(newState.pendingTx) // These options should probably be items also TODO
+
+        detailsAdapter.populate(itemList)
 
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
             totalAmount)
@@ -92,15 +95,18 @@ class ConfirmTransactionSheet(
         } ?: dialogView.confirm_details_note_holder.gone()
     }
 
-    private fun addFeeItem(state: SendState): PendingTxItem {
-        val feeTitle = getString(R.string.common_spaced_strings,
-            getString(R.string.send_confirmation_fee),
-            getString(R.string.send_confirmation_regular_estimation))
-        return if (state.errorState == SendErrorState.FEE_REQUEST_FAILED) {
-            PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_error))
-        } else {
-            PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
+    private fun getFeeItem(state: SendState): PendingTxItem? {
+        state.pendingTx?.let {
+            if (it.feeLevel != FeeLevel.None) {
+                val feeTitle = getString(
+                    R.string.common_spaced_strings,
+                    getString(R.string.send_confirmation_fee),
+                    getString(R.string.send_confirmation_regular_estimation)
+                )
+                return PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
+            }
         }
+        return null
     }
 
     override fun initControls(view: View) {

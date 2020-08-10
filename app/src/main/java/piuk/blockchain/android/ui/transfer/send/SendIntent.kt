@@ -123,23 +123,6 @@ sealed class SendIntent : MviIntent<SendState> {
         )
     }
 
-//    object RequestFee : SendIntent() {
-//        override fun reduce(oldState: SendState): SendState =
-//            oldState
-//    }
-
-//    object FeeRequestError : SendIntent() {
-//        override fun reduce(oldState: SendState): SendState =
-//            oldState.copy(errorState = SendErrorState.FEE_REQUEST_FAILED)
-//    }
-
-//    class FeeUpdate(
-//        val fee: CryptoValue
-//    ) : SendIntent() {
-//        override fun reduce(oldState: SendState): SendState =
-//            oldState.copy(feeAmount = fee)
-//    }
-
     class ModifyTxOption(
         val option: TxOptionValue
     ) : SendIntent() {
@@ -151,7 +134,8 @@ sealed class SendIntent : MviIntent<SendState> {
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                pendingTx = pendingTx
+                pendingTx = pendingTx,
+                nextEnabled = pendingTx.amount.isPositive
             )
     }
 
