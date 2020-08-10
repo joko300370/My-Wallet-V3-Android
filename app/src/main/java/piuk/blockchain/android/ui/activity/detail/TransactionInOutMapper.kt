@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.sunriver.XlmDataManager
-import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
@@ -22,7 +21,6 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class TransactionInOutMapper(
