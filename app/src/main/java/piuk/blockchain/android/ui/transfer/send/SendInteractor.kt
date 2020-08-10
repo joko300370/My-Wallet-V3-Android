@@ -65,8 +65,7 @@ class SendInteractor(
             .map { it as ExchangeRate.CryptoToFiat }
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
-        Observable.empty()
-//        transactionProcessor.startTargetRateFetch()
+        transactionProcessor.targetExchangeRate()
 }
 
 private val Throwable.isUnexpectedContractError
