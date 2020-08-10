@@ -92,7 +92,7 @@ class SendFlow(
                 onSuccess = { passwordRequired ->
                     model.process(
                         SendIntent.Initialise(
-                            AssetAction.NewSend, // TODO: Get this from init
+                            action,
                             fromAccount,
                             passwordRequired
                         )
