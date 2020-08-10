@@ -14,7 +14,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransferError
@@ -92,7 +92,7 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
         when (sendTo) {
             is CryptoAddress -> Single.just(
                 EthSendTransaction(
