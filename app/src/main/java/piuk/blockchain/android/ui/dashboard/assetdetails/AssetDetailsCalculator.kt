@@ -62,8 +62,6 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
             getAssetDisplayDetails(it)
         }.subscribeOn(Schedulers.computation())
 
-
-
     private sealed class Details {
         object NoDetails : Details()
         class DetailsItem(
