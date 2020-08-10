@@ -23,7 +23,6 @@ import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
-import piuk.blockchain.androidcore.utils.extensions.switchToSingleIfEmpty
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -47,7 +46,7 @@ open class CustodialTradingAccount(
         get() = custodialWalletManager.getBalanceForAsset(asset)
             .doOnComplete { nabuAccountExists.set(false) }
             .doOnSuccess { nabuAccountExists.set(true) }
-            .switchToSingleIfEmpty { Single.just(CryptoValue.zero(asset)) }
+            .toSingle(CryptoValue.zero(asset))
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading balance: $it")
                 CryptoValue.zero(asset)
@@ -62,7 +61,7 @@ open class CustodialTradingAccount(
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
-    val hasSeenFunds: Boolean
+    val isConfigured: Boolean
         get() = nabuAccountExists.get()
 
     override val isFunded: Boolean

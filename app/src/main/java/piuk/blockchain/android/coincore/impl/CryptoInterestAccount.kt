@@ -23,27 +23,30 @@ internal class CryptoInterestAccount(
 
     override val feeAsset: CryptoCurrency? = null
 
-    private val isConfigured = AtomicBoolean(false)
+    private val nabuAccountExists = AtomicBoolean(false)
+    private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
-            .doOnSuccess {
-                isConfigured.set(true)
-            }.doOnComplete {
-                isConfigured.set(false)
-            }.switchIfEmpty(
+            .doOnSuccess { nabuAccountExists.set(true) }
+            .doOnComplete { nabuAccountExists.set(false) }
+            .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
             )
+            .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
+    val isConfigured: Boolean
+        get() = nabuAccountExists.get()
+
     override val isFunded: Boolean
-        get() = isConfigured.get()
+        get() = hasFunds.get()
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
