@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
@@ -38,15 +39,14 @@ class Coincore internal constructor(
         payloadManager.validateSecondPassword(secondPassword)
 
     fun allWallets(): Single<AccountGroup> =
-        Single.zip(
-            allAssets.map { it.accountGroup() }
-        ) { t: Array<Any> ->
-            t.map { it as AccountGroup }
-                .map { it.accounts }
-                .reduce { l, g -> l + g }
-        }.map {
-            AllWalletsAccount(it, defaultLabels)
-        }
+        Maybe.concat(
+            allAssets.map {
+                it.accountGroup().map { grp -> grp.accounts }
+            }
+        ).reduce { a, l -> a + l }
+        .map { list ->
+            AllWalletsAccount(list, defaultLabels) as AccountGroup
+        }.toSingle()
 
     fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
         // We only support transfers between similar assets and (soon; to - but not from - fiat)

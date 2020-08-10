@@ -13,7 +13,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.Maybes
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_basic_transfer_to_wallet.view.*
@@ -75,27 +75,28 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
             image.setCoinIcon(cryptoCurrency)
 
-            disposables += Singles.zip(
-                token.exchangeRate(),
-                token.accountGroup(AssetFilter.Custodial).flatMap { it.balance }
+            disposables += Maybes.zip(
+                token.exchangeRate().toMaybe(),
+                token.accountGroup(AssetFilter.Custodial).flatMap { it.balance.toMaybe() }
             ) { fiatPrice, custodialBalance ->
                 val custodialFiat = fiatPrice.convert(custodialBalance)
                 Pair(custodialBalance, custodialFiat)
             }
-                .observeOn(uiScheduler)
-                .doOnSubscribe { cta_button.isEnabled = false }
-                .subscribeBy(
-                    onSuccess = { (crypto, fiat) ->
-                        valueToSend = crypto as CryptoValue
-                        amount_crypto.text = crypto.toStringWithSymbol()
-                        amount_fiat.text = fiat.toStringWithSymbol()
-                        checkCtaEnable()
-                    },
-                    onError = {
-                        Timber.e(it)
-                        dismiss()
-                    }
-                )
+            .doOnComplete { throw IllegalStateException("Empty Account Group") }
+            .observeOn(uiScheduler)
+            .doOnSubscribe { cta_button.isEnabled = false }
+            .subscribeBy(
+                onSuccess = { (crypto, fiat) ->
+                    valueToSend = crypto as CryptoValue
+                    amount_crypto.text = crypto.toStringWithSymbol()
+                    amount_fiat.text = fiat.toStringWithSymbol()
+                    checkCtaEnable()
+                },
+                onError = {
+                    Timber.e(it)
+                    dismiss()
+                }
+            )
 
             disposables += token.defaultAccount()
                 .flatMap { account ->
