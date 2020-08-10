@@ -58,14 +58,14 @@
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/confirm_details_note_holder"
+        app:layout_constraintBottom_toTopOf="@id/confirm_details_bottom_view_switcher"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_title_separator"
         tools:listitem="@layout/item_send_confirm_details" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/confirm_details_note_holder"
+    <ViewSwitcher
+        android:id="@+id/confirm_details_bottom_view_switcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
@@ -73,14 +73,50 @@
         android:layout_marginBottom="@dimen/very_small_margin"
         app:layout_constraintBottom_toTopOf="@id/confirm_cta_button">
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/confirm_details_note_input"
+        <LinearLayout
+            android:id="@+id/confirm_details_consent_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:hint="@string/send_confirmation_add_note_hint"
-            app:backgroundTint="@color/blue_600" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/confirm_details_tcs_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:button="@drawable/ic_checkbox_checked_blue"
+                android:checked="false"
+                android:padding="4dp"
+                android:text="TC's " />
+
+            <androidx.appcompat.widget.AppCompatCheckBox
+                android:id="@+id/confirm_details_holdings_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:button="@drawable/ic_checkbox_checked_blue"
+                android:checked="false"
+                android:padding="4dp"
+                android:text="hold millions" />
+
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/confirm_details_note_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/confirm_cta_button">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/confirm_details_note_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/send_confirmation_add_note_hint"
+                android:imeOptions="actionDone"
+                app:backgroundTint="@color/blue_600" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </ViewSwitcher>
 
     <Button
         android:id="@+id/confirm_cta_button"

@@ -143,6 +143,11 @@ class ConfirmTransactionSheet(
     private fun onCtaClick() {
         model.process(SendIntent.ExecuteTransaction)
     }
+
+    companion object {
+        private const val DESCRIPTION_INPUT = 0
+        private const val CONFIRMATION_INPUT = 1
+    }
 }
 
 class DetailsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
