@@ -6,7 +6,6 @@ import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -55,8 +54,6 @@ internal class CryptoExchangeAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
@@ -91,9 +88,6 @@ abstract class CryptoNonCustodialAccount(
 ) : CryptoAccountBase() {
 
     override val isFunded: Boolean = true
-
-    override val feeAsset: CryptoCurrency?
-        get() = asset
 
     override val actions: AvailableActions
         get() =

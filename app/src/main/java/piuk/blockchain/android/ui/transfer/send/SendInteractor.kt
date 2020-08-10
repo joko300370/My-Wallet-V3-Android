@@ -1,8 +1,11 @@
 package piuk.blockchain.android.ui.transfer.send
 
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
@@ -18,6 +21,7 @@ import piuk.blockchain.androidcore.utils.extensions.then
 
 class SendInteractor(
     private val coincore: Coincore,
+    private val currencyPrefs: CurrencyPrefs,
     private val addressFactory: AddressFactory
 ) {
     private lateinit var transactionProcessor: TransactionProcessor
@@ -55,6 +59,14 @@ class SendInteractor(
 
     fun modifyOptionValue(newOption: TxOptionValue): Single<PendingTx> =
         transactionProcessor.setOption(newOption)
+
+    fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
+        transactionProcessor.userExchangeRate(currencyPrefs.selectedFiatCurrency)
+            .map { it as ExchangeRate.CryptoToFiat }
+
+    fun startTargetRateFetch(): Observable<ExchangeRate> =
+        Observable.empty()
+//        transactionProcessor.startTargetRateFetch()
 }
 
 private val Throwable.isUnexpectedContractError

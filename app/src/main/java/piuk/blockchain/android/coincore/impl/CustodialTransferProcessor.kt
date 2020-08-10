@@ -11,13 +11,15 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class CustodialTransferProcessor(
-    private val isNoteSupported: Boolean,
-    override val sendingAccount: CryptoAccount,
-    override val sendTarget: CryptoAddress,
-    private val walletManager: CustodialWalletManager
-) : TransactionProcessorBase() {
+open class CustodialTransferProcessor(
+    isNoteSupported: Boolean,
+    final override val sendingAccount: CryptoAccount,
+    final override val sendTarget: CryptoAddress,
+    private val walletManager: CustodialWalletManager,
+    exchangeRates: ExchangeRateDataManager
+) : TransactionProcessorBase(exchangeRates) {
 
     init {
         require(sendingAccount.asset == sendTarget.asset)

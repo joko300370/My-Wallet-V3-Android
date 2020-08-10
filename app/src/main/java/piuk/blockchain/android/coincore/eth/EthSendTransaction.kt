@@ -19,19 +19,22 @@ import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class EthSendTransaction(
+open class EthSendTransaction(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
+    exchangeRates: ExchangeRateDataManager,
     sendingAccount: CryptoAccount,
     sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainSendProcessorBase(
+        exchangeRates,
         sendingAccount,
         sendTarget,
         requireSecondPassword

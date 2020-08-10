@@ -34,8 +34,6 @@ open class CustodialTradingAccount(
     private val isNoteSupported: Boolean = false
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
@@ -79,6 +77,7 @@ open class CustodialTradingAccount(
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     sendTarget = sendTo,
+                    exchangeRates = exchangeRates,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -87,6 +86,7 @@ open class CustodialTradingAccount(
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     sendTarget = it as CryptoAddress,
+                    exchangeRates = exchangeRates,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )

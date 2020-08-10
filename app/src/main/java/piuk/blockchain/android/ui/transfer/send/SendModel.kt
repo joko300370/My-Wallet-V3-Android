@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -52,6 +53,8 @@ data class SendState(
     val currentStep: SendStep = SendStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount,
     val sendTarget: SendTarget = NullAddress,
+    val fiatRate: ExchangeRate.CryptoToFiat? = null,
+    val targetRate: ExchangeRate? = null,
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
@@ -107,6 +110,10 @@ class SendModel(
             is SendIntent.InputValidationError -> null
             is SendIntent.FatalTransactionError -> null
             is SendIntent.ReturnToPreviousStep -> null
+            is SendIntent.FetchFiatRates -> processGetFiatRate()
+            is SendIntent.FetchTargetRates -> processGetTargetRate()
+            is SendIntent.FiatRateUpdated -> null
+            is SendIntent.CryptoRateUpdated -> null
         }
     }
 
@@ -163,6 +170,8 @@ class SendModel(
             .subscribeBy(
                 onSuccess = {
                     process(SendIntent.TargetAddressValidated(sendTarget))
+                    process(SendIntent.FetchFiatRates)
+                    process(SendIntent.FetchTargetRates)
                     process(SendIntent.PendingTxUpdated(it))
                     process(SendIntent.SendAmountChanged(amount))
                 },
@@ -211,4 +220,19 @@ class SendModel(
                 // TODO: Report problem
             }
         )
+
+    private fun processGetFiatRate(): Disposable =
+        interactor.startFiatRateFetch()
+            .subscribeBy(
+                onNext = { process(SendIntent.FiatRateUpdated(it)) },
+                onComplete = { Timber.d("Fiat exchange Rate completed") },
+                onError = { Timber.e("Failed getting exchange rate") }
+            )
+
+    private fun processGetTargetRate(): Disposable =
+        interactor.startTargetRateFetch()
+            .subscribeBy(
+                onNext = { process(SendIntent.CryptoRateUpdated(it)) },
+                onComplete = { Timber.d("Target exchange Rate completed") },
+                onError = { Timber.e("Failed getting target exchange rate") }            )
 }

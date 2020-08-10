@@ -100,20 +100,22 @@ internal class EthCryptoWalletAccount(
         when (sendTo) {
             is CryptoAddress -> Single.just(
                 EthSendTransaction(
-                    ethDataManager,
-                    fees,
-                    this,
-                    sendTo,
-                    ethDataManager.requireSecondPassword
+                    ethDataManager = ethDataManager,
+                    feeManager = fees,
+                    exchangeRates = exchangeRates,
+                    sendingAccount = this,
+                    sendTarget = sendTo,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             )
             is CryptoAccount -> sendTo.receiveAddress.map {
                 EthSendTransaction(
-                    ethDataManager,
-                    fees,
-                    this,
-                    it as CryptoAddress,
-                    ethDataManager.requireSecondPassword
+                    ethDataManager = ethDataManager,
+                    feeManager = fees,
+                    exchangeRates = exchangeRates,
+                    sendingAccount = this,
+                    sendTarget = it as CryptoAddress,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             }
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))

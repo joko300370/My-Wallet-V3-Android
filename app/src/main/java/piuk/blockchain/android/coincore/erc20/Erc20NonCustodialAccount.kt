@@ -33,8 +33,6 @@ abstract class Erc20NonCustodialAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(payloadManager, asset) {
 
-    final override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
-
     abstract val erc20Account: Erc20Account
 
     private val ethDataManager: EthDataManager
@@ -112,6 +110,7 @@ abstract class Erc20NonCustodialAccount(
                     asset = asset,
                     erc20Account = erc20Account,
                     feeManager = fees,
+                    exchangeRates = exchangeRates,
                     sendingAccount = this,
                     sendTarget = sendTo as Erc20Address,
                     requireSecondPassword = ethDataManager.requireSecondPassword
@@ -122,6 +121,7 @@ abstract class Erc20NonCustodialAccount(
                     asset = asset,
                     erc20Account = erc20Account,
                     feeManager = fees,
+                    exchangeRates = exchangeRates,
                     sendingAccount = this,
                     sendTarget = sendTo as Erc20Address,
                     requireSecondPassword = ethDataManager.requireSecondPassword

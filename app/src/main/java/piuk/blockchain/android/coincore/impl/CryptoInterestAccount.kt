@@ -21,8 +21,6 @@ internal class CryptoInterestAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
