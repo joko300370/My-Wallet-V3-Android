@@ -26,7 +26,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.assetTint
@@ -36,9 +36,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class AssetActionsSheet : SlidingModalBottomDialog() {
-    private lateinit var account: BlockchainAccount
-    private lateinit var accountType: AssetFilter
+class AssetActionsSheet :
+    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
 
@@ -46,7 +45,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val labels: DefaultLabels by scopedInject()
-    private val model: AssetDetailsModel by scopedInject()
+    override val model: AssetDetailsModel by scopedInject()
 
     private val itemAdapter: AssetActionAdapter by lazy {
         AssetActionAdapter()
@@ -55,20 +54,15 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
     override val layoutResource: Int
         get() = R.layout.sheet_asset_actions
 
-    override fun initControls(view: View) {
-        disposables += Singles.zip(
-            account.balance,
-            account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
-        ).observeOn(uiScheduler).subscribeBy(
-            onSuccess = { (balance, fiatBalance) ->
-                view.asset_actions_crypto_value.text = balance.toStringWithSymbol()
-                view.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
-            },
-            onError = {
-                Timber.e("ActionSheet error loading balances: $it")
-            }
-        )
+    override fun render(newState: AssetDetailsState) {
+        showAssetBalances(newState)
 
+        val actionItems =
+            mapDetailsAndActions(dialogView, newState.selectedAccount!!, newState.assetFilter!!)
+        itemAdapter.itemList = actionItems
+    }
+
+    override fun initControls(view: View) {
         view.asset_actions_list.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -78,11 +72,30 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
             adapter = itemAdapter
         }
 
-        val actionItems = mapDetailsAndActions(view, account, accountType)
-        itemAdapter.itemList = actionItems
-
         view.asset_actions_back.setOnClickListener {
             model.process(ReturnToPreviousStep)
+        }
+    }
+
+    private fun showAssetBalances(state: AssetDetailsState) {
+        if (state.selectedAccountCryptoBalance != null && state.selectedAccountFiatBalance != null) {
+            dialogView.asset_actions_crypto_value.text =
+                state.selectedAccountCryptoBalance.toStringWithSymbol()
+            dialogView.asset_actions_fiat_value.text =
+                state.selectedAccountFiatBalance.toStringWithSymbol()
+        } else {
+            disposables += Singles.zip(
+                state.selectedAccount!!.balance,
+                state.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+            ).observeOn(uiScheduler).subscribeBy(
+                onSuccess = { (balance, fiatBalance) ->
+                    dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
+                    dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
+                },
+                onError = {
+                    Timber.e("ActionSheet error loading balances: $it")
+                }
+            )
         }
     }
 
@@ -190,35 +203,34 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.ACTIVITY))
+                    model.process(HandleActionIntent(AssetAction.ViewActivity))
                     dismiss()
                 }
             AssetAction.Send ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
-                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
-                    asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
+                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker), asset) {
+                    model.process(HandleActionIntent(AssetAction.Send))
                     dismiss()
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.SEND))
+                    model.process(HandleActionIntent(AssetAction.NewSend))
                     dismiss()
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetDetailsAction.RECEIVE))
+                    model.process(HandleActionIntent(AssetAction.Receive))
                     dismiss()
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset) {
-                model.process(HandleActionIntent(AssetDetailsAction.SWAP))
+                model.process(HandleActionIntent(AssetAction.Swap))
                 dismiss()
             }
             AssetAction.Summary -> AssetActionItem(
@@ -238,7 +250,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
                     if (it.accounts.size > 1) {
                         model.process(SelectSendingAccount)
                     } else {
-                        model.process(HandleActionIntent(AssetDetailsAction.DEPOSIT))
+                        model.process(HandleActionIntent(AssetAction.Deposit))
                         dismiss()
                     }
                 }
@@ -246,15 +258,7 @@ class AssetActionsSheet : SlidingModalBottomDialog() {
         }
 
     companion object {
-        fun newInstance(
-            blockchainAccount: BlockchainAccount,
-            assetFilter: AssetFilter
-        ): AssetActionsSheet {
-            return AssetActionsSheet().apply {
-                account = blockchainAccount
-                accountType = assetFilter
-            }
-        }
+        fun newInstance(): AssetActionsSheet = AssetActionsSheet()
     }
 }
 

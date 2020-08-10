@@ -39,6 +39,7 @@ interface AnnouncementHost {
 
     fun showFiatFundsKyc()
     fun showBankLinking()
+    fun openBrowserLink(url: String)
 }
 
 abstract class AnnouncementRule(private val dismissRecorder: DismissRecorder) {

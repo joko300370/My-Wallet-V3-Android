@@ -32,7 +32,6 @@ import org.spongycastle.crypto.InvalidCipherTextException;
 
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
-import java.util.Locale;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -150,7 +149,7 @@ public class PinEntryPresenterTest {
         when(activity.getPageIntent()).thenReturn(new Intent());
         when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)).thenReturn(4);
         when(payloadManager.getWallet()).thenReturn(mock(Wallet.class));
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)).thenReturn("");
         // Act
         subject.onViewReady();
@@ -165,7 +164,7 @@ public class PinEntryPresenterTest {
     public void checkFingerprintStatusShouldShowDialog() {
         // Arrange
         subject.setForValidatingPinForResult(false);
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("1234");
+        when(prefsUtil.getPinId()).thenReturn("1234");
         when(fingerprintHelper.isFingerprintUnlockEnabled()).thenReturn(true);
         when(fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)).thenReturn(null);
         when(fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)).thenReturn("");
@@ -234,7 +233,7 @@ public class PinEntryPresenterTest {
         // Arrange
         subject.setUserEnteredPin("000");
         // Act
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)).thenReturn("");
         subject.onPadClicked("0");
         // Assert
@@ -249,7 +248,7 @@ public class PinEntryPresenterTest {
     public void padClickedShowCommonPinWarning() {
         // Arrange
         subject.setUserEnteredPin("123");
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         // Act
         subject.onPadClicked("4");
         // Assert
@@ -260,7 +259,7 @@ public class PinEntryPresenterTest {
     public void padClickedShowCommonPinWarningAndClickRetry() {
         // Arrange
         subject.setUserEnteredPin("123");
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         doAnswer(invocation -> {
             ((DialogButtonCallback) invocation.getArguments()[0]).onPositiveClicked();
             return null;
@@ -278,7 +277,7 @@ public class PinEntryPresenterTest {
     public void padClickedShowCommonPinWarningAndClickContinue() {
         // Arrange
         subject.setUserEnteredPin("123");
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         doAnswer(invocation -> {
             ((DialogButtonCallback) invocation.getArguments()[0]).onNegativeClicked();
             return null;
@@ -295,7 +294,7 @@ public class PinEntryPresenterTest {
     public void padClickedShowPinReuseWarning() {
         // Arrange
         subject.setUserEnteredPin("258");
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(accessState.getPin()).thenReturn("2580");
         // Act
         subject.onPadClicked("0");
@@ -310,8 +309,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalled() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString())).thenReturn(just(""));
         // Act
         subject.onPadClicked("7");
@@ -326,8 +324,7 @@ public class PinEntryPresenterTest {
         // Arrange
         subject.setUserEnteredPin("133");
         subject.setForValidatingPinForResult(true);
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString())).thenReturn(just(""));
         // Act
         subject.onPadClicked("7");
@@ -343,8 +340,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalledReturnsErrorIncrementsFailureCount() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString()))
                 .thenReturn(Observable.error(new InvalidCredentialsException()));
         // Act
@@ -364,8 +360,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalledReturnsServerError() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString()))
                 .thenReturn(Observable.error(new ServerConnectionException()));
         // Act
@@ -383,8 +378,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalledReturnsTimeout() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString()))
                 .thenReturn(Observable.error(new SocketTimeoutException()));
         // Act
@@ -402,8 +396,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalledReturnsInvalidCipherText() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString())).thenReturn(just(""));
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new InvalidCipherTextException()));
@@ -427,8 +420,7 @@ public class PinEntryPresenterTest {
     public void padClickedVerifyPinValidateCalledReturnsGenericException() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, ""))
-                .thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         when(authDataManager.validatePin(anyString())).thenReturn(just(""));
         when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
                 .thenReturn(Completable.error(new Exception()));
@@ -452,7 +444,7 @@ public class PinEntryPresenterTest {
         subject.setUserEnteredPin("133");
         subject.setUserEnteredConfirmationPin("1337");
         when(payloadManager.getTempPassword()).thenReturn("temp password");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(authDataManager.createPin(anyString(), anyString())).thenReturn(Completable.complete());
         when(authDataManager.validatePin(anyString())).thenReturn(just("password"));
         when(accessState.getPin()).thenReturn("1337");
@@ -471,7 +463,7 @@ public class PinEntryPresenterTest {
         subject.setUserEnteredPin("133");
         subject.setUserEnteredConfirmationPin("1337");
         when(payloadManager.getTempPassword()).thenReturn("temp password");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(authDataManager.createPin(anyString(), anyString()))
                 .thenReturn(Completable.error(new Throwable()));
         when(accessState.getPin()).thenReturn("");
@@ -490,7 +482,7 @@ public class PinEntryPresenterTest {
     public void padClickedCreatePinWritesNewConfirmationValue() {
         // Arrange
         subject.setUserEnteredPin("133");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(authDataManager.createPin(anyString(), anyString())).thenReturn(Completable.complete());
         when(accessState.getPin()).thenReturn("");
         // Act
@@ -505,7 +497,7 @@ public class PinEntryPresenterTest {
         // Arrange
         subject.setUserEnteredPin("133");
         subject.setUserEnteredConfirmationPin("1234");
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "")).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         when(authDataManager.createPin(anyString(), anyString())).thenReturn(Completable.complete());
         when(accessState.getPin()).thenReturn("");
         // Act
@@ -543,7 +535,8 @@ public class PinEntryPresenterTest {
         verify(activity).dismissProgressDialog();
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
-        verify(prefsUtil, times(2)).removeValue(anyString());
+        verify(prefsUtil).removeValue(anyString());
+        verify(prefsUtil).setPinId(anyString());
         verify(accessState).clearPin();
         verify(activity).restartPageAndClearTop();
     }
@@ -876,7 +869,7 @@ public class PinEntryPresenterTest {
     @Test
     public void isCreatingNewPin() {
         // Arrange
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("");
+        when(prefsUtil.getPinId()).thenReturn("");
         // Act
         boolean creatingNewPin = subject.isCreatingNewPin();
         // Assert
@@ -886,7 +879,7 @@ public class PinEntryPresenterTest {
     @Test
     public void isNotCreatingNewPin() {
         // Arrange
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("1234567890");
+        when(prefsUtil.getPinId()).thenReturn("1234567890");
         // Act
         boolean creatingNewPin = subject.isCreatingNewPin();
         // Assert

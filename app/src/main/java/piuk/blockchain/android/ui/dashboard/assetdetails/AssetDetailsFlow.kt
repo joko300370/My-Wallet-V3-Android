@@ -3,13 +3,17 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SingleAccount
@@ -26,8 +30,9 @@ enum class AssetDetailsStep {
 }
 
 class AssetDetailsFlow(
-    val cryptoCurrency: CryptoCurrency
-) : DialogFlow(), KoinComponent, AccountSelectSheet.Host {
+    val cryptoCurrency: CryptoCurrency,
+    val coincore: Coincore
+) : DialogFlow(), KoinComponent, AccountSelectSheet.SelectAndBackHost {
 
     interface AssetDetailsHost : FlowHost {
         fun launchNewSendFor(account: SingleAccount)
@@ -77,7 +82,7 @@ class AssetDetailsFlow(
             }
         }
 
-        if (newState.hostAction != AssetDetailsAction.NONE) {
+        if (newState.hostAction != null) {
             handleHostAction(newState, assetFlowHost)
         }
     }
@@ -88,15 +93,17 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ZERO -> null
                 AssetDetailsStep.CUSTODY_INTRO_SHEET -> CustodyWalletIntroSheet.newInstance()
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
-                AssetDetailsStep.ASSET_ACTIONS ->
-                    AssetActionsSheet.newInstance(newState.selectedAccount!!,
-                        newState.assetFilter!!)
+                AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
-                    newState.assetFilter!!,
-                    cryptoCurrency, this)
+                    this, interestAccountsFilter(), R.string.select_deposit_source_title)
             }
         )
     }
+
+    private fun interestAccountsFilter(): Single<List<BlockchainAccount>> =
+        coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
+            .map { it.accounts }.toSingle(emptyList())
+            .map { it.filter { a -> a.isFunded } }
 
     private fun handleHostAction(
         newState: AssetDetailsState,
@@ -104,20 +111,14 @@ class AssetDetailsFlow(
     ) {
         val account = newState.selectedAccount.selectFirstAccount()
         when (newState.hostAction) {
-            AssetDetailsAction.ACTIVITY -> host.gotoActivityFor(account)
-            AssetDetailsAction.SEND -> host.gotoSendFor(account)
-            AssetDetailsAction.NEW_SEND -> host.launchNewSendFor(account)
-            AssetDetailsAction.RECEIVE -> host.goToReceiveFor(account)
-            AssetDetailsAction.SWAP -> host.gotoSwap(account)
-            AssetDetailsAction.INTEREST_SUMMARY -> TODO()
-            AssetDetailsAction.DEPOSIT -> {
-                newState.asset!!.accountGroup(AssetFilter.NonCustodial).subscribeBy {
-                    getInterestAccountAndNavigate(it.accounts.first())
-                }
-            }
-            AssetDetailsAction.NONE -> {
-                // do nothing
-            }
+            AssetAction.ViewActivity -> host.gotoActivityFor(account)
+            AssetAction.Send -> host.gotoSendFor(account)
+            AssetAction.NewSend -> host.launchNewSendFor(account)
+            AssetAction.Receive -> host.goToReceiveFor(account)
+            AssetAction.Swap -> host.gotoSwap(account)
+            AssetAction.Summary -> TODO()
+            AssetAction.Deposit -> host.goToDeposit(account,
+                localState.selectedAccount!! as SingleAccount, newState.asset!!)
         }
     }
 

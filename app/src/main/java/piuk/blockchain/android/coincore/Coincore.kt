@@ -39,15 +39,14 @@ class Coincore internal constructor(
         payloadManager.validateSecondPassword(secondPassword)
 
     fun allWallets(): Single<AccountGroup> =
-        Single.zip(
-            allAssets.map { it.accountGroup() }
-        ) { t: Array<Any> ->
-            t.map { it as AccountGroup }
-                .map { it.accounts }
-                .reduce { l, g -> l + g }
-        }.map {
-            AllWalletsAccount(it, defaultLabels)
-        }
+        Maybe.concat(
+            allAssets.map {
+                it.accountGroup().map { grp -> grp.accounts }
+            }
+        ).reduce { a, l -> a + l }
+        .map { list ->
+            AllWalletsAccount(list, defaultLabels) as AccountGroup
+        }.toSingle()
 
     fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
     // We only support transfers between similar assets and (soon; to - but not from - fiat)
@@ -59,9 +58,6 @@ class Coincore internal constructor(
             crypto + fiat
         }
 
-    fun findAccountByAddress(address: String): Maybe<SingleAccount> =
-        filterAccountsByAddress(allWallets(), address)
-
     fun findAccountByAddress(
         cryptoCurrency: CryptoCurrency,
         address: String
@@ -70,7 +66,7 @@ class Coincore internal constructor(
             address)
 
     private fun filterAccountsByAddress(
-        accountGroup: Single<AccountGroup>,
+        accountGroup: Maybe<AccountGroup>,
         address: String
     ): Maybe<SingleAccount> =
         accountGroup.map {

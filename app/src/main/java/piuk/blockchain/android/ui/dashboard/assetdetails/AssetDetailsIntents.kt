@@ -1,7 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -12,14 +14,18 @@ sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
 class ShowAssetActionsIntent(
     private val account: BlockchainAccount,
-    private val assetFilter: AssetFilter
+    private val assetFilter: AssetFilter,
+    private val currentBalance: Money,
+    private val currentFiatBalance: Money
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             selectedAccount = account,
             errorState = AssetDetailsError.NONE,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
-            assetFilter = assetFilter
+            assetFilter = assetFilter,
+            selectedAccountCryptoBalance = currentBalance,
+            selectedAccountFiatBalance = currentFiatBalance
         )
 }
 
@@ -50,7 +56,7 @@ class UpdateTimeSpan(
 }
 
 class HandleActionIntent(
-    private val action: AssetDetailsAction
+    private val action: AssetAction
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(hostAction = action)
@@ -70,7 +76,7 @@ class AssetExchangeRateLoaded(
     val exchangeRate: String
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState.copy(assetFiatValue = exchangeRate)
+        oldState.copy(assetFiatPrice = exchangeRate)
 }
 
 class AssetDisplayDetailsLoaded(
@@ -119,6 +125,11 @@ object ShowCustodyIntroSheetIntent : AssetDetailsIntent() {
 }
 
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
+}
+
+object CustodialSheetFinished : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
 }

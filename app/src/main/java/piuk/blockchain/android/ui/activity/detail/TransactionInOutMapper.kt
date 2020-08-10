@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
@@ -28,7 +29,6 @@ class TransactionInOutMapper(
     private val transactionHelper: TransactionHelper,
     private val payloadDataManager: PayloadDataManager,
     private val stringUtils: StringUtils,
-    private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
     private val xlmDataManager: XlmDataManager,
     private val environmentSettings: EnvironmentConfig,
@@ -42,11 +42,10 @@ class TransactionInOutMapper(
             CryptoCurrency.BTC -> handleBtcToAndFrom(item)
             CryptoCurrency.BCH -> handleBchToAndFrom(item)
             CryptoCurrency.XLM -> handleXlmToAndFrom(item)
+            CryptoCurrency.ETHER,
             CryptoCurrency.PAX,
-            CryptoCurrency.USDT,
-            CryptoCurrency.ETHER -> handleErc20ToAndFrom(item)
-            else -> throw IllegalArgumentException(
-                "${item.cryptoCurrency} is not currently supported")
+            CryptoCurrency.USDT -> handleErc20ToAndFrom(item)
+            else -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
         }
 
     private fun handleXlmToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =

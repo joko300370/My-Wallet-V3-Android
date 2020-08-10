@@ -1,25 +1,28 @@
 package piuk.blockchain.android.ui.customviews.account
 
 import android.view.View
+import androidx.annotation.StringRes
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
-import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class AccountSelectSheet(
     override val host: Host
 ) : SlidingModalBottomDialog() {
 
-    interface Host : SlidingModalBottomDialog.Host {
+    interface SelectionHost : Host {
         fun onAccountSelected(account: BlockchainAccount)
+    }
+
+    interface SelectAndBackHost : SelectionHost {
         fun onAccountSelectorBack()
     }
 
@@ -28,12 +31,17 @@ class AccountSelectSheet(
 
     private val coincore: Coincore by scopedInject()
     private val disposables = CompositeDisposable()
-    private var assetFilter: AssetFilter = AssetFilter.All
-    private lateinit var cryptoCurrency: CryptoCurrency
+
+    private var accountFilter: Single<List<BlockchainAccount>> =
+        coincore.allWallets()
+            .map { listOf(it) + it.accounts }
+            .map { it.filter { a -> a.hasTransactions } }
+
+    private var sheetTitle: Int = R.string.select_account_sheet_title
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         analytics.logEvent(activityShown(account.label))
-        host.onAccountSelected(account)
+        (host as SelectionHost).onAccountSelected(account)
         dismiss()
     }
 
@@ -52,44 +60,24 @@ class AccountSelectSheet(
             onEmptyList = ::doOnEmptyList
             onLoadError = ::doOnLoadError
 
-            val accounts = when (assetFilter) {
-                AssetFilter.All,
-                AssetFilter.NonCustodial,
-                AssetFilter.Custodial -> {
-                    showAllUi(view)
-                    defaultAllWallets()
-                }
-                AssetFilter.Interest -> {
-                    showDepositUi(view)
-                    allowedInterestWallets()
-                }
+            view.account_list_title.text = getString(sheetTitle)
+
+            if (host is SelectAndBackHost) {
+                showBackArrow(view)
+            } else {
+                view.account_list_back.gone()
             }
 
-            initialise(accounts)
+            initialise(accountFilter)
         }
     }
 
-    private fun showAllUi(view: View) {
-        view.account_list_title.text = getString(R.string.select_account_sheet_title)
-    }
-
-    private fun showDepositUi(view: View) {
-        view.account_list_title.text = getString(R.string.select_deposit_source_title)
+    private fun showBackArrow(view: View) {
         view.account_list_back.visible()
         view.account_list_back.setOnClickListener {
-            host.onAccountSelectorBack()
+            (host as SelectAndBackHost).onAccountSelectorBack()
         }
     }
-
-    private fun allowedInterestWallets(): Single<List<BlockchainAccount>> =
-        coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial) // TODO add custodial here later
-            .map { it.accounts }
-            .map { it.filter { a -> a.isFunded } }
-
-    private fun defaultAllWallets() =
-        coincore.allWallets()
-            .map { listOf(it) + it.accounts }
-            .map { it.filter { a -> a.hasTransactions } }
 
     override fun onSheetHidden() {
         super.onSheetHidden()
@@ -97,17 +85,16 @@ class AccountSelectSheet(
     }
 
     companion object {
-        fun newInstance(host: Host): AccountSelectSheet =
-            AccountSelectSheet(host)
+        fun newInstance(host: Host): AccountSelectSheet = AccountSelectSheet(host)
 
         fun newInstance(
-            assetFilter: AssetFilter,
-            cryptoCurrency: CryptoCurrency,
-            host: Host
+            host: Host,
+            accountFilter: Single<List<BlockchainAccount>>,
+            @StringRes sheetTitle: Int
         ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
-                this.assetFilter = assetFilter
-                this.cryptoCurrency = cryptoCurrency
+                this.accountFilter = accountFilter
+                this.sheetTitle = sheetTitle
             }
     }
 }

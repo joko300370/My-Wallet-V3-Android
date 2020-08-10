@@ -9,6 +9,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
+import io.reactivex.Maybe
 import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import org.amshove.kluent.mock
@@ -44,11 +45,10 @@ class AssetDetailsInteractorTest {
     fun setUp() {
         interactor = AssetDetailsInteractor(featureFlagMock, mock(), mock())
 
-        whenever(asset.accountGroup(AssetFilter.All)).thenReturn(Single.just(totalGroup))
-        whenever(asset.accountGroup(AssetFilter.NonCustodial)).thenReturn(
-            Single.just(nonCustodialGroup))
-        whenever(asset.accountGroup(AssetFilter.Custodial)).thenReturn(Single.just(custodialGroup))
-        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Single.just(interestGroup))
+        whenever(asset.accountGroup(AssetFilter.All)).thenReturn(Maybe.just(totalGroup))
+        whenever(asset.accountGroup(AssetFilter.NonCustodial)).thenReturn(Maybe.just(nonCustodialGroup))
+        whenever(asset.accountGroup(AssetFilter.Custodial)).thenReturn(Maybe.just(custodialGroup))
+        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.just(interestGroup))
         whenever(featureFlagMock.enabled).thenReturn(Single.just(interestEnabled))
 
         Locale.setDefault(Locale.US)
@@ -70,17 +70,12 @@ class AssetDetailsInteractorTest {
         val totalFiat = walletFiat + custodialFiat + interestFiat
 
         val expectedResult = mapOf(
-            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
-                walletFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED),
-            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
-                custodialFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED),
-            AssetFilter.Interest to AssetDisplayInfo(interestGroup, interestCrypto, interestFiat,
-                emptySet(),
-                interestRate)
+            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet()),
+            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto, walletFiat, emptySet()),
+            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto, custodialFiat, emptySet()),
+            AssetFilter.Interest to AssetDisplayInfo(
+                interestGroup, interestCrypto, interestFiat, emptySet(), interestRate
+            )
         )
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
@@ -98,105 +93,6 @@ class AssetDetailsInteractorTest {
 
         whenever(interestGroup.accounts).thenReturn(listOf(mock()))
         whenever(interestGroup.isFunded).thenReturn(true)
-
-        val v = interactor.loadAssetDetails(asset)
-            .test()
-            .values()
-
-        // Using assertResult(expectedResult) instead of fetching the values and checking them results in
-        // an 'AssertionException Not completed' result. I have no clue why; changing the matchers to not use all
-        // three possible enum values changes the failure into an expected 'Failed, not equal' result (hence the
-        // doAnswer() nonsense instead of eq() etc - I tried many things)
-        // All very strange.
-        assertEquals(expectedResult, v[0])
-    }
-
-    @Test
-    fun `custodial not show if unfunded`() {
-
-        val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 56478.99.toBigDecimal())
-
-        val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-        val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
-
-        val walletFiat = FiatValue.fromMinor("USD", 30985)
-        val custodialFiat = FiatValue.fromMinor("USD", 0)
-        val interestFiat = FiatValue.fromMinor("USD", 0)
-        val totalFiat = walletFiat + custodialFiat + interestFiat
-
-        val expectedResult = mapOf(
-            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet()),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
-                walletFiat, emptySet())
-        )
-
-        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
-
-        whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
-
-        whenever(nonCustodialGroup.accounts).thenReturn(listOf(mock()))
-        whenever(nonCustodialGroup.isFunded).thenReturn(true)
-
-        whenever(custodialGroup.isFunded).thenReturn(false)
-        whenever(interestGroup.isFunded).thenReturn(false)
-
-        val v = interactor.loadAssetDetails(asset)
-            .test()
-            .values()
-
-        // Using assertResult(expectedResult) instead of fetching the values and checking them results in
-        // an 'AssertionException Not completed' result. I have no clue why; changing the matchers to not use all
-        // three possible enum values changes the failure into an expected 'Failed, not equal' result (hence the
-        // doAnswer() nonsense instead of eq() etc - I tried many things)
-        // All very strange.
-        assertEquals(expectedResult, v[0])
-    }
-
-    @Test
-    fun `interest doesn't show if unfunded`() {
-
-        val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 56478.99.toBigDecimal())
-
-        val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-        val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
-
-        val walletFiat = FiatValue.fromMinor("USD", 30985)
-        val custodialFiat = FiatValue.fromMinor("USD", 0)
-        val interestFiat = FiatValue.fromMinor("USD", 0)
-        val totalFiat = walletFiat + custodialFiat + interestFiat
-
-        val expectedResult = mapOf(
-            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto,
-                walletFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED),
-            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto,
-                custodialFiat, emptySet(),
-                AssetDetailsInteractor.NOT_USED)
-        )
-
-        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
-
-        whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
-        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
-
-        whenever(custodialGroup.accounts).thenReturn(listOf(mock()))
-        whenever(nonCustodialGroup.accounts).thenReturn(listOf(mock()))
-        whenever(nonCustodialGroup.isFunded).thenReturn(true)
-        whenever(custodialGroup.isFunded).thenReturn(true)
-        whenever(interestGroup.isFunded).thenReturn(false)
 
         val v = interactor.loadAssetDetails(asset)
             .test()
@@ -240,7 +136,7 @@ class AssetDetailsInteractorTest {
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
-        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Single.error(Throwable()))
+        whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.error(Throwable()))
 
         whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))

@@ -54,7 +54,7 @@ class AssetDetailsModelTest {
         val testObserver = model.state.test()
         model.process(LoadAssetFiatValue)
         testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(assetFiatValue = price))
+        testObserver.assertValueAt(1, defaultState.copy(assetFiatPrice = price))
     }
 
     @Test

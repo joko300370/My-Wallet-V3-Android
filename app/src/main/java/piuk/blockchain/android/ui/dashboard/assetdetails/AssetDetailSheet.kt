@@ -85,7 +85,7 @@ class AssetDetailSheet :
             onGotAssetDetails(it)
         }
 
-        dialogView.current_price.text = newState.assetFiatValue
+        dialogView.current_price.text = newState.assetFiatPrice
 
         configureTimespanSelectionUI(dialogView, newState.timeSpan)
 
@@ -188,7 +188,12 @@ class AssetDetailSheet :
             // TODO must check if user has KYC'd - if not launch info sheet about KYC (screen 0.1 of Earn flow)
             // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
         } else {
-            model.process(ShowAssetActionsIntent(account, assetFilter))
+            state.assetDisplayMap!![assetFilter]?.let {
+                val currentBalance = it.amount
+                val currentFiatBalance = it.fiatValue
+                model.process(ShowAssetActionsIntent(account, assetFilter, currentBalance,
+                    currentFiatBalance))
+            }
         }
     }
 
@@ -238,7 +243,8 @@ class AssetDetailSheet :
                     TYPE_ERROR)
             AssetDetailsError.NO_EXCHANGE_RATE ->
                 ToastCustom.makeText(requireContext(),
-                    getString(R.string.asset_details_exchange_load_failed_toast), Toast.LENGTH_SHORT,
+                    getString(R.string.asset_details_exchange_load_failed_toast),
+                    Toast.LENGTH_SHORT,
                     TYPE_ERROR)
             else -> {
                 // do nothing
@@ -298,12 +304,17 @@ class AssetDetailSheet :
         val difference = lastPrice - firstPrice
 
         val percentChange = (difference / firstPrice) * 100
+        val percentChangeTxt = if (percentChange.isNaN()) {
+            "--"
+        } else {
+            String.format("%.1f", percentChange)
+        }
 
         percentageView.text =
             FiatValue.fromMajor(
                 currencyPrefs.selectedFiatCurrency,
                 difference.toBigDecimal()
-            ).toStringWithSymbol() + " (${String.format("%.1f", percentChange)}%)"
+            ).toStringWithSymbol() + " ($percentChangeTxt%)"
 
         percentageView.setDeltaColour(
             delta = difference,

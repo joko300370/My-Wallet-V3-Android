@@ -452,7 +452,7 @@
     </style>
 
     <style name="AppTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/tab_layout_selector_bkgd</item>
+        <item name="tabIndicatorColor">@color/white</item>
         <item name="tabIndicatorHeight">4dp</item>
         <item name="tabPaddingStart">@dimen/standard_margin</item>
         <item name="tabPaddingEnd">@dimen/standard_margin</item>

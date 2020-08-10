@@ -78,15 +78,21 @@ internal abstract class CryptoAssetBase(
     abstract fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>
 
     private fun loadInterestAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.fromCallable {
-            listOf(
-                CryptoInterestAccount(
-                    asset,
-                    labels.getDefaultInterestWalletLabel(asset),
-                    custodialManager,
-                    exchangeRates
-                )
+        Single.just(
+            CryptoInterestAccount(
+                asset,
+                labels.getDefaultInterestWalletLabel(asset),
+                custodialManager,
+                exchangeRates
             )
+        ).flatMap { account ->
+            account.balance.map {
+                if (account.isConfigured) {
+                    listOf(account)
+                } else {
+                    emptyList()
+                }
+            }
         }
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
@@ -101,7 +107,7 @@ internal abstract class CryptoAssetBase(
             )
         ).flatMap { account ->
             account.balance.map {
-                if (account.hasSeenFunds) {
+                if (account.isConfigured) {
                     listOf(account)
                 } else {
                     emptyList()
@@ -109,8 +115,8 @@ internal abstract class CryptoAssetBase(
             }
         }
 
-    final override fun accountGroup(filter: AssetFilter): Single<AccountGroup> =
-        Single.fromCallable {
+    final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
+        Maybe.fromCallable {
             filterTokenAccounts(asset, labels, accounts, filter)
         }
 
@@ -122,6 +128,7 @@ internal abstract class CryptoAssetBase(
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
             .map { group -> group.accounts.mapNotNull { it as? SingleAccount } }
+            .toSingle(emptyList())
 
     final override fun exchangeRate(): Single<ExchangeRate> =
         exchangeRates.fetchExchangeRate(asset, currencyPrefs.selectedFiatCurrency)

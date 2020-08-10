@@ -513,11 +513,20 @@
     </string>
     <string name="enable_fingerprint">Fingerprint Unlock</string>
 
+    <string name="notification_2fa_summary">2FA Notifications</string>
+    <string name="notification_2fa_description">Notifications related to Two Factor Authentication</string>
+    <string name="notification_payments_summary">Payments Notifications</string>
+    <string name="notification_payments_description">Notifications related to Payments</string>
+
     <string name="two_fa">2-step Verification</string>
     <string name="tor_requests">Block Tor Requests</string>
     <string name="tor_summary">Block IP addresses that are known to be part of the Tor anonymizing
         network. The Tor network is frequently used by hackers attempting to access Blockchain
         user\'s wallets.
+    </string>
+    <string name="enable_cloud_backup">Enable Cloud Backups</string>
+    <string name="enable_cloud_backup_summary">Store the encrypted backup in your Google Drive account,
+        if available. This allows you to restore your wallet if you lose this device.
     </string>
     <string name="enable_screenshots">Enable Screenshots</string>
     <string name="enable_screenshots_summary">Some screens within the application can display
@@ -1114,6 +1123,11 @@
     <string name="two_fa_card_body">Protect your wallet from unauthorized access by enabling 2-Step Verification.</string>
     <string name="two_fa_card_cta">Enable 2-Step Verification</string>
 
+    <!-- Cloud backup announcement -->
+    <string name="cloud_backup_card_title">Introducing Cloud Backups</string>
+    <string name="cloud_backup_card_body">You can now backup your wallet securely to the cloud. You can opt-out of backups in your wallet settings.</string>
+    <string name="cloud_backup_card_cta">Learn More</string>
+
     <!-- Buy Bitcoin announcement -->
     <string name="buy_btc_card_title">Buy Bitcoin</string>
     <string name="buy_btc_card_body">Buy Bitcoin with your credit card or bank account to kickstart your crypto portfolio.</string>
@@ -1510,6 +1524,7 @@
 
     <!--More eth needed-->
     <string name="pax_need_more_eth_error_body_1">You\'ll need ETH to send your USD-D</string>
+    <string name="erc20_need_more_eth_error_body_1">You\'ll need ETH to send your %1$s</string>
     <string name="pax_need_more_eth_error_title">More ETH Needed</string>
 
     <!-- send -->
