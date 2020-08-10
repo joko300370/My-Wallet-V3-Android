@@ -5,7 +5,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -18,10 +17,11 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
 internal class StxAsset(
-    private val payloadManager: PayloadManager,
+    payloadManager: PayloadDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -30,6 +30,7 @@ internal class StxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -53,13 +54,10 @@ internal class StxAsset(
         .onErrorReturn { emptyList() }
 
     private fun getStxAccount(): CryptoAccount {
-        val hdWallets = payloadManager.payload?.hdWallets
-            ?: throw IllegalStateException("Wallet not available")
-
-        val stxAccount = hdWallets[0].stxAccount
-            ?: throw IllegalStateException("Wallet not available")
+        val stxAccount = payloadManager.stxAccount
 
         return StxCryptoWalletAccount(
+            payloadManager,
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
             exchangeRates = exchangeRates

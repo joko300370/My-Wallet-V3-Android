@@ -29,6 +29,9 @@ internal class CryptoInterestAccount(
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
 
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
+
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
             .doOnSuccess { nabuAccountExists.set(true) }

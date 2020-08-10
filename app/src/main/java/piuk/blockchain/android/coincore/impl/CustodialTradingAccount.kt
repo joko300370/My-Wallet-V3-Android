@@ -42,6 +42,9 @@ open class CustodialTradingAccount(
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
 
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
+
     override val balance: Single<Money>
         get() = custodialWalletManager.getBalanceForAsset(asset)
             .doOnComplete { nabuAccountExists.set(false) }

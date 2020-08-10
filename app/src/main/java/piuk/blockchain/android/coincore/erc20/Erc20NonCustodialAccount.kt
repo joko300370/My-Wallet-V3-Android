@@ -22,14 +22,16 @@ import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 
 abstract class Erc20NonCustodialAccount(
+    payloadManager: PayloadDataManager,
     asset: CryptoCurrency,
     private val fees: FeeDataManager,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(asset) {
+) : CryptoNonCustodialAccount(payloadManager, asset) {
 
     final override val feeAsset: CryptoCurrency? = CryptoCurrency.ETHER
 
