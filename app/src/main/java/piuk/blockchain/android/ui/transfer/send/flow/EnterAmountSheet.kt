@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
-import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoValue
@@ -19,7 +18,6 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
-import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.setAssetIconColours
@@ -81,19 +79,12 @@ class EnterAmountSheet(
             amount_sheet_to.text =
                 getString(R.string.send_enter_amount_to, newState.sendTarget.label)
 
-            when (newState.errorState) {
-                SendErrorState.NONE -> dialogView.amount_sheet_input.hideError()
-                SendErrorState.MAX_EXCEEDED -> amount_sheet_input.showError(
-                    getString(R.string.send_enter_amount_error_max,
-                        newState.sendingAccount.asset.networkTicker))
-                SendErrorState.MIN_REQUIRED -> amount_sheet_input.showError(
-                    getString(R.string.send_enter_amount_error_min,
-                        newState.sendingAccount.asset.networkTicker))
-                SendErrorState.INVALID_ADDRESS,
-                SendErrorState.ADDRESS_IS_CONTRACT,
-                SendErrorState.INVALID_PASSWORD,
-                SendErrorState.FEE_REQUEST_FAILED -> throw NotImplementedError("Not expected here")
-            }.exhaustive
+            newState.errorState.toString(
+                newState.sendingAccount.asset.networkTicker,
+                resources
+            )?.let {
+                amount_sheet_input.showError(it)
+            } ?: amount_sheet_input.hideError()
         }
 
         state = newState

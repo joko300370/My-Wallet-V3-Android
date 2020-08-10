@@ -8,7 +8,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -51,8 +51,8 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
-        Single.error<SendProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+        Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)

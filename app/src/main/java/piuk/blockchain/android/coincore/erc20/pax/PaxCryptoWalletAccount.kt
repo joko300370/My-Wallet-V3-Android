@@ -8,16 +8,16 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
-internal class PaxCryptoWalletAccount(
+class PaxCryptoWalletAccount(
     label: String,
     private val address: String,
     override val erc20Account: Erc20Account,
-    feeDataManager: FeeDataManager,
+    fees: FeeDataManager,
     exchangeRates: ExchangeRateDataManager
 ) : Erc20NonCustodialAccount(
     CryptoCurrency.PAX,
+    fees,
     label,
-    feeDataManager,
     exchangeRates
 ) {
     override val receiveAddress: Single<ReceiveAddress>

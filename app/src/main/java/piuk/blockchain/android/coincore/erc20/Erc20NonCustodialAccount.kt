@@ -12,9 +12,9 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
-import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -26,8 +26,8 @@ import piuk.blockchain.androidcore.utils.extensions.mapList
 
 abstract class Erc20NonCustodialAccount(
     asset: CryptoCurrency,
-    override val label: String,
     private val fees: FeeDataManager,
+    override val label: String,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(asset) {
 
@@ -91,31 +91,6 @@ abstract class Erc20NonCustodialAccount(
             }
         }
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
-        when (sendTo) {
-            is CryptoAddress -> Single.just(
-                Erc20SendTransaction(
-                    asset = asset,
-                    erc20Account = erc20Account,
-                    feeManager = fees,
-                    sendingAccount = this,
-                    sendTarget = sendTo as Erc20Address,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
-                )
-            )
-            is CryptoAccount -> sendTo.receiveAddress.map {
-                Erc20SendTransaction(
-                    asset = asset,
-                    erc20Account = erc20Account,
-                    feeManager = fees,
-                    sendingAccount = this,
-                    sendTarget = sendTo as Erc20Address,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
-                )
-            }
-            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
-        }
-
     override val sendState: Single<SendState>
         get() = Singles.zip(
             balance,
@@ -126,6 +101,31 @@ abstract class Erc20NonCustodialAccount(
                 hasUnconfirmed -> SendState.SEND_IN_FLIGHT
                 else -> SendState.CAN_SEND
             }
+        }
+
+    final override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+        when (sendTo) {
+            is CryptoAddress -> Single.just(
+                Erc20OnChainTransaction(
+                    asset = asset,
+                    erc20Account = erc20Account,
+                    feeManager = fees,
+                    sendingAccount = this,
+                    sendTarget = sendTo as Erc20Address,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
+                )
+            )
+            is CryptoAccount -> sendTo.receiveAddress.map {
+                Erc20OnChainTransaction(
+                    asset = asset,
+                    erc20Account = erc20Account,
+                    feeManager = fees,
+                    sendingAccount = this,
+                    sendTarget = sendTo as Erc20Address,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
+                )
+            }
+            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
         }
 }
 

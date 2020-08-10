@@ -7,16 +7,17 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.PendingSendTx
-import piuk.blockchain.android.coincore.SendProcessor
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TransactionValidationError
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 
 class CustodialTransferProcessor(
-    override val isNoteSupported: Boolean,
+    private val isNoteSupported: Boolean,
     override val sendingAccount: CryptoAccount,
     override val sendTarget: CryptoAddress,
     private val walletManager: CustodialWalletManager
-) : SendProcessor {
+) : TransactionProcessorBase() {
 
     init {
         require(sendingAccount.asset == sendTarget.asset)
@@ -24,25 +25,46 @@ class CustodialTransferProcessor(
 
     override val feeOptions = setOf(FeeLevel.None)
 
-    override fun availableBalance(pendingTx: PendingSendTx): Single<CryptoValue> =
+    override var pendingTx: PendingTx =
+        PendingTx(
+            amount = CryptoValue.zero(sendingAccount.asset),
+            available = CryptoValue.zero(sendingAccount.asset),
+            fees = CryptoValue.zero(sendingAccount.asset),
+            feeLevel = FeeLevel.None,
+            options = if (isNoteSupported) {
+                setOf(TxOptionValue.TxTextOption(TxOption.DESCRIPTION))
+            } else {
+                emptySet()
+            }
+        )
+
+    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
         sendingAccount.balance
             .map { it as CryptoValue }
+            .map { available ->
+                if (amount <= available) {
+                    pendingTx.copy(
+                        amount = amount,
+                        available = available
+                    )
+                } else {
+                    throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
+                }
+            }
+            .doOnSuccess { this.pendingTx = it }
 
-    override fun absoluteFee(pendingTx: PendingSendTx): Single<CryptoValue> =
-        Single.just(CryptoValue.zero(sendingAccount.asset))
-
-    override fun validate(pendingTx: PendingSendTx): Completable =
-        availableBalance(pendingTx)
+    override fun validate(): Completable =
+        sendingAccount.balance
             .flatMapCompletable { max ->
                 if (max >= pendingTx.amount) {
                     Completable.complete()
                 } else {
                     Completable.error(
-                        SendValidationError(SendValidationError.INSUFFICIENT_FUNDS)
+                        TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
                     )
                 }
             }
 
-    override fun execute(pendingTx: PendingSendTx, secondPassword: String): Completable =
+    override fun execute(secondPassword: String): Completable =
         walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, sendTarget.address)
 }

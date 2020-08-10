@@ -18,7 +18,6 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
-import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -57,23 +56,15 @@ class EnterTargetAddressSheet(
                 showNonCustodialInput(newState)
             }
 
-            when (newState.errorState) {
-                SendErrorState.NONE -> error_msg.invisible()
-                SendErrorState.INVALID_PASSWORD ->
-                    error_msg.apply {
-                        text = getString(
-                            R.string.send_error_not_valid_asset_address,
-                            getString(newState.asset.assetName())
-                        )
-                        visible()
-                    }
-                SendErrorState.ADDRESS_IS_CONTRACT ->
-                    error_msg.apply {
-                        text = getString(R.string.send_error_address_is_eth_contract)
-                        visible()
-                    }
-                else -> throw NotImplementedError("Not expected here")
-            }
+            newState.errorState.toString(
+                newState.sendingAccount.asset.networkTicker,
+                resources
+            )?.let {
+                error_msg.apply {
+                    text = it
+                    visible()
+                }
+            } ?: error_msg.invisible()
         }
         state = newState
     }
