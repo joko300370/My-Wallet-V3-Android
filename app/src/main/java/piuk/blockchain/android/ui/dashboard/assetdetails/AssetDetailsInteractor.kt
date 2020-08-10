@@ -6,6 +6,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.TimeInterval
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
@@ -23,7 +24,7 @@ data class AssetDisplayInfo(
     val amount: Money,
     val fiatValue: Money,
     val actions: Set<AssetAction>,
-    val interestRate: Double = AssetDetailsInteractor.NOT_USED
+    val interestRate: Double = Double.NaN
 )
 
 class AssetDetailsInteractor(
@@ -46,30 +47,31 @@ class AssetDetailsInteractor(
 
     fun shouldShowCustody(cryptoCurrency: CryptoCurrency): Single<Boolean> {
         return coincore[cryptoCurrency].accountGroup(AssetFilter.Custodial)
-            .flatMap { it.balance }
+            .flatMapSingle { it.balance }
             .map {
                 !dashboardPrefs.isCustodialIntroSeen && !it.isZero
             }
     }
 
-    private data class Details(
-        val account: BlockchainAccount,
-        val balance: Money,
-        val actions: AvailableActions,
-        val shouldShow: Boolean
-    )
+    private sealed class Details {
+        object NoDetails : Details()
+        class DetailsItem(
+            val account: BlockchainAccount,
+            val balance: Money,
+            val actions: AvailableActions
+        ) : Details()
+    }
 
-    private fun Single<AccountGroup>.mapDetails(): Single<Details> =
+    private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.balance.map { balance ->
-                Details(
+            grp.balance.toMaybe().map { balance ->
+                Details.DetailsItem(
                     grp,
                     balance,
-                    grp.actions,
-                    grp.accounts.isNotEmpty()
-                )
+                    grp.actions
+                ) as Details
             }
-        }
+        }.toSingle(Details.NoDetails)
 
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
@@ -94,43 +96,34 @@ class AssetDetailsInteractor(
         interest: Details,
         interestRate: Double,
         interestEnabled: Boolean
-    ): AssetDisplayMap {
-        val totalFiat = fiatRate.convert(total.balance)
-        val walletFiat = fiatRate.convert(nonCustodial.balance)
-        val custodialFiat = fiatRate.convert(custodial.balance)
-        val interestFiat = fiatRate.convert(interest.balance)
-
-        return mutableMapOf(
-            AssetFilter.All to AssetDisplayInfo(total.account, total.balance, totalFiat,
-                total.actions)
-        ).apply {
-            if (nonCustodial.shouldShow) {
-                put(
-                    AssetFilter.NonCustodial,
-                    AssetDisplayInfo(nonCustodial.account, nonCustodial.balance, walletFiat,
-                        nonCustodial.actions)
-                )
+    ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
+            addToDisplayMap(this, AssetFilter.All, total, fiatRate)
+            addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
+            addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+            if (interestEnabled) {
+                addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
             }
-
-            if (custodial.shouldShow) {
-                put(
-                    AssetFilter.Custodial,
-                    AssetDisplayInfo(custodial.account, custodial.balance, custodialFiat,
-                        custodial.actions)
-                )
-            }
-
-            if (interest.shouldShow && interestEnabled) {
-                put(
-                    AssetFilter.Interest,
-                    AssetDisplayInfo(interest.account, interest.balance, interestFiat,
-                        interest.actions, interestRate)
-                )
-            }
-        }
     }
 
-    companion object {
-        const val NOT_USED: Double = -99.0
+    private fun addToDisplayMap(
+        map: MutableMap<AssetFilter, AssetDisplayInfo>,
+        filter: AssetFilter,
+        item: Details,
+        fiatRate: ExchangeRate,
+        interestRate: Double = Double.NaN
+    ) {
+        (item as? Details.DetailsItem)?.let {
+            val fiat = fiatRate.convert(it.balance)
+            map.put(
+                filter,
+                AssetDisplayInfo(
+                    it.account,
+                    it.balance,
+                    fiat,
+                    it.actions,
+                    interestRate
+                )
+            )
+        }
     }
 }

@@ -102,7 +102,7 @@ class AssetDetailsFlow(
 
     private fun interestAccountsFilter(): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
-            .map { it.accounts }
+            .map { it.accounts }.toSingle(emptyList())
             .map { it.filter { a -> a.isFunded } }
 
     private fun handleHostAction(

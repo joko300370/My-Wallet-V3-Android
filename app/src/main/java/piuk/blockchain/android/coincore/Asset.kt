@@ -37,7 +37,7 @@ interface Asset {
     fun init(): Completable
     val isEnabled: Boolean
 
-    fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
+    fun accountGroup(filter: AssetFilter = AssetFilter.All): Maybe<AccountGroup>
 
     fun transferList(account: SingleAccount): Single<SingleAccountList>
 
