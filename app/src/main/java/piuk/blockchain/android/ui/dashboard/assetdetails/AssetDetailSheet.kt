@@ -274,7 +274,6 @@ class AssetDetailSheet :
         }
         chartPricePeriods.setOnTabSelectedListener {
             model.process(UpdateTimeSpan(TimeSpan.values()[it]))
-            // assetDetailsViewModel.timeSpan.accept(TimeSpan.values()[it])
         }
     }
 
