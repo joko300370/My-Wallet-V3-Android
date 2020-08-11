@@ -67,6 +67,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                     funds_user_fiat_balance.text = userFiatBalance.toStringWithSymbol()
 
                     funds_balance.text = fiatBalance.toStringWithSymbol()
+                    funds_balance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
                 },
                 onError = {
                     Timber.e("Error getting fiat funds balances: $it")

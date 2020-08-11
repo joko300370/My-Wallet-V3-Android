@@ -57,8 +57,12 @@ class AssetActionsSheet :
     override fun render(newState: AssetDetailsState) {
         showAssetBalances(newState)
 
+        require(newState.selectedAccount != null)
+        require(newState.assetFilter != null)
+
         val actionItems =
-            mapDetailsAndActions(dialogView, newState.selectedAccount!!, newState.assetFilter!!)
+            mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
+
         itemAdapter.itemList = actionItems
     }
 
