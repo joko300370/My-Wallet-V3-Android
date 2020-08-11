@@ -10,7 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
@@ -65,9 +65,9 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 }
 
 class SendFlow(
-    private val coincore: Coincore,
     private val sourceAccount: CryptoAccount = NullCryptoAccount,
     private val targetAccount: SendTarget = NullCryptoAccount,
+    private val action: AssetAction,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : DialogFlow() {
 
@@ -90,7 +90,7 @@ class SendFlow(
             )
         }
 
-        disposables += coincore.requireSecondPassword()
+        disposables += sourceAccount.requireSecondPassword()
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
@@ -101,7 +101,7 @@ class SendFlow(
                                 passwordRequired, balance as CryptoValue))
                         }
                     } else if (sourceAccount != NullCryptoAccount) {
-                        model.process(SendIntent.Initialise(sourceAccount, passwordRequired))
+                        model.process(SendIntent.Initialise(action, sourceAccount, passwordRequired))
                     } else {
                         throw IllegalStateException(
                             "Send flow initialised without at least one target")

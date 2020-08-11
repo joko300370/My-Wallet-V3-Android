@@ -17,6 +17,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -181,13 +182,17 @@ class DashboardInteractor(
             )
     }
 
-    fun getSendFlow(model: DashboardModel, fromAccount: SingleAccount): Disposable? {
+    fun getSendFlow(
+        model: DashboardModel,
+        fromAccount: SingleAccount,
+        action: AssetAction
+    ): Disposable? {
         if (fromAccount is CryptoAccount) {
             model.process(
                 UpdateLaunchDialogFlow(
                     SendFlow(
                         sourceAccount = fromAccount,
-                        coincore = coincore
+                        action = action
                     )
                 )
             )
@@ -210,15 +215,16 @@ class DashboardInteractor(
     fun getDepositFlow(
         model: DashboardModel,
         sourceAccount: SingleAccount,
-        targetAccount: SingleAccount
+        targetAccount: SingleAccount,
+        action: AssetAction
     ): Disposable? {
         if (sourceAccount is CryptoAccount) {
             model.process(
                 UpdateLaunchDialogFlow(
                     SendFlow(
-                        coincore = coincore,
                         sourceAccount = sourceAccount,
-                        targetAccount = targetAccount
+                        targetAccount = targetAccount,
+                        action = action
                     )
                 )
             )

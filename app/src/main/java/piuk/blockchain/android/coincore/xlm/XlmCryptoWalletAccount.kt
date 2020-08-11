@@ -11,15 +11,17 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class XlmCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String = "",
     private val address: String,
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(CryptoCurrency.XLM) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
@@ -52,8 +54,9 @@ internal class XlmCryptoWalletAccount(
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     constructor(
+        payloadManager: PayloadDataManager,
         account: AccountReference.Xlm,
         xlmManager: XlmDataManager,
         exchangeRates: ExchangeRateDataManager
-    ) : this(account.label, account.accountId, xlmManager, exchangeRates)
+    ) : this(payloadManager, account.label, account.accountId, xlmManager, exchangeRates)
 }

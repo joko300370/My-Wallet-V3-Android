@@ -17,9 +17,11 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
 internal class AlgoAsset(
+    payloadManager: PayloadDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -29,6 +31,7 @@ internal class AlgoAsset(
     crashLogger: CrashLogger,
     tiersService: TierService
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -53,7 +56,9 @@ internal class AlgoAsset(
         .onErrorReturn { emptyList() }
 
     private fun getAlgoAccount(): SingleAccount =
-        AlgoCryptoWalletAccount(label = labels.getDefaultNonCustodialWalletLabel(asset),
+        AlgoCryptoWalletAccount(
+            payloadManager = payloadManager,
+            label = labels.getDefaultNonCustodialWalletLabel(asset),
             exchangeRates = exchangeRates)
 
     override fun loadCustodialAccount(): Single<SingleAccountList> =

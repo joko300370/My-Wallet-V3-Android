@@ -23,8 +23,10 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class EthAsset(
+    payloadManager: PayloadDataManager,
     private val ethDataManager: EthDataManager,
     private val feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
@@ -36,6 +38,7 @@ internal class EthAsset(
     crashLogger: CrashLogger,
     tiersService: TierService
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -60,6 +63,7 @@ internal class EthAsset(
         Single.just(
             listOf(
                 EthCryptoWalletAccount(
+                    payloadManager,
                     ethDataManager,
                     feeDataManager,
                     ethDataManager.getEthWallet()?.account ?: throw Exception("No ether wallet found"),

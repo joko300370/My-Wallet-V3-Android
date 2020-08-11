@@ -9,12 +9,14 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class AlgoCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String,
     override val isDefault: Boolean = true,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(CryptoCurrency.ALGO) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.ZeroAlg)

@@ -30,7 +30,7 @@ interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
     val isDefault: Boolean
 
     val sendState: Single<SendState>
-    fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor>
+    fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor>
 }
 
 enum class SendState {
@@ -45,7 +45,8 @@ typealias SingleAccountList = List<SingleAccount>
 
 interface CryptoAccount : SingleAccount {
     val asset: CryptoCurrency
-    val feeAsset: CryptoCurrency?
+
+    fun requireSecondPassword(): Single<Boolean>
 }
 
 interface FiatAccount : SingleAccount {
@@ -81,7 +82,7 @@ object NullCryptoAccount : CryptoAccount {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val sendState: Single<SendState>
@@ -99,7 +100,7 @@ object NullCryptoAccount : CryptoAccount {
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
 
-    override val feeAsset: CryptoCurrency? = null
+    override fun requireSecondPassword(): Single<Boolean> = Single.just(false)
 
     override fun fiatBalance(
         fiatCurrency: String,
@@ -117,7 +118,7 @@ object NullFiatAccount : FiatAccount {
     override val isDefault: Boolean
         get() = false
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
     override val sendState: Single<SendState>

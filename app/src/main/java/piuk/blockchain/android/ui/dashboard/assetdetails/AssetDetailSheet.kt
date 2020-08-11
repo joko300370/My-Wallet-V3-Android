@@ -54,6 +54,7 @@ class AssetDetailSheet :
     MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
     private val currencyPrefs: CurrencyPrefs by inject()
     private val locale = Locale.getDefault()
+
     private val cryptoCurrency: CryptoCurrency by lazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
@@ -79,7 +80,9 @@ class AssetDetailSheet :
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
-        handleErrorState(newState.errorState)
+        if (newState.errorState != AssetDetailsError.NONE) {
+            handleErrorState(newState.errorState)
+        }
 
         newState.assetDisplayMap?.let {
             onGotAssetDetails(it)
@@ -233,23 +236,16 @@ class AssetDetailSheet :
     }
 
     private fun handleErrorState(error: AssetDetailsError) {
-        when (error) {
-            AssetDetailsError.NO_CHART_DATA -> ToastCustom.makeText(requireContext(),
-                getString(R.string.asset_details_chart_load_failed_toast), Toast.LENGTH_SHORT,
-                TYPE_ERROR)
+        val errorString = when (error) {
+            AssetDetailsError.NO_CHART_DATA ->
+                getString(R.string.asset_details_chart_load_failed_toast)
             AssetDetailsError.NO_ASSET_DETAILS ->
-                ToastCustom.makeText(requireContext(),
-                    getString(R.string.asset_details_load_failed_toast), Toast.LENGTH_SHORT,
-                    TYPE_ERROR)
+                getString(R.string.asset_details_load_failed_toast)
             AssetDetailsError.NO_EXCHANGE_RATE ->
-                ToastCustom.makeText(requireContext(),
-                    getString(R.string.asset_details_exchange_load_failed_toast),
-                    Toast.LENGTH_SHORT,
-                    TYPE_ERROR)
-            else -> {
-                // do nothing
-            }
+                getString(R.string.asset_details_exchange_load_failed_toast)
+            AssetDetailsError.NONE -> "" // this never triggers
         }
+        ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, TYPE_ERROR)
     }
 
     private fun chartToLoadingState() {

@@ -16,17 +16,19 @@ import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BchCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String,
     private val address: String,
     private val bchManager: BchDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters
-) : CryptoNonCustodialAccount(CryptoCurrency.BCH) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -68,12 +70,14 @@ internal class BchCryptoWalletAccount(
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     constructor(
+        payloadManager: PayloadDataManager,
         jsonAccount: GenericMetadataAccount,
         bchManager: BchDataManager,
         isDefault: Boolean,
         exchangeRates: ExchangeRateDataManager,
         networkParams: NetworkParameters
     ) : this(
+        payloadManager,
         jsonAccount.label,
         jsonAccount.xpub,
         bchManager,

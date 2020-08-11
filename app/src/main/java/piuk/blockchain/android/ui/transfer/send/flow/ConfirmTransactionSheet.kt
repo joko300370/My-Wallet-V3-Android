@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,8 +30,10 @@ import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
-import piuk.blockchain.android.ui.transfer.send.NoteState
-import piuk.blockchain.android.ui.transfer.send.SendErrorState
+import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
@@ -61,20 +62,32 @@ class ConfirmTransactionSheet(
         Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == SendStep.CONFIRM_DETAIL)
 
-        val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
-        detailsAdapter.populate(
-            listOf(
-                PendingTxItem(getString(R.string.common_send),
-                    newState.sendAmount.toStringWithSymbol()),
-                PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
-                PendingTxItem(getString(R.string.common_to), newState.sendTarget.label),
-                addFeeItem(newState),
-                PendingTxItem(getString(R.string.common_total), totalAmount)
-            )
+        // We _should_ always have a pending Tx when we get here
+        require(newState.pendingTx != null)
+
+        val amount = newState.sendAmount
+        val itemList = mutableListOf(
+            PendingTxItem(getString(R.string.common_send), amount.toStringWithSymbol()),
+            PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
+            PendingTxItem(getString(R.string.common_to), newState.sendTarget.label)
         )
 
-        showAddNoteIfSupported(newState)
-        showNoteState(newState)
+        getFeeItem(newState)?.let {
+            itemList.add(it)
+        }
+
+        val fee = newState.feeAmount
+        val totalAmount = if (amount.symbol == fee.symbol) {
+            (amount + fee).toStringWithSymbol()
+        } else {
+            "${amount.toStringWithSymbol()} (${fee.toStringWithSymbol()}"
+        }
+
+        itemList.add(PendingTxItem(getString(R.string.common_total), totalAmount))
+
+        updateOptions(newState.pendingTx) // These options should probably be items also TODO
+
+        detailsAdapter.populate(itemList)
 
         // TODO if new state tx options have confirmation
         dialogView.confirm_details_bottom_view_switcher.displayedChild = 0
@@ -89,58 +102,42 @@ class ConfirmTransactionSheet(
         state = newState
     }
 
-    private fun showNoteState(newState: SendState) {
-        if (newState.note.isNotEmpty()) {
-            dialogView.confirm_details_note_input.setText(newState.note,
-                TextView.BufferType.EDITABLE)
-        } else {
-            when (newState.noteState) {
-                NoteState.UPDATE_SUCCESS -> {
-                    Toast.makeText(requireContext(),
-                        getString(R.string.send_confirmation_add_note_success), Toast.LENGTH_SHORT)
-                        .show()
-                }
-                NoteState.UPDATE_ERROR -> {
-                    // can this happen?
-                }
-                NoteState.NOT_SET -> {
-                    // do nothing
-                }
-            }
-        }
-    }
+    private fun updateOptions(pendingTx: PendingTx) {
+        // Current iteration only supports notes/description. But this is where all and any other
+        // options - ie agreements, t&c confirmations etc are added and updated
 
-    private fun showAddNoteIfSupported(state: SendState) {
-        state.transactionNoteSupported?.let {
-            if (it) {
-                dialogView.confirm_details_note_input.apply {
-                    inputType = INPUT_FIELD_FLAGS
-                    filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
+        val note = pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
+        note?.let { opt ->
+            // Option exists. Show and update the field
+            dialogView.confirm_details_note_input.apply {
+                inputType = INPUT_FIELD_FLAGS
+                filters = arrayOf(InputFilter.LengthFilter(MAX_NOTE_LENGTH))
 
-                    setOnEditorActionListener { v, actionId, _ ->
-                        if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
-                            model.process(SendIntent.NoteAdded(v.text.toString()))
-                            clearFocus()
-                        }
-
-                        false
+                setOnEditorActionListener { v, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
+                        model.process(SendIntent.ModifyTxOption(opt.copy(text = v.text.toString())))
+                        clearFocus()
                     }
+                    false
                 }
-            } else {
-                dialogView.confirm_details_note_holder.gone()
+
+                setText(opt.text, TextView.BufferType.EDITABLE)
             }
-        } ?: model.process(SendIntent.RequestTransactionNoteSupport)
+        } ?: dialogView.confirm_details_note_holder.gone()
     }
 
-    private fun addFeeItem(state: SendState): PendingTxItem {
-        val feeTitle = getString(R.string.common_spaced_strings,
-            getString(R.string.send_confirmation_fee),
-            getString(R.string.send_confirmation_regular_estimation))
-        return if (state.errorState == SendErrorState.FEE_REQUEST_FAILED) {
-            PendingTxItem(feeTitle, getString(R.string.send_confirmation_fee_error))
-        } else {
-            PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
+    private fun getFeeItem(state: SendState): PendingTxItem? {
+        state.pendingTx?.let {
+            if (it.feeLevel != FeeLevel.None) {
+                val feeTitle = getString(
+                    R.string.common_spaced_strings,
+                    getString(R.string.send_confirmation_fee),
+                    getString(R.string.send_confirmation_regular_estimation)
+                )
+                return PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
+            }
         }
+        return null
     }
 
     private fun setupTosAndPPLinks() {
@@ -215,8 +212,6 @@ class ConfirmTransactionSheet(
         view.confirm_sheet_back.setOnClickListener {
             model.process(SendIntent.ReturnToPreviousStep)
         }
-
-        model.process(SendIntent.RequestFee)
     }
 
     private fun onCtaClick() {

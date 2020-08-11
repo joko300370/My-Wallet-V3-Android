@@ -35,7 +35,7 @@ class AssetDetailsFlow(
 ) : DialogFlow(), KoinComponent, AccountSelectSheet.SelectAndBackHost {
 
     interface AssetDetailsHost : FlowHost {
-        fun launchNewSendFor(account: SingleAccount)
+        fun launchNewSendFor(account: SingleAccount, action: AssetAction)
         fun gotoSendFor(account: SingleAccount)
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
@@ -43,7 +43,8 @@ class AssetDetailsFlow(
         fun goToDeposit(
             fromAccount: SingleAccount,
             toAccount: SingleAccount,
-            cryptoAsset: CryptoAsset
+            cryptoAsset: CryptoAsset,
+            action: AssetAction
         )
     }
 
@@ -113,13 +114,13 @@ class AssetDetailsFlow(
         when (newState.hostAction) {
             AssetAction.ViewActivity -> host.gotoActivityFor(account)
             AssetAction.Send -> host.gotoSendFor(account)
-            AssetAction.NewSend -> host.launchNewSendFor(account)
+            AssetAction.NewSend -> host.launchNewSendFor(account, newState.hostAction)
             AssetAction.Receive -> host.goToReceiveFor(account)
             AssetAction.Swap -> host.gotoSwap(account)
             AssetAction.Summary -> TODO()
             AssetAction.Deposit -> newState.asset!!.accountGroup(AssetFilter.NonCustodial)
                 .subscribeBy {
-                    getInterestAccountAndNavigate(it.accounts.first())
+                    getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
                 }
         }
     }
@@ -130,15 +131,16 @@ class AssetDetailsFlow(
     }
 
     override fun onAccountSelected(account: BlockchainAccount) {
-        getInterestAccountAndNavigate(account as SingleAccount)
+        getInterestAccountAndNavigate(account as SingleAccount, AssetAction.Deposit)
     }
 
-    private fun getInterestAccountAndNavigate(account: SingleAccount) {
+    private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
         disposables += localState.asset!!.accountGroup(AssetFilter.Interest).subscribeBy {
             assetFlowHost.goToDeposit(
                 account,
                 it.accounts.first(),
-                localState.asset!!)
+                localState.asset!!,
+                assetAction)
         }
     }
 

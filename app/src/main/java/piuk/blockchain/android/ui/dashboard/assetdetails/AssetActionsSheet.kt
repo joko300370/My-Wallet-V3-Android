@@ -247,11 +247,17 @@ class AssetActionsSheet :
                 asset) {
 
                 disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
-                    if (it.accounts.size > 1) {
-                        model.process(SelectSendingAccount)
-                    } else {
-                        model.process(HandleActionIntent(AssetAction.Deposit))
-                        dismiss()
+                    when {
+                        it.accounts.size > 1 -> {
+                            model.process(SelectSendingAccount)
+                        }
+                        it.accounts.size == 1 -> {
+                            model.process(HandleActionIntent(AssetAction.Deposit))
+                            dismiss()
+                        }
+                        else -> {
+                            throw IllegalStateException("No accounts available to deposit into interest")
+                        }
                     }
                 }
             }

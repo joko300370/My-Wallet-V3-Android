@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
-import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoValue
@@ -19,13 +18,10 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
-import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import timber.log.Timber
 
 class EnterAmountSheet(
@@ -35,7 +31,6 @@ class EnterAmountSheet(
 
     private var state: SendState = SendState()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
-    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
     private val imm: InputMethodManager by lazy {
@@ -64,13 +59,14 @@ class EnterAmountSheet(
                 )
             }
 
-            if (newState.availableBalance.isPositive || newState.availableBalance.isZero) {
+            val balance = newState.availableBalance
+            if (balance.isPositive || balance.isZero) {
                 amount_sheet_input.maxLimit = newState.availableBalance
 
-                amount_sheet_max_available.text =
-                    "${newState.availableBalance.toFiat(exchangeRateDataManager,
-                        currencyPrefs.selectedFiatCurrency)
-                        .toStringWithSymbol()} (${newState.availableBalance.toStringWithSymbol()})"
+                newState.fiatRate?.let { rate ->
+                    amount_sheet_max_available.text =
+                        "${rate.convert(balance).toStringWithSymbol()} (${balance.toStringWithSymbol()})"
+                }
             }
 
             amount_sheet_asset_icon.setCoinIcon(newState.sendingAccount.asset)
@@ -81,19 +77,12 @@ class EnterAmountSheet(
             amount_sheet_to.text =
                 getString(R.string.send_enter_amount_to, newState.sendTarget.label)
 
-            when (newState.errorState) {
-                SendErrorState.NONE -> dialogView.amount_sheet_input.hideError()
-                SendErrorState.MAX_EXCEEDED -> amount_sheet_input.showError(
-                    getString(R.string.send_enter_amount_error_max,
-                        newState.sendingAccount.asset.networkTicker))
-                SendErrorState.MIN_REQUIRED -> amount_sheet_input.showError(
-                    getString(R.string.send_enter_amount_error_min,
-                        newState.sendingAccount.asset.networkTicker))
-                SendErrorState.INVALID_ADDRESS,
-                SendErrorState.ADDRESS_IS_CONTRACT,
-                SendErrorState.INVALID_PASSWORD,
-                SendErrorState.FEE_REQUEST_FAILED -> throw NotImplementedError("Not expected here")
-            }.exhaustive
+            newState.errorState.toString(
+                newState.sendingAccount.asset.networkTicker,
+                resources
+            )?.let {
+                amount_sheet_input.showError(it)
+            } ?: amount_sheet_input.hideError()
         }
 
         state = newState
@@ -119,11 +108,15 @@ class EnterAmountSheet(
 //            }
 //        }, 200)
 
-        compositeDisposable += view.amount_sheet_input.amount.subscribe {
-            when (it) {
-                is FiatValue -> model.process(SendIntent.SendAmountChanged(
-                    it.toCrypto(exchangeRateDataManager, state.sendingAccount.asset)))
-                else -> model.process(SendIntent.SendAmountChanged(it as CryptoValue))
+        compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
+            state.fiatRate?.let { rate ->
+                SendIntent.SendAmountChanged(
+                    if (amount is FiatValue) {
+                        rate.inverse().convert(amount) as CryptoValue
+                    } else {
+                        amount as CryptoValue
+                    }
+                )
             }
         }
     }

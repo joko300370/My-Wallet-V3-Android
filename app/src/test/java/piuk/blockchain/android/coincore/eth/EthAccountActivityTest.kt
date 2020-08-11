@@ -19,9 +19,11 @@ import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class EthAccountActivityTest {
 
+    private val payloadManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val feeDataManager: FeeDataManager = mock()
     private val currencyState: CurrencyState = mock()
@@ -30,6 +32,7 @@ class EthAccountActivityTest {
 
     private val subject =
         EthCryptoWalletAccount(
+            payloadManager = payloadManager,
             label = "TestEthAccount",
             address = "Test Address",
             ethDataManager = ethDataManager,

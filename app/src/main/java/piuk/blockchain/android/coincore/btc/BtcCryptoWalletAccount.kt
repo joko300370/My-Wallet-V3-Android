@@ -18,35 +18,35 @@ import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BtcCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String,
     private val address: String,
-    private val payloadDataManager: PayloadDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(CryptoCurrency.BTC) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
     private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
 
     override val balance: Single<Money>
-        get() = payloadDataManager.getAddressBalanceRefresh(address)
+        get() = payloadManager.getAddressBalanceRefresh(address)
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
             .map { it as Money }
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = payloadDataManager.getNextReceiveAddress(
+        get() = payloadManager.getNextReceiveAddress(
             // TODO: Probably want the index of this address'
-            payloadDataManager.getAccount(payloadDataManager.defaultAccountIndex)
+            payloadManager.getAccount(payloadManager.defaultAccountIndex)
         ).singleOrError()
             .map {
                 BtcAddress(it, label)
             }
 
     override val activity: Single<ActivitySummaryList>
-        get() = payloadDataManager.getAccountTransactions(
+        get() = payloadManager.getAccountTransactions(
             address,
             transactionFetchCount,
             transactionFetchOffset
@@ -55,7 +55,7 @@ internal class BtcCryptoWalletAccount(
         .mapList {
             BtcActivitySummaryItem(
                 it,
-                payloadDataManager,
+                payloadManager,
                 exchangeRates,
                 this
             ) as ActivitySummaryItem
@@ -65,25 +65,25 @@ internal class BtcCryptoWalletAccount(
 
     constructor(
         jsonAccount: Account,
-        payloadDataManager: PayloadDataManager,
+        payloadManager: PayloadDataManager,
         isDefault: Boolean = false,
         exchangeRates: ExchangeRateDataManager
     ) : this(
+        payloadManager,
         jsonAccount.label,
         jsonAccount.xpub,
-        payloadDataManager,
         isDefault,
         exchangeRates
     )
 
     constructor(
         legacyAccount: LegacyAddress,
-        payloadDataManager: PayloadDataManager,
+        payloadManager: PayloadDataManager,
         exchangeRates: ExchangeRateDataManager
     ) : this(
+        payloadManager,
         legacyAccount.label ?: legacyAccount.address,
         legacyAccount.address,
-        payloadDataManager,
         false,
         exchangeRates
     )

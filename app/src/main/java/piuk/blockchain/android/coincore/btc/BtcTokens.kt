@@ -22,7 +22,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class BtcAsset(
-    private val payloadDataManager: PayloadDataManager,
+    payloadManager: PayloadDataManager,
     private val environmentSettings: EnvironmentConfig,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
@@ -33,6 +33,7 @@ internal class BtcAsset(
     crashLogger: CrashLogger,
     tiersService: TierService
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -51,14 +52,14 @@ internal class BtcAsset(
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
-            with(payloadDataManager) {
+            with(payloadManager) {
                 val result = mutableListOf<CryptoAccount>()
                 val defaultIndex = defaultAccountIndex
                 accounts.forEachIndexed { i, a ->
                     result.add(
                         BtcCryptoWalletAccount(
                             a,
-                            payloadDataManager,
+                            payloadManager,
                             i == defaultIndex,
                             exchangeRates
                         )
@@ -69,7 +70,7 @@ internal class BtcAsset(
                     result.add(
                         BtcCryptoWalletAccount(
                             a,
-                            payloadDataManager,
+                            payloadManager,
                             exchangeRates
                         )
                     )

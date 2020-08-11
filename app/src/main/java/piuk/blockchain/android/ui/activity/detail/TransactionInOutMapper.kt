@@ -14,10 +14,10 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -188,7 +188,7 @@ class TransactionInOutMapper(
         override val isDefault: Boolean
             get() = false
 
-        override fun createSendProcessor(sendTo: SendTarget): Single<SendProcessor> =
+        override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
             Single.error(NotImplementedError("Empty Account"))
 
         override val sendState: Single<SendState>

@@ -5,6 +5,7 @@ import android.view.View
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -63,7 +64,7 @@ class TransferSendFragment :
     private fun startFlowForAccount(account: CryptoAccount) {
         flow = SendFlow(
             sourceAccount = account,
-            coincore = coincore
+            action = AssetAction.NewSend
         ).apply {
             startFlow(
                 fragmentManager = childFragmentManager,

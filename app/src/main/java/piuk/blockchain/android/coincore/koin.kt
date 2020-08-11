@@ -41,7 +41,7 @@ val coincoreModule = module {
                 environmentSettings = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                payloadDataManager = get(),
+                payloadManager = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
@@ -52,6 +52,7 @@ val coincoreModule = module {
 
         scoped {
             BchAsset(
+                payloadManager = get(),
                 bchDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -68,6 +69,7 @@ val coincoreModule = module {
 
         scoped {
             XlmAsset(
+                payloadManager = get(),
                 xlmDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -82,6 +84,7 @@ val coincoreModule = module {
 
         scoped {
             EthAsset(
+                payloadManager = get(),
                 ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
@@ -97,6 +100,7 @@ val coincoreModule = module {
 
         scoped {
             PaxAsset(
+                payloadManager = get(),
                 paxAccount = get(paxAccount),
                 feeDataManager = get(),
                 exchangeRates = get(),
@@ -112,6 +116,7 @@ val coincoreModule = module {
 
         scoped {
             AlgoAsset(
+                payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -136,6 +141,7 @@ val coincoreModule = module {
 
         scoped {
             UsdtAsset(
+                payloadManager = get(),
                 usdtAccount = get(usdtAccount),
                 feeDataManager = get(),
                 exchangeRates = get(),

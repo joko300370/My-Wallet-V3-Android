@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -237,7 +238,8 @@ object TransferFunds : DashboardIntent() {
 }
 
 class LaunchSendFlow(
-    val fromAccount: SingleAccount
+    val fromAccount: SingleAccount,
+    val action: AssetAction
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
@@ -249,7 +251,8 @@ class LaunchSendFlow(
 
 class LaunchDepositFlow(
     val toAccount: SingleAccount,
-    val fromAccount: SingleAccount
+    val fromAccount: SingleAccount,
+    val action: AssetAction
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(

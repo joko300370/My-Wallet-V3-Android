@@ -2,21 +2,27 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.SendValidationError
+import piuk.blockchain.android.coincore.TransactionValidationError
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 
 sealed class SendIntent : MviIntent<SendState> {
 
     class Initialise(
+        private val action: AssetAction,
         private val account: CryptoAccount,
         private val passwordRequired: Boolean
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
+                action = action,
                 sendingAccount = account,
                 errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
@@ -42,7 +48,7 @@ sealed class SendIntent : MviIntent<SendState> {
         private val fromAccount: CryptoAccount,
         private val toAccount: SendTarget,
         private val passwordRequired: Boolean,
-        private val balance: CryptoValue
+        private val balance: CryptoValue // TODO can this be removed?
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
@@ -50,7 +56,6 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendTarget = toAccount,
                 errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
-                availableBalance = balance,
                 currentStep = if (passwordRequired) {
                     SendStep.ENTER_PASSWORD
                 } else {
@@ -123,11 +128,11 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    class TargetAddressInvalid(private val error: SendValidationError) : SendIntent() {
+    class TargetAddressInvalid(private val error: TransactionValidationError) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 errorState = when (error.errorCode) {
-                    SendValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
+                    TransactionValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
                     else -> SendErrorState.INVALID_ADDRESS
                 },
                 sendTarget = NullCryptoAccount,
@@ -145,6 +150,32 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
+    object FetchFiatRates : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    object FetchTargetRates : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class FiatRateUpdated(
+        private val fiatRate: ExchangeRate.CryptoToFiat
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                fiatRate = fiatRate
+            )
+    }
+
+    class CryptoRateUpdated(
+        private val targetRate: ExchangeRate
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                targetRate = targetRate
+            )
+    }
+
     class SendAmountChanged(
         val amount: CryptoValue
     ) : SendIntent() {
@@ -154,61 +185,33 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    object MaxAmountExceeded : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(errorState = SendErrorState.MAX_EXCEEDED)
-    }
-
-    object MinRequired : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(errorState = SendErrorState.MIN_REQUIRED)
-    }
-
-    object RequestFee : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState
-    }
-
-    object FeeRequestError : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(errorState = SendErrorState.FEE_REQUEST_FAILED)
-    }
-
-    class FeeUpdate(
-        val fee: CryptoValue
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(feeAmount = fee)
-    }
-
-    object RequestTransactionNoteSupport : SendIntent() {
-        override fun reduce(oldState: SendState): SendState = oldState
-    }
-
-    object TransactionNoteSupported : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(transactionNoteSupported = true)
-    }
-
-    class NoteAdded(
-        val note: String
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState = oldState.copy(
-            note = note,
-            noteState = NoteState.UPDATE_SUCCESS
-        )
-    }
-
-    class UpdateTransactionAmounts(
-        val amount: CryptoValue,
-        private val maxAvailable: CryptoValue
+    class InputValidationError(
+        private val error: TransactionValidationError
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = amount.isPositive,
-                sendAmount = amount,
-                availableBalance = maxAvailable,
-                errorState = SendErrorState.NONE
+                errorState = when (error.errorCode) {
+                    TransactionValidationError.INVALID_AMOUNT -> SendErrorState.MIN_REQUIRED
+                    TransactionValidationError.INSUFFICIENT_FUNDS -> SendErrorState.MAX_EXCEEDED
+                    TransactionValidationError.INSUFFICIENT_GAS -> SendErrorState.NOT_ENOUGH_GAS
+                    else -> SendErrorState.UNEXPECTED_ERROR
+                }
+        )
+    }
+
+    class ModifyTxOption(
+        val option: TxOptionValue
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class PendingTxUpdated(
+        private val pendingTx: PendingTx
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                pendingTx = pendingTx,
+                nextEnabled = pendingTx.amount.isPositive
             )
     }
 
