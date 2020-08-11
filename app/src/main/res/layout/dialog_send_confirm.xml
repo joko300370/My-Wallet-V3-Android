@@ -80,14 +80,14 @@
             android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatCheckBox
-                android:id="@+id/confirm_details_tcs_checkbox"
+                android:id="@+id/confirm_details_tos_pp_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:button="@drawable/ic_checkbox_checked_blue"
                 android:checked="false"
                 android:padding="4dp"
-                android:text="TC's " />
+                tools:text="@string/send_confirmation_interest_tos_pp" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/confirm_details_holdings_checkbox"
@@ -97,7 +97,7 @@
                 android:button="@drawable/ic_checkbox_checked_blue"
                 android:checked="false"
                 android:padding="4dp"
-                android:text="hold millions" />
+                tools:text="hold millions" />
 
         </LinearLayout>
 

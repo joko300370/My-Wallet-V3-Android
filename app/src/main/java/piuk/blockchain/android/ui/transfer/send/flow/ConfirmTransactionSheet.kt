@@ -1,6 +1,12 @@
 package piuk.blockchain.android.ui.transfer.send.flow
 
+import android.graphics.Typeface.BOLD
+import android.net.Uri
 import android.text.InputFilter
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,19 +16,27 @@ import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.scopedInject
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.ui.urllinks.INTEREST_PRIVACY_POLICY
+import com.blockchain.ui.urllinks.INTEREST_TERMS_OF_SERVICE
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRates
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.NoteState
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 
@@ -36,6 +50,10 @@ class ConfirmTransactionSheet(
 ) : FlowInputSheet(host) {
     override val layoutResource: Int = R.layout.dialog_send_confirm
 
+    private val stringUtils: StringUtils by inject()
+    private val exchangeRates: ExchangeRates by scopedInject()
+    private val prefs: CurrencyPrefs by scopedInject()
+
     private val detailsAdapter = DetailsAdapter()
     private var state = SendState()
 
@@ -46,7 +64,8 @@ class ConfirmTransactionSheet(
         val totalAmount = (newState.sendAmount + newState.feeAmount).toStringWithSymbol()
         detailsAdapter.populate(
             listOf(
-                PendingTxItem(getString(R.string.common_send), newState.sendAmount.toStringWithSymbol()),
+                PendingTxItem(getString(R.string.common_send),
+                    newState.sendAmount.toStringWithSymbol()),
                 PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
                 PendingTxItem(getString(R.string.common_to), newState.sendTarget.label),
                 addFeeItem(newState),
@@ -115,6 +134,35 @@ class ConfirmTransactionSheet(
         } else {
             PendingTxItem(feeTitle, state.feeAmount.toStringWithSymbol())
         }
+    }
+
+    private fun setupTosAndPPLinks() {
+        val linksMap = mapOf<String, Uri>(
+            "interest_tos" to Uri.parse(INTEREST_TERMS_OF_SERVICE),
+            "interest_pp" to Uri.parse(INTEREST_PRIVACY_POLICY)
+        )
+        dialogView.confirm_details_tos_pp_checkbox.text =
+            stringUtils.getStringWithMappedLinks(
+                R.string.send_confirmation_interest_tos_pp,
+                linksMap,
+                requireActivity()
+            )
+        dialogView.confirm_details_tos_pp_checkbox.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    private fun setupHoldingValues(sendAmount: CryptoValue) {
+        val part1 = getString(R.string.send_confirmation_interest_holding_period_1)
+        val part2 =
+            sendAmount.toFiat(exchangeRates, prefs.selectedFiatCurrency).toStringWithSymbol()
+        val part3 = getString(R.string.send_confirmation_interest_holding_period_2,
+            sendAmount.toStringWithSymbol())
+        val sb = SpannableStringBuilder()
+        sb.append(part1)
+        sb.append(part2)
+        sb.setSpan(StyleSpan(BOLD), part1.length, part1.length + part2.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append(part3)
+        dialogView.confirm_details_holdings_checkbox.setText(sb, TextView.BufferType.SPANNABLE)
     }
 
     override fun initControls(view: View) {

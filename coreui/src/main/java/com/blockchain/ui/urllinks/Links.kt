@@ -51,6 +51,9 @@ const val STX_STACKS_LEARN_MORE =
 const val MODULAR_TERMS_AND_CONDITIONS =
     "https://exchange.blockchain.com/legal#modulr"
 
+const val INTEREST_TERMS_OF_SERVICE = "https://www.blockchain.com/legal/borrow-terms"
+const val INTEREST_PRIVACY_POLICY = "https://blockchain.com/legal/privacy"
+
 fun makeBlockExplorerUrl(
     cryptoCurrency: CryptoCurrency,
     transactionHash: String
