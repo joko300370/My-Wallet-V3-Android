@@ -34,7 +34,7 @@
         android:layout_marginStart="@dimen/xlarge_margin"
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="@string/send_enter_amount_title"
+        android:text="@string/send_confirmation_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/confirm_sheet_back"
@@ -84,9 +84,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:button="@drawable/ic_checkbox_checked_blue"
-                android:checked="false"
-                android:padding="4dp"
+                android:button="@drawable/checkbox_selector_blue"
+                android:paddingLeft="@dimen/very_small_margin"
                 tools:text="@string/send_confirmation_interest_tos_pp" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
@@ -94,9 +93,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
-                android:button="@drawable/ic_checkbox_checked_blue"
+                android:button="@drawable/checkbox_selector_blue"
                 android:checked="false"
-                android:padding="4dp"
+                android:layout_marginTop="@dimen/small_margin"
+                android:paddingLeft="@dimen/very_small_margin"
                 tools:text="hold millions" />
 
         </LinearLayout>

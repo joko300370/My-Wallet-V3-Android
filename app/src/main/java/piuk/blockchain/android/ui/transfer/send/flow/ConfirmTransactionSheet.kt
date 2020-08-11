@@ -76,6 +76,14 @@ class ConfirmTransactionSheet(
         showAddNoteIfSupported(newState)
         showNoteState(newState)
 
+
+        // TODO if new state tx options have confirmation
+        dialogView.confirm_details_bottom_view_switcher.displayedChild = 0
+
+        setupTosAndPPLinks()
+        setupHoldingValues(newState.sendAmount)
+        setupCheckboxEvents()
+
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
             totalAmount)
 
@@ -163,6 +171,30 @@ class ConfirmTransactionSheet(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.append(part3)
         dialogView.confirm_details_holdings_checkbox.setText(sb, TextView.BufferType.SPANNABLE)
+    }
+
+    private fun setupCheckboxEvents() {
+        dialogView.confirm_cta_button.isEnabled = false
+
+        dialogView.confirm_details_tos_pp_checkbox.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked) {
+                if(dialogView.confirm_details_holdings_checkbox.isChecked) {
+                    dialogView.confirm_cta_button.isEnabled = true
+                }
+            } else {
+                dialogView.confirm_cta_button.isEnabled = false
+            }
+        }
+
+        dialogView.confirm_details_holdings_checkbox.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked) {
+                if(dialogView.confirm_details_tos_pp_checkbox.isChecked) {
+                    dialogView.confirm_cta_button.isEnabled = true
+                }
+            } else {
+                dialogView.confirm_cta_button.isEnabled = false
+            }
+        }
     }
 
     override fun initControls(view: View) {

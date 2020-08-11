@@ -1879,6 +1879,7 @@
     <string name="send_enter_amount_max">Send Max</string>
     <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
     <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
+    <string name="send_confirmation_title">Confirm</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
     <string name="send_confirmation_fee_loading">Loading…</string>
@@ -1886,7 +1887,7 @@
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_add_note_success">Note successfully added</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
-    <string name="send_confirmation_interest_tos_pp">I have read and agree to the <annotation link="interest_tos">Terms of Service</annotation> &amp; <annotation link="interest_pp">Privacy Policy</annotation>.</string>
+    <string name="send_confirmation_interest_tos_pp">I have read and agree to the <annotation link="interest_tos">Terms of Service</annotation>\n&amp; <annotation link="interest_pp">Privacy Policy</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">By accepting this, you agree to transfer&#160;</string>
     <string name="send_confirmation_interest_holding_period_2">&#160; (%1$s) from your Bitcoin Wallet to your Interest Account. An initial hold period of 7 days will be applied to your funds.</string>
     <string name="send_state_no_funds">No funds</string>
