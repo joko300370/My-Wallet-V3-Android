@@ -22,22 +22,26 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String,
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(CryptoCurrency.ETHER) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
 
     constructor(
+        payloadManager: PayloadDataManager,
         ethDataManager: EthDataManager,
         fees: FeeDataManager,
         jsonAccount: EthereumAccount,
         exchangeRates: ExchangeRateDataManager
     ) : this(
+        payloadManager,
         jsonAccount.label,
         jsonAccount.address,
         ethDataManager,
@@ -96,20 +100,22 @@ internal class EthCryptoWalletAccount(
         when (sendTo) {
             is CryptoAddress -> Single.just(
                 EthSendTransaction(
-                    ethDataManager,
-                    fees,
-                    this,
-                    sendTo,
-                    ethDataManager.requireSecondPassword
+                    ethDataManager = ethDataManager,
+                    feeManager = fees,
+                    exchangeRates = exchangeRates,
+                    sendingAccount = this,
+                    sendTarget = sendTo,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             )
             is CryptoAccount -> sendTo.receiveAddress.map {
                 EthSendTransaction(
-                    ethDataManager,
-                    fees,
-                    this,
-                    it as CryptoAddress,
-                    ethDataManager.requireSecondPassword
+                    ethDataManager = ethDataManager,
+                    feeManager = fees,
+                    exchangeRates = exchangeRates,
+                    sendingAccount = this,
+                    sendTarget = it as CryptoAddress,
+                    requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             }
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))

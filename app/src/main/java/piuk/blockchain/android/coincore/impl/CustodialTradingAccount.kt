@@ -34,13 +34,14 @@ open class CustodialTradingAccount(
     private val isNoteSupported: Boolean = false
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
+
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getBalanceForAsset(asset)
@@ -76,6 +77,7 @@ open class CustodialTradingAccount(
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     sendTarget = sendTo,
+                    exchangeRates = exchangeRates,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )
@@ -84,6 +86,7 @@ open class CustodialTradingAccount(
                 CustodialTransferProcessor(
                     sendingAccount = this,
                     sendTarget = it as CryptoAddress,
+                    exchangeRates = exchangeRates,
                     walletManager = custodialWalletManager,
                     isNoteSupported = isNoteSupported
                 )

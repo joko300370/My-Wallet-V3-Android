@@ -24,8 +24,10 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class PaxAsset(
+    payloadManager: PayloadDataManager,
     paxAccount: Erc20Account,
     feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
@@ -36,6 +38,7 @@ internal class PaxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : Erc20TokensBase(
+    payloadManager,
     paxAccount,
     feeDataManager,
     custodialManager,
@@ -57,6 +60,7 @@ internal class PaxAsset(
             ?: throw Exception("No ether wallet found")
 
         return PaxCryptoWalletAccount(
+            payloadManager,
             labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
             paxAddress,
             erc20Account,

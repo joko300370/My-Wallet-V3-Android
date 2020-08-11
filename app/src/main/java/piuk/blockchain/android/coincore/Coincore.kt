@@ -28,9 +28,6 @@ class Coincore internal constructor(
             Timber.e("Coincore initialisation failed! $it")
         }
 
-    fun requireSecondPassword(): Single<Boolean> =
-        Single.fromCallable { payloadManager.isDoubleEncrypted }
-
     val fiatAssets: Asset = fiatAsset
     val cryptoAssets: Iterable<Asset> = assetMap.values.filter { it.isEnabled }
     val allAssets: Iterable<Asset> = listOf(fiatAsset) + cryptoAssets

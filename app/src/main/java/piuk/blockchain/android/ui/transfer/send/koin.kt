@@ -14,6 +14,7 @@ val transferModule = module {
         scoped {
             SendInteractor(
                 coincore = payloadScope.get(),
+                currencyPrefs = payloadScope.get(),
                 addressFactory = payloadScope.get()
             )
         }

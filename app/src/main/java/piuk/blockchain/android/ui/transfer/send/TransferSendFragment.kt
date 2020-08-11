@@ -9,6 +9,7 @@ import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -81,8 +82,8 @@ class TransferSendFragment :
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
             flow = SendFlow(
-                account = account,
-                coincore = coincore
+                fromAccount = account,
+                action = AssetAction.NewSend
             ).apply {
                 startFlow(
                     fragmentManager = childFragmentManager,
