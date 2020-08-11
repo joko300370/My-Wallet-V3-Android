@@ -110,12 +110,14 @@ class EnterAmountSheet(
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
             state.fiatRate?.let { rate ->
-                SendIntent.SendAmountChanged(
-                    if (amount is FiatValue) {
-                        rate.inverse().convert(amount) as CryptoValue
-                    } else {
-                        amount as CryptoValue
-                    }
+                model.process(
+                    SendIntent.SendAmountChanged(
+                        if (amount is FiatValue) {
+                            rate.inverse().convert(amount) as CryptoValue
+                        } else {
+                            amount as CryptoValue
+                        }
+                    )
                 )
             }
         }
