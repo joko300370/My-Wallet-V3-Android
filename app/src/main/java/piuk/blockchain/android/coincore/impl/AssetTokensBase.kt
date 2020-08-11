@@ -21,11 +21,13 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import timber.log.Timber
 import java.math.BigDecimal
 
 internal abstract class CryptoAssetBase(
+    protected val payloadManager: PayloadDataManager,
     protected val exchangeRates: ExchangeRateDataManager,
     private val historicRates: ChartsDataManager,
     protected val currencyPrefs: CurrencyPrefs,

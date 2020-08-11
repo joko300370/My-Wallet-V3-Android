@@ -16,8 +16,10 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class XlmAsset(
+    payloadManager: PayloadDataManager,
     private val xlmDataManager: XlmDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
@@ -27,6 +29,7 @@ internal class XlmAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -45,7 +48,14 @@ internal class XlmAsset(
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         xlmDataManager.defaultAccount()
             .map {
-                listOf(XlmCryptoWalletAccount(it, xlmDataManager, exchangeRates))
+                listOf(
+                    XlmCryptoWalletAccount(
+                        payloadManager,
+                        it,
+                        xlmDataManager,
+                        exchangeRates
+                    )
+                )
             }
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =

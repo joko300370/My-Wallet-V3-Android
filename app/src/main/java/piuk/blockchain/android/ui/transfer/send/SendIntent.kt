@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transfer.send
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -97,6 +98,32 @@ sealed class SendIntent : MviIntent<SendState> {
                 errorState = SendErrorState.NONE,
                 nextEnabled = false,
                 currentStep = SendStep.ENTER_AMOUNT
+            )
+    }
+
+    object FetchFiatRates : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    object FetchTargetRates : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
+    }
+
+    class FiatRateUpdated(
+        private val fiatRate: ExchangeRate.CryptoToFiat
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                fiatRate = fiatRate
+            )
+    }
+
+    class CryptoRateUpdated(
+        private val targetRate: ExchangeRate
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                targetRate = targetRate
             )
     }
 

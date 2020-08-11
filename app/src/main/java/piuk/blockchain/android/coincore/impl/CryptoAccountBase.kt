@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
@@ -53,7 +54,8 @@ internal class CryptoExchangeAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
@@ -80,13 +82,12 @@ internal class CryptoExchangeAccount(
 }
 
 abstract class CryptoNonCustodialAccount(
+    // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
+    protected val payloadManager: PayloadDataManager,
     override val asset: CryptoCurrency
 ) : CryptoAccountBase() {
 
     override val isFunded: Boolean = true
-
-    override val feeAsset: CryptoCurrency?
-        get() = asset
 
     override val actions: AvailableActions
         get() =
@@ -101,6 +102,9 @@ abstract class CryptoNonCustodialAccount(
                     remove(AssetAction.Send)
                 }
             }
+
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.fromCallable { payloadManager.isDoubleEncrypted }
 
     override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> {
         TODO("Implement me")

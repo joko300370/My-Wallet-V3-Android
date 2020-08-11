@@ -23,13 +23,14 @@ internal class CryptoInterestAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
+
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)

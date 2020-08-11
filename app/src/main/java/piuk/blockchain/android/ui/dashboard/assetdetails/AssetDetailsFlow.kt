@@ -35,7 +35,7 @@ class AssetDetailsFlow(
 ) : DialogFlow(), KoinComponent, AccountSelectSheet.SelectAndBackHost {
 
     interface AssetDetailsHost : FlowHost {
-        fun launchNewSendFor(account: SingleAccount)
+        fun launchNewSendFor(account: SingleAccount, action: AssetAction)
         fun gotoSendFor(account: SingleAccount)
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
@@ -113,7 +113,7 @@ class AssetDetailsFlow(
         when (newState.hostAction) {
             AssetAction.ViewActivity -> host.gotoActivityFor(account)
             AssetAction.Send -> host.gotoSendFor(account)
-            AssetAction.NewSend -> host.launchNewSendFor(account)
+            AssetAction.NewSend -> host.launchNewSendFor(account, newState.hostAction)
             AssetAction.Receive -> host.goToReceiveFor(account)
             AssetAction.Swap -> host.gotoSwap(account)
             AssetAction.Summary -> TODO()

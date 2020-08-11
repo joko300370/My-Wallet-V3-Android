@@ -54,6 +54,7 @@ class AssetDetailSheet :
     MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
     private val currencyPrefs: CurrencyPrefs by inject()
     private val locale = Locale.getDefault()
+
     private val cryptoCurrency: CryptoCurrency by lazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("No cryptoCurrency specified")

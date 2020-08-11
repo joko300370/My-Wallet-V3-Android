@@ -10,7 +10,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.SendIntent
@@ -63,8 +62,8 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 }
 
 class SendFlow(
-    private val coincore: Coincore,
-    private val account: CryptoAccount,
+    private val action: AssetAction,
+    private val fromAccount: CryptoAccount,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : DialogFlow() {
 
@@ -87,14 +86,14 @@ class SendFlow(
             )
         }
 
-        disposables += coincore.requireSecondPassword()
+        disposables += fromAccount.requireSecondPassword()
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
                     model.process(
                         SendIntent.Initialise(
-                            AssetAction.NewSend, // TODO: Get this from init
-                            account,
+                            action,
+                            fromAccount,
                             passwordRequired
                         )
                     )

@@ -24,6 +24,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
@@ -45,8 +46,8 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
-import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -410,8 +411,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun launchNewSendFor(account: SingleAccount) =
-        model.process(LaunchSendFlow(account))
+    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =
+        model.process(LaunchSendFlow(account, action))
 
     override fun gotoSendFor(account: SingleAccount) {
         when (account) {

@@ -19,12 +19,14 @@ import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigInteger
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class XlmAccountActivityTest {
 
+    private val payloadManager: PayloadDataManager = mock()
     private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
@@ -33,7 +35,8 @@ class XlmAccountActivityTest {
 
     private val subject =
         XlmCryptoWalletAccount(
-            label = "TEst Xlm Account",
+            payloadManager = payloadManager,
+            label = "Test Xlm Account",
             address = "Test XLM Address",
             xlmManager = xlmDataManager,
             exchangeRates = exchangeRates

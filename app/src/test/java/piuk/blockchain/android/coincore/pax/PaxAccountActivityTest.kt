@@ -22,9 +22,11 @@ import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class PaxAccountActivityTest {
 
+    private val payloadManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
@@ -34,6 +36,7 @@ class PaxAccountActivityTest {
 
     private val subject =
         PaxCryptoWalletAccount(
+            payloadManager = payloadManager,
             label = "Text Pax Account",
             address = "Test Px Address",
             fees = mock(),
