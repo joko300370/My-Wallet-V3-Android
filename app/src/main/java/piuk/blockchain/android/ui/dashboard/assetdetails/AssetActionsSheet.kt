@@ -247,10 +247,16 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
                 disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
-                    if (it.accounts.size > 1) {
-                        model.process(SelectSendingAccount)
-                    } else {
-                        // TODO launch send flow with pre-selected accounts
+                    when {
+                        it.accounts.size > 1 -> {
+                            model.process(SelectSendingAccount)
+                        }
+                        it.accounts.size == 1 -> {
+                            // TODO in next story - launch send flow with pre-selected accounts
+                        }
+                        else -> {
+                            throw IllegalStateException("No accounts available to deposit into interest")
+                        }
                     }
                 }
             }

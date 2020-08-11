@@ -32,7 +32,7 @@ class AccountSelectSheet(
     private val coincore: Coincore by scopedInject()
     private val disposables = CompositeDisposable()
 
-    private var accountFilter: Single<List<BlockchainAccount>> =
+    private var accountList: Single<List<BlockchainAccount>> =
         coincore.allWallets()
             .map { listOf(it) + it.accounts }
             .map { it.filter { a -> a.hasTransactions } }
@@ -68,7 +68,7 @@ class AccountSelectSheet(
                 view.account_list_back.gone()
             }
 
-            initialise(accountFilter)
+            initialise(accountList)
         }
     }
 
@@ -89,11 +89,11 @@ class AccountSelectSheet(
 
         fun newInstance(
             host: Host,
-            accountFilter: Single<List<BlockchainAccount>>,
+            accountList: Single<List<BlockchainAccount>>,
             @StringRes sheetTitle: Int
         ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
-                this.accountFilter = accountFilter
+                this.accountList = accountList
                 this.sheetTitle = sheetTitle
             }
     }
