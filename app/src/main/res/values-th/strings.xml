@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">รับ</string>
   <string name="toolbar_cmd_activity">กิจกรรม</string>
   <string name="toolbar_cmd_view_activity">ดูกิจกรรม</string>
-  <string name="toolbar_cmd_swap">แลกเปลี่ยน</string>
+  <string name="common_swap">แลกเปลี่ยน</string>
   <string name="cancel">ยกเลิก</string>
   <string name="btn_ok">ตกลง</string>
   <string name="common_yes">ใช่</string>
@@ -826,7 +826,7 @@
  เนื่องจากกิจกรรมการตลาด เมื่อคำสั่งเริ่มต้นเราไม่สามารถหยุดได้ 
 </string>
   <string name="send_to">ส่งถึง</string>
-  <string name="receive">รับ</string>
+  <string name="common_receive">รับ</string>
   <string name="fees">ค่าเล่าเรียน</string>
   <string name="value">ราคา</string>
   <string name="status">สถานะ</string>

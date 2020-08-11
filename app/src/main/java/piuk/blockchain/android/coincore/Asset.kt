@@ -18,13 +18,16 @@ enum class AssetFilter {
 
 // TEMP flag to enable/disable new send from actions
 const val ENABLE_NEW_SEND_ACTION = false
+const val ENABLE_INTEREST_ACTIONS = false
 
 enum class AssetAction {
     ViewActivity,
     Send,
     NewSend,
     Receive,
-    Swap
+    Swap,
+    Summary,
+    Deposit
 }
 
 typealias AvailableActions = Set<AssetAction>

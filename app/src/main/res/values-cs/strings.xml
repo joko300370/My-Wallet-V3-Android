@@ -48,7 +48,7 @@
   <string name="toolbar_cmd_receive_crypto">Dostávat</string>
   <string name="toolbar_cmd_activity">Aktivita</string>
   <string name="toolbar_cmd_view_activity">Zobrazit aktivitu</string>
-  <string name="toolbar_cmd_swap">Zaměnit</string>
+  <string name="common_swap">Zaměnit</string>
   <string name="cancel">zrušení</string>
   <string name="btn_ok">OK</string>
   <string name="common_yes">Ano</string>
@@ -829,7 +829,7 @@
  kvůli tržní aktivitě. Jakmile objednávka začne, nemůžeme ji zastavit 
 </string>
   <string name="send_to">Poslat komu</string>
-  <string name="receive">Dostávat</string>
+  <string name="common_receive">Dostávat</string>
   <string name="fees">Poplatky</string>
   <string name="value">Hodnota</string>
   <string name="status">Postavení</string>

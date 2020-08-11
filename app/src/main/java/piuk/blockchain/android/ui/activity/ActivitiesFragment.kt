@@ -31,10 +31,10 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
-import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
+import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.setCoinIcon
@@ -50,7 +50,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
-    AccountSelectSheet.Host,
+    AccountSelectSheet.SelectionHost,
     CryptoActivityDetailsBottomSheet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host {
@@ -104,7 +104,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             when (newState.bottomSheet) {
                 ActivitiesSheet.ACCOUNT_SELECTOR -> {
                     analytics.logEvent(ActivityAnalytics.WALLET_PICKER_SHOWN)
-                    showBottomSheet(AccountSelectSheet.newInstance())
+                    showBottomSheet(AccountSelectSheet.newInstance(this))
                 }
                 ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS -> {
                     newState.selectedCryptoCurrency?.let {

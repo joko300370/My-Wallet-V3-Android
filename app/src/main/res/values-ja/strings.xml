@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">受け取る</string>
   <string name="toolbar_cmd_activity">アクティビティ</string>
   <string name="toolbar_cmd_view_activity">アクティビティを表示</string>
-  <string name="toolbar_cmd_swap">スワップ</string>
+  <string name="common_swap">スワップ</string>
   <string name="cancel">キャンセル</string>
   <string name="btn_ok">OK</string>
   <string name="common_yes">はい</string>
@@ -826,7 +826,7 @@
 市場活動のため。注文が開始されると、停止することはできません
 </string>
   <string name="send_to">に送る</string>
-  <string name="receive">受け取る</string>
+  <string name="common_receive">受け取る</string>
   <string name="fees">料金</string>
   <string name="value">値</string>
   <string name="status">状態</string>

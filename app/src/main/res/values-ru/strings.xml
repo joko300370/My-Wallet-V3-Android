@@ -48,7 +48,7 @@
   <string name="toolbar_cmd_receive_crypto">Получать</string>
   <string name="toolbar_cmd_activity">Мероприятия</string>
   <string name="toolbar_cmd_view_activity">Просмотр активности</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">Отмена</string>
   <string name="btn_ok">Ok</string>
   <string name="common_yes">да</string>
@@ -829,7 +829,7 @@
  из-за рыночной активности. После запуска заказа мы не можем его остановить 
 </string>
   <string name="send_to">Отправить</string>
-  <string name="receive">Получать</string>
+  <string name="common_receive">Получать</string>
   <string name="fees">сборы</string>
   <string name="value">Значение</string>
   <string name="status">Положение дел</string>

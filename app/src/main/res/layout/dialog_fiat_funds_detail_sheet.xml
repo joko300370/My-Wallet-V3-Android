@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/small_margin"
-            android:text="@string/fiat_funds_detail_deposit_title"
+            android:text="@string/common_deposit"
             app:layout_constraintStart_toEndOf="@id/funds_deposit_icon"
             app:layout_constraintTop_toTopOf="parent" />
 

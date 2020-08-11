@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
@@ -196,6 +197,18 @@ class DashboardInteractor(
                 )
             )
         }
+        return null
+    }
+
+    fun getAssetDetailsFlow(model: DashboardModel, cryptoCurrency: CryptoCurrency): Disposable? {
+        model.process(
+            UpdateLaunchDialogFlow(
+                AssetDetailsFlow(
+                    cryptoCurrency = cryptoCurrency,
+                    coincore = coincore
+                )
+            )
+        )
         return null
     }
 

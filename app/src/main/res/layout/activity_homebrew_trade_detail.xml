@@ -163,7 +163,7 @@
                 android:layout_marginTop="2dp"
                 android:gravity="center_vertical"
                 android:padding="16dp"
-                android:text="@string/receive"
+                android:text="@string/common_receive"
                 android:textColor="@color/exchange_text_dark_color"
                 android:textSize="16sp"
                 android:textStyle="bold"

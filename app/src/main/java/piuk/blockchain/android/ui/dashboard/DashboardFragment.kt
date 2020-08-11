@@ -26,6 +26,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -36,9 +37,8 @@ import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
-import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
@@ -46,8 +46,8 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
-import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -59,14 +59,14 @@ class EmptyDashboardItem : DashboardItem
 private typealias RefreshFn = () -> Unit
 
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
-    AssetDetailSheet.Host,
     ForceBackupForSendSheet.Host,
     BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
     FiatFundsNoKycDetailsSheet.Host,
-    DialogFlow.FlowHost {
+    DialogFlow.FlowHost,
+    AssetDetailsFlow.AssetDetailsHost {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
@@ -114,13 +114,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             updateDisplayList(newState)
         }
 
-        // Update/show bottom sheet
-        if (this.state?.showAssetSheetFor != newState.showAssetSheetFor) {
-            showAssetSheet(newState.showAssetSheetFor)
-        } else {
-            if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
-                showPromoSheet(newState)
-            }
+        if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
+            showPromoSheet(newState)
         }
 
         // Update/show dialog flow
@@ -193,20 +188,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun showAssetSheet(sheetFor: CryptoCurrency?) {
-        if (sheetFor != null) {
-            showBottomSheet(AssetDetailSheet.newInstance(sheetFor))
-        } else {
-            // Nothing, unless we need to remove the sheet? TODO
-        }
-    }
-
     private fun showPromoSheet(state: DashboardState) {
         showBottomSheet(
             when (state.showDashboardSheet) {
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
-                DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
                 DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
@@ -329,7 +315,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
-        model.process(ShowCryptoAssetDetails(cryptoCurrency))
+        model.process(LaunchAssetDetailsFlow(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {
@@ -416,7 +402,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         navigator().launchKyc(CampaignType.FiatFunds)
     }
 
-    // AssetDetailSheet.Host
+    // DialogBottomSheet.Host
     override fun onSheetClosed() {
         model.process(ClearBottomSheet)
     }
@@ -447,6 +433,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
+
+    override fun goToDeposit(
+        fromAccount: SingleAccount,
+        toAccount: BlockchainAccount,
+        cryptoAsset: CryptoAsset
+    ) {
+        // TODO in next story
+        Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
+    }
 
     override fun gotoSwap(account: SingleAccount) =
         when (account) {

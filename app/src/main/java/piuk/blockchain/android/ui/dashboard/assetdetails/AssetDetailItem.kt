@@ -1,15 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.PopupMenu
-import androidx.core.content.ContextCompat
-import androidx.core.view.MenuCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.extensions.exhaustive
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.CustodialBalanceClicked
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_detail_item.view.*
@@ -24,11 +17,10 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.context
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import kotlin.properties.Delegates
 
 data class AssetDetailItem(
     val assetFilter: AssetFilter,
@@ -43,8 +35,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
     fun bind(
         item: AssetDetailItem,
-        onActionSelected: AssetActionHandler,
-        analytics: Analytics
+        onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit
     ) {
         with(itemView) {
             val asset = getAsset(item.account)
@@ -65,15 +56,23 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 )
             }
 
-            if (item.actions.isEmpty()) {
-                action_menu.invisible()
-            } else {
-                action_menu.visible()
-                setOnClickListenerDebounced { doShowMenu(item, onActionSelected, analytics) }
+            rootView.setOnClickListener {
+                onAccountSelected(item.account, item.assetFilter)
             }
 
-            asset_spend_locked.goneIf {
-                item.assetFilter == AssetFilter.NonCustodial || item.assetFilter == AssetFilter.Interest
+            when (item.assetFilter) {
+                AssetFilter.NonCustodial -> asset_account_icon.gone()
+                AssetFilter.Interest -> {
+                    asset_account_icon.visible()
+                    asset_account_icon.setImageResource(
+                        R.drawable.ic_account_badge_interest)
+                }
+                AssetFilter.Custodial -> {
+                    asset_account_icon.visible()
+                    asset_account_icon.setImageResource(
+                        R.drawable.ic_account_badge_custodial)
+                }
+                AssetFilter.All -> asset_account_icon.gone()
             }
 
             asset_balance_crypto.text = item.balance.toStringWithSymbol()
@@ -88,73 +87,6 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 .firstOrNull()?.asset
             else -> null
         } ?: throw IllegalStateException("Unsupported account type")
-
-    private fun doShowMenu(
-        detailItem: AssetDetailItem,
-        onActionSelected: AssetActionHandler,
-        analytics: Analytics
-    ) {
-        if (detailItem.account is CryptoAccount) {
-            if (detailItem.assetFilter == AssetFilter.Custodial) {
-                val crypto = detailItem.account.asset
-                analytics.logEvent(CustodialBalanceClicked(crypto))
-            }
-        }
-
-        PopupMenu(itemView.context, itemView.action_menu).apply {
-            menuInflater.inflate(R.menu.menu_asset_actions, menu)
-
-            // enable available actions
-            detailItem.actions.forEach {
-                menu.findItem(mapActionToMenuItem(it))?.isVisible = true
-            }
-
-            MenuCompat.setGroupDividerEnabled(menu, true)
-
-            setOnMenuItemClickListener {
-                val account = detailItem.account
-                val action = mapMenuItemToAction(it.itemId, account)
-
-                onActionSelected(action, account)
-                true
-            }
-
-            setOnDismissListener {
-                itemView.setBackgroundColor(
-                    ContextCompat.getColor(
-                        itemView.context,
-                        R.color.white
-                    )
-                )
-            }
-
-            gravity = Gravity.END
-            show()
-        }
-
-        itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.grey_000))
-    }
-
-    private fun mapMenuItemToAction(menuId: Int, account: BlockchainAccount): AssetAction =
-        when (menuId) {
-            R.id.action_activity -> AssetAction.ViewActivity
-            R.id.action_send -> if (account.actions.contains(AssetAction.Send))
-                AssetAction.Send
-                    else
-                AssetAction.NewSend
-            R.id.action_receive -> AssetAction.Receive
-            R.id.action_swap -> AssetAction.Swap
-            else -> throw IllegalArgumentException("id maps to unknown action")
-        }
-
-    private fun mapActionToMenuItem(action: AssetAction): Int =
-        when (action) {
-            AssetAction.ViewActivity -> R.id.action_activity
-            AssetAction.Send,
-            AssetAction.NewSend -> R.id.action_send
-            AssetAction.Receive -> R.id.action_receive
-            AssetAction.Swap -> R.id.action_swap
-        }.exhaustive
 }
 
 class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -167,15 +99,17 @@ class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 }
 
-typealias AssetActionHandler = (action: AssetAction, account: BlockchainAccount) -> Unit
-
 internal class AssetDetailAdapter(
-    private val itemList: List<AssetDetailItem>,
-    private val onActionSelected: AssetActionHandler,
-    private val analytics: Analytics,
+    private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,
     private val token: CryptoAsset
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    var itemList: List<AssetDetailItem> by Delegates.observable(emptyList()) { _, oldValue, newValue ->
+        if (oldValue != newValue) {
+            notifyDataSetChanged()
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_CRYPTO) {
@@ -199,7 +133,7 @@ internal class AssetDetailAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is AssetDetailViewHolder) {
-            holder.bind(itemList[position], onActionSelected, analytics)
+            holder.bind(itemList[position], onAccountSelected)
         } else {
             (holder as LabelViewHolder).bind(token)
         }

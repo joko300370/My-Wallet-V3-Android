@@ -46,7 +46,7 @@
   <string name="toolbar_cmd_receive_crypto">Te ontvangen</string>
   <string name="toolbar_cmd_activity">Werkzaamheid</string>
   <string name="toolbar_cmd_view_activity">Bekijk activiteit</string>
-  <string name="toolbar_cmd_swap">ruil</string>
+  <string name="common_swap">ruil</string>
   <string name="cancel">annuleren</string>
   <string name="btn_ok">OK</string>
   <string name="common_yes">Ja</string>
@@ -827,7 +827,7 @@
  wegens marktactiviteit. Zodra een bestelling is gestart, kunnen we deze niet meer stoppen 
 </string>
   <string name="send_to">Verzenden naar</string>
-  <string name="receive">Te ontvangen</string>
+  <string name="common_receive">Te ontvangen</string>
   <string name="fees">Vergoedingen</string>
   <string name="value">Waarde</string>
   <string name="status">Toestand</string>

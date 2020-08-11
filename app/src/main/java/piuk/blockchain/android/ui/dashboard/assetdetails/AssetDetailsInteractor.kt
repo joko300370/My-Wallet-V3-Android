@@ -1,25 +1,24 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.remoteconfig.FeatureFlag
-import com.jakewharton.rxrelay2.BehaviorRelay
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.TimeInterval
-import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Maybe
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import io.reactivex.rxkotlin.withLatestFrom
-import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
+typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
 data class AssetDisplayInfo(
     val account: BlockchainAccount,
     val amount: Money,
@@ -28,39 +27,31 @@ data class AssetDisplayInfo(
     val interestRate: Double = Double.NaN
 )
 
-typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
+class AssetDetailsInteractor(
+    private val interestFeatureFlag: FeatureFlag,
+    private val dashboardPrefs: DashboardPrefs,
+    private val coincore: Coincore
+) {
 
-class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
-    // input
-    val token = BehaviorRelay.create<CryptoAsset>()
-    val timeSpan = BehaviorRelay.createDefault<TimeSpan>(TimeSpan.DAY)
+    fun loadAssetDetails(asset: CryptoAsset) =
+        getAssetDisplayDetails(asset)
 
-    private val _chartLoading: BehaviorRelay<Boolean> = BehaviorRelay.createDefault<Boolean>(false)
+    fun loadExchangeRate(asset: CryptoAsset) =
+        asset.exchangeRate().map {
+            it.price().toStringWithSymbol()
+        }
 
-    val chartLoading: Observable<Boolean>
-        get() = _chartLoading
+    fun loadHistoricPrices(asset: CryptoAsset, timeSpan: TimeSpan) =
+        asset.historicRateSeries(timeSpan, TimeInterval.FIFTEEN_MINUTES)
+            .onErrorResumeNext(Single.just(emptyList()))
 
-    val exchangeRate: Observable<String> = token.flatMapSingle {
-        it.exchangeRate()
-    }.map {
-        it.price().toStringWithSymbol()
-    }.subscribeOn(Schedulers.io())
-
-    val historicPrices: Observable<List<PriceDatum>> =
-        (timeSpan.distinctUntilChanged().withLatestFrom(token)
-            .doOnNext { _chartLoading.accept(true) })
-            .switchMapSingle { (timeSpan, token) ->
-                token.historicRateSeries(timeSpan, TimeInterval.FIFTEEN_MINUTES)
-                    .onErrorResumeNext(Single.just(emptyList()))
+    fun shouldShowCustody(cryptoCurrency: CryptoCurrency): Single<Boolean> {
+        return coincore[cryptoCurrency].accountGroup(AssetFilter.Custodial)
+            .flatMapSingle { it.balance }
+            .map {
+                !dashboardPrefs.isCustodialIntroSeen && !it.isZero
             }
-            .doOnNext { _chartLoading.accept(false) }
-            .subscribeOn(Schedulers.io())
-
-    // output
-    val assetDisplayDetails: Observable<AssetDisplayMap> =
-        token.flatMapSingle {
-            getAssetDisplayDetails(it)
-        }.subscribeOn(Schedulers.computation())
+    }
 
     private sealed class Details {
         object NoDetails : Details()
@@ -97,7 +88,6 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
             )
         }
     }
-
     private fun makeAssetDisplayMap(
         fiatRate: ExchangeRate,
         total: Details,
@@ -106,15 +96,13 @@ class AssetDetailsCalculator(private val interestFeatureFlag: FeatureFlag) {
         interest: Details,
         interestRate: Double,
         interestEnabled: Boolean
-    ): AssetDisplayMap {
-        return mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
+    ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
             addToDisplayMap(this, AssetFilter.All, total, fiatRate)
             addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
             addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
             if (interestEnabled) {
                 addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
             }
-        }
     }
 
     private fun addToDisplayMap(

@@ -48,7 +48,7 @@
   <string name="toolbar_cmd_receive_crypto">Отримати</string>
   <string name="toolbar_cmd_activity">Діяльність</string>
   <string name="toolbar_cmd_view_activity">Переглянути активність</string>
-  <string name="toolbar_cmd_swap">Зміна</string>
+  <string name="common_swap">Зміна</string>
   <string name="cancel">Скасувати</string>
   <string name="btn_ok">добре</string>
   <string name="common_yes">Так</string>
@@ -829,7 +829,7 @@
  завдяки ринковій активності. Щойно замовлення починається, ми не можемо його зупинити 
 </string>
   <string name="send_to">Відправити</string>
-  <string name="receive">Отримати</string>
+  <string name="common_receive">Отримати</string>
   <string name="fees">Збори</string>
   <string name="value">Значення</string>
   <string name="status">Статус</string>

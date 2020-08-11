@@ -46,7 +46,7 @@
   <string name="toolbar_cmd_receive_crypto">Erhalten</string>
   <string name="toolbar_cmd_activity">Aktivität</string>
   <string name="toolbar_cmd_view_activity">Aktivität anzeigen</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">Stornieren</string>
   <string name="btn_ok">in Ordnung</string>
   <string name="common_yes">Ja</string>
@@ -827,7 +827,7 @@
  aufgrund der Marktaktivität. Sobald eine Bestellung beginnt, können wir sie nicht mehr stoppen 
 </string>
   <string name="send_to">Senden an</string>
-  <string name="receive">Erhalten</string>
+  <string name="common_receive">Erhalten</string>
   <string name="fees">Gebühren</string>
   <string name="value">Wert</string>
   <string name="status">Status</string>

@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">接收</string>
   <string name="toolbar_cmd_activity">活动</string>
   <string name="toolbar_cmd_view_activity">查看活动</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">取消</string>
   <string name="btn_ok">好</string>
   <string name="common_yes">是</string>
@@ -826,7 +826,7 @@
 由于市场活动。订单开始后，我们将无法停止
 </string>
   <string name="send_to">发给</string>
-  <string name="receive">接收</string>
+  <string name="common_receive">接收</string>
   <string name="fees">费用</string>
   <string name="value">值</string>
   <string name="status">状态</string>
