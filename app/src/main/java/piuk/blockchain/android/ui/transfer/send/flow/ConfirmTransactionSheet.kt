@@ -76,7 +76,6 @@ class ConfirmTransactionSheet(
         showAddNoteIfSupported(newState)
         showNoteState(newState)
 
-
         // TODO if new state tx options have confirmation
         dialogView.confirm_details_bottom_view_switcher.displayedChild = 0
 
@@ -177,8 +176,8 @@ class ConfirmTransactionSheet(
         dialogView.confirm_cta_button.isEnabled = false
 
         dialogView.confirm_details_tos_pp_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked) {
-                if(dialogView.confirm_details_holdings_checkbox.isChecked) {
+            if (isChecked) {
+                if (dialogView.confirm_details_holdings_checkbox.isChecked) {
                     dialogView.confirm_cta_button.isEnabled = true
                 }
             } else {
@@ -187,8 +186,8 @@ class ConfirmTransactionSheet(
         }
 
         dialogView.confirm_details_holdings_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked) {
-                if(dialogView.confirm_details_tos_pp_checkbox.isChecked) {
+            if (isChecked) {
+                if (dialogView.confirm_details_tos_pp_checkbox.isChecked) {
                     dialogView.confirm_cta_button.isEnabled = true
                 }
             } else {
