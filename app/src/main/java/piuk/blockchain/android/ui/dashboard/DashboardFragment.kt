@@ -440,7 +440,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         cryptoAsset: CryptoAsset,
         action: AssetAction
     ) {
-        Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
         model.process(LaunchDepositFlow(toAccount, fromAccount, action))
     }
 

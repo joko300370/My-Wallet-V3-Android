@@ -135,7 +135,6 @@ class SendModel(
                     )
                 },
                 onError = {
-                    Timber.e("----  Unable to get transaction processor: $it")
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
