@@ -96,8 +96,10 @@ class ConfirmTransactionSheet(
         }
     }
 
-    private fun updateOptions(state: SendState,
-                              itemList: MutableList<PendingTxItem>) {
+    private fun updateOptions(
+        state: SendState,
+        itemList: MutableList<PendingTxItem>
+    ) {
         // Current iteration only supports notes/description. But this is where all and any other
         // options - ie agreements, t&c confirmations etc are added and updated
 
@@ -140,15 +142,19 @@ class ConfirmTransactionSheet(
         }
     }
 
-    private fun showDepositUi(state: SendState,
-                              itemList: MutableList<PendingTxItem>) {
+    private fun showDepositUi(
+        state: SendState,
+        itemList: MutableList<PendingTxItem>
+    ) {
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_deposit_cta_button)
         itemList.add(0, PendingTxItem(getString(R.string.common_deposit),
             state.sendAmount.toStringWithSymbol()))
     }
 
-    private fun showSendUi(state: SendState,
-                           itemList: MutableList<PendingTxItem>) {
+    private fun showSendUi(
+        state: SendState,
+        itemList: MutableList<PendingTxItem>
+    ) {
         dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
             getTotalAmount(state))
         itemList.add(0,

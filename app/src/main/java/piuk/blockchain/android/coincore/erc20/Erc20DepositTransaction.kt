@@ -40,5 +40,4 @@ class Erc20DepositTransaction(
             )
         )
     )
-
 }

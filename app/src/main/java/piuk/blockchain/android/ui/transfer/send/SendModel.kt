@@ -120,7 +120,8 @@ class SendModel(
     }
 
     private fun processInitialisationWithPredefinedAccounts(
-        intent: SendIntent.InitialiseWithTarget): Disposable {
+        intent: SendIntent.InitialiseWithTarget
+    ): Disposable {
         return interactor.initialiseTransaction(
             intent.fromAccount, intent.toAccount)
             .subscribeBy(
