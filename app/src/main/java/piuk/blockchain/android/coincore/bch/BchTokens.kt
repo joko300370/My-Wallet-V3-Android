@@ -20,9 +20,11 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
 internal class BchAsset(
+    payloadManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
     private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
@@ -34,6 +36,7 @@ internal class BchAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
@@ -56,6 +59,7 @@ internal class BchAsset(
                 getAccountMetadataList()
                     .mapIndexed { i, a ->
                         BchCryptoWalletAccount(
+                            payloadManager = payloadManager,
                             jsonAccount = a,
                             bchManager = bchDataManager,
                             isDefault = i == getDefaultAccountPosition(),

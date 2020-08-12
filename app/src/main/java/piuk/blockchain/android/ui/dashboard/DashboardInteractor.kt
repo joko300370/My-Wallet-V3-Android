@@ -17,11 +17,13 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
@@ -180,17 +182,33 @@ class DashboardInteractor(
             )
     }
 
-    fun getSendFlow(model: DashboardModel, fromAccount: SingleAccount): Disposable? {
+    fun getSendFlow(
+        model: DashboardModel,
+        fromAccount: SingleAccount,
+        action: AssetAction
+    ): Disposable? {
         if (fromAccount is CryptoAccount) {
             model.process(
                 UpdateLaunchDialogFlow(
                     SendFlow(
-                        account = fromAccount,
-                        coincore = coincore
+                        action = action,
+                        fromAccount = fromAccount
                     )
                 )
             )
         }
+        return null
+    }
+
+    fun getAssetDetailsFlow(model: DashboardModel, cryptoCurrency: CryptoCurrency): Disposable? {
+        model.process(
+            UpdateLaunchDialogFlow(
+                AssetDetailsFlow(
+                    cryptoCurrency = cryptoCurrency,
+                    coincore = coincore
+                )
+            )
+        )
         return null
     }
 

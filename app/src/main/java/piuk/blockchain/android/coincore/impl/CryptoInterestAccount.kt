@@ -6,7 +6,9 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.ENABLE_INTEREST_ACTIONS
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
@@ -21,13 +23,14 @@ internal class CryptoInterestAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
-    override val feeAsset: CryptoCurrency? = null
-
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
+
+    override fun requireSecondPassword(): Single<Boolean> =
+        Single.just(false)
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
@@ -57,5 +60,9 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions = emptySet()
+    override val actions: AvailableActions = if (ENABLE_INTEREST_ACTIONS) {
+        setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
+    } else {
+        emptySet()
+    }
 }

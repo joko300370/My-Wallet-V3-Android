@@ -11,8 +11,10 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal abstract class Erc20TokensBase(
+    payloadManager: PayloadDataManager,
     protected val erc20Account: Erc20Account,
     protected val feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
@@ -23,6 +25,7 @@ internal abstract class Erc20TokensBase(
     pitLinking: PitLinking,
     crashLogger: CrashLogger
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,

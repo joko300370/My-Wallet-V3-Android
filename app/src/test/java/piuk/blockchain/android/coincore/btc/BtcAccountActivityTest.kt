@@ -28,7 +28,7 @@ class BtcAccountActivityTest {
         BtcCryptoWalletAccount(
             label = "TestBtcAccount",
             address = "",
-            payloadDataManager = payloadDataManager,
+            payloadManager = payloadDataManager,
             isDefault = true,
             exchangeRates = exchangeRates
         )

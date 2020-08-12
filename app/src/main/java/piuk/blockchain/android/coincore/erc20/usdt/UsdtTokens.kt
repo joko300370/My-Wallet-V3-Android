@@ -24,8 +24,10 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class UsdtAsset(
+    payloadManager: PayloadDataManager,
     usdtAccount: Erc20Account,
     feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
@@ -36,6 +38,7 @@ internal class UsdtAsset(
     crashLogger: CrashLogger,
     pitLinking: PitLinking
 ) : Erc20TokensBase(
+    payloadManager,
     usdtAccount,
     feeDataManager,
     custodialManager,
@@ -56,6 +59,7 @@ internal class UsdtAsset(
             ?: throw Exception("No USDT wallet found")
 
         return UsdtCryptoWalletAccount(
+            payloadManager,
             labels.getDefaultNonCustodialWalletLabel(asset),
             usdtAddress,
             erc20Account,

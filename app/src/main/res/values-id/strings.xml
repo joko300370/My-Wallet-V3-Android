@@ -45,7 +45,7 @@
   <string name="toolbar_cmd_receive_crypto">Menerima</string>
   <string name="toolbar_cmd_activity">Aktivitas</string>
   <string name="toolbar_cmd_view_activity">Lihat Aktivitas</string>
-  <string name="toolbar_cmd_swap">Menukar</string>
+  <string name="common_swap">Menukar</string>
   <string name="cancel">Membatalkan</string>
   <string name="btn_ok">baik</string>
   <string name="common_yes">Iya</string>
@@ -826,7 +826,7 @@
  karena aktivitas pasar. Setelah pesanan dimulai, kami tidak dapat menghentikannya 
 </string>
   <string name="send_to">Kirim ke</string>
-  <string name="receive">Menerima</string>
+  <string name="common_receive">Menerima</string>
   <string name="fees">Biaya</string>
   <string name="value">Nilai</string>
   <string name="status">Status</string>

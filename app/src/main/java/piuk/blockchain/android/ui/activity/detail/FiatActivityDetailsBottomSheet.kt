@@ -44,7 +44,7 @@ class FiatActivityDetailsBottomSheet :
 
             assetActivityRepository.findCachedItem(currency, txHash)?.let {
                 title.text =
-                    if (it.type == TransactionType.DEPOSIT) getString(R.string.fiat_funds_detail_deposit_title) else
+                    if (it.type == TransactionType.DEPOSIT) getString(R.string.common_deposit) else
                         getString(R.string.fiat_funds_detail_withdraw_title)
                 amount.text =
                     if (it.type == TransactionType.DEPOSIT) it.value.toStringWithSymbol() else

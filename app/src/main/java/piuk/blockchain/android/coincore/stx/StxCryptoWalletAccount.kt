@@ -7,12 +7,14 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class StxCryptoWalletAccount(
+    payloadManager: PayloadDataManager,
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(CryptoCurrency.STX) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX) {
 
     override val isFunded: Boolean
         get() = false

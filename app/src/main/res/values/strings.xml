@@ -5,6 +5,8 @@
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
     <string name="common_send">Send</string>
+    <string name="common_receive">Receive</string>
+    <string name="common_swap">Swap</string>
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_yes">Yes</string>
@@ -12,6 +14,7 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_total">Total</string>
+    <string name="common_deposit">Deposit</string>
     <string name="common_error">Something went wrong, please try again</string>
 
     <plurals name="transfer_label_plural">
@@ -43,7 +46,9 @@
     <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
     <string name="toolbar_cmd_view_activity">View Activity</string>
+
     <string name="toolbar_cmd_swap">Swap</string>
+    <string name="toolbar_cmd_transfer">Transfer</string>
 
     <string name="polite_no">No thanks</string>
 
@@ -865,6 +870,17 @@
     <string name="dashboard_asset_balance_custodial">Trading Wallet</string>
     <string name="dashboard_asset_balance_interest">Earn %1$.1f%% APY</string>
 
+    <string name="dashboard_asset_actions_send_dsc">Transfer %1$s to any Wallet</string>
+    <string name="dashboard_asset_actions_receive_dsc">Accept or Share Your %1$s Address</string>
+    <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
+    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Wallet</string>
+    <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
+    <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
+    <string name="dashboard_asset_actions_interest_dsc_failed">Could not load Interest details</string>
+    <string name="asset_details_chart_load_failed_toast">Failed to load chart details, please try again</string>
+    <string name="asset_details_load_failed_toast">Failed to load wallet details, please try again</string>
+    <string name="asset_details_exchange_load_failed_toast">Failed to exchange rate information, please try again</string>
+
     <string name="more">More</string>
 
     <string name="force_upgrade_message">The version of the app you are using is no longer
@@ -992,7 +1008,6 @@
         due to market activity. Once an order starts, we are unable to stop it
     </string>
     <string name="send_to">Send To</string>
-    <string name="receive">Receive</string>
     <string name="value">Value</string>
     <string name="status">Status</string>
 
@@ -1685,6 +1700,7 @@
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
     <string name="select_account_sheet_title">Select a Wallet</string>
+    <string name="select_deposit_source_title">Deposit from</string>
     <string name="activity_state_initialised">Initialised</string>
     <string name="activity_state_uninitialised">Uninitialised</string>
     <string name="activity_state_awaiting_funds">Waiting On Funds</string>
@@ -1815,7 +1831,6 @@
     <string name="most_popular">Most Popular</string>
 
     <!-- Fiat Funds -->
-    <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
@@ -1837,6 +1852,7 @@
     <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
     <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
     <string name="transfer_send_crypto">Send crypto</string>
+    <string name="transfer_receive_crypto">Receive crypto</string>
     <string name="transfer_second_pswd_title">2nd Password</string>
     <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
     <string name="transfer_second_pswd_hint">2nd password</string>

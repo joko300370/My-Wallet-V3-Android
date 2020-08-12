@@ -18,20 +18,23 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
-class Erc20OnChainTransaction(
-    override val asset: CryptoCurrency,
+open class Erc20OnChainTransaction(
+    final override val asset: CryptoCurrency,
     private val erc20Account: Erc20Account,
     private val feeManager: FeeDataManager,
+    exchangeRates: ExchangeRateDataManager,
     sendingAccount: Erc20NonCustodialAccount,
     sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainSendProcessorBase(
+        exchangeRates,
         sendingAccount,
         sendTarget,
         requireSecondPassword
@@ -94,14 +97,11 @@ class Erc20OnChainTransaction(
 
     override fun validate(): Completable =
         validateAddresses()
-//            .then { validateFees(pendingTx) }
             .then { validateAmount(pendingTx) }
             .then { validateSufficientFunds(pendingTx) }
             .then { validateSufficientGas(pendingTx) }
             .then { validateNoPendingTx() }
             .doOnError { Timber.e("Validation failed: $it") }
-
-//    private fun validateFees(pendingTx: PendingTx) {}
 
     // This should have already been checked, but we'll check again because
     // burning tokens by sending them to the contract address is probably not what we

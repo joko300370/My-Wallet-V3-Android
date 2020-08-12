@@ -14,7 +14,7 @@ import com.blockchain.koin.etherStrategy
 import com.blockchain.koin.eur
 import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
-import com.blockchain.koin.interestAccount
+import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
@@ -95,7 +95,9 @@ import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
 import piuk.blockchain.android.ui.dashboard.DashboardState
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsCalculator
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsInteractor
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.fingerprint.FingerprintPresenter
 import piuk.blockchain.android.ui.home.CacheCredentialsWiper
@@ -232,10 +234,6 @@ val applicationModule = module {
                 qrGenerator = get(),
                 swipeToReceiveHelper = get()
             )
-        }
-
-        factory {
-            AssetDetailsCalculator(get(interestAccount))
         }
 
         factory {
@@ -667,8 +665,7 @@ val applicationModule = module {
             DashboardModel(
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get(),
-                persistence = get()
+                interactor = get()
             )
         }
 
@@ -681,6 +678,22 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get()
+            )
+        }
+
+        scoped {
+            AssetDetailsModel(
+                initialState = AssetDetailsState(),
+                mainScheduler = AndroidSchedulers.mainThread(),
+                interactor = get()
+            )
+        }
+
+        factory {
+            AssetDetailsInteractor(
+                interestFeatureFlag = get(interestAccountFeatureFlag),
+                dashboardPrefs = get(),
+                coincore = get()
             )
         }
 

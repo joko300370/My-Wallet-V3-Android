@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -36,7 +37,9 @@ class BalanceUpdate(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         val balance = newBalance as CryptoValue
-        require(cryptoCurrency == balance.currency) { throw IllegalStateException("CryptoCurrency mismatch") }
+        require(cryptoCurrency == balance.currency) {
+            throw IllegalStateException("CryptoCurrency mismatch")
+        }
 
         val oldAsset = oldState[cryptoCurrency]
         val newAsset = oldAsset.copy(balance = newBalance, hasBalanceError = false)
@@ -151,39 +154,11 @@ object ClearAnnouncement : DashboardIntent() {
     }
 }
 
-class ShowCryptoAssetDetails(
-    private val cryptoCurrency: CryptoCurrency
-) : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        when {
-            oldState.showAssetSheetFor != null -> oldState
-            oldState.shouldShowCustodialIntro(cryptoCurrency) ->
-                oldState.copy(
-                    showDashboardSheet = DashboardSheet.CUSTODY_INTRO,
-                    pendingAssetSheetFor = cryptoCurrency,
-                    showAssetSheetFor = null,
-                    activeFlow = null,
-                    custodyIntroSeen = true,
-                    selectedFiatAccount = null
-                )
-            else -> oldState.copy(
-                showAssetSheetFor = cryptoCurrency,
-                pendingAssetSheetFor = null,
-                showDashboardSheet = null,
-                activeFlow = null,
-                selectedFiatAccount = null
-            )
-        }
-}
-
 class ShowFiatAssetDetails(
     private val fiatAccount: FiatAccount
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showAssetSheetFor = null,
-            pendingAssetSheetFor = null,
-            activeFlow = null,
             showDashboardSheet = DashboardSheet.FIAT_FUNDS_DETAILS,
             selectedFiatAccount = fiatAccount
         )
@@ -194,8 +169,6 @@ class ShowBankLinkingSheet(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showAssetSheetFor = null,
-            pendingAssetSheetFor = null,
             showDashboardSheet = DashboardSheet.LINK_OR_DEPOSIT,
             selectedFiatAccount = fiatAccount
         )
@@ -204,14 +177,10 @@ class ShowBankLinkingSheet(
 class ShowDashboardSheet(
     private val dashboardSheet: DashboardSheet
 ) : DashboardIntent() {
-    override fun isValidFor(oldState: DashboardState): Boolean =
-        dashboardSheet != DashboardSheet.CUSTODY_INTRO
-
     override fun reduce(oldState: DashboardState): DashboardState =
         // Custody sheet isn't displayed via this intent, so filter it out
         oldState.copy(
             showDashboardSheet = dashboardSheet,
-            showAssetSheetFor = null,
             activeFlow = null,
             selectedFiatAccount = null
         )
@@ -227,9 +196,7 @@ object ClearBottomSheet : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             showDashboardSheet = null,
-            activeFlow = null,
-            showAssetSheetFor = oldState.pendingAssetSheetFor,
-            pendingAssetSheetFor = null
+            activeFlow = null
         )
 }
 
@@ -240,9 +207,7 @@ class StartCustodialTransfer(
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             showDashboardSheet = null,
-            showAssetSheetFor = null,
             activeFlow = null,
-            pendingAssetSheetFor = null,
             transferFundsCurrency = cryptoCurrency
         )
 }
@@ -270,17 +235,27 @@ object TransferFunds : DashboardIntent() {
 
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
-    }
+}
 
 class LaunchSendFlow(
-    val fromAccount: SingleAccount
+    val fromAccount: SingleAccount,
+    val action: AssetAction
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             showDashboardSheet = null,
-            showAssetSheetFor = null,
             activeFlow = null,
-            pendingAssetSheetFor = null,
+            transferFundsCurrency = null
+        )
+}
+
+class LaunchAssetDetailsFlow(
+    val cryptoCurrency: CryptoCurrency
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            showDashboardSheet = null,
+            activeFlow = null,
             transferFundsCurrency = null
         )
 }
@@ -291,9 +266,7 @@ class UpdateLaunchDialogFlow(
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             showDashboardSheet = null,
-            showAssetSheetFor = null,
             activeFlow = flow,
-            pendingAssetSheetFor = null,
             transferFundsCurrency = null
         )
 }
