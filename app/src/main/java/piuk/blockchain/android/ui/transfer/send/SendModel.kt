@@ -135,6 +135,7 @@ class SendModel(
                     )
                 },
                 onError = {
+                    Timber.e("!SEND!> Unable to init transaction: $it")
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
