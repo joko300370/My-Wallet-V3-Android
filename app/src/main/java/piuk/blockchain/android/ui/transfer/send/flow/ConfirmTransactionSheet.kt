@@ -26,19 +26,19 @@ import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
-import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 data class PendingTxItem(
@@ -67,7 +67,6 @@ class ConfirmTransactionSheet(
 
         val amount = newState.sendAmount
         val itemList = mutableListOf(
-            PendingTxItem(getString(R.string.common_send), amount.toStringWithSymbol()),
             PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
             PendingTxItem(getString(R.string.common_to), newState.sendTarget.label)
         )
@@ -76,38 +75,36 @@ class ConfirmTransactionSheet(
             itemList.add(it)
         }
 
-        val fee = newState.feeAmount
-        val totalAmount = if (amount.symbol == fee.symbol) {
-            (amount + fee).toStringWithSymbol()
-        } else {
-            "${amount.toStringWithSymbol()} (${fee.toStringWithSymbol()}"
-        }
+        itemList.add(PendingTxItem(getString(R.string.common_total), getTotalAmount(newState)))
 
-        itemList.add(PendingTxItem(getString(R.string.common_total), totalAmount))
-
-        updateOptions(newState.pendingTx) // These options should probably be items also TODO
+        // These options should probably be items also TODO
+        updateOptions(newState, itemList)
 
         detailsAdapter.populate(itemList)
-
-        // TODO if new state tx options have confirmation
-        dialogView.confirm_details_bottom_view_switcher.displayedChild = 0
-
-        setupTosAndPPLinks()
-        setupHoldingValues(newState.sendAmount)
-        setupCheckboxEvents()
-
-        dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
-            totalAmount)
 
         state = newState
     }
 
-    private fun updateOptions(pendingTx: PendingTx) {
+    private fun getTotalAmount(newState: SendState): String {
+        val fee = newState.feeAmount
+        val amount = newState.sendAmount
+
+        return if (amount.symbol == fee.symbol) {
+            (amount + fee).toStringWithSymbol()
+        } else {
+            "${amount.toStringWithSymbol()} (${fee.toStringWithSymbol()}"
+        }
+    }
+
+    private fun updateOptions(state: SendState,
+                              itemList: MutableList<PendingTxItem>) {
         // Current iteration only supports notes/description. But this is where all and any other
         // options - ie agreements, t&c confirmations etc are added and updated
 
-        val note = pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
+        val note = state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
         note?.let { opt ->
+            dialogView.confirm_details_bottom_view_switcher.displayedChild = DESCRIPTION_INPUT
+
             // Option exists. Show and update the field
             dialogView.confirm_details_note_input.apply {
                 inputType = INPUT_FIELD_FLAGS
@@ -123,7 +120,39 @@ class ConfirmTransactionSheet(
 
                 setText(opt.text, TextView.BufferType.EDITABLE)
             }
-        } ?: dialogView.confirm_details_note_holder.gone()
+        }
+
+        val agreement = state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.AGREEMENT)
+        agreement?.let {
+            dialogView.confirm_details_bottom_view_switcher.displayedChild = AGREEMENT_INPUT
+
+            setupTosAndPPLinks()
+            setupHoldingValues(state.sendAmount)
+            setupCheckboxEvents()
+
+            showDepositUi(state, itemList)
+        } ?: showSendUi(state, itemList)
+
+        if (note != null || agreement != null) {
+            dialogView.confirm_details_bottom_view_switcher.visible()
+        } else {
+            dialogView.confirm_details_bottom_view_switcher.gone()
+        }
+    }
+
+    private fun showDepositUi(state: SendState,
+                              itemList: MutableList<PendingTxItem>) {
+        dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_deposit_cta_button)
+        itemList.add(0, PendingTxItem(getString(R.string.common_deposit),
+            state.sendAmount.toStringWithSymbol()))
+    }
+
+    private fun showSendUi(state: SendState,
+                           itemList: MutableList<PendingTxItem>) {
+        dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
+            getTotalAmount(state))
+        itemList.add(0,
+            PendingTxItem(getString(R.string.common_send), state.sendAmount.toStringWithSymbol()))
     }
 
     private fun getFeeItem(state: SendState): PendingTxItem? {
@@ -220,7 +249,7 @@ class ConfirmTransactionSheet(
 
     companion object {
         private const val DESCRIPTION_INPUT = 0
-        private const val CONFIRMATION_INPUT = 1
+        private const val AGREEMENT_INPUT = 1
     }
 }
 

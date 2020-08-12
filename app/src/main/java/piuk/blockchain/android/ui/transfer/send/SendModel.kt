@@ -12,13 +12,12 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
-import java.lang.IllegalStateException
 
 enum class SendStep {
     ZERO,
@@ -87,18 +86,8 @@ class SendModel(
 
         return when (intent) {
             is SendIntent.Initialise -> null
-            is SendIntent.InitialiseWithTarget -> interactor.initialiseTransaction(
-                intent.fromAccount, intent.toAccount)
-                .subscribeBy(
-                    onSuccess = {
-                        process(SendIntent.StartWithDefinedAccounts(intent.fromAccount, intent.toAccount,
-                            intent.passwordRequired, intent.balance))
-                    },
-                    onError = {
-                        Timber.e("----  Unable to get transaction processor: $it")
-                        process(SendIntent.FatalTransactionError(it))
-                    }
-                )
+            is SendIntent.InitialiseWithTarget ->
+                processInitialisationWithPredefinedAccounts(intent)
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
@@ -128,6 +117,27 @@ class SendModel(
             is SendIntent.FiatRateUpdated -> null
             is SendIntent.CryptoRateUpdated -> null
         }
+    }
+
+    private fun processInitialisationWithPredefinedAccounts(
+        intent: SendIntent.InitialiseWithTarget): Disposable {
+        return interactor.initialiseTransaction(
+            intent.fromAccount, intent.toAccount)
+            .subscribeBy(
+                onSuccess = {
+                    val updatedTx = it.copy(available = intent.balance)
+                    process(SendIntent.FetchFiatRates)
+                    process(SendIntent.FetchTargetRates)
+                    process(
+                        SendIntent.StartWithDefinedAccounts(intent.fromAccount, intent.toAccount,
+                            intent.passwordRequired, updatedTx)
+                    )
+                },
+                onError = {
+                    Timber.e("----  Unable to get transaction processor: $it")
+                    process(SendIntent.FatalTransactionError(it))
+                }
+            )
     }
 
     override fun onScanLoopError(t: Throwable) {
@@ -164,7 +174,8 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is TransactionValidationError -> process(SendIntent.TargetAddressInvalid(it))
+                        is TransactionValidationError -> process(
+                            SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }
@@ -208,8 +219,8 @@ class SendModel(
                         Timber.e("!SEND!> Unable to get update available balance")
                         process(SendIntent.FatalTransactionError(it))
                     }
-            }
-        )
+                }
+            )
 
     private fun processExecuteTransaction(): Disposable? =
         interactor.verifyAndExecute()

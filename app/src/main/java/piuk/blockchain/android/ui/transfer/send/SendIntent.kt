@@ -48,7 +48,7 @@ sealed class SendIntent : MviIntent<SendState> {
         private val fromAccount: CryptoAccount,
         private val toAccount: SendTarget,
         private val passwordRequired: Boolean,
-        private val balance: CryptoValue // TODO can this be removed?
+        private val pendingTx: PendingTx
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
@@ -56,6 +56,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 sendTarget = toAccount,
                 errorState = SendErrorState.NONE,
                 passwordRequired = passwordRequired,
+                pendingTx = pendingTx,
                 currentStep = if (passwordRequired) {
                     SendStep.ENTER_PASSWORD
                 } else {

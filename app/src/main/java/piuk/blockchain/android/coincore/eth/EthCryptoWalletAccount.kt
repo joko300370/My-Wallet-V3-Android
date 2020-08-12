@@ -110,7 +110,7 @@ internal class EthCryptoWalletAccount(
                 )
             )
             is CryptoInterestAccount -> sendTo.receiveAddress.map {
-                EthSendTransaction(
+                EthDepositTransaction(
                     ethDataManager = ethDataManager,
                     feeManager = fees,
                     exchangeRates = exchangeRates,

@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
+import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -116,6 +117,18 @@ abstract class Erc20NonCustodialAccount(
                     requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             )
+            is CryptoInterestAccount ->
+                sendTo.receiveAddress.map {
+                    Erc20DepositTransaction(
+                        asset = asset,
+                        erc20Account = erc20Account,
+                        feeManager = fees,
+                        exchangeRates = exchangeRates,
+                        sendingAccount = this,
+                        sendTarget = sendTo as Erc20Address,
+                        requireSecondPassword = ethDataManager.requireSecondPassword
+                    )
+                }
             is CryptoAccount -> sendTo.receiveAddress.map {
                 Erc20OnChainTransaction(
                     asset = asset,
