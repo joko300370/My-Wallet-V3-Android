@@ -84,16 +84,16 @@ class TransactionInOutMapper(
                 .toSingle(EmptyAccount(fromAddress)),
             coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, toAddress)
                 .toSingle(EmptyAccount(toAddress))
-        ) { a, b ->
+        ) { fromAccount, toAccount ->
             TransactionInOutDetails(
                 inputs = listOf(
                     TransactionDetailModel(
-                        a.label
+                        fromAccount.label
                     )
                 ),
                 outputs = listOf(
                     TransactionDetailModel(
-                        b.label
+                        toAccount.label
                     )
                 )
             )

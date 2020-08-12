@@ -7,7 +7,6 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
-import java.io.Serializable
 
 interface BlockchainAccount {
     val label: String
@@ -25,7 +24,7 @@ interface BlockchainAccount {
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
 
-interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
+interface SingleAccount : BlockchainAccount, SendTarget {
     val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
 

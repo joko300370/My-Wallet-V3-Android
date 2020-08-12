@@ -135,13 +135,15 @@ class AssetDetailsFlow(
     }
 
     private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
-        disposables += localState.asset!!.accountGroup(AssetFilter.Interest).subscribeBy {
-            assetFlowHost.goToDeposit(
-                account,
-                it.accounts.first(),
-                localState.asset!!,
-                assetAction)
-        }
+        localState.asset?.let { ca ->
+            disposables += ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
+                assetFlowHost.goToDeposit(
+                    account,
+                    ag.accounts.first(),
+                    ca,
+                    assetAction)
+            }
+        } ?: throw IllegalStateException("No asset defined in local state - action: $assetAction")
     }
 
     override fun onAccountSelectorBack() {

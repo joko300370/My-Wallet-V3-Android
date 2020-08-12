@@ -174,8 +174,7 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is TransactionValidationError -> process(
-                            SendIntent.TargetAddressInvalid(it))
+                        is TransactionValidationError -> process(SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }
