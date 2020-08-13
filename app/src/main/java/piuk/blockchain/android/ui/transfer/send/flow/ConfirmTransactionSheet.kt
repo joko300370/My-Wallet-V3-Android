@@ -79,6 +79,8 @@ class ConfirmTransactionSheet(
         // These options should probably be items also TODO
         updateOptions(newState, itemList)
 
+        showSendUi(state, itemList)
+
         detailsAdapter.populate(itemList)
 
         state = newState
@@ -130,9 +132,9 @@ class ConfirmTransactionSheet(
             setupTosAndPPLinks()
             setupHoldingValues(state.sendAmount)
             setupCheckboxEvents()
-
-            showDepositUi(state, itemList)
-        } ?: showSendUi(state, itemList)
+            // TODO how do we show specific UI for a different transfer type?
+            // showDepositUi(state, itemList)
+        } // ?: showSendUi(state, itemList)
 
         if (note != null || agreement != null) {
             dialogView.confirm_details_bottom_view_switcher.visible()
