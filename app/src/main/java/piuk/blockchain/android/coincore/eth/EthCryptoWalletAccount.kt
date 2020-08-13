@@ -14,9 +14,9 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -66,8 +66,8 @@ internal class EthCryptoWalletAccount(
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
             EthAddress(
-                    address = address,
-                    label = label
+                address = address,
+                label = label
             )
         )
 
@@ -77,22 +77,27 @@ internal class EthCryptoWalletAccount(
                 ethDataManager.getEthTransactions()
                     .map { list ->
                         list.map { transaction ->
-                            val ethFeeForPaxTransaction = transaction.to.equals(
-                                ethDataManager.getErc20TokenData(CryptoCurrency.PAX).contractAddress,
-                                ignoreCase = true
-                            )
                             EthActivitySummaryItem(
-                                ethDataManager,
-                                transaction,
-                                ethFeeForPaxTransaction,
-                                latestBlock.number.toLong(),
-                                exchangeRates,
-                                account = this
-                            ) as ActivitySummaryItem
+                                    ethDataManager,
+                                    transaction,
+                                    isErc20FeeTransaction(transaction.to),
+                                    latestBlock.number.toLong(),
+                                    exchangeRates,
+                                    account = this
+                                ) as ActivitySummaryItem
                         }
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+
+    private fun isErc20FeeTransaction(to: String): Boolean =
+        to.equals(
+            ethDataManager.getErc20TokenData(CryptoCurrency.PAX).contractAddress,
+            ignoreCase = true
+        ) || to.equals(
+                ethDataManager.getErc20TokenData(CryptoCurrency.USDT).contractAddress,
+                ignoreCase = true
+            )
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
