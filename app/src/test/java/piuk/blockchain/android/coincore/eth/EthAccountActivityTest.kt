@@ -2,17 +2,18 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -31,14 +32,14 @@ class EthAccountActivityTest {
     private val currencyPrefs: CurrencyPrefs = mock()
 
     private val subject =
-        EthCryptoWalletAccount(
+        spy(EthCryptoWalletAccount(
             payloadManager = payloadManager,
             label = "TestEthAccount",
             address = "Test Address",
             ethDataManager = ethDataManager,
             fees = feeDataManager,
             exchangeRates = exchangeRates
-        )
+        ))
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -59,7 +60,9 @@ class EthAccountActivityTest {
         val latestBlock = EthLatestBlockNumber()
         val transaction: EthTransaction = mock()
 
+        val to = "12345"
         whenever(transaction.hash).thenReturn("hash")
+        whenever(transaction.to).thenReturn(to)
 
         val ethModel: CombinedEthModel = mock()
 
@@ -72,8 +75,7 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        whenever(ethDataManager.getErc20TokenData(CryptoCurrency.PAX))
-            .thenReturn(Erc20TokenData.createPaxTokenData(""))
+        doReturn(true).`when`(subject).isErc20FeeTransaction(to)
 
         subject.activity
             .test()
@@ -82,7 +84,6 @@ class EthAccountActivityTest {
 
         verify(ethDataManager).getLatestBlockNumber()
         verify(ethDataManager).getEthTransactions()
-        verify(ethDataManager).getErc20TokenData(CryptoCurrency.PAX)
     }
 
     @Test
@@ -94,12 +95,13 @@ class EthAccountActivityTest {
 
         whenever(ethDataManager.getLatestBlockNumber())
             .thenReturn(Single.just(EthLatestBlockNumber()))
-        whenever(ethDataManager.getErc20TokenData(CryptoCurrency.PAX))
-            .thenReturn(Erc20TokenData.createPaxTokenData(""))
+
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(mock())
         whenever(ethDataManager.getEthTransactions())
             .thenReturn(Single.just(listOf(ethTransaction)))
+
+        doReturn(true).`when`(subject).isErc20FeeTransaction(ethTransaction.to)
 
         subject.activity
             .test()
@@ -113,7 +115,6 @@ class EthAccountActivityTest {
                 (it[0] as NonCustodialActivitySummaryItem).isFeeTransaction
             }
 
-        verify(ethDataManager).getErc20TokenData(CryptoCurrency.PAX)
         verify(ethDataManager).getEthTransactions()
     }
 
@@ -121,13 +122,13 @@ class EthAccountActivityTest {
     fun getEthTransactionsListWithNoErc20FeeTransactionInTheList() {
         // Arrange
         val ethTransaction = EthTransaction(
-            to = "0x8E870D234660D95d5be530380D0eC0bd388289E1"
+            to = "0x8E870D67F660D95d5be530380D0eC0bd388289E1"
         )
 
         whenever(ethDataManager.getLatestBlockNumber())
             .thenReturn(Single.just(EthLatestBlockNumber()))
-        whenever(ethDataManager.getErc20TokenData(CryptoCurrency.PAX))
-            .thenReturn(Erc20TokenData.createPaxTokenData(""))
+        doReturn(false).`when`(subject).isErc20FeeTransaction(ethTransaction.to)
+
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(mock())
         whenever(ethDataManager.getEthTransactions())
@@ -145,7 +146,6 @@ class EthAccountActivityTest {
                 !(it[0] as NonCustodialActivitySummaryItem).isFeeTransaction
             }
 
-        verify(ethDataManager).getErc20TokenData(CryptoCurrency.PAX)
         verify(ethDataManager).getEthTransactions()
     }
 }

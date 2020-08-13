@@ -67,8 +67,8 @@ internal class EthCryptoWalletAccount(
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
             EthAddress(
-                    address = address,
-                    label = label
+                address = address,
+                label = label
             )
         )
 
@@ -78,14 +78,12 @@ internal class EthCryptoWalletAccount(
                 ethDataManager.getEthTransactions()
                     .map { list ->
                         list.map { transaction ->
-                            val ethFeeForPaxTransaction = transaction.to.equals(
-                                ethDataManager.getErc20TokenData(CryptoCurrency.PAX).contractAddress,
-                                ignoreCase = true
-                            )
+                            val isEr20FeeTransaction = isErc20FeeTransaction(transaction.to)
+
                             EthActivitySummaryItem(
                                 ethDataManager,
                                 transaction,
-                                ethFeeForPaxTransaction,
+                                isEr20FeeTransaction,
                                 latestBlock.number.toLong(),
                                 exchangeRates,
                                 account = this
@@ -94,6 +92,11 @@ internal class EthCryptoWalletAccount(
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+
+    fun isErc20FeeTransaction(to: String): Boolean =
+        CryptoCurrency.erc20Assets().firstOrNull {
+            to.equals(ethDataManager.getErc20TokenData(it).contractAddress, true)
+        } != null
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 

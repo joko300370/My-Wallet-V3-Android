@@ -56,6 +56,7 @@ import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
+import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
@@ -164,6 +165,12 @@ val applicationModule = module {
             payloadManager = get(),
             accessState = get(),
             prefs = get()
+        )
+    }
+
+    single {
+        CoinsWebSocketService(
+            applicationContext = get()
         )
     }
 

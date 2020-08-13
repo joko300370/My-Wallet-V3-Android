@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import kotlin.properties.Delegates
 
@@ -75,6 +76,12 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
                 Selection.setSelection(text, 0)
             }
             isEnabled = true
+        }
+    }
+
+    fun resetForTyping() {
+        if (isFocused && majorValue.toDoubleOrNull() == 0.toDouble()) {
+            setText(text.toString().replace(digitsOnlyRegex, ""))
         }
     }
 }
