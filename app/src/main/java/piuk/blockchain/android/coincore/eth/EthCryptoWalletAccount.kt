@@ -77,10 +77,12 @@ internal class EthCryptoWalletAccount(
                 ethDataManager.getEthTransactions()
                     .map { list ->
                         list.map { transaction ->
+                            val isEr20FeeTransaction = isErc20FeeTransaction(transaction.to)
+
                             EthActivitySummaryItem(
                                 ethDataManager,
                                 transaction,
-                                isErc20FeeTransaction(transaction.to),
+                                isEr20FeeTransaction,
                                 latestBlock.number.toLong(),
                                 exchangeRates,
                                 account = this
@@ -90,7 +92,7 @@ internal class EthCryptoWalletAccount(
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
-    private fun isErc20FeeTransaction(to: String): Boolean =
+    fun isErc20FeeTransaction(to: String): Boolean =
         CryptoCurrency.erc20Assets().firstOrNull {
             to.equals(ethDataManager.getErc20TokenData(it).contractAddress, true)
         } != null
