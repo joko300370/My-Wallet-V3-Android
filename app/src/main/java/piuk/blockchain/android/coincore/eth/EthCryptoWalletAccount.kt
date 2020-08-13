@@ -78,26 +78,22 @@ internal class EthCryptoWalletAccount(
                     .map { list ->
                         list.map { transaction ->
                             EthActivitySummaryItem(
-                                    ethDataManager,
-                                    transaction,
-                                    isErc20FeeTransaction(transaction.to),
-                                    latestBlock.number.toLong(),
-                                    exchangeRates,
-                                    account = this
-                                ) as ActivitySummaryItem
+                                ethDataManager,
+                                transaction,
+                                isErc20FeeTransaction(transaction.to),
+                                latestBlock.number.toLong(),
+                                exchangeRates,
+                                account = this
+                            ) as ActivitySummaryItem
                         }
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     private fun isErc20FeeTransaction(to: String): Boolean =
-        to.equals(
-            ethDataManager.getErc20TokenData(CryptoCurrency.PAX).contractAddress,
-            ignoreCase = true
-        ) || to.equals(
-                ethDataManager.getErc20TokenData(CryptoCurrency.USDT).contractAddress,
-                ignoreCase = true
-            )
+        CryptoCurrency.erc20Assets().firstOrNull {
+            to.equals(ethDataManager.getErc20TokenData(it).contractAddress, true)
+        } != null
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 

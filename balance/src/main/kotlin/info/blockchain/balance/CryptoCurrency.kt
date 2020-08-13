@@ -97,6 +97,10 @@ enum class CryptoCurrency(
             !it.hasFeature(STUB_ASSET)
         }
 
+        fun erc20Assets(): List<CryptoCurrency> = values().filter {
+            it.hasFeature(IS_ERC20)
+        }
+
         const val PRICE_CHARTING = 0x00000001L
         const val MULTI_WALLET = 0x00000002L
         const val CUSTODIAL_ONLY = 0x0000004L
