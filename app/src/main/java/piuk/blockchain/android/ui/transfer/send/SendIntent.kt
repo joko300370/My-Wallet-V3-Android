@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import java.util.EmptyStackException
 
 sealed class SendIntent : MviIntent<SendState> {
 
@@ -197,7 +198,7 @@ sealed class SendIntent : MviIntent<SendState> {
                     TransactionValidationError.INSUFFICIENT_GAS -> SendErrorState.NOT_ENOUGH_GAS
                     else -> SendErrorState.UNEXPECTED_ERROR
                 }
-        )
+            )
     }
 
     class ModifyTxOption(
@@ -251,19 +252,33 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    object ReturnToPreviousStep : SendIntent() {
+    class AddStepToBackStack(
+        val currentStep: SendStep
+    ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState {
-            val steps = SendStep.values()
-            val currentStep = oldState.currentStep.ordinal
-            if (currentStep == 0) {
-                throw IllegalStateException("Cannot go back")
-            }
-            val previousStep = steps[currentStep - 1]
+            val updatedStack = oldState.stepsBackStack
+            updatedStack.push(currentStep)
 
             return oldState.copy(
-                currentStep = previousStep,
-                errorState = SendErrorState.NONE
+                stepsBackStack = updatedStack
             )
+        }
+    }
+
+    object ReturnToPreviousStep : SendIntent() {
+        override fun reduce(oldState: SendState): SendState {
+            try {
+                val stack = oldState.stepsBackStack
+                val previousStep = stack.pop()
+                return oldState.copy(
+                    stepsBackStack = stack,
+                    currentStep = previousStep,
+                    errorState = SendErrorState.NONE
+                )
+            } catch (e: EmptyStackException) {
+                // if the stack is empty, throw
+                throw IllegalStateException("Cannot go back")
+            }
         }
     }
 }

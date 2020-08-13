@@ -258,12 +258,19 @@ class DashboardModel(
         nextIntent: DashboardIntent
     ): Boolean {
         return when (previousIntent) {
-            // Allow consecutive ClearBottomSheet intents
-            is ClearBottomSheet -> {
-                if (nextIntent is ClearBottomSheet)
-                    false
-                else
+            is UpdateLaunchDialogFlow -> {
+                if (nextIntent is ClearBottomSheet) {
+                    true
+                } else {
                     super.distinctIntentFilter(previousIntent, nextIntent)
+                }
+            }
+            is ClearBottomSheet -> {
+                if (nextIntent is ClearBottomSheet) {
+                    false
+                } else {
+                    super.distinctIntentFilter(previousIntent, nextIntent)
+                }
             }
             else -> super.distinctIntentFilter(previousIntent, nextIntent)
         }

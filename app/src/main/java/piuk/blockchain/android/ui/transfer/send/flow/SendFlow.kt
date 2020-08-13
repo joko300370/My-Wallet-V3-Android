@@ -122,10 +122,10 @@ class SendFlow(
 
     private fun handleStateChange(newState: SendState) {
         if (currentStep != newState.currentStep) {
-            currentStep = newState.currentStep
-            if (currentStep == SendStep.ZERO) {
+            if (newState.currentStep == SendStep.ZERO) {
                 onSendComplete()
             } else {
+                currentStep = newState.currentStep
                 showFlowStep(currentStep)
             }
         }

@@ -120,7 +120,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {
-            state?.activeFlow?.finishFlow()
+            state?.activeFlow?.let {
+                clearBottomSheet()
+                it.finishFlow()
+            }
+
             newState.activeFlow?.startFlow(childFragmentManager, this)
         }
 
@@ -408,7 +412,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun onFlowFinished() {
-        // do nothing, dismissing the sheet already clears the flow
+        model.process(ClearBottomSheet)
     }
 
     override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =

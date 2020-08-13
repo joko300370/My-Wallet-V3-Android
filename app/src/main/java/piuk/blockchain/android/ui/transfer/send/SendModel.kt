@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
+import java.util.Stack
 
 enum class SendStep {
     ZERO,
@@ -58,7 +59,8 @@ data class SendState(
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
     val pendingTx: PendingTx? = null,
-    val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED
+    val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
+    val stepsBackStack: Stack<SendStep> = Stack<SendStep>().apply { push(SendStep.ZERO) }
 ) : MviState {
 
     val asset: CryptoCurrency = sendingAccount.asset
@@ -91,7 +93,10 @@ class SendModel(
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
-            is SendIntent.PrepareTransaction -> null
+            is SendIntent.PrepareTransaction -> {
+                addToBackStack(previousState.currentStep)
+                null
+            }
             is SendIntent.ExecuteTransaction -> processExecuteTransaction()
             is SendIntent.ValidateInputTargetAddress ->
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
@@ -103,13 +108,17 @@ class SendModel(
                     previousState.sendAmount,
                     intent.sendTarget
                 )
-            is SendIntent.SelectionTargetAddressValidated -> null
+            is SendIntent.SelectionTargetAddressValidated -> {
+                addToBackStack(previousState.currentStep)
+                null
+            }
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
             is SendIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
             is SendIntent.PendingTxUpdated -> null
             is SendIntent.UpdateTransactionComplete -> null
             is SendIntent.InputValidationError -> null
+            is SendIntent.AddStepToBackStack -> null
             is SendIntent.ReturnToPreviousStep -> null
             is SendIntent.StartWithDefinedAccounts -> null
             is SendIntent.FetchFiatRates -> processGetFiatRate()
@@ -139,6 +148,10 @@ class SendModel(
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
+    }
+
+    private fun addToBackStack(currentStep: SendStep) {
+        process(SendIntent.AddStepToBackStack(currentStep))
     }
 
     override fun onScanLoopError(t: Throwable) {
@@ -175,7 +188,8 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is TransactionValidationError -> process(SendIntent.TargetAddressInvalid(it))
+                        is TransactionValidationError -> process(
+                            SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }
@@ -261,4 +275,21 @@ class SendModel(
                 onComplete = { Timber.d("Target exchange Rate completed") },
                 onError = { Timber.e("Failed getting target exchange rate") }
             )
+
+    override fun distinctIntentFilter(
+        previousIntent: SendIntent,
+        nextIntent: SendIntent
+    ): Boolean {
+        return when (previousIntent) {
+            // Allow consecutive ReturnToPreviousStep intents
+            is SendIntent.ReturnToPreviousStep -> {
+                if (nextIntent is SendIntent.ReturnToPreviousStep) {
+                    false
+                } else {
+                    super.distinctIntentFilter(previousIntent, nextIntent)
+                }
+            }
+            else -> super.distinctIntentFilter(previousIntent, nextIntent)
+        }
+    }
 }

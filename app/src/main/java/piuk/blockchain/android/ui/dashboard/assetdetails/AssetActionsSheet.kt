@@ -154,14 +154,14 @@ class AssetActionsSheet :
                 onSuccess = {
                     showTextAndAssetIcon(view,
                         labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        getString(R.string.dashboard_asset_balance_interest, it),
+                        activity?.getString(R.string.dashboard_asset_balance_interest, it) ?: "",
                         firstAccount.asset.drawableResFilled()
                     )
                 },
                 onError = {
                     showTextAndAssetIcon(view,
                         labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        getString(R.string.dashboard_asset_actions_interest_dsc_failed),
+                        activity?.getString(R.string.dashboard_asset_actions_interest_dsc_failed) ?: "",
                         firstAccount.asset.drawableResFilled()
                     )
                     Timber.e("AssetActions error loading Interest rate: $it")

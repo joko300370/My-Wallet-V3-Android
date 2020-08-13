@@ -65,7 +65,6 @@ class ConfirmTransactionSheet(
         // We _should_ always have a pending Tx when we get here
         require(newState.pendingTx != null)
 
-        val amount = newState.sendAmount
         val itemList = mutableListOf(
             PendingTxItem(getString(R.string.common_from), newState.sendingAccount.label),
             PendingTxItem(getString(R.string.common_to), newState.sendTarget.label)
@@ -92,7 +91,7 @@ class ConfirmTransactionSheet(
         return if (amount.symbol == fee.symbol) {
             (amount + fee).toStringWithSymbol()
         } else {
-            "${amount.toStringWithSymbol()} (${fee.toStringWithSymbol()}"
+            "${amount.toStringWithSymbol()} (${fee.toStringWithSymbol()})"
         }
     }
 
