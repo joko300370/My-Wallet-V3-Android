@@ -132,6 +132,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 if (newValue.output == CurrencyType.Crypto) newValue.predefinedAmount.inCrypto()
                 else newValue.predefinedAmount.inFiat()
             )
+            enter_amount.resetForTyping()
         }
     }
 
