@@ -166,10 +166,6 @@
                 android:configChanges="keyboardHidden|orientation|screenSize"
                 android:windowSoftInputMode="adjustResize" />
 
-        <service
-                android:name=".data.coinswebsocket.service.CoinsWebSocketService"
-                android:stopWithTask="true" />
-
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_icon"
                 android:resource="@mipmap/ic_notification" />
