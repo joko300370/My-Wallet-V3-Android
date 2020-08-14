@@ -12,12 +12,10 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.thepit.PitLinking
@@ -187,24 +185,10 @@ internal abstract class CryptoAssetBase(
             is CryptoInterestAccount -> Single.just(emptyList())
             is CryptoExchangeAccount -> Single.just(emptyList())
             is CryptoNonCustodialAccount ->
-                // TODO cleanup with Maybe.concat
-                Singles.zip(
-                    getPitLinkingAccount().toSingle(NullCryptoAccount()),
-                    getInterestAccount().toSingle(NullCryptoAccount()))
-                    .map { accounts ->
-                        when {
-                            accounts.first is NullCryptoAccount && accounts.second is NullCryptoAccount -> {
-                                emptyList()
-                            }
-                            accounts.first is NullCryptoAccount && accounts.second !is NullCryptoAccount -> {
-                                listOf(accounts.second)
-                            }
-                            else -> {
-                                listOf(accounts.first, accounts.second)
-                            }
-                        }
-                    }
-                .onErrorReturn { emptyList() }
+                Maybe.concat(
+                    listOf(getPitLinkingAccount(), getInterestAccount())
+                ).toList()
+                    .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())
         }
     }
