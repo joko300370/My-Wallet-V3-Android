@@ -30,7 +30,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-typealias StatusDecorator = (BlockchainAccount) -> Single<String>
+typealias StatusDecorator = (BlockchainAccount) -> Single<AccountDecorator>
 
 class AccountList @JvmOverloads constructor(
     ctx: Context,
@@ -162,17 +162,22 @@ private class CryptoSingleAccountViewHolder(
 
             crypto_account.updateAccount(account, disposables)
 
-            setOnClickListener { onAccountClicked(account) }
-
             itemView.crypto_status.gone()
+            container.alpha = 1f
 
-            statusDecorator?.let { decorator ->
-                disposables += decorator(account).subscribeBy(
-                        onSuccess = { status ->
-                            itemView.crypto_status.status = status
-                            itemView.crypto_status.goneIf(status.isBlank())
+            statusDecorator?.let {
+                disposables += it(account).subscribeBy(
+                    onSuccess = { decorator ->
+                        itemView.crypto_status.status = decorator.status
+                        itemView.crypto_status.goneIf(decorator.status.isBlank())
+                        if (decorator.enabled) {
+                            setOnClickListener { onAccountClicked(account) }
+                            container.alpha = 1f
+                        } else {
+                            container.alpha = .6f
                         }
-                    )
+                    }
+                )
             }
         }
     }
@@ -210,11 +215,24 @@ private class FiatAccountViewHolder(
         statusDecorator: StatusDecorator?,
         onAccountClicked: (FiatAccount) -> Unit
     ) {
-        with(itemView) {
-            disposables.clear()
 
+        disposables.clear()
+        with(itemView) {
+            fiat_container.alpha = 1f
             fiat_account.updateAccount(account, disposables)
-            setOnClickListener { onAccountClicked(account) }
+            statusDecorator?.let {
+                disposables += it(account).subscribeBy(
+                    onSuccess = { decorator ->
+
+                        if (decorator.enabled) {
+                            setOnClickListener { onAccountClicked(account) }
+                            fiat_container.alpha = 1f
+                        } else {
+                            fiat_container.alpha = .6f
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -256,7 +274,26 @@ private class AllWalletsAccountViewHolder(
             disposables.clear()
 
             account_group.updateAccount(account, disposables)
+            group_container.alpha = 1f
+
+            statusDecorator?.let {
+                disposables += it(account).subscribeBy(
+                    onSuccess = { decorator ->
+                        if (decorator.enabled) {
+                            setOnClickListener { onAccountClicked(account) }
+                            group_container.alpha = 1f
+                        } else {
+                            group_container.alpha = .6f
+                        }
+                    }
+                )
+            }
             setOnClickListener { onAccountClicked(account) }
         }
     }
+}
+
+interface AccountDecorator {
+    val enabled: Boolean
+    val status: String
 }

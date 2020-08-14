@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
@@ -31,20 +32,30 @@ class TransferSendFragment :
         )
     }
 
-    private fun statusDecorator(account: BlockchainAccount): Single<String> =
+    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
         if (account is CryptoAccount) {
             account.sendState
                 .map { sendState ->
-                    when (sendState) {
-                        SendState.NO_FUNDS -> getString(R.string.send_state_no_funds)
-                        SendState.NOT_SUPPORTED -> getString(R.string.send_state_not_supported)
-                        SendState.NOT_ENOUGH_GAS -> getString(R.string.send_state_not_enough_gas)
-                        SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
-                        SendState.CAN_SEND -> ""
+                    object : AccountDecorator {
+                        override val enabled: Boolean
+                            get() = true
+                        override val status: String
+                            get() = when (sendState) {
+                                SendState.NO_FUNDS -> getString(R.string.send_state_no_funds)
+                                SendState.NOT_SUPPORTED -> getString(R.string.send_state_not_supported)
+                                SendState.NOT_ENOUGH_GAS -> getString(R.string.send_state_not_enough_gas)
+                                SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
+                                SendState.CAN_SEND -> ""
+                            }
                     }
                 }
         } else {
-            Single.just("")
+            Single.just(object : AccountDecorator {
+                override val enabled: Boolean
+                    get() = true
+                override val status: String
+                    get() = ""
+            })
         }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
