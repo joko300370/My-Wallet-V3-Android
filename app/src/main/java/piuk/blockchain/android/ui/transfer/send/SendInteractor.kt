@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.androidcore.utils.extensions.then
+import timber.log.Timber
 
 class SendInteractor(
     private val coincore: Coincore,
@@ -49,6 +50,9 @@ class SendInteractor(
         sourceAccount.createSendProcessor(targetAddress)
             .doOnSuccess { transactionProcessor = it }
             .flatMap { it.createPendingTx() }
+            .doOnError {
+                Timber.e("---- error initialising $it")
+            }
 
     fun updateTransactionAmount(amount: CryptoValue): Single<PendingTx> =
         transactionProcessor.updateAmount(amount)

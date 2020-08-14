@@ -72,7 +72,9 @@ object NullCryptoAddress : CryptoAddress {
 }
 
 // Stub invalid accounts; use as an initialisers to avoid nulls.
-object NullCryptoAccount : CryptoAccount {
+class NullCryptoAccount(
+    override val label: String = ""
+) : CryptoAccount {
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(NullAddress)
 
@@ -87,8 +89,6 @@ object NullCryptoAccount : CryptoAccount {
 
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
-
-    override val label: String = ""
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)

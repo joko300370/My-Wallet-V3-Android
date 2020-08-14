@@ -36,11 +36,10 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    class InitialiseWithTarget(
+    class InitialiseWithTargetAccount(
         val fromAccount: CryptoAccount,
         val toAccount: SendTarget,
-        val passwordRequired: Boolean,
-        val balance: CryptoValue
+        val passwordRequired: Boolean
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState = oldState
     }
@@ -53,6 +52,7 @@ sealed class SendIntent : MviIntent<SendState> {
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             SendState(
+                action = AssetAction.Deposit,
                 sendingAccount = fromAccount,
                 sendTarget = toAccount,
                 errorState = SendErrorState.NONE,
@@ -64,7 +64,7 @@ sealed class SendIntent : MviIntent<SendState> {
                     SendStep.ENTER_AMOUNT
                 },
                 nextEnabled = passwordRequired
-            )
+            ).updateBackstack(oldState)
     }
 
     class ValidatePassword(
@@ -89,7 +89,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 } else {
                     SendStep.ENTER_AMOUNT
                 }
-            )
+            ).updateBackstack(oldState)
     }
 
     object UpdatePasswordNotValidated : SendIntent() {
@@ -119,17 +119,6 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    class SelectionTargetAddressValidated(
-        val sendTarget: SendTarget
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState =
-            oldState.copy(
-                errorState = SendErrorState.NONE,
-                sendTarget = sendTarget,
-                currentStep = SendStep.ENTER_AMOUNT
-            )
-    }
-
     class TargetAddressInvalid(private val error: TransactionValidationError) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
@@ -137,7 +126,7 @@ sealed class SendIntent : MviIntent<SendState> {
                     TransactionValidationError.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
                     else -> SendErrorState.INVALID_ADDRESS
                 },
-                sendTarget = NullCryptoAccount,
+                sendTarget = NullCryptoAccount(),
                 nextEnabled = false
             )
     }
@@ -222,7 +211,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = true,
                 currentStep = SendStep.CONFIRM_DETAIL
-            )
+            ).updateBackstack(oldState)
     }
 
     object ExecuteTransaction : SendIntent() {
@@ -252,19 +241,6 @@ sealed class SendIntent : MviIntent<SendState> {
             )
     }
 
-    class AddStepToBackStack(
-        val currentStep: SendStep
-    ) : SendIntent() {
-        override fun reduce(oldState: SendState): SendState {
-            val updatedStack = oldState.stepsBackStack
-            updatedStack.push(currentStep)
-
-            return oldState.copy(
-                stepsBackStack = updatedStack
-            )
-        }
-    }
-
     object ReturnToPreviousStep : SendIntent() {
         override fun reduce(oldState: SendState): SendState {
             try {
@@ -281,4 +257,14 @@ sealed class SendIntent : MviIntent<SendState> {
             }
         }
     }
+
+    fun SendState.updateBackstack(oldState: SendState) =
+        if (oldState.currentStep != this.currentStep && oldState.currentStep.addToBackStack) {
+            val updatedStack = oldState.stepsBackStack
+            updatedStack.push(oldState.currentStep)
+
+            this.copy(stepsBackStack = updatedStack)
+        } else {
+            this
+        }
 }

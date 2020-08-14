@@ -2,22 +2,15 @@ package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.sunriver.XlmDataManager
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.MultiAddressFactory
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.SendTarget
-import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -81,9 +74,9 @@ class TransactionInOutMapper(
 
         return Singles.zip(
             coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, fromAddress)
-                .toSingle(EmptyAccount(fromAddress)),
+                .toSingle(NullCryptoAccount(fromAddress)),
             coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, toAddress)
-                .toSingle(EmptyAccount(toAddress))
+                .toSingle(NullCryptoAccount(toAddress))
         ) { fromAccount, toAccount ->
             TransactionInOutDetails(
                 inputs = listOf(
@@ -180,34 +173,4 @@ class TransactionInOutMapper(
                 addressDecodeError = true
             }
         }
-
-    private class EmptyAccount(override val label: String) : SingleAccount {
-        override val receiveAddress: Single<ReceiveAddress>
-            get() = Single.error(NotImplementedError("Empty Account"))
-
-        override val isDefault: Boolean
-            get() = false
-
-        override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
-            Single.error(NotImplementedError("Empty Account"))
-
-        override val sendState: Single<SendState>
-            get() = Single.error(NotImplementedError("Empty Account"))
-
-        override val balance: Single<Money>
-            get() = Single.error(NotImplementedError("Empty Account"))
-
-        override val activity: Single<ActivitySummaryList>
-            get() = Single.error(NotImplementedError("Empty Account"))
-
-        override val actions: AvailableActions = emptySet()
-        override val isFunded: Boolean = false
-        override val hasTransactions: Boolean = false
-
-        override fun fiatBalance(
-            fiatCurrency: String,
-            exchangeRates: ExchangeRates
-        ): Single<Money> =
-            Single.error(NotImplementedError("Empty Account"))
-    }
 }

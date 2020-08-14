@@ -79,7 +79,7 @@ class ConfirmTransactionSheet(
         // These options should probably be items also TODO
         updateOptions(newState, itemList)
 
-        showSendUi(state, itemList)
+        showSendUi(newState, itemList)
 
         detailsAdapter.populate(itemList)
 

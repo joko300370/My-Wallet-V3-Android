@@ -78,11 +78,11 @@ class Coincore internal constructor(
                         if (ca.address.equals(address, true)) {
                             a
                         } else {
-                            NullCryptoAccount
+                            NullCryptoAccount()
                         }
                     }
             }
-            .filter { it != NullCryptoAccount }
+            .filter { it != NullCryptoAccount() }
             .toList()
             .flatMapMaybe {
                 if (it.isEmpty())

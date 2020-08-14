@@ -4,7 +4,6 @@ import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import info.blockchain.balance.CryptoValue
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -65,8 +64,8 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 }
 
 class SendFlow(
-    private val sourceAccount: CryptoAccount = NullCryptoAccount,
-    private val targetAccount: SendTarget = NullCryptoAccount,
+    private val sourceAccount: CryptoAccount = NullCryptoAccount(),
+    private val targetAccount: SendTarget = NullCryptoAccount(),
     private val action: AssetAction,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : DialogFlow() {
@@ -94,13 +93,12 @@ class SendFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    if (targetAccount != NullCryptoAccount &&
-                        sourceAccount != NullCryptoAccount) {
-                        sourceAccount.balance.subscribeBy { balance ->
-                            model.process(SendIntent.InitialiseWithTarget(sourceAccount, targetAccount,
-                                passwordRequired, balance as CryptoValue))
-                        }
-                    } else if (sourceAccount != NullCryptoAccount) {
+                    if (targetAccount != NullCryptoAccount() &&
+                        sourceAccount != NullCryptoAccount()) {
+                            model.process(SendIntent.InitialiseWithTargetAccount(
+                                sourceAccount, targetAccount, passwordRequired)
+                            )
+                    } else if (sourceAccount != NullCryptoAccount()) {
                         model.process(SendIntent.Initialise(action, sourceAccount, passwordRequired))
                     } else {
                         throw IllegalStateException(

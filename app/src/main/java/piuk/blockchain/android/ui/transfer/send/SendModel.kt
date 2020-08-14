@@ -20,11 +20,11 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
 import java.util.Stack
 
-enum class SendStep {
+enum class SendStep(val addToBackStack: Boolean = false) {
     ZERO,
     ENTER_PASSWORD,
-    ENTER_ADDRESS,
-    ENTER_AMOUNT,
+    ENTER_ADDRESS(true),
+    ENTER_AMOUNT(true),
     CONFIRM_DETAIL,
     IN_PROGRESS
 }
@@ -50,7 +50,7 @@ enum class TransactionInFlightState {
 data class SendState(
     val action: AssetAction = AssetAction.NewSend,
     val currentStep: SendStep = SendStep.ZERO,
-    val sendingAccount: CryptoAccount = NullCryptoAccount,
+    val sendingAccount: CryptoAccount = NullCryptoAccount(),
     val sendTarget: SendTarget = NullAddress,
     val fiatRate: ExchangeRate.CryptoToFiat? = null,
     val targetRate: ExchangeRate? = null,
@@ -60,7 +60,7 @@ data class SendState(
     val errorState: SendErrorState = SendErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
-    val stepsBackStack: Stack<SendStep> = Stack<SendStep>().apply { push(SendStep.ZERO) }
+    val stepsBackStack: Stack<SendStep> = Stack<SendStep>()
 ) : MviState {
 
     val asset: CryptoCurrency = sendingAccount.asset
@@ -88,15 +88,12 @@ class SendModel(
 
         return when (intent) {
             is SendIntent.Initialise -> null
-            is SendIntent.InitialiseWithTarget ->
+            is SendIntent.InitialiseWithTargetAccount ->
                 processInitialisationWithPredefinedAccounts(intent)
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
-            is SendIntent.PrepareTransaction -> {
-                addToBackStack(previousState.currentStep)
-                null
-            }
+            is SendIntent.PrepareTransaction -> null
             is SendIntent.ExecuteTransaction -> processExecuteTransaction()
             is SendIntent.ValidateInputTargetAddress ->
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
@@ -108,17 +105,12 @@ class SendModel(
                     previousState.sendAmount,
                     intent.sendTarget
                 )
-            is SendIntent.SelectionTargetAddressValidated -> {
-                addToBackStack(previousState.currentStep)
-                null
-            }
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
             is SendIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
             is SendIntent.PendingTxUpdated -> null
             is SendIntent.UpdateTransactionComplete -> null
             is SendIntent.InputValidationError -> null
-            is SendIntent.AddStepToBackStack -> null
             is SendIntent.ReturnToPreviousStep -> null
             is SendIntent.StartWithDefinedAccounts -> null
             is SendIntent.FetchFiatRates -> processGetFiatRate()
@@ -129,18 +121,19 @@ class SendModel(
     }
 
     private fun processInitialisationWithPredefinedAccounts(
-        intent: SendIntent.InitialiseWithTarget
+        intent: SendIntent.InitialiseWithTargetAccount
     ): Disposable {
         return interactor.initialiseTransaction(
             intent.fromAccount, intent.toAccount)
             .subscribeBy(
                 onSuccess = {
-                    val updatedTx = it.copy(available = intent.balance)
+                    //val updatedTx = it.copy(available = intent.balance)
                     process(SendIntent.FetchFiatRates)
                     process(SendIntent.FetchTargetRates)
+                    process(SendIntent.SendAmountChanged(CryptoValue.zero(intent.fromAccount.asset)))
                     process(
                         SendIntent.StartWithDefinedAccounts(intent.fromAccount, intent.toAccount,
-                            intent.passwordRequired, updatedTx)
+                            intent.passwordRequired, it)
                     )
                 },
                 onError = {
@@ -148,10 +141,6 @@ class SendModel(
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
-    }
-
-    private fun addToBackStack(currentStep: SendStep) {
-        process(SendIntent.AddStepToBackStack(currentStep))
     }
 
     override fun onScanLoopError(t: Throwable) {
@@ -212,7 +201,6 @@ class SendModel(
                     process(SendIntent.FetchTargetRates)
                     process(SendIntent.PendingTxUpdated(it))
                     process(SendIntent.SendAmountChanged(amount))
-                    process(SendIntent.SelectionTargetAddressValidated(sendTarget))
                 },
                 onError = {
                     Timber.e("!SEND!> Unable to get transaction processor: $it")

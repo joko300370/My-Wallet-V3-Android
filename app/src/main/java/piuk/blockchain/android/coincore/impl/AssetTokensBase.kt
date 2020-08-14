@@ -187,9 +187,10 @@ internal abstract class CryptoAssetBase(
             is CryptoInterestAccount -> Single.just(emptyList())
             is CryptoExchangeAccount -> Single.just(emptyList())
             is CryptoNonCustodialAccount ->
+                // TODO cleanup with Maybe.concat
                 Singles.zip(
-                    getPitLinkingAccount().toSingle(NullCryptoAccount),
-                    getInterestAccount().toSingle(NullCryptoAccount))
+                    getPitLinkingAccount().toSingle(NullCryptoAccount()),
+                    getInterestAccount().toSingle(NullCryptoAccount()))
                     .map { accounts ->
                         when {
                             accounts.first is NullCryptoAccount && accounts.second is NullCryptoAccount -> {
