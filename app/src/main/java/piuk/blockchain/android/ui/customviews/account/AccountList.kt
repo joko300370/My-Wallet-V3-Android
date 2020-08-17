@@ -46,7 +46,18 @@ class AccountList @JvmOverloads constructor(
             .inflate(R.layout.view_account_list, this, true)
     }
 
-    fun initialise(source: Single<List<BlockchainAccount>>, status: StatusDecorator? = null) {
+    private val defaultDecorator: StatusDecorator = {
+        Single.just(
+            object : AccountDecorator {
+                override val enabled: Boolean
+                    get() = true
+                override val status: String
+                    get() = ""
+            }
+        )
+    }
+
+    fun initialise(source: Single<List<BlockchainAccount>>, status: StatusDecorator = defaultDecorator) {
 
         val itemList = mutableListOf<BlockchainAccount>()
 
@@ -96,7 +107,7 @@ class AccountList @JvmOverloads constructor(
 }
 
 private class AccountsDelegateAdapter(
-    statusDecorator: StatusDecorator?,
+    statusDecorator: StatusDecorator,
     onAccountClicked: (BlockchainAccount) -> Unit
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
 
@@ -125,7 +136,7 @@ private class AccountsDelegateAdapter(
 }
 
 private class CryptoAccountDelegate<in T>(
-    private val statusDecorator: StatusDecorator?,
+    private val statusDecorator: StatusDecorator,
     private val onAccountClicked: (CryptoAccount) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -154,7 +165,7 @@ private class CryptoSingleAccountViewHolder(
 
     internal fun bind(
         account: CryptoAccount,
-        statusDecorator: StatusDecorator?,
+        statusDecorator: StatusDecorator,
         onAccountClicked: (CryptoAccount) -> Unit
     ) {
         with(itemView) {
@@ -165,7 +176,7 @@ private class CryptoSingleAccountViewHolder(
             itemView.crypto_status.gone()
             container.alpha = 1f
 
-            statusDecorator?.let {
+            statusDecorator.let {
                 disposables += it(account).subscribeBy(
                     onSuccess = { decorator ->
                         itemView.crypto_status.status = decorator.status
@@ -184,7 +195,7 @@ private class CryptoSingleAccountViewHolder(
 }
 
 private class FiatAccountDelegate<in T>(
-    private val statusDecorator: StatusDecorator?,
+    private val statusDecorator: StatusDecorator,
     private val onAccountClicked: (FiatAccount) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -212,7 +223,7 @@ private class FiatAccountViewHolder(
 
     internal fun bind(
         account: FiatAccount,
-        statusDecorator: StatusDecorator?,
+        statusDecorator: StatusDecorator,
         onAccountClicked: (FiatAccount) -> Unit
     ) {
 
@@ -220,7 +231,7 @@ private class FiatAccountViewHolder(
         with(itemView) {
             fiat_container.alpha = 1f
             fiat_account.updateAccount(account, disposables)
-            statusDecorator?.let {
+            statusDecorator.let {
                 disposables += it(account).subscribeBy(
                     onSuccess = { decorator ->
 
@@ -238,7 +249,7 @@ private class FiatAccountViewHolder(
 }
 
 private class AllWalletsAccountDelegate<in T>(
-    private val statusDecorator: StatusDecorator?,
+    private val statusDecorator: StatusDecorator,
     private val onAccountClicked: (BlockchainAccount) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -267,7 +278,7 @@ private class AllWalletsAccountViewHolder(
 
     internal fun bind(
         account: AllWalletsAccount,
-        statusDecorator: StatusDecorator?,
+        statusDecorator: StatusDecorator,
         onAccountClicked: (BlockchainAccount) -> Unit
     ) {
         with(itemView) {
@@ -276,7 +287,7 @@ private class AllWalletsAccountViewHolder(
             account_group.updateAccount(account, disposables)
             group_container.alpha = 1f
 
-            statusDecorator?.let {
+            statusDecorator.let {
                 disposables += it(account).subscribeBy(
                     onSuccess = { decorator ->
                         if (decorator.enabled) {
