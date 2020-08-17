@@ -60,7 +60,7 @@ data class SendState(
     val errorState: SendErrorState = SendErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
-    val stepsBackStack: Stack<SendStep> = Stack<SendStep>()
+    val stepsBackStack: Stack<SendStep> = Stack<SendStep>().apply { push(SendStep.ZERO) }
 ) : MviState {
 
     val asset: CryptoCurrency = sendingAccount.asset
