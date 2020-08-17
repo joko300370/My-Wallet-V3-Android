@@ -122,9 +122,6 @@ class ConfirmTransactionSheet(
         state: SendState,
         itemList: MutableList<ConfirmItemType>
     ) {
-        // Current iteration only supports notes/description. But this is where all and any other
-        // options - ie agreements, t&c confirmations etc are added and updated
-
         val note = state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
         note?.let { opt ->
             itemList.add(ConfirmNoteItem(opt.text))
@@ -213,6 +210,7 @@ class ConfirmTransactionSheet(
         sb.setSpan(StyleSpan(BOLD), part1.length, part1.length + part2.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.append(part3)
+
         itemList.add(ConfirmAgreementTextItem(sb))
     }
 
@@ -254,10 +252,5 @@ class ConfirmTransactionSheet(
 
     private fun onCtaClick() {
         model.process(SendIntent.ExecuteTransaction)
-    }
-
-    companion object {
-        private const val DESCRIPTION_INPUT = 0
-        private const val AGREEMENT_INPUT = 1
     }
 }
