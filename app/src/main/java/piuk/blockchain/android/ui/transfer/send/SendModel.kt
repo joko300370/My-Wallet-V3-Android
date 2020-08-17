@@ -127,7 +127,6 @@ class SendModel(
             intent.fromAccount, intent.toAccount)
             .subscribeBy(
                 onSuccess = {
-                    //val updatedTx = it.copy(available = intent.balance)
                     process(SendIntent.FetchFiatRates)
                     process(SendIntent.FetchTargetRates)
                     process(SendIntent.SendAmountChanged(CryptoValue.zero(intent.fromAccount.asset)))
