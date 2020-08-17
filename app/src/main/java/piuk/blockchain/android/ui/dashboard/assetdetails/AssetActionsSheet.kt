@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -152,18 +153,24 @@ class AssetActionsSheet :
         disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {
-                    showTextAndAssetIcon(view,
-                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        resources.getString(R.string.dashboard_asset_balance_interest, it) ?: "",
-                        firstAccount.asset.drawableResFilled()
-                    )
+                    if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        showTextAndAssetIcon(view,
+                            labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                            resources.getString(R.string.dashboard_asset_balance_interest, it)
+                                ?: "",
+                            firstAccount.asset.drawableResFilled()
+                        )
+                    }
                 },
                 onError = {
-                    showTextAndAssetIcon(view,
-                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        resources.getString(R.string.dashboard_asset_actions_interest_dsc_failed) ?: "",
-                        firstAccount.asset.drawableResFilled()
-                    )
+                    if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        showTextAndAssetIcon(view,
+                            labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                            resources.getString(
+                                R.string.dashboard_asset_actions_interest_dsc_failed) ?: "",
+                            firstAccount.asset.drawableResFilled()
+                        )
+                    }
                     Timber.e("AssetActions error loading Interest rate: $it")
                 }
             )

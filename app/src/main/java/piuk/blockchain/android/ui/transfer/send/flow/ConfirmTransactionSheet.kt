@@ -83,6 +83,8 @@ class ConfirmTransactionSheet(
         listAdapter.items = itemList
         listAdapter.notifyDataSetChanged()
 
+        dialogView.confirm_cta_button.isEnabled = newState.nextEnabled
+
         state = newState
     }
 
@@ -127,10 +129,15 @@ class ConfirmTransactionSheet(
             itemList.add(ConfirmNoteItem(opt.text))
         }
 
-        val agreement = state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)
-        agreement?.let {
-            dialogView.confirm_cta_button.isEnabled = false
+        val linkAgreement =
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)
+        linkAgreement?.let {
             setupTosAndPPLinks(itemList)
+        }
+
+        val textAgreement =
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.TEXT_AGREEMENT)
+        textAgreement?.let {
             setupHoldingValues(state.sendAmount, itemList)
         }
     }
@@ -199,48 +206,31 @@ class ConfirmTransactionSheet(
         sendAmount: CryptoValue,
         itemList: MutableList<ConfirmItemType>
     ) {
-        val part1 = getString(R.string.send_confirmation_interest_holding_period_1)
-        val part2 =
+        val introToHolding = getString(R.string.send_confirmation_interest_holding_period_1)
+        val amountInBold =
             sendAmount.toFiat(exchangeRates, prefs.selectedFiatCurrency).toStringWithSymbol()
-        val part3 = getString(R.string.send_confirmation_interest_holding_period_2,
+        val outroToHolding = getString(R.string.send_confirmation_interest_holding_period_2,
             sendAmount.toStringWithSymbol())
         val sb = SpannableStringBuilder()
-        sb.append(part1)
-        sb.append(part2)
-        sb.setSpan(StyleSpan(BOLD), part1.length, part1.length + part2.length,
+        sb.append(introToHolding)
+        sb.append(amountInBold)
+        sb.setSpan(StyleSpan(BOLD), introToHolding.length,
+            introToHolding.length + amountInBold.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.append(part3)
+        sb.append(outroToHolding)
 
         itemList.add(ConfirmAgreementTextItem(sb))
     }
 
-    private var linkAgreementChecked = false
-    private var textAgreementChecked = false
     private fun updateLinkAgreement(isChecked: Boolean) {
-        linkAgreementChecked = isChecked
-        if (isChecked && textAgreementChecked) {
-            dialogView.confirm_cta_button.isEnabled = true
-            updateAgreementPendingTx(true)
-        } else {
-            dialogView.confirm_cta_button.isEnabled = false
-            updateAgreementPendingTx(false)
+        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)?.let {
+            model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
         }
     }
 
     private fun updateTextAgreement(isChecked: Boolean) {
-        textAgreementChecked = isChecked
-        if (isChecked && linkAgreementChecked) {
-            dialogView.confirm_cta_button.isEnabled = true
-            updateAgreementPendingTx(true)
-        } else {
-            dialogView.confirm_cta_button.isEnabled = false
-            updateAgreementPendingTx(false)
-        }
-    }
-
-    private fun updateAgreementPendingTx(agreed: Boolean) {
-        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)?.let {
-            model.process(SendIntent.ModifyTxOption(it.copy(value = agreed)))
+        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.TEXT_AGREEMENT)?.let {
+            model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
         }
     }
 

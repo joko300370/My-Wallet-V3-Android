@@ -209,7 +209,11 @@ sealed class SendIntent : MviIntent<SendState> {
     object PrepareTransaction : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
-                nextEnabled = true,
+                nextEnabled = if (oldState.action == AssetAction.Deposit) {
+                    false
+                } else {
+                    true
+                },
                 currentStep = SendStep.CONFIRM_DETAIL
             ).updateBackstack(oldState)
     }

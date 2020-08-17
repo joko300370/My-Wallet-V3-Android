@@ -44,7 +44,8 @@ data class PendingTx(
 
 enum class TxOption {
     DESCRIPTION,
-    AGREEMENT,
+    AGREEMENT_WITH_LINKS,
+    TEXT_AGREEMENT,
 }
 
 sealed class TxOptionValue {

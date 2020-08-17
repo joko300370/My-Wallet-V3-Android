@@ -22,11 +22,11 @@ class EthDepositTransaction(
     requireSecondPassword: Boolean
 ) : EthSendTransaction(
     ethDataManager,
-        feeManager,
-        exchangeRates,
-        sendingAccount,
-        sendTarget,
-        requireSecondPassword
+    feeManager,
+    exchangeRates,
+    sendingAccount,
+    sendTarget,
+    requireSecondPassword
 ) {
     override var pendingTx: PendingTx =
         PendingTx(
@@ -36,20 +36,28 @@ class EthDepositTransaction(
             feeLevel = FeeLevel.Regular,
             options = setOf(
                 TxOptionValue.TxBooleanOption(
-                    option = TxOption.AGREEMENT
+                    option = TxOption.AGREEMENT_WITH_LINKS
+                ),
+                TxOptionValue.TxBooleanOption(
+                    option = TxOption.TEXT_AGREEMENT
                 )
             )
         )
 
     override fun validate(): Completable {
         return Completable.fromCallable {
-            pendingTx.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)?.let {
-                if (!it.value) {
-                    throw TransactionValidationError(TransactionValidationError.OPTION_MISSING)
-                } else {
-                    super.validate()
+            pendingTx.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)
+                ?.let { linksAgreement ->
+                    pendingTx.getOption<TxOptionValue.TxBooleanOption>(TxOption.TEXT_AGREEMENT)
+                        ?.let { textAgreement ->
+                            if (linksAgreement.value && textAgreement.value) {
+                                super.validate()
+                            } else {
+                                throw TransactionValidationError(
+                                    TransactionValidationError.OPTION_MISSING)
+                            }
+                        }
                 }
-            }
         }
     }
 }
