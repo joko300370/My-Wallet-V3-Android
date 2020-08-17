@@ -130,7 +130,7 @@ class ConfirmTransactionSheet(
             itemList.add(ConfirmNoteItem(opt.text))
         }
 
-        val agreement = state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.AGREEMENT)
+        val agreement = state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)
         agreement?.let {
             dialogView.confirm_cta_button.isEnabled = false
             setupTosAndPPLinks(itemList)
@@ -138,6 +138,7 @@ class ConfirmTransactionSheet(
         }
     }
 
+    // TODO use AssetActions differently
     private fun showActionSpecificUi(
         state: SendState,
         itemList: MutableList<ConfirmItemType>
@@ -221,8 +222,10 @@ class ConfirmTransactionSheet(
         linkAgreementChecked = isChecked
         if (isChecked && textAgreementChecked) {
             dialogView.confirm_cta_button.isEnabled = true
+            updateAgreementPendingTx(true)
         } else {
             dialogView.confirm_cta_button.isEnabled = false
+            updateAgreementPendingTx(false)
         }
     }
 
@@ -230,8 +233,16 @@ class ConfirmTransactionSheet(
         textAgreementChecked = isChecked
         if (isChecked && linkAgreementChecked) {
             dialogView.confirm_cta_button.isEnabled = true
+            updateAgreementPendingTx(true)
         } else {
             dialogView.confirm_cta_button.isEnabled = false
+            updateAgreementPendingTx(false)
+        }
+    }
+
+    private fun updateAgreementPendingTx(agreed: Boolean) {
+        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)?.let {
+            model.process(SendIntent.ModifyTxOption(it.copy(value = agreed)))
         }
     }
 

@@ -17,6 +17,7 @@ class TransactionValidationError(val errorCode: Int) : TransferError("Invalid Se
         const val INVALID_ADDRESS = 1004
         const val ADDRESS_IS_CONTRACT = 1005
         const val UNSUPPORTED_OPTION = 1006
+        const val HAS_NOT_AGREED = 1007
     }
 }
 
@@ -52,6 +53,11 @@ sealed class TxOptionValue {
     data class TxTextOption(
         override val option: TxOption,
         val text: String = ""
+    ) : TxOptionValue()
+
+    data class TxBooleanOption(
+        override val option: TxOption,
+        val value: Boolean = false
     ) : TxOptionValue()
 }
 

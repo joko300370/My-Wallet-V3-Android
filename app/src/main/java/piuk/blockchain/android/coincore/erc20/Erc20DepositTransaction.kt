@@ -2,9 +2,11 @@ package piuk.blockchain.android.coincore.erc20
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import io.reactivex.Completable
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -35,9 +37,21 @@ class Erc20DepositTransaction(
         fees = CryptoValue.ZeroEth,
         feeLevel = FeeLevel.Regular,
         options = setOf(
-            TxOptionValue.TxTextOption(
+            TxOptionValue.TxBooleanOption(
                 option = TxOption.AGREEMENT
             )
         )
     )
+
+    override fun validate(): Completable {
+        return Completable.fromCallable {
+            pendingTx.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)?.let {
+                if (!it.value) {
+                    throw TransactionValidationError(TransactionValidationError.HAS_NOT_AGREED)
+                } else {
+                    super.validate()
+                }
+            }
+        }
+    }
 }
