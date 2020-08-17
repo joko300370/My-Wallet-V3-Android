@@ -169,7 +169,7 @@ internal abstract class CryptoAssetBase(
         tiersService.tiers().flatMapMaybe { tier ->
             if (tier.isApprovedFor(KycTierLevel.GOLD)) {
                 val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
-                if(interestAccounts.isNotEmpty()) {
+                if (interestAccounts.isNotEmpty()) {
                     Maybe.just(interestAccounts.first())
                 } else {
                     Maybe.empty()
