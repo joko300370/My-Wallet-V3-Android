@@ -33,6 +33,6 @@ class TransferReceiveFragment : AccountSelectorFragment() {
     }
 
     companion object {
-        fun newInstance(startingAccount: CryptoAccount?) = TransferReceiveFragment()
+        fun newInstance() = TransferReceiveFragment()
     }
 }

@@ -21,10 +21,6 @@ class TransferSendFragment :
     private val coincore: Coincore by scopedInject()
     private var flow: SendFlow? = null
 
-    private val startingAccount by lazy {
-        arguments?.getSerializable(STARTING_ACCOUNT)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -33,10 +29,6 @@ class TransferSendFragment :
             statusDecorator = ::statusDecorator,
             onAccountSelected = ::doOnAccountSelected
         )
-
-        if (startingAccount != null) {
-            startFlowForAccount(startingAccount as CryptoAccount)
-        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): Single<String> =
@@ -78,12 +70,6 @@ class TransferSendFragment :
     }
 
     companion object {
-        private const val STARTING_ACCOUNT = "STARTING_ACCOUNT"
-
-        fun newInstance(startingAccount: CryptoAccount?) = TransferSendFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(STARTING_ACCOUNT, startingAccount)
-            }
-        }
+        fun newInstance() = TransferSendFragment()
     }
 }
