@@ -17,7 +17,7 @@ class TransactionValidationError(val errorCode: Int) : TransferError("Invalid Se
         const val INVALID_ADDRESS = 1004
         const val ADDRESS_IS_CONTRACT = 1005
         const val UNSUPPORTED_OPTION = 1006
-        const val HAS_NOT_AGREED = 1007
+        const val OPTION_MISSING = 1007
     }
 }
 

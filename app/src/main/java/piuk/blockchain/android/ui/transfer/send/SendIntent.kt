@@ -33,7 +33,7 @@ sealed class SendIntent : MviIntent<SendState> {
                     SendStep.ENTER_ADDRESS
                 },
                 nextEnabled = passwordRequired
-            )
+            ).updateBackstack(oldState)
     }
 
     class InitialiseWithTargetAccount(
@@ -74,7 +74,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = false,
                 errorState = SendErrorState.NONE
-            )
+            ).updateBackstack(oldState)
     }
 
     class UpdatePasswordIsValidated(
@@ -98,7 +98,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 nextEnabled = false,
                 errorState = SendErrorState.INVALID_PASSWORD,
                 secondPassword = ""
-            )
+            ).updateBackstack(oldState)
     }
 
     class ValidateInputTargetAddress(
@@ -116,7 +116,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 errorState = SendErrorState.NONE,
                 sendTarget = sendTarget,
                 nextEnabled = true
-            )
+            ).updateBackstack(oldState)
     }
 
     class TargetAddressInvalid(private val error: TransactionValidationError) : SendIntent() {
@@ -128,7 +128,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 },
                 sendTarget = NullCryptoAccount(),
                 nextEnabled = false
-            )
+            ).updateBackstack(oldState)
     }
 
     class TargetSelectionConfirmed(
@@ -138,7 +138,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 errorState = SendErrorState.NONE,
                 nextEnabled = false
-            )
+            ).updateBackstack(oldState)
     }
 
     object FetchFiatRates : SendIntent() {
@@ -155,7 +155,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 fiatRate = fiatRate
-            )
+            ).updateBackstack(oldState)
     }
 
     class CryptoRateUpdated(
@@ -164,7 +164,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 targetRate = targetRate
-            )
+            ).updateBackstack(oldState)
     }
 
     class SendAmountChanged(
@@ -173,7 +173,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = false
-            )
+            ).updateBackstack(oldState)
     }
 
     class InputValidationError(
@@ -187,7 +187,7 @@ sealed class SendIntent : MviIntent<SendState> {
                     TransactionValidationError.INSUFFICIENT_GAS -> SendErrorState.NOT_ENOUGH_GAS
                     else -> SendErrorState.UNEXPECTED_ERROR
                 }
-            )
+            ).updateBackstack(oldState)
     }
 
     class ModifyTxOption(
@@ -203,7 +203,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 pendingTx = pendingTx,
                 nextEnabled = pendingTx.amount.isPositive
-            )
+            ).updateBackstack(oldState)
     }
 
     object PrepareTransaction : SendIntent() {
@@ -220,7 +220,7 @@ sealed class SendIntent : MviIntent<SendState> {
                 nextEnabled = false,
                 currentStep = SendStep.IN_PROGRESS,
                 transactionInFlight = TransactionInFlightState.IN_PROGRESS
-            )
+            ).updateBackstack(oldState)
     }
 
     class FatalTransactionError(
@@ -230,7 +230,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = true,
                 transactionInFlight = TransactionInFlightState.ERROR
-            )
+            ).updateBackstack(oldState)
     }
 
     object UpdateTransactionComplete : SendIntent() {
@@ -238,9 +238,10 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = true,
                 transactionInFlight = TransactionInFlightState.COMPLETED
-            )
+            ).updateBackstack(oldState)
     }
 
+    // This fn pops the backstack, thus no need to update the backstack here
     object ReturnToPreviousStep : SendIntent() {
         override fun reduce(oldState: SendState): SendState {
             try {

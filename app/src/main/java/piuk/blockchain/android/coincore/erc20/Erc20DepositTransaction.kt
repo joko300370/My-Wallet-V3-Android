@@ -47,7 +47,7 @@ class Erc20DepositTransaction(
         return Completable.fromCallable {
             pendingTx.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT)?.let {
                 if (!it.value) {
-                    throw TransactionValidationError(TransactionValidationError.HAS_NOT_AGREED)
+                    throw TransactionValidationError(TransactionValidationError.OPTION_MISSING)
                 } else {
                     super.validate()
                 }
