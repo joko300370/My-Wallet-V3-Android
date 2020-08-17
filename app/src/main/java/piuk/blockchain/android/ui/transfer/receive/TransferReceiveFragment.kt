@@ -7,6 +7,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 
 class TransferReceiveFragment : AccountSelectorFragment() {
@@ -21,9 +22,12 @@ class TransferReceiveFragment : AccountSelectorFragment() {
         )
     }
 
-    private fun statusDecorator(account: BlockchainAccount): Single<String> =
+    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
         // TODO: how do we decorate Receive accounts?
-        Single.just("")
+        Single.just(object : AccountDecorator {
+            override val enabled = true
+            override val status: String = ""
+        })
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
