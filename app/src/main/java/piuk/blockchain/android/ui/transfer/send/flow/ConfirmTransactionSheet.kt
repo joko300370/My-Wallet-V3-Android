@@ -48,11 +48,8 @@ class ConfirmTransactionSheet(
 
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
-            onAgreementWithLinksActionClicked = { isChecked -> updateLinkAgreement(isChecked) },
-            onAgreementTextActionClicked = { isChecked -> updateTextAgreement(isChecked) },
-            onNoteItemUpdated = { note ->
-                updateNoteOption(note)
-            },
+            state,
+            model,
             stringUtils = stringUtils,
             activityContext = requireActivity()
         )
@@ -220,24 +217,6 @@ class ConfirmTransactionSheet(
         sb.append(outroToHolding)
 
         itemList.add(ConfirmAgreementTextItem(sb))
-    }
-
-    private fun updateLinkAgreement(isChecked: Boolean) {
-        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)?.let {
-            model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
-        }
-    }
-
-    private fun updateTextAgreement(isChecked: Boolean) {
-        state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.TEXT_AGREEMENT)?.let {
-            model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
-        }
-    }
-
-    private fun updateNoteOption(note: String) {
-        state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)?.let {
-            model.process(SendIntent.ModifyTxOption(it.copy(text = note)))
-        }
     }
 
     private fun onCtaClick() {
