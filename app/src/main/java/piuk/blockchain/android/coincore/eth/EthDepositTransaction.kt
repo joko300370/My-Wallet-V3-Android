@@ -68,32 +68,20 @@ class EthDepositTransaction(
     }
 
     override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
-        custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
-            val inputFiatAmount = amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-            val endpointFiatAmount =
-                FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
-            /*if (inputFiatAmount.symbol != endpointFiatAmount.symbol) {
-                val priceOfEndpointCurrency =
-                    exchangeRates.getLastPrice(amount.currency, it.currency)
-                val updatedInputAmount =
-                    inputFiatAmount.toBigDecimal().toDouble() * priceOfEndpointCurrency
-                if (updatedInputAmount < endpointFiatAmount.toBigDecimal().toDouble()) {
-                    throw TransactionValidationError(
-                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
-                        it.minDepositAmount.toString())
-                } else {
-                    Single.just(true)
-                }
-            } else {*/
+        super.updateAmount(amount).flatMap { pendingTx ->
+            custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
+                val inputFiatAmount =
+                    amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+                val endpointFiatAmount =
+                    FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
+
                 if (amount.isPositive && inputFiatAmount < endpointFiatAmount) {
                     throw TransactionValidationError(
                         TransactionValidationError.MIN_DEPOSIT_REQUIRED,
                         endpointFiatAmount.toStringWithSymbol())
                 } else {
-                    Single.just(true)
+                    Single.just(pendingTx)
                 }
-            // }
-        }.flatMap {
-            super.updateAmount(amount)
+            }
         }
 }

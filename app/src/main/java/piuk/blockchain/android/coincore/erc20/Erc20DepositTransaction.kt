@@ -70,32 +70,20 @@ class Erc20DepositTransaction(
     }
 
     override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
-        custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
-            val inputFiatAmount = amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-            val endpointFiatAmount =
-                FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
-            if (inputFiatAmount.symbol != endpointFiatAmount.symbol) {
-                val priceOfEndpointCurrency =
-                    exchangeRates.getLastPrice(amount.currency, it.currency)
-                val updatedInputAmount =
-                    inputFiatAmount.toBigDecimal().toDouble() * priceOfEndpointCurrency
-                if (updatedInputAmount < endpointFiatAmount.toBigDecimal().toDouble()) {
+        super.updateAmount(amount).flatMap { pendingTx ->
+            custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
+                val inputFiatAmount =
+                    amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+                val endpointFiatAmount =
+                    FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
+
+                if (amount.isPositive && inputFiatAmount < endpointFiatAmount) {
                     throw TransactionValidationError(
                         TransactionValidationError.MIN_DEPOSIT_REQUIRED,
-                        it.minDepositAmount.toString())
+                        endpointFiatAmount.toStringWithSymbol())
                 } else {
-                    Single.just(true)
-                }
-            } else {
-                if (inputFiatAmount < endpointFiatAmount) {
-                    throw TransactionValidationError(
-                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
-                        it.minDepositAmount.toString())
-                } else {
-                    Single.just(true)
+                    Single.just(pendingTx)
                 }
             }
-        }.flatMap {
-            super.updateAmount(amount)
         }
 }

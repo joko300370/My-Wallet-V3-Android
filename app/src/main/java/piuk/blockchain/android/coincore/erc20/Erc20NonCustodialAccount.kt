@@ -126,7 +126,7 @@ abstract class Erc20NonCustodialAccount(
                 sendTo.receiveAddress.map {
                     Erc20DepositTransaction(
                         currencyPrefs = currencyPrefs,
-                        custodialWalletManager= custodialWalletManager,
+                        custodialWalletManager = custodialWalletManager,
                         asset = asset,
                         erc20Account = erc20Account,
                         feeManager = fees,

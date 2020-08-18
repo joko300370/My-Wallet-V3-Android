@@ -8,7 +8,10 @@ import io.reactivex.Single
 
 open class TransferError(msg: String) : Exception(msg)
 
-class TransactionValidationError(val errorCode: Int, val optionalMessage: String = "") : TransferError("Invalid Send Tx: code $errorCode") {
+class TransactionValidationError(
+    val errorCode: Int,
+    val optionalMessage: String = ""
+) : TransferError("Invalid Send Tx: code $errorCode") {
     companion object {
         const val HAS_TX_IN_FLIGHT = 1000
         const val INVALID_AMOUNT = 1001

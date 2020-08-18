@@ -20,7 +20,7 @@ class InterestLimitsRepository(limitsProvider: LimitsProvider) {
                 Maybe.just(it)
             } ?: Maybe.empty()
         }.onErrorResumeNext(Maybe.empty())
-    
+
     companion object {
         private const val CACHE_LIFETIME = 240L
     }

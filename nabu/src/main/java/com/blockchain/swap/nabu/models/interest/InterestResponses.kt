@@ -42,5 +42,5 @@ data class InterestLimitsResponse(
 )
 
 data class InterestLimitsList(
-    val list : MutableList<InterestLimits> = mutableListOf()
+    val list: MutableList<InterestLimits> = mutableListOf()
 )

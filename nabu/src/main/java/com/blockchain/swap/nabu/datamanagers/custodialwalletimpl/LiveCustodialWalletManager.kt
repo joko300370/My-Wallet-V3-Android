@@ -518,8 +518,10 @@ class LiveCustodialWalletManager(
     override fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits> =
         interestLimitsRepository.getLimitForAsset(crypto)
 
-    override fun getSupportedFundsFiats(fiatCurrency: String,
-                                        isTier2Approved: Boolean): Single<List<String>> {
+    override fun getSupportedFundsFiats(
+        fiatCurrency: String,
+        isTier2Approved: Boolean
+    ): Single<List<String>> {
 
         val supportedFundCurrencies = authenticator.authenticate {
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
@@ -704,5 +706,8 @@ interface PaymentAccountMapper {
     fun map(bankAccountResponse: BankAccountResponse): BankAccount?
 }
 
-private data class CustodialFiatBalance(val currency: String, val available: Boolean,
-                                        val balance: FiatValue?)
+private data class CustodialFiatBalance(
+    val currency: String,
+    val available: Boolean,
+    val balance: FiatValue?
+)
