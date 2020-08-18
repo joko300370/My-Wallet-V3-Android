@@ -1,5 +1,7 @@
 package piuk.blockchain.android.coincore.erc20.usdt
 
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
@@ -11,6 +13,8 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class UsdtCryptoWalletAccount(
+    currencyPrefs: CurrencyPrefs,
+    custodialManager: CustodialWalletManager,
     payloadManager: PayloadDataManager,
     label: String,
     private val address: String,
@@ -18,6 +22,8 @@ class UsdtCryptoWalletAccount(
     fees: FeeDataManager,
     exchangeRates: ExchangeRateDataManager
 ) : Erc20NonCustodialAccount(
+    currencyPrefs,
+    custodialManager,
     payloadManager,
     CryptoCurrency.USDT,
     fees,

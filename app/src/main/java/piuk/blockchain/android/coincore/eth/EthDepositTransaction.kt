@@ -1,7 +1,11 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
+import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
@@ -14,6 +18,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 class EthDepositTransaction(
+    private val currencyPrefs: CurrencyPrefs,
+    val custodialWalletManager: CustodialWalletManager,
     ethDataManager: EthDataManager,
     feeManager: FeeDataManager,
     exchangeRates: ExchangeRateDataManager,
@@ -60,4 +66,34 @@ class EthDepositTransaction(
                 }
         }
     }
+
+    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
+        custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
+            val inputFiatAmount = amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+            val endpointFiatAmount =
+                FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
+            /*if (inputFiatAmount.symbol != endpointFiatAmount.symbol) {
+                val priceOfEndpointCurrency =
+                    exchangeRates.getLastPrice(amount.currency, it.currency)
+                val updatedInputAmount =
+                    inputFiatAmount.toBigDecimal().toDouble() * priceOfEndpointCurrency
+                if (updatedInputAmount < endpointFiatAmount.toBigDecimal().toDouble()) {
+                    throw TransactionValidationError(
+                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
+                        it.minDepositAmount.toString())
+                } else {
+                    Single.just(true)
+                }
+            } else {*/
+                if (amount.isPositive && inputFiatAmount < endpointFiatAmount) {
+                    throw TransactionValidationError(
+                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
+                        endpointFiatAmount.toStringWithSymbol())
+                } else {
+                    Single.just(true)
+                }
+            // }
+        }.flatMap {
+            super.updateAmount(amount)
+        }
 }

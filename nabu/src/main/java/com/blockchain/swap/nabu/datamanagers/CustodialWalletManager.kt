@@ -2,6 +2,7 @@ package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.swap.nabu.models.interest.InterestLimits
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -120,6 +121,8 @@ interface CustodialWalletManager {
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
 
     fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String>
+
+    fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits>
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>

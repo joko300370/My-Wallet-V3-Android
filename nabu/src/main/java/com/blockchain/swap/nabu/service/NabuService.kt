@@ -442,6 +442,12 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getInterestAddress(authorization = sessionToken.authHeader, currency = currency)
     .wrapErrorMessage()
 
+    fun getInterestLimits(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestLimits(authorization = sessionToken.authHeader, currency = currency)
+    .wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }

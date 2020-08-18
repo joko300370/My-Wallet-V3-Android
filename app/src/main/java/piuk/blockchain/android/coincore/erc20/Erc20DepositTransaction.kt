@@ -1,8 +1,12 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
+import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
@@ -14,6 +18,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 class Erc20DepositTransaction(
+    private val currencyPrefs: CurrencyPrefs,
+    private val custodialWalletManager: CustodialWalletManager,
     asset: CryptoCurrency,
     erc20Account: Erc20Account,
     feeManager: FeeDataManager,
@@ -62,4 +68,34 @@ class Erc20DepositTransaction(
                 }
         }
     }
+
+    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
+        custodialWalletManager.getInterestLimits(amount.currency).flatMapSingle {
+            val inputFiatAmount = amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+            val endpointFiatAmount =
+                FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
+            if (inputFiatAmount.symbol != endpointFiatAmount.symbol) {
+                val priceOfEndpointCurrency =
+                    exchangeRates.getLastPrice(amount.currency, it.currency)
+                val updatedInputAmount =
+                    inputFiatAmount.toBigDecimal().toDouble() * priceOfEndpointCurrency
+                if (updatedInputAmount < endpointFiatAmount.toBigDecimal().toDouble()) {
+                    throw TransactionValidationError(
+                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
+                        it.minDepositAmount.toString())
+                } else {
+                    Single.just(true)
+                }
+            } else {
+                if (inputFiatAmount < endpointFiatAmount) {
+                    throw TransactionValidationError(
+                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
+                        it.minDepositAmount.toString())
+                } else {
+                    Single.just(true)
+                }
+            }
+        }.flatMap {
+            super.updateAmount(amount)
+        }
 }

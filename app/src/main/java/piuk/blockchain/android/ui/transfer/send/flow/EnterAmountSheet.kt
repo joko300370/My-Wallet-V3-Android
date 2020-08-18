@@ -79,7 +79,8 @@ class EnterAmountSheet(
 
             newState.errorState.toString(
                 newState.sendingAccount.asset.networkTicker,
-                resources
+                resources,
+                newState.errorMessage
             )?.let {
                 amount_sheet_input.showError(it)
             } ?: amount_sheet_input.hideError()

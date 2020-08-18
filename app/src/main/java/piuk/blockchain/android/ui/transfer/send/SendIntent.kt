@@ -185,8 +185,15 @@ sealed class SendIntent : MviIntent<SendState> {
                     TransactionValidationError.INVALID_AMOUNT -> SendErrorState.MIN_REQUIRED
                     TransactionValidationError.INSUFFICIENT_FUNDS -> SendErrorState.MAX_EXCEEDED
                     TransactionValidationError.INSUFFICIENT_GAS -> SendErrorState.NOT_ENOUGH_GAS
+                    TransactionValidationError.MIN_DEPOSIT_REQUIRED -> SendErrorState.MIN_DEPOSIT
                     else -> SendErrorState.UNEXPECTED_ERROR
+                },
+                errorMessage = if (error.errorCode == TransactionValidationError.MIN_DEPOSIT_REQUIRED) {
+                    error.optionalMessage
+                } else {
+                    ""
                 }
+
             ).updateBackstack(oldState)
     }
 
