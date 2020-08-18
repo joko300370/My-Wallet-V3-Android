@@ -13,6 +13,7 @@ import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_send_enter_amount.view.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
@@ -31,6 +32,7 @@ class EnterAmountSheet(
 
     private var state: SendState = SendState()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
+    private val customiser: SendFlowCustomiser by inject()
     private val compositeDisposable = CompositeDisposable()
 
     private val imm: InputMethodManager by lazy {
@@ -61,6 +63,9 @@ class EnterAmountSheet(
 
             val balance = newState.availableBalance
             if (balance.isPositive || balance.isZero) {
+                // The maxLimit set here controls the number of digits that can be entered,
+                // but doesn't restrict the input to be always under that value. Which might be
+                // strange UX, but is currently by design.
                 amount_sheet_input.maxLimit = newState.availableBalance
 
                 newState.fiatRate?.let { rate ->
@@ -69,23 +74,28 @@ class EnterAmountSheet(
                 }
             }
 
-            amount_sheet_asset_icon.setCoinIcon(newState.sendingAccount.asset)
-            amount_sheet_asset_direction.setAssetIconColours(newState.sendingAccount.asset, context)
+            amount_sheet_title.text = customiser.enterAmountTitle(newState)
 
-            amount_sheet_from.text =
-                getString(R.string.send_enter_amount_from, newState.sendingAccount.label)
-            amount_sheet_to.text =
-                getString(R.string.send_enter_amount_to, newState.sendTarget.label)
+            updatePendingTxDetails(newState)
 
-            newState.errorState.toString(
-                newState.sendingAccount.asset.networkTicker,
-                resources
-            )?.let {
+            customiser.errorFlashMessage(newState)?.let {
                 amount_sheet_input.showError(it)
             } ?: amount_sheet_input.hideError()
         }
 
         state = newState
+    }
+
+    private fun updatePendingTxDetails(state: SendState) {
+        with(dialogView) {
+            amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
+            amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
+
+            amount_sheet_from.text =
+                getString(R.string.send_enter_amount_from, state.sendingAccount.label)
+            amount_sheet_to.text =
+                getString(R.string.send_enter_amount_to, state.sendTarget.label)
+        }
     }
 
     override fun initControls(view: View) {

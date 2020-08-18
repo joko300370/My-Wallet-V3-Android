@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -33,7 +34,10 @@ data class PendingTx(
     val available: CryptoValue,
     val fees: CryptoValue,
     val feeLevel: FeeLevel = FeeLevel.Regular,
-    val options: Set<TxOptionValue> = emptySet()
+    val options: Set<TxOptionValue> = emptySet(),
+    val minLimit: Money? = null,
+    val maxLimit: Money? = null,
+    val canExecute: Boolean = true // TODO: Set this when updating amounts/options & validating
 ) {
     fun hasOption(option: TxOption): Boolean =
         options.find { it.option == option } != null
@@ -69,8 +73,11 @@ interface TransactionProcessor {
     // This may be moved into options at some point in the near future.
     val feeOptions: Set<FeeLevel>
 
+    val canTransactFiat: Boolean get() = false
+
     // Call this first to initialise the processor
-    fun createPendingTx(): Single<PendingTx>
+    fun initialiseTx(): Single<PendingTx>
+    // fun initialise() : Observable<PendingTx>
 
     // Set the option to the passed option value. If the option is not supported, it will not be
     // in the original list when the pendincTx is created. And if it is not supported, then trying to

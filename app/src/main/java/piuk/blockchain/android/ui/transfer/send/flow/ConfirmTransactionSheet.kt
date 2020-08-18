@@ -46,6 +46,8 @@ class ConfirmTransactionSheet(
 
     private var state = SendState()
 
+    private val customiser: SendFlowCustomiser by inject()
+
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
             onAgreementWithLinksActionClicked = { isChecked -> updateLinkAgreement(isChecked) },
@@ -83,6 +85,8 @@ class ConfirmTransactionSheet(
         listAdapter.items = itemList
         listAdapter.notifyDataSetChanged()
 
+        dialogView.confirm_cta_button.text = customiser.confirmCtaText(newState)
+        dialogView.confirm_sheet_title.text = customiser.confirmTitle(newState)
         dialogView.confirm_cta_button.isEnabled = newState.nextEnabled
 
         state = newState
