@@ -232,6 +232,7 @@ class DashboardModel(
             is CheckBackupStatus -> interactor.hasUserBackedUp(this)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
+            is LaunchDepositFlow -> interactor.getDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,
             is BackupStatusUpdate,
@@ -244,7 +245,8 @@ class DashboardModel(
             is ShowDashboardSheet,
             is TransferFunds,
             is UpdateLaunchDialogFlow,
-            is ClearBottomSheet -> null
+            is ClearBottomSheet,
+            is ClearFlow -> null
         }
     }
 
@@ -257,12 +259,26 @@ class DashboardModel(
         nextIntent: DashboardIntent
     ): Boolean {
         return when (previousIntent) {
-            // Allow consecutive ClearBottomSheet intents
-            is ClearBottomSheet -> {
-                if (nextIntent is ClearBottomSheet)
-                    false
-                else
+            is UpdateLaunchDialogFlow -> {
+                if (nextIntent is ClearBottomSheet || nextIntent is ClearFlow) {
+                    true
+                } else {
                     super.distinctIntentFilter(previousIntent, nextIntent)
+                }
+            }
+            is ClearBottomSheet -> {
+                if (nextIntent is ClearBottomSheet) {
+                    false
+                } else {
+                    super.distinctIntentFilter(previousIntent, nextIntent)
+                }
+            }
+            is ClearFlow -> {
+                if (nextIntent is ClearFlow) {
+                    false
+                } else {
+                    super.distinctIntentFilter(previousIntent, nextIntent)
+                }
             }
             else -> super.distinctIntentFilter(previousIntent, nextIntent)
         }

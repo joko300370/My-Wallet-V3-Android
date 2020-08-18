@@ -60,15 +60,19 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         if (account is CryptoAccount) {
-            flow = SendFlow(
-                fromAccount = account,
-                action = AssetAction.NewSend
-            ).apply {
-                startFlow(
-                    fragmentManager = childFragmentManager,
-                    host = this@TransferSendFragment
-                )
-            }
+            startFlowForAccount(account)
+        }
+    }
+
+    private fun startFlowForAccount(account: CryptoAccount) {
+        flow = SendFlow(
+            sourceAccount = account,
+            action = AssetAction.NewSend
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@TransferSendFragment
+            )
         }
     }
 

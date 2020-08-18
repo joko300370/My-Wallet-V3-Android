@@ -7,6 +7,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import java.io.Serializable
 
 interface BlockchainAccount {
     val label: String
@@ -24,7 +25,7 @@ interface BlockchainAccount {
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
 
-interface SingleAccount : BlockchainAccount, SendTarget {
+interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
     val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
 
@@ -61,8 +62,19 @@ interface AccountGroup : BlockchainAccount {
 internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
+object NullCryptoAddress : CryptoAddress {
+    override val asset: CryptoCurrency
+        get() = CryptoCurrency.BTC
+    override val address: String
+        get() = ""
+    override val label: String
+        get() = ""
+}
+
 // Stub invalid accounts; use as an initialisers to avoid nulls.
-object NullCryptoAccount : CryptoAccount {
+class NullCryptoAccount(
+    override val label: String = ""
+) : CryptoAccount {
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(NullAddress)
 
@@ -77,8 +89,6 @@ object NullCryptoAccount : CryptoAccount {
 
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
-
-    override val label: String = ""
 
     override val balance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)

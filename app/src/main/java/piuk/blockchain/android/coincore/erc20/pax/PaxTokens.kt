@@ -4,6 +4,7 @@ import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
@@ -36,7 +37,8 @@ internal class PaxAsset(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService
 ) : Erc20TokensBase(
     payloadManager,
     paxAccount,
@@ -47,7 +49,8 @@ internal class PaxAsset(
     currencyPrefs,
     labels,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService
 ) {
 
     override val asset = CryptoCurrency.PAX

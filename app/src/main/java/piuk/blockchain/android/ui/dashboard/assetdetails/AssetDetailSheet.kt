@@ -185,8 +185,10 @@ class AssetDetailSheet :
         if (account is CryptoAccount && assetFilter == AssetFilter.Custodial) {
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }
+
         if (assetFilter == AssetFilter.Interest && !ENABLE_INTEREST_ACTIONS) {
             // do nothing
+            // TODO must check if user has KYC'd - if not launch info sheet about KYC (screen 0.1 of Earn flow)
             // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
         } else {
             state.assetDisplayMap!![assetFilter]?.let {
@@ -268,7 +270,6 @@ class AssetDetailSheet :
         }
         chartPricePeriods.setOnTabSelectedListener {
             model.process(UpdateTimeSpan(TimeSpan.values()[it]))
-            // assetDetailsViewModel.timeSpan.accept(TimeSpan.values()[it])
         }
     }
 

@@ -120,7 +120,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         // Update/show dialog flow
         if (state?.activeFlow != newState.activeFlow) {
-            state?.activeFlow?.finishFlow()
+            state?.activeFlow?.let {
+                clearBottomSheet()
+                it.finishFlow()
+            }
+
             newState.activeFlow?.startFlow(childFragmentManager, this)
         }
 
@@ -408,7 +412,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun onFlowFinished() {
-        model.process(ClearBottomSheet)
+        model.process(ClearFlow)
     }
 
     override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =
@@ -436,11 +440,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun goToDeposit(
         fromAccount: SingleAccount,
-        toAccount: BlockchainAccount,
-        cryptoAsset: CryptoAsset
+        toAccount: SingleAccount,
+        cryptoAsset: CryptoAsset,
+        action: AssetAction
     ) {
-        // TODO in next story
-        Timber.e("--- go to deposit $fromAccount, $toAccount, $cryptoAsset")
+        model.process(LaunchDepositFlow(toAccount, fromAccount, action))
     }
 
     override fun gotoSwap(account: SingleAccount) =

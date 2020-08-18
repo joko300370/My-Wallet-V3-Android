@@ -11,6 +11,8 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
@@ -62,8 +64,9 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 }
 
 class SendFlow(
+    private val sourceAccount: CryptoAccount = NullCryptoAccount(),
+    private val targetAccount: SendTarget = NullCryptoAccount(),
     private val action: AssetAction,
-    private val fromAccount: CryptoAccount,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : DialogFlow() {
 
@@ -86,17 +89,21 @@ class SendFlow(
             )
         }
 
-        disposables += fromAccount.requireSecondPassword()
+        disposables += sourceAccount.requireSecondPassword()
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    model.process(
-                        SendIntent.Initialise(
-                            action,
-                            fromAccount,
-                            passwordRequired
-                        )
-                    )
+                    if (targetAccount != NullCryptoAccount() &&
+                        sourceAccount != NullCryptoAccount()) {
+                            model.process(SendIntent.InitialiseWithTargetAccount(
+                                sourceAccount, targetAccount, passwordRequired)
+                            )
+                    } else if (sourceAccount != NullCryptoAccount()) {
+                        model.process(SendIntent.Initialise(action, sourceAccount, passwordRequired))
+                    } else {
+                        throw IllegalStateException(
+                            "Send flow initialised without at least one target")
+                    }
                 },
                 onError = {
                     Timber.e("Unable to configure send flow, aborting. e == $it")
@@ -113,10 +120,10 @@ class SendFlow(
 
     private fun handleStateChange(newState: SendState) {
         if (currentStep != newState.currentStep) {
-            currentStep = newState.currentStep
-            if (currentStep == SendStep.ZERO) {
+            if (newState.currentStep == SendStep.ZERO) {
                 onSendComplete()
             } else {
+                currentStep = newState.currentStep
                 showFlowStep(currentStep)
             }
         }

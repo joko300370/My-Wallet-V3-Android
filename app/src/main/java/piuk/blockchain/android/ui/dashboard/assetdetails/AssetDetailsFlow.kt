@@ -42,8 +42,9 @@ class AssetDetailsFlow(
         fun gotoSwap(account: SingleAccount)
         fun goToDeposit(
             fromAccount: SingleAccount,
-            toAccount: BlockchainAccount,
-            cryptoAsset: CryptoAsset
+            toAccount: SingleAccount,
+            cryptoAsset: CryptoAsset,
+            action: AssetAction
         )
     }
 
@@ -117,8 +118,10 @@ class AssetDetailsFlow(
             AssetAction.Receive -> host.goToReceiveFor(account)
             AssetAction.Swap -> host.gotoSwap(account)
             AssetAction.Summary -> TODO()
-            AssetAction.Deposit -> host.goToDeposit(account,
-                localState.selectedAccount!! as SingleAccount, newState.asset!!)
+            AssetAction.Deposit -> newState.asset!!.accountGroup(AssetFilter.NonCustodial)
+                .subscribeBy {
+                    getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
+                }
         }
     }
 
@@ -128,10 +131,19 @@ class AssetDetailsFlow(
     }
 
     override fun onAccountSelected(account: BlockchainAccount) {
-        assetFlowHost.goToDeposit(
-            account as SingleAccount,
-            localState.selectedAccount!!,
-            localState.asset!!)
+        getInterestAccountAndNavigate(account as SingleAccount, AssetAction.Deposit)
+    }
+
+    private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
+        localState.asset?.let { ca ->
+            disposables += ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
+                assetFlowHost.goToDeposit(
+                    account,
+                    ag.accounts.first(),
+                    ca,
+                    assetAction)
+            }
+        } ?: throw IllegalStateException("No asset defined in local state - action: $assetAction")
     }
 
     override fun onAccountSelectorBack() {

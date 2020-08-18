@@ -60,7 +60,7 @@ class EnterAmountSheet(
             }
 
             val balance = newState.availableBalance
-            if (balance.isPositive) {
+            if (balance.isPositive || balance.isZero) {
                 amount_sheet_input.maxLimit = newState.availableBalance
 
                 newState.fiatRate?.let { rate ->

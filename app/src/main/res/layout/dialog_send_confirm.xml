@@ -34,7 +34,7 @@
         android:layout_marginStart="@dimen/xlarge_margin"
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="@string/send_enter_amount_title"
+        android:text="@string/send_confirmation_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/confirm_sheet_back"
@@ -58,29 +58,11 @@
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/confirm_details_note_holder"
+        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_title_separator"
         tools:listitem="@layout/item_send_confirm_details" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/confirm_details_note_holder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/very_small_margin"
-        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button">
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/confirm_details_note_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:hint="@string/send_confirmation_add_note_hint"
-            app:backgroundTint="@color/blue_600" />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/confirm_cta_button"

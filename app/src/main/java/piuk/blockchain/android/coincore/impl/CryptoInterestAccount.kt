@@ -8,11 +8,12 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ENABLE_INTEREST_ACTIONS
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -27,7 +28,13 @@ internal class CryptoInterestAccount(
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = Single.error(NotImplementedError("Interest accounts don't support receive"))
+        get() = custodialWalletManager.getInterestAccountAddress(asset).map {
+            InterestAddress(
+                address = it,
+                label = label,
+                asset = asset
+            )
+        }
 
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
@@ -60,9 +67,17 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions = if (ENABLE_INTEREST_ACTIONS) {
-        setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
+    override val actions: AvailableActions = if (ENABLE_INTEREST_ACTIONS &&
+        (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER)) {
+        // TODO coming soon - AssetAction.Summary + AssetAction.ViewActivity
+        setOf(AssetAction.Deposit)
     } else {
         emptySet()
     }
 }
+
+internal class InterestAddress(
+    override val address: String,
+    override val label: String = address,
+    override val asset: CryptoCurrency
+) : CryptoAddress

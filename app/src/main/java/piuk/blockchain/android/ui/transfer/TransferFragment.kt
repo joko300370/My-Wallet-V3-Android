@@ -39,23 +39,15 @@ class TransferFragment : Fragment() {
         }.attach()
     }
     companion object {
-        enum class StartingView {
-            SHOW_SEND,
-            SHOW_RECEIVE
-        }
-
-        private const val START_AT_VIEW = "START_AT_VIEW"
-        fun newInstance(startAt: StartingView = StartingView.SHOW_SEND): TransferFragment {
-            return TransferFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(START_AT_VIEW, startAt)
-                }
-            }
+        fun newInstance(): TransferFragment {
+            return TransferFragment()
         }
     }
 }
 
-class TransferPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class TransferPagerAdapter(
+    fragment: Fragment
+) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment =

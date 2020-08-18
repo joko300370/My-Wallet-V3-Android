@@ -191,8 +191,8 @@ class DashboardInteractor(
             model.process(
                 UpdateLaunchDialogFlow(
                     SendFlow(
-                        action = action,
-                        fromAccount = fromAccount
+                        sourceAccount = fromAccount,
+                        action = action
                     )
                 )
             )
@@ -209,6 +209,26 @@ class DashboardInteractor(
                 )
             )
         )
+        return null
+    }
+
+    fun getDepositFlow(
+        model: DashboardModel,
+        sourceAccount: SingleAccount,
+        targetAccount: SingleAccount,
+        action: AssetAction
+    ): Disposable? {
+        if (sourceAccount is CryptoAccount) {
+            model.process(
+                UpdateLaunchDialogFlow(
+                    SendFlow(
+                        sourceAccount = sourceAccount,
+                        targetAccount = targetAccount,
+                        action = action
+                    )
+                )
+            )
+        }
         return null
     }
 

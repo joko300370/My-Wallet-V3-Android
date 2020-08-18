@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -152,18 +153,24 @@ class AssetActionsSheet :
         disposables += coincore[firstAccount.asset].interestRate().observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {
-                    showTextAndAssetIcon(view,
-                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        getString(R.string.dashboard_asset_balance_interest, it),
-                        firstAccount.asset.drawableResFilled()
-                    )
+                    if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        showTextAndAssetIcon(view,
+                            labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                            resources.getString(R.string.dashboard_asset_balance_interest, it)
+                                ?: "",
+                            firstAccount.asset.drawableResFilled()
+                        )
+                    }
                 },
                 onError = {
-                    showTextAndAssetIcon(view,
-                        labels.getDefaultInterestWalletLabel(firstAccount.asset),
-                        getString(R.string.dashboard_asset_actions_interest_dsc_failed),
-                        firstAccount.asset.drawableResFilled()
-                    )
+                    if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        showTextAndAssetIcon(view,
+                            labels.getDefaultInterestWalletLabel(firstAccount.asset),
+                            resources.getString(
+                                R.string.dashboard_asset_actions_interest_dsc_failed) ?: "",
+                            firstAccount.asset.drawableResFilled()
+                        )
+                    }
                     Timber.e("AssetActions error loading Interest rate: $it")
                 }
             )
@@ -207,36 +214,30 @@ class AssetActionsSheet :
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
-                    model.process(HandleActionIntent(AssetAction.ViewActivity))
-                    dismiss()
+                    processAction(AssetAction.ViewActivity)
                 }
             AssetAction.Send ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
-                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker),
-                    asset) {
-                    model.process(HandleActionIntent(AssetAction.Send))
-                    dismiss()
+                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker), asset) {
+                    processAction(AssetAction.Send)
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetAction.NewSend))
-                    dismiss()
+                    processAction(AssetAction.NewSend)
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
-                    model.process(HandleActionIntent(AssetAction.Receive))
-                    dismiss()
+                    processAction(AssetAction.Receive)
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset) {
-                model.process(HandleActionIntent(AssetAction.Swap))
-                dismiss()
+                processAction(AssetAction.Swap)
             }
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
@@ -250,13 +251,14 @@ class AssetActionsSheet :
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
                 asset) {
+
                 disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
                     when {
                         it.accounts.size > 1 -> {
                             model.process(SelectSendingAccount)
                         }
                         it.accounts.size == 1 -> {
-                            // TODO in next story - launch send flow with pre-selected accounts
+                            processAction(AssetAction.Deposit)
                         }
                         else -> {
                             throw IllegalStateException("No accounts available to deposit into interest")
@@ -265,6 +267,12 @@ class AssetActionsSheet :
                 }
             }
         }
+
+    private fun processAction(action: AssetAction) {
+        model.process(HandleActionIntent(action))
+        dismiss()
+        model.process(ClearSheetDataIntent)
+    }
 
     companion object {
         fun newInstance(): AssetActionsSheet = AssetActionsSheet()

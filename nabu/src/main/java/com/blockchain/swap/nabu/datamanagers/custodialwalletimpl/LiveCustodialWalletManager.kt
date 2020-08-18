@@ -494,6 +494,21 @@ class LiveCustodialWalletManager(
                 }
             }
 
+    override fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String> =
+        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_RATES)
+            .onErrorReturnItem(false)
+            .flatMap { eligible ->
+                if (eligible) {
+                    authenticator.authenticate { sessionToken ->
+                        nabuService.getInterestAddress(sessionToken, crypto.networkTicker).map {
+                            it.body()?.accountRef ?: ""
+                        }
+                    }
+                } else {
+                    Single.just("")
+                }
+            }
+
     override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>> {
 
         val supportedFundCurrencies = authenticator.authenticate {

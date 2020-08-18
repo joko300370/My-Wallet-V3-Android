@@ -17,6 +17,7 @@ class TransactionValidationError(val errorCode: Int) : TransferError("Invalid Se
         const val INVALID_ADDRESS = 1004
         const val ADDRESS_IS_CONTRACT = 1005
         const val UNSUPPORTED_OPTION = 1006
+        const val OPTION_MISSING = 1007
     }
 }
 
@@ -43,7 +44,8 @@ data class PendingTx(
 
 enum class TxOption {
     DESCRIPTION,
-    AGREEMENT,
+    AGREEMENT_WITH_LINKS,
+    TEXT_AGREEMENT,
 }
 
 sealed class TxOptionValue {
@@ -52,6 +54,11 @@ sealed class TxOptionValue {
     data class TxTextOption(
         override val option: TxOption,
         val text: String = ""
+    ) : TxOptionValue()
+
+    data class TxBooleanOption(
+        override val option: TxOption,
+        val value: Boolean = false
     ) : TxOptionValue()
 }
 

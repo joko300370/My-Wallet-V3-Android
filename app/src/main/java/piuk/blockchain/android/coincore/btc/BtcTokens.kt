@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.btc
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -29,7 +30,8 @@ internal class BtcAsset(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -38,7 +40,8 @@ internal class BtcAsset(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService
 ) {
 
     override val asset: CryptoCurrency

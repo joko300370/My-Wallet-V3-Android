@@ -3,6 +3,8 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -34,7 +36,8 @@ internal abstract class CryptoAssetBase(
     protected val labels: DefaultLabels,
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
-    protected val crashLogger: CrashLogger
+    protected val crashLogger: CrashLogger,
+    private val tiersService: TierService
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -162,6 +165,20 @@ internal abstract class CryptoAssetBase(
                 )
             }
 
+    private fun getInterestAccount(): Maybe<SingleAccount> =
+        tiersService.tiers().flatMapMaybe { tier ->
+            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
+                val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
+                if (interestAccounts.isNotEmpty()) {
+                    Maybe.just(interestAccounts.first())
+                } else {
+                    Maybe.empty()
+                }
+            } else {
+                Maybe.empty()
+            }
+        }
+
     final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)
@@ -170,10 +187,11 @@ internal abstract class CryptoAssetBase(
             is CustodialTradingAccount -> getNonCustodialAccountList()
             is CryptoInterestAccount -> Single.just(emptyList())
             is CryptoExchangeAccount -> Single.just(emptyList())
-            is CryptoNonCustodialAccount -> getPitLinkingAccount()
-                .map { listOf(it) }
-                .toSingle(emptyList())
-                .onErrorReturn { emptyList() }
+            is CryptoNonCustodialAccount ->
+                Maybe.concat(
+                    listOf(getPitLinkingAccount(), getInterestAccount())
+                ).toList()
+                    .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())
         }
     }

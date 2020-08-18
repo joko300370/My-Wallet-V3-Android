@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.erc20
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
@@ -23,7 +24,8 @@ internal abstract class Erc20TokensBase(
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -32,7 +34,8 @@ internal abstract class Erc20TokensBase(
     labels,
     custodialManager,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService
 ) {
     final override fun initToken(): Completable = erc20Account.fetchErc20Address().ignoreElements()
 }

@@ -195,7 +195,13 @@ class CancelSimpleBuyOrder(
 object ClearBottomSheet : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            showDashboardSheet = null
+        )
+}
+
+object ClearFlow : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
             activeFlow = null
         )
 }
@@ -238,6 +244,19 @@ object TransferFunds : DashboardIntent() {
 }
 
 class LaunchSendFlow(
+    val fromAccount: SingleAccount,
+    val action: AssetAction
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            showDashboardSheet = null,
+            activeFlow = null,
+            transferFundsCurrency = null
+        )
+}
+
+class LaunchDepositFlow(
+    val toAccount: SingleAccount,
     val fromAccount: SingleAccount,
     val action: AssetAction
 ) : DashboardIntent() {

@@ -119,6 +119,8 @@ interface CustodialWalletManager {
 
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
 
+    fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String>
+
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 }
