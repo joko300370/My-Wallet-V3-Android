@@ -81,12 +81,12 @@ class TransactionInOutMapper(
             TransactionInOutDetails(
                 inputs = listOf(
                     TransactionDetailModel(
-                        fromAccount.label
+                        fromAccount.label.takeIf { it.isNotEmpty() } ?: fromAddress
                     )
                 ),
                 outputs = listOf(
                     TransactionDetailModel(
-                        toAccount.label
+                        toAccount.label.takeIf { it.isNotEmpty() } ?: toAddress
                     )
                 )
             )
