@@ -182,10 +182,10 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 errorState = when (error.errorCode) {
-                    TransactionValidationError.INVALID_AMOUNT -> SendErrorState.MIN_REQUIRED
-                    TransactionValidationError.INSUFFICIENT_FUNDS -> SendErrorState.MAX_EXCEEDED
+                    TransactionValidationError.INVALID_AMOUNT -> SendErrorState.INVALID_AMOUNT
+                    TransactionValidationError.INSUFFICIENT_FUNDS -> SendErrorState.INSUFFICIENT_FUNDS
                     TransactionValidationError.INSUFFICIENT_GAS -> SendErrorState.NOT_ENOUGH_GAS
-                    TransactionValidationError.MIN_DEPOSIT_REQUIRED -> SendErrorState.MIN_DEPOSIT
+                    TransactionValidationError.MIN_DEPOSIT_REQUIRED -> SendErrorState.BELOW_MIN_LIMIT
                     else -> SendErrorState.UNEXPECTED_ERROR
                 },
                 errorMessage = if (error.errorCode == TransactionValidationError.MIN_DEPOSIT_REQUIRED) {

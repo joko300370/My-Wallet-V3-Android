@@ -1874,10 +1874,10 @@
     <string name="send_select_target_title">Destination</string>
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
-    <string name="send_enter_amount_title">Amount</string>
+    <string name="send_enter_amount_title">Send %1$s</string>
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
-    <string name="send_confirmation_title">Confirm</string>
+    <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
     <string name="send_confirmation_fee_loading">Loading…</string>
@@ -1904,8 +1904,8 @@
     <string name="send_scan_qr_code">Scan QR Code</string>
     <string name="send_error_not_valid_asset_address">Not a valid %1s address</string>
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
-    <string name="send_enter_amount_error_max">Not enough %1$s in your wallet.</string>
-    <string name="send_enter_amount_error_min">Send 0.00000001 %1$s or more.</string>
+    <string name="send_enter_amount_error_insufficient_funds">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_invalid_amount">Send 0.00000001 %1$s or more.</string>
     <string name="send_enter_invalid_password">Password is incorrect.</string>
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>

@@ -36,6 +36,7 @@ class EnterTargetAddressSheet(
 
     private val appUtil: AppUtil by inject()
     private val coincore: Coincore by scopedInject()
+    private val customiser: SendFlowCustomiser by inject()
 
     private val disposables = CompositeDisposable()
     private var state: SendState = SendState()
@@ -56,15 +57,14 @@ class EnterTargetAddressSheet(
                 showNonCustodialInput(newState)
             }
 
-            newState.errorState.toString(
-                newState.sendingAccount.asset.networkTicker,
-                resources
-            )?.let {
+            customiser.errorFlashMessage(newState)?.let {
                 error_msg.apply {
                     text = it
                     visible()
                 }
             } ?: error_msg.invisible()
+
+            title.text = customiser.selectTargetAddressTitle(newState)
         }
         state = newState
     }
@@ -103,7 +103,6 @@ class EnterTargetAddressSheet(
         }
     }
 
-    // TODO: This address processing should occur via the interactor
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
             val asset = state.asset

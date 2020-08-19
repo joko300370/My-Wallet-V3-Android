@@ -49,7 +49,7 @@ class SendInteractor(
     ): Single<PendingTx> =
         sourceAccount.createSendProcessor(targetAddress)
             .doOnSuccess { transactionProcessor = it }
-            .flatMap { it.createPendingTx() }
+            .flatMap { it.initialiseTx() }
             .doOnError {
                 Timber.e("---- error initialising $it")
             }

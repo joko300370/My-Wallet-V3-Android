@@ -34,7 +34,6 @@
         android:layout_marginStart="@dimen/xlarge_margin"
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="@string/send_confirmation_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/confirm_sheet_back"

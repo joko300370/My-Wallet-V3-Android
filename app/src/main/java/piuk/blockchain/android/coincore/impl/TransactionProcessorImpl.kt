@@ -21,7 +21,7 @@ abstract class TransactionProcessorBase(
 
     protected abstract var pendingTx: PendingTx
 
-    override fun createPendingTx(): Single<PendingTx> =
+    override fun initialiseTx(): Single<PendingTx> =
         Single.just(pendingTx)
 
     final override fun setOption(newOption: TxOptionValue): Single<PendingTx> {
