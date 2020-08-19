@@ -22,7 +22,7 @@ class TransactionValidationError(
         const val ADDRESS_IS_CONTRACT = 1005
         const val UNSUPPORTED_OPTION = 1006
         const val OPTION_MISSING = 1007
-        const val MIN_DEPOSIT_REQUIRED = 1008
+        const val MIN_REQUIRED = 1008
     }
 }
 

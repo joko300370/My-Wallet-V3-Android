@@ -79,7 +79,7 @@ class Erc20DepositTransaction(
 
                 if (amount.isPositive && inputFiatAmount < endpointFiatAmount) {
                     throw TransactionValidationError(
-                        TransactionValidationError.MIN_DEPOSIT_REQUIRED,
+                        TransactionValidationError.MIN_REQUIRED,
                         endpointFiatAmount.toStringWithSymbol())
                 } else {
                     Single.just(pendingTx)

@@ -1877,6 +1877,7 @@
     <string name="send_enter_amount_title">Send %1$s</string>
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
+    <string name="send_enter_amount_min_deposit">Minimum deposit of %1$s required</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>

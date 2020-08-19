@@ -146,8 +146,6 @@ class SendFlowCustomiserImpl(
     }
 
     override fun errorFlashMessage(state: SendState): String? {
-        require(state.errorState != SendErrorState.NONE)
-
         return when (state.errorState) {
             SendErrorState.NONE -> null
             SendErrorState.INSUFFICIENT_FUNDS -> resources.getString(
@@ -170,7 +168,11 @@ class SendFlowCustomiserImpl(
                 R.string.send_enter_insufficient_gas)
             SendErrorState.UNEXPECTED_ERROR -> resources.getString(
                 R.string.send_enter_unexpected_error)
-            SendErrorState.BELOW_MIN_LIMIT -> TODO()
+            SendErrorState.BELOW_MIN_LIMIT -> when (state.action) {
+                AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_min_deposit,
+                    state.pendingTx?.minLimit?.toStringWithSymbol())
+                else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            }
             SendErrorState.ABOVE_MAX_LIMIT -> TODO()
         }
     }

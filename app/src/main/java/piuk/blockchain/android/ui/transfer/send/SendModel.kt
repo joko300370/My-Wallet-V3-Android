@@ -60,7 +60,6 @@ data class SendState(
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
-    val errorMessage: String = "",
     val pendingTx: PendingTx? = null,
     val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
     val stepsBackStack: Stack<SendStep> = Stack<SendStep>().apply { push(SendStep.ZERO) }
