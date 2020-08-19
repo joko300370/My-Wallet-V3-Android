@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 
 class EnterAmountSheet(
@@ -81,6 +82,10 @@ class EnterAmountSheet(
             customiser.errorFlashMessage(newState)?.let {
                 amount_sheet_input.showError(it)
             } ?: amount_sheet_input.hideError()
+
+            if (newState.stepsBackStack.isEmpty()) {
+                amount_sheet_back.gone()
+            }
         }
 
         state = newState

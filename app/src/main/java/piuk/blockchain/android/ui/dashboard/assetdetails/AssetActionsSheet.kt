@@ -56,15 +56,17 @@ class AssetActionsSheet :
         get() = R.layout.sheet_asset_actions
 
     override fun render(newState: AssetDetailsState) {
-        showAssetBalances(newState)
+        if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            showAssetBalances(newState)
 
-        require(newState.selectedAccount != null)
-        require(newState.assetFilter != null)
+            require(newState.selectedAccount != null)
+            require(newState.assetFilter != null)
 
-        val actionItems =
-            mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
+            val actionItems =
+                mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
 
-        itemAdapter.itemList = actionItems
+            itemAdapter.itemList = actionItems
+        }
     }
 
     override fun initControls(view: View) {
@@ -272,8 +274,6 @@ class AssetActionsSheet :
 
     private fun processAction(action: AssetAction) {
         model.process(HandleActionIntent(action))
-        dismiss()
-        model.process(ClearSheetDataIntent)
     }
 
     companion object {

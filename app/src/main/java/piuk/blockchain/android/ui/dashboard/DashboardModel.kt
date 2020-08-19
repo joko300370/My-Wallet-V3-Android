@@ -245,8 +245,7 @@ class DashboardModel(
             is ShowDashboardSheet,
             is TransferFunds,
             is UpdateLaunchDialogFlow,
-            is ClearBottomSheet,
-            is ClearFlow -> null
+            is ClearBottomSheet -> null
         }
     }
 
@@ -260,22 +259,8 @@ class DashboardModel(
     ): Boolean {
         return when (previousIntent) {
             is UpdateLaunchDialogFlow -> {
-                if (nextIntent is ClearBottomSheet || nextIntent is ClearFlow) {
-                    true
-                } else {
-                    super.distinctIntentFilter(previousIntent, nextIntent)
-                }
-            }
-            is ClearBottomSheet -> {
                 if (nextIntent is ClearBottomSheet) {
-                    false
-                } else {
-                    super.distinctIntentFilter(previousIntent, nextIntent)
-                }
-            }
-            is ClearFlow -> {
-                if (nextIntent is ClearFlow) {
-                    false
+                    true
                 } else {
                     super.distinctIntentFilter(previousIntent, nextIntent)
                 }

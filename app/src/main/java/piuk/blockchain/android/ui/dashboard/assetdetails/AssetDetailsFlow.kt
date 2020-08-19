@@ -123,10 +123,11 @@ class AssetDetailsFlow(
                     getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
                 }
         }
+        finishFlow()
     }
 
     override fun finishFlow() {
-        resetFow()
+        resetFlow()
         super.finishFlow()
     }
 
@@ -156,7 +157,7 @@ class AssetDetailsFlow(
         }
     }
 
-    private fun resetFow() {
+    private fun resetFlow() {
         disposables.clear()
         currentStep = AssetDetailsStep.ZERO
         model.process(ClearSheetDataIntent)
