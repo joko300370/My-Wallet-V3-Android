@@ -16,7 +16,7 @@ class LimitsProviderImpl(
     override fun getLimitsForAllAssets(): Single<InterestLimitsList> =
         authenticator.authenticate {
             nabuService.getInterestLimits(it, currencyPrefs.selectedFiatCurrency)
-                .flatMap { response ->
+                .map { response ->
                     val list = response.body()?.let { responseBody ->
                         responseBody.limits.assetMap.entries.map { entry ->
                             InterestLimits(
@@ -27,7 +27,8 @@ class LimitsProviderImpl(
                             )
                         }
                     } ?: emptyList()
-                    Single.just(InterestLimitsList(list))
+
+                    InterestLimitsList(list)
                 }
         }
 }
