@@ -66,7 +66,7 @@ class EnterAmountSheet(
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                amount_sheet_input.maxLimit = newState.availableBalance
+                amount_sheet_input.maxLimit = balance
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =

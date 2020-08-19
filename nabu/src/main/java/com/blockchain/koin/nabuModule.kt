@@ -31,6 +31,7 @@ import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.InterestLimitsRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestMapAdapter
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -172,6 +173,10 @@ val nabuModule = module {
 
     moshiInterceptor(nabu) { builder ->
         builder.add(TransactionStateAdapter())
+    }
+
+    moshiInterceptor(interestLimits) { builder ->
+        builder.add(InterestMapAdapter())
     }
 
     single { NabuSessionTokenStore() }

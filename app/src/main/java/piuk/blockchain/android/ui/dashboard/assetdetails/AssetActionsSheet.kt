@@ -89,18 +89,20 @@ class AssetActionsSheet :
             dialogView.asset_actions_fiat_value.text =
                 state.selectedAccountFiatBalance.toStringWithSymbol()
         } else {
-            disposables += Singles.zip(
-                state.selectedAccount!!.balance,
-                state.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
-            ).observeOn(uiScheduler).subscribeBy(
-                onSuccess = { (balance, fiatBalance) ->
-                    dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
-                    dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
-                },
-                onError = {
-                    Timber.e("ActionSheet error loading balances: $it")
-                }
-            )
+            state.selectedAccount?.let {
+                disposables += Singles.zip(
+                    it.balance,
+                    it.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+                ).observeOn(uiScheduler).subscribeBy(
+                    onSuccess = { (balance, fiatBalance) ->
+                        dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
+                        dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
+                    },
+                    onError = {
+                        Timber.e("ActionSheet error loading balances: $it")
+                    }
+                )
+            }
         }
     }
 

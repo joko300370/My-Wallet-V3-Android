@@ -219,7 +219,7 @@ class SendModel(
                     if (it is TransactionValidationError) {
                         process(SendIntent.InputValidationError(it))
                     } else {
-                        Timber.e("!SEND!> Unable to get update available balance")
+                        Timber.e("!SEND!> Unable to get update available balance $it")
                         process(SendIntent.FatalTransactionError(it))
                     }
                 }

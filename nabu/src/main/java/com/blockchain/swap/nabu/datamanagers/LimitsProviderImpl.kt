@@ -15,39 +15,19 @@ class LimitsProviderImpl(
 ) : LimitsProvider {
     override fun getLimitsForAllAssets(): Single<InterestLimitsList> =
         authenticator.authenticate {
-            nabuService.getInterestLimits(it, currencyPrefs.selectedFiatCurrency).flatMap {
-                val assetList = InterestLimitsList()
-                it.body()?.let { responseBody ->
-                    assetList.list.add(
-                        InterestLimits(
-                            responseBody.limits.BTC.lockUpDuration,
-                            responseBody.limits.BTC.minDepositAmount,
-                            CryptoCurrency.BTC,
-                            responseBody.limits.BTC.currency
-                        ))
-                    assetList.list.add(
-                        InterestLimits(
-                            responseBody.limits.ETH.lockUpDuration,
-                            responseBody.limits.ETH.minDepositAmount,
-                            CryptoCurrency.ETHER,
-                            responseBody.limits.ETH.currency
-                        ))
-                    assetList.list.add(
-                        InterestLimits(
-                            responseBody.limits.USDT.lockUpDuration,
-                            responseBody.limits.USDT.minDepositAmount,
-                            CryptoCurrency.USDT,
-                            responseBody.limits.USDT.currency
-                        ))
-                    assetList.list.add(
-                        InterestLimits(
-                            responseBody.limits.PAX.lockUpDuration,
-                            responseBody.limits.PAX.minDepositAmount,
-                            CryptoCurrency.PAX,
-                            responseBody.limits.PAX.currency
-                        ))
+            nabuService.getInterestLimits(it, currencyPrefs.selectedFiatCurrency)
+                .flatMap { response ->
+                    val list = response.body()?.let { responseBody ->
+                        responseBody.limits.assetMap.entries.map { entry ->
+                            InterestLimits(
+                                entry.value.lockUpDuration,
+                                entry.value.minDepositAmount,
+                                CryptoCurrency.fromNetworkTicker(entry.key)!!,
+                                entry.value.currency
+                            )
+                        }
+                    } ?: emptyList()
+                    Single.just(InterestLimitsList(list))
                 }
-                Single.just(assetList)
-            }
         }
 }

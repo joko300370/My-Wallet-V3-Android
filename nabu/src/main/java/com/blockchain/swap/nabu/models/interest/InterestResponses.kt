@@ -28,10 +28,7 @@ data class InterestLimitsFullResponse(
 )
 
 data class AssetLimitsResponse(
-    val BTC: InterestLimitsResponse,
-    val ETH: InterestLimitsResponse,
-    val USDT: InterestLimitsResponse,
-    val PAX: InterestLimitsResponse
+    val assetMap: Map<String, InterestLimitsResponse>
 )
 
 data class InterestLimitsResponse(
@@ -42,5 +39,5 @@ data class InterestLimitsResponse(
 )
 
 data class InterestLimitsList(
-    val list: MutableList<InterestLimits> = mutableListOf()
+    val list: List<InterestLimits>
 )

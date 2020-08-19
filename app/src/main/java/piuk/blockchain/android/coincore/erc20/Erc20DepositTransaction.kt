@@ -78,11 +78,11 @@ class Erc20DepositTransaction(
                     FiatValue.fromMajor(it.currency, it.minDepositAmount.toBigDecimal())
 
                 if (amount.isPositive && inputFiatAmount < endpointFiatAmount) {
-                    throw TransactionValidationError(
-                        TransactionValidationError.MIN_REQUIRED,
-                        endpointFiatAmount.toStringWithSymbol())
+                    throw TransactionValidationError(TransactionValidationError.MIN_REQUIRED)
                 } else {
-                    Single.just(pendingTx)
+                    Single.just(pendingTx.copy(
+                        minLimit = endpointFiatAmount
+                    ))
                 }
             }
         }
