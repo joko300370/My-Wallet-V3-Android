@@ -638,7 +638,7 @@
  ikon di peluncur, membuat menerima bitcoin lebih cepat. 
 </string>
   <string name="shortcut_settings_enable">Pintasan Peluncur</string>
-  <string name="confirm">Konfirmasi</string>
+  <string name="common_confirm">Konfirmasi</string>
   <string name="swipe_receive_hint">Geser untuk menerima</string>
   <string name="swipe_receive_preference_summary">Mengungkapkan alamat penerimaan ketika Anda menggesek kiri 
  layar PIN, membuat menerima dana lebih cepat. 

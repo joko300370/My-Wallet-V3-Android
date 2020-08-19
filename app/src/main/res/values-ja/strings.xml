@@ -638,7 +638,7 @@
 ランチャーのアイコンで、ビットコインの受信をさらに高速化します。 
 </string>
   <string name="shortcut_settings_enable">ランチャーのショートカット</string>
-  <string name="confirm">確認</string>
+  <string name="common_confirm">確認</string>
   <string name="swipe_receive_hint">スワイプして受信</string>
   <string name="swipe_receive_preference_summary">左にスワイプすると受信アドレスが表示されます
  PIN画面により、資金の受け取りがさらに速くなります。 

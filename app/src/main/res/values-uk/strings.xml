@@ -641,7 +641,7 @@
  піктограми в пусковій установці, що робить отримання біткойна ще швидшим. 
 </string>
   <string name="shortcut_settings_enable">Клавіші швидкого запуску</string>
-  <string name="confirm">Підтвердіть</string>
+  <string name="common_confirm">Підтвердіть</string>
   <string name="swipe_receive_hint">Проведіть пальцем, щоб отримати</string>
   <string name="swipe_receive_preference_summary">Виявіть адресу отримання, коли проведіть пальцем ліворуч на 
  екран PIN-коду, що робить отримання коштів ще швидшим. 

@@ -641,7 +641,7 @@
  ikona w programie uruchamiającym, dzięki czemu otrzymywanie bitcoinów jest jeszcze szybsze. 
 </string>
   <string name="shortcut_settings_enable">Skróty programu uruchamiającego</string>
-  <string name="confirm">Potwierdzać</string>
+  <string name="common_confirm">Potwierdzać</string>
   <string name="swipe_receive_hint">Przesuń, aby odebrać</string>
   <string name="swipe_receive_preference_summary">Ujawnij adres odbioru po przesunięciu w lewo 
  ekran PIN, dzięki czemu otrzymywanie funduszy jest jeszcze szybsze. 

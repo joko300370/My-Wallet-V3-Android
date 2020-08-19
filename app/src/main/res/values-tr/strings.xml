@@ -639,7 +639,7 @@
  başlatıcıdaki simge, bitcoin almayı daha da hızlı hale getirir. 
 </string>
   <string name="shortcut_settings_enable">Başlatıcı Kısayolları</string>
-  <string name="confirm">Onaylamak</string>
+  <string name="common_confirm">Onaylamak</string>
   <string name="swipe_receive_hint">Almak için hızlıca kaydırın</string>
   <string name="swipe_receive_preference_summary">Düğmesini sola kaydırdığınızda bir alma adresini ortaya çıkarın 
  PIN ekranını kullanarak para kazanmayı daha da hızlı hale getirir. 

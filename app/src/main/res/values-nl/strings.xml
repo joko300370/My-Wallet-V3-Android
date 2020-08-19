@@ -639,7 +639,7 @@
  icoon in de launcher, waardoor het ontvangen van bitcoin nog sneller wordt. 
 </string>
   <string name="shortcut_settings_enable">Launcher-snelkoppelingen</string>
-  <string name="confirm">Bevestigen</string>
+  <string name="common_confirm">Bevestigen</string>
   <string name="swipe_receive_hint">Veeg om te ontvangen</string>
   <string name="swipe_receive_preference_summary">Onthul een ontvangstadres wanneer u naar links veegt 
  het pincodescherm, waardoor u nog sneller geld ontvangt. 

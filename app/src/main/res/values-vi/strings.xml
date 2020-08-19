@@ -638,7 +638,7 @@
  biểu tượng trong trình khởi chạy, giúp nhận bitcoin nhanh hơn. 
 </string>
   <string name="shortcut_settings_enable">Phím tắt Launcher</string>
-  <string name="confirm">Xác nhận</string>
+  <string name="common_confirm">Xác nhận</string>
   <string name="swipe_receive_hint">Vuốt để nhận</string>
   <string name="swipe_receive_preference_summary">Hiển thị địa chỉ nhận khi bạn vuốt sang trái 
  màn hình PIN, giúp nhận tiền nhanh hơn. 

@@ -89,6 +89,8 @@ class EnterAmountSheet(
     private fun updatePendingTxDetails(state: SendState) {
         with(dialogView) {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
+
+            amount_sheet_asset_direction.setImageResource(customiser.setDirectionIcon(state))
             amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
 
             amount_sheet_from.text =

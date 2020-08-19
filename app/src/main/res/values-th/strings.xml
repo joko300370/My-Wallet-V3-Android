@@ -638,7 +638,7 @@
  ไอคอนในตัวเรียกใช้งานทำให้การรับ bitcoin เร็วยิ่งขึ้น 
 </string>
   <string name="shortcut_settings_enable">ทางลัดของตัวเรียกใช้</string>
-  <string name="confirm">ยืนยัน</string>
+  <string name="common_confirm">ยืนยัน</string>
   <string name="swipe_receive_hint">ปัดเพื่อรับ</string>
   <string name="swipe_receive_preference_summary">เปิดเผยที่อยู่ที่รับเมื่อคุณปัดไปทางซ้าย 
  หน้าจอ PIN ทำให้การรับเงินเร็วขึ้น 

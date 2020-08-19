@@ -639,7 +639,7 @@
  icona nel programma di avvio, rendendo ancora più veloce la ricezione di bitcoin. 
 </string>
   <string name="shortcut_settings_enable">Scorciatoie di avvio</string>
-  <string name="confirm">Confermare</string>
+  <string name="common_confirm">Confermare</string>
   <string name="swipe_receive_hint">Scorri per ricevere</string>
   <string name="swipe_receive_preference_summary">Rivela un indirizzo di ricezione quando scorri verso sinistra 
  schermata PIN, rendendo la ricezione di fondi ancora più veloce. 
