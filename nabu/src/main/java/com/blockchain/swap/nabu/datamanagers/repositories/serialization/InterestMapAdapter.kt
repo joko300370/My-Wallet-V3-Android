@@ -21,7 +21,7 @@ class InterestMapAdapter {
                             var currency = ""
                             var lockUpDuration: Int = -1
                             var maxWithdrawalAmount: Int = -1
-                            var minDepositAmount: Int = -1
+                            var minDepositAmount: Long = -1L
 
                             reader.beginObject()
                             while (reader.hasNext()) {
@@ -33,7 +33,7 @@ class InterestMapAdapter {
                                         "lockUpDuration" -> lockUpDuration = reader.nextInt()
                                         "maxWithdrawalAmount" -> maxWithdrawalAmount =
                                             reader.nextInt()
-                                        "minDepositAmount" -> minDepositAmount = reader.nextInt()
+                                        "minDepositAmount" -> minDepositAmount = reader.nextLong()
                                     }
                                 }
                                 reader.endObject()

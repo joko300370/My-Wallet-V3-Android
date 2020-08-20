@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.models.interest.InterestLimits
 import com.blockchain.swap.nabu.models.interest.InterestLimitsList
 import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.Single
 
 class LimitsProviderImpl(
@@ -21,7 +22,7 @@ class LimitsProviderImpl(
                         responseBody.limits.assetMap.entries.map { entry ->
                             InterestLimits(
                                 entry.value.lockUpDuration,
-                                entry.value.minDepositAmount,
+                                FiatValue.fromMinor(entry.value.currency, entry.value.minDepositAmount),
                                 CryptoCurrency.fromNetworkTicker(entry.key)!!,
                                 entry.value.currency
                             )

@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.models.interest
 
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 
 data class InterestResponse(
     val rate: Double
@@ -16,7 +17,7 @@ data class InterestAddressResponse(
 
 data class InterestLimits(
     val interestLockUpDuration: Int,
-    val minDepositAmount: Int,
+    val minDepositAmount: FiatValue,
     val cryptoCurrency: CryptoCurrency,
     val currency: String
 )
@@ -33,7 +34,7 @@ data class InterestLimitsResponse(
     val currency: String,
     val lockUpDuration: Int,
     val maxWithdrawalAmount: Int,
-    val minDepositAmount: Int
+    val minDepositAmount: Long
 )
 
 data class InterestLimitsList(
