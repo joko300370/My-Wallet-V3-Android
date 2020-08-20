@@ -1,7 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
 import org.koin.core.KoinComponent
@@ -31,7 +30,6 @@ class EthDepositTransaction(
     requireSecondPassword
 ), KoinComponent {
 
-    private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -56,10 +54,7 @@ class EthDepositTransaction(
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         super.doValidateAmount(pendingTx)
             .map {
-                val inputFiatAmount =
-                    it.amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-
-                if (it.amount.isPositive && inputFiatAmount < it.minLimit!!) {
+                if (it.amount.isPositive && it.amount < it.minLimit!!) {
                     it.copy(validationState = ValidationState.UNDER_MIN_LIMIT)
                 } else {
                     it

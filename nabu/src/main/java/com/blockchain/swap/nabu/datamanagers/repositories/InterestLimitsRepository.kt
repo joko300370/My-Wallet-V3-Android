@@ -1,8 +1,8 @@
 package com.blockchain.swap.nabu.datamanagers.repositories
 
 import com.blockchain.rx.TimedCacheRequest
+import com.blockchain.swap.nabu.datamanagers.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.LimitsProvider
-import com.blockchain.swap.nabu.models.interest.InterestLimits
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 

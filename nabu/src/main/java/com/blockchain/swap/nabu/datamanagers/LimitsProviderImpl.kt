@@ -2,17 +2,18 @@ package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.Authenticator
-import com.blockchain.swap.nabu.models.interest.InterestLimits
-import com.blockchain.swap.nabu.models.interest.InterestLimitsList
 import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.Single
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 
 class LimitsProviderImpl(
     private val nabuService: NabuService,
     private val authenticator: Authenticator,
-    private val currencyPrefs: CurrencyPrefs
+    private val currencyPrefs: CurrencyPrefs,
+    private val exchangeRates: ExchangeRateDataManager
 ) : LimitsProvider {
     override fun getLimitsForAllAssets(): Single<InterestLimitsList> =
         authenticator.authenticate {
@@ -20,10 +21,15 @@ class LimitsProviderImpl(
                 .map { response ->
                     val list = response.body()?.let { responseBody ->
                         responseBody.limits.assetMap.entries.map { entry ->
+                            val crypto = CryptoCurrency.fromNetworkTicker(entry.key)!!
+                            val fiatValue = FiatValue.fromMinor(currencyPrefs.selectedFiatCurrency,
+                                entry.value.minDepositAmount)
+                            val cryptoValue = fiatValue.toCrypto(exchangeRates, crypto)
+
                             InterestLimits(
                                 entry.value.lockUpDuration,
-                                FiatValue.fromMinor(entry.value.currency, entry.value.minDepositAmount),
-                                CryptoCurrency.fromNetworkTicker(entry.key)!!,
+                                cryptoValue,
+                                crypto,
                                 entry.value.currency
                             )
                         }

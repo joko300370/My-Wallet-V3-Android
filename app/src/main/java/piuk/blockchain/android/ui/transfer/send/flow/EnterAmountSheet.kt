@@ -62,8 +62,8 @@ class EnterAmountSheet(
                 )
             }
 
-            val balance = newState.availableBalance
-            if (balance.isPositive || balance.isZero) {
+            val availableBalance = newState.availableBalance
+            if (availableBalance.isPositive || availableBalance.isZero) {
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
@@ -71,7 +71,7 @@ class EnterAmountSheet(
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
-                        "${rate.convert(balance).toStringWithSymbol()} (${balance.toStringWithSymbol()})"
+                        "${rate.convert(availableBalance).toStringWithSymbol()} (${availableBalance.toStringWithSymbol()})"
                 }
             }
 

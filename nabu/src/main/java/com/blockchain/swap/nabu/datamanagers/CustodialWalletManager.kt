@@ -2,7 +2,6 @@ package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.interest.InterestLimits
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse

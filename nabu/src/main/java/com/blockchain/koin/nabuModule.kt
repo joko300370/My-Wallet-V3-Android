@@ -104,7 +104,8 @@ val nabuModule = module {
             LimitsProviderImpl(
                 nabuService = get(),
                 authenticator = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                exchangeRates = get()
             )
         }.bind(LimitsProvider::class)
 

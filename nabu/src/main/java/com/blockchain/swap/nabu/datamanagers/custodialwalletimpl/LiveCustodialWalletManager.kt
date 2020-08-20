@@ -12,6 +12,7 @@ import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
+import com.blockchain.swap.nabu.datamanagers.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
@@ -34,7 +35,6 @@ import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
-import com.blockchain.swap.nabu.models.interest.InterestLimits
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
