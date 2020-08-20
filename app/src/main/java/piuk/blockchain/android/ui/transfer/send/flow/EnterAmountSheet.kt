@@ -71,7 +71,8 @@ class EnterAmountSheet(
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
-                        "${rate.convert(availableBalance).toStringWithSymbol()} (${availableBalance.toStringWithSymbol()})"
+                        "${rate.convert(availableBalance).toStringWithSymbol()} " +
+                            "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
