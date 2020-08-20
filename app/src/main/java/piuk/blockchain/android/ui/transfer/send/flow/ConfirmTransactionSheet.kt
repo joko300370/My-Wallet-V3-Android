@@ -17,7 +17,6 @@ import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
@@ -65,6 +64,8 @@ class ConfirmTransactionSheet(
         require(newState.pendingTx != null)
 
         val itemList = mutableListOf<ConfirmItemType>(
+            ConfirmInfoItem(customiser.confirmListItemTitle(state),
+                state.sendAmount.toStringWithSymbol()),
             ConfirmInfoItem(getString(R.string.common_from), newState.sendingAccount.label),
             ConfirmInfoItem(getString(R.string.common_to), newState.sendTarget.label)
         )
@@ -76,8 +77,6 @@ class ConfirmTransactionSheet(
         itemList.add(ConfirmInfoItem(getString(R.string.common_total), getTotalAmount(newState)))
 
         updateOptions(newState, itemList)
-
-        showActionSpecificUi(newState, itemList)
 
         listAdapter.items = itemList
         listAdapter.notifyDataSetChanged()
@@ -131,52 +130,18 @@ class ConfirmTransactionSheet(
         }
 
         val linkAgreement =
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+                TxOption.AGREEMENT_INTEREST_T_AND_C)
         linkAgreement?.let {
             setupTosAndPPLinks(itemList)
         }
 
         val textAgreement =
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+                TxOption.AGREEMENT_INTEREST_TRANSFER)
         textAgreement?.let {
             setupHoldingValues(state.sendAmount, itemList)
         }
-    }
-
-    // TODO use AssetActions differently
-    private fun showActionSpecificUi(
-        state: SendState,
-        itemList: MutableList<ConfirmItemType>
-    ) {
-        when (state.action) {
-            AssetAction.ViewActivity -> TODO()
-            AssetAction.Send -> showSendUi(state, itemList)
-            AssetAction.NewSend -> showSendUi(state, itemList)
-            AssetAction.Receive -> TODO()
-            AssetAction.Swap -> TODO()
-            AssetAction.Summary -> TODO()
-            AssetAction.Deposit -> showDepositUi(state, itemList)
-        }
-    }
-
-    private fun showDepositUi(
-        state: SendState,
-        itemList: MutableList<ConfirmItemType>
-    ) {
-        dialogView.confirm_cta_button.text =
-            getString(R.string.send_confirmation_deposit_cta_button)
-        itemList.add(0, ConfirmInfoItem(getString(R.string.common_deposit),
-            state.sendAmount.toStringWithSymbol()))
-    }
-
-    private fun showSendUi(
-        state: SendState,
-        itemList: MutableList<ConfirmItemType>
-    ) {
-        dialogView.confirm_cta_button.text = getString(R.string.send_confirmation_cta_button,
-            getTotalAmount(state))
-        itemList.add(0,
-            ConfirmInfoItem(getString(R.string.common_send), state.sendAmount.toStringWithSymbol()))
     }
 
     private fun getFeeItem(state: SendState): ConfirmInfoItem? {

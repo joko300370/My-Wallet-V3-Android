@@ -12,6 +12,7 @@ interface SendFlowCustomiser {
     fun enterAmountTitle(state: SendState): String
     fun confirmTitle(state: SendState): String
     fun confirmCtaText(state: SendState): String
+    fun confirmListItemTitle(state: SendState): String
     fun transactionProgressTitle(state: SendState): String
     fun transactionProgressMessage(state: SendState): String
     fun transactionCompleteTitle(state: SendState): String
@@ -87,6 +88,14 @@ class SendFlowCustomiserImpl(
                 R.string.send_confirmation_deposit_cta_button)
             // AssetAction.Swap -> "Execute Trade"
             // AssertAction.Sell ->
+            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+        }
+    }
+
+    override fun confirmListItemTitle(state: SendState): String {
+        return when (state.action) {
+            AssetAction.NewSend -> resources.getString(R.string.common_send)
+            AssetAction.Deposit -> resources.getString(R.string.common_deposit)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
