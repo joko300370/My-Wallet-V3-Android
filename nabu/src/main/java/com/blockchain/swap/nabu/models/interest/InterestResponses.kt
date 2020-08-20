@@ -23,6 +23,6 @@ data class AssetLimitsResponse(
 data class InterestLimitsResponse(
     val currency: String,
     val lockUpDuration: Int,
-    val maxWithdrawalAmount: Int,
-    val minDepositAmount: Long
+    val maxWithdrawalAmount: String,
+    val minDepositAmount: String
 )

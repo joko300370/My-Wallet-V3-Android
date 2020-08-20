@@ -23,7 +23,7 @@ class LimitsProviderImpl(
                         responseBody.limits.assetMap.entries.map { entry ->
                             val crypto = CryptoCurrency.fromNetworkTicker(entry.key)!!
                             val fiatValue = FiatValue.fromMinor(currencyPrefs.selectedFiatCurrency,
-                                entry.value.minDepositAmount)
+                                entry.value.minDepositAmount.toLong())
                             val cryptoValue = fiatValue.toCrypto(exchangeRates, crypto)
 
                             InterestLimits(
