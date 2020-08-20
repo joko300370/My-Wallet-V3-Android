@@ -639,7 +639,7 @@
  Symbol im Launcher, wodurch der Empfang von Bitcoin noch schneller wird. 
 </string>
   <string name="shortcut_settings_enable">Launcher-Verknüpfungen</string>
-  <string name="confirm">Bestätigen</string>
+  <string name="common_confirm">Bestätigen</string>
   <string name="swipe_receive_hint">Wischen Sie zum Empfangen</string>
   <string name="swipe_receive_preference_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie nach links wischen 
  der PIN-Bildschirm, wodurch der Geldempfang noch schneller wird. 

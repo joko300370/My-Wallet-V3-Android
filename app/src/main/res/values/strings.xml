@@ -16,6 +16,7 @@
     <string name="common_total">Total</string>
     <string name="common_deposit">Deposit</string>
     <string name="common_error">Something went wrong, please try again</string>
+    <string name="common_confirm">Confirm</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -743,7 +744,6 @@
         icon in the launcher, making receiving bitcoin even faster.
     </string>
     <string name="shortcut_settings_enable">Launcher Shortcuts</string>
-    <string name="confirm">Confirm</string>
 
     <string name="swipe_receive_hint">Swipe to receive</string>
 
@@ -1877,6 +1877,7 @@
     <string name="send_enter_amount_title">Send %1$s</string>
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
+    <string name="send_enter_amount_min_deposit">Minimum deposit of %1$s required</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
@@ -1889,6 +1890,10 @@
     <string name="send_confirmation_interest_tos_pp">I have read and agree to the <annotation link="interest_tos">Terms of Service</annotation>\n&amp; <annotation link="interest_pp">Privacy Policy</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">By accepting this, you agree to transfer&#160;</string>
     <string name="send_confirmation_interest_holding_period_2">&#160; (%1$s) from your Bitcoin Wallet to your Interest Account. An initial hold period of 7 days will be applied to your funds.</string>
+    <string name="send_confirmation_progress_title">Depositing %1$s</string>
+    <string name="send_confirmation_progress_message">We\'re depositing your %1$s now.</string>
+    <string name="send_confirmation_success_title">%1$s Deposited</string>
+    <string name="send_confirmation_success_message">Your %1$s has been deposited successfully.</string>
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
@@ -1898,7 +1903,7 @@
     <string name="send_progress_complete_title">%1$s Sent</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
     <string name="send_progress_error_title">Oops! Something Went Wrong.</string>
-    <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
+    <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
     <string name="send_enter_asset_address_hint">%1s Address</string>
     <string name="send_warn_internal_send_only">Internal Send Only</string>
     <string name="send_scan_qr_code">Scan QR Code</string>

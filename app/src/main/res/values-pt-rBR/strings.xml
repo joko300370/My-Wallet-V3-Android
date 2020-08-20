@@ -471,7 +471,7 @@
     <string name="backup_complete_message">Você pode usar a sua Frase de Backup para restaurar seus fundos caso perca a sua senha. Qualquer pessoa com acesso à sua Frase de Backup pode acessar seus fundos. Portanto, lembre-se de mantê-la off-line em algum lugar seguro e protegido.</string>
     <string name="shortcut_settings_summary">Revele um endereço de recebimento ao manter pressionado o ícone do app no inicializador, tornando o recebimento de bitcoins ainda mais rápido.</string>
 
-    <string name="confirm">Confirmar</string>
+    <string name="common_confirm">Confirmar</string>
     <string name="transactions">Transações</string>
 
     <string name="swipe_receive_preference_summary">Revele um endereço de recebimento ao deslizar para a esquerda na tela de PIN, tornando o recebimento de fundos ainda mais rápido.</string>

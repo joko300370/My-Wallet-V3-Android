@@ -640,7 +640,7 @@
  pictogramă în lansator, făcând primirea bitcoin și mai rapid. 
 </string>
   <string name="shortcut_settings_enable">Comenzi rapide de lansare</string>
-  <string name="confirm">A confirma</string>
+  <string name="common_confirm">A confirma</string>
   <string name="swipe_receive_hint">Glisați pentru a primi</string>
   <string name="swipe_receive_preference_summary">Dezvăluiți o adresă de primire când glisați spre stânga 
  ecranul PIN, făcând primirea de fonduri și mai rapidă. 

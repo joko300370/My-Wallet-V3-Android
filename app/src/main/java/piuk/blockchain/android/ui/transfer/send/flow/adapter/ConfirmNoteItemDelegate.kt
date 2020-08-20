@@ -9,13 +9,19 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_note.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.transfer.send.SendIntent
+import piuk.blockchain.android.ui.transfer.send.SendModel
+import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmNoteItemDelegate<in T>(
-    private val onNoteItemUpdated: (String) -> Unit
+    private val state: SendState,
+    private val model: SendModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         val item = items[position] as ConfirmItemType
@@ -33,7 +39,8 @@ class ConfirmNoteItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as NoteItemViewHolder).bind(
         items[position] as ConfirmNoteItem,
-        onNoteItemUpdated
+        state,
+        model
     )
 }
 
@@ -46,7 +53,8 @@ private class NoteItemViewHolder(val parent: View) :
 
     fun bind(
         item: ConfirmNoteItem,
-        onNoteItemUpdated: (String) -> Unit
+        state: SendState,
+        model: SendModel
     ) {
 
         itemView.confirm_details_note_input.apply {
@@ -56,7 +64,11 @@ private class NoteItemViewHolder(val parent: View) :
             setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
 
-                    onNoteItemUpdated.invoke(v.text.toString())
+                    state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
+                        ?.let {
+                            model.process(
+                                SendIntent.ModifyTxOption(it.copy(text = v.text.toString())))
+                        }
                     clearFocus()
                 }
                 false

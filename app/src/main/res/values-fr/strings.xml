@@ -639,7 +639,7 @@
  icône dans le lanceur, ce qui rend la réception de bitcoin encore plus rapide. 
 </string>
   <string name="shortcut_settings_enable">Raccourcis du lanceur</string>
-  <string name="confirm">Confirmer</string>
+  <string name="common_confirm">Confirmer</string>
   <string name="swipe_receive_hint">Glissez pour recevoir</string>
   <string name="swipe_receive_preference_summary">Révéler une adresse de réception lorsque vous balayez vers la gauche 
  l\'écran PIN, ce qui rend la réception des fonds encore plus rapide. 

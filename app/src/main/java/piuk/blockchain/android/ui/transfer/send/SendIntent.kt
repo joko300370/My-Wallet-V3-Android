@@ -265,6 +265,8 @@ private fun ValidationState.mapToSendError() =
         ValidationState.UNINITIALISED -> SendErrorState.NONE
         ValidationState.INVALID_ADDRESS -> SendErrorState.INVALID_ADDRESS
         ValidationState.ADDRESS_IS_CONTRACT -> SendErrorState.ADDRESS_IS_CONTRACT
+        ValidationState.UNDER_MIN_LIMIT -> SendErrorState.BELOW_MIN_LIMIT
         ValidationState.HAS_TX_IN_FLIGHT, // TODO: Map there better - perhaps add a param for failing txoption?
-        ValidationState.OPTION_INVALID -> SendErrorState.UNEXPECTED_ERROR
+        ValidationState.OPTION_INVALID,
+        ValidationState.OVER_MAX_LIMIT -> SendErrorState.UNEXPECTED_ERROR
     }

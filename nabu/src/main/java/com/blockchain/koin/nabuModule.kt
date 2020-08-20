@@ -13,13 +13,14 @@ import com.blockchain.swap.nabu.datamanagers.BalanceProviderImpl
 import com.blockchain.swap.nabu.datamanagers.BalancesProvider
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.LimitsProvider
+import com.blockchain.swap.nabu.datamanagers.LimitsProviderImpl
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.datamanagers.NabuDataManagerImpl
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.swap.nabu.datamanagers.NabuUserReporter
-import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.swap.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsWalletReporter
@@ -28,6 +29,9 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWa
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.InterestLimitsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestMapAdapter
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -91,9 +95,19 @@ val nabuModule = module {
                 cardsPaymentFeatureFlag = get(cardPaymentsFeatureFlag),
                 fundsFeatureFlag = get(simpleBuyFundsFeatureFlag),
                 kycFeatureEligibility = get(),
-                assetBalancesRepository = get()
+                assetBalancesRepository = get(),
+                interestLimitsRepository = get()
             )
         }.bind(CustodialWalletManager::class)
+
+        factory {
+            LimitsProviderImpl(
+                nabuService = get(),
+                authenticator = get(),
+                currencyPrefs = get(),
+                exchangeRates = get()
+            )
+        }.bind(LimitsProvider::class)
 
         factory {
             BalanceProviderImpl(
@@ -152,10 +166,18 @@ val nabuModule = module {
         scoped {
             AssetBalancesRepository(balancesProvider = get())
         }
+
+        scoped {
+            InterestLimitsRepository(limitsProvider = get())
+        }
     }
 
     moshiInterceptor(nabu) { builder ->
         builder.add(TransactionStateAdapter())
+    }
+
+    moshiInterceptor(interestLimits) { builder ->
+        builder.add(InterestMapAdapter())
     }
 
     single { NabuSessionTokenStore() }

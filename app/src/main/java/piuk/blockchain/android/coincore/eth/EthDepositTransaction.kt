@@ -1,6 +1,9 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.koin.scopedInject
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.PendingTx
@@ -25,10 +28,17 @@ class EthDepositTransaction(
     sendingAccount,
     sendTarget,
     requireSecondPassword
-) {
+), KoinComponent {
+
+    private val custodialWalletManager: CustodialWalletManager by scopedInject()
+
     override fun doInitialiseTx(): Single<PendingTx> =
         super.doInitialiseTx()
-            .map {
+            .flatMap { pendingTx ->
+                custodialWalletManager.getInterestLimits(asset).toSingle().map {
+                    pendingTx.copy(minLimit = it.minDepositAmount)
+                }
+            }.map {
                 it.copy(
                     options = setOf(
                         TxOptionValue.TxBooleanOption(
@@ -39,6 +49,16 @@ class EthDepositTransaction(
                         )
                     )
                 )
+            }
+
+    override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
+        super.doValidateAmount(pendingTx)
+            .map {
+                if (it.amount.isPositive && it.amount < it.minLimit!!) {
+                    it.copy(validationState = ValidationState.UNDER_MIN_LIMIT)
+                } else {
+                    it
+                }
             }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =

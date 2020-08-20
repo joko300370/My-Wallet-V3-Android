@@ -6,12 +6,13 @@ import android.text.SpannableStringBuilder
 import androidx.annotation.StringRes
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.android.ui.transfer.send.SendModel
+import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.StringUtils
 
 class ConfirmTransactionDelegateAdapter(
-    onAgreementWithLinksActionClicked: (Boolean) -> Unit,
-    onAgreementTextActionClicked: (Boolean) -> Unit,
-    onNoteItemUpdated: (String) -> Unit,
+    state: SendState,
+    model: SendModel,
     stringUtils: StringUtils,
     activityContext: Activity
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
@@ -20,12 +21,16 @@ class ConfirmTransactionDelegateAdapter(
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
             addAdapterDelegate(ConfirmInfoItemDelegate())
-            addAdapterDelegate(ConfirmNoteItemDelegate(onNoteItemUpdated))
-            addAdapterDelegate(ConfirmAgreementWithLinksItemDelegate(
-                onAgreementWithLinksActionClicked,
+            addAdapterDelegate(ConfirmNoteItemDelegate(state, model))
+            addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(
+                state,
+                model,
                 stringUtils,
                 activityContext))
-            addAdapterDelegate(ConfirmAgreementTextItemDelegate(onAgreementTextActionClicked))
+            addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(
+                state,
+                model
+            ))
         }
     }
 }

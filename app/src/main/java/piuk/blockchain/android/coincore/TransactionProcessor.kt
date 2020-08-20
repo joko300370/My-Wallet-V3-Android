@@ -9,8 +9,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 
 open class TransferError(msg: String) : Exception(msg)
 
@@ -23,7 +21,9 @@ enum class ValidationState {
     INSUFFICIENT_GAS,
     INVALID_ADDRESS,
     ADDRESS_IS_CONTRACT,
-    OPTION_INVALID
+    OPTION_INVALID,
+    UNDER_MIN_LIMIT,
+    OVER_MAX_LIMIT
 }
 
 class TxValidationFailure(val state: ValidationState) : TransferError("Invalid Send Tx: $state")

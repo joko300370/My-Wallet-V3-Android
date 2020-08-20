@@ -412,7 +412,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     override fun onFlowFinished() {
-        model.process(ClearFlow)
+        model.process(ClearBottomSheet)
     }
 
     override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =

@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 
 class EnterAmountSheet(
@@ -61,8 +62,8 @@ class EnterAmountSheet(
                 )
             }
 
-            val balance = newState.availableBalance
-            if (balance.isPositive || balance.isZero) {
+            val availableBalance = newState.availableBalance
+            if (availableBalance.isPositive || availableBalance.isZero) {
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
@@ -70,7 +71,8 @@ class EnterAmountSheet(
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
-                        "${rate.convert(balance).toStringWithSymbol()} (${balance.toStringWithSymbol()})"
+                        "${rate.convert(availableBalance).toStringWithSymbol()} " +
+                            "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -81,6 +83,10 @@ class EnterAmountSheet(
             customiser.errorFlashMessage(newState)?.let {
                 amount_sheet_input.showError(it)
             } ?: amount_sheet_input.hideError()
+
+            if (!newState.canGoBack) {
+                amount_sheet_back.gone()
+            }
         }
 
         state = newState
@@ -89,6 +95,8 @@ class EnterAmountSheet(
     private fun updatePendingTxDetails(state: SendState) {
         with(dialogView) {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
+
+            amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
             amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
 
             amount_sheet_from.text =

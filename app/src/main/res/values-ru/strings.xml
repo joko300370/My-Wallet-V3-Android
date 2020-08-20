@@ -641,7 +641,7 @@
  Иконка в лаунчере, делающая получение биткойнов еще быстрее. 
 </string>
   <string name="shortcut_settings_enable">Ярлыки запуска</string>
-  <string name="confirm">Подтверждение</string>
+  <string name="common_confirm">Подтверждение</string>
   <string name="swipe_receive_hint">Проведите, чтобы получить</string>
   <string name="swipe_receive_preference_summary">Раскройте получающий адрес, когда вы проводите влево на 
  экран PIN, что делает получение средств еще быстрее. 

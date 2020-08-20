@@ -56,15 +56,17 @@ class AssetActionsSheet :
         get() = R.layout.sheet_asset_actions
 
     override fun render(newState: AssetDetailsState) {
-        showAssetBalances(newState)
+        if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            showAssetBalances(newState)
 
-        require(newState.selectedAccount != null)
-        require(newState.assetFilter != null)
+            require(newState.selectedAccount != null)
+            require(newState.assetFilter != null)
 
-        val actionItems =
-            mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
+            val actionItems =
+                mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
 
-        itemAdapter.itemList = actionItems
+            itemAdapter.itemList = actionItems
+        }
     }
 
     override fun initControls(view: View) {
@@ -89,18 +91,20 @@ class AssetActionsSheet :
             dialogView.asset_actions_fiat_value.text =
                 state.selectedAccountFiatBalance.toStringWithSymbol()
         } else {
-            disposables += Singles.zip(
-                state.selectedAccount!!.balance,
-                state.selectedAccount.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
-            ).observeOn(uiScheduler).subscribeBy(
-                onSuccess = { (balance, fiatBalance) ->
-                    dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
-                    dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
-                },
-                onError = {
-                    Timber.e("ActionSheet error loading balances: $it")
-                }
-            )
+            state.selectedAccount?.let {
+                disposables += Singles.zip(
+                    it.balance,
+                    it.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+                ).observeOn(uiScheduler).subscribeBy(
+                    onSuccess = { (balance, fiatBalance) ->
+                        dialogView.asset_actions_crypto_value.text = balance.toStringWithSymbol()
+                        dialogView.asset_actions_fiat_value.text = fiatBalance.toStringWithSymbol()
+                    },
+                    onError = {
+                        Timber.e("ActionSheet error loading balances: $it")
+                    }
+                )
+            }
         }
     }
 
@@ -270,8 +274,6 @@ class AssetActionsSheet :
 
     private fun processAction(action: AssetAction) {
         model.process(HandleActionIntent(action))
-        dismiss()
-        model.process(ClearSheetDataIntent)
     }
 
     companion object {

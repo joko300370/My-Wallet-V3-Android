@@ -638,7 +638,7 @@
 启动器中的图标，可以更快地接收比特币。 
 </string>
   <string name="shortcut_settings_enable">启动器快捷方式</string>
-  <string name="confirm">确认</string>
+  <string name="common_confirm">确认</string>
   <string name="swipe_receive_hint">滑动即可接收</string>
   <string name="swipe_receive_preference_summary">向左滑动时显示一个接收地址
  PIN屏幕，使收款速度更快。 

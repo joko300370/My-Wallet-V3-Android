@@ -8,12 +8,18 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_agreement.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.transfer.send.SendIntent
+import piuk.blockchain.android.ui.transfer.send.SendModel
+import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-class ConfirmAgreementWithLinksItemDelegate<in T>(
-    private val onAgreementActionClicked: (Boolean) -> Unit,
+class ConfirmAgreementWithTAndCsItemDelegate<in T>(
+    private val state: SendState,
+    private val model: SendModel,
     private val stringUtils: StringUtils,
     private val activityContext: Activity
 ) : AdapterDelegate<T> {
@@ -32,8 +38,9 @@ class ConfirmAgreementWithLinksItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementItemViewHolder).bind(
+        state,
+        model,
         items[position] as ConfirmAgreementWithLinksItem,
-        onAgreementActionClicked,
         stringUtils,
         activityContext
     )
@@ -47,8 +54,9 @@ private class AgreementItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
+        state: SendState,
+        model: SendModel,
         item: ConfirmAgreementWithLinksItem,
-        onAgreementActionClicked: (Boolean) -> Unit,
         stringUtils: StringUtils,
         activityContext: Activity
     ) {
@@ -60,8 +68,12 @@ private class AgreementItemViewHolder(val parent: View) :
         )
 
         itemView.confirm_details_checkbox.movementMethod = LinkMovementMethod.getInstance()
+
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            onAgreementActionClicked.invoke(isChecked)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
+                ?.let {
+                    model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
+                }
         }
     }
 }

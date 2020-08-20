@@ -64,7 +64,7 @@ data class SendState(
     val errorState: SendErrorState = SendErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
-    val stepsBackStack: Stack<SendStep> = Stack<SendStep>().apply { push(SendStep.ZERO) }
+    val stepsBackStack: Stack<SendStep> = Stack()
 ) : MviState {
 
     val asset: CryptoCurrency = sendingAccount.asset
@@ -77,6 +77,9 @@ data class SendState(
 
     val feeAmount: Money
         get() = pendingTx?.fees ?: throw IllegalStateException("No pending tx, fees unavailable")
+
+    val canGoBack: Boolean
+        get() = stepsBackStack.isNotEmpty()
 }
 
 class SendModel(

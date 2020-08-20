@@ -12,6 +12,7 @@ import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
+import com.blockchain.swap.nabu.datamanagers.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
@@ -28,6 +29,7 @@ import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.InterestLimitsRepository
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -71,7 +73,8 @@ class LiveCustodialWalletManager(
     private val fundsFeatureFlag: FeatureFlag,
     private val paymentAccountMapperMappers: Map<String, PaymentAccountMapper>,
     private val kycFeatureEligibility: FeatureEligibility,
-    private val assetBalancesRepository: AssetBalancesRepository
+    private val assetBalancesRepository: AssetBalancesRepository,
+    private val interestLimitsRepository: InterestLimitsRepository
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -168,7 +171,8 @@ class LiveCustodialWalletManager(
                         state = it.state.toTransactionState(),
                         type = it.type.toTransactionType()
                     )
-                }.filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
+                }
+                    .filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
             }
         }
 
@@ -319,9 +323,10 @@ class LiveCustodialWalletManager(
         fiatCurrency: String,
         isTier2Approved: Boolean
     ): Single<List<PaymentMethod>> =
-        cardsPaymentFeatureFlag.enabled.zipWith(fundsFeatureFlag.enabled).flatMap { (cardsEnabled, fundsEnabled) ->
-            paymentMethods(cardsEnabled, fundsEnabled, fiatCurrency, isTier2Approved)
-        }
+        cardsPaymentFeatureFlag.enabled.zipWith(fundsFeatureFlag.enabled)
+            .flatMap { (cardsEnabled, fundsEnabled) ->
+                paymentMethods(cardsEnabled, fundsEnabled, fiatCurrency, isTier2Approved)
+            }
 
     private val updateSupportedCards: (PaymentMethodsResponse) -> Unit = {
         val cardTypes = it.methods.filter { it.subTypes.isNullOrEmpty().not() }.mapNotNull {
@@ -368,7 +373,8 @@ class LiveCustodialWalletManager(
                 }?.let { balance ->
                     val fundsLimits =
                         PaymentLimits(it.limits.min,
-                            it.limits.max.coerceAtMost(balance.toBigInteger().toLong()), it.currency)
+                            it.limits.max.coerceAtMost(balance.toBigInteger().toLong()),
+                            it.currency)
                     availablePaymentMethods.add(PaymentMethod.Funds(
                         balance,
                         it.currency,
@@ -509,14 +515,20 @@ class LiveCustodialWalletManager(
                 }
             }
 
-    override fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>> {
+    override fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits> =
+        interestLimitsRepository.getLimitForAsset(crypto)
+
+    override fun getSupportedFundsFiats(
+        fiatCurrency: String,
+        isTier2Approved: Boolean
+    ): Single<List<String>> {
 
         val supportedFundCurrencies = authenticator.authenticate {
             nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
         }.map { paymentMethodsResponse ->
             paymentMethodsResponse.methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -660,11 +672,11 @@ private fun BuyOrderResponse.toBuyOrder(): BuyOrder =
         created = insertedAt.fromIso8601ToUtc() ?: Date(0),
         fee = fee?.let { FiatValue.fromMinor(inputCurrency, it.toLongOrDefault(0)) },
         paymentMethodId = paymentMethodId ?: (
-                when (paymentType.toPaymentMethodType()) {
-                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                }),
+            when (paymentType.toPaymentMethodType()) {
+                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+            }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(
@@ -694,4 +706,8 @@ interface PaymentAccountMapper {
     fun map(bankAccountResponse: BankAccountResponse): BankAccount?
 }
 
-private data class CustodialFiatBalance(val currency: String, val available: Boolean, val balance: FiatValue?)
+private data class CustodialFiatBalance(
+    val currency: String,
+    val available: Boolean,
+    val balance: FiatValue?
+)

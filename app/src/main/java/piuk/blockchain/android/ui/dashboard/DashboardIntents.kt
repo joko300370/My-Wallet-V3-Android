@@ -195,13 +195,7 @@ class CancelSimpleBuyOrder(
 object ClearBottomSheet : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null
-        )
-}
-
-object ClearFlow : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState.copy(
+            showDashboardSheet = null,
             activeFlow = null
         )
 }

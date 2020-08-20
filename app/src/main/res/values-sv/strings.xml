@@ -639,7 +639,7 @@
  ikonen i startern, vilket gör att ta emot bitcoin ännu snabbare. 
 </string>
   <string name="shortcut_settings_enable">Starta genvägar</string>
-  <string name="confirm">Bekräfta</string>
+  <string name="common_confirm">Bekräfta</string>
   <string name="swipe_receive_hint">Svep för att ta emot</string>
   <string name="swipe_receive_preference_summary">Visa en mottagaradress när du sveper till vänster 
  PIN-skärmen, vilket gör mottagningen av pengar ännu snabbare. 

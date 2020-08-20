@@ -641,7 +641,7 @@
  ikona ve spouštěči, čímž je příjem bitcoinů ještě rychlejší. 
 </string>
   <string name="shortcut_settings_enable">Klávesové zkratky spouštěče</string>
-  <string name="confirm">Potvrdit</string>
+  <string name="common_confirm">Potvrdit</string>
   <string name="swipe_receive_hint">Přejetím přejděte prstem</string>
   <string name="swipe_receive_preference_summary">Když přejedete prstem doleva, odhalte adresu pro příjem 
  na obrazovce PIN, což zrychluje příjem prostředků. 

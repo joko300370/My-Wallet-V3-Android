@@ -639,7 +639,7 @@
  ícone no iniciador, tornando o recebimento de bitcoin ainda mais rápido. 
 </string>
   <string name="shortcut_settings_enable">Atalhos do iniciador</string>
-  <string name="confirm">confirme</string>
+  <string name="common_confirm">confirme</string>
   <string name="swipe_receive_hint">Deslize para receber</string>
   <string name="swipe_receive_preference_summary">Revele um endereço de recebimento ao deslizar para a esquerda no 
  a tela do PIN, tornando o recebimento de fundos ainda mais rápido. 

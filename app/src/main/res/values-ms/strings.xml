@@ -638,7 +638,7 @@
  ikon dalam pelancar, membuat bitcoin menerima lebih cepat. 
 </string>
   <string name="shortcut_settings_enable">Pintasan Pelancar</string>
-  <string name="confirm">Sahkan</string>
+  <string name="common_confirm">Sahkan</string>
   <string name="swipe_receive_hint">Leret untuk menerima</string>
   <string name="swipe_receive_preference_summary">Mendedahkan alamat yang diterima apabila anda meleret ke kiri 
  skrin PIN, membuat dana lebih cepat. 
