@@ -49,15 +49,23 @@ class Erc20DepositTransaction(
                 )
             }
 
-    override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
-        super.doValidateAll(pendingTx)
+    override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
+        super.doValidateAmount(pendingTx)
             .map {
                 val inputFiatAmount =
                     it.amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
 
                 if (it.amount.isPositive && inputFiatAmount < it.minLimit!!) {
                     it.copy(validationState = ValidationState.MIN_REQUIRED)
-                } else if (it.validationState == ValidationState.CAN_EXECUTE && !areOptionsValid(
+                } else {
+                    it
+                }
+            }
+
+    override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
+        super.doValidateAll(pendingTx)
+            .map {
+                if (it.validationState == ValidationState.CAN_EXECUTE && !areOptionsValid(
                         pendingTx)) {
                     it.copy(validationState = ValidationState.OPTION_INVALID)
                 } else {
