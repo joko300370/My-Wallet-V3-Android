@@ -9,7 +9,6 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.ENABLE_INTEREST_ACTIONS
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
@@ -67,13 +66,13 @@ internal class CryptoInterestAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val actions: AvailableActions = if (ENABLE_INTEREST_ACTIONS &&
-        (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER)) {
+    override val actions: AvailableActions =
+        if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
         // TODO coming soon - AssetAction.Summary + AssetAction.ViewActivity
-        setOf(AssetAction.Deposit)
-    } else {
-        emptySet()
-    }
+            setOf(AssetAction.Deposit)
+        } else {
+            emptySet()
+        }
 }
 
 internal class InterestAddress(

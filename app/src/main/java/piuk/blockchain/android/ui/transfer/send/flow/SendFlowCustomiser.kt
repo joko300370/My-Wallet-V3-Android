@@ -145,8 +145,8 @@ class SendFlowCustomiserImpl(
         }
     }
 
-    override fun errorFlashMessage(state: SendState): String? {
-        return when (state.errorState) {
+    override fun errorFlashMessage(state: SendState): String? =
+        when (state.errorState) {
             SendErrorState.NONE -> null
             SendErrorState.INSUFFICIENT_FUNDS -> resources.getString(
                 R.string.send_enter_amount_error_insufficient_funds,
@@ -175,5 +175,4 @@ class SendFlowCustomiserImpl(
             }
             SendErrorState.ABOVE_MAX_LIMIT -> TODO()
         }
-    }
 }

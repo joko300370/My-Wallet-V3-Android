@@ -1,9 +1,8 @@
 package piuk.blockchain.android.ui.transfer.send.flow.adapter
 
-import android.app.Activity
-import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_agreement.view.*
@@ -14,22 +13,19 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
 import piuk.blockchain.android.ui.transfer.send.SendState
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-class ConfirmAgreementWithLinksItemDelegate<in T>(
+class ConfirmAgreementToTransferItemDelegate<in T>(
     private val state: SendState,
-    private val model: SendModel,
-    private val stringUtils: StringUtils,
-    private val activityContext: Activity
+    private val model: SendModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         val item = items[position] as ConfirmItemType
-        return item is ConfirmAgreementWithLinksItem
+        return item is ConfirmAgreementTextItem
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AgreementItemViewHolder(
+        AgreementTextItemViewHolder(
             parent.inflate(R.layout.item_send_confirm_agreement)
         )
 
@@ -37,16 +33,14 @@ class ConfirmAgreementWithLinksItemDelegate<in T>(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as AgreementItemViewHolder).bind(
+    ) = (holder as AgreementTextItemViewHolder).bind(
         state,
         model,
-        items[position] as ConfirmAgreementWithLinksItem,
-        stringUtils,
-        activityContext
+        items[position] as ConfirmAgreementTextItem
     )
 }
 
-private class AgreementItemViewHolder(val parent: View) :
+private class AgreementTextItemViewHolder(val parent: View) :
     RecyclerView.ViewHolder(parent),
     LayoutContainer {
 
@@ -56,21 +50,12 @@ private class AgreementItemViewHolder(val parent: View) :
     fun bind(
         state: SendState,
         model: SendModel,
-        item: ConfirmAgreementWithLinksItem,
-        stringUtils: StringUtils,
-        activityContext: Activity
+        item: ConfirmAgreementTextItem
     ) {
-
-        itemView.confirm_details_checkbox.text = stringUtils.getStringWithMappedLinks(
-            item.mappedString,
-            item.uriMap,
-            activityContext
-        )
-
-        itemView.confirm_details_checkbox.movementMethod = LinkMovementMethod.getInstance()
+        itemView.confirm_details_checkbox.setText(item.agreementText, TextView.BufferType.SPANNABLE)
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
                 ?.let {
                     model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
                 }

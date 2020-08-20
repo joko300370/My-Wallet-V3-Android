@@ -12,8 +12,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.urllinks.INTEREST_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.INTEREST_TERMS_OF_SERVICE
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
+import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.dialog_send_confirm.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -131,13 +131,13 @@ class ConfirmTransactionSheet(
         }
 
         val linkAgreement =
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_WITH_LINKS)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
         linkAgreement?.let {
             setupTosAndPPLinks(itemList)
         }
 
         val textAgreement =
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.TEXT_AGREEMENT)
+            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
         textAgreement?.let {
             setupHoldingValues(state.sendAmount, itemList)
         }
@@ -204,7 +204,7 @@ class ConfirmTransactionSheet(
     }
 
     private fun setupHoldingValues(
-        sendAmount: CryptoValue,
+        sendAmount: Money,
         itemList: MutableList<ConfirmItemType>
     ) {
         val introToHolding = getString(R.string.send_confirmation_interest_holding_period_1)

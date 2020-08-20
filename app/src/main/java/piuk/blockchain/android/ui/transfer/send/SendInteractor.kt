@@ -2,8 +2,8 @@ package piuk.blockchain.android.ui.transfer.send
 
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -15,9 +15,9 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
-import piuk.blockchain.androidcore.utils.extensions.then
+import piuk.blockchain.android.coincore.TxValidationFailure
+import piuk.blockchain.android.coincore.ValidationState
 import timber.log.Timber
 
 class SendInteractor(
@@ -33,11 +33,12 @@ class SendInteractor(
     fun validateTargetAddress(address: String, asset: CryptoCurrency): Single<ReceiveAddress> =
         addressFactory.parse(address, asset)
             .switchIfEmpty(
-                Single.error<ReceiveAddress>(TransactionValidationError(TransactionValidationError.INVALID_ADDRESS))
+                Single.error<ReceiveAddress>(
+                    TxValidationFailure(ValidationState.CAN_EXECUTE))
             )
             .onErrorResumeNext { e ->
                 if (e.isUnexpectedContractError) {
-                    Single.error(TransactionValidationError(TransactionValidationError.ADDRESS_IS_CONTRACT))
+                    Single.error(TxValidationFailure(ValidationState.ADDRESS_IS_CONTRACT))
                 } else {
                     Single.error(e)
                 }
@@ -46,22 +47,23 @@ class SendInteractor(
     fun initialiseTransaction(
         sourceAccount: SingleAccount,
         targetAddress: SendTarget
-    ): Single<PendingTx> =
+    ): Completable =
         sourceAccount.createSendProcessor(targetAddress)
             .doOnSuccess { transactionProcessor = it }
-            .flatMap { it.initialiseTx() }
             .doOnError {
-                Timber.e("---- error initialising $it")
-            }
+                Timber.e("!SEND!> error initialising $it")
+            }.ignoreElement()
 
-    fun updateTransactionAmount(amount: CryptoValue): Single<PendingTx> =
+    fun requestTxUpdates(): Observable<PendingTx> =
+        transactionProcessor.initialiseTx()
+
+    fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor.updateAmount(amount)
 
     fun verifyAndExecute(): Completable =
-        transactionProcessor.validate()
-            .then { transactionProcessor.execute() }
+        transactionProcessor.execute()
 
-    fun modifyOptionValue(newOption: TxOptionValue): Single<PendingTx> =
+    fun modifyOptionValue(newOption: TxOptionValue): Completable =
         transactionProcessor.setOption(newOption)
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =

@@ -191,11 +191,12 @@ class AssetDetailSheet :
             // TODO must check if user has KYC'd - if not launch info sheet about KYC (screen 0.1 of Earn flow)
             // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
         } else {
-            state.assetDisplayMap!![assetFilter]?.let {
+            state.assetDisplayMap?.get(assetFilter)?.let {
                 val currentBalance = it.amount
                 val currentFiatBalance = it.fiatValue
-                model.process(ShowAssetActionsIntent(account, assetFilter, currentBalance,
-                    currentFiatBalance))
+                model.process(
+                    ShowAssetActionsIntent(account, assetFilter, currentBalance, currentFiatBalance)
+                )
             }
         }
     }

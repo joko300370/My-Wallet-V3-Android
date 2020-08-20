@@ -22,12 +22,12 @@ class ConfirmTransactionDelegateAdapter(
         with(delegatesManager) {
             addAdapterDelegate(ConfirmInfoItemDelegate())
             addAdapterDelegate(ConfirmNoteItemDelegate(state, model))
-            addAdapterDelegate(ConfirmAgreementWithLinksItemDelegate(
+            addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(
                 state,
                 model,
                 stringUtils,
                 activityContext))
-            addAdapterDelegate(ConfirmAgreementTextItemDelegate(
+            addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(
                 state,
                 model
             ))
