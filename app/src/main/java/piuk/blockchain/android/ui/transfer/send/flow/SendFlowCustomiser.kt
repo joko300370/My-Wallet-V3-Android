@@ -128,10 +128,8 @@ class SendFlowCustomiserImpl(
         }
     }
 
-    override fun errorFlashMessage(state: SendState): String? {
-        require(state.errorState != SendErrorState.NONE)
-
-        return when (state.errorState) {
+    override fun errorFlashMessage(state: SendState): String? =
+        when (state.errorState) {
             SendErrorState.NONE -> null
             SendErrorState.INSUFFICIENT_FUNDS -> resources.getString(
                 R.string.send_enter_amount_error_insufficient_funds, state.sendingAccount.asset.displayTicker
@@ -149,5 +147,4 @@ class SendFlowCustomiserImpl(
             SendErrorState.BELOW_MIN_LIMIT -> TODO()
             SendErrorState.ABOVE_MAX_LIMIT -> TODO()
         }
-    }
 }

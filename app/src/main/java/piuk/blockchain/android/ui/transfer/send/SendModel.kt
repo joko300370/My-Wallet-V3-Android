@@ -3,8 +3,10 @@ package piuk.blockchain.android.ui.transfer.send
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -13,8 +15,8 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
@@ -67,13 +69,13 @@ data class SendState(
 
     val asset: CryptoCurrency = sendingAccount.asset
 
-    val sendAmount: CryptoValue
-        get() = pendingTx?.amount ?: CryptoValue.zero(asset)
+    val sendAmount: Money
+        get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: BEtter default required
 
-    val availableBalance: CryptoValue
-        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset)
+    val availableBalance: Money
+        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset) // TODO: BEtter default required
 
-    val feeAmount: CryptoValue
+    val feeAmount: Money
         get() = pendingTx?.fees ?: throw IllegalStateException("No pending tx, fees unavailable")
 }
 
@@ -89,9 +91,7 @@ class SendModel(
         Timber.v("!SEND!> Send Model: performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is SendIntent.Initialise -> null
-            is SendIntent.InitialiseWithTargetAccount ->
-                processInitialisationWithPredefinedAccounts(intent)
+            is SendIntent.InitialiseWithSourceAccount -> null
             is SendIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is SendIntent.UpdatePasswordIsValidated -> null
             is SendIntent.UpdatePasswordNotValidated -> null
@@ -101,8 +101,12 @@ class SendModel(
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
             is SendIntent.TargetAddressValidated -> null
             is SendIntent.TargetAddressInvalid -> null
+            is SendIntent.InitialiseWithSourceAndTargetAccount -> {
+                process(SendIntent.TargetSelectionConfirmed(intent.toAccount))
+                null
+            }
             is SendIntent.TargetSelectionConfirmed ->
-                processAddressConfirmation(
+                processTargetSelectionConfirmed(
                     previousState.sendingAccount,
                     previousState.sendAmount,
                     intent.sendTarget
@@ -112,36 +116,12 @@ class SendModel(
             is SendIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
             is SendIntent.PendingTxUpdated -> null
             is SendIntent.UpdateTransactionComplete -> null
-            is SendIntent.InputValidationError -> null
             is SendIntent.ReturnToPreviousStep -> null
-            is SendIntent.StartWithDefinedAccounts -> null
             is SendIntent.FetchFiatRates -> processGetFiatRate()
             is SendIntent.FetchTargetRates -> processGetTargetRate()
             is SendIntent.FiatRateUpdated -> null
             is SendIntent.CryptoRateUpdated -> null
         }
-    }
-
-    private fun processInitialisationWithPredefinedAccounts(
-        intent: SendIntent.InitialiseWithTargetAccount
-    ): Disposable {
-        return interactor.initialiseTransaction(
-            intent.fromAccount, intent.toAccount)
-            .subscribeBy(
-                onSuccess = {
-                    process(SendIntent.FetchFiatRates)
-                    process(SendIntent.FetchTargetRates)
-                    process(SendIntent.SendAmountChanged(CryptoValue.zero(intent.fromAccount.asset)))
-                    process(
-                        SendIntent.StartWithDefinedAccounts(intent.fromAccount, intent.toAccount,
-                            intent.passwordRequired, it)
-                    )
-                },
-                onError = {
-                    Timber.e("!SEND!> Unable to init transaction: $it")
-                    process(SendIntent.FatalTransactionError(it))
-                }
-            )
     }
 
     override fun onScanLoopError(t: Throwable) {
@@ -178,29 +158,33 @@ class SendModel(
                 },
                 onError = {
                     when (it) {
-                        is TransactionValidationError -> process(
+                        is TxValidationFailure -> process(
                             SendIntent.TargetAddressInvalid(it))
                         else -> process(SendIntent.FatalTransactionError(it))
                     }
                 }
             )
 
-    private fun processAddressConfirmation(
-        sourceAccount: SingleAccount,
-        amount: CryptoValue,
-        sendTarget: SendTarget
-    ): Disposable =
     // At this point we can build a transactor object from coincore and configure
     // the state object a bit more; depending on whether it's an internal, external,
     // bitpay or BTC Url address we can set things like note, amount, fee schedule
-        // and hook up the correct processor to execute the transaction.
+    // and hook up the correct processor to execute the transaction.
+    private fun processTargetSelectionConfirmed(
+        sourceAccount: SingleAccount,
+        amount: Money,
+        sendTarget: SendTarget
+    ): Disposable =
         interactor.initialiseTransaction(sourceAccount, sendTarget)
             .subscribeBy(
-                onSuccess = {
+                onComplete = {
+                    // This is a bit of a hack - when selecting an address from the account list, we need
+                    // to trigger a page change. TODO: Make this not a hack
                     process(SendIntent.TargetAddressValidated(sendTarget))
+                    // State the pendingTx observable
+                    startProcessor()
+                    // Start the rates observables
                     process(SendIntent.FetchFiatRates)
                     process(SendIntent.FetchTargetRates)
-                    process(SendIntent.PendingTxUpdated(it))
                     process(SendIntent.SendAmountChanged(amount))
                 },
                 onError = {
@@ -209,19 +193,25 @@ class SendModel(
                 }
             )
 
-    private fun processAmountChanged(amount: CryptoValue): Disposable =
-        interactor.updateTransactionAmount(amount)
+    private fun startProcessor() {
+        disposables += interactor.requestTxUpdates()
             .subscribeBy(
-                onSuccess = { pendingTx ->
-                    process(SendIntent.PendingTxUpdated(pendingTx))
+                onNext = {
+                    process(SendIntent.PendingTxUpdated(it))
                 },
                 onError = {
-                    if (it is TransactionValidationError) {
-                        process(SendIntent.InputValidationError(it))
-                    } else {
-                        Timber.e("!SEND!> Unable to get update available balance")
-                        process(SendIntent.FatalTransactionError(it))
-                    }
+                    Timber.e("!SEND!> Processor failed: $it")
+                    process(SendIntent.FatalTransactionError(it))
+                }
+            )
+    }
+
+    private fun processAmountChanged(amount: Money): Disposable =
+        interactor.updateTransactionAmount(amount)
+            .subscribeBy(
+                onError = {
+                    Timber.e("!SEND!> Unable to get update available balance")
+                    process(SendIntent.FatalTransactionError(it))
                 }
             )
 
@@ -241,11 +231,8 @@ class SendModel(
         interactor.modifyOptionValue(
             newOption
         ).subscribeBy(
-            onSuccess = { pendingTx ->
-                process(SendIntent.PendingTxUpdated(pendingTx))
-            },
             onError = {
-                // TODO: Report problem
+                Timber.e("Failed updating Tx options")
             }
         )
 

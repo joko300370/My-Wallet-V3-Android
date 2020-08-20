@@ -109,7 +109,6 @@ abstract class Erc20NonCustodialAccount(
         when (sendTo) {
             is CryptoAddress -> Single.just(
                 Erc20OnChainTransaction(
-                    asset = asset,
                     erc20Account = erc20Account,
                     feeManager = fees,
                     exchangeRates = exchangeRates,
@@ -121,7 +120,6 @@ abstract class Erc20NonCustodialAccount(
             is CryptoInterestAccount ->
                 sendTo.receiveAddress.map {
                     Erc20DepositTransaction(
-                        asset = asset,
                         erc20Account = erc20Account,
                         feeManager = fees,
                         exchangeRates = exchangeRates,
@@ -132,7 +130,6 @@ abstract class Erc20NonCustodialAccount(
                 }
             is CryptoAccount -> sendTo.receiveAddress.map {
                 Erc20OnChainTransaction(
-                    asset = asset,
                     erc20Account = erc20Account,
                     feeManager = fees,
                     exchangeRates = exchangeRates,

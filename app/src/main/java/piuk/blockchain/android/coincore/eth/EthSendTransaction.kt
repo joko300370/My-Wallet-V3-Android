@@ -14,15 +14,16 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TransactionValidationError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
-import piuk.blockchain.android.coincore.impl.OnChainSendProcessorBase
+import piuk.blockchain.android.coincore.TxValidationFailure
+import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.impl.OnChainTxProcessorBase
+import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -33,25 +34,29 @@ open class EthSendTransaction(
     sendingAccount: CryptoAccount,
     sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
-) : OnChainSendProcessorBase(
-        exchangeRates,
+) : OnChainTxProcessorBase(
         sendingAccount,
         sendTarget,
+        exchangeRates,
         requireSecondPassword
 ) {
-    override val asset: CryptoCurrency = CryptoCurrency.ETHER
+    init {
+        require(asset == CryptoCurrency.ETHER)
+    }
 
     override val feeOptions = setOf(FeeLevel.Regular)
 
-    override var pendingTx: PendingTx =
-        PendingTx(
-            amount = CryptoValue.ZeroEth,
-            available = CryptoValue.ZeroEth,
-            fees = CryptoValue.ZeroEth,
-            feeLevel = FeeLevel.Regular,
-            options = setOf(
-                TxOptionValue.TxTextOption(
-                    option = TxOption.DESCRIPTION
+    override fun doInitialiseTx(): Single<PendingTx> =
+        Single.just(
+            PendingTx(
+                amount = CryptoValue.ZeroEth,
+                available = CryptoValue.ZeroEth,
+                fees = CryptoValue.ZeroEth,
+                feeLevel = FeeLevel.Regular,
+                options = setOf(
+                    TxOptionValue.TxTextOption(
+                        option = TxOption.DESCRIPTION
+                    )
                 )
             )
         )
@@ -70,31 +75,36 @@ open class EthSendTransaction(
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
 
-    override fun updateAmount(amount: CryptoValue): Single<PendingTx> =
-        Singles.zip(
+    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
+        require(amount is CryptoValue)
+        require(amount.currency == CryptoCurrency.ETHER)
+
+        return Singles.zip(
             sendingAccount.balance.map { it as CryptoValue },
             absoluteFee()
         ) { available, fees ->
-            if (amount + fees <= available) {
-                pendingTx.copy(
-                    amount = amount,
-                    available = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
-                    fees = fees
-                )
-            } else {
-                throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
-            }
-        }.doOnSuccess { pendingTx = it }
+            pendingTx.copy(
+                amount = amount,
+                available = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
+                fees = fees
+            )
+        }
+    }
+
+    override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
+        validateAmounts(pendingTx)
+            .then { validateSufficientFunds(pendingTx) }
+            .updateTxValidity(pendingTx)
 
     // We can make some assumptions here over the previous impl;
     // 1. a CryptAddress object will be self-validating, so we need not check that it's valid
-    override fun validate(): Completable =
-        validateAmount(pendingTx)
+    override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
+        validateAmounts(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
             .then { validateNoPendingTx() }
-            .doOnError { Timber.e("Validation failed: $it") }
+            .updateTxValidity(pendingTx)
 
-    override fun executeTransaction(secondPassword: String): Single<String> =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
@@ -105,10 +115,12 @@ open class EthSendTransaction(
                 pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)?.let { notes ->
                     ethDataManager.updateErc20TransactionNotes(hash, notes.text)
                 }
-            }
+            }.ignoreElement()
 
-    private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> =
-        Singles.zip(
+    private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> {
+        require(sendTarget is CryptoAddress)
+
+        return Singles.zip(
             ethDataManager.getNonce(),
             ethDataManager.isContractAddress(sendTarget.address),
             feeOptions()
@@ -121,6 +133,7 @@ open class EthSendTransaction(
                 weiValue = pendingTx.amount.toBigInteger()
             )
         }
+    }
 
     // TODO: Have FeeOptions deal with this conversion
     private val FeeOptions.gasPrice: BigInteger
@@ -134,10 +147,10 @@ open class EthSendTransaction(
             if (isContract) gasLimitContract else gasLimit
         )
 
-    private fun validateAmount(pendingTx: PendingTx): Completable =
+    private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             if (pendingTx.amount <= CryptoValue.ZeroEth) {
-                throw TransactionValidationError(TransactionValidationError.INVALID_AMOUNT)
+                throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
 
@@ -147,7 +160,7 @@ open class EthSendTransaction(
             absoluteFee()
         ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {
-                throw TransactionValidationError(TransactionValidationError.INSUFFICIENT_FUNDS)
+                throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
             } else {
                 true
             }
@@ -157,7 +170,7 @@ open class EthSendTransaction(
         ethDataManager.isLastTxPending()
             .flatMapCompletable { hasUnconfirmed: Boolean ->
                 if (hasUnconfirmed) {
-                    Completable.error(TransactionValidationError(TransactionValidationError.HAS_TX_IN_FLIGHT))
+                    Completable.error(TxValidationFailure(ValidationState.HAS_TX_IN_FLIGHT))
                 } else {
                     Completable.complete()
                 }

@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
@@ -141,7 +142,7 @@ class EnterTargetAddressSheet(
     }
 
     private fun accountSelected(account: BlockchainAccount) {
-        require(account is CryptoAccount)
+        require(account is SingleAccount)
         model.process(SendIntent.TargetSelectionConfirmed(account))
     }
 
