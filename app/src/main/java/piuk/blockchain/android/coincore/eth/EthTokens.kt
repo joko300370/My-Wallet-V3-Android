@@ -63,8 +63,6 @@ internal class EthAsset(
         Single.just(
             listOf(
                 EthCryptoWalletAccount(
-                    currencyPrefs,
-                    custodialManager,
                     payloadManager,
                     ethDataManager,
                     feeDataManager,

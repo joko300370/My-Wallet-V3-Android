@@ -1,7 +1,5 @@
 package piuk.blockchain.android.coincore.eth
 
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -29,8 +27,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
-    private val currencyPrefs: CurrencyPrefs,
-    private val custodialWalletManager: CustodialWalletManager,
     payloadManager: PayloadDataManager,
     override val label: String,
     internal val address: String,
@@ -40,16 +36,12 @@ internal class EthCryptoWalletAccount(
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
 
     constructor(
-        currencyPrefs: CurrencyPrefs,
-        custodialWalletManager: CustodialWalletManager,
         payloadManager: PayloadDataManager,
         ethDataManager: EthDataManager,
         fees: FeeDataManager,
         jsonAccount: EthereumAccount,
         exchangeRates: ExchangeRateDataManager
     ) : this(
-        currencyPrefs,
-        custodialWalletManager,
         payloadManager,
         jsonAccount.label,
         jsonAccount.address,
@@ -122,8 +114,6 @@ internal class EthCryptoWalletAccount(
             )
             is CryptoInterestAccount -> sendTo.receiveAddress.map {
                 EthDepositTransaction(
-                    currencyPrefs = currencyPrefs,
-                    custodialWalletManager = custodialWalletManager,
                     ethDataManager = ethDataManager,
                     feeManager = fees,
                     exchangeRates = exchangeRates,

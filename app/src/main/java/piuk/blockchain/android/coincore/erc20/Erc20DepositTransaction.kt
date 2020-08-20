@@ -1,8 +1,10 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOption
@@ -13,8 +15,6 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 class Erc20DepositTransaction(
-    private val currencyPrefs: CurrencyPrefs,
-    private val custodialWalletManager: CustodialWalletManager,
     erc20Account: Erc20Account,
     feeManager: FeeDataManager,
     exchangeRates: ExchangeRateDataManager,
@@ -28,7 +28,10 @@ class Erc20DepositTransaction(
     sendingAccount,
     sendTarget,
     requireSecondPassword
-) {
+), KoinComponent {
+
+    private val currencyPrefs: CurrencyPrefs by scopedInject()
+    private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
     override fun doInitialiseTx(): Single<PendingTx> =
         super.doInitialiseTx()
@@ -56,7 +59,7 @@ class Erc20DepositTransaction(
                     it.amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
 
                 if (it.amount.isPositive && inputFiatAmount < it.minLimit!!) {
-                    it.copy(validationState = ValidationState.MIN_REQUIRED)
+                    it.copy(validationState = ValidationState.UNDER_MIN_LIMIT)
                 } else {
                     it
                 }

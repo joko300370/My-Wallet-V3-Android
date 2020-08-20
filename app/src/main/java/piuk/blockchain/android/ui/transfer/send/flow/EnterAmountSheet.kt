@@ -67,7 +67,7 @@ class EnterAmountSheet(
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                amount_sheet_input.maxLimit = balance
+                amount_sheet_input.maxLimit = newState.availableBalance
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
@@ -83,7 +83,7 @@ class EnterAmountSheet(
                 amount_sheet_input.showError(it)
             } ?: amount_sheet_input.hideError()
 
-            if (newState.stepsBackStack.isEmpty()) {
+            if (!newState.canGoBack) {
                 amount_sheet_back.gone()
             }
         }
@@ -95,7 +95,7 @@ class EnterAmountSheet(
         with(dialogView) {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
 
-            amount_sheet_asset_direction.setImageResource(customiser.setDirectionIcon(state))
+            amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
             amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
 
             amount_sheet_from.text =

@@ -63,8 +63,6 @@ internal class PaxAsset(
             ?: throw Exception("No ether wallet found")
 
         return PaxCryptoWalletAccount(
-            currencyPrefs,
-            custodialManager,
             payloadManager,
             labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
             paxAddress,

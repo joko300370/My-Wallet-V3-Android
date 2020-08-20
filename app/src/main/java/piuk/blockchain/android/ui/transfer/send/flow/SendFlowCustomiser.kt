@@ -10,15 +10,15 @@ interface SendFlowCustomiser {
     fun selectSourceAddressTitle(state: SendState): String
     fun selectTargetAddressTitle(state: SendState): String
     fun enterAmountTitle(state: SendState): String
+    fun enterAmountActionIcon(state: SendState): Int
     fun confirmTitle(state: SendState): String
     fun confirmCtaText(state: SendState): String
     fun confirmListItemTitle(state: SendState): String
     fun transactionProgressTitle(state: SendState): String
     fun transactionProgressMessage(state: SendState): String
     fun transactionCompleteTitle(state: SendState): String
-    fun transactionCompleteMessage(state: SendState): String
 
-    fun setDirectionIcon(state: SendState): Int
+    fun transactionCompleteMessage(state: SendState): String
 
     // val targetAccountFilter(state: SendState): (SingleAccount) -> Boolean
 
@@ -28,7 +28,7 @@ interface SendFlowCustomiser {
 class SendFlowCustomiserImpl(
     private val resources: Resources
 ) : SendFlowCustomiser {
-    override fun setDirectionIcon(state: SendState): Int {
+    override fun enterAmountActionIcon(state: SendState): Int {
         return when (state.action) {
             AssetAction.NewSend -> R.drawable.ic_tx_sent
             AssetAction.Deposit -> R.drawable.ic_tx_deposit_arrow

@@ -1,8 +1,10 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.PendingTx
@@ -14,8 +16,6 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
 class EthDepositTransaction(
-    private val currencyPrefs: CurrencyPrefs,
-    val custodialWalletManager: CustodialWalletManager,
     ethDataManager: EthDataManager,
     feeManager: FeeDataManager,
     exchangeRates: ExchangeRateDataManager,
@@ -29,7 +29,11 @@ class EthDepositTransaction(
     sendingAccount,
     sendTarget,
     requireSecondPassword
-) {
+), KoinComponent {
+
+    private val currencyPrefs: CurrencyPrefs by scopedInject()
+    private val custodialWalletManager: CustodialWalletManager by scopedInject()
+
     override fun doInitialiseTx(): Single<PendingTx> =
         super.doInitialiseTx()
             .flatMap { pendingTx ->
@@ -56,7 +60,7 @@ class EthDepositTransaction(
                     it.amount.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
 
                 if (it.amount.isPositive && inputFiatAmount < it.minLimit!!) {
-                    it.copy(validationState = ValidationState.MIN_REQUIRED)
+                    it.copy(validationState = ValidationState.UNDER_MIN_LIMIT)
                 } else {
                     it
                 }
@@ -65,8 +69,7 @@ class EthDepositTransaction(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         super.doValidateAll(pendingTx)
             .map {
-                if (it.validationState == ValidationState.CAN_EXECUTE && !areOptionsValid(
-                        pendingTx)) {
+                if (it.validationState == ValidationState.CAN_EXECUTE && !areOptionsValid(pendingTx)) {
                     it.copy(validationState = ValidationState.OPTION_INVALID)
                 } else {
                     it

@@ -1,7 +1,5 @@
 package piuk.blockchain.android.coincore.erc20
 
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -30,8 +28,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 
 abstract class Erc20NonCustodialAccount(
-    private val currencyPrefs: CurrencyPrefs,
-    private val custodialWalletManager: CustodialWalletManager,
     payloadManager: PayloadDataManager,
     asset: CryptoCurrency,
     private val fees: FeeDataManager,
@@ -124,8 +120,6 @@ abstract class Erc20NonCustodialAccount(
             is CryptoInterestAccount ->
                 sendTo.receiveAddress.map {
                     Erc20DepositTransaction(
-                        currencyPrefs = currencyPrefs,
-                        custodialWalletManager = custodialWalletManager,
                         erc20Account = erc20Account,
                         feeManager = fees,
                         exchangeRates = exchangeRates,

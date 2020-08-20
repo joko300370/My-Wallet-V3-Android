@@ -77,6 +77,9 @@ data class SendState(
 
     val feeAmount: Money
         get() = pendingTx?.fees ?: throw IllegalStateException("No pending tx, fees unavailable")
+
+    val canGoBack: Boolean
+        get() = stepsBackStack.isNotEmpty()
 }
 
 class SendModel(

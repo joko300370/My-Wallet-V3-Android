@@ -62,8 +62,6 @@ internal class UsdtAsset(
             ?: throw Exception("No USDT wallet found")
 
         return UsdtCryptoWalletAccount(
-            currencyPrefs,
-            custodialManager,
             payloadManager,
             labels.getDefaultNonCustodialWalletLabel(asset),
             usdtAddress,
