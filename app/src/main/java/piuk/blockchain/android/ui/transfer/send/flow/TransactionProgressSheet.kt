@@ -9,7 +9,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.transfer.send.SendStep
-import piuk.blockchain.android.ui.transfer.send.TransactionInFlightState
+import piuk.blockchain.android.ui.transfer.send.TxExecutionStatus
 import piuk.blockchain.android.util.maskedAsset
 import timber.log.Timber
 
@@ -26,16 +26,16 @@ class TransactionProgressSheet(
 
         dialogView.send_tx_progress.setAssetIcon(newState.sendingAccount.asset.maskedAsset())
 
-        when (newState.transactionInFlight) {
-            TransactionInFlightState.IN_PROGRESS -> dialogView.send_tx_progress.showTxInProgress(
+        when (newState.executionStatus) {
+            TxExecutionStatus.IN_PROGRESS -> dialogView.send_tx_progress.showTxInProgress(
                 customiser.transactionProgressTitle(newState),
                 customiser.transactionProgressMessage(newState)
             )
-            TransactionInFlightState.COMPLETED -> dialogView.send_tx_progress.showTxSuccess(
+            TxExecutionStatus.COMPLETED -> dialogView.send_tx_progress.showTxSuccess(
                 customiser.transactionCompleteTitle(newState),
                 customiser.transactionCompleteMessage(newState)
             )
-            TransactionInFlightState.ERROR -> dialogView.send_tx_progress.showTxError(
+            TxExecutionStatus.ERROR -> dialogView.send_tx_progress.showTxError(
                 getString(R.string.send_progress_error_title),
                 getString(R.string.send_progress_error_subtitle)
             )

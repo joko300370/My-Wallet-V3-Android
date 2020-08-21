@@ -97,11 +97,9 @@ abstract class TransactionProcessor(
         txObservable.value ?: throw IllegalStateException("TransactionProcessor not initialised")
 
     // Initialise the tx as required.
-    // This will call validate and then start propagating the
-    // pendingTx to the client code.
+    // This will start propagating the pendingTx to the client code.
     fun initialiseTx(): Observable<PendingTx> =
         doInitialiseTx()
-            .flatMap { doValidateAmount(it) }
             .doOnSuccess {
                 updatePendingTx(it)
             }.flatMapObservable {
@@ -109,12 +107,12 @@ abstract class TransactionProcessor(
             }
 
     // Set the option to the passed option value. If the option is not supported, it will not be
-    // in the original list when the pendincTx is created. And if it is not supported, then trying to
+    // in the original list when the pendingTx is created. And if it is not supported, then trying to
     // update it will cause an error.
     fun setOption(newOption: TxOptionValue): Completable {
         val pendingTx = getPendingTx()
-        if (pendingTx.hasOption(newOption.option)) {
-            throw IllegalArgumentException("Unsupported TxOption")
+        if (!pendingTx.hasOption(newOption.option)) {
+            throw IllegalArgumentException("Unsupported TxOption: ${newOption.option}")
         }
         val opts = pendingTx.options.toMutableSet()
         val old = opts.find { it.option == newOption.option }
@@ -150,6 +148,14 @@ abstract class TransactionProcessor(
                 rate.toBigDecimal()
             )
         }
+
+    // Check the validity of a pending transactions.
+    fun validateAll(): Completable {
+        val pendingTx = getPendingTx()
+        return doValidateAll(pendingTx)
+            .doOnSuccess { updatePendingTx(it) }
+            .ignoreElement()
+    }
 
     // Execute the transaction.
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
@@ -200,10 +206,10 @@ fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
     this.toSingle {
         pendingTx.copy(validationState = ValidationState.CAN_EXECUTE)
     }
-        .onErrorReturn {
-            if (it is TxValidationFailure) {
-                pendingTx.copy(validationState = it.state)
-            } else {
-                throw it
-            }
+    .onErrorReturn {
+        if (it is TxValidationFailure) {
+            pendingTx.copy(validationState = it.state)
+        } else {
+            throw it
         }
+    }

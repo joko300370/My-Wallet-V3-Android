@@ -4,9 +4,9 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
+import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -44,11 +44,11 @@ enum class SendErrorState {
     UNEXPECTED_ERROR
 }
 
-enum class TransactionInFlightState {
+enum class TxExecutionStatus {
+    NOT_STARTED,
     IN_PROGRESS,
     ERROR,
-    COMPLETED,
-    NOT_STARTED
+    COMPLETED
 }
 
 data class SendState(
@@ -63,7 +63,8 @@ data class SendState(
     val nextEnabled: Boolean = false,
     val errorState: SendErrorState = SendErrorState.NONE,
     val pendingTx: PendingTx? = null,
-    val transactionInFlight: TransactionInFlightState = TransactionInFlightState.NOT_STARTED,
+    val allowFiatInput: Boolean = false,
+    val executionStatus: TxExecutionStatus = TxExecutionStatus.NOT_STARTED,
     val stepsBackStack: Stack<SendStep> = Stack()
 ) : MviState {
 
@@ -114,6 +115,7 @@ class SendModel(
                     previousState.sendAmount,
                     intent.sendTarget
                 )
+            is SendIntent.PendingTransactionStarted -> null
             is SendIntent.FatalTransactionError -> null
             is SendIntent.SendAmountChanged -> processAmountChanged(intent.amount)
             is SendIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
@@ -124,6 +126,7 @@ class SendModel(
             is SendIntent.FetchTargetRates -> processGetTargetRate()
             is SendIntent.FiatRateUpdated -> null
             is SendIntent.CryptoRateUpdated -> null
+            is SendIntent.ValidateTransaction -> processValidateTransaction()
         }
     }
 
@@ -178,26 +181,7 @@ class SendModel(
         sendTarget: SendTarget
     ): Disposable =
         interactor.initialiseTransaction(sourceAccount, sendTarget)
-            .subscribeBy(
-                onComplete = {
-                    // This is a bit of a hack - when selecting an address from the account list, we need
-                    // to trigger a page change. TODO: Make this not a hack
-                    process(SendIntent.TargetAddressValidated(sendTarget))
-                    // State the pendingTx observable
-                    startProcessor()
-                    // Start the rates observables
-                    process(SendIntent.FetchFiatRates)
-                    process(SendIntent.FetchTargetRates)
-                    process(SendIntent.SendAmountChanged(amount))
-                },
-                onError = {
-                    Timber.e("!SEND!> Unable to get transaction processor: $it")
-                    process(SendIntent.FatalTransactionError(it))
-                }
-            )
-
-    private fun startProcessor() {
-        disposables += interactor.requestTxUpdates()
+            .doOnFirst { onFirstUpdate(amount) }
             .subscribeBy(
                 onNext = {
                     process(SendIntent.PendingTxUpdated(it))
@@ -207,6 +191,14 @@ class SendModel(
                     process(SendIntent.FatalTransactionError(it))
                 }
             )
+
+    private fun onFirstUpdate(
+        amount: Money
+    ) {
+        process(SendIntent.PendingTransactionStarted(interactor.canTransactFiat))
+        process(SendIntent.FetchFiatRates)
+        process(SendIntent.FetchTargetRates)
+        process(SendIntent.SendAmountChanged(amount))
     }
 
     private fun processAmountChanged(amount: Money): Disposable =
@@ -271,4 +263,18 @@ class SendModel(
             else -> super.distinctIntentFilter(previousIntent, nextIntent)
         }
     }
+
+    private fun processValidateTransaction(): Disposable? =
+        interactor.validateTransaction()
+            .subscribeBy(
+                onError = {
+                    Timber.e("!SEND!> Unable to validate transaction: $it")
+                    process(SendIntent.FatalTransactionError(it))
+                }
+            )
 }
+
+fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> =
+    take(1)
+        .doOnNext { onAction.invoke(it) }
+        .concatWith(skip(1))

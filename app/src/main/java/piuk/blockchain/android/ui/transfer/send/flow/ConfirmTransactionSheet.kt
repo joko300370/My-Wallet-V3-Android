@@ -107,6 +107,8 @@ class ConfirmTransactionSheet(
         view.confirm_sheet_back.setOnClickListener {
             model.process(SendIntent.ReturnToPreviousStep)
         }
+
+        model.process(SendIntent.ValidateTransaction)
     }
 
     private fun getTotalAmount(newState: SendState): String {

@@ -8,7 +8,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -115,25 +114,14 @@ class EnterAmountSheet(
             }
         }
 
-//        // TODO: kill this before shipping, we need to find a better way of showing the keyboard
-//        // TODO: tried a ViewTreeObserver - View.post {} - onViewCreated
-//        Handler().postDelayed({
-//            val inputView = view.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
-//                R.id.enter_amount)
-//            inputView?.let {
-//                inputView.requestFocus()
-//                imm.showSoftInput(inputView, InputMethodManager.SHOW_FORCED)
-//            }
-//        }, 200)
-
         compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
             state.fiatRate?.let { rate ->
                 model.process(
                     SendIntent.SendAmountChanged(
-                        if (amount is FiatValue) {
-                            rate.inverse().convert(amount) as CryptoValue
+                        if (!state.allowFiatInput && amount is FiatValue) {
+                            rate.inverse().convert(amount)
                         } else {
-                            amount as CryptoValue
+                            amount
                         }
                     )
                 )

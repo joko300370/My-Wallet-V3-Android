@@ -3,10 +3,12 @@ package piuk.blockchain.android.ui.transfer.send.flow
 import android.content.res.Resources
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendState
 
 interface SendFlowCustomiser {
+    // UI Element text, icons etc may be customised here:
     fun selectSourceAddressTitle(state: SendState): String
     fun selectTargetAddressTitle(state: SendState): String
     fun enterAmountTitle(state: SendState): String
@@ -17,12 +19,13 @@ interface SendFlowCustomiser {
     fun transactionProgressTitle(state: SendState): String
     fun transactionProgressMessage(state: SendState): String
     fun transactionCompleteTitle(state: SendState): String
-
     fun transactionCompleteMessage(state: SendState): String
 
-    // val targetAccountFilter(state: SendState): (SingleAccount) -> Boolean
-
+    // Format those flash error messages:
     fun errorFlashMessage(state: SendState): String?
+
+    // Perform per-action account selection filtering
+    fun targetAccountFilter(state: SendState): (SingleAccount) -> Boolean
 }
 
 class SendFlowCustomiserImpl(
@@ -183,5 +186,10 @@ class SendFlowCustomiserImpl(
                 else -> throw IllegalArgumentException("Action not supported by Send Flow")
             }
             SendErrorState.ABOVE_MAX_LIMIT -> TODO()
+        }
+
+    override fun targetAccountFilter(state: SendState): (SingleAccount) -> Boolean =
+        when (state.action) {
+            else -> { { true } }
         }
 }

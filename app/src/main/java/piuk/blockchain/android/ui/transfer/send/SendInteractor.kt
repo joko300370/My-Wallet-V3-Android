@@ -34,7 +34,7 @@ class SendInteractor(
         addressFactory.parse(address, asset)
             .switchIfEmpty(
                 Single.error<ReceiveAddress>(
-                    TxValidationFailure(ValidationState.CAN_EXECUTE))
+                    TxValidationFailure(ValidationState.INVALID_ADDRESS))
             )
             .onErrorResumeNext { e ->
                 if (e.isUnexpectedContractError) {
@@ -47,15 +47,17 @@ class SendInteractor(
     fun initialiseTransaction(
         sourceAccount: SingleAccount,
         targetAddress: SendTarget
-    ): Completable =
+    ): Observable<PendingTx> =
         sourceAccount.createSendProcessor(targetAddress)
             .doOnSuccess { transactionProcessor = it }
             .doOnError {
                 Timber.e("!SEND!> error initialising $it")
-            }.ignoreElement()
+            }.flatMapObservable {
+                it.initialiseTx()
+            }
 
-    fun requestTxUpdates(): Observable<PendingTx> =
-        transactionProcessor.initialiseTx()
+    val canTransactFiat: Boolean
+        get() = transactionProcessor.canTransactFiat
 
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor.updateAmount(amount)
@@ -72,6 +74,9 @@ class SendInteractor(
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
         transactionProcessor.targetExchangeRate()
+
+    fun validateTransaction(): Completable =
+        transactionProcessor.validateAll()
 }
 
 private val Throwable.isUnexpectedContractError

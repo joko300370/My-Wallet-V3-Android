@@ -131,8 +131,13 @@ class EnterTargetAddressSheet(
     }
 
     private fun setupTransferList(account: CryptoAccount) {
+        val accountFilter = customiser.targetAccountFilter(state)
         dialogView.wallet_select.initialise(
-            coincore.canTransferTo(account).map { it.map { it as BlockchainAccount } }
+            coincore.canTransferTo(account)
+                .map {
+                    it.filter(accountFilter)
+                    it.map { it as BlockchainAccount }
+                }
         )
     }
 

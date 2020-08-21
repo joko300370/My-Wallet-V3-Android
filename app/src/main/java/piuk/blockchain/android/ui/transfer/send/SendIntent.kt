@@ -129,13 +129,13 @@ sealed class SendIntent : MviIntent<SendState> {
             ).updateBackstack(oldState)
     }
 
+    // When a target is selected and valid, send by the UI to prep the BE for amount input
     class TargetSelectionConfirmed(
         val sendTarget: SendTarget
     ) : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 errorState = SendErrorState.NONE,
-                currentStep = SendStep.ENTER_AMOUNT,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }
@@ -163,6 +163,20 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 targetRate = targetRate
+            ).updateBackstack(oldState)
+    }
+
+    // Send by the interactor when the transaction engine is started, informs the FE that amount input
+    // can be performed and provides any capability flags to the FE
+    class PendingTransactionStarted(
+        private val canTransactFiat: Boolean
+    ) : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                errorState = SendErrorState.NONE,
+                currentStep = SendStep.ENTER_AMOUNT,
+                allowFiatInput = canTransactFiat,
+                nextEnabled = false
             ).updateBackstack(oldState)
     }
 
@@ -205,7 +219,7 @@ sealed class SendIntent : MviIntent<SendState> {
             oldState.copy(
                 nextEnabled = false,
                 currentStep = SendStep.IN_PROGRESS,
-                transactionInFlight = TransactionInFlightState.IN_PROGRESS
+                executionStatus = TxExecutionStatus.IN_PROGRESS
             ).updateBackstack(oldState)
     }
 
@@ -215,7 +229,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                transactionInFlight = TransactionInFlightState.ERROR
+                executionStatus = TxExecutionStatus.ERROR
             ).updateBackstack(oldState)
     }
 
@@ -223,7 +237,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
-                transactionInFlight = TransactionInFlightState.COMPLETED
+                executionStatus = TxExecutionStatus.COMPLETED
             ).updateBackstack(oldState)
     }
 
@@ -243,6 +257,13 @@ sealed class SendIntent : MviIntent<SendState> {
                 throw IllegalStateException("Cannot go back")
             }
         }
+    }
+
+    // When we start the enter amount sheet, we need to kick off a validation pass, so we
+    // know to enable the CTA button or not - transactions might require further option
+    // setting - t&cs etc - before the Tx can proceed.
+    object ValidateTransaction : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState
     }
 
     fun SendState.updateBackstack(oldState: SendState) =
