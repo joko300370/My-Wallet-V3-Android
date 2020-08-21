@@ -82,16 +82,16 @@ object ShowCancelOrderIntent : ActivitiesIntent() {
 }
 
 class ShowActivityDetailsIntent(
-    val cryptoCurrency: CryptoCurrency,
-    val txHash: String,
-    val isCustodial: Boolean
+    private val cryptoCurrency: CryptoCurrency,
+    private val txHash: String,
+    private val type: CryptoAccountType
 ) : ActivitiesIntent() {
     override fun reduce(oldState: ActivitiesState): ActivitiesState {
         return oldState.copy(
             bottomSheet = ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS,
             selectedCryptoCurrency = cryptoCurrency,
             selectedTxId = txHash,
-            isCustodial = isCustodial
+            accountType = type
         )
     }
 }
@@ -114,6 +114,6 @@ object ClearBottomSheetIntent : ActivitiesIntent() {
         oldState.copy(bottomSheet = null,
             selectedCryptoCurrency = null,
             selectedTxId = "",
-            isCustodial = false
+            accountType = CryptoAccountType.UNKNOWN
         )
 }

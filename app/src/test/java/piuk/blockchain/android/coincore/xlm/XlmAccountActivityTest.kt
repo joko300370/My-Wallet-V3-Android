@@ -82,7 +82,8 @@ class XlmAccountActivityTest {
         val activityItem = result[0] as NonCustodialActivitySummaryItem
         assertEquals(CryptoCurrency.XLM, activityItem.cryptoCurrency)
         assertEquals("hash", activityItem.txId)
-        assertEquals(TransactionSummary.Direction.RECEIVED, activityItem.direction)
+        assertEquals(
+            TransactionSummary.TransactionType.RECEIVED, activityItem.transactionType)
         assertEquals(1, activityItem.confirmations.toLong())
         assertFalse(activityItem.isFeeTransaction)
         assertEquals(output, activityItem.value.toBigInteger())

@@ -16,7 +16,7 @@ internal class BchActivitySummaryItem(
 ) : NonCustodialActivitySummaryItem() {
 
     override val cryptoCurrency = CryptoCurrency.BCH
-    override val direction: TransactionSummary.Direction = transactionSummary.direction
+    override val transactionType: TransactionSummary.TransactionType = transactionSummary.transactionType
     override val timeStampMs: Long = transactionSummary.time * 1000
 
     override val value: Money = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)

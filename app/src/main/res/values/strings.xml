@@ -16,6 +16,7 @@
     <string name="common_total">Total</string>
     <string name="common_deposit">Deposit</string>
     <string name="common_error">Something went wrong, please try again</string>
+    <string name="common_company_name">Blockchain.com</string>
     <string name="common_confirm">Confirm</string>
 
     <plurals name="transfer_label_plural">
@@ -650,6 +651,7 @@
     <string name="tx_title_swap">Swap %1s -> %2s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
+    <string name="tx_title_interest">%1$s Interest Earned</string>
 
     <!-- TRANSACTION DETAILS -->
     <string name="transaction_detail_title">Transaction</string>
@@ -1708,6 +1710,9 @@
     <string name="activity_state_canceled">Canceled</string>
     <string name="activity_state_unknown">Unknown</string>
     <string name="activity_state_failed">Failed</string>
+    <string name="activity_state_cleared">Cleared</string>
+    <string name="activity_state_rejected">Rejected</string>
+    <string name="activity_state_refunded">Refunded</string>
     <string name="activity_wallet_total_balance">Total Balance</string>
 
     <!--Cards-->
@@ -1771,6 +1776,8 @@
     <string name="activity_detail_description_action">Add a description</string>
     <string name="activity_detail_description_label">Description</string>
     <string name="activity_details_label_pending">Pending</string>
+    <string name="activity_details_label_manual_review">Manual Review</string>
+    <string name="activity_details_label_processing">Processing</string>
     <string name="activity_details_label_complete">Complete</string>
     <string name="activity_details_title_transferred">Transfer</string>
     <string name="activity_details_title_received">Receive</string>
@@ -1778,6 +1785,9 @@
     <string name="activity_details_title_buy">Buy</string>
     <string name="activity_details_title_sell">Sell</string>
     <string name="activity_details_title_swap">Swap</string>
+    <string name="activity_details_title_deposit">Deposit</string>
+    <string name="activity_details_title_interest_earned">Interest Earned</string>
+    <string name="activity_details_title_withdraw">Withdrawal</string>
     <string name="activity_details_label_confirming">Confirming</string>
     <string name="activity_details_label_waiting_on_funds">Waiting on Funds</string>
     <string name="activity_details_label_confirmations">%1$d of %2$d\nConfirmations</string>

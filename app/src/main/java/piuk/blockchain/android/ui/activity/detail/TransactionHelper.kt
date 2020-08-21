@@ -31,7 +31,7 @@ class TransactionHelper(
         val inputXpubList = ArrayList<String>()
 
         // Inputs / From field
-        if (tx.direction == TransactionSummary.Direction.RECEIVED && tx.inputsMap.isNotEmpty()) {
+        if (tx.transactionType == TransactionSummary.TransactionType.RECEIVED && tx.inputsMap.isNotEmpty()) {
             // Only 1 addr for receive
             val treeMap = TreeMap(tx.inputsMap)
             inputMap[treeMap.lastKey()] = treeMap.lastEntry().value
@@ -87,7 +87,7 @@ class TransactionHelper(
                 }
                 outputMap[outputAddress] = outputValue
             } else {
-                if (tx.direction != TransactionSummary.Direction.RECEIVED) {
+                if (tx.transactionType != TransactionSummary.TransactionType.RECEIVED) {
                     outputMap[outputAddress] = outputValue
                 }
             }
@@ -102,7 +102,7 @@ class TransactionHelper(
         val outputMap = HashMap<String, Money>()
         val inputXpubList = ArrayList<String>()
         // Inputs / From field
-        if (tx.direction == TransactionSummary.Direction.RECEIVED && tx.inputsMap.isNotEmpty()) {
+        if (tx.transactionType == TransactionSummary.TransactionType.RECEIVED && tx.inputsMap.isNotEmpty()) {
             for ((address, value) in tx.inputsMap) {
                 if (value.toBigInteger() == Payment.DUST)
                     continue
@@ -167,7 +167,7 @@ class TransactionHelper(
                 }
                 outputMap[outputAddress] = outputValue
             } else {
-                if (tx.direction != TransactionSummary.Direction.RECEIVED) {
+                if (tx.transactionType != TransactionSummary.TransactionType.RECEIVED) {
                     outputMap[outputAddress] = outputValue
                 }
             }

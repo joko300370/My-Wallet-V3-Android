@@ -10,11 +10,8 @@ import info.blockchain.api.data.Transaction;
 import info.blockchain.api.data.Xpub;
 import info.blockchain.wallet.bip44.HDChain;
 import info.blockchain.wallet.exceptions.ApiException;
-import info.blockchain.wallet.multiaddress.TransactionSummary.Direction;
+import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType;
 import info.blockchain.wallet.payload.data.AddressLabel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -217,11 +214,11 @@ public class MultiAddressFactory {
             txSummary.outputsXpubMap = new HashMap<>();
 
             if (tx.getResult().add(tx.getFee()).signum() == 0) {
-                txSummary.setDirection(Direction.TRANSFERRED);
+                txSummary.setTransactionType(TransactionType.TRANSFERRED);
             } else if (tx.getResult().signum() > 0) {
-                txSummary.setDirection(Direction.RECEIVED);
+                txSummary.setTransactionType(TransactionType.RECEIVED);
             } else {
-                txSummary.setDirection(Direction.SENT);
+                txSummary.setTransactionType(TransactionType.SENT);
             }
 
             //Inputs
@@ -299,8 +296,8 @@ public class MultiAddressFactory {
                         if (ownAddressesAndXpubs.contains(outputAddr)
                                 && !txSummary.inputsMap.keySet().contains(outputAddr)) {
 
-                            if (txSummary.getDirection() == Direction.SENT) {
-                                txSummary.setDirection(Direction.TRANSFERRED);
+                            if (txSummary.getTransactionType() == TransactionType.SENT) {
+                                txSummary.setTransactionType(TransactionType.TRANSFERRED);
                             }
 
                             //Don't add change coming back
@@ -348,14 +345,14 @@ public class MultiAddressFactory {
                     ownAddressesAndXpubs,
                     txSummary.inputsMap,
                     txSummary.outputsMap,
-                    txSummary.getDirection());
+                    txSummary.getTransactionType());
 
             txSummary.setHash(tx.getHash());
             txSummary.setTime(tx.getTime());
             txSummary.setDoubleSpend(tx.isDoubleSpend());
             txSummary.setFee(tx.getFee());
 
-            if (txSummary.getDirection() == Direction.RECEIVED) {
+            if (txSummary.getTransactionType() == TransactionType.RECEIVED) {
                 BigInteger total = calculateTotalReceived(txSummary.outputsMap);
                 txSummary.setTotal(total);
             } else {
@@ -363,7 +360,7 @@ public class MultiAddressFactory {
                         txSummary.inputsMap,
                         changeMap,
                         tx.getFee(),
-                        txSummary.getDirection());
+                        txSummary.getTransactionType());
                 txSummary.setTotal(total);
             }
 
@@ -387,12 +384,12 @@ public class MultiAddressFactory {
 
     private void filterOwnedAddresses(List<String> ownAddressesAndXpubs,
                                       HashMap<String, BigInteger> inputsMap,
-                                      HashMap<String, BigInteger> outputsMap, Direction direction) {
+                                      HashMap<String, BigInteger> outputsMap, TransactionType transactionType) {
 
         Iterator<Entry<String, BigInteger>> iterator = inputsMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Entry<String, BigInteger> item = iterator.next();
-            if (!ownAddressesAndXpubs.contains(item.getKey()) && direction.equals(Direction.SENT)) {
+            if (!ownAddressesAndXpubs.contains(item.getKey()) && transactionType.equals(TransactionType.SENT)) {
                 iterator.remove();
             }
         }
@@ -400,7 +397,7 @@ public class MultiAddressFactory {
         iterator = outputsMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Entry<String, BigInteger> item = iterator.next();
-            if (!ownAddressesAndXpubs.contains(item.getKey()) && direction.equals(Direction.RECEIVED)) {
+            if (!ownAddressesAndXpubs.contains(item.getKey()) && transactionType.equals(TransactionType.RECEIVED)) {
                 iterator.remove();
             }
         }
@@ -419,7 +416,7 @@ public class MultiAddressFactory {
 
     private BigInteger calculateTotalSent(HashMap<String, BigInteger> inputsMap,
                                           HashMap<String, BigInteger> changeMap,
-                                          BigInteger fee, Direction direction) {
+                                          BigInteger fee, TransactionType transactionType) {
 
         BigInteger total = BigInteger.ZERO;
 
@@ -431,7 +428,7 @@ public class MultiAddressFactory {
             total = total.subtract(change);
         }
 
-        if (direction == Direction.TRANSFERRED) {
+        if (transactionType == TransactionType.TRANSFERRED) {
             total = total.subtract(fee);
         }
 

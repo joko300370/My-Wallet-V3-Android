@@ -14,12 +14,12 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -117,7 +117,7 @@ open class CustodialTradingAccount(
             }
 
     private fun buyOrderToSummary(buyOrder: BuyOrder): ActivitySummaryItem =
-        CustodialActivitySummaryItem(
+        CustodialTradingActivitySummaryItem(
             exchangeRates = exchangeRates,
             cryptoCurrency = buyOrder.crypto.currency,
             value = buyOrder.crypto,
@@ -135,7 +135,7 @@ open class CustodialTradingAccount(
     private fun Single<ActivitySummaryList>.filterActivityStates(): Single<ActivitySummaryList> {
         return flattenAsObservable { list ->
             list.filter {
-                it is CustodialActivitySummaryItem && displayedStates.contains(it.status)
+                it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)
             }
         }.toList()
     }

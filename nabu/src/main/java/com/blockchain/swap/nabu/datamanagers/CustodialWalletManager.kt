@@ -2,6 +2,8 @@ package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
+import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -9,6 +11,7 @@ import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -121,10 +124,57 @@ interface CustodialWalletManager {
 
     fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String>
 
+    fun getInterestActivity(crypto: CryptoCurrency): Single<List<InterestActivityItem>>
+
     fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits>
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
+}
+
+data class InterestActivityItem(
+    val value: CryptoValue,
+    val cryptoCurrency: CryptoCurrency,
+    val id: String,
+    val insertedAt: Date,
+    val state: InterestState,
+    val type: TransactionSummary.TransactionType,
+    val extraAttributes: InterestAttributes?
+) {
+    companion object {
+        fun toInterestState(state: String): InterestState =
+            when (state) {
+                InterestActivityItemResponse.FAILED -> InterestState.FAILED
+                InterestActivityItemResponse.REJECTED -> InterestState.REJECTED
+                InterestActivityItemResponse.PROCESSING -> InterestState.PROCESSING
+                InterestActivityItemResponse.COMPLETE -> InterestState.COMPLETE
+                InterestActivityItemResponse.PENDING -> InterestState.PENDING
+                InterestActivityItemResponse.MANUAL_REVIEW -> InterestState.MANUAL_REVIEW
+                InterestActivityItemResponse.CLEARED -> InterestState.CLEARED
+                InterestActivityItemResponse.REFUNDED -> InterestState.REFUNDED
+                else -> InterestState.UNKNOWN
+            }
+
+        fun toTransactionType(type: String) =
+            when (type) {
+                InterestActivityItemResponse.DEPOSIT -> TransactionSummary.TransactionType.DEPOSIT
+                InterestActivityItemResponse.WITHDRAWAL -> TransactionSummary.TransactionType.WITHDRAW
+                InterestActivityItemResponse.INTEREST_OUTGOING -> TransactionSummary.TransactionType.INTEREST_EARNED
+                else -> TransactionSummary.TransactionType.UNKNOWN
+            }
+    }
+}
+
+enum class InterestState {
+    FAILED,
+    REJECTED,
+    PROCESSING,
+    COMPLETE,
+    PENDING,
+    MANUAL_REVIEW,
+    CLEARED,
+    REFUNDED,
+    UNKNOWN
 }
 
 data class BuyOrder(
@@ -171,11 +221,14 @@ data class FiatTransaction(
 )
 
 enum class TransactionType {
-    DEPOSIT, WITHDRAWAL, UNKNOWN
+    DEPOSIT,
+    WITHDRAWAL,
+    UNKNOWN
 }
 
 enum class TransactionState {
-    COMPLETED, UNKNOWN
+    COMPLETED,
+    UNKNOWN
 }
 
 data class SimpleBuyPairs(val pairs: List<SimpleBuyPair>)
@@ -209,7 +262,8 @@ sealed class SimpleBuyError : Throwable() {
     object WithdrawlInsufficientFunds : SimpleBuyError()
 }
 
-sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) : Serializable {
+sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
+    Serializable {
     object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
     data class BankTransfer(override val limits: PaymentLimits) :
         PaymentMethod(BANK_PAYMENT_ID, limits, BANK_PAYMENT_METHOD_ORDER)
@@ -217,7 +271,11 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     data class UndefinedCard(override val limits: PaymentLimits) :
         PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER)
 
-    data class Funds(val balance: FiatValue, val fiatCurrency: String, override val limits: PaymentLimits) :
+    data class Funds(
+        val balance: FiatValue,
+        val fiatCurrency: String,
+        override val limits: PaymentLimits
+    ) :
         PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER)
 
     data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :

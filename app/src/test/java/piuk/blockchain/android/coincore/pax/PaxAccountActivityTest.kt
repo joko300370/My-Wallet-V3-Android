@@ -107,7 +107,7 @@ class PaxAccountActivityTest {
                     !isFeeTransaction &&
                     confirmations == 3 &&
                     timeStampMs == 1557334297000L &&
-                    direction == TransactionSummary.Direction.SENT &&
+                    transactionType == TransactionSummary.TransactionType.SENT &&
                     txId == "0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff" &&
                     confirmations == 3 &&
                     value == CryptoValue.fromMinor(CryptoCurrency.PAX, 10000.toBigInteger()) &&

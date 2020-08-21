@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
+import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.ui.urllinks.makeBlockExplorerUrl
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
+import piuk.blockchain.android.ui.activity.CryptoAccountType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -82,44 +84,87 @@ class CryptoActivityDetailsBottomSheet :
             title.text = if (newState.isFeeTransaction) {
                 getString(R.string.activity_details_title_fee)
             } else {
-                mapToAction(newState.direction)
+                newState.transactionType?.let {
+                    mapToAction(newState.transactionType)
+                }
             }
             amount.text = newState.amount?.toStringWithSymbol()
 
-            if (newState.direction == TransactionSummary.Direction.BUY) {
-                if (newState.isPending || newState.isPendingExecution) {
-                    custodial_tx_button.text =
-                        getString(R.string.activity_details_view_bank_transfer_details)
-                    custodial_tx_button.setOnClickListener {
-                        host.onShowBankDetailsSelected()
-                        dismiss()
-                    }
-                } else {
-                    custodial_tx_button.text =
-                        getString(R.string.activity_details_buy_again)
-                    custodial_tx_button.setOnClickListener {
-                        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
-                        compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
-                            AndroidSchedulers.mainThread())
-                            .subscribe {
-                                startActivity(SimpleBuyActivity.newInstance(requireContext(), true))
-                                dismiss()
-                            }
-                    }
-                }
+            newState.transactionType?.let {
+                showTransactionTypeUi(newState, dialogView)
 
-                custodial_tx_button.visible()
+                renderCompletedOrPending(newState.isPending, newState.isPendingExecution,
+                    newState.confirmations, newState.totalConfirmations, newState.transactionType,
+                    newState.isFeeTransaction)
             }
         }
-
-        renderCompletedOrPending(newState.isPending, newState.isPendingExecution,
-            newState.confirmations, newState.totalConfirmations, newState.direction,
-            newState.isFeeTransaction)
 
         if (listAdapter.items != newState.listOfItems) {
             listAdapter.items = newState.listOfItems.toList()
             listAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun showInterestUi(
+        newState: ActivityDetailState,
+        dialogView: View
+    ) {
+        if (newState.isPending) {
+            dialogView.status.text = getString(
+                when (newState.interestState) {
+                    InterestState.PENDING -> R.string.activity_details_label_pending
+                    InterestState.MANUAL_REVIEW -> R.string.activity_details_label_manual_review
+                    InterestState.PROCESSING -> R.string.activity_details_label_processing
+                    else -> R.string.empty
+                })
+
+            showPendingPill()
+
+            if (newState.transactionType == TransactionSummary.TransactionType.DEPOSIT) {
+                showConfirmationUi(newState.confirmations, newState.totalConfirmations)
+            }
+        } else {
+            showCompletePill()
+        }
+    }
+
+    private fun showTransactionTypeUi(state: ActivityDetailState, view: View) {
+        if (state.transactionType == TransactionSummary.TransactionType.BUY) {
+            showBuyUi(state, view)
+        } else if (state.transactionType == TransactionSummary.TransactionType.INTEREST_EARNED ||
+            state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
+            state.transactionType == TransactionSummary.TransactionType.WITHDRAW) {
+
+            showInterestUi(state, dialogView)
+        }
+    }
+
+    private fun showBuyUi(
+        state: ActivityDetailState,
+        view: View
+    ) {
+        if (state.isPending || state.isPendingExecution) {
+            view.custodial_tx_button.text =
+                getString(R.string.activity_details_view_bank_transfer_details)
+            view.custodial_tx_button.setOnClickListener {
+                host.onShowBankDetailsSelected()
+                dismiss()
+            }
+        } else {
+            view.custodial_tx_button.text =
+                getString(R.string.activity_details_buy_again)
+            view.custodial_tx_button.setOnClickListener {
+                analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
+                compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
+                    AndroidSchedulers.mainThread())
+                    .subscribe {
+                        startActivity(SimpleBuyActivity.newInstance(requireContext(), true))
+                        dismiss()
+                    }
+            }
+        }
+
+        view.custodial_tx_button.visible()
     }
 
     private fun showDescriptionUpdate(descriptionState: DescriptionState) {
@@ -140,28 +185,20 @@ class CryptoActivityDetailsBottomSheet :
         pendingExecution: Boolean,
         confirmations: Int,
         totalConfirmations: Int,
-        direction: TransactionSummary.Direction?,
+        transactionType: TransactionSummary.TransactionType?,
         isFeeTransaction: Boolean
     ) {
         dialogView.apply {
             if (pending || pendingExecution) {
-                if (confirmations != totalConfirmations) {
-                    confirmation_label.text =
-                        getString(R.string.activity_details_label_confirmations, confirmations,
-                            totalConfirmations)
-                    confirmation_progress.setProgress(
-                        (confirmations / totalConfirmations.toFloat()) * 100)
-                    confirmation_label.visible()
-                    confirmation_progress.visible()
-                }
+                showConfirmationUi(confirmations, totalConfirmations)
 
                 status.text = getString(when {
-                    direction == TransactionSummary.Direction.SENT ||
-                        direction == TransactionSummary.Direction.TRANSFERRED -> {
+                    transactionType == TransactionSummary.TransactionType.SENT ||
+                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }
-                    isFeeTransaction || direction == TransactionSummary.Direction.SWAP -> {
+                    isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP -> {
                         if (isFeeTransaction) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
                         } else {
@@ -169,7 +206,7 @@ class CryptoActivityDetailsBottomSheet :
                         }
                         R.string.activity_details_label_pending
                     }
-                    direction == TransactionSummary.Direction.BUY ->
+                    transactionType == TransactionSummary.TransactionType.BUY ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds
@@ -179,18 +216,47 @@ class CryptoActivityDetailsBottomSheet :
                         }
                     else -> R.string.activity_details_label_confirming
                 })
-                status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
-                status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.grey_800))
+                showPendingPill()
             } else {
-                status.text = getString(R.string.activity_details_label_complete)
-                status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_received)
-                status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.green_600))
-                logAnalyticsForComplete(direction, isFeeTransaction)
+                showCompletePill()
+                logAnalyticsForComplete(transactionType, isFeeTransaction)
             }
+        }
+    }
+
+    private fun showConfirmationUi(
+        confirmations: Int,
+        totalConfirmations: Int
+    ) {
+        if (confirmations != totalConfirmations) {
+            dialogView.apply {
+                confirmation_label.text =
+                    getString(R.string.activity_details_label_confirmations, confirmations,
+                        totalConfirmations)
+                confirmation_progress.setProgress(
+                    (confirmations / totalConfirmations.toFloat()) * 100)
+                confirmation_label.visible()
+                confirmation_progress.visible()
+            }
+        }
+    }
+
+    private fun showPendingPill() {
+        dialogView.apply {
+            status.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
+            status.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.grey_800))
+        }
+    }
+
+    private fun showCompletePill() {
+        dialogView.apply {
+            status.text = getString(R.string.activity_details_label_complete)
+            status.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_received)
+            status.setTextColor(
+                ContextCompat.getColor(requireContext(), R.color.green_600))
         }
     }
 
@@ -214,16 +280,22 @@ class CryptoActivityDetailsBottomSheet :
         }
     }
 
-    private fun mapToAction(direction: TransactionSummary.Direction?): String =
-        when (direction) {
-            TransactionSummary.Direction.TRANSFERRED -> getString(
+    private fun mapToAction(transactionType: TransactionSummary.TransactionType?): String =
+        when (transactionType) {
+            TransactionSummary.TransactionType.TRANSFERRED -> getString(
                 R.string.activity_details_title_transferred)
-            TransactionSummary.Direction.RECEIVED -> getString(
+            TransactionSummary.TransactionType.RECEIVED -> getString(
                 R.string.activity_details_title_received)
-            TransactionSummary.Direction.SENT -> getString(R.string.activity_details_title_sent)
-            TransactionSummary.Direction.BUY -> getString(R.string.activity_details_title_buy)
-            TransactionSummary.Direction.SELL -> getString(R.string.activity_details_title_sell)
-            TransactionSummary.Direction.SWAP -> getString(R.string.activity_details_title_swap)
+            TransactionSummary.TransactionType.SENT -> getString(R.string.activity_details_title_sent)
+            TransactionSummary.TransactionType.BUY -> getString(R.string.activity_details_title_buy)
+            TransactionSummary.TransactionType.SELL -> getString(R.string.activity_details_title_sell)
+            TransactionSummary.TransactionType.SWAP -> getString(R.string.activity_details_title_swap)
+            TransactionSummary.TransactionType.DEPOSIT -> getString(
+                R.string.activity_details_title_deposit)
+            TransactionSummary.TransactionType.WITHDRAW -> getString(
+                R.string.activity_details_title_withdraw)
+            TransactionSummary.TransactionType.INTEREST_EARNED -> getString(
+                R.string.activity_details_title_interest_earned)
             else -> ""
         }
 
@@ -231,29 +303,29 @@ class CryptoActivityDetailsBottomSheet :
         when {
             currentState.isFeeTransaction ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_FEE_VIEW_EXPLORER)
-            currentState.direction == TransactionSummary.Direction.SENT ->
+            currentState.transactionType == TransactionSummary.TransactionType.SENT ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_SEND_VIEW_EXPLORER)
-            currentState.direction == TransactionSummary.Direction.SWAP ->
+            currentState.transactionType == TransactionSummary.TransactionType.SWAP ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_VIEW_EXPLORER)
-            currentState.direction == TransactionSummary.Direction.RECEIVED ->
+            currentState.transactionType == TransactionSummary.TransactionType.RECEIVED ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_RECEIVE_VIEW_EXPLORER)
         }
     }
 
     private fun logAnalyticsForComplete(
-        direction: TransactionSummary.Direction?,
+        transactionType: TransactionSummary.TransactionType?,
         isFeeTransaction: Boolean
     ) {
         when {
             isFeeTransaction ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_FEE_COMPLETE)
-            direction == TransactionSummary.Direction.SENT ->
+            transactionType == TransactionSummary.TransactionType.SENT ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_SEND_COMPLETE)
-            direction == TransactionSummary.Direction.SWAP ->
+            transactionType == TransactionSummary.TransactionType.SWAP ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_COMPLETE)
-            direction == TransactionSummary.Direction.BUY ->
+            transactionType == TransactionSummary.TransactionType.BUY ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_BUY_COMPLETE)
-            direction == TransactionSummary.Direction.RECEIVED ->
+            transactionType == TransactionSummary.TransactionType.RECEIVED ->
                 analytics.logEvent(ActivityAnalytics.DETAILS_RECEIVE_COMPLETE)
         }
     }
@@ -261,9 +333,9 @@ class CryptoActivityDetailsBottomSheet :
     private fun loadActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String,
-        isCustodial: Boolean
+        accountType: CryptoAccountType
     ) {
-        model.process(LoadActivityDetailsIntent(cryptoCurrency, txHash, isCustodial))
+        model.process(LoadActivityDetailsIntent(cryptoCurrency, txHash, accountType))
     }
 
     override fun onDestroy() {
@@ -274,21 +346,19 @@ class CryptoActivityDetailsBottomSheet :
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto_currency"
         private const val ARG_TRANSACTION_HASH = "tx_hash"
-        private const val ARG_CUSTODIAL_TRANSACTION = "custodial_tx"
 
         fun newInstance(
             cryptoCurrency: CryptoCurrency,
             txHash: String,
-            isCustodial: Boolean
+            accountType: CryptoAccountType
         ): CryptoActivityDetailsBottomSheet {
             return CryptoActivityDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                     putString(ARG_TRANSACTION_HASH, txHash)
-                    putBoolean(ARG_CUSTODIAL_TRANSACTION, isCustodial)
                 }
 
-                loadActivityDetails(cryptoCurrency, txHash, isCustodial)
+                loadActivityDetails(cryptoCurrency, txHash, accountType)
             }
         }
     }

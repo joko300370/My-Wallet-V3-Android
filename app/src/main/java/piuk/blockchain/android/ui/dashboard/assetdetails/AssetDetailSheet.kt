@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.android.coincore.ENABLE_INTEREST_ACTIONS
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -186,18 +185,12 @@ class AssetDetailSheet :
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }
 
-        if (assetFilter == AssetFilter.Interest && !ENABLE_INTEREST_ACTIONS) {
-            // do nothing
-            // TODO must check if user has KYC'd - if not launch info sheet about KYC (screen 0.1 of Earn flow)
-            // TODO FYI for users https://blockchain.atlassian.net/browse/AND-3458
-        } else {
-            state.assetDisplayMap?.get(assetFilter)?.let {
-                val currentBalance = it.amount
-                val currentFiatBalance = it.fiatValue
-                model.process(
-                    ShowAssetActionsIntent(account, assetFilter, currentBalance, currentFiatBalance)
-                )
-            }
+        state.assetDisplayMap?.get(assetFilter)?.let {
+            val currentBalance = it.amount
+            val currentFiatBalance = it.fiatValue
+            model.process(
+                ShowAssetActionsIntent(account, assetFilter, currentBalance, currentFiatBalance)
+            )
         }
     }
 

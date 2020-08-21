@@ -20,8 +20,8 @@ internal class BtcActivitySummaryItem(
 
     override val cryptoCurrency = CryptoCurrency.BTC
 
-    override val direction: TransactionSummary.Direction
-        get() = transactionSummary.direction
+    override val transactionType: TransactionSummary.TransactionType
+        get() = transactionSummary.transactionType
 
     override val timeStampMs = transactionSummary.time * 1000
 

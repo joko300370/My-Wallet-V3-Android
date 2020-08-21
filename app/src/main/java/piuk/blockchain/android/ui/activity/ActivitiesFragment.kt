@@ -61,7 +61,9 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
         ActivitiesDelegateAdapter(
             disposables = disposables,
             prefs = get(),
-            onCryptoItemClicked = { cc, tx, isCustodial -> onCryptoActivityClicked(cc, tx, isCustodial) },
+            onCryptoItemClicked = { cc, tx, type ->
+                onCryptoActivityClicked(cc, tx, type)
+            },
             onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) },
             analytics = get()
         )
@@ -110,7 +112,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                     newState.selectedCryptoCurrency?.let {
                         showBottomSheet(
                             CryptoActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId,
-                                newState.isCustodial))
+                                newState.accountType))
                     }
                 }
                 ActivitiesSheet.FIAT_ACTIVITY_DETAILS -> {
@@ -280,9 +282,9 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private fun onCryptoActivityClicked(
         cryptoCurrency: CryptoCurrency,
         txHash: String,
-        isCustodial: Boolean
+        type: CryptoAccountType
     ) {
-        model.process(ShowActivityDetailsIntent(cryptoCurrency, txHash, isCustodial))
+        model.process(ShowActivityDetailsIntent(cryptoCurrency, txHash, type))
     }
 
     private fun onFiatActivityClicked(

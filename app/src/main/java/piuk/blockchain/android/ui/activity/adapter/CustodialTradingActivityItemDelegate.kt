@@ -11,40 +11,41 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
+import piuk.blockchain.android.ui.activity.CryptoAccountType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.util.Date
 
-class CustodialActivityItemDelegate<in T>(
-    private val onItemClicked: (CryptoCurrency, String, Boolean) -> Unit // crypto, txID, isCustodial
+class CustodialTradingActivityItemDelegate<in T>(
+    private val onItemClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is CustodialActivitySummaryItem
+        items[position] is CustodialTradingActivitySummaryItem
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        CustodialActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
+        CustodialTradingActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
 
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as CustodialActivityItemViewHolder).bind(
-        items[position] as CustodialActivitySummaryItem,
+    ) = (holder as CustodialTradingActivityItemViewHolder).bind(
+        items[position] as CustodialTradingActivitySummaryItem,
         onItemClicked
     )
 }
 
-private class CustodialActivityItemViewHolder(
+private class CustodialTradingActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
     internal fun bind(
-        tx: CustodialActivitySummaryItem,
-        onAccountClicked: (CryptoCurrency, String, Boolean) -> Unit
+        tx: CustodialTradingActivitySummaryItem,
+        onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
     ) {
         with(itemView) {
             icon.setIcon(tx.status)
@@ -67,7 +68,9 @@ private class CustodialActivityItemViewHolder(
                 asset_balance_crypto.text =
                     context.getString(R.string.activity_custodial_pending_value)
             }
-            setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, true) }
+            setOnClickListener {
+                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.CUSTODIAL_TRADING)
+            }
         }
     }
 
@@ -112,7 +115,7 @@ private fun TextView.setTxLabel(cryptoCurrency: CryptoCurrency) {
     text = context.resources.getString(R.string.tx_title_buy, cryptoCurrency.displayTicker)
 }
 
-private fun TextView.setTxStatus(tx: CustodialActivitySummaryItem) {
+private fun TextView.setTxStatus(tx: CustodialTradingActivitySummaryItem) {
     text = when (tx.status) {
         OrderState.FINISHED -> Date(tx.timeStampMs).toFormattedDate()
         OrderState.UNINITIALISED -> context.getString(R.string.activity_state_uninitialised)

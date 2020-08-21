@@ -6,7 +6,7 @@ import com.blockchain.swap.nabu.models.interest.InterestLimitsResponse
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonReader
 
-class InterestMapAdapter {
+class InterestLimitsMapAdapter {
     @FromJson
     fun fromJson(reader: JsonReader): InterestLimitsFullResponse {
         val map = mutableMapOf<String, InterestLimitsResponse>()

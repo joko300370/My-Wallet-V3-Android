@@ -15,7 +15,6 @@ import piuk.blockchain.android.ui.activity.detail.BuyCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.BuyFee
 import piuk.blockchain.android.ui.activity.detail.BuyPaymentMethod
 import piuk.blockchain.android.ui.activity.detail.BuyPurchaseAmount
-import piuk.blockchain.android.ui.activity.detail.BuyTransactionId
 import piuk.blockchain.android.ui.activity.detail.CancelAction
 import piuk.blockchain.android.ui.activity.detail.Created
 import piuk.blockchain.android.ui.activity.detail.Description
@@ -24,6 +23,7 @@ import piuk.blockchain.android.ui.activity.detail.FeeForTransaction
 import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.To
+import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
@@ -68,16 +68,17 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 is Fee -> R.string.activity_details_fee
                 is Value -> R.string.activity_details_value
                 is HistoricValue -> {
-                    when (infoType.direction) {
-                        TransactionSummary.Direction.SENT,
-                        TransactionSummary.Direction.SELL ->
+                    when (infoType.transactionType) {
+                        TransactionSummary.TransactionType.SENT,
+                        TransactionSummary.TransactionType.SELL ->
                             R.string.activity_details_historic_sent
-                        TransactionSummary.Direction.RECEIVED,
-                        TransactionSummary.Direction.BUY ->
+                        TransactionSummary.TransactionType.RECEIVED,
+                        TransactionSummary.TransactionType.BUY ->
                             R.string.activity_details_historic_received
-                        TransactionSummary.Direction.TRANSFERRED,
-                        TransactionSummary.Direction.SWAP
+                        TransactionSummary.TransactionType.TRANSFERRED,
+                        TransactionSummary.TransactionType.SWAP
                         -> R.string.activity_details_historic_transferred
+                        else -> R.string.empty
                     }
                 }
                 is To -> R.string.activity_details_to
@@ -85,7 +86,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 is FeeForTransaction -> R.string.activity_details_transaction_fee
                 is BuyFee -> R.string.activity_details_buy_fees
                 is BuyPurchaseAmount -> R.string.activity_details_buy_purchase_amount
-                is BuyTransactionId -> R.string.activity_details_buy_tx_id
+                is TransactionId -> R.string.activity_details_buy_tx_id
                 is BuyCryptoWallet -> R.string.activity_details_buy_sending_to
                 is BuyPaymentMethod -> R.string.activity_details_buy_payment_method
                 else -> R.string.empty
@@ -107,8 +108,8 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is From -> infoType.fromAddress ?: parent.context.getString(
                 R.string.activity_details_from_load_fail)
             is FeeForTransaction -> {
-                when (infoType.direction) {
-                    TransactionSummary.Direction.SENT -> parent.context.getString(
+                when (infoType.transactionType) {
+                    TransactionSummary.TransactionType.SENT -> parent.context.getString(
                         R.string.activity_details_transaction_fee_send,
                         infoType.cryptoValue.toStringWithSymbol())
                     else -> parent.context.getString(
@@ -117,7 +118,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             }
             is BuyFee -> infoType.feeValue.toStringWithSymbol()
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
-            is BuyTransactionId -> infoType.txId
+            is TransactionId -> infoType.txId
             is BuyCryptoWallet -> parent.context.getString(R.string.custodial_wallet_default_label,
                 parent.context.getString(infoType.crypto.assetName()))
             is BuyPaymentMethod -> {

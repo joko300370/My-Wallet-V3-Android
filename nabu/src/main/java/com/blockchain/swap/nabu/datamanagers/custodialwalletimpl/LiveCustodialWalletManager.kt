@@ -12,6 +12,7 @@ import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
+import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
@@ -35,6 +36,7 @@ import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
+import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
@@ -515,6 +517,27 @@ class LiveCustodialWalletManager(
                 }
             }
 
+    override fun getInterestActivity(crypto: CryptoCurrency): Single<List<InterestActivityItem>> =
+        kycFeatureEligibility.isEligibleFor(Feature.INTEREST_RATES)
+            .onErrorReturnItem(false)
+            .flatMap { eligible ->
+                if (eligible) {
+                    authenticator.authenticate { sessionToken ->
+                        nabuService.getInterestActivity(sessionToken, crypto.networkTicker)
+                            .map { interestActivityResponse ->
+                                interestActivityResponse.body()?.items?.map {
+                                    val cryptoCurrency =
+                                        CryptoCurrency.fromNetworkTicker(it.amount.symbol)!!
+
+                                    it.toInterestActivityItem(cryptoCurrency)
+                                } ?: emptyList()
+                            }
+                    }
+                } else {
+                    Single.just(emptyList())
+                }
+            }
+
     override fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits> =
         interestLimitsRepository.getLimitForAsset(crypto)
 
@@ -701,6 +724,17 @@ private fun String.toPaymentMethodType(): PaymentMethodType =
         PaymentMethodResponse.FUNDS -> PaymentMethodType.FUNDS
         else -> PaymentMethodType.UNKNOWN
     }
+
+private fun InterestActivityItemResponse.toInterestActivityItem(cryptoCurrency: CryptoCurrency) =
+    InterestActivityItem(
+        value = CryptoValue.fromMinor(cryptoCurrency, amountMinor.toBigInteger()),
+        cryptoCurrency = cryptoCurrency,
+        id = id,
+        insertedAt = insertedAt.fromIso8601ToUtc() ?: Date(0),
+        state = InterestActivityItem.toInterestState(state),
+        type = InterestActivityItem.toTransactionType(type),
+        extraAttributes = extraAttributes
+    )
 
 interface PaymentAccountMapper {
     fun map(bankAccountResponse: BankAccountResponse): BankAccount?

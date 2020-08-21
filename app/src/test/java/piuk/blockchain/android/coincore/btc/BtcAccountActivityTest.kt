@@ -51,7 +51,7 @@ class BtcAccountActivityTest {
 
         val summary = TransactionSummary().apply {
             confirmations = 3
-            direction = TransactionSummary.Direction.RECEIVED
+            transactionType = TransactionSummary.TransactionType.RECEIVED
             fee = BigInteger.ONE
             total = BigInteger.TEN
             hash = "hash"

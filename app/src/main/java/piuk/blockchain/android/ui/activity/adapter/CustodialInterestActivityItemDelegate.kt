@@ -5,10 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.InterestState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,7 +17,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoAccountType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
@@ -28,56 +28,52 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.util.Date
 
-class NonCustodialActivityItemDelegate<in T>(
+class CustodialInterestActivityItemDelegate<in T>(
     private val disposables: CompositeDisposable,
     private val currencyPrefs: CurrencyPrefs,
     private val onItemClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is NonCustodialActivitySummaryItem
+        items[position] is CustodialInterestActivitySummaryItem
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        NonCustodialActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
+        CustodialInterestActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
 
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as NonCustodialActivityItemViewHolder).bind(
-        items[position] as NonCustodialActivitySummaryItem,
+    ) = (holder as CustodialInterestActivityItemViewHolder).bind(
+        items[position] as CustodialInterestActivitySummaryItem,
         disposables,
         currencyPrefs.selectedFiatCurrency,
         onItemClicked
     )
 }
 
-private class NonCustodialActivityItemViewHolder(
+private class CustodialInterestActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
     internal fun bind(
-        tx: NonCustodialActivitySummaryItem,
+        tx: CustodialInterestActivitySummaryItem,
         disposables: CompositeDisposable,
-        fiatCurrency: String,
+        selectedFiatCurrency: String,
         onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
     ) {
         with(itemView) {
-            if (tx.isConfirmed) {
-                icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
+            icon.setIcon(tx.isPending(), tx.type)
+            if (tx.status.isPending().not()) {
                 icon.setAssetIconColours(tx.cryptoCurrency, context)
-                status_date.text = Date(tx.timeStampMs).toFormattedDate()
             } else {
-                icon.setIsConfirming()
+                icon.background = null
+                icon.setColorFilter(Color.TRANSPARENT)
             }
-
-            tx_type.setTxLabel(tx.cryptoCurrency, tx.transactionType, tx.isFeeTransaction)
-
-            setTextColours(tx.isConfirmed)
 
             asset_balance_fiat.gone()
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            disposables += tx.totalFiatWhenExecuted(fiatCurrency)
+            disposables += tx.totalFiatWhenExecuted(selectedFiatCurrency)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = {
@@ -89,13 +85,19 @@ private class NonCustodialActivityItemViewHolder(
                     }
                 )
 
-            setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.NON_CUSTODIAL) }
+            tx_type.setTxLabel(tx.cryptoCurrency, tx.type)
+            status_date.setTxStatus(tx)
+            setTextColours(tx.status)
+
+            setOnClickListener {
+                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.CUSTODIAL_INTEREST)
+            }
         }
     }
 
-    private fun setTextColours(isConfirmed: Boolean) {
+    private fun setTextColours(txStatus: InterestState) {
         with(itemView) {
-            if (isConfirmed) {
+            if (txStatus == InterestState.COMPLETE) {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
                 status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
                 asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.black))
@@ -110,57 +112,54 @@ private class NonCustodialActivityItemViewHolder(
     }
 }
 
-private fun ImageView.setTransactionTypeIcon(
-    transactionType: TransactionSummary.TransactionType,
-    isFeeTransaction: Boolean
-) {
+private fun InterestState.isPending(): Boolean =
+    this == InterestState.PENDING ||
+        this == InterestState.PROCESSING ||
+        this == InterestState.MANUAL_REVIEW
+
+private fun ImageView.setIcon(txPending: Boolean, type: TransactionSummary.TransactionType) =
     setImageResource(
-        if (isFeeTransaction) {
-            R.drawable.ic_tx_sent
+        if (txPending) {
+            R.drawable.ic_tx_confirming
         } else {
-            when (transactionType) {
-                TransactionSummary.TransactionType.TRANSFERRED -> R.drawable.ic_tx_transfer
-                TransactionSummary.TransactionType.RECEIVED -> R.drawable.ic_tx_receive
-                TransactionSummary.TransactionType.SENT -> R.drawable.ic_tx_sent
-                TransactionSummary.TransactionType.BUY -> R.drawable.ic_tx_buy
-                TransactionSummary.TransactionType.SELL -> R.drawable.ic_tx_sell
-                TransactionSummary.TransactionType.SWAP -> R.drawable.ic_tx_swap
+            when (type) {
+                TransactionSummary.TransactionType.DEPOSIT -> R.drawable.ic_tx_buy
+                TransactionSummary.TransactionType.INTEREST_EARNED -> R.drawable.ic_tx_interest
+                TransactionSummary.TransactionType.WITHDRAW -> R.drawable.ic_tx_sell
                 else -> R.drawable.ic_tx_buy
             }
         }
     )
-}
-
-private fun ImageView.setIsConfirming() =
-    icon.apply {
-        setImageDrawable(
-            AppCompatResources.getDrawable(
-                context,
-                R.drawable.ic_tx_confirming
-            )
-        )
-        background = null
-        setColorFilter(Color.TRANSPARENT)
-    }
 
 private fun TextView.setTxLabel(
     cryptoCurrency: CryptoCurrency,
-    transactionType: TransactionSummary.TransactionType,
-    isFeeTransaction: Boolean
+    type: TransactionSummary.TransactionType
 ) {
-    val resId = if (isFeeTransaction) {
-        R.string.tx_title_fee
-    } else {
-        when (transactionType) {
-            TransactionSummary.TransactionType.TRANSFERRED -> R.string.tx_title_transfer
-            TransactionSummary.TransactionType.RECEIVED -> R.string.tx_title_receive
-            TransactionSummary.TransactionType.SENT -> R.string.tx_title_send
-            TransactionSummary.TransactionType.BUY -> R.string.tx_title_buy
-            TransactionSummary.TransactionType.SELL -> R.string.tx_title_sell
-            TransactionSummary.TransactionType.SWAP -> R.string.tx_title_swap
-            else -> R.string.empty
-        }
+    text = when (type) {
+        TransactionSummary.TransactionType.DEPOSIT -> context.resources.getString(
+            R.string.tx_title_deposit,
+            cryptoCurrency.displayTicker)
+        TransactionSummary.TransactionType.INTEREST_EARNED -> context.resources.getString(
+            R.string.tx_title_interest,
+            cryptoCurrency.displayTicker)
+        TransactionSummary.TransactionType.WITHDRAW -> context.resources.getString(
+            R.string.tx_title_withdraw,
+            cryptoCurrency.displayTicker)
+        else -> context.resources.getString(R.string.tx_title_deposit,
+            cryptoCurrency.displayTicker)
     }
+}
 
-    text = context.resources.getString(resId, cryptoCurrency.displayTicker)
+private fun TextView.setTxStatus(tx: CustodialInterestActivitySummaryItem) {
+    text = when (tx.status) {
+        InterestState.COMPLETE -> Date(tx.timeStampMs).toFormattedDate()
+        InterestState.FAILED -> context.getString(R.string.activity_state_failed)
+        InterestState.CLEARED -> context.getString(R.string.activity_state_cleared)
+        InterestState.REFUNDED -> context.getString(R.string.activity_state_refunded)
+        InterestState.PENDING -> context.getString(R.string.activity_state_pending)
+        InterestState.PROCESSING -> context.getString(R.string.activity_state_pending)
+        InterestState.MANUAL_REVIEW -> context.getString(R.string.activity_state_pending)
+        InterestState.REJECTED -> context.getString(R.string.activity_state_rejected)
+        InterestState.UNKNOWN -> context.getString(R.string.activity_state_unknown)
+    }
 }
