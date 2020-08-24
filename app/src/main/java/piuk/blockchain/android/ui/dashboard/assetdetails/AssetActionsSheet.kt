@@ -257,14 +257,14 @@ class AssetActionsSheet :
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
                 R.drawable.ic_tx_interest,
-                getString(R.string.dashboard_asset_actions_summary_dsc, asset.networkTicker),
+                getString(R.string.dashboard_asset_actions_summary_dsc, asset.displayTicker),
                 asset) {
                 // TODO in upcoming story
                 Timber.e("---- summary clicked")
             }
             AssetAction.Deposit -> AssetActionItem(getString(R.string.common_deposit),
                 R.drawable.ic_tx_deposit_arrow,
-                getString(R.string.dashboard_asset_actions_deposit_dsc, asset.networkTicker),
+                getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset) {
 
                 disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
