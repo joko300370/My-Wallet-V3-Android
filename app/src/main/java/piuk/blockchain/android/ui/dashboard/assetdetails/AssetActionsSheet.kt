@@ -81,7 +81,18 @@ class AssetActionsSheet :
 
         view.asset_actions_back.setOnClickListener {
             model.process(ReturnToPreviousStep)
+            dispose()
         }
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        dispose()
+    }
+
+    private fun dispose() {
+        disposables.dispose()
+        subscription?.dispose()
     }
 
     private fun showAssetBalances(state: AssetDetailsState) {
@@ -274,6 +285,7 @@ class AssetActionsSheet :
 
     private fun processAction(action: AssetAction) {
         model.process(HandleActionIntent(action))
+        subscription?.dispose()
     }
 
     companion object {

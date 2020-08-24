@@ -11,26 +11,21 @@ import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.StringUtils
 
 class ConfirmTransactionDelegateAdapter(
-    state: SendState,
-    model: SendModel,
     stringUtils: StringUtils,
-    activityContext: Activity
+    activityContext: Activity,
+    model: SendModel
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
 
     init {
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
             addAdapterDelegate(ConfirmInfoItemDelegate())
-            addAdapterDelegate(ConfirmNoteItemDelegate(state, model))
+            addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(
-                state,
                 model,
                 stringUtils,
                 activityContext))
-            addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(
-                state,
-                model
-            ))
+            addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(model))
         }
     }
 }
@@ -38,9 +33,18 @@ class ConfirmTransactionDelegateAdapter(
 sealed class ConfirmItemType
 
 class ConfirmInfoItem(val title: String, val label: String) : ConfirmItemType()
-class ConfirmNoteItem(val hint: String) : ConfirmItemType()
+class ConfirmNoteItem(
+    val hint: String,
+    val state: SendState
+) : ConfirmItemType()
+
 class ConfirmAgreementWithLinksItem(
     val uriMap: Map<String, Uri>,
-    @StringRes val mappedString: Int
+    @StringRes val mappedString: Int,
+    val state: SendState
 ) : ConfirmItemType()
-class ConfirmAgreementTextItem(val agreementText: SpannableStringBuilder) : ConfirmItemType()
+
+class ConfirmAgreementTextItem(
+    val agreementText: SpannableStringBuilder,
+    val state: SendState
+) : ConfirmItemType()

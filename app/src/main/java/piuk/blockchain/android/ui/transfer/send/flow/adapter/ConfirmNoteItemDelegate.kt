@@ -16,11 +16,9 @@ import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
-import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmNoteItemDelegate<in T>(
-    private val state: SendState,
     private val model: SendModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -39,7 +37,6 @@ class ConfirmNoteItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as NoteItemViewHolder).bind(
         items[position] as ConfirmNoteItem,
-        state,
         model
     )
 }
@@ -53,7 +50,6 @@ private class NoteItemViewHolder(val parent: View) :
 
     fun bind(
         item: ConfirmNoteItem,
-        state: SendState,
         model: SendModel
     ) {
 
@@ -64,7 +60,7 @@ private class NoteItemViewHolder(val parent: View) :
             setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
 
-                    state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
+                    item.state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
                         ?.let {
                             model.process(
                                 SendIntent.ModifyTxOption(it.copy(text = v.text.toString())))

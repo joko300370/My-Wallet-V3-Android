@@ -12,11 +12,9 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
-import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmAgreementToTransferItemDelegate<in T>(
-    private val state: SendState,
     private val model: SendModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -34,9 +32,8 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementTextItemViewHolder).bind(
-        state,
-        model,
-        items[position] as ConfirmAgreementTextItem
+        items[position] as ConfirmAgreementTextItem,
+        model
     )
 }
 
@@ -48,14 +45,13 @@ private class AgreementTextItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        state: SendState,
-        model: SendModel,
-        item: ConfirmAgreementTextItem
+        item: ConfirmAgreementTextItem,
+        model: SendModel
     ) {
         itemView.confirm_details_checkbox.setText(item.agreementText, TextView.BufferType.SPANNABLE)
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
+            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
                 ?.let {
                     model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
                 }

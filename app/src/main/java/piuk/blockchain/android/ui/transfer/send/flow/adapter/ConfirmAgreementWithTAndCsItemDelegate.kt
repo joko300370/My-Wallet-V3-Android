@@ -13,12 +13,10 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
-import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmAgreementWithTAndCsItemDelegate<in T>(
-    private val state: SendState,
     private val model: SendModel,
     private val stringUtils: StringUtils,
     private val activityContext: Activity
@@ -38,9 +36,8 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementItemViewHolder).bind(
-        state,
-        model,
         items[position] as ConfirmAgreementWithLinksItem,
+        model,
         stringUtils,
         activityContext
     )
@@ -54,9 +51,8 @@ private class AgreementItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        state: SendState,
-        model: SendModel,
         item: ConfirmAgreementWithLinksItem,
+        model: SendModel,
         stringUtils: StringUtils,
         activityContext: Activity
     ) {
@@ -70,7 +66,7 @@ private class AgreementItemViewHolder(val parent: View) :
         itemView.confirm_details_checkbox.movementMethod = LinkMovementMethod.getInstance()
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
+            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
                 ?.let {
                     model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
                 }

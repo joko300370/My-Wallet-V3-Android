@@ -43,14 +43,11 @@ class ConfirmTransactionSheet(
     private val exchangeRates: ExchangeRates by scopedInject()
     private val prefs: CurrencyPrefs by scopedInject()
 
-    private var state = SendState()
-
     private val customiser: SendFlowCustomiser by inject()
 
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
-            state,
-            model,
+            model = model,
             stringUtils = stringUtils,
             activityContext = requireActivity()
         )
@@ -64,8 +61,8 @@ class ConfirmTransactionSheet(
         require(newState.pendingTx != null)
 
         val itemList = mutableListOf<ConfirmItemType>(
-            ConfirmInfoItem(customiser.confirmListItemTitle(state),
-                state.sendAmount.toStringWithSymbol()),
+            ConfirmInfoItem(customiser.confirmListItemTitle(newState),
+                newState.sendAmount.toStringWithSymbol()),
             ConfirmInfoItem(getString(R.string.common_from), newState.sendingAccount.label),
             ConfirmInfoItem(getString(R.string.common_to), newState.sendTarget.label)
         )
@@ -84,8 +81,6 @@ class ConfirmTransactionSheet(
         dialogView.confirm_cta_button.text = customiser.confirmCtaText(newState)
         dialogView.confirm_sheet_title.text = customiser.confirmTitle(newState)
         dialogView.confirm_cta_button.isEnabled = newState.nextEnabled
-
-        state = newState
     }
 
     override fun initControls(view: View) {
@@ -128,21 +123,21 @@ class ConfirmTransactionSheet(
     ) {
         val note = state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
         note?.let { opt ->
-            itemList.add(ConfirmNoteItem(opt.text))
+            itemList.add(ConfirmNoteItem(opt.text, state))
         }
 
         val linkAgreement =
             state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
                 TxOption.AGREEMENT_INTEREST_T_AND_C)
         linkAgreement?.let {
-            setupTosAndPPLinks(itemList)
+            setupTosAndPPLinks(itemList, state)
         }
 
         val textAgreement =
             state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
                 TxOption.AGREEMENT_INTEREST_TRANSFER)
         textAgreement?.let {
-            setupHoldingValues(state.sendAmount, itemList)
+            setupHoldingValues(state.sendAmount, itemList, state)
         }
     }
 
@@ -160,19 +155,20 @@ class ConfirmTransactionSheet(
         return null
     }
 
-    private fun setupTosAndPPLinks(itemList: MutableList<ConfirmItemType>) {
+    private fun setupTosAndPPLinks(itemList: MutableList<ConfirmItemType>, state: SendState) {
         val linksMap = mapOf<String, Uri>(
             "interest_tos" to Uri.parse(INTEREST_TERMS_OF_SERVICE),
             "interest_pp" to Uri.parse(INTEREST_PRIVACY_POLICY)
         )
 
         itemList.add(
-            ConfirmAgreementWithLinksItem(linksMap, R.string.send_confirmation_interest_tos_pp))
+            ConfirmAgreementWithLinksItem(linksMap, R.string.send_confirmation_interest_tos_pp, state))
     }
 
     private fun setupHoldingValues(
         sendAmount: Money,
-        itemList: MutableList<ConfirmItemType>
+        itemList: MutableList<ConfirmItemType>,
+        state: SendState
     ) {
         val introToHolding = getString(R.string.send_confirmation_interest_holding_period_1)
         val amountInBold =
@@ -187,7 +183,7 @@ class ConfirmTransactionSheet(
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.append(outroToHolding)
 
-        itemList.add(ConfirmAgreementTextItem(sb))
+        itemList.add(ConfirmAgreementTextItem(sb, state))
     }
 
     private fun onCtaClick() {
