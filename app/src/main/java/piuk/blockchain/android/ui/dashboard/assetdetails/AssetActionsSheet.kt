@@ -57,10 +57,11 @@ class AssetActionsSheet :
 
     override fun render(newState: AssetDetailsState) {
         if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
-            showAssetBalances(newState)
 
             require(newState.selectedAccount != null)
             require(newState.assetFilter != null)
+
+            showAssetBalances(newState)
 
             val actionItems =
                 mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
@@ -87,6 +88,7 @@ class AssetActionsSheet :
 
     override fun dismiss() {
         super.dismiss()
+        model.process(ClearSheetDataIntent)
         dispose()
     }
 
