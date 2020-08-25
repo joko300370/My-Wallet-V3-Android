@@ -274,7 +274,13 @@ class SendModel(
             )
 }
 
-fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> =
-    take(1)
-        .doOnNext { onAction.invoke(it) }
-        .concatWith(skip(1))
+private var firstCall = true
+fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> {
+    firstCall = true
+    return this.doOnNext {
+        if (firstCall) {
+            onAction.invoke(it)
+            firstCall = false
+        }
+    }
+}

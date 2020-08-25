@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import timber.log.Timber
+import java.lang.IllegalStateException
 
 class SendInteractor(
     private val coincore: Coincore,
@@ -49,6 +50,11 @@ class SendInteractor(
         targetAddress: SendTarget
     ): Observable<PendingTx> =
         sourceAccount.createSendProcessor(targetAddress)
+            .doOnSubscribe { Timber.e("!SEND!> SUBSCRIBE") }
+            .doOnSuccess {
+                if (::transactionProcessor.isInitialized)
+                    throw IllegalStateException("TxProcessor double init")
+            }
             .doOnSuccess { transactionProcessor = it }
             .doOnError {
                 Timber.e("!SEND!> error initialising $it")

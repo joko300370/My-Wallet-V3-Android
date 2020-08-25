@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -27,6 +28,10 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
+import java.lang.Exception
+
+private class DashboardBalanceFailure(msg: String, e: Throwable)
+    : Exception(msg, e)
 
 class DashboardInteractor(
     private val coincore: Coincore,
@@ -35,7 +40,8 @@ class DashboardInteractor(
     private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val crashLogger: CrashLogger
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -64,6 +70,7 @@ class DashboardInteractor(
                                     },
                                     onError = { e ->
                                         Timber.e("Failed getting balance for PAX: $e")
+                                        logBalanceLoadError(CryptoCurrency.PAX, e)
                                         model.process(BalanceUpdateError(CryptoCurrency.PAX))
                                     }
                                 )
@@ -76,6 +83,7 @@ class DashboardInteractor(
                                     },
                                     onError = { e ->
                                         Timber.e("Failed getting balance for USDT: $e")
+                                        logBalanceLoadError(CryptoCurrency.USDT, e)
                                         model.process(BalanceUpdateError(CryptoCurrency.USDT))
                                     }
                                 )
@@ -95,6 +103,7 @@ class DashboardInteractor(
                         },
                         onError = { e ->
                             Timber.e("Failed getting balance for $it: $e")
+                            logBalanceLoadError(it, e)
                             model.process(BalanceUpdateError(it))
                         }
                     )
@@ -103,6 +112,12 @@ class DashboardInteractor(
         cd += checkForFiatBalances(model)
 
         return cd
+    }
+
+    private fun logBalanceLoadError(asset: CryptoCurrency, e: Throwable) {
+        crashLogger.logException(
+            DashboardBalanceFailure("Cannot load ${asset.networkTicker}", e)
+        )
     }
 
     private fun checkForFiatBalances(model: DashboardModel): Disposable =

@@ -684,7 +684,8 @@ val applicationModule = module {
                 currencyPrefs = get(),
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
-                analytics = get()
+                analytics = get(),
+                crashLogger = get()
             )
         }
 

@@ -169,7 +169,8 @@ val coincoreModule = module {
                     CryptoCurrency.ALGO to get<AlgoAsset>(),
                     CryptoCurrency.USDT to get<UsdtAsset>()
                 ),
-                defaultLabels = get()
+                defaultLabels = get(),
+                crashLogger = get()
             )
         }
 

@@ -132,15 +132,16 @@ class LauncherPresenter(
             // or select the default from device Locale
             if (!isNewAccount())
                 setCurrencyUnits(it)
-        }
-            .singleOrError()
+        }.singleOrError()
 
         val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
             .ignoreElements()
 
         compositeDisposable +=
-            settings.zipWith(metadata.toSingleDefault(true)).flatMap { (_, _) ->
+            settings.zipWith(
+                metadata.toSingleDefault(true)
+            ).flatMap { (_, _) ->
                 if (!shouldCheckForSimpleBuyLaunching())
                     Single.just(false)
                 else {

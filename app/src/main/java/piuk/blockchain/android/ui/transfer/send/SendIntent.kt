@@ -136,6 +136,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 errorState = SendErrorState.NONE,
+                sendTarget = sendTarget,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }

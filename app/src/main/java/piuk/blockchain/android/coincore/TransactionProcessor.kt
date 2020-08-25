@@ -9,6 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import timber.log.Timber
 
 open class TransferError(msg: String) : Exception(msg)
 
@@ -56,6 +57,7 @@ enum class TxOption {
     DESCRIPTION,
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
+    READ_ONLY_QUOTE
 }
 
 sealed class TxOptionValue {
@@ -89,9 +91,8 @@ abstract class TransactionProcessor(
 
     private val txObservable: BehaviorSubject<PendingTx> = BehaviorSubject.create()
 
-    private fun updatePendingTx(pendingTx: PendingTx) {
+    private fun updatePendingTx(pendingTx: PendingTx) =
         txObservable.onNext(pendingTx)
-    }
 
     private fun getPendingTx(): PendingTx =
         txObservable.value ?: throw IllegalStateException("TransactionProcessor not initialised")
@@ -125,13 +126,27 @@ abstract class TransactionProcessor(
     }
 
     fun updateAmount(amount: Money): Completable {
+        Timber.d("!SEND!> in UpdateAmount")
         val pendingTx = getPendingTx()
         if (!canTransactFiat && amount is FiatValue)
             throw IllegalArgumentException("The processor does not support fiat values")
 
         return doUpdateAmount(amount, pendingTx)
-            .flatMap { doValidateAmount(it) }
-            .doOnSuccess { updatePendingTx(it) }
+            .flatMap {
+                val isFreshTx = it.validationState == ValidationState.UNINITIALISED
+                doValidateAmount(it)
+                    .map { pendingTx ->
+                        // Remove initial "insufficient funds' warning
+                        if (amount.isZero && isFreshTx) {
+                            pendingTx.copy(validationState = ValidationState.UNINITIALISED)
+                        } else {
+                            pendingTx
+                        }
+                    }
+            }
+            .doOnSuccess {
+                updatePendingTx(it)
+            }
             .ignoreElement()
     }
 
@@ -169,9 +184,9 @@ abstract class TransactionProcessor(
             .doOnSuccess {
                 if (it.validationState != ValidationState.CAN_EXECUTE)
                     throw IllegalStateException("PendingTx is not executable")
-            }.doOnSuccess {
+            }.flatMapCompletable {
                 doExecute(it, secondPassword)
-            }.ignoreElement()
+            }
         }
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -9,21 +10,34 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
+import java.lang.Exception
+
+private class CoincoreInitFailure(msg: String, e: Throwable)
+    : Exception(msg, e)
 
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
     private val assetMap: Map<CryptoCurrency, CryptoAsset>,
     private val defaultLabels: DefaultLabels,
-    private val fiatAsset: Asset
+    private val fiatAsset: Asset,
+    private val crashLogger: CrashLogger
 ) {
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException(
-            "Unknown CryptoCurrency ${ccy.networkTicker}")
+            "Unknown CryptoCurrency ${ccy.networkTicker}"
+        )
 
     fun init(): Completable =
         Completable.concat(
-            assetMap.values.map { asset -> Completable.defer { asset.init() } }.toList()
+            assetMap.values.map { asset ->
+                Completable.defer { asset.init() }
+                    .doOnError {
+                        crashLogger.logException(
+                            CoincoreInitFailure("Failed init: ${asset.asset.networkTicker}", it)
+                        )
+                    }
+            }.toList()
         ).doOnError {
             Timber.e("Coincore initialisation failed! $it")
         }

@@ -90,9 +90,9 @@ class AssetActionsSheet :
         dispose()
     }
 
-    private fun dispose() {
+    override fun dispose() {
+        super.dispose()
         disposables.dispose()
-        subscription?.dispose()
     }
 
     private fun showAssetBalances(state: AssetDetailsState) {
@@ -285,7 +285,7 @@ class AssetActionsSheet :
 
     private fun processAction(action: AssetAction) {
         model.process(HandleActionIntent(action))
-        subscription?.dispose()
+        dispose()
     }
 
     companion object {
