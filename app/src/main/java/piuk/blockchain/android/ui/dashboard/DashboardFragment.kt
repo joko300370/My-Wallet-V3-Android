@@ -402,6 +402,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowBankLinkingSheet(account))
     }
 
+    override fun showFundsKyc() {
+        model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+    }
+
     override fun fiatFundsVerifyIdentityCta() {
         navigator().launchKyc(CampaignType.FiatFunds)
     }

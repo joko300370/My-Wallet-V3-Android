@@ -31,6 +31,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     interface Host : SlidingModalBottomDialog.Host {
         fun depositFiat(account: FiatAccount)
         fun gotoActivityFor(account: BlockchainAccount)
+        fun showFundsKyc()
     }
 
     override val host: Host by lazy {
@@ -78,13 +79,12 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             disposables += tierService.tiers()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onSuccess = {
-                        if (!it.isApprovedFor(KycTierLevel.GOLD)) {
-                            funds_deposit_holder.gone()
-                            funds_deposit_separator.gone()
-                        } else {
-                            funds_deposit_holder.setOnClickListener {
-                                dismiss()
+                    onSuccess = { tiers ->
+                        funds_deposit_holder.setOnClickListener {
+                            dismiss()
+                            if (!tiers.isApprovedFor(KycTierLevel.GOLD)) {
+                                host.showFundsKyc()
+                            } else {
                                 host.depositFiat(account)
                             }
                         }
