@@ -53,7 +53,6 @@ private class BalanceCardViewHolder internal constructor(
         itemView.total_balance.resetLoader()
         itemView.balance_delta_value.resetLoader()
         itemView.balance_delta_percent.resetLoader()
-        itemView.delta_interval.resetLoader()
 
         populateEmptyPieChart()
     }
@@ -73,8 +72,6 @@ private class BalanceCardViewHolder internal constructor(
                 balance_delta_value.text = deltaVal.toStringWithSymbol()
                 balance_delta_value.setDeltaColour(deltaPercent)
                 balance_delta_percent.asDeltaPercent(deltaPercent, "(", ")")
-
-                delta_interval.text = "Today"
             }
 
             populatePieChart(state)

@@ -229,7 +229,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
             val newBalance = s.balance
             if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.balance) {
-                // IF we have the full set, this will fire
+                // If we have the full set, this will fire
                 analyticsReporter.gotAssetBalance(cc, newBalance)
             }
         }
