@@ -29,6 +29,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -379,21 +380,39 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader
     ).wrapErrorMessage()
 
+//    fun transferFunds(
+//        sessionToken: NabuSessionTokenResponse,
+//        request: TransferRequest
+//    ): Completable = service.transferFunds(
+//        sessionToken.authHeader,
+//        request
+//    ).onErrorResumeNext {
+//        if (it is HttpException) {
+//            when (it.code()) {
+//                403 -> Completable.error(SimpleBuyError.WithdrawlAlreadyPending)
+//                409 -> Completable.error(SimpleBuyError.WithdrawlInsufficientFunds)
+//                else -> Completable.error(it)
+//            }
+//        } else {
+//            Completable.error(it)
+//        }
+//    }.wrapErrorMessage()
+
     fun transferFunds(
         sessionToken: NabuSessionTokenResponse,
         request: TransferRequest
-    ): Completable = service.transferFunds(
+    ): Single<String> = service.transferFunds(
         sessionToken.authHeader,
         request
-    ).onErrorResumeNext {
-        if (it is HttpException) {
-            when (it.code()) {
-                403 -> Completable.error(SimpleBuyError.WithdrawlAlreadyPending)
-                409 -> Completable.error(SimpleBuyError.WithdrawlInsufficientFunds)
-                else -> Completable.error(it)
-            }
-        } else {
-            Completable.error(it)
+    ).map {
+        when (it.code()) {
+            200 -> it.body()?.id ?: ""
+            203 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
+                        throw SimpleBuyError.WithdrawalBalanceLocked
+                    else
+                        throw SimpleBuyError.WithdrawalAlreadyPending
+            409 -> throw SimpleBuyError.WithdrawalInsufficientFunds
+            else -> throw SimpleBuyError.UnexpectedError
         }
     }.wrapErrorMessage()
 

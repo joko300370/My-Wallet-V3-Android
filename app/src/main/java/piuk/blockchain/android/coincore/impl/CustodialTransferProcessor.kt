@@ -80,8 +80,11 @@ open class CustodialTransferProcessor(
                 }
             }
 
+    // The custodial balance now returns an id, so it is possible to add a note via this
+    // processor at some point. TODO
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable {
         require(sendTarget is CryptoAddress)
         return walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, sendTarget.address)
+            .ignoreElement()
     }
 }

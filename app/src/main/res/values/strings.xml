@@ -1220,6 +1220,12 @@
     <string name="basic_transfer_error_in_progress_title">Send In Progress</string>
     <string name="basic_transfer_error_in_progress_body">There is a transaction in progress. We’ll let you know once the funds reach your wallet.</string>
 
+    <string name="basic_transfer_error_insufficient_funds_title">Insufficient Funds</string>
+    <string name="basic_transfer_error_insufficient_funds">You have insufficient funds in your account to complete this transaction.</string>
+
+    <string name="basic_transfer_error_locked_funds_title">Funds Locked</string>
+    <string name="basic_transfer_error_locked_funds">Your Trading Wallet balance will be available once the hold period expires. <annotation link="balance_lock">Learn more</annotation>.</string>
+
     <string name="airdrop_status_date_active">Drops on %1s</string>
     <string name="airdrop_status_date_inactive">Ended on %1s</string>
 

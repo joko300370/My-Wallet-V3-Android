@@ -92,7 +92,7 @@ interface CustodialWalletManager {
 
     fun deleteBank(bankId: String): Completable
 
-    fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Completable
+    fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String>
 
     // For test/dev
     fun cancelAllPendingBuys(): Completable
@@ -258,8 +258,10 @@ data class BankDetail(val title: String, val value: String, val isCopyable: Bool
 sealed class SimpleBuyError : Throwable() {
     object OrderLimitReached : SimpleBuyError()
     object OrderNotCancelable : SimpleBuyError()
-    object WithdrawlAlreadyPending : SimpleBuyError()
-    object WithdrawlInsufficientFunds : SimpleBuyError()
+    object WithdrawalAlreadyPending : SimpleBuyError()
+    object WithdrawalBalanceLocked : SimpleBuyError()
+    object WithdrawalInsufficientFunds : SimpleBuyError()
+    object UnexpectedError : SimpleBuyError()
 }
 
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :

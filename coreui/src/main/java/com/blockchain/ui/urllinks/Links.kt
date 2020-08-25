@@ -54,6 +54,8 @@ const val MODULAR_TERMS_AND_CONDITIONS =
 const val INTEREST_TERMS_OF_SERVICE = "https://www.blockchain.com/legal/borrow-terms"
 const val INTEREST_PRIVACY_POLICY = "https://blockchain.com/legal/privacy"
 
+const val URL_SUPPORT_BALANCE_LOCKED = "https://support.blockchain.com/hc/en-us/articles/360048200392"
+
 fun makeBlockExplorerUrl(
     cryptoCurrency: CryptoCurrency,
     transactionHash: String

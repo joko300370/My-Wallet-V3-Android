@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.transfer
 
 import android.content.DialogInterface
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
@@ -9,6 +10,7 @@ import com.blockchain.notifications.analytics.WithdrawScreenClicked
 import com.blockchain.notifications.analytics.WithdrawScreenShown
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
+import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,6 +25,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -47,6 +50,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
     }
 
     private val coincore: Coincore by scopedInject()
+    private val stringUtils: StringUtils by scopedInject()
 
     private val token: CryptoAsset by lazy {
         coincore[cryptoCurrency]
@@ -147,7 +151,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
             .doOnSubscribe { updateTransferInProgress() }
             .subscribeBy(
                 onError = { updateTransferError(it) },
-                onComplete = { updateTransferDone() }
+                onSuccess = { updateTransferDone() }
             )
     }
 
@@ -181,13 +185,29 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
         with(dialogView) {
             image.setImageDrawable(R.drawable.vector_pit_request_failure)
+            when (t) {
+                is SimpleBuyError.WithdrawalInsufficientFunds -> {
+                    complete_title.text = getString(R.string.basic_transfer_error_insufficient_funds_title)
+                    complete_message.text = getString(R.string.basic_transfer_error_insufficient_funds)
+                }
+                is SimpleBuyError.WithdrawalAlreadyPending -> {
+                    complete_title.text = getString(R.string.basic_transfer_error_in_progress_title)
+                    complete_message.text = getString(R.string.basic_transfer_error_in_progress_body)
+                }
+                is SimpleBuyError.WithdrawalBalanceLocked -> {
+                    complete_title.text = getString(R.string.basic_transfer_error_locked_funds_title)
 
-            if (t is SimpleBuyError.WithdrawlInsufficientFunds || t is SimpleBuyError.WithdrawlAlreadyPending) {
-                complete_title.text = getString(R.string.basic_transfer_error_in_progress_title)
-                complete_message.text = getString(R.string.basic_transfer_error_in_progress_body)
-            } else {
-                complete_title.text = getString(R.string.basic_transfer_error_title)
-                complete_message.text = getString(R.string.basic_transfer_error_body)
+                    val msg = stringUtils.getStringWithMappedLinks(
+                        R.string.basic_transfer_error_locked_funds,
+                        mapOf("balance_lock" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED)),
+                        requireActivity()
+                    )
+                    complete_message.text = msg
+                }
+                else -> {
+                    complete_title.text = getString(R.string.basic_transfer_error_title)
+                    complete_message.text = getString(R.string.basic_transfer_error_body)
+                }
             }
 
             switchView(VIEW_COMPLETE)

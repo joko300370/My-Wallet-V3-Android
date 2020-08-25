@@ -89,6 +89,15 @@ data class SimpleBuyAllBalancesResponse(
     }
 }
 
+data class TransferFundsResponse(
+    val id: String,
+    val code: Long? // Only present in error responses
+) {
+    companion object {
+        const val ERROR_WITHDRAWL_LOCKED = 152L
+    }
+}
+
 data class CustodialWalletOrder(
     private val pair: String,
     private val action: String,

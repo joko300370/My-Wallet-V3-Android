@@ -43,6 +43,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -336,7 +337,7 @@ internal interface Nabu {
     fun transferFunds(
         @Header("authorization") authorization: String,
         @Body request: TransferRequest
-    ): Completable
+    ): Single<Response<TransferFundsResponse>>
 
     @GET(NABU_INTEREST_RATES)
     fun getInterestRates(

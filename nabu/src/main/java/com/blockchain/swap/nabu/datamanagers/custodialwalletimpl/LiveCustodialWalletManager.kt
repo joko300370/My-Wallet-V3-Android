@@ -278,8 +278,8 @@ class LiveCustodialWalletManager(
                 }
             }
 
-    override fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Completable =
-        authenticator.authenticateCompletable {
+    override fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String> =
+        authenticator.authenticate {
             nabuService.transferFunds(
                 it,
                 TransferRequest(
