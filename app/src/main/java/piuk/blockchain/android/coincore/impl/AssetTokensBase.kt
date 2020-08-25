@@ -86,7 +86,7 @@ internal abstract class CryptoAssetBase(
                 exchangeRates
             )
         ).flatMap { account ->
-            account.balance.map {
+            account.isInterestEnabled().map {
                 if (account.isConfigured) {
                     listOf(account)
                 } else {

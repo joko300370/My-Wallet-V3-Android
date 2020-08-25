@@ -1,10 +1,10 @@
-package com.blockchain.swap.nabu.datamanagers
+package com.blockchain.swap.nabu.datamanagers.repositories.interest
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Single
 
-interface LimitsProvider {
+interface InterestLimitsProvider {
     fun getLimitsForAllAssets(): Single<InterestLimitsList>
 }
 

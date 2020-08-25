@@ -1,4 +1,4 @@
-package com.blockchain.swap.nabu.datamanagers
+package com.blockchain.swap.nabu.datamanagers.repositories.interest
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.Authenticator
@@ -9,12 +9,12 @@ import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 
-class LimitsProviderImpl(
+class InterestLimitsProviderImpl(
     private val nabuService: NabuService,
     private val authenticator: Authenticator,
     private val currencyPrefs: CurrencyPrefs,
     private val exchangeRates: ExchangeRateDataManager
-) : LimitsProvider {
+) : InterestLimitsProvider {
     override fun getLimitsForAllAssets(): Single<InterestLimitsList> =
         authenticator.authenticate {
             nabuService.getInterestLimits(it, currencyPrefs.selectedFiatCurrency)

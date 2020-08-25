@@ -13,7 +13,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
-import com.blockchain.swap.nabu.datamanagers.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
@@ -30,7 +29,9 @@ import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.InterestLimitsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsRepository
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -76,7 +77,8 @@ class LiveCustodialWalletManager(
     private val paymentAccountMapperMappers: Map<String, PaymentAccountMapper>,
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
-    private val interestLimitsRepository: InterestLimitsRepository
+    private val interestLimitsRepository: InterestLimitsRepository,
+    private val interestEnabledRepository: InterestEnabledRepository
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -540,6 +542,9 @@ class LiveCustodialWalletManager(
 
     override fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits> =
         interestLimitsRepository.getLimitForAsset(crypto)
+
+    override fun getInterestEnabledForAsset(crypto: CryptoCurrency): Single<Boolean> =
+        interestEnabledRepository.getEnabledForAsset(crypto)
 
     override fun getSupportedFundsFiats(
         fiatCurrency: String,

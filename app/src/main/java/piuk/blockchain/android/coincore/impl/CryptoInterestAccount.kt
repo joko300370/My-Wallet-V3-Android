@@ -45,8 +45,6 @@ internal class CryptoInterestAccount(
 
     override val balance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
-            .doOnSuccess { nabuAccountExists.set(true) }
-            .doOnComplete { nabuAccountExists.set(false) }
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
             )
@@ -84,6 +82,12 @@ internal class CryptoInterestAccount(
             }
         }.toList()
     }
+
+    fun isInterestEnabled() =
+        custodialWalletManager.getInterestEnabledForAsset(asset)
+            .map {
+                nabuAccountExists.set(it)
+            }
 
     val isConfigured: Boolean
         get() = nabuAccountExists.get()

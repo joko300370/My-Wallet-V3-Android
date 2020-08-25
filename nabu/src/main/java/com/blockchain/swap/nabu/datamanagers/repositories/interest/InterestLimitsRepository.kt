@@ -1,16 +1,14 @@
-package com.blockchain.swap.nabu.datamanagers.repositories
+package com.blockchain.swap.nabu.datamanagers.repositories.interest
 
 import com.blockchain.rx.TimedCacheRequest
-import com.blockchain.swap.nabu.datamanagers.InterestLimits
-import com.blockchain.swap.nabu.datamanagers.LimitsProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 
-class InterestLimitsRepository(limitsProvider: LimitsProvider) {
+class InterestLimitsRepository(interestLimitsProvider: InterestLimitsProvider) {
 
     private val cache = TimedCacheRequest(
         cacheLifetimeSeconds = CACHE_LIFETIME,
-        refreshFn = { limitsProvider.getLimitsForAllAssets() }
+        refreshFn = { interestLimitsProvider.getLimitsForAllAssets() }
     )
 
     fun getLimitForAsset(ccy: CryptoCurrency): Maybe<InterestLimits> =

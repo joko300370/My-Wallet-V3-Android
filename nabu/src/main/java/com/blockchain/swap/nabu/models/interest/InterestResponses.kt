@@ -73,3 +73,7 @@ data class InterestLimitsResponse(
     val maxWithdrawalAmount: String,
     val minDepositAmount: String
 )
+
+data class InterestEnabledResponse(
+    val instruments: List<String>
+)

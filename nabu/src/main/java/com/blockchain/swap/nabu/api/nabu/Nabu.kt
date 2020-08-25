@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountBalanceResponse
 import com.blockchain.swap.nabu.models.interest.InterestActivityResponse
 import com.blockchain.swap.nabu.models.interest.InterestAddressResponse
+import com.blockchain.swap.nabu.models.interest.InterestEnabledResponse
 import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
 import com.blockchain.swap.nabu.models.interest.InterestResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
@@ -369,4 +370,9 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("currency") currency: String
     ): Single<Response<InterestLimitsFullResponse>>
+
+    @GET(NABU_INTEREST_ENABLED)
+    fun getInterestEnabled(
+        @Header("authorization") authorization: String
+    ): Single<Response<InterestEnabledResponse>>
 }
