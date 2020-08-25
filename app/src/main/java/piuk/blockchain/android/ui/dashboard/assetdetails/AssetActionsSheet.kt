@@ -90,11 +90,6 @@ class AssetActionsSheet :
         dispose()
     }
 
-    override fun dispose() {
-        super.dispose()
-        disposables.dispose()
-    }
-
     private fun showAssetBalances(state: AssetDetailsState) {
         if (state.selectedAccountCryptoBalance != null && state.selectedAccountFiatBalance != null) {
             dialogView.asset_actions_crypto_value.text =

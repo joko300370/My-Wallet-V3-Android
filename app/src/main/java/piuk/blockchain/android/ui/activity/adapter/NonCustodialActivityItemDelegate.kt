@@ -66,10 +66,11 @@ private class NonCustodialActivityItemViewHolder(
             if (tx.isConfirmed) {
                 icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
                 icon.setAssetIconColours(tx.cryptoCurrency, context)
-                status_date.text = Date(tx.timeStampMs).toFormattedDate()
             } else {
                 icon.setIsConfirming()
             }
+
+            status_date.text = Date(tx.timeStampMs).toFormattedDate()
 
             tx_type.setTxLabel(tx.cryptoCurrency, tx.transactionType, tx.isFeeTransaction)
 
