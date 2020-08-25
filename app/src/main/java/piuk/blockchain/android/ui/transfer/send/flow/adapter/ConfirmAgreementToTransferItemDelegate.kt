@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_agreement.view.*
+import kotlinx.android.synthetic.main.item_send_confirm_agreement_transfer.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
@@ -24,7 +24,7 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AgreementTextItemViewHolder(
-            parent.inflate(R.layout.item_send_confirm_agreement)
+            parent.inflate(R.layout.item_send_confirm_agreement_transfer)
         )
 
     override fun onBindViewHolder(
@@ -51,7 +51,8 @@ private class AgreementTextItemViewHolder(val parent: View) :
         itemView.confirm_details_checkbox.setText(item.agreementText, TextView.BufferType.SPANNABLE)
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_TRANSFER)
+            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+                TxOption.AGREEMENT_INTEREST_TRANSFER)
                 ?.let {
                     model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
                 }

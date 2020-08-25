@@ -11,4 +11,4 @@
     android:paddingStart="@dimen/very_small_margin"
     android:paddingTop="@dimen/very_small_margin"
     android:paddingBottom="@dimen/very_small_margin"
-    tools:text="@string/send_confirmation_interest_tos_pp" />
+    tools:text="@string/send_confirmation_interest_holding_period_2" />

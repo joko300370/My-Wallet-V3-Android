@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_agreement.view.*
+import kotlinx.android.synthetic.main.item_send_confirm_agreement_tcs.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
@@ -28,7 +28,7 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AgreementItemViewHolder(
-            parent.inflate(R.layout.item_send_confirm_agreement)
+            parent.inflate(R.layout.item_send_confirm_agreement_tcs)
         )
 
     override fun onBindViewHolder(
@@ -57,16 +57,17 @@ private class AgreementItemViewHolder(val parent: View) :
         activityContext: Activity
     ) {
 
-        itemView.confirm_details_checkbox.text = stringUtils.getStringWithMappedLinks(
+        itemView.confirm_details_checkbox_text.text = stringUtils.getStringWithMappedLinks(
             item.mappedString,
             item.uriMap,
             activityContext
         )
 
-        itemView.confirm_details_checkbox.movementMethod = LinkMovementMethod.getInstance()
+        itemView.confirm_details_checkbox_text.movementMethod = LinkMovementMethod.getInstance()
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(TxOption.AGREEMENT_INTEREST_T_AND_C)
+            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+                TxOption.AGREEMENT_INTEREST_T_AND_C)
                 ?.let {
                     model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
                 }
