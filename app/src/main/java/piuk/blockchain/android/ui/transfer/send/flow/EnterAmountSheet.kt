@@ -17,6 +17,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
+import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -59,6 +60,8 @@ class EnterAmountSheet(
                     cryptoCurrency = newState.sendingAccount.asset,
                     predefinedAmount = newState.sendAmount
                 )
+
+                showKeyboard()
             }
 
             val availableBalance = newState.availableBalance
@@ -91,20 +94,6 @@ class EnterAmountSheet(
         state = newState
     }
 
-    private fun updatePendingTxDetails(state: SendState) {
-        with(dialogView) {
-            amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
-
-            amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
-            amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
-
-            amount_sheet_from.text =
-                getString(R.string.send_enter_amount_from, state.sendingAccount.label)
-            amount_sheet_to.text =
-                getString(R.string.send_enter_amount_to, state.sendTarget.label)
-        }
-    }
-
     override fun initControls(view: View) {
         view.apply {
             amount_sheet_use_max.setOnClickListener { onUseMaxClick() }
@@ -129,6 +118,20 @@ class EnterAmountSheet(
         }
     }
 
+    private fun updatePendingTxDetails(state: SendState) {
+        with(dialogView) {
+            amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
+
+            amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
+            amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
+
+            amount_sheet_from.text =
+                getString(R.string.send_enter_amount_from, state.sendingAccount.label)
+            amount_sheet_to.text =
+                getString(R.string.send_enter_amount_to, state.sendTarget.label)
+        }
+    }
+
     private fun onUseMaxClick() {
         dialogView.amount_sheet_input.showValue(state.availableBalance)
     }
@@ -136,5 +139,14 @@ class EnterAmountSheet(
     private fun onCtaClick() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
         model.process(SendIntent.PrepareTransaction)
+    }
+
+    private fun showKeyboard() {
+        val inputView = dialogView.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
+            R.id.enter_amount)
+        inputView?.run {
+            requestFocus()
+            imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+        }
     }
 }
