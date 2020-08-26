@@ -134,6 +134,11 @@ class AssetDetailSheet :
         }
     }
 
+    override fun dismiss() {
+        super.dismiss()
+        model.process(ClearSheetDataIntent)
+    }
+
     private fun onGotAssetDetails(assetDetails: AssetDisplayMap) {
 
         val itemList = mutableListOf<AssetDetailItem>()
