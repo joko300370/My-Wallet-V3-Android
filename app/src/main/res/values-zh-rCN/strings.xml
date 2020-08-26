@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">美东时间。量</string>
   <string name="buying_fee">购买费用</string>
   <string name="purchase_bank_note">收到您的资金后，我们将开始您的%1$s购买订单。请注意，您的最终金额可能会因应市场活动而改变。可能需要付费。</string>
-  <string name="purchase_card_note">我们将在2个工作日内从您的付款方式中扣款。您的最终金额可能会因市场活动而变化。</string>
   <string name="complete_payment">完成支付</string>
   <string name="card_payment">信用卡支付</string>
   <string name="buy_now">立即购买</string>

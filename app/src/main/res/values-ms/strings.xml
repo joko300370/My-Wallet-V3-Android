@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">Est. Jumlah</string>
   <string name="buying_fee">Bayaran Membeli</string>
   <string name="purchase_bank_note">Setelah kami menerima dana anda, kami akan memulakan pesanan beli %1$s . Perhatikan, jumlah akhir anda mungkin berubah menjadi aktiviti pasaran yang sepatutnya. Bayaran mungkin dikenakan.</string>
-  <string name="purchase_card_note">Kami akan mendebitkan kaedah pembayaran anda dalam 2 hari bekerja. Jumlah akhir anda mungkin berubah kerana aktiviti pasaran.</string>
   <string name="complete_payment">Pembayaran Lengkap</string>
   <string name="card_payment">Pembayaran Kad</string>
   <string name="buy_now">Beli sekarang</string>

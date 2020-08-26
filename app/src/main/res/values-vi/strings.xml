@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">Est. Số tiền</string>
   <string name="buying_fee">Phí mua</string>
   <string name="purchase_bank_note">Khi chúng tôi nhận được tiền của bạn, chúng tôi sẽ bắt đầu đơn đặt hàng mua %1$s . Lưu ý, số tiền cuối cùng của bạn có thể thay đổi thành hoạt động thị trường do. Lệ phí có thể áp dụng.</string>
-  <string name="purchase_card_note">Chúng tôi sẽ ghi nợ phương thức thanh toán của bạn trong 2 ngày làm việc. Số tiền cuối cùng của bạn có thể thay đổi do hoạt động thị trường.</string>
   <string name="complete_payment">Hoàn thành thanh toán</string>
   <string name="card_payment">Thanh toán thẻ</string>
   <string name="buy_now">Mua ngay</string>

@@ -200,4 +200,5 @@ data class SelectedPaymentMethod(
 ) {
     fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
     fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
+    fun isFunds() = paymentMethodType == PaymentMethodType.FUNDS
 }

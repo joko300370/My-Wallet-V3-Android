@@ -1544,7 +1544,6 @@
   <string name="estimated_amount">Est. Quantità</string>
   <string name="buying_fee">Commissione d\'acquisto</string>
   <string name="purchase_bank_note">Una volta ricevuti i tuoi fondi, inizieremo il tuo ordine di acquisto di %1$s . Tieni presente che l\'importo finale potrebbe cambiare in due attività di mercato Potrebbero essere applicate commissioni.</string>
-  <string name="purchase_card_note">Addebiteremo il tuo metodo di pagamento in 2 giorni lavorativi. L\'importo finale potrebbe variare a causa dell\'attività di mercato.</string>
   <string name="complete_payment">Pagamento completo</string>
   <string name="card_payment">Pagamento con carta</string>
   <string name="buy_now">Acquista ora</string>

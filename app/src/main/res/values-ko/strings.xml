@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">동부 표준시. 양</string>
   <string name="buying_fee">구매 수수료</string>
   <string name="purchase_bank_note">귀하의 자금을 받으면 %1$s 구매 주문을 시작합니다. 최종 금액은 시장 활동으로 인해 변경 될 수 있습니다. 요금이 부과 될 수 있습니다.</string>
-  <string name="purchase_card_note">영업일 기준 2 일 이내에 결제 수단에서 인출됩니다. 시장 활동으로 인해 최종 금액이 변경 될 수 있습니다.</string>
   <string name="complete_payment">결제 완료</string>
   <string name="card_payment">카드 결제</string>
   <string name="buy_now">지금 구매</string>

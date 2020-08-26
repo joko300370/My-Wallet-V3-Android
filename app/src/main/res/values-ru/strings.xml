@@ -1546,7 +1546,6 @@
   <string name="estimated_amount">Стандартное восточное время. Количество</string>
   <string name="buying_fee">Плата за покупку</string>
   <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>
-  <string name="purchase_card_note">Мы выберем способ оплаты в течение 2 рабочих дней. Ваша итоговая сумма может измениться из-за активности на рынке.</string>
   <string name="complete_payment">Полная оплата</string>
   <string name="card_payment">Оплата картой</string>
   <string name="buy_now">купить сейчас</string>

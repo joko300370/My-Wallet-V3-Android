@@ -1536,7 +1536,6 @@
   <string name="estimated_amount">Szac. Ilość</string>
   <string name="buying_fee">Opłata za zakup</string>
   <string name="purchase_bank_note">Gdy otrzymamy twoje środki, rozpoczniemy twoje zamówienie zakupu %1$s . Pamiętaj, że ostateczna kwota może się zmienić na odpowiednią aktywność na rynku. Mogą obowiązywać opłaty.</string>
-  <string name="purchase_card_note">Obciążymy Twoją metodę płatności w ciągu 2 dni roboczych. Ostateczna kwota może się zmienić z powodu aktywności na rynku.</string>
   <string name="complete_payment">Dokonaj płatności</string>
   <string name="card_payment">Płatność kartą</string>
   <string name="buy_now">Kup Teraz</string>

@@ -1645,7 +1645,7 @@
     <string name="buying_fee">Buying Fee</string>
     <string name="date">Date</string>
     <string name="purchase_bank_note">Once we receive your funds, we’ll start your %1$s buy order. Note, your final amount might change to due market activity. Fees may apply.</string>
-    <string name="purchase_card_note">We will debit your payment method in 2 business days. Your final amount might change due to market activity.</string>
+    <string name="purchase_card_note_1">Your final amount might change due to market activity. An initial hold period of 7 days will be applied to your funds.</string>
     <string name="complete_payment">Complete Payment</string>
     <string name="buy_crypto">Buy %1$s</string>
     <string name="kyc_verifying_info">Verifying your information</string>
@@ -1932,4 +1932,5 @@
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
     <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %1$s Trade Wallet to your Vault Wallets. Once %1$s is in your Vault Wallet you can transfer to external addresses.</string>
+    <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
 </resources>

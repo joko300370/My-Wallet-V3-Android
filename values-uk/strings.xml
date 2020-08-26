@@ -1536,7 +1536,6 @@
   <string name="estimated_amount">Оцінка Сума</string>
   <string name="buying_fee">Плата за покупку</string>
   <string name="purchase_bank_note">Щойно ми отримаємо ваші кошти, ми розпочнемо ваше замовлення на покупку %1$s . Зауважте, остаточна сума може змінитися на належну ринкову активність. Може стягуватися плата.</string>
-  <string name="purchase_card_note">Ми будемо стягувати ваш спосіб оплати протягом 2 робочих днів. Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="complete_payment">Повна оплата</string>
   <string name="card_payment">Оплата карткою</string>
   <string name="buy_now">Придбайте зараз</string>

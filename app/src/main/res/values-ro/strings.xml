@@ -1541,7 +1541,6 @@
   <string name="estimated_amount">Est. Cantitate</string>
   <string name="buying_fee">Taxa de cumpărare</string>
   <string name="purchase_bank_note">După ce primim fondurile dvs., vom începe comanda dvs. de cumpărare de %1$s . Rețineți, valoarea dvs. finală s-ar putea modifica în funcție de activitatea pieței scadente. Se pot aplica comisioane.</string>
-  <string name="purchase_card_note">Vom debita metoda de plată în 2 zile lucrătoare. Suma dvs. finală s-ar putea modifica din cauza activității pieței.</string>
   <string name="complete_payment">Plata completă</string>
   <string name="card_payment">Plata cu cardul</string>
   <string name="buy_now">Cumpără acum</string>

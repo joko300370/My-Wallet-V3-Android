@@ -1544,7 +1544,6 @@
   <string name="estimated_amount">Husa. Montante</string>
   <string name="buying_fee">Taxa de compra</string>
   <string name="purchase_bank_note">Assim que recebermos seus fundos, iniciaremos seu pedido de compra de %1$s . Observe que seu valor final pode mudar para a atividade de mercado devida. Podem ser aplicadas taxas.</string>
-  <string name="purchase_card_note">Debitaremos sua forma de pagamento em dois dias úteis. Seu valor final pode mudar devido à atividade do mercado.</string>
   <string name="complete_payment">Pagamento Completo</string>
   <string name="card_payment">Pagamento com cartão</string>
   <string name="buy_now">Compre Agora</string>

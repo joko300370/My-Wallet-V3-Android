@@ -1542,7 +1542,6 @@
   <string name="estimated_amount">Est. Belopp</string>
   <string name="buying_fee">Köpsavgift</string>
   <string name="purchase_bank_note">När vi har fått dina medel börjar du din beställning av %1$s . Observera att ditt slutliga belopp kan ändras till marknadsaktivitet. Avgifter kan tillkomma.</string>
-  <string name="purchase_card_note">Vi debiterar din betalningsmetod inom två arbetsdagar. Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
   <string name="complete_payment">Komplett betalning</string>
   <string name="card_payment">Kortbetalning</string>
   <string name="buy_now">Köp nu</string>

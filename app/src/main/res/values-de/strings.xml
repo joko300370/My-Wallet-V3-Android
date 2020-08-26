@@ -1542,7 +1542,6 @@
   <string name="estimated_amount">Europäische Sommerzeit. Menge</string>
   <string name="buying_fee">Kaufgebühr</string>
   <string name="purchase_bank_note">Sobald wir Ihr Geld erhalten haben, beginnen wir mit Ihrer %1$s . Beachten Sie, dass sich Ihr endgültiger Betrag möglicherweise aufgrund der Marktaktivität ändert. Es können Gebühren anfallen.</string>
-  <string name="purchase_card_note">Wir werden Ihre Zahlungsmethode innerhalb von 2 Werktagen belasten. Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern.</string>
   <string name="complete_payment">Zur vollständigen Bezahlung</string>
   <string name="card_payment">Kartenzahlung</string>
   <string name="buy_now">Kaufe jetzt</string>

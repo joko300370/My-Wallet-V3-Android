@@ -1546,7 +1546,6 @@
   <string name="estimated_amount">Est. Množství</string>
   <string name="buying_fee">Poplatek za nákup</string>
   <string name="purchase_bank_note">Jakmile dostaneme vaše prostředky, zahájíme vaši objednávku nákupu %1$s . Vaše konečná částka se může změnit na řádnou tržní aktivitu. Mohou být účtovány poplatky.</string>
-  <string name="purchase_card_note">Za 2 pracovní dny odečteme platbu z vaší platební metody. Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
   <string name="complete_payment">Dokončete platbu</string>
   <string name="card_payment">Platba kartou</string>
   <string name="buy_now">Kup nyní</string>

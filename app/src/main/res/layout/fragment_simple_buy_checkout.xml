@@ -79,7 +79,7 @@
         app:layout_constraintEnd_toEndOf="@id/button_action"
         app:layout_constraintStart_toStartOf="@id/button_action"
         app:layout_goneMarginBottom="@dimen/standard_margin"
-        tools:text="@string/purchase_card_note" />
+        tools:text="@string/purchase_card_note_1" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_cancel"

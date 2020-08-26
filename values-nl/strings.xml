@@ -1534,7 +1534,6 @@
   <string name="estimated_amount">Est. Bedrag</string>
   <string name="buying_fee">Aankoopkosten</string>
   <string name="purchase_bank_note">Zodra we uw geld hebben ontvangen, starten we uw %1$s kooporder. Houd er rekening mee dat uw uiteindelijke bedrag kan veranderen naar marktactiviteit. Mogelijk zijn toeslagen van toepassing.</string>
-  <string name="purchase_card_note">We zullen uw betaalmethode binnen twee werkdagen afschrijven. Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
   <string name="complete_payment">Volledige betaling</string>
   <string name="card_payment">Kaart betaling</string>
   <string name="buy_now">Koop nu</string>

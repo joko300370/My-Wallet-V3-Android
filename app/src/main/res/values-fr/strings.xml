@@ -1542,7 +1542,6 @@
   <string name="estimated_amount">Est. Montant</string>
   <string name="buying_fee">Frais d\'achat</string>
   <string name="purchase_bank_note">Une fois que nous aurons reçu vos fonds, nous commencerons votre commande d\'achat %1$s . Notez que votre montant final peut changer en fonction de l\'activité du marché. Des frais peuvent s\'appliquer.</string>
-  <string name="purchase_card_note">Nous débiterons votre mode de paiement dans les 2 jours ouvrables. Votre montant final peut changer en raison de l\'activité du marché.</string>
   <string name="complete_payment">Paiement complet</string>
   <string name="card_payment">Paiement par carte</string>
   <string name="buy_now">Acheter maintenant</string>

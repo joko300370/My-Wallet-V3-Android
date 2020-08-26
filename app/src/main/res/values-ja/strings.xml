@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">EST（東部基準時。量</string>
   <string name="buying_fee">購入手数料</string>
   <string name="purchase_bank_note">資金を受け取り次第、 %1$s購入注文を開始します。注意してください、あなたの最終的な量は当然の市場活動に変わるかもしれません。手数料がかかる場合があります。</string>
-  <string name="purchase_card_note">お支払い方法は2営業日以内に引き落とされます。あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
   <string name="complete_payment">完全な支払い</string>
   <string name="card_payment">カード決済</string>
   <string name="buy_now">今買う</string>

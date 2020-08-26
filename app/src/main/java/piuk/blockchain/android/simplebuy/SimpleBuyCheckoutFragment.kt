@@ -89,7 +89,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
             }
             newState.selectedPaymentMethod?.isCard() == true -> {
-                getString(R.string.purchase_card_note)
+                getString(R.string.purchase_card_note_1)
+            }
+            newState.selectedPaymentMethod?.isFunds() == true -> {
+                getString(R.string.purchase_funds_note)
             }
             else -> ""
         }

@@ -1532,7 +1532,6 @@
   <string name="estimated_amount">Avustralya, Brezilya ve Kuzey Amerika ülkelerinin kullandığı saat uygulaması. Miktar</string>
   <string name="buying_fee">Alış Ücreti</string>
   <string name="purchase_bank_note">Paranızı aldıktan sonra, %1$s satın alma siparişinize başlayacağız. Nihai tutarınızın vadesi gelmiş piyasa etkinliğine göre değişebileceğini unutmayın. Ücret uygulanabilir.</string>
-  <string name="purchase_card_note">Ödeme yönteminizi 2 iş günü içinde borçlandıracağız. Nihai tutarınız piyasadaki faaliyetlerden dolayı değişebilir.</string>
   <string name="complete_payment">Ödemeyi tamamla</string>
   <string name="card_payment">Kartlı Ödeme</string>
   <string name="buy_now">Şimdi al</string>

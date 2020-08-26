@@ -1542,7 +1542,6 @@
   <string name="estimated_amount">Est. Cantidad</string>
   <string name="buying_fee">Tarifa de compra</string>
   <string name="purchase_bank_note">Una vez que recibamos sus fondos, comenzaremos su orden de compra de %1$s . Tenga en cuenta que su cantidad final puede cambiar a la actividad de mercado debida. Se pueden aplicar tarifas.</string>
-  <string name="purchase_card_note">Cobraremos su método de pago en 2 días hábiles. Su cantidad final puede cambiar debido a la actividad del mercado.</string>
   <string name="complete_payment">El pago completo</string>
   <string name="card_payment">Pago con tarjeta</string>
   <string name="buy_now">Compra ahora</string>

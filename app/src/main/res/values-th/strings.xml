@@ -1543,7 +1543,6 @@
   <string name="estimated_amount">Est จำนวน</string>
   <string name="buying_fee">ค่าธรรมเนียมการซื้อ</string>
   <string name="purchase_bank_note">เมื่อเราได้รับเงินของคุณแล้วเราจะเริ่มสั่งซื้อ %1$s หมายเหตุจำนวนเงินสุดท้ายของคุณอาจเปลี่ยนเป็นกิจกรรมการตลาดที่ครบกำหนด อาจมีค่าธรรมเนียม</string>
-  <string name="purchase_card_note">เราจะหักเงินจากวิธีการชำระเงินของคุณใน 2 วันทำการ จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมการตลาด</string>
   <string name="complete_payment">ชำระเงินให้เสร็จสมบูรณ์</string>
   <string name="card_payment">ชำระเงินด้วยบัตร</string>
   <string name="buy_now">ซื้อเลย</string>
