@@ -15,6 +15,7 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_total">Total</string>
     <string name="common_deposit">Deposit</string>
+    <string name="common_transfer">Transfer</string>
     <string name="common_error">Something went wrong, please try again</string>
     <string name="common_company_name">Blockchain.com</string>
     <string name="common_confirm">Confirm</string>
@@ -646,7 +647,7 @@
     <string name="tx_title_receive">Receive %1s</string>
     <string name="tx_title_sell">Sell %1s</string>
     <string name="tx_title_buy">Buy %1s</string>
-    <string name="tx_title_deposit">Deposit %1s</string>
+    <string name="tx_title_deposit">Transfer %1s</string>
     <string name="tx_title_withdraw">Withdraw %1s</string>
     <string name="tx_title_swap">Swap %1s -> %2s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
@@ -882,6 +883,7 @@
     <string name="asset_details_chart_load_failed_toast">Failed to load chart details, please try again</string>
     <string name="asset_details_load_failed_toast">Failed to load wallet details, please try again</string>
     <string name="asset_details_exchange_load_failed_toast">Failed to exchange rate information, please try again</string>
+    <string name="dashboard_asset_actions_tx_in_progress">There is already a transaction in progress, please wait until it completes</string>
 
     <string name="more">More</string>
 
@@ -1709,7 +1711,7 @@
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
     <string name="select_account_sheet_title">Select a Wallet</string>
-    <string name="select_deposit_source_title">Deposit from</string>
+    <string name="select_deposit_source_title">Transfer from</string>
     <string name="activity_state_initialised">Initialised</string>
     <string name="activity_state_uninitialised">Uninitialised</string>
     <string name="activity_state_awaiting_funds">Waiting On Funds</string>
@@ -1894,7 +1896,8 @@
     <string name="send_enter_amount_title">Send %1$s</string>
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
-    <string name="send_enter_amount_min_deposit">Minimum deposit of %1$s required</string>
+    <string name="send_enter_amount_deposit_max">Transfer Max</string>
+    <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
@@ -1903,14 +1906,14 @@
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_add_note_success">Note successfully added</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
-    <string name="send_confirmation_deposit_cta_button">Confirm Deposit</string>
+    <string name="send_confirmation_deposit_cta_button">Confirm Transfer</string>
     <string name="send_confirmation_interest_tos_pp">I have read and agree to the <annotation link="interest_tos">Terms of Service</annotation> &amp; <annotation link="interest_pp">Privacy Policy</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">By accepting this, you agree to transfer&#160;</string>
     <string name="send_confirmation_interest_holding_period_2">&#160; (%1$s) from your Bitcoin Wallet to your Interest Account. An initial hold period of 7 days will be applied to your funds.</string>
-    <string name="send_confirmation_progress_title">Depositing %1$s</string>
-    <string name="send_confirmation_progress_message">We\'re depositing your %1$s now.</string>
-    <string name="send_confirmation_success_title">%1$s Deposited</string>
-    <string name="send_confirmation_success_message">Your %1$s has been deposited successfully.</string>
+    <string name="send_confirmation_progress_title">Transferring %1$s</string>
+    <string name="send_confirmation_progress_message">We\'re transferring your %1$s now.</string>
+    <string name="send_confirmation_success_title">%1$s Transferred</string>
+    <string name="send_confirmation_success_message">Your %1$s has been transferred successfully.</string>
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>

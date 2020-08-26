@@ -34,7 +34,8 @@ enum class AssetDetailsError {
     NONE,
     NO_CHART_DATA,
     NO_ASSET_DETAILS,
-    NO_EXCHANGE_RATE
+    NO_EXCHANGE_RATE,
+    TX_IN_FLIGHT
 }
 
 class AssetDetailsModel(
@@ -95,7 +96,8 @@ class AssetDetailsModel(
             is SelectSendingAccount,
             is ReturnToPreviousStep,
             is ClearSheetDataIntent,
-            is CustodialSheetFinished -> null
+            is CustodialSheetFinished,
+            is TransactionInFlight -> null
         }
     }
 

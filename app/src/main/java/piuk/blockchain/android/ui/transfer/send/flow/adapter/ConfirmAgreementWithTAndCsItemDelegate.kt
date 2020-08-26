@@ -65,12 +65,15 @@ private class AgreementItemViewHolder(val parent: View) :
 
         itemView.confirm_details_checkbox_text.movementMethod = LinkMovementMethod.getInstance()
 
+        val option = item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+            TxOption.AGREEMENT_INTEREST_T_AND_C)
+
+        itemView.confirm_details_checkbox.isChecked = option?.value ?: false
+
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
-                TxOption.AGREEMENT_INTEREST_T_AND_C)
-                ?.let {
-                    model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
-                }
+            option?.let {
+                model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
+            }
         }
     }
 }

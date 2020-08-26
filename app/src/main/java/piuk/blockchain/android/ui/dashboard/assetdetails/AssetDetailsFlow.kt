@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
@@ -79,7 +80,7 @@ class AssetDetailsFlow(
             if (currentStep == AssetDetailsStep.ZERO) {
                 finishFlow()
             } else {
-                showFlowStep(currentStep, newState)
+                showFlowStep(currentStep)
             }
         }
 
@@ -88,7 +89,7 @@ class AssetDetailsFlow(
         }
     }
 
-    private fun showFlowStep(step: AssetDetailsStep, newState: AssetDetailsState) {
+    private fun showFlowStep(step: AssetDetailsStep) {
         replaceBottomSheet(
             when (step) {
                 AssetDetailsStep.ZERO -> null
@@ -112,18 +113,32 @@ class AssetDetailsFlow(
     ) {
         val account = newState.selectedAccount.selectFirstAccount()
         when (newState.hostAction) {
-            AssetAction.ViewActivity -> host.gotoActivityFor(account)
-            AssetAction.Send -> host.gotoSendFor(account)
-            AssetAction.NewSend -> host.launchNewSendFor(account, newState.hostAction)
-            AssetAction.Receive -> host.goToReceiveFor(account)
-            AssetAction.Swap -> host.gotoSwap(account)
+            AssetAction.ViewActivity -> {
+                host.gotoActivityFor(account)
+                finishFlow()
+            }
+            AssetAction.Send -> {
+                host.gotoSendFor(account)
+                finishFlow()
+            }
+            AssetAction.NewSend -> {
+                host.launchNewSendFor(account, newState.hostAction)
+                finishFlow()
+            }
+            AssetAction.Receive -> {
+                host.goToReceiveFor(account)
+                finishFlow()
+            }
+            AssetAction.Swap -> {
+                host.gotoSwap(account)
+                finishFlow()
+            }
             AssetAction.Summary -> TODO()
             AssetAction.Deposit -> newState.asset!!.accountGroup(AssetFilter.NonCustodial)
                 .subscribeBy {
                     getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
                 }
         }
-        finishFlow()
     }
 
     override fun finishFlow() {
@@ -137,12 +152,19 @@ class AssetDetailsFlow(
 
     private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
         localState.asset?.let { ca ->
-            disposables += ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
-                assetFlowHost.goToDeposit(
-                    account,
-                    ag.accounts.first(),
-                    ca,
-                    assetAction)
+            disposables += account.sendState.subscribeBy {
+                if (it == SendState.SEND_IN_FLIGHT) {
+                    model.process(TransactionInFlight)
+                } else {
+                    ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
+                        assetFlowHost.goToDeposit(
+                            account,
+                            ag.accounts.first(),
+                            ca,
+                            assetAction)
+                        finishFlow()
+                    }
+                }
             }
         } ?: throw IllegalStateException("No asset defined in local state - action: $assetAction")
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -33,6 +34,7 @@ import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
@@ -67,6 +69,10 @@ class AssetActionsSheet :
                 mapDetailsAndActions(dialogView, newState.selectedAccount, newState.assetFilter)
 
             itemAdapter.itemList = actionItems
+
+            if (newState.errorState != AssetDetailsError.NONE) {
+                showError(newState.errorState)
+            }
         }
     }
 
@@ -91,6 +97,16 @@ class AssetActionsSheet :
         model.process(ClearSheetDataIntent)
         dispose()
     }
+
+    private fun showError(error: AssetDetailsError) =
+        when (error) {
+            AssetDetailsError.TX_IN_FLIGHT -> ToastCustom.makeText(requireContext(),
+                getString(R.string.dashboard_asset_actions_tx_in_progress), Toast.LENGTH_SHORT,
+                ToastCustom.TYPE_ERROR)
+            else -> {
+                // do nothing
+            }
+        }
 
     private fun showAssetBalances(state: AssetDetailsState) {
         if (state.selectedAccountCryptoBalance != null && state.selectedAccountFiatBalance != null) {
@@ -259,7 +275,7 @@ class AssetActionsSheet :
                 // TODO in upcoming story
                 Timber.e("---- summary clicked")
             }
-            AssetAction.Deposit -> AssetActionItem(getString(R.string.common_deposit),
+            AssetAction.Deposit -> AssetActionItem(getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset) {

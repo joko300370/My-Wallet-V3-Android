@@ -50,12 +50,15 @@ private class AgreementTextItemViewHolder(val parent: View) :
     ) {
         itemView.confirm_details_checkbox.setText(item.agreementText, TextView.BufferType.SPANNABLE)
 
+        val option = item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
+            TxOption.AGREEMENT_INTEREST_TRANSFER)
+
+        itemView.confirm_details_checkbox.isChecked = option?.value ?: false
+
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
-                TxOption.AGREEMENT_INTEREST_TRANSFER)
-                ?.let {
-                    model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
-                }
+            option?.let {
+                model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
+            }
         }
     }
 }

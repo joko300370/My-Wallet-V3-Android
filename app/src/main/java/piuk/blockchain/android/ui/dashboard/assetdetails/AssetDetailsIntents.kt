@@ -138,6 +138,11 @@ object ClearSheetDataIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState = AssetDetailsState()
 }
 
+object TransactionInFlight : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(errorState = AssetDetailsError.TX_IN_FLIGHT)
+}
+
 class ShowRelevantAssetDetailsSheet(
     val cryptoCurrency: CryptoCurrency
 ) : AssetDetailsIntent() {
