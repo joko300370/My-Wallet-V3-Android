@@ -237,7 +237,7 @@ class AssetDetailSheet :
                 getString(R.string.asset_details_load_failed_toast)
             AssetDetailsError.NO_EXCHANGE_RATE ->
                 getString(R.string.asset_details_exchange_load_failed_toast)
-            AssetDetailsError.NONE -> "" // this never triggers
+            else -> "" // this never triggers
         }
         ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, TYPE_ERROR)
     }

@@ -13,6 +13,7 @@ interface SendFlowCustomiser {
     fun selectTargetAddressTitle(state: SendState): String
     fun enterAmountTitle(state: SendState): String
     fun enterAmountActionIcon(state: SendState): Int
+    fun enterAmountMaxButton(state: SendState): String
     fun confirmTitle(state: SendState): String
     fun confirmCtaText(state: SendState): String
     fun confirmListItemTitle(state: SendState): String
@@ -46,7 +47,7 @@ class SendFlowCustomiserImpl(
     override fun selectTargetAddressTitle(state: SendState): String {
         return when (state.action) {
             AssetAction.NewSend -> resources.getString(R.string.common_send)
-            AssetAction.Deposit -> resources.getString(R.string.common_deposit)
+            AssetAction.Deposit -> resources.getString(R.string.common_transfer)
             // AssetAction.Swap -> resources.getString(R.string.common_swap)
             // AssertAction.Sell -> "Sell for"
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
@@ -65,6 +66,15 @@ class SendFlowCustomiserImpl(
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
+
+    override fun enterAmountMaxButton(state: SendState): String =
+        when (state.action) {
+            AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_max)
+            AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_deposit_max)
+            // AssetAction.Swap -> "Swap..."
+            // AssertAction.Sell -> "Sell ${state.sendingAccount.asset.displayTicker}"
+            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+        }
 
     override fun confirmTitle(state: SendState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
@@ -98,7 +108,7 @@ class SendFlowCustomiserImpl(
     override fun confirmListItemTitle(state: SendState): String {
         return when (state.action) {
             AssetAction.NewSend -> resources.getString(R.string.common_send)
-            AssetAction.Deposit -> resources.getString(R.string.common_deposit)
+            AssetAction.Deposit -> resources.getString(R.string.common_transfer)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
@@ -190,6 +200,8 @@ class SendFlowCustomiserImpl(
 
     override fun targetAccountFilter(state: SendState): (SingleAccount) -> Boolean =
         when (state.action) {
-            else -> { { true } }
+            else -> {
+                { true }
+            }
         }
 }

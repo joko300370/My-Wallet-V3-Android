@@ -79,6 +79,7 @@ class EnterAmountSheet(
             }
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
+            amount_sheet_use_max.text = customiser.enterAmountMaxButton(newState)
 
             updatePendingTxDetails(newState)
 
