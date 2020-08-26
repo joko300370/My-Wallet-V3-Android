@@ -45,11 +45,22 @@ data class BankAgentResponse(
 
 data class SimpleBuyBalanceResponse(
     val pending: String,
-    @Json(name = "available") // Badly named param, is actually the total including uncleared & locked
+    @field:Json(name="available") // Badly named param, is actually the total including uncleared & locked
     val total: String,
-    @Json(name = "withdrawable") // Balance that is NOT uncleared and IS withdrawable
+    @field:Json(name="withdrawable") // Balance that is NOT uncleared and IS withdrawable
     val actionable: String
 )
+
+//data class SimpleBuyBalanceResponse(
+//    val pending: String,
+//    private val available: String, // Badly named param, is actually the total including uncleared & locked
+//    private val withdrawable: String // Balance that is NOT uncleared and IS withdrawable
+//) {
+//    val actionable: String
+//        get() = withdrawable
+//    val total: String
+//        get() = available
+//}
 
 data class SimpleBuyAllBalancesResponse(
     @Json(name = "BTC")
