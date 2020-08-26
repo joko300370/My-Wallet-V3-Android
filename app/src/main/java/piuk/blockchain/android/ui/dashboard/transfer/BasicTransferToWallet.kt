@@ -13,9 +13,11 @@ import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Maybes
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_basic_transfer_to_wallet.view.*
@@ -24,6 +26,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.setCoinIcon
@@ -79,22 +82,26 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
 
             image.setCoinIcon(cryptoCurrency)
 
-            disposables += Maybes.zip(
-                token.exchangeRate().toMaybe(),
-                token.accountGroup(AssetFilter.Custodial).flatMap { it.balance.toMaybe() }
-            ) { fiatPrice, custodialBalance ->
-                val custodialFiat = fiatPrice.convert(custodialBalance)
-                Pair(custodialBalance, custodialFiat)
+            // This is a bit of a hack, but it's only until new send is rolled out, so I can
+            // live with it.
+            val account: Single<SingleAccount> = token.accountGroup(AssetFilter.Custodial)
+                .toSingle() // NoSuchElement, if the maybe is empty.
+                .map { it.accounts[0] } // IndexOuOFRange if doesn't exist.
+
+            disposables += Singles.zip(
+                token.exchangeRate(),
+                account.flatMap { it.accountBalance },
+                account.flatMap { it.actionableBalance }
+            ) { fiatPrice, totalBalance, availableBalance ->
+                val availableFiat = fiatPrice.convert(availableBalance)
+                Triple(availableBalance, totalBalance, availableFiat)
             }
-            .doOnComplete { throw IllegalStateException("Empty Account Group") }
             .observeOn(uiScheduler)
             .doOnSubscribe { cta_button.isEnabled = false }
             .subscribeBy(
-                onSuccess = { (crypto, fiat) ->
-                    valueToSend = crypto as CryptoValue
-                    amount_crypto.text = crypto.toStringWithSymbol()
-                    amount_fiat.text = fiat.toStringWithSymbol()
-                    checkCtaEnable()
+                onSuccess = { (available, total, fiat) ->
+                    valueToSend = available as CryptoValue
+                    updatePendingUi(view, available, total, fiat)
                 },
                 onError = {
                     Timber.e(it)
@@ -103,9 +110,9 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
             )
 
             disposables += token.defaultAccount()
-                .flatMap { account ->
-                    account.receiveAddress
-                        .map { address -> Pair(address, account.label) }
+                .flatMap { targetAccount ->
+                    targetAccount.receiveAddress
+                        .map { address -> Pair(address, targetAccount.label) }
                 }
                 .observeOn(uiScheduler)
                 .subscribeBy(
@@ -120,6 +127,36 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                         dismiss()
                     }
                 )
+        }
+    }
+
+    private fun updatePendingUi(view: View, available: Money, total: Money, fiat: Money) {
+        with(view) {
+            amount_crypto.text = available.toStringWithSymbol()
+            amount_fiat.text = fiat.toStringWithSymbol()
+            checkCtaEnable()
+
+            if (total != available) {
+                // Show the locked balance notice
+                val msg = getString(
+                    R.string.basic_transfer_lock_warn,
+                    available.toStringWithSymbol(),
+                    (total - available).toStringWithSymbol()
+                )
+
+                val linkTxt = stringUtils.getStringWithMappedLinks(
+                    R.string.basic_transfer_lock_learn_more,
+                    mapOf("balance_lock" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED)),
+                    requireActivity()
+                )
+                locked_total_learn_more.text = linkTxt
+
+                locked_total_warning.visible()
+                locked_total_learn_more.visible()
+            } else {
+                locked_total_warning.gone()
+                locked_total_learn_more.gone()
+            }
         }
     }
 
@@ -184,18 +221,21 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
         analytics.logEvent(SimpleBuyAnalytics.WITHDRAW_WALLET_SCREEN_FAILURE)
 
         with(dialogView) {
-            image.setImageDrawable(R.drawable.vector_pit_request_failure)
+
             when (t) {
                 is SimpleBuyError.WithdrawalInsufficientFunds -> {
+                    image.setImageDrawable(R.drawable.vector_pit_request_failure)
                     complete_title.text = getString(R.string.basic_transfer_error_insufficient_funds_title)
                     complete_message.text = getString(R.string.basic_transfer_error_insufficient_funds)
                 }
                 is SimpleBuyError.WithdrawalAlreadyPending -> {
+                    image.setImageDrawable(R.drawable.vector_pit_request_failure)
                     complete_title.text = getString(R.string.basic_transfer_error_in_progress_title)
                     complete_message.text = getString(R.string.basic_transfer_error_in_progress_body)
                 }
                 is SimpleBuyError.WithdrawalBalanceLocked -> {
-                    complete_title.text = getString(R.string.basic_transfer_error_locked_funds_title)
+                    image.setImageDrawable(R.drawable.vector_transfer_funds_locked)
+                    complete_title.text = ""
 
                     val msg = stringUtils.getStringWithMappedLinks(
                         R.string.basic_transfer_error_locked_funds,
@@ -205,6 +245,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                     complete_message.text = msg
                 }
                 else -> {
+                    image.setImageDrawable(R.drawable.vector_pit_request_failure)
                     complete_title.text = getString(R.string.basic_transfer_error_title)
                     complete_message.text = getString(R.string.basic_transfer_error_body)
                 }

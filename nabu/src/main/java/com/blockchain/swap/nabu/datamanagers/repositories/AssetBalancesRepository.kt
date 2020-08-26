@@ -6,25 +6,43 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import io.reactivex.Maybe
+import timber.log.Timber
 
 class AssetBalancesRepository(balancesProvider: BalancesProvider) {
 
     private val cache = TimedCacheRequest(
         cacheLifetimeSeconds = CACHE_LIFETIME,
-        refreshFn = { balancesProvider.getBalanceForAllAssets() }
+        refreshFn = {
+            balancesProvider.getBalanceForAllAssets()
+                .doOnSuccess { Timber.e("Balance response: $it") }
+        }
     )
 
-    fun getBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
+    fun getTotalBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
         cache.getCachedSingle().flatMapMaybe {
-            it[ccy]?.let { value ->
-                Maybe.just(CryptoValue.fromMinor(ccy, value.toBigInteger()))
+            it[ccy]?.let { response ->
+                Maybe.just(CryptoValue.fromMinor(ccy, response.total.toBigInteger()))
             } ?: Maybe.empty()
         }.onErrorResumeNext(Maybe.empty())
 
-    fun getBalanceForAsset(fiat: String): Maybe<FiatValue> =
+    fun getActionableBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
         cache.getCachedSingle().flatMapMaybe {
-            it[fiat]?.let { value ->
-                Maybe.just(FiatValue.fromMinor(fiat, value.toLong()))
+            it[ccy]?.let { response ->
+                Maybe.just(CryptoValue.fromMinor(ccy, response.actionable.toBigInteger()))
+            } ?: Maybe.empty()
+        }.onErrorResumeNext(Maybe.empty())
+
+    fun getTotalBalanceForAsset(fiat: String): Maybe<FiatValue> =
+        cache.getCachedSingle().flatMapMaybe {
+            it[fiat]?.let { response ->
+                Maybe.just(FiatValue.fromMinor(fiat, response.total.toLong()))
+            } ?: Maybe.empty()
+        }.onErrorResumeNext(Maybe.empty())
+
+    fun getActionableBalanceForAsset(fiat: String): Maybe<FiatValue> =
+        cache.getCachedSingle().flatMapMaybe {
+            it[fiat]?.let { response ->
+                Maybe.just(FiatValue.fromMinor(fiat, response.actionable.toLong()))
             } ?: Maybe.empty()
         }.onErrorResumeNext(Maybe.empty())
 

@@ -101,7 +101,7 @@ class AssetActionsSheet :
         } else {
             state.selectedAccount?.let {
                 disposables += Singles.zip(
-                    it.balance,
+                    it.accountBalance,
                     it.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
                 ).observeOn(uiScheduler).subscribeBy(
                     onSuccess = { (balance, fiatBalance) ->

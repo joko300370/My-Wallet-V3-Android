@@ -58,7 +58,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
 
-        disposables += account.balance
+        disposables += account.accountBalance
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {

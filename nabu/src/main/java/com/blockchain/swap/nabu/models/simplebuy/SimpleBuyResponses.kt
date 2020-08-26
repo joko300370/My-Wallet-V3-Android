@@ -44,7 +44,11 @@ data class BankAgentResponse(
 )
 
 data class SimpleBuyBalanceResponse(
-    val available: String
+    val pending: String,
+    @Json(name = "available") // Badly named param, is actually the total including uncleared & locked
+    val total: String,
+    @Json(name = "withdrawable") // Balance that is NOT uncleared and IS withdrawable
+    val actionable: String
 )
 
 data class SimpleBuyAllBalancesResponse(
@@ -67,7 +71,7 @@ data class SimpleBuyAllBalancesResponse(
     @Json(name = "GBP")
     val GBP: SimpleBuyBalanceResponse? = null
 ) {
-    operator fun get(ccy: CryptoCurrency): String? {
+    operator fun get(ccy: CryptoCurrency): SimpleBuyBalanceResponse? {
         return when (ccy) {
             CryptoCurrency.BTC -> BTC
             CryptoCurrency.ETHER -> ETH
@@ -77,15 +81,15 @@ data class SimpleBuyAllBalancesResponse(
             CryptoCurrency.ALGO -> ALGO
             CryptoCurrency.USDT -> USDT
             else -> null
-        }?.available
+        }
     }
 
-    operator fun get(fiat: String): String? {
+    operator fun get(fiat: String): SimpleBuyBalanceResponse? {
         return when (fiat) {
             "EUR" -> EUR
             "GBP" -> GBP
             else -> null
-        }?.available
+        }
     }
 }
 

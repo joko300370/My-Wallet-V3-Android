@@ -26,7 +26,7 @@ class CryptoAccountCompoundGroupTest {
     fun `group with single account returns single account balance`() {
         // Arrange
         val account: CryptoAccount = mock {
-            on { balance } itReturns Single.just(100.bitcoin() as Money)
+            on { accountBalance } itReturns Single.just(100.bitcoin() as Money)
         }
 
         val subject = CryptoAccountNonCustodialGroup(
@@ -36,7 +36,7 @@ class CryptoAccountCompoundGroupTest {
         )
 
         // Act
-        subject.balance.test()
+        subject.accountBalance.test()
             .assertComplete()
             .assertValue(100.bitcoin())
     }
@@ -45,11 +45,11 @@ class CryptoAccountCompoundGroupTest {
     fun `group with two accounts returns the sum of the account balance`() {
         // Arrange
         val account1: CryptoAccount = mock {
-            on { balance } itReturns Single.just(100.bitcoin() as Money)
+            on { accountBalance } itReturns Single.just(100.bitcoin() as Money)
         }
 
         val account2: CryptoAccount = mock {
-            on { balance } itReturns Single.just(150.bitcoin() as Money)
+            on { accountBalance } itReturns Single.just(150.bitcoin() as Money)
         }
 
         val subject = CryptoAccountNonCustodialGroup(
@@ -59,7 +59,7 @@ class CryptoAccountCompoundGroupTest {
         )
 
         // Act
-        subject.balance.test()
+        subject.accountBalance.test()
             .assertComplete()
             .assertValue(250.bitcoin())
     }

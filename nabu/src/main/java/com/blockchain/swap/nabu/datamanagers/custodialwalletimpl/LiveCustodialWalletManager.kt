@@ -270,11 +270,21 @@ class LiveCustodialWalletManager(
             nabuService.deleteBank(it, bankId)
         }
 
-    override fun getBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
+    override fun getTotalBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
         kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
             .flatMapMaybe { eligible ->
                 if (eligible) {
-                    assetBalancesRepository.getBalanceForAsset(crypto)
+                    assetBalancesRepository.getTotalBalanceForAsset(crypto)
+                } else {
+                    Maybe.empty()
+                }
+            }
+
+    override fun getActionableBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
+        kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
+            .flatMapMaybe { eligible ->
+                if (eligible) {
+                    assetBalancesRepository.getActionableBalanceForAsset(crypto)
                 } else {
                     Maybe.empty()
                 }
@@ -346,7 +356,7 @@ class LiveCustodialWalletManager(
         isTier2Approved: Boolean
     ) = authenticator.authenticate {
         Singles.zip(
-            assetBalancesRepository.getBalanceForAsset(fiatCurrency)
+            assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
                 .map { balance -> CustodialFiatBalance(fiatCurrency, true, balance) }
                 .toSingle(CustodialFiatBalance(fiatCurrency, false, null)),
             nabuService.getCards(it).onErrorReturn { emptyList() },

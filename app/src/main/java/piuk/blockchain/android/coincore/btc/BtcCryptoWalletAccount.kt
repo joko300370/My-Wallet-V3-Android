@@ -29,12 +29,15 @@ internal class BtcCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = payloadManager.getAddressBalanceRefresh(address)
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
             .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = payloadManager.getNextReceiveAddress(

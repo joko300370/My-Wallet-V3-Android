@@ -43,13 +43,16 @@ internal class CryptoInterestAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = custodialWalletManager.getInterestAccountDetails(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
             )
             .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance // TODO This will need updating when we support transfer out of an interest account
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)

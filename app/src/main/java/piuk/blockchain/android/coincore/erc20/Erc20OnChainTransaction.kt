@@ -78,7 +78,7 @@ open class Erc20OnChainTransaction(
         require(amount.currency == asset)
 
         return Singles.zip(
-            sendingAccount.balance.map { it as CryptoValue },
+            sendingAccount.accountBalance.map { it as CryptoValue },
             absoluteFee()
         ) { available, fee ->
             pendingTx.copy(
@@ -135,7 +135,7 @@ open class Erc20OnChainTransaction(
         }
 
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
-        sendingAccount.balance
+        sendingAccount.accountBalance
             .map { balance ->
                 if (pendingTx.amount > balance) {
                     throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)

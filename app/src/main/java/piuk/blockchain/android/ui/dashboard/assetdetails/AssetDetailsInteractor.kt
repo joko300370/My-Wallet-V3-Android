@@ -47,7 +47,7 @@ class AssetDetailsInteractor(
 
     fun shouldShowCustody(cryptoCurrency: CryptoCurrency): Single<Boolean> {
         return coincore[cryptoCurrency].accountGroup(AssetFilter.Custodial)
-            .flatMapSingle { it.balance }
+            .flatMapSingle { it.accountBalance }
             .map {
                 !dashboardPrefs.isCustodialIntroSeen && !it.isZero
             }
@@ -64,7 +64,7 @@ class AssetDetailsInteractor(
 
     private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.balance.toMaybe().map { balance ->
+            grp.accountBalance.toMaybe().map { balance ->
                 Details.DetailsItem(
                     grp,
                     balance,

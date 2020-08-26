@@ -12,7 +12,7 @@ import java.io.Serializable
 interface BlockchainAccount {
     val label: String
 
-    val balance: Single<Money>
+    val accountBalance: Single<Money> // Total balance, including uncleared and locked
 
     val activity: Single<ActivitySummaryList>
 
@@ -28,6 +28,9 @@ interface BlockchainAccount {
 interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
     val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
+
+    // Available balance, not including uncleared and locked, that may be used for transactions
+    val actionableBalance: Single<Money>
 
     val sendState: Single<SendState>
     fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor>
@@ -90,8 +93,11 @@ class NullCryptoAccount(
     override val sendState: Single<SendState>
         get() = Single.just(SendState.NOT_SUPPORTED)
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
@@ -126,8 +132,11 @@ object NullFiatAccount : FiatAccount {
 
     override val label: String = ""
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())

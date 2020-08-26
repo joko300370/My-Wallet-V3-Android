@@ -36,7 +36,7 @@ abstract class CryptoAccountBase : CryptoAccount {
         fiatCurrency: String,
         exchangeRates: ExchangeRates
     ): Single<Money> =
-        balance.map { it.toFiat(exchangeRates, fiatCurrency) }
+        accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
 
     protected fun setHasTransactions(hasTransactions: Boolean) {
         this.hasTransactions = hasTransactions
@@ -57,8 +57,11 @@ internal class CryptoExchangeAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
@@ -128,8 +131,8 @@ class CryptoAccountCustodialGroup(
         account = accounts[0] as CryptoAccountBase
     }
 
-    override val balance: Single<Money>
-        get() = account.balance
+    override val accountBalance: Single<Money>
+        get() = account.accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() = account.activity
@@ -147,7 +150,7 @@ class CryptoAccountCustodialGroup(
         fiatCurrency: String,
         exchangeRates: ExchangeRates
     ): Single<Money> =
-        balance.map { it.toFiat(exchangeRates, fiatCurrency) }
+        accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
 
     override fun includes(account: BlockchainAccount): Boolean =
         accounts.contains(account)
@@ -159,12 +162,12 @@ class CryptoAccountNonCustodialGroup(
     override val accounts: SingleAccountList
 ) : AccountGroup {
     // Produce the sum of all balances of all accounts
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = if (accounts.isEmpty()) {
             Single.just(CryptoValue.zero(asset))
         } else {
             Single.zip(
-                accounts.map { it.balance }
+                accounts.map { it.accountBalance }
             ) { t: Array<Any> ->
                 t.map { it as Money }
                     .total()
@@ -205,7 +208,7 @@ class CryptoAccountNonCustodialGroup(
         if (accounts.isEmpty()) {
             Single.just(FiatValue.zero(fiatCurrency))
         } else {
-            balance.map { it.toFiat(exchangeRates, fiatCurrency) }
+            accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
         }
 
     override fun includes(account: BlockchainAccount): Boolean =

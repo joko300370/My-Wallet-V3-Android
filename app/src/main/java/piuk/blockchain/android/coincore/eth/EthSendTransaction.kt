@@ -80,7 +80,7 @@ open class EthSendTransaction(
         require(amount.currency == CryptoCurrency.ETHER)
 
         return Singles.zip(
-            sendingAccount.balance.map { it as CryptoValue },
+            sendingAccount.accountBalance.map { it as CryptoValue },
             absoluteFee()
         ) { available, fees ->
             pendingTx.copy(
@@ -156,7 +156,7 @@ open class EthSendTransaction(
 
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Singles.zip(
-            sendingAccount.balance,
+            sendingAccount.accountBalance,
             absoluteFee()
         ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {

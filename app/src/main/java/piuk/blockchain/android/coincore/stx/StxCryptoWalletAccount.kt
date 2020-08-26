@@ -21,8 +21,11 @@ class StxCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = TODO("not implemented")
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = TODO("not implemented")

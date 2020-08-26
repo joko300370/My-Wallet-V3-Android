@@ -81,6 +81,30 @@
                 android:contentDescription="@string/basic_transfer_body"
                 android:text="@string/basic_transfer_body" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/locked_total_warning"
+                    style="@style/Text.Standard.Centered.12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/huge_margin"
+                    android:layout_marginTop="@dimen/large_margin"
+                    android:layout_marginEnd="@dimen/huge_margin"
+                    android:contentDescription="@string/basic_transfer_lock_warn"
+                    android:visibility="gone"
+                    android:text="@string/basic_transfer_lock_warn" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/locked_total_learn_more"
+                    style="@style/Text.Standard.Centered.12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/huge_margin"
+                    android:layout_marginTop="@dimen/smallest_margin"
+                    android:layout_marginEnd="@dimen/huge_margin"
+                    android:contentDescription="@string/basic_transfer_lock_learn_more"
+                    android:visibility="gone"
+                    android:text="@string/basic_transfer_lock_learn_more" />
+
         </LinearLayout>
 
         <LinearLayout

@@ -57,12 +57,12 @@ class DashboardInteractor(
             .filter { !it.hasFeature(CryptoCurrency.IS_ERC20) }
             .forEach {
                 cd += coincore[it].accountGroup(balanceFilter)
-                    .flatMapSingle { group -> group.balance }
+                    .flatMapSingle { group -> group.accountBalance }
                     .map { balance -> balance as CryptoValue }
                     .doOnSuccess { value ->
                         if (value.currency == CryptoCurrency.ETHER) {
                             cd += coincore[CryptoCurrency.PAX].accountGroup(balanceFilter)
-                                .flatMapSingle { asset -> asset.balance }
+                                .flatMapSingle { asset -> asset.accountBalance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
                                         Timber.d("*****> Got balance for PAX")
@@ -75,7 +75,7 @@ class DashboardInteractor(
                                     }
                                 )
                             cd += coincore[CryptoCurrency.USDT].accountGroup(balanceFilter)
-                                .flatMapSingle { asset -> asset.balance }
+                                .flatMapSingle { asset -> asset.accountBalance }
                                 .subscribeBy(
                                     onSuccess = { balance ->
                                         Timber.d("*****> Got balance for USDT")
@@ -124,7 +124,7 @@ class DashboardInteractor(
         coincore.fiatAssets.accountGroup()
             .flattenAsObservable { g -> g.accounts }
             .flatMapSingle {
-                    a -> a.balance.map { balance ->
+                    a -> a.accountBalance.map { balance ->
                         FiatBalanceInfo(
                             balance,
                             balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
@@ -171,7 +171,7 @@ class DashboardInteractor(
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
         return coincore[crypto].accountGroup(AssetFilter.Custodial)
-            .flatMapSingle { it.balance }
+            .flatMapSingle { it.accountBalance }
             .subscribeBy(
                 onSuccess = { model.process(UpdateHasCustodialBalanceIntent(crypto, !it.isZero)) },
                 onError = { model.process(UpdateHasCustodialBalanceIntent(crypto, false)) }

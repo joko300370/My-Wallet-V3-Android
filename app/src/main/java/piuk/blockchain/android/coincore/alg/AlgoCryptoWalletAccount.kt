@@ -18,8 +18,11 @@ internal class AlgoCryptoWalletAccount(
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.ZeroAlg)
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedException("Need implementation of ALGO receive"))

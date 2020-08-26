@@ -42,9 +42,12 @@ abstract class Erc20NonCustodialAccount(
 
     override val isDefault: Boolean = true // Only one account, so always default
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = erc20Account.getBalance()
             .map { CryptoValue.fromMinor(asset, it) }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() {
@@ -95,7 +98,7 @@ abstract class Erc20NonCustodialAccount(
 
     override val sendState: Single<SendState>
         get() = Singles.zip(
-            balance,
+            accountBalance,
             ethDataManager.isLastTxPending()
         ) { balance: Money, hasUnconfirmed: Boolean ->
             when {

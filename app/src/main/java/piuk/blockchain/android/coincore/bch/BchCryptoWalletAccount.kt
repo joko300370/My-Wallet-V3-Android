@@ -35,13 +35,16 @@ internal class BchCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = bchManager.getBalance(address)
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBch)
             }
             .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = bchManager.getNextReceiveAddress(

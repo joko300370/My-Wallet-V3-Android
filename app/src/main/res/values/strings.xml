@@ -1207,6 +1207,8 @@
     <string name="basic_transfer_title">Send to %1s</string>
     <string name="basic_transfer_body">Blockchain.com only allows sending your Wallet\'s total amount at this time.</string>
     <string name="basic_transfer_cta">Send</string>
+    <string name="basic_transfer_lock_warn">Your available balance to withdraw is %1s. The remaining balance %2s will be available to be withdrawn within 7 days.</string>
+    <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">Learn more</annotation>.</string>
 
     <!-- basic transfer complete -->
     <string name="basic_transfer_complete_title">Success! %1s Sent.</string>
@@ -1223,8 +1225,7 @@
     <string name="basic_transfer_error_insufficient_funds_title">Insufficient Funds</string>
     <string name="basic_transfer_error_insufficient_funds">You have insufficient funds in your account to complete this transaction.</string>
 
-    <string name="basic_transfer_error_locked_funds_title">Funds Locked</string>
-    <string name="basic_transfer_error_locked_funds">Your Trading Wallet balance will be available once the hold period expires. <annotation link="balance_lock">Learn more</annotation>.</string>
+    <string name="basic_transfer_error_locked_funds">Your crypto will be available to be withdrawn within 7 days. <annotation link="balance_lock">Learn more</annotation>.</string>
 
     <string name="airdrop_status_date_active">Drops on %1s</string>
     <string name="airdrop_status_date_inactive">Ended on %1s</string>

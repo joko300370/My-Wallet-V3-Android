@@ -33,8 +33,16 @@ internal class FiatCustodialAccount(
 ) : FiatAccount {
     private val hasFunds = AtomicBoolean(false)
 
-    override val balance: Single<Money>
-        get() = assetBalancesRepository.getBalanceForAsset(fiatCurrency)
+    override val accountBalance: Single<Money>
+        get() = assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
+            .toSingle(FiatValue.zero(fiatCurrency)).map {
+                it as Money
+            }.doOnSuccess {
+                hasFunds.set(it.isPositive)
+            }
+
+    override val actionableBalance: Single<Money>
+        get() = assetBalancesRepository.getActionableBalanceForAsset(fiatCurrency)
             .toSingle(FiatValue.zero(fiatCurrency)).map {
                 it as Money
             }.doOnSuccess {
@@ -72,7 +80,7 @@ internal class FiatCustodialAccount(
     }
 
     override fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money> =
-        balance.map { it.toFiat(exchangeRates, fiatCurrency) }
+        accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Send to fiat not supported"))
@@ -89,7 +97,7 @@ class FiatAccountGroup(
     override val accounts: SingleAccountList
 ) : AccountGroup {
     // Produce the sum of all balances of all accounts
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
 
     // All the activities for all the accounts

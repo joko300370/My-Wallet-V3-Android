@@ -30,12 +30,15 @@ internal class XlmCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = xlmManager.getBalance()
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroXlm)
             }
             .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(

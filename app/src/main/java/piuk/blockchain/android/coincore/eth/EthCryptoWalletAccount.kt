@@ -55,7 +55,7 @@ internal class EthCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
@@ -63,6 +63,9 @@ internal class EthCryptoWalletAccount(
                 hasFunds.set(it > CryptoValue.ZeroEth)
             }
             .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
@@ -137,7 +140,7 @@ internal class EthCryptoWalletAccount(
 
     override val sendState: Single<SendState>
         get() = Singles.zip(
-                balance,
+                accountBalance,
                 ethDataManager.isLastTxPending()
             ) { balance: Money, hasUnconfirmed: Boolean ->
                 when {

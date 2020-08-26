@@ -39,7 +39,11 @@ enum class OrderState {
 
 interface CustodialWalletManager {
 
-    fun getBalanceForAsset(
+    fun getTotalBalanceForAsset(
+        crypto: CryptoCurrency
+    ): Maybe<CryptoValue>
+
+    fun getActionableBalanceForAsset(
         crypto: CryptoCurrency
     ): Maybe<CryptoValue>
 

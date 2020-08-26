@@ -106,7 +106,7 @@ internal abstract class CryptoAssetBase(
                 custodialManager
             )
         ).flatMap { account ->
-            account.balance.map {
+            account.accountBalance.map {
                 if (account.isConfigured) {
                     listOf(account)
                 } else {

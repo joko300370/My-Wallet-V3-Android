@@ -43,13 +43,25 @@ open class CustodialTradingAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
-    override val balance: Single<Money>
-        get() = custodialWalletManager.getBalanceForAsset(asset)
+    override val accountBalance: Single<Money>
+        get() = custodialWalletManager.getTotalBalanceForAsset(asset)
             .doOnComplete { nabuAccountExists.set(false) }
             .doOnSuccess { nabuAccountExists.set(true) }
             .toSingle(CryptoValue.zero(asset))
             .onErrorReturn {
-                Timber.d("Unable to get custodial trading balance: $it")
+                Timber.d("Unable to get custodial trading total balance: $it")
+                CryptoValue.zero(asset)
+            }
+            .doOnSuccess { hasFunds.set(it.isPositive) }
+            .map { it as Money }
+
+    override val actionableBalance: Single<Money>
+        get() = custodialWalletManager.getActionableBalanceForAsset(asset)
+            .doOnComplete { nabuAccountExists.set(false) }
+            .doOnSuccess { nabuAccountExists.set(true) }
+            .toSingle(CryptoValue.zero(asset))
+            .onErrorReturn {
+                Timber.d("Unable to get custodial trading actionable balance: $it")
                 CryptoValue.zero(asset)
             }
             .doOnSuccess { hasFunds.set(it.isPositive) }
@@ -95,7 +107,7 @@ open class CustodialTradingAccount(
         }
 
     override val sendState: Single<SendState>
-        get() = balance.map { balance ->
+        get() = accountBalance.map { balance ->
                 if (balance <= CryptoValue.zero(asset))
                     SendState.NO_FUNDS
                 else

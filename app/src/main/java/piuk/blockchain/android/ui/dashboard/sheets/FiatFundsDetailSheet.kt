@@ -60,7 +60,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             funds_user_fiat_balance.gone()
 
             disposables += Singles.zip(
-                account.balance,
+                account.accountBalance,
                 account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
             ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onSuccess = { (fiatBalance, userFiatBalance) ->

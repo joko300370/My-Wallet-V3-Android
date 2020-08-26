@@ -80,10 +80,10 @@ class AssetDetailsInteractorTest {
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
-        whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
+        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
+        whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
+        whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
+        whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))
@@ -115,10 +115,10 @@ class AssetDetailsInteractorTest {
         val interestCrypto = CryptoValue.ZeroBtc
         val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
 
-        whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
+        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
+        whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
+        whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
+        whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         val testObserver = interactor.loadAssetDetails(asset)
@@ -138,9 +138,9 @@ class AssetDetailsInteractorTest {
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
         whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.error(Throwable()))
 
-        whenever(totalGroup.balance).thenReturn(Single.just(totalCrypto))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
+        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
+        whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
+        whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         val testObserver = interactor.loadAssetDetails(asset)
@@ -157,10 +157,10 @@ class AssetDetailsInteractorTest {
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
-        whenever(totalGroup.balance).thenReturn(Single.error(Throwable()))
-        whenever(nonCustodialGroup.balance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.balance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.balance).thenReturn(Single.just(interestCrypto))
+        whenever(totalGroup.accountBalance).thenReturn(Single.error(Throwable()))
+        whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
+        whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
+        whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         val testObserver = interactor.loadAssetDetails(asset)
