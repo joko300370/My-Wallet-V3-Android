@@ -86,11 +86,17 @@ internal abstract class CryptoAssetBase(
                 exchangeRates
             )
         ).flatMap { account ->
-            account.isInterestEnabled().map {
+            account.isInterestEnabled().flatMap {
                 if (account.isConfigured) {
-                    listOf(account)
+                    tiersService.tiers().map { tiers ->
+                        if (tiers.isApprovedFor(KycTierLevel.GOLD)) {
+                            listOf(account)
+                        } else {
+                            emptyList()
+                        }
+                    }
                 } else {
-                    emptyList()
+                    Single.just(emptyList())
                 }
             }
         }
