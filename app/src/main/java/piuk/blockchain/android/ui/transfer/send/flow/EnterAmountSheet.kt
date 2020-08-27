@@ -147,7 +147,7 @@ class EnterAmountSheet(
             R.id.enter_amount)
         inputView?.run {
             requestFocus()
-            imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+            imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
     }
 }
