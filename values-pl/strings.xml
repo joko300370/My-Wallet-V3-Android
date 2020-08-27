@@ -352,7 +352,17 @@
  Adres Bitcoin %1$s . Zeskanuj kod QR. 
 </string>
   <string name="invalid_private_key">Nieprawidłowy klucz prywatny</string>
+  <string name="watch_only_import_warning">Zamierzasz zaimportować adres, którego nie można wydać, an 
+ adres (lub skrypt klucza publicznego) 
+ przechowywane w portfelu bez odpowiedniego klucza prywatnego. To 
+ oznacza, że fundusze można wydać WYŁĄCZNIE, jeśli klucz prywatny jest przechowywany w innym miejscu. Jeśli ty 
+ robić 
+ nie przechowuj klucza prywatnego, NIE instruuj nikogo, aby wysyłał Ci bitcoiny do 
+ niewymienialne 
+ adres. 
 
+ Te opcje są zalecane tylko dla zaawansowanych użytkowników. Kontyntynuj? 
+</string>
   <string name="scan_private_key">Skanuj klucz prywatny</string>
   <string name="private_key_successfully_imported">Klucz prywatny został pomyślnie zaimportowany.</string>
   <string name="private_key_not_matching_address">UWAGA: Zeskanowany klucz prywatny nie 
@@ -1116,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Wysłaliśmy link weryfikacyjny do</string>
   <string name="buy_sell_unverified_email_verify_message2">Kliknij i wróć tutaj, aby kontynuować transakcję.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otwórz e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Zgadzam się na Coinify <a href="ignored"> warunki handlowe </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-mail zweryfikowany!</string>
   <string name="buy_sell_verified_email_message">Nasz partner %1$s przetworzy Twoją transakcję bitcoin. Klikając przycisk Zgadzam się i kontynuuj, utworzysz konto z %1$s .</string>
   <string name="buy_sell_identification_verification">Zidentyfikuj weryfikację</string>
@@ -1458,9 +1467,7 @@
   <string name="simple_buy_amount_to_send">Kwota do wysłania</string>
   <string name="simple_buy_pending_buy_sheet_title">Oczekuje na zakup %1s</string>
   <string name="recipient_name_must_match_eur">Nazwa odbiorcy powyżej musi być zgodna z nazwą posiadacza konta na koncie bankowym, aby przelew mógł zostać zrealizowany. Twój transfer może zostać odrzucony, jeśli nie ma dopasowania.</string>
-  <string name="recipient_name_must_match_gbp"><![CDATA[Nazwa odbiorcy powyżej musi być zgodna z nazwą posiadacza konta na koncie bankowym, aby przelew mógł zostać zrealizowany. Twój transfer może zostać odrzucony, jeśli nie ma dopasowania. 
-
- <annotation link=\"modular_terms_and_conditions\"> środki na to konto, zgadzasz się na <annotation link=\"modular_terms_and_conditions\"> Regulamin Modulr </annotation> , naszego partnera bankowego.]]></string>
+  <string name="recipient_name_must_match_gbp">Nazwa odbiorcy powyżej musi być zgodna z nazwą posiadacza konta na koncie bankowym, aby przelew mógł zostać zrealizowany. Twój transfer może zostać odrzucony, jeśli nie ma dopasowania. środki na to konto, zgadzasz się na <annotation link="modular_terms_and_conditions"> Regulamin Modulr </annotation> , naszego partnera bankowego.</string>
   <string name="recipient_name_must_match">Wysyłaj środki wyłącznie z konta bankowego na Twoje nazwisko. Jeśli nie, Twój depozyt może zostać opóźniony lub odrzucony.</string>
   <string name="simple_buy_no_currencies_available_title">Brak dostępnych walut</string>
   <string name="simple_buy_no_currencies_available">Niestety obecnie nie ma walut, którymi można handlować :(</string>
@@ -1536,6 +1543,7 @@
   <string name="estimated_amount">Szac. Ilość</string>
   <string name="buying_fee">Opłata za zakup</string>
   <string name="purchase_bank_note">Gdy otrzymamy twoje środki, rozpoczniemy twoje zamówienie zakupu %1$s . Pamiętaj, że ostateczna kwota może się zmienić na odpowiednią aktywność na rynku. Mogą obowiązywać opłaty.</string>
+  <string name="purchase_card_note">Obciążymy Twoją metodę płatności w ciągu 2 dni roboczych. Ostateczna kwota może się zmienić z powodu aktywności na rynku.</string>
   <string name="complete_payment">Dokonaj płatności</string>
   <string name="card_payment">Płatność kartą</string>
   <string name="buy_now">Kup Teraz</string>
@@ -1661,7 +1669,7 @@
   <string name="bank_transfer">Przelew bankowy</string>
   <string name="instantly_buy_crypto_with_card">Natychmiast kupuj kryptowaluty za pomocą dowolnej karty Visa lub Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Wysyłaj środki bezpośrednio ze swojego banku do portfela Blockchain. Gdy otrzymamy przelew ręczny, użyj tej gotówki na zakup kryptowalut.</string>
-  <string name="by_depositing_funds_terms_and_conds"><![CDATA[<annotation link=\"modular_terms_and_conditions\"> środki na to konto, wyrażasz zgodę na <annotation link=\"modular_terms_and_conditions\"> Warunki korzystania z usługi Modulr </annotation> , naszego partnera bankowego.]]></string>
+  <string name="by_depositing_funds_terms_and_conds">środki na to konto, wyrażasz zgodę na <annotation link="modular_terms_and_conditions"> Warunki korzystania z usługi Modulr </annotation> , naszego partnera bankowego.</string>
   <string name="add_bank_with_currency">Dodaj bank %1s</string>
   <string name="deposit_currency">Wpłać %1s</string>
   <string name="currency_bank_transfer">Przelew bankowy</string>
@@ -1708,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Wpłać gotówkę</string>
   <string name="fiat_funds_no_kyc_step_2_description">Przelej gotówkę ze swojego banku i włącz salda gotówkowe.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Kup Crypto za gotówkę</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Użyj portfela gotówkowego jako metody płatności, aby kupić BTC, ETH, XLM i nie tylko.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Użyj portfela gotówkowego jako metody płatności, aby kupić BTC, ETH, XLM i nie tylko.</string>
   <string name="fiat_funds_no_kyc_positive_action">Zweryfikuj moją tożsamość</string>
   <string name="fiat_funds_no_kyc_negative_action">Nie teraz</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1736,4 +1744,103 @@
   <string name="send_state_not_supported">Wysyłanie nie jest obsługiwane na tym koncie</string>
   <string name="send_state_not_enough_gas">Saldo ETH niskie, nie można uiścić opłaty sieciowej</string>
   <string name="send_state_send_in_flight">Niedostępne z powodu oczekującej transakcji.</string>
+  <string name="common_send">Wysłać</string>
+  <string name="common_receive">Otrzymać</string>
+  <string name="common_swap">Zamiana</string>
+  <string name="common_from">Z</string>
+  <string name="common_to">Do</string>
+  <string name="common_yes">tak</string>
+  <string name="common_no">Nie</string>
+  <string name="common_ok">dobrze</string>
+  <string name="common_cancel">Anuluj</string>
+  <string name="common_total">Całkowity</string>
+  <string name="common_deposit">Kaucja</string>
+  <string name="common_transfer">Transfer</string>
+  <string name="common_error">Coś poszło nie tak. Proszę spróbuj ponownie</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Potwierdzać</string>
+  <string name="toolbar_cmd_transfer">Transfer</string>
+  <string name="notification_2fa_summary">Powiadomienia 2FA</string>
+  <string name="notification_2fa_description">Powiadomienia związane z uwierzytelnianiem dwuskładnikowym</string>
+  <string name="notification_payments_summary">Powiadomienia o płatnościach</string>
+  <string name="notification_payments_description">Powiadomienia związane z płatnościami</string>
+  <string name="enable_cloud_backup">Włącz kopie zapasowe w chmurze</string>
+  <string name="enable_cloud_backup_summary">Przechowuj zaszyfrowaną kopię zapasową na swoim koncie Dysku Google, 
+ Jeśli możliwe. Dzięki temu możesz przywrócić portfel, jeśli zgubisz to urządzenie. 
+</string>
+  <string name="tx_title_interest">Uzyskane odsetki: %1$s</string>
+  <string name="dashboard_asset_actions_send_dsc">Przenieś %1$s do dowolnego portfela</string>
+  <string name="dashboard_asset_actions_receive_dsc">Zaakceptuj lub udostępnij swój adres %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Wymień %1$s na inną kryptowalutę</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Dodaj %1$s do swojego portfela odsetkowego</string>
+  <string name="dashboard_asset_actions_summary_title">Podsumowanie zainteresowań</string>
+  <string name="dashboard_asset_actions_summary_dsc">Wyświetl naliczone odsetki w wysokości %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Nie udało się załadować szczegółów zainteresowań</string>
+  <string name="asset_details_chart_load_failed_toast">Nie udało się załadować szczegółów wykresu, spróbuj ponownie</string>
+  <string name="asset_details_load_failed_toast">Nie udało się wczytać szczegółów portfela, spróbuj ponownie</string>
+  <string name="asset_details_exchange_load_failed_toast">Nie udało się uzyskać informacji o kursie wymiany, spróbuj ponownie</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Trwa już transakcja, poczekaj, aż się zakończy</string>
+  <string name="cloud_backup_card_title">Przedstawiamy kopie zapasowe w chmurze</string>
+  <string name="cloud_backup_card_body">Możesz teraz bezpiecznie tworzyć kopie zapasowe swojego portfela w chmurze. Możesz zrezygnować z tworzenia kopii zapasowych w ustawieniach swojego portfela.</string>
+  <string name="cloud_backup_card_cta">Ucz się więcej</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Twoje dostępne saldo do wypłaty to %1s . Pozostałe saldo %2s będzie dostępne do wypłaty w ciągu 7 dni.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Dowiedz się więcej </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Niewystarczające środki</string>
+  <string name="basic_transfer_error_insufficient_funds">Nie masz wystarczających środków na koncie, aby zakończyć tę transakcję.</string>
+  <string name="basic_transfer_error_locked_funds">Twoje krypto będzie dostępne do wypłaty w ciągu 7 dni. <annotation link="balance_lock"> Dowiedz się więcej </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">Aby wysłać %1$s potrzebujesz ETH</string>
+  <string name="purchase_card_note_1">Twoja ostateczna kwota może ulec zmianie w wyniku aktywności na rynku. Państwa fundusze zostaną objęte początkowym okresem wstrzymania wynoszącym 7 dni.</string>
+  <string name="select_deposit_source_title">Przenieść z</string>
+  <string name="activity_state_cleared">Wyczyszczone</string>
+  <string name="activity_state_rejected">Odrzucony</string>
+  <string name="activity_state_refunded">Zwrócono koszty</string>
+  <string name="activity_details_label_manual_review">Przegląd ręczny</string>
+  <string name="activity_details_label_processing">Przetwarzanie</string>
+  <string name="activity_details_title_deposit">Kaucja</string>
+  <string name="activity_details_title_interest_earned">Odsetki</string>
+  <string name="activity_details_title_withdraw">Wycofanie</string>
+  <string name="transfer_receive_crypto">Odbierz krypto</string>
+  <string name="send_select_target_title">Miejsce docelowe</string>
+  <string name="send_enter_amount_from">Od: %1$s</string>
+  <string name="send_enter_amount_to">Do: %1$s</string>
+  <string name="send_enter_amount_title">Wyślij %1$s</string>
+  <string name="send_enter_amount_available">Dostępny</string>
+  <string name="send_enter_amount_max">Wyślij Max</string>
+  <string name="send_enter_amount_deposit_max">Transfer Max</string>
+  <string name="send_enter_amount_min_deposit">Wymagany minimalny przelew %1$s</string>
+  <string name="send_confirmation_title">Wyślij %1$s</string>
+  <string name="send_confirmation_fee">Opłata - standardowa</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 minut)</string>
+  <string name="send_confirmation_fee_loading">Ładowanie…</string>
+  <string name="send_confirmation_fee_error">Błąd ładowania opłaty</string>
+  <string name="send_confirmation_add_note_hint">Dodaj notatkę</string>
+  <string name="send_confirmation_add_note_success">Notatka została pomyślnie dodana</string>
+  <string name="send_confirmation_cta_button">Wyślij %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Potwierdź transfer</string>
+  <string name="send_confirmation_interest_tos_pp">Przeczytałem i akceptuję <annotation link="interest_tos"> Warunki korzystania z usługi </annotation> i <annotation link="interest_pp"> Polityka prywatności </annotation> .</string>
+  <string name="send_confirmation_interest_holding_period_1">Akceptując to, zgadzasz się na przeniesienie</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) z portfela Bitcoin na konto odsetkowe. Państwa fundusze zostaną objęte początkowym okresem wstrzymania wynoszącym 7 dni.</string>
+  <string name="send_confirmation_progress_title">Przesyłam %1$s</string>
+  <string name="send_confirmation_progress_message">Przenosimy teraz Twoje %1$s .</string>
+  <string name="send_confirmation_success_title">Przeniesiono %1$s</string>
+  <string name="send_confirmation_success_message">Twój %1$s został pomyślnie przesłany.</string>
+  <string name="send_progress_sending_title">Wysyłanie %1$s</string>
+  <string name="send_progress_sending_subtitle">Wysyłamy teraz Twoją transakcję.</string>
+  <string name="send_progress_complete_title">Wysłano %1$s</string>
+  <string name="send_progress_complete_subtitle">Twoje %1$s zostało pomyślnie wysłane.</string>
+  <string name="send_progress_error_title">Ups! Coś poszło nie tak.</string>
+  <string name="send_progress_error_subtitle">Nie martw się. Twoje pieniądze są bezpieczne. Spróbuj ponownie lub skontaktuj się z naszym zespołem pomocy technicznej, aby uzyskać pomoc.</string>
+  <string name="send_enter_asset_address_hint">%1s Adres</string>
+  <string name="send_warn_internal_send_only">Tylko wysyłanie wewnętrzne</string>
+  <string name="send_scan_qr_code">Skanowania QR code</string>
+  <string name="send_error_not_valid_asset_address">Nieprawidłowy adres %1s</string>
+  <string name="send_error_address_is_eth_contract">Adres nie jest adresem użytkownika</string>
+  <string name="send_enter_amount_error_insufficient_funds">Za mało %1$s w Twoim portfelu.</string>
+  <string name="send_enter_amount_error_invalid_amount">Wyślij 0,00000001 %1$s lub więcej.</string>
+  <string name="send_enter_invalid_password">Hasło jest niepoprawne.</string>
+  <string name="send_enter_unexpected_error">Wystąpił nieoczekiwany błąd. Proszę spróbuj ponownie.</string>
+  <string name="send_enter_insufficient_gas">Nie masz wystarczającej liczby ETH, aby przetworzyć tę transakcję.</string>
+  <string name="send_select_a_wallet_title">lub Wybierz portfel</string>
+  <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %1$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
+  <string name="purchase_funds_note">Twoja ostateczna kwota może ulec zmianie ze względu na aktywność na rynku.</string>
 </resources>

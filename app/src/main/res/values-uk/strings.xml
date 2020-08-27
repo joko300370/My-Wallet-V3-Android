@@ -1126,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Ми надіслали посилання для підтвердження до</string>
   <string name="buy_sell_unverified_email_verify_message2">Клацніть по ньому та поверніться сюди, щоб продовжити транзакцію.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Відкрити електронну пошту</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Погодьтеся, щоб Coinify <a href="ignored"> положення та умови </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Підтверджено електронною поштою!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обробить вашу біткойн-транзакцію. Натиснувши «Погодитися» та «Продовжити», ви створите обліковий запис за допомогою %1$s .</string>
   <string name="buy_sell_identification_verification">Визначте верифікацію</string>

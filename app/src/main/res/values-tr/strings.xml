@@ -1124,8 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Adresine bir doğrulama bağlantısı gönderdik</string>
   <string name="buy_sell_unverified_email_verify_message2">Tıklayın ve işleminize devam etmek için buraya geri dönün.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-postayı Aç</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><![CDATA[<a href=\"ignored\"> şartlar ve koşullarını </a> <a href=\"ignored\"> kabul edin]]></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-posta Doğrulandı!</string>
   <string name="buy_sell_verified_email_message">%1$s ortağımız bitcoin işleminizi gerçekleştirecek. Kabul Et ve \'Devam Et\'i tıklayarak %1$s ile bir hesap oluşturacaksınız.</string>
   <string name="buy_sell_identification_verification">Doğrulamayı tanımlayın</string>
@@ -1244,7 +1243,7 @@
   <string name="kyc_phone_number_message">Bu, bugün kimliğinizi doğrulamamıza ve gelecekte hesabınızı güvende tutmamıza yardımcı olacaktır. Bunu yapmak için telefonunuza bir doğrulama kodu ile bir SMS gönderilir.</string>
   <string name="kyc_phone_number_hint_focused">Senin telefon numaran</string>
   <string name="kyc_phone_number_hint_unfocused">+1 2345678 910</string>
-  <string name="kyc_phone_send_again"><![CDATA[<annotation link=\"resend_code\"> Kodu <annotation link=\"resend_code\"> Gönder </annotation>]]></string>
+  <string name="kyc_phone_send_again">Kodu <annotation link="resend_code"> Gönder </annotation></string>
   <string name="kyc_phone_number_error_saving_number">Cep telefonu numarası kaydedilirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_phone_number_code_was_resent">Kod yeniden gönderildi</string>
   <string name="kyc_phone_number_validation_header">Adresine gönderilen kodu girin</string>

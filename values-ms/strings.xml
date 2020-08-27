@@ -349,7 +349,17 @@
  Alamat Bitcoin %1$s . Sila imbas kod QR. 
 </string>
   <string name="invalid_private_key">Kunci peribadi tidak sah</string>
+  <string name="watch_only_import_warning">Anda akan mengimport alamat tidak boleh dibelanjakan, a 
+ alamat (atau skrip utama awam) 
+ disimpan dalam dompet tanpa kunci persendirian yang sepadan. Ini 
+ bermaksud dana boleh dibelanjakan SAHAJA jika anda mempunyai kekunci peribadi yang disimpan di tempat lain. Jika awak 
+ buat 
+ tidak mempunyai kunci peribadi yang disimpan, TIDAK memberi arahan kepada sesiapa sahaja untuk menghantar bitcoin kepada anda 
+ tidak boleh dibelanjakan 
+ alamat. 
 
+ Pilihan ini disarankan untuk pengguna canggih sahaja. Teruskan? 
+</string>
   <string name="scan_private_key">Imbas kekunci persendirian</string>
   <string name="private_key_successfully_imported">Kunci peribadi berjaya diimport.</string>
   <string name="private_key_not_matching_address">NOTA: Kunci peribadi yang diimbas tidak 
@@ -1113,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami menghantar pautan pengesahan kepada</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk meneruskan transaksi anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka E-mel</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Bersetuju untuk <a href="ignored"> terma dan syarat </a></string>
   <string name="coinify">Mencukupi</string>
   <string name="buy_sell_verified_email_title">E-mel Disahkan!</string>
   <string name="buy_sell_verified_email_message">Rakan kongsi kami %1$s akan memproses transaksi bitcoin anda. Dengan mengklik Setuju dan \'Teruskan\', anda akan membuat akaun dengan %1$s .</string>
@@ -1533,6 +1542,7 @@
   <string name="estimated_amount">Est. Jumlah</string>
   <string name="buying_fee">Bayaran Membeli</string>
   <string name="purchase_bank_note">Setelah kami menerima dana anda, kami akan memulakan pesanan beli %1$s . Perhatikan, jumlah akhir anda mungkin berubah menjadi aktiviti pasaran yang sepatutnya. Bayaran mungkin dikenakan.</string>
+  <string name="purchase_card_note">Kami akan mendebitkan kaedah pembayaran anda dalam 2 hari bekerja. Jumlah akhir anda mungkin berubah kerana aktiviti pasaran.</string>
   <string name="complete_payment">Pembayaran Lengkap</string>
   <string name="card_payment">Pembayaran Kad</string>
   <string name="buy_now">Beli sekarang</string>
@@ -1705,7 +1715,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Wang Tunai Deposit</string>
   <string name="fiat_funds_no_kyc_step_2_description">Pindahkan wang tunai dari bank anda dan aktifkan baki tunai anda.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Beli Crypto dengan Wang Tunai</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Gunakan dompet tunai anda sebagai kaedah pembayaran untuk membeli BTC, ETH, XLM & banyak lagi.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Gunakan dompet tunai anda sebagai kaedah pembayaran untuk membeli BTC, ETH, XLM & banyak lagi.</string>
   <string name="fiat_funds_no_kyc_positive_action">Sahkan Identiti Saya</string>
   <string name="fiat_funds_no_kyc_negative_action">Bukan sekarang</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1733,4 +1743,103 @@
   <string name="send_state_not_supported">Hantar tidak disokong pada akaun ini</string>
   <string name="send_state_not_enough_gas">Baki ETH rendah, tidak dapat membayar yuran rangkaian</string>
   <string name="send_state_send_in_flight">Tidak tersedia kerana transaksi belum selesai.</string>
+  <string name="common_send">Hantar</string>
+  <string name="common_receive">Terima</string>
+  <string name="common_swap">Tukar</string>
+  <string name="common_from">Dari</string>
+  <string name="common_to">Ke</string>
+  <string name="common_yes">Ya</string>
+  <string name="common_no">Tidak</string>
+  <string name="common_ok">okey</string>
+  <string name="common_cancel">Batal</string>
+  <string name="common_total">Jumlah</string>
+  <string name="common_deposit">Deposit</string>
+  <string name="common_transfer">Pindah</string>
+  <string name="common_error">Ada yang tidak kena, sila cuba lagi</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Sahkan</string>
+  <string name="toolbar_cmd_transfer">Pindah</string>
+  <string name="notification_2fa_summary">Pemberitahuan 2FA</string>
+  <string name="notification_2fa_description">Pemberitahuan berkaitan dengan Pengesahan Dua Faktor</string>
+  <string name="notification_payments_summary">Pemberitahuan Pembayaran</string>
+  <string name="notification_payments_description">Pemberitahuan berkaitan dengan Pembayaran</string>
+  <string name="enable_cloud_backup">Dayakan Cloud Backup</string>
+  <string name="enable_cloud_backup_summary">Simpan sandaran yang dienkripsi dalam akaun Google Drive anda, 
+ jika ada. Ini membolehkan anda memulihkan dompet jika anda kehilangan peranti ini. 
+</string>
+  <string name="tx_title_interest">%1$s Faedah Diperolehi</string>
+  <string name="dashboard_asset_actions_send_dsc">Pindahkan %1$s ke mana-mana Wallet</string>
+  <string name="dashboard_asset_actions_receive_dsc">Terima atau Kongsi Alamat %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Tukar %1$s untuk Crypto Lain</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Tambahkan %1$s ke Dompet Minat anda</string>
+  <string name="dashboard_asset_actions_summary_title">Ringkasan Minat</string>
+  <string name="dashboard_asset_actions_summary_dsc">Lihat Minat %1$s anda yang terakru</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Tidak dapat memuatkan butiran Minat</string>
+  <string name="asset_details_chart_load_failed_toast">Gagal memuatkan butiran carta, sila cuba lagi</string>
+  <string name="asset_details_load_failed_toast">Gagal memuatkan butiran dompet, sila cuba lagi</string>
+  <string name="asset_details_exchange_load_failed_toast">Gagal menukar maklumat kadar, sila cuba lagi</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Sudah ada transaksi yang sedang berlangsung, harap tunggu hingga selesai</string>
+  <string name="cloud_backup_card_title">Memperkenalkan Cloud Backup</string>
+  <string name="cloud_backup_card_body">Anda kini boleh membuat sandaran dompet anda dengan selamat ke awan. Anda boleh memilih untuk tidak membuat sandaran dalam tetapan dompet anda.</string>
+  <string name="cloud_backup_card_cta">Ketahui Lebih Lanjut</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Baki yang ada untuk dikeluarkan adalah %1s . Baki %2s selebihnya akan tersedia untuk dikeluarkan dalam masa 7 hari.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Ketahui lebih lanjut </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Kekurangan dana</string>
+  <string name="basic_transfer_error_insufficient_funds">Anda tidak mempunyai cukup dana dalam akaun anda untuk menyelesaikan transaksi ini.</string>
+  <string name="basic_transfer_error_locked_funds">Crypto anda akan tersedia untuk ditarik balik dalam masa 7 hari. <annotation link="balance_lock"> Ketahui lebih lanjut </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">Anda memerlukan ETH untuk menghantar %1$s</string>
+  <string name="purchase_card_note_1">Jumlah akhir anda mungkin berubah kerana aktiviti pasaran. Tempoh penangguhan awal 7 hari akan digunakan untuk dana anda.</string>
+  <string name="select_deposit_source_title">Pindah dari</string>
+  <string name="activity_state_cleared">Dibersihkan</string>
+  <string name="activity_state_rejected">Ditolak</string>
+  <string name="activity_state_refunded">Dikembalikan</string>
+  <string name="activity_details_label_manual_review">Semakan Manual</string>
+  <string name="activity_details_label_processing">Memproses</string>
+  <string name="activity_details_title_deposit">Deposit</string>
+  <string name="activity_details_title_interest_earned">Minat yang Diperolehi</string>
+  <string name="activity_details_title_withdraw">Mengeluarkan</string>
+  <string name="transfer_receive_crypto">Terima kripto</string>
+  <string name="send_select_target_title">Destinasi</string>
+  <string name="send_enter_amount_from">Dari: %1$s</string>
+  <string name="send_enter_amount_to">Kepada: %1$s</string>
+  <string name="send_enter_amount_title">Hantar %1$s</string>
+  <string name="send_enter_amount_available">Ada</string>
+  <string name="send_enter_amount_max">Hantar Max</string>
+  <string name="send_enter_amount_deposit_max">Pindahkan Maks</string>
+  <string name="send_enter_amount_min_deposit">Pemindahan minimum %1$s diperlukan</string>
+  <string name="send_confirmation_title">Hantar %1$s</string>
+  <string name="send_confirmation_fee">Yuran - Biasa</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 Minit)</string>
+  <string name="send_confirmation_fee_loading">Memuat ...</string>
+  <string name="send_confirmation_fee_error">Ralat semasa memuatkan yuran</string>
+  <string name="send_confirmation_add_note_hint">Tambah Nota</string>
+  <string name="send_confirmation_add_note_success">Catatan berjaya ditambahkan</string>
+  <string name="send_confirmation_cta_button">Hantar %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Sahkan Pemindahan</string>
+  <string name="send_confirmation_interest_tos_pp">Saya telah membaca dan bersetuju dengan <annotation link="interest_tos"> Syarat Perkhidmatan </annotation> &amp; <annotation link="interest_pp"> Dasar Privasi </annotation> .</string>
+  <string name="send_confirmation_interest_holding_period_1">Dengan menerima ini, anda bersetuju untuk memindahkan</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dari Bitcoin Wallet anda ke Akaun Minat anda. Tempoh penangguhan awal 7 hari akan digunakan untuk dana anda.</string>
+  <string name="send_confirmation_progress_title">Memindahkan %1$s</string>
+  <string name="send_confirmation_progress_message">Kami memindahkan %1$s sekarang.</string>
+  <string name="send_confirmation_success_title">%1$s Dipindahkan</string>
+  <string name="send_confirmation_success_message">%1$s berjaya dipindahkan.</string>
+  <string name="send_progress_sending_title">Menghantar %1$s</string>
+  <string name="send_progress_sending_subtitle">Kami menghantar transaksi anda sekarang.</string>
+  <string name="send_progress_complete_title">%1$s Dihantar</string>
+  <string name="send_progress_complete_subtitle">%1$s berjaya dihantar.</string>
+  <string name="send_progress_error_title">Alamak! Sesuatu Yang Keliru.</string>
+  <string name="send_progress_error_subtitle">Jangan risau. Wang anda selamat. Sila cuba lagi atau hubungi Pasukan Sokongan kami untuk mendapatkan bantuan.</string>
+  <string name="send_enter_asset_address_hint">%1s Alamat</string>
+  <string name="send_warn_internal_send_only">Hantar Dalaman Sahaja</string>
+  <string name="send_scan_qr_code">Imbas Kod QR</string>
+  <string name="send_error_not_valid_asset_address">Bukan alamat %1s yang sah</string>
+  <string name="send_error_address_is_eth_contract">Alamat bukan alamat pengguna</string>
+  <string name="send_enter_amount_error_insufficient_funds">%1$s tidak mencukupi dalam dompet anda.</string>
+  <string name="send_enter_amount_error_invalid_amount">Hantar 0.00000001 %1$s atau lebih.</string>
+  <string name="send_enter_invalid_password">Kata laluan tidak betul.</string>
+  <string name="send_enter_unexpected_error">Ralat tidak dijangka telah berlaku. Sila cuba lagi.</string>
+  <string name="send_enter_insufficient_gas">Anda tidak mempunyai ETH yang mencukupi untuk memproses transaksi ini.</string>
+  <string name="send_select_a_wallet_title">atau Pilih Dompet</string>
+  <string name="send_internal_transfer_message">Pada masa ini, anda hanya dapat memindahkan %1$s dari Dompet Perdagangan %1$s ke Dompet Vault anda. Setelah %1$s berada di Vault Wallet anda, anda boleh memindahkan ke alamat luaran.</string>
+  <string name="purchase_funds_note">Jumlah akhir anda mungkin berubah kerana aktiviti pasaran.</string>
 </resources>

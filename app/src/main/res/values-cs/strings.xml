@@ -1126,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Souhlasíte s Coinify <a href="ignored"> smluvními podmínkami </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>

@@ -1123,8 +1123,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Chúng tôi đã gửi một liên kết xác minh đến</string>
   <string name="buy_sell_unverified_email_verify_message2">Nhấn vào đó và trở lại đây để tiếp tục với giao dịch của bạn.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Mở email</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Đồng ý với Coinify <a href="ignored"> điều khoản và điều kiện </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email đã kích hoạt!</string>
   <string name="buy_sell_verified_email_message">Đối tác của chúng tôi %1$s sẽ xử lý giao dịch bitcoin của bạn. Bằng cách nhấp vào Đồng ý và \'Tiếp tục\', bạn sẽ tạo một tài khoản với %1$s .</string>
   <string name="buy_sell_identification_verification">Xác định xác minh</string>

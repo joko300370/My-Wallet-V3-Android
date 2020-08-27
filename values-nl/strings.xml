@@ -350,7 +350,17 @@
  Bitcoin-adres %1$s . Scan de QR-code. 
 </string>
   <string name="invalid_private_key">Ongeldige privésleutel</string>
+  <string name="watch_only_import_warning">U staat op het punt een niet-besteedbaar adres te importeren, een 
+ adres (of script met openbare sleutel) 
+ opgeslagen in de portemonnee zonder de bijbehorende privésleutel. Deze 
+ betekent dat het geld ALLEEN kan worden uitgegeven als u de privésleutel ergens anders heeft opgeslagen. als jij 
+ Doen 
+ niet de privésleutel hebben opgeslagen, instrueer niemand om u bitcoin naar de 
+ niet besteedbaar 
+ adres. 
 
+ Deze opties worden alleen aanbevolen voor gevorderde gebruikers. Doorgaan met? 
+</string>
   <string name="scan_private_key">Privésleutel scannen</string>
   <string name="private_key_successfully_imported">Privésleutel succesvol geïmporteerd.</string>
   <string name="private_key_not_matching_address">OPMERKING: de gescande privésleutel niet 
@@ -1114,8 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><![CDATA[Ga akkoord met de <a href=\"ignored\"> algemene voorwaarden </a> <a href=\"ignored\">]]></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>
@@ -1534,6 +1543,7 @@
   <string name="estimated_amount">Est. Bedrag</string>
   <string name="buying_fee">Aankoopkosten</string>
   <string name="purchase_bank_note">Zodra we uw geld hebben ontvangen, starten we uw %1$s kooporder. Houd er rekening mee dat uw uiteindelijke bedrag kan veranderen naar marktactiviteit. Mogelijk zijn toeslagen van toepassing.</string>
+  <string name="purchase_card_note">We zullen uw betaalmethode binnen twee werkdagen afschrijven. Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
   <string name="complete_payment">Volledige betaling</string>
   <string name="card_payment">Kaart betaling</string>
   <string name="buy_now">Koop nu</string>
@@ -1706,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Geld storten</string>
   <string name="fiat_funds_no_kyc_step_2_description">Maak geld over van uw bank en activeer uw kassaldi.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koop Crypto met contant geld</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Gebruik uw geldportemonnee als betaalmethode om BTC, ETH, XLM en meer te kopen.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Gebruik uw geldportemonnee als betaalmethode om BTC, ETH, XLM en meer te kopen.</string>
   <string name="fiat_funds_no_kyc_positive_action">Controleer mijn identiteit</string>
   <string name="fiat_funds_no_kyc_negative_action">Niet nu</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1734,4 +1744,103 @@
   <string name="send_state_not_supported">Verzenden wordt niet ondersteund op dit account</string>
   <string name="send_state_not_enough_gas">ETH-saldo laag, kan geen netwerkkosten betalen</string>
   <string name="send_state_send_in_flight">Niet beschikbaar wegens in behandeling zijnde transactie.</string>
+  <string name="common_send">Sturen</string>
+  <string name="common_receive">Te ontvangen</string>
+  <string name="common_swap">Wissel</string>
+  <string name="common_from">Van</string>
+  <string name="common_to">Naar</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nee</string>
+  <string name="common_ok">OK</string>
+  <string name="common_cancel">Annuleer</string>
+  <string name="common_total">Totaal</string>
+  <string name="common_deposit">Storting</string>
+  <string name="common_transfer">Overdracht</string>
+  <string name="common_error">Er is iets mis gegaan, probeer het alstublieft nogmaals</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Bevestigen</string>
+  <string name="toolbar_cmd_transfer">Overdracht</string>
+  <string name="notification_2fa_summary">2FA-meldingen</string>
+  <string name="notification_2fa_description">Meldingen met betrekking tot tweefactorauthenticatie</string>
+  <string name="notification_payments_summary">Betalingsmeldingen</string>
+  <string name="notification_payments_description">Meldingen met betrekking tot betalingen</string>
+  <string name="enable_cloud_backup">Schakel cloudback-ups in</string>
+  <string name="enable_cloud_backup_summary">Sla de versleutelde back-up op in uw Google Drive-account, 
+ indien beschikbaar. Hiermee kunt u uw portemonnee herstellen als u dit apparaat kwijtraakt. 
+</string>
+  <string name="tx_title_interest">%1$s rente verdiend</string>
+  <string name="dashboard_asset_actions_send_dsc">Zet %1$s naar een willekeurige portemonnee</string>
+  <string name="dashboard_asset_actions_receive_dsc">Accepteer of deel uw %1$s adres</string>
+  <string name="dashboard_asset_actions_swap_dsc">Wissel %1$s voor een andere crypto</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Voeg %1$s aan uw Interest Wallet</string>
+  <string name="dashboard_asset_actions_summary_title">Samenvatting rente</string>
+  <string name="dashboard_asset_actions_summary_dsc">Bekijk uw opgebouwde rente van %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Kan interessegegevens niet laden</string>
+  <string name="asset_details_chart_load_failed_toast">Kan diagramdetails niet laden. Probeer het opnieuw</string>
+  <string name="asset_details_load_failed_toast">Kan portefeuillegegevens niet laden. Probeer het opnieuw</string>
+  <string name="asset_details_exchange_load_failed_toast">Het uitwisselen van koersinformatie is mislukt. Probeer het opnieuw</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Er is al een transactie bezig, wacht tot deze is voltooid</string>
+  <string name="cloud_backup_card_title">Introductie van cloudback-ups</string>
+  <string name="cloud_backup_card_body">U kunt nu veilig een back-up van uw portemonnee maken in de cloud. U kunt zich afmelden voor back-ups in uw portemonnee-instellingen.</string>
+  <string name="cloud_backup_card_cta">Leer meer</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Uw beschikbare saldo om op te nemen is %1s . Het resterende saldo %2s kan binnen 7 dagen worden opgenomen.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Meer informatie </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Onvoldoende middelen</string>
+  <string name="basic_transfer_error_insufficient_funds">U heeft onvoldoende saldo op uw rekening om deze transactie te voltooien.</string>
+  <string name="basic_transfer_error_locked_funds">Uw cryptovaluta is binnen 7 dagen beschikbaar voor opname. <annotation link="balance_lock"> Meer informatie </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">U heeft ETH nodig om uw %1$s te verzenden</string>
+  <string name="purchase_card_note_1">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit. Er wordt een initiële wachtperiode van 7 dagen op uw geld toegepast.</string>
+  <string name="select_deposit_source_title">Transfer van</string>
+  <string name="activity_state_cleared">Gewist</string>
+  <string name="activity_state_rejected">Afgekeurd</string>
+  <string name="activity_state_refunded">Terugbetaald</string>
+  <string name="activity_details_label_manual_review">Handmatige beoordeling</string>
+  <string name="activity_details_label_processing">Verwerken</string>
+  <string name="activity_details_title_deposit">Storting</string>
+  <string name="activity_details_title_interest_earned">Verkregen rente</string>
+  <string name="activity_details_title_withdraw">Intrekking</string>
+  <string name="transfer_receive_crypto">Ontvang crypto</string>
+  <string name="send_select_target_title">Bestemming</string>
+  <string name="send_enter_amount_from">Van: %1$s</string>
+  <string name="send_enter_amount_to">Aan: %1$s</string>
+  <string name="send_enter_amount_title">%1$s verzenden</string>
+  <string name="send_enter_amount_available">Beschikbaar</string>
+  <string name="send_enter_amount_max">Stuur Max</string>
+  <string name="send_enter_amount_deposit_max">Overdracht Max</string>
+  <string name="send_enter_amount_min_deposit">Minimale overdracht van %1$s vereist</string>
+  <string name="send_confirmation_title">%1$s verzenden</string>
+  <string name="send_confirmation_fee">Fee - Normaal</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 minuten)</string>
+  <string name="send_confirmation_fee_loading">Bezig met laden…</string>
+  <string name="send_confirmation_fee_error">Fout bij het laden van vergoeding</string>
+  <string name="send_confirmation_add_note_hint">Voeg een notitie toe</string>
+  <string name="send_confirmation_add_note_success">Opmerking succesvol toegevoegd</string>
+  <string name="send_confirmation_cta_button">%1$s verzenden</string>
+  <string name="send_confirmation_deposit_cta_button">Bevestig de overdracht</string>
+  <string name="send_confirmation_interest_tos_pp">Ik heb de <annotation link="interest_tos"> Servicevoorwaarden </annotation> en <annotation link="interest_pp"> Privacybeleid </annotation> gelezen en ga hiermee akkoord.</string>
+  <string name="send_confirmation_interest_holding_period_1">Door dit te accepteren, gaat u akkoord met overdracht</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) van uw Bitcoin Wallet naar uw Interest Account. Er wordt een initiële wachtperiode van 7 dagen op uw geld toegepast.</string>
+  <string name="send_confirmation_progress_title">%1$s overzetten</string>
+  <string name="send_confirmation_progress_message">We maken nu uw %1$s .</string>
+  <string name="send_confirmation_success_title">%1$s overgedragen</string>
+  <string name="send_confirmation_success_message">Uw %1$s is succesvol overgedragen.</string>
+  <string name="send_progress_sending_title">%1$s verzenden</string>
+  <string name="send_progress_sending_subtitle">We verzenden uw transactie nu.</string>
+  <string name="send_progress_complete_title">%1$s verzonden</string>
+  <string name="send_progress_complete_subtitle">Uw %1$s is succesvol verzonden.</string>
+  <string name="send_progress_error_title">Oeps! Er is iets fout gegaan.</string>
+  <string name="send_progress_error_subtitle">Maakt u zich geen zorgen. Uw geld is veilig. Probeer het opnieuw of neem contact op met ons ondersteuningsteam voor hulp.</string>
+  <string name="send_enter_asset_address_hint">%1s adres</string>
+  <string name="send_warn_internal_send_only">Alleen intern verzenden</string>
+  <string name="send_scan_qr_code">Scan QR-code</string>
+  <string name="send_error_not_valid_asset_address">Geen geldig %1s adres</string>
+  <string name="send_error_address_is_eth_contract">Adres is geen gebruikersadres</string>
+  <string name="send_enter_amount_error_insufficient_funds">Niet genoeg %1$s in uw portemonnee.</string>
+  <string name="send_enter_amount_error_invalid_amount">Verzend 0,00000001 %1$s of meer.</string>
+  <string name="send_enter_invalid_password">Wachtwoord is niet correct.</string>
+  <string name="send_enter_unexpected_error">Er is een onverwachte fout opgetreden. Probeer het a.u.b. opnieuw.</string>
+  <string name="send_enter_insufficient_gas">U heeft niet genoeg ETH om deze transactie te verwerken.</string>
+  <string name="send_select_a_wallet_title">of Selecteer een portemonnee</string>
+  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %1$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
+  <string name="purchase_funds_note">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
 </resources>

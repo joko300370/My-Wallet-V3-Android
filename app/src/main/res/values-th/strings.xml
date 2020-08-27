@@ -1123,8 +1123,7 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">ยอมรับการ Coinify <a href="ignored"> ข้อกำหนดในการให้บริการ </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>

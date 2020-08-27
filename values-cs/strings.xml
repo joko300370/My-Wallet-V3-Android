@@ -1126,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Souhlasíte s Coinify <a href="ignored"> smluvními podmínkami </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>
@@ -1468,9 +1467,7 @@
   <string name="simple_buy_amount_to_send">Částka k odeslání</string>
   <string name="simple_buy_pending_buy_sheet_title">Čeká se na nákup %1s</string>
   <string name="recipient_name_must_match_eur">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.</string>
-  <string name="recipient_name_must_match_gbp"><![CDATA[Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut. 
-
- Vložením prostředků na tento účet <annotation link=\"modular_terms_and_conditions\"> souhlas s <annotation link=\"modular_terms_and_conditions\"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.]]></string>
+  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
   <string name="recipient_name_must_match">Prostředky zasílejte pouze z vašeho bankovního účtu. Pokud ne, váš vklad může být zpožděn nebo odmítnut.</string>
   <string name="simple_buy_no_currencies_available_title">K dispozici nejsou žádné měny</string>
   <string name="simple_buy_no_currencies_available">Bohužel v současné době neexistují žádné měny, se kterými můžete obchodovat :(</string>
@@ -1546,6 +1543,7 @@
   <string name="estimated_amount">Est. Množství</string>
   <string name="buying_fee">Poplatek za nákup</string>
   <string name="purchase_bank_note">Jakmile dostaneme vaše prostředky, zahájíme vaši objednávku nákupu %1$s . Vaše konečná částka se může změnit na řádnou tržní aktivitu. Mohou být účtovány poplatky.</string>
+  <string name="purchase_card_note">Za 2 pracovní dny odečteme platbu z vaší platební metody. Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
   <string name="complete_payment">Dokončete platbu</string>
   <string name="card_payment">Platba kartou</string>
   <string name="buy_now">Kup nyní</string>
@@ -1671,7 +1669,7 @@
   <string name="bank_transfer">Bankovní převod</string>
   <string name="instantly_buy_crypto_with_card">Okamžitě si zakupte kryptografii s jakýmkoli Visa nebo Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Pošlete peníze přímo z vaší banky do vaší peněženky Blockchain. Jakmile obdržíme manuální převod, použijte tuto hotovost na zakoupení krypto.</string>
-  <string name="by_depositing_funds_terms_and_conds"><![CDATA[Vložením prostředků na tento účet <annotation link=\"modular_terms_and_conditions\"> souhlas s <annotation link=\"modular_terms_and_conditions\"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.]]></string>
+  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
   <string name="add_bank_with_currency">Přidejte banku %1s</string>
   <string name="deposit_currency">Vložte %1s</string>
   <string name="currency_bank_transfer">Bankovní převod</string>
@@ -1718,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Vklad hotovosti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Převeďte hotovost z banky a aktivujte své hotovostní zůstatky.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koupit kryptografii za hotovost</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.></string>
   <string name="fiat_funds_no_kyc_positive_action">Ověřte moji identitu</string>
   <string name="fiat_funds_no_kyc_negative_action">Teď ne</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1746,4 +1744,103 @@
   <string name="send_state_not_supported">V tomto účtu není podporováno odesílání</string>
   <string name="send_state_not_enough_gas">Zůstatek ETH nízký, nelze platit poplatek za síť</string>
   <string name="send_state_send_in_flight">Nedostupné kvůli čekající transakci.</string>
+  <string name="common_send">Poslat</string>
+  <string name="common_receive">Dostávat</string>
+  <string name="common_swap">Zaměnit</string>
+  <string name="common_from">Z</string>
+  <string name="common_to">Na</string>
+  <string name="common_yes">Ano</string>
+  <string name="common_no">Ne</string>
+  <string name="common_ok">OK</string>
+  <string name="common_cancel">zrušení</string>
+  <string name="common_total">Celkový</string>
+  <string name="common_deposit">Vklad</string>
+  <string name="common_transfer">Převod</string>
+  <string name="common_error">Něco se pokazilo. Prosím zkuste to znovu</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Potvrdit</string>
+  <string name="toolbar_cmd_transfer">Převod</string>
+  <string name="notification_2fa_summary">Oznámení 2FA</string>
+  <string name="notification_2fa_description">Oznámení týkající se dvoufaktorového ověření</string>
+  <string name="notification_payments_summary">Oznámení o platbách</string>
+  <string name="notification_payments_description">Oznámení týkající se plateb</string>
+  <string name="enable_cloud_backup">Povolit cloudové zálohy</string>
+  <string name="enable_cloud_backup_summary">Uložte šifrovanou zálohu do účtu Disku Google, 
+ Pokud je k dispozici. To vám umožní obnovit peněženku, pokud ztratíte toto zařízení. 
+</string>
+  <string name="tx_title_interest">Získané úroky: %1$s</string>
+  <string name="dashboard_asset_actions_send_dsc">Převeďte %1$s do libovolné Peněženky</string>
+  <string name="dashboard_asset_actions_receive_dsc">Přijměte nebo sdílejte svou %1$s adresu</string>
+  <string name="dashboard_asset_actions_swap_dsc">Vyměňte %1$s za jiné krypto</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Přidejte %1$s do své zájmové peněženky</string>
+  <string name="dashboard_asset_actions_summary_title">Souhrn zájmu</string>
+  <string name="dashboard_asset_actions_summary_dsc">Zobrazit nahromaděný úrok %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Podrobnosti o zájmu nelze načíst</string>
+  <string name="asset_details_chart_load_failed_toast">Nepodařilo se načíst podrobnosti grafu, zkuste to znovu</string>
+  <string name="asset_details_load_failed_toast">Nepodařilo se načíst podrobnosti peněženky, zkuste to znovu</string>
+  <string name="asset_details_exchange_load_failed_toast">Nepodařilo se si vyměnit informace o kurzu, zkuste to znovu</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Probíhá již transakce, počkejte prosím na dokončení</string>
+  <string name="cloud_backup_card_title">Představujeme cloudové zálohy</string>
+  <string name="cloud_backup_card_body">Nyní můžete bezpečně zálohovat peněženku do cloudu. Zálohy můžete v nastavení peněženky odhlásit.</string>
+  <string name="cloud_backup_card_cta">Další informace</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Váš dostupný zůstatek k výběru je %1s . Zbývající zůstatek %2s bude k dispozici k výběru do 7 dnů.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Další informace </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Nedostatečné finanční prostředky</string>
+  <string name="basic_transfer_error_insufficient_funds">Na dokončení této transakce nemáte na svém účtu dostatek prostředků.</string>
+  <string name="basic_transfer_error_locked_funds">Vaše krypto bude k dispozici ke stažení do 7 dnů. <annotation link="balance_lock"> Další informace </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">K odeslání %1$s budete potřebovat ETH</string>
+  <string name="purchase_card_note_1">Vaše konečná částka se může v důsledku tržní aktivity změnit. Na vaše prostředky se použije počáteční doba zadržení 7 dní.</string>
+  <string name="select_deposit_source_title">Převod z</string>
+  <string name="activity_state_cleared">Vymazáno</string>
+  <string name="activity_state_rejected">Odmítnuto</string>
+  <string name="activity_state_refunded">Vráceno</string>
+  <string name="activity_details_label_manual_review">Ruční kontrola</string>
+  <string name="activity_details_label_processing">zpracovává se</string>
+  <string name="activity_details_title_deposit">Vklad</string>
+  <string name="activity_details_title_interest_earned">Výnos z úroků</string>
+  <string name="activity_details_title_withdraw">Vybrání</string>
+  <string name="transfer_receive_crypto">Přijmout krypto</string>
+  <string name="send_select_target_title">Destinace</string>
+  <string name="send_enter_amount_from">Od: %1$s</string>
+  <string name="send_enter_amount_to">Komu: %1$s</string>
+  <string name="send_enter_amount_title">Odeslat %1$s</string>
+  <string name="send_enter_amount_available">K dispozici</string>
+  <string name="send_enter_amount_max">Odeslat max</string>
+  <string name="send_enter_amount_deposit_max">Převod Max</string>
+  <string name="send_enter_amount_min_deposit">%1$s vyžadován minimální převod %1$s</string>
+  <string name="send_confirmation_title">Odeslat %1$s</string>
+  <string name="send_confirmation_fee">Poplatek - pravidelný</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 minut)</string>
+  <string name="send_confirmation_fee_loading">Načítání…</string>
+  <string name="send_confirmation_fee_error">Chyba při načítání poplatku</string>
+  <string name="send_confirmation_add_note_hint">Přidat poznámku</string>
+  <string name="send_confirmation_add_note_success">Poznámka byla úspěšně přidána</string>
+  <string name="send_confirmation_cta_button">Odeslat %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Potvrďte převod</string>
+  <string name="send_confirmation_interest_tos_pp">Přečetl jsem si a souhlasím s <annotation link="interest_tos"> Smluvní podmínky </annotation> &amp; <annotation link="interest_pp"> Zásady ochrany osobních údajů </annotation> .</string>
+  <string name="send_confirmation_interest_holding_period_1">Přijetím tohoto souhlasíte s převodem</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) z vaší bitcoinové peněženky na váš zájmový účet. Na vaše prostředky se použije počáteční doba zadržení 7 dní.</string>
+  <string name="send_confirmation_progress_title">Převádí se %1$s</string>
+  <string name="send_confirmation_progress_message">Nyní převádíme vaše %1$s .</string>
+  <string name="send_confirmation_success_title">Převedeno %1$s</string>
+  <string name="send_confirmation_success_message">Vaše %1$s bylo úspěšně přeneseno.</string>
+  <string name="send_progress_sending_title">Odesílá se %1$s</string>
+  <string name="send_progress_sending_subtitle">Vaše transakce nyní odesíláme.</string>
+  <string name="send_progress_complete_title">Odesláno %1$s</string>
+  <string name="send_progress_complete_subtitle">Vaše %1$s bylo úspěšně odesláno.</string>
+  <string name="send_progress_error_title">Jejda! Něco se pokazilo.</string>
+  <string name="send_progress_error_subtitle">Nebojte se. Vaše peníze jsou v bezpečí. Zkuste to prosím znovu nebo kontaktujte náš tým podpory.</string>
+  <string name="send_enter_asset_address_hint">Adresa %1s</string>
+  <string name="send_warn_internal_send_only">Pouze interní odeslání</string>
+  <string name="send_scan_qr_code">Naskenujte QR kód</string>
+  <string name="send_error_not_valid_asset_address">Není platná adresa %1s</string>
+  <string name="send_error_address_is_eth_contract">Adresa není uživatelská adresa</string>
+  <string name="send_enter_amount_error_insufficient_funds">V peněžence není dost %1$s .</string>
+  <string name="send_enter_amount_error_invalid_amount">Odeslat 0,00000001 %1$s nebo více.</string>
+  <string name="send_enter_invalid_password">Heslo je nesprávné.</string>
+  <string name="send_enter_unexpected_error">Došlo k neočekávané chybě. Prosím zkuste to znovu.</string>
+  <string name="send_enter_insufficient_gas">Na zpracování této transakce nemáte dostatek ETH.</string>
+  <string name="send_select_a_wallet_title">nebo Vyberte Peněženku</string>
+  <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %1$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
+  <string name="purchase_funds_note">Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
 </resources>

@@ -1114,8 +1114,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Nous avons envoyé un lien de vérification à</string>
   <string name="buy_sell_unverified_email_verify_message2">Cliquez dessus et revenez ici pour poursuivre votre transaction.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail ouvert</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Acceptez de Coinify <a href="ignored"> Termes et conditions </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email verifié!</string>
   <string name="buy_sell_verified_email_message">Notre partenaire %1$s traitera votre transaction bitcoin. En cliquant sur Accepter et sur «Continuer», vous créerez un compte avec %1$s .</string>
   <string name="buy_sell_identification_verification">Identifier la vérification</string>
@@ -1706,7 +1705,7 @@ Veuillez réessayer plus tard.</string>
   <string name="fiat_funds_no_kyc_step_2_title">Dépôt d\'espèces</string>
   <string name="fiat_funds_no_kyc_step_2_description">Transférez de l\'argent de votre banque et activez vos soldes.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Achetez de la crypto avec des espèces</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Utilisez votre portefeuille électronique comme mode de paiement pour acheter des BTC, ETH, XLM et autres.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Utilisez votre portefeuille électronique comme mode de paiement pour acheter des BTC, ETH, XLM et autres.</string>
   <string name="fiat_funds_no_kyc_positive_action">Vérifier mon identité</string>
   <string name="fiat_funds_no_kyc_negative_action">Pas maintenant</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>

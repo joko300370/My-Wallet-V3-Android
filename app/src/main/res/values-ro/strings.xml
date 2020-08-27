@@ -1125,8 +1125,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Am trimis un link de verificare la</string>
   <string name="buy_sell_unverified_email_verify_message2">Faceți clic pe el și reveniți aici pentru a continua cu tranzacția.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Deschideți e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Sunt de acord să coinificați <a href="ignored"> termeni și condiții </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Verificat prin e-mail!</string>
   <string name="buy_sell_verified_email_message">Partenerul nostru %1$s va procesa tranzacția bitcoin. Făcând clic pe De acord și pe „Continuare” veți crea un cont cu %1$s .</string>
   <string name="buy_sell_identification_verification">Identificați verificarea</string>
@@ -1245,7 +1244,7 @@
   <string name="kyc_phone_number_message">Acest lucru ne va ajuta să vă verificăm identitatea astăzi și, de asemenea, să vă păstrăm contul în siguranță în viitor. Pentru aceasta, un SMS va fi trimis către telefonul dvs. cu un cod de verificare.</string>
   <string name="kyc_phone_number_hint_focused">Numărul tău de telefon</string>
   <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
-  <string name="kyc_phone_send_again"><![CDATA[<annotation link=\"resend_code\"> Cod de <annotation link=\"resend_code\"> </annotation>]]></string>
+  <string name="kyc_phone_send_again"><annotation link="resend_code"> Cod de </annotation></string>
   <string name="kyc_phone_number_error_saving_number">Eroare la salvarea numărului mobil, încercați din nou</string>
   <string name="kyc_phone_number_code_was_resent">Codul a fost resentit</string>
   <string name="kyc_phone_number_validation_header">Introduceți codul trimis la</string>

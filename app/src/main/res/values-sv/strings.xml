@@ -1124,8 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Vi skickade en verifieringslänk till</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicka på den och gå tillbaka hit för att fortsätta med din transaktion.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öppna e-post</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Håller med att Coinify <a href="ignored"> villkor </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-post bekräftad!</string>
   <string name="buy_sell_verified_email_message">Vår partner %1$s kommer att behandla din bitcoin-transaktion. Genom att klicka på Agree och \'Fortsätt\' skapar du ett konto med %1$s .</string>
   <string name="buy_sell_identification_verification">Identifiera verifiering</string>

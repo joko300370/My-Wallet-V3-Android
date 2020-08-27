@@ -1124,8 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Wir haben einen Bestätigungslink an gesendet</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicken Sie darauf und kehren Sie hierher zurück, um mit Ihrer Transaktion fortzufahren.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öffnen Sie die E-Mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Stimmen Sie zu, <a href="ignored"> Geschäftsbedingungen </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email überprüft!</string>
   <string name="buy_sell_verified_email_message">Unser Partner %1$s wird Ihre Bitcoin-Transaktion abwickeln. Wenn Sie auf Zustimmen und dann auf Weiter klicken, erstellen Sie ein Konto mit %1$s .</string>
   <string name="buy_sell_identification_verification">Identifizieren Sie die Überprüfung</string>
@@ -1256,7 +1255,7 @@
   <string name="kyc_onfido_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
   <string name="kyc_onfido_splash_verification_error">Fehler beim Überprüfen der ID, versuchen Sie es erneut</string>
   <string name="kyc_veriff_splash_country_supported_header">Wird mein Land unterstützt?</string>
-  <string name="kyc_veriff_splash_country_supported_subheader"><![CDATA[Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link=\"country_list\"> Liste der Länder </annotation> bevor Sie <annotation link=\"country_list\"> .]]></string>
+  <string name="kyc_veriff_splash_country_supported_subheader">Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link="country_list"> Liste der Länder </annotation> bevor Sie.</string>
   <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILBER ÜBERPRÜFT</string>
   <string name="kyc_veriff_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
@@ -1467,7 +1466,7 @@
   <string name="simple_buy_pending_buy_sheet_title">Ausstehender %1s-Kauf</string>
   <string name="recipient_name_must_match_eur">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.</string>
   <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.\n\nDurch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
-   <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
+  <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
   <string name="simple_buy_no_currencies_available_title">Keine Währungen verfügbar</string>
   <string name="simple_buy_no_currencies_available">Leider gibt es derzeit keine Währungen, mit denen Sie handeln können :(</string>
   <string name="are_ypu_sure">Bist du sicher?</string>
@@ -1542,6 +1541,7 @@
   <string name="estimated_amount">Europäische Sommerzeit. Menge</string>
   <string name="buying_fee">Kaufgebühr</string>
   <string name="purchase_bank_note">Sobald wir Ihr Geld erhalten haben, beginnen wir mit Ihrer %1$s . Beachten Sie, dass sich Ihr endgültiger Betrag möglicherweise aufgrund der Marktaktivität ändert. Es können Gebühren anfallen.</string>
+  <string name="purchase_card_note">Wir werden Ihre Zahlungsmethode innerhalb von 2 Werktagen belasten. Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern.</string>
   <string name="complete_payment">Zur vollständigen Bezahlung</string>
   <string name="card_payment">Kartenzahlung</string>
   <string name="buy_now">Kaufe jetzt</string>
@@ -1742,4 +1742,103 @@
   <string name="send_state_not_supported">Senden wird von diesem Konto nicht unterstützt</string>
   <string name="send_state_not_enough_gas">ETH-Kontostand niedrig, Netzwerkgebühr nicht zahlbar</string>
   <string name="send_state_send_in_flight">Aufgrund ausstehender Transaktion nicht verfügbar.</string>
+  <string name="common_send">Senden</string>
+  <string name="common_receive">Erhalten</string>
+  <string name="common_swap">Tauschen</string>
+  <string name="common_from">Von</string>
+  <string name="common_to">Zu</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nein</string>
+  <string name="common_ok">OK</string>
+  <string name="common_cancel">Stornieren</string>
+  <string name="common_total">Gesamt</string>
+  <string name="common_deposit">Anzahlung</string>
+  <string name="common_transfer">Transfer</string>
+  <string name="common_error">Etwas ist schief gelaufen. Bitte versuche es erneut</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Bestätigen</string>
+  <string name="toolbar_cmd_transfer">Transfer</string>
+  <string name="notification_2fa_summary">2FA-Benachrichtigungen</string>
+  <string name="notification_2fa_description">Benachrichtigungen im Zusammenhang mit der Zwei-Faktor-Authentifizierung</string>
+  <string name="notification_payments_summary">Zahlungsbenachrichtigungen</string>
+  <string name="notification_payments_description">Benachrichtigungen im Zusammenhang mit Zahlungen</string>
+  <string name="enable_cloud_backup">Aktivieren Sie Cloud-Backups</string>
+  <string name="enable_cloud_backup_summary">Speichern Sie das verschlüsselte Backup in Ihrem Google Drive-Konto. 
+ wenn verfügbar. Auf diese Weise können Sie Ihre Brieftasche wiederherstellen, wenn Sie dieses Gerät verlieren. 
+</string>
+  <string name="tx_title_interest">%1$s Zinsen verdient</string>
+  <string name="dashboard_asset_actions_send_dsc">Überweisen Sie %1$s auf eine beliebige Brieftasche</string>
+  <string name="dashboard_asset_actions_receive_dsc">Akzeptieren oder teilen Sie Ihre %1$s Adresse</string>
+  <string name="dashboard_asset_actions_swap_dsc">Tauschen Sie %1$s gegen eine andere Krypto aus</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Fügen Sie Ihrer Zinsbrieftasche %1$s</string>
+  <string name="dashboard_asset_actions_summary_title">Zinsübersicht</string>
+  <string name="dashboard_asset_actions_summary_dsc">Zeigen Sie Ihre aufgelaufenen %1$s Zinsen an</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Zinsdetails konnten nicht geladen werden</string>
+  <string name="asset_details_chart_load_failed_toast">Fehler beim Laden der Diagrammdetails. Versuchen Sie es erneut</string>
+  <string name="asset_details_load_failed_toast">Fehler beim Laden der Brieftaschendetails. Versuchen Sie es erneut</string>
+  <string name="asset_details_exchange_load_failed_toast">Fehler beim Wechselkursinformationen, versuchen Sie es erneut</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Es ist bereits eine Transaktion im Gange. Bitte warten Sie, bis die Transaktion abgeschlossen ist</string>
+  <string name="cloud_backup_card_title">Einführung in Cloud-Backups</string>
+  <string name="cloud_backup_card_body">Sie können Ihre Brieftasche jetzt sicher in der Cloud sichern. Sie können Backups in Ihren Brieftascheneinstellungen deaktivieren.</string>
+  <string name="cloud_backup_card_cta">Mehr erfahren</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Ihr verfügbares Guthaben zum Abheben beträgt %1s . Der verbleibende Restbetrag in %2s kann innerhalb von 7 Tagen abgehoben werden.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Weitere </annotation>.</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Unzureichende Mittel</string>
+  <string name="basic_transfer_error_insufficient_funds">Sie haben nicht genügend Guthaben auf Ihrem Konto, um diese Transaktion abzuschließen.</string>
+  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden.<annotation link="balance_lock"> Weitere </annotation>.</string>
+  <string name="erc20_need_more_eth_error_body_1">Sie benötigen die ETH, um Ihre %1$s zu senden</string>
+  <string name="purchase_card_note_1">Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
+  <string name="select_deposit_source_title">Übertragen von</string>
+  <string name="activity_state_cleared">Gelöscht</string>
+  <string name="activity_state_rejected">Abgelehnt</string>
+  <string name="activity_state_refunded">Rückerstattung</string>
+  <string name="activity_details_label_manual_review">Manuelle Überprüfung</string>
+  <string name="activity_details_label_processing">wird bearbeitet</string>
+  <string name="activity_details_title_deposit">Anzahlung</string>
+  <string name="activity_details_title_interest_earned">Zinserträge</string>
+  <string name="activity_details_title_withdraw">Rückzug</string>
+  <string name="transfer_receive_crypto">Krypto erhalten</string>
+  <string name="send_select_target_title">Ziel</string>
+  <string name="send_enter_amount_from">Von: %1$s</string>
+  <string name="send_enter_amount_to">An: %1$s</string>
+  <string name="send_enter_amount_title">%1$s senden</string>
+  <string name="send_enter_amount_available">Verfügbar</string>
+  <string name="send_enter_amount_max">Senden Sie max</string>
+  <string name="send_enter_amount_deposit_max">Transfer max</string>
+  <string name="send_enter_amount_min_deposit">Mindesttransfer von %1$s erforderlich</string>
+  <string name="send_confirmation_title">%1$s senden</string>
+  <string name="send_confirmation_fee">Gebühr - Regelmäßig</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 Minuten)</string>
+  <string name="send_confirmation_fee_loading">Wird geladen…</string>
+  <string name="send_confirmation_fee_error">Fehler beim Laden der Gebühr</string>
+  <string name="send_confirmation_add_note_hint">Füg ein Notiz hinzu</string>
+  <string name="send_confirmation_add_note_success">Hinweis erfolgreich hinzugefügt</string>
+  <string name="send_confirmation_cta_button">%1$s senden</string>
+  <string name="send_confirmation_deposit_cta_button">Übertragung bestätigen</string>
+  <string name="send_confirmation_interest_tos_pp">Ich habe die <annotation link="interest_tos"> Nutzungsbedingungen </annotation> und <annotation link="interest_pp"> Datenschutzrichtlinie </annotation> gelesen und bin damit einverstanden.</string>
+  <string name="send_confirmation_interest_holding_period_1">Indem Sie dies akzeptieren, stimmen Sie der Übertragung zu</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) von Ihrer Bitcoin-Brieftasche auf Ihr Zinskonto. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
+  <string name="send_confirmation_progress_title">%1$s</string>
+  <string name="send_confirmation_progress_message">Wir übertragen jetzt Ihre %1$s .</string>
+  <string name="send_confirmation_success_title">%1$s übertragen</string>
+  <string name="send_confirmation_success_message">Ihre %1$s wurden erfolgreich übertragen.</string>
+  <string name="send_progress_sending_title">%1$s senden</string>
+  <string name="send_progress_sending_subtitle">Wir senden Ihre Transaktion jetzt.</string>
+  <string name="send_progress_complete_title">%1$s Gesendet</string>
+  <string name="send_progress_complete_subtitle">Ihre %1$s wurden erfolgreich gesendet.</string>
+  <string name="send_progress_error_title">Hoppla! Etwas ist schief gelaufen.</string>
+  <string name="send_progress_error_subtitle">Mach dir keine Sorgen. Ihr Geld ist sicher. Bitte versuchen Sie es erneut oder wenden Sie sich an unser Support-Team.</string>
+  <string name="send_enter_asset_address_hint">%1s Adresse</string>
+  <string name="send_warn_internal_send_only">Nur internes Senden</string>
+  <string name="send_scan_qr_code">QR-Code scannen</string>
+  <string name="send_error_not_valid_asset_address">Keine gültige %1s Adresse</string>
+  <string name="send_error_address_is_eth_contract">Adresse ist keine Benutzeradresse</string>
+  <string name="send_enter_amount_error_insufficient_funds">Nicht genug %1$s in Ihrer Brieftasche.</string>
+  <string name="send_enter_amount_error_invalid_amount">Senden Sie 0,00000001 %1$s oder mehr.</string>
+  <string name="send_enter_invalid_password">Das Passwort ist inkorrekt.</string>
+  <string name="send_enter_unexpected_error">Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.</string>
+  <string name="send_enter_insufficient_gas">Sie haben nicht genug ETH, um diese Transaktion abzuwickeln.</string>
+  <string name="send_select_a_wallet_title">oder Wählen Sie eine Brieftasche</string>
+  <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %1$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
+  <string name="purchase_funds_note">Ihr endgültiger Betrag kann sich aufgrund von Marktaktivitäten ändern.</string>
 </resources>

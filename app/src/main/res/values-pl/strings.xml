@@ -1126,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Wysłaliśmy link weryfikacyjny do</string>
   <string name="buy_sell_unverified_email_verify_message2">Kliknij i wróć tutaj, aby kontynuować transakcję.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otwórz e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Zgadzam się na Coinify <a href="ignored"> warunki handlowe </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-mail zweryfikowany!</string>
   <string name="buy_sell_verified_email_message">Nasz partner %1$s przetworzy Twoją transakcję bitcoin. Klikając przycisk Zgadzam się i kontynuuj, utworzysz konto z %1$s .</string>
   <string name="buy_sell_identification_verification">Zidentyfikuj weryfikację</string>

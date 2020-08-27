@@ -1123,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
   <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
   <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意Coinify <a href="ignored">条款</a></string>
   <string name="coinify">协整</string>
   <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
   <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>

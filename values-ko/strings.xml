@@ -349,6 +349,17 @@
  비트 코인 주소 %1$s . QR 코드를 스캔하십시오. 
 </string>
   <string name="invalid_private_key">잘못된 개인 키</string>
+  <string name="watch_only_import_warning">사용할 수없는 주소를 가져 오려고합니다. 
+ 주소 (또는 공개 키 스크립트) 
+ 해당 개인 키없이 지갑에 저장됩니다. 이 
+ 개인 키가 다른 곳에 저장된 경우에만 자금을 사용할 수 있습니다. 만약 너라면 
+ 하다 
+ 개인 키가 저장되어 있지 않은 사람에게 비트 코인을 보내도록 지시하지 마십시오. 
+ 사용할 수없는 
+ 주소. 
+
+ 이 옵션은 고급 사용자에게만 권장됩니다. 계속하다? 
+</string>
   <string name="scan_private_key">개인 키 스캔</string>
   <string name="private_key_successfully_imported">개인 키를 성공적으로 가져 왔습니다.</string>
   <string name="private_key_not_matching_address">참고 : 스캔 한 개인 키는 
@@ -1112,8 +1123,7 @@
   <string name="buy_sell_unverified_email_verify_message1">에 확인 링크를 보냈습니다.</string>
   <string name="buy_sell_unverified_email_verify_message2">거래를 계속하려면 여기를 클릭하고 여기로 돌아갑니다.</string>
   <string name="buy_sell_unverified_email_verify_open_email">이메일 열기</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Coinify <a href="ignored"> 이용 약관 </a> 동의</string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">이메일 확인 됨!</string>
   <string name="buy_sell_verified_email_message">파트너 %1$s 비트 코인 거래를 처리합니다. 동의 및 \'계속\'을 클릭하면 %1$s 계정을 생성합니다.</string>
   <string name="buy_sell_identification_verification">확인 식별</string>
@@ -1220,7 +1230,7 @@
   <string name="kyc_email_title">이메일 확인</string>
   <string name="kyc_email_message">추가 보안 계층으로 이메일 주소를 확인해야합니다.</string>
   <string name="kyc_email_hint_focused">귀하의 이메일</string>
-  <string name="kyc_email_hint_unfocused">\@ 문자열 / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">이메일 저장 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_email_send_verification">이메일을 보내</string>
   <string name="kyc_email_validation_header">받은 편지함을 확인.</string>
@@ -1245,7 +1255,7 @@
   <string name="kyc_onfido_splash_verification_error">ID 확인 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_veriff_splash_country_supported_header">우리나라가 지원 되나요?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">현재 모든 국가가 지원되는 것은 아닙니다. 계속하기 전에 최신 <annotation link="country_list"> 국가 목록 </annotation> 을 확인하십시오.</string>
-  <string name="kyc_veriff_splash_title">\@ 문자열 / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">은색 검증</string>
   <string name="kyc_veriff_splash_header">당신인지 확인합시다</string>
   <string name="kyc_veriff_splash_subtitle">계속하려면 아래의 ID 유형 중 하나가 필요합니다.</string>
@@ -1271,7 +1281,7 @@
   <string name="kyc_help_dialog_need_some_help_body">당사의 블록 체인 지원 팀은 신원 확인이 필요한 이유를 설명하는 도움말 가이드를 작성했습니다.</string>
   <string name="kyc_help_dialog_read_now">지금 읽어라</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ 문자열 / 연락처 _support</string>
+  <string name="kyc_help_dialog_contact_support">@string/연락처 _support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">신원 확인</string>
   <string name="kyc_settings_status_none">미확인</string>
@@ -1307,10 +1317,10 @@
   <string name="kyc_drop_off_card_description">중단 한 곳을 찾아 신원 확인을 완료합니다.</string>
   <string name="kyc_drop_off_card_button">확인 계속</string>
   <string name="kyc_documents_needed">필요한 서류</string>
-  <string name="kyc_resubmission_card_title">\@ 문자열 / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">제공하신 문서에 문제가있었습니다. 확인을 계속하려면 문서를 다시 업로드하십시오.</string>
   <string name="kyc_resubmission_card_button">문서 업로드</string>
-  <string name="kyc_resubmission_splash_title">\@ 문자열 / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">신원을 확인할 수 없으므로 필요한 문서를 다시 업로드해야합니다.</string>
   <string name="kyc_resubmission_splash_description_2">이것이 일어나는 주된 이유 :</string>
   <string name="kyc_resubmission_splash_description_3">필요한 사진이 없습니다.</string>
@@ -1532,6 +1542,7 @@
   <string name="estimated_amount">동부 표준시. 양</string>
   <string name="buying_fee">구매 수수료</string>
   <string name="purchase_bank_note">귀하의 자금을 받으면 %1$s 구매 주문을 시작합니다. 최종 금액은 시장 활동으로 인해 변경 될 수 있습니다. 요금이 부과 될 수 있습니다.</string>
+  <string name="purchase_card_note">영업일 기준 2 일 이내에 결제 수단에서 인출됩니다. 시장 활동으로 인해 최종 금액이 변경 될 수 있습니다.</string>
   <string name="complete_payment">결제 완료</string>
   <string name="card_payment">카드 결제</string>
   <string name="buy_now">지금 구매</string>
@@ -1704,7 +1715,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">예금 현금</string>
   <string name="fiat_funds_no_kyc_step_2_description">은행에서 현금을 송금하고 현금 잔고를 활성화하십시오.</string>
   <string name="fiat_funds_no_kyc_step_3_title">현금으로 암호 화폐 구매</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[현금 지갑을 결제 수단으로 사용하여 BTC, ETH, XLM 등을 구매하십시오.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">현금 지갑을 결제 수단으로 사용하여 BTC, ETH, XLM 등을 구매하십시오.</string>
   <string name="fiat_funds_no_kyc_positive_action">내 신원 확인</string>
   <string name="fiat_funds_no_kyc_negative_action">지금은 아님</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1732,4 +1743,103 @@
   <string name="send_state_not_supported">이 계정에서 지원되지 않습니다</string>
   <string name="send_state_not_enough_gas">ETH 잔액이 낮고 네트워크 요금을 지불 할 수 없음</string>
   <string name="send_state_send_in_flight">보류중인 거래로 인해 사용할 수 없습니다.</string>
+  <string name="common_send">보내다</string>
+  <string name="common_receive">받다</string>
+  <string name="common_swap">교환</string>
+  <string name="common_from">에서</string>
+  <string name="common_to">에</string>
+  <string name="common_yes">예</string>
+  <string name="common_no">아니</string>
+  <string name="common_ok">확인</string>
+  <string name="common_cancel">취소</string>
+  <string name="common_total">합계</string>
+  <string name="common_deposit">예금</string>
+  <string name="common_transfer">이전</string>
+  <string name="common_error">문제가 발생했습니다. 다시 시도하십시오</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">확인</string>
+  <string name="toolbar_cmd_transfer">이전</string>
+  <string name="notification_2fa_summary">2FA 알림</string>
+  <string name="notification_2fa_description">2 단계 인증 관련 알림</string>
+  <string name="notification_payments_summary">결제 알림</string>
+  <string name="notification_payments_description">결제 관련 알림</string>
+  <string name="enable_cloud_backup">클라우드 백업 활성화</string>
+  <string name="enable_cloud_backup_summary">암호화 된 백업을 Google 드라이브 계정에 저장하고, 
+ 가능한 경우. 이 장치를 분실 한 경우 지갑을 복원 할 수 있습니다. 
+</string>
+  <string name="tx_title_interest">%1$s 이자 획득</string>
+  <string name="dashboard_asset_actions_send_dsc">%1$s 을 지갑으로 이체</string>
+  <string name="dashboard_asset_actions_receive_dsc">%1$s 주소 수락 또는 공유</string>
+  <string name="dashboard_asset_actions_swap_dsc">%1$s 를 다른 암호화로 교환</string>
+  <string name="dashboard_asset_actions_deposit_dsc">관심 지갑에 %1$s 추가</string>
+  <string name="dashboard_asset_actions_summary_title">관심 요약</string>
+  <string name="dashboard_asset_actions_summary_dsc">적립 된 %1$s 이자보기</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">관심 분야 세부 정보를로드 할 수 없습니다.</string>
+  <string name="asset_details_chart_load_failed_toast">차트 세부 정보를로드하지 못했습니다. 다시 시도하세요.</string>
+  <string name="asset_details_load_failed_toast">지갑 세부 정보를로드하지 못했습니다. 다시 시도하십시오.</string>
+  <string name="asset_details_exchange_load_failed_toast">환율 정보를 교환하지 못했습니다. 다시 시도하십시오.</string>
+  <string name="dashboard_asset_actions_tx_in_progress">이미 진행중인 거래가 있습니다. 완료 될 때까지 기다려주세요.</string>
+  <string name="cloud_backup_card_title">클라우드 백업 소개</string>
+  <string name="cloud_backup_card_body">이제 지갑을 클라우드에 안전하게 백업 할 수 있습니다. 지갑 설정에서 백업을 거부 할 수 있습니다.</string>
+  <string name="cloud_backup_card_cta">더 알아보기</string>
+  <string name="basic_transfer_lock_warn" formatted="false">인출 할 수있는 잔액은 %1s 입니다. 남은 잔액 %2s 는 7 일 이내에 인출 할 수 있습니다.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> 자세히 알아보기 </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">자금 부족</string>
+  <string name="basic_transfer_error_insufficient_funds">이 거래를 완료하기위한 계정 잔액이 부족합니다.</string>
+  <string name="basic_transfer_error_locked_funds">귀하의 암호 화폐는 7 일 이내에 인출 할 수 있습니다. <annotation link="balance_lock"> 자세히 알아보기 </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">%1$s 를 보내려면 ETH가 필요합니다.</string>
+  <string name="purchase_card_note_1">최종 금액은 시장 활동으로 인해 변경 될 수 있습니다. 7 일의 초기 보류 기간이 귀하의 자금에 적용됩니다.</string>
+  <string name="select_deposit_source_title">다음에서 전송</string>
+  <string name="activity_state_cleared">클리어</string>
+  <string name="activity_state_rejected">거부 됨</string>
+  <string name="activity_state_refunded">환불 됨</string>
+  <string name="activity_details_label_manual_review">직접 검토</string>
+  <string name="activity_details_label_processing">가공</string>
+  <string name="activity_details_title_deposit">예금</string>
+  <string name="activity_details_title_interest_earned">이자 획득</string>
+  <string name="activity_details_title_withdraw">철수</string>
+  <string name="transfer_receive_crypto">암호 화폐 받기</string>
+  <string name="send_select_target_title">목적지</string>
+  <string name="send_enter_amount_from">보낸 사람 : %1$s</string>
+  <string name="send_enter_amount_to">받는 사람 : %1$s</string>
+  <string name="send_enter_amount_title">%1$s 보내기</string>
+  <string name="send_enter_amount_available">유효한</string>
+  <string name="send_enter_amount_max">최대 보내기</string>
+  <string name="send_enter_amount_deposit_max">최대 전송</string>
+  <string name="send_enter_amount_min_deposit">최소 %1$s 이체 필요</string>
+  <string name="send_confirmation_title">%1$s 보내기</string>
+  <string name="send_confirmation_fee">수수료-일반</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 분)</string>
+  <string name="send_confirmation_fee_loading">로드 중…</string>
+  <string name="send_confirmation_fee_error">수수료 로딩 오류</string>
+  <string name="send_confirmation_add_note_hint">메모 추가</string>
+  <string name="send_confirmation_add_note_success">메모가 성공적으로 추가되었습니다.</string>
+  <string name="send_confirmation_cta_button">%1$s 보내기</string>
+  <string name="send_confirmation_deposit_cta_button">전송 확인</string>
+  <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos"> 서비스 약관 </annotation> 및 <annotation link="interest_pp"> 개인 정보 보호 정책 </annotation> 을 읽었으며 이에 동의합니다.</string>
+  <string name="send_confirmation_interest_holding_period_1">이를 수락하면 이전에 동의하는 것입니다.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) 비트 코인 지갑에서 관심 계정으로. 7 일의 초기 보류 기간이 귀하의 자금에 적용됩니다.</string>
+  <string name="send_confirmation_progress_title">%1$s 전송</string>
+  <string name="send_confirmation_progress_message">지금 귀하의 %1$s 전송합니다.</string>
+  <string name="send_confirmation_success_title">%1$s 전송 됨</string>
+  <string name="send_confirmation_success_message">%1$s 이 성공적으로 전송되었습니다.</string>
+  <string name="send_progress_sending_title">%1$s 보내는 중</string>
+  <string name="send_progress_sending_subtitle">지금 거래를 보내고 있습니다.</string>
+  <string name="send_progress_complete_title">%1$s 보냄</string>
+  <string name="send_progress_complete_subtitle">%1$s 이 성공적으로 전송되었습니다.</string>
+  <string name="send_progress_error_title">이런! 뭔가 잘못되었습니다.</string>
+  <string name="send_progress_error_subtitle">걱정하지 마세요. 당신의 돈은 안전합니다. 다시 시도하거나 지원 팀에 도움을 요청하십시오.</string>
+  <string name="send_enter_asset_address_hint">%1s 주소</string>
+  <string name="send_warn_internal_send_only">내부 전송 만</string>
+  <string name="send_scan_qr_code">QR 코드 스캔</string>
+  <string name="send_error_not_valid_asset_address">유효한 %1s 주소가 아닙니다.</string>
+  <string name="send_error_address_is_eth_contract">주소가 사용자 주소가 아닙니다.</string>
+  <string name="send_enter_amount_error_insufficient_funds">지갑에 %1$s 가) 충분하지 않습니다.</string>
+  <string name="send_enter_amount_error_invalid_amount">0.00000001 %1$s 이상을 보냅니다.</string>
+  <string name="send_enter_invalid_password">비밀번호가 맞지 않습니다.</string>
+  <string name="send_enter_unexpected_error">예상치 못한 오류가 발생했습니다. 다시 시도하십시오.</string>
+  <string name="send_enter_insufficient_gas">이 거래를 처리하기에 충분한 ETH가 없습니다.</string>
+  <string name="send_select_a_wallet_title">또는 지갑 선택</string>
+  <string name="send_internal_transfer_message">현재는 %1$s 트레이드 월렛에서 Vault 월렛으로 %1$s 만 이체 할 수 있습니다. %1$s 이 Vault 지갑에 있으면 외부 주소로 이체 할 수 있습니다.</string>
+  <string name="purchase_funds_note">최종 금액은 시장 활동으로 인해 변경 될 수 있습니다.</string>
 </resources>

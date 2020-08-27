@@ -1123,8 +1123,7 @@
   <string name="buy_sell_unverified_email_verify_message1">에 확인 링크를 보냈습니다.</string>
   <string name="buy_sell_unverified_email_verify_message2">거래를 계속하려면 여기를 클릭하고 여기로 돌아갑니다.</string>
   <string name="buy_sell_unverified_email_verify_open_email">이메일 열기</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Coinify <a href="ignored"> 이용 약관 </a> 동의</string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">이메일 확인 됨!</string>
   <string name="buy_sell_verified_email_message">파트너 %1$s 비트 코인 거래를 처리합니다. 동의 및 \'계속\'을 클릭하면 %1$s 계정을 생성합니다.</string>
   <string name="buy_sell_identification_verification">확인 식별</string>

@@ -351,7 +351,17 @@
  Adresa Bitcoin %1$s . Vă rugăm să scanați codul QR. 
 </string>
   <string name="invalid_private_key">Cheie privată nevalidă</string>
+  <string name="watch_only_import_warning">Ești pe cale să importezi o adresă care nu poate fi cheltuită, an 
+ adresa (sau script-ul cu cheie publică) 
+ stocate în portofel fără cheia privată corespunzătoare. Acest 
+ înseamnă că fondurile pot fi cheltuite DOAR dacă aveți cheia privată stocată în altă parte. daca tu 
+ do 
+ nu aveți cheia privată stocată, NU instruiți pe nimeni să vă trimită bitcoin la 
+ non-spendable 
+ abordare. 
 
+ Aceste opțiuni sunt recomandate numai pentru utilizatorii avansați. Continua? 
+</string>
   <string name="scan_private_key">Scanează cheia privată</string>
   <string name="private_key_successfully_imported">Cheia privată a fost importată cu succes.</string>
   <string name="private_key_not_matching_address">NOTĂ: Cheia privată scanată nu 
@@ -1115,8 +1125,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Am trimis un link de verificare la</string>
   <string name="buy_sell_unverified_email_verify_message2">Faceți clic pe el și reveniți aici pentru a continua cu tranzacția.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Deschideți e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Sunt de acord să coinificați <a href="ignored"> termeni și condiții </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Verificat prin e-mail!</string>
   <string name="buy_sell_verified_email_message">Partenerul nostru %1$s va procesa tranzacția bitcoin. Făcând clic pe De acord și pe „Continuare” veți crea un cont cu %1$s .</string>
   <string name="buy_sell_identification_verification">Identificați verificarea</string>
@@ -1235,7 +1244,7 @@
   <string name="kyc_phone_number_message">Acest lucru ne va ajuta să vă verificăm identitatea astăzi și, de asemenea, să vă păstrăm contul în siguranță în viitor. Pentru aceasta, un SMS va fi trimis către telefonul dvs. cu un cod de verificare.</string>
   <string name="kyc_phone_number_hint_focused">Numărul tău de telefon</string>
   <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
-  <string name="kyc_phone_send_again"><![CDATA[<annotation link=\"resend_code\"> Cod de <annotation link=\"resend_code\"> </annotation>]]></string>
+  <string name="kyc_phone_send_again"><annotation link="resend_code"> Cod de </annotation></string>
   <string name="kyc_phone_number_error_saving_number">Eroare la salvarea numărului mobil, încercați din nou</string>
   <string name="kyc_phone_number_code_was_resent">Codul a fost resentit</string>
   <string name="kyc_phone_number_validation_header">Introduceți codul trimis la</string>
@@ -1533,6 +1542,7 @@
   <string name="estimated_amount">Est. Cantitate</string>
   <string name="buying_fee">Taxa de cumpărare</string>
   <string name="purchase_bank_note">După ce primim fondurile dvs., vom începe comanda dvs. de cumpărare de %1$s . Rețineți, valoarea dvs. finală s-ar putea modifica în funcție de activitatea pieței scadente. Se pot aplica comisioane.</string>
+  <string name="purchase_card_note">Vom debita metoda de plată în 2 zile lucrătoare. Suma dvs. finală s-ar putea modifica din cauza activității pieței.</string>
   <string name="complete_payment">Plata completă</string>
   <string name="card_payment">Plata cu cardul</string>
   <string name="buy_now">Cumpără acum</string>
@@ -1705,7 +1715,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Depozit numerar</string>
   <string name="fiat_funds_no_kyc_step_2_description">Transferați numerar de la banca dvs. și activați-vă soldurile.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Cumpără Crypto cu numerar</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Utilizați portofelul de numerar ca metodă de plată pentru a cumpăra BTC, ETH, XLM și altele.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Utilizați portofelul de numerar ca metodă de plată pentru a cumpăra BTC, ETH, XLM și altele.</string>
   <string name="fiat_funds_no_kyc_positive_action">Verificați identitatea mea</string>
   <string name="fiat_funds_no_kyc_negative_action">Nu acum</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1733,4 +1743,103 @@
   <string name="send_state_not_supported">Trimiteți nu este acceptat pe acest cont</string>
   <string name="send_state_not_enough_gas">Soldul ETH scăzut, incapabil să plătească comisioane de rețea</string>
   <string name="send_state_send_in_flight">Indisponibil din cauza tranzacției pendinte.</string>
+  <string name="common_send">Trimite</string>
+  <string name="common_receive">A primi</string>
+  <string name="common_swap">schimb</string>
+  <string name="common_from">Din</string>
+  <string name="common_to">La</string>
+  <string name="common_yes">da</string>
+  <string name="common_no">Nu</string>
+  <string name="common_ok">O.K</string>
+  <string name="common_cancel">Anulare</string>
+  <string name="common_total">Total</string>
+  <string name="common_deposit">Depozit</string>
+  <string name="common_transfer">Transfer</string>
+  <string name="common_error">Ceva n-a mers bine. Vă rugăm să încercați din nou</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">A confirma</string>
+  <string name="toolbar_cmd_transfer">Transfer</string>
+  <string name="notification_2fa_summary">2FA Notificări</string>
+  <string name="notification_2fa_description">Notificări legate de autentificarea cu doi factori</string>
+  <string name="notification_payments_summary">Notificări de plată</string>
+  <string name="notification_payments_description">Notificări referitoare la plăți</string>
+  <string name="enable_cloud_backup">Activați Backup-uri Cloud</string>
+  <string name="enable_cloud_backup_summary">Stocați backup-ul criptat în contul dvs. Google Drive, 
+ daca este disponibil. Acest lucru vă permite să restaurați portofelul dacă pierdeți acest dispozitiv. 
+</string>
+  <string name="tx_title_interest">%1$s Dobândă câștigată</string>
+  <string name="dashboard_asset_actions_send_dsc">Transferați %1$s în orice portofel</string>
+  <string name="dashboard_asset_actions_receive_dsc">Acceptați sau distribuiți adresa dvs. %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Schimbați %1$s pentru un alt Crypto</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Adăugați %1$s în portofelul dvs. de interese</string>
+  <string name="dashboard_asset_actions_summary_title">Rezumatul dobânzii</string>
+  <string name="dashboard_asset_actions_summary_dsc">Vizualizați dobânda acumulată %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Nu s-au putut încărca detaliile dobânzii</string>
+  <string name="asset_details_chart_load_failed_toast">Nu a putut încărca detaliile graficului, încercați din nou</string>
+  <string name="asset_details_load_failed_toast">Nu ați putut încărca detaliile portofelului, încercați din nou</string>
+  <string name="asset_details_exchange_load_failed_toast">Nu a reușit schimbul de informații despre cursul de schimb, încercați din nou</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Există deja o tranzacție în derulare, vă rugăm să așteptați până la finalizarea acesteia</string>
+  <string name="cloud_backup_card_title">Introducerea copiilor de rezervă cloud</string>
+  <string name="cloud_backup_card_body">Acum puteți face backup portofelului în siguranță în cloud. Puteți renunța la copiile de rezervă din setările portofelului.</string>
+  <string name="cloud_backup_card_cta">Aflați mai multe</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Soldul dvs. disponibil pentru retragere este de %1s . Soldul rămas %2s va fi disponibil pentru a fi retras în termen de 7 zile.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Aflați mai multe </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Fonduri insuficiente</string>
+  <string name="basic_transfer_error_insufficient_funds">Nu aveți fonduri suficiente în contul dvs. pentru a finaliza această tranzacție.</string>
+  <string name="basic_transfer_error_locked_funds">Crypto-ul dvs. va fi disponibil pentru a fi retras în termen de 7 zile. <annotation link="balance_lock"> Aflați mai multe </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">Veți avea nevoie de ETH pentru a vă trimite %1$s</string>
+  <string name="purchase_card_note_1">Suma dvs. finală s-ar putea modifica din cauza activității pieței. O perioadă inițială de reținere de 7 zile se va aplica fondurilor dvs.</string>
+  <string name="select_deposit_source_title">Transfer de la</string>
+  <string name="activity_state_cleared">şters</string>
+  <string name="activity_state_rejected">respins</string>
+  <string name="activity_state_refunded">rambursată</string>
+  <string name="activity_details_label_manual_review">Revizuire manuală</string>
+  <string name="activity_details_label_processing">Prelucrare</string>
+  <string name="activity_details_title_deposit">Depozit</string>
+  <string name="activity_details_title_interest_earned">Interes dobândit</string>
+  <string name="activity_details_title_withdraw">Retragere</string>
+  <string name="transfer_receive_crypto">Primește cripto</string>
+  <string name="send_select_target_title">Destinaţie</string>
+  <string name="send_enter_amount_from">De la: %1$s</string>
+  <string name="send_enter_amount_to">Pentru: %1$s</string>
+  <string name="send_enter_amount_title">Trimite %1$s</string>
+  <string name="send_enter_amount_available">Disponibil</string>
+  <string name="send_enter_amount_max">Trimite Max</string>
+  <string name="send_enter_amount_deposit_max">Transfer max</string>
+  <string name="send_enter_amount_min_deposit">Transfer minim de %1$s</string>
+  <string name="send_confirmation_title">Trimite %1$s</string>
+  <string name="send_confirmation_fee">Taxa - regulat</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 minute)</string>
+  <string name="send_confirmation_fee_loading">Se încarcă…</string>
+  <string name="send_confirmation_fee_error">Eroare la încărcarea comisiei</string>
+  <string name="send_confirmation_add_note_hint">Adaugă o notiță</string>
+  <string name="send_confirmation_add_note_success">Notă adăugată cu succes</string>
+  <string name="send_confirmation_cta_button">Trimite %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Confirmați Transferul</string>
+  <string name="send_confirmation_interest_tos_pp">Am citit și sunt de acord cu <annotation link="interest_tos"> Termenii condițiile </annotation> & <annotation link="interest_pp"> Politica de confidențialitate </annotation>.</string>
+  <string name="send_confirmation_interest_holding_period_1">Acceptând acest lucru, sunteți de acord să transferați</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) din portofelul Bitcoin în contul dvs. de interese. O perioadă inițială de reținere de 7 zile se va aplica fondurilor dvs.</string>
+  <string name="send_confirmation_progress_title">Transferul %1$s</string>
+  <string name="send_confirmation_progress_message">Transferăm %1$s acum.</string>
+  <string name="send_confirmation_success_title">%1$s Transferat</string>
+  <string name="send_confirmation_success_message">%1$s a fost transferat cu succes.</string>
+  <string name="send_progress_sending_title">Se trimite %1$s</string>
+  <string name="send_progress_sending_subtitle">Vă trimitem tranzacția acum.</string>
+  <string name="send_progress_complete_title">%1$s trimis</string>
+  <string name="send_progress_complete_subtitle">%1$s au fost trimise cu succes.</string>
+  <string name="send_progress_error_title">Hopa! Ceva n-a mers bine.</string>
+  <string name="send_progress_error_subtitle">Nu-ți face griji. Banii dvs. sunt în siguranță. Încercați din nou sau contactați echipa noastră de asistență pentru ajutor.</string>
+  <string name="send_enter_asset_address_hint">Adresa %1s</string>
+  <string name="send_warn_internal_send_only">Numai trimitere internă</string>
+  <string name="send_scan_qr_code">Scanează codul QR</string>
+  <string name="send_error_not_valid_asset_address">Nu este o adresă valabilă %1s</string>
+  <string name="send_error_address_is_eth_contract">Adresa nu este o adresă de utilizator</string>
+  <string name="send_enter_amount_error_insufficient_funds">Nu este suficient %1$s în portofel.</string>
+  <string name="send_enter_amount_error_invalid_amount">Trimiteți 0.00000001 %1$s sau mai mult.</string>
+  <string name="send_enter_invalid_password">Parola este incorectă.</string>
+  <string name="send_enter_unexpected_error">A aparut o eroare neasteptata. Vă rugăm să încercați din nou.</string>
+  <string name="send_enter_insufficient_gas">Nu aveți suficient ETH pentru a procesa această tranzacție.</string>
+  <string name="send_select_a_wallet_title">sau Selectați un portofel</string>
+  <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %1$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
+  <string name="purchase_funds_note">Suma finală se poate modifica din cauza activității de pe piață.</string>
 </resources>

@@ -352,7 +352,17 @@
  Біткойн-адреса %1$s . Будь ласка, скануйте QR-код. 
 </string>
   <string name="invalid_private_key">Недійсний приватний ключ</string>
+  <string name="watch_only_import_warning">Ви збираєтесь імпортувати не витрачається адресу, 
+ адреса (або сценарій відкритого ключа) 
+ зберігається в гаманці без відповідного приватного ключа. Це 
+ означає, що кошти можна витратити ТІЛЬКИ, якщо приватний ключ зберігається в іншому місці. Якщо ти 
+ робити 
+ не зберігайте приватний ключ, НЕ дайте вказівки нікому надсилати вам біткойн 
+ не витрачається 
+ адреса. 
 
+ Ці параметри рекомендуються лише для досвідчених користувачів. Продовжувати? 
+</string>
   <string name="scan_private_key">Сканувати приватний ключ</string>
   <string name="private_key_successfully_imported">Приватний ключ успішно імпортований.</string>
   <string name="private_key_not_matching_address">ПРИМІТКА. Сканований приватний ключ не працює 
@@ -1116,8 +1126,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Ми надіслали посилання для підтвердження до</string>
   <string name="buy_sell_unverified_email_verify_message2">Клацніть по ньому та поверніться сюди, щоб продовжити транзакцію.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Відкрити електронну пошту</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Погодьтеся, щоб Coinify <a href="ignored"> положення та умови </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Підтверджено електронною поштою!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обробить вашу біткойн-транзакцію. Натиснувши «Погодитися» та «Продовжити», ви створите обліковий запис за допомогою %1$s .</string>
   <string name="buy_sell_identification_verification">Визначте верифікацію</string>
@@ -1536,6 +1545,7 @@
   <string name="estimated_amount">Оцінка Сума</string>
   <string name="buying_fee">Плата за покупку</string>
   <string name="purchase_bank_note">Щойно ми отримаємо ваші кошти, ми розпочнемо ваше замовлення на покупку %1$s . Зауважте, остаточна сума може змінитися на належну ринкову активність. Може стягуватися плата.</string>
+  <string name="purchase_card_note">Ми будемо стягувати ваш спосіб оплати протягом 2 робочих днів. Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="complete_payment">Повна оплата</string>
   <string name="card_payment">Оплата карткою</string>
   <string name="buy_now">Придбайте зараз</string>
@@ -1736,4 +1746,103 @@
   <string name="send_state_not_supported">Надсилання не підтримується в цьому обліковому записі</string>
   <string name="send_state_not_enough_gas">Баланс ETH низький, не може платити мережевий збір</string>
   <string name="send_state_send_in_flight">Недоступно через відкладену транзакцію.</string>
+  <string name="common_send">Надіслати</string>
+  <string name="common_receive">Отримати</string>
+  <string name="common_swap">Зміна</string>
+  <string name="common_from">З</string>
+  <string name="common_to">До</string>
+  <string name="common_yes">Так</string>
+  <string name="common_no">Немає</string>
+  <string name="common_ok">гаразд</string>
+  <string name="common_cancel">Скасувати</string>
+  <string name="common_total">Всього</string>
+  <string name="common_deposit">Депозит</string>
+  <string name="common_transfer">Передача</string>
+  <string name="common_error">Щось пішло не так, будь ласка, спробуйте ще раз</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Підтвердіть</string>
+  <string name="toolbar_cmd_transfer">Передача</string>
+  <string name="notification_2fa_summary">2FA сповіщення</string>
+  <string name="notification_2fa_description">Сповіщення, пов\'язані з двофакторною автентифікацією</string>
+  <string name="notification_payments_summary">Повідомлення про платежі</string>
+  <string name="notification_payments_description">Сповіщення про платежі</string>
+  <string name="enable_cloud_backup">Увімкнути хмарні резервні копії</string>
+  <string name="enable_cloud_backup_summary">Зберігайте зашифровану резервну копію у своєму обліковому записі Диска Google, 
+ якщо доступно. Це дозволяє відновити гаманець, якщо ви втратите цей пристрій. 
+</string>
+  <string name="tx_title_interest">%1$s Зароблено відсотки</string>
+  <string name="dashboard_asset_actions_send_dsc">Перенесіть %1$s у будь-який гаманець</string>
+  <string name="dashboard_asset_actions_receive_dsc">Прийміть або поділіться своєю адресою %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Обміняйте %1$s на іншу криптовалюту</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Додайте %1$s у свій гаманець із інтересами</string>
+  <string name="dashboard_asset_actions_summary_title">Підсумок інтересів</string>
+  <string name="dashboard_asset_actions_summary_dsc">Переглянути накопичені %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Неможливо завантажити дані про інтереси</string>
+  <string name="asset_details_chart_load_failed_toast">Не вдалося завантажити дані діаграми, будь ласка, спробуйте ще раз</string>
+  <string name="asset_details_load_failed_toast">Не вдалося завантажити дані про гаманець, спробуйте ще раз</string>
+  <string name="asset_details_exchange_load_failed_toast">Не вдалося обмінятися інформацією про курс, будь ласка, спробуйте ще раз</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Операція вже триває, зачекайте, поки вона завершиться</string>
+  <string name="cloud_backup_card_title">Представляємо хмарні резервні копії</string>
+  <string name="cloud_backup_card_body">Тепер ви можете створити резервну копію свого гаманця в хмарі. Ви можете відмовитись від резервних копій у налаштуваннях гаманця.</string>
+  <string name="cloud_backup_card_cta">Вчи більше</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Ваш наявний залишок для зняття - %1s . Решта залишку %2s буде доступна для зняття протягом 7 днів.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Докладніше </annotation> .</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Недостатньо коштів</string>
+  <string name="basic_transfer_error_insufficient_funds">У вас недостатньо коштів на вашому рахунку для завершення цієї транзакції.</string>
+  <string name="basic_transfer_error_locked_funds">Ваша криптовалюта буде доступна для зняття протягом 7 днів. <annotation link="balance_lock"> Докладніше </annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">Вам знадобиться ETH, щоб надіслати свої %1$s</string>
+  <string name="purchase_card_note_1">Ваша остаточна сума може змінитися через активність на ринку. Початковий термін утримування у 7 днів буде застосовано до ваших коштів.</string>
+  <string name="select_deposit_source_title">Трансфер з</string>
+  <string name="activity_state_cleared">Очищено</string>
+  <string name="activity_state_rejected">Відхилено</string>
+  <string name="activity_state_refunded">Відшкодовано</string>
+  <string name="activity_details_label_manual_review">Огляд вручну</string>
+  <string name="activity_details_label_processing">Обробка</string>
+  <string name="activity_details_title_deposit">Депозит</string>
+  <string name="activity_details_title_interest_earned">Зароблені відсотки</string>
+  <string name="activity_details_title_withdraw">Виведення</string>
+  <string name="transfer_receive_crypto">Отримати криптовалюту</string>
+  <string name="send_select_target_title">Місце призначення</string>
+  <string name="send_enter_amount_from">Від: %1$s</string>
+  <string name="send_enter_amount_to">До: %1$s</string>
+  <string name="send_enter_amount_title">Надіслати %1$s</string>
+  <string name="send_enter_amount_available">Доступні</string>
+  <string name="send_enter_amount_max">Надіслати макс</string>
+  <string name="send_enter_amount_deposit_max">Передача макс</string>
+  <string name="send_enter_amount_min_deposit">Необхідний мінімальний переказ %1$s</string>
+  <string name="send_confirmation_title">Надіслати %1$s</string>
+  <string name="send_confirmation_fee">Плата - регулярна</string>
+  <string name="send_confirmation_regular_estimation">(60 хвилин ETA)</string>
+  <string name="send_confirmation_fee_loading">Завантаження…</string>
+  <string name="send_confirmation_fee_error">Помилка завантаження плати</string>
+  <string name="send_confirmation_add_note_hint">Додати примітку</string>
+  <string name="send_confirmation_add_note_success">Примітка успішно додана</string>
+  <string name="send_confirmation_cta_button">Надіслати %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Підтвердити передачу</string>
+  <string name="send_confirmation_interest_tos_pp">Я прочитав і погоджуюся на <annotation link="interest_tos"> Умови надання послуг </annotation> &amp; <annotation link="interest_pp"> Політика конфіденційності </annotation> .</string>
+  <string name="send_confirmation_interest_holding_period_1">Приймаючи це, ви погоджуєтесь передати</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) з вашого Bitcoin Wallet на ваш рахунок інтересів. Початковий термін утримування у 7 днів буде застосовано до ваших коштів.</string>
+  <string name="send_confirmation_progress_title">Передача %1$s</string>
+  <string name="send_confirmation_progress_message">Зараз ми передаємо ваш %1$s .</string>
+  <string name="send_confirmation_success_title">Перенесено %1$s</string>
+  <string name="send_confirmation_success_message">Ваш %1$s переданий успішно.</string>
+  <string name="send_progress_sending_title">Надсилання %1$s</string>
+  <string name="send_progress_sending_subtitle">Зараз ми надсилаємо вашу транзакцію.</string>
+  <string name="send_progress_complete_title">%1$s Надіслано</string>
+  <string name="send_progress_complete_subtitle">Ваш %1$s успішно надісланий.</string>
+  <string name="send_progress_error_title">На жаль! Щось пішло не так.</string>
+  <string name="send_progress_error_subtitle">Не хвилюйся. Ваші гроші в безпеці. Повторіть спробу або зв’яжіться з нашою службою підтримки.</string>
+  <string name="send_enter_asset_address_hint">Адреса %1s</string>
+  <string name="send_warn_internal_send_only">Лише внутрішній надіслати</string>
+  <string name="send_scan_qr_code">Сканувати QR-код</string>
+  <string name="send_error_not_valid_asset_address">Неправильна адреса %1s</string>
+  <string name="send_error_address_is_eth_contract">Адреса - це не адреса користувача</string>
+  <string name="send_enter_amount_error_insufficient_funds">У вашому гаманці недостатньо %1$s .</string>
+  <string name="send_enter_amount_error_invalid_amount">Надіслати 0,00000001 %1$s або більше.</string>
+  <string name="send_enter_invalid_password">Неправильний пароль.</string>
+  <string name="send_enter_unexpected_error">Виникла несподівана помилка. Будь ласка спробуйте ще раз.</string>
+  <string name="send_enter_insufficient_gas">У вас недостатньо ETH для обробки цієї транзакції.</string>
+  <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
+  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
+  <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
 </resources>

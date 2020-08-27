@@ -1124,8 +1124,7 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Ga akkoord met de <a href="ignored"> algemene voorwaarden </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>

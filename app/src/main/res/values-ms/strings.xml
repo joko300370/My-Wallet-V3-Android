@@ -1123,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami menghantar pautan pengesahan kepada</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk meneruskan transaksi anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka E-mel</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Bersetuju untuk <a href="ignored"> terma dan syarat </a></string>
   <string name="coinify">Mencukupi</string>
   <string name="buy_sell_verified_email_title">E-mel Disahkan!</string>
   <string name="buy_sell_verified_email_message">Rakan kongsi kami %1$s akan memproses transaksi bitcoin anda. Dengan mengklik Setuju dan \'Teruskan\', anda akan membuat akaun dengan %1$s .</string>

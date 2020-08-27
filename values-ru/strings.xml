@@ -154,7 +154,7 @@
   <string name="restoring_wallet">Восстановление кошелька.</string>
   <string name="password">пароль</string>
   <string name="email">Ваш адрес электронной почты</string>
-  <string name="you_agree_terms_of_service"><![CDATA[Создавая учетную запись, вы соглашаетесь с <annotation link=\"terms\"> Terms <annotation link=\"terms\"> Условиями обслуживания </annotation> & <annotation link=\"privacy\"> Политика конфиденциальности </annotation> Blockchain.]]></string>
+  <string name="you_agree_terms_of_service">Создавая учетную запись, вы соглашаетесь с <annotation link="terms"> Условиями обслуживания </annotation> &amp; <annotation link="privacy"> Политика конфиденциальности </annotation> Blockchain.</string>
   <string name="new_account_cta_text">Продолжить</string>
   <string name="new_account_title">Завести аккаунт</string>
   <string name="strength_weak">слабый</string>
@@ -1116,8 +1116,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Мы отправили ссылку для подтверждения</string>
   <string name="buy_sell_unverified_email_verify_message2">Нажмите на нее и вернитесь сюда, чтобы продолжить транзакцию.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Открыть электронную почту</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Согласитесь с Coinify <a href="ignored"> правилами и условиями </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email подтвержден!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обработает вашу биткойн-транзакцию. Нажав «Согласен» и «Продолжить», вы создадите учетную запись с %1$s .</string>
   <string name="buy_sell_identification_verification">Определить подтверждение</string>
@@ -1708,7 +1707,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Внести наличные</string>
   <string name="fiat_funds_no_kyc_step_2_description">Перечислите наличные деньги из банка и включите баланс наличных средств.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Купить криптовалюту за наличные</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Используйте свой кошелек наличных денег в качестве способа оплаты, чтобы купить BTC, ETH, XLM и другое.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Используйте свой кошелек наличных денег в качестве способа оплаты, чтобы купить BTC, ETH, XLM и другое.</string>
   <string name="fiat_funds_no_kyc_positive_action">Пройти проверку личности</string>
   <string name="fiat_funds_no_kyc_negative_action">Не сейчас</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>

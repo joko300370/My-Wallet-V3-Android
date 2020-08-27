@@ -1123,8 +1123,7 @@
   <string name="buy_sell_unverified_email_verify_message1">確認リンクを送信しました</string>
   <string name="buy_sell_unverified_email_verify_message2">それをクリックしてここに戻り、取引を続行します。</string>
   <string name="buy_sell_unverified_email_verify_open_email">メールを開く</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><a href="ignored">利用規約</a>同意する</string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">メール確認済み！</string>
   <string name="buy_sell_verified_email_message">パートナー%1$sがビットコイントランザクションを処理します。同意して「続行」をクリックすると、 %1$sアカウントが作成されます。</string>
   <string name="buy_sell_identification_verification">確認を識別する</string>
