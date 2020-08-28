@@ -44,7 +44,8 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
     }
 
     override val host: Host by lazy {
-        super.host as? Host ?: throw IllegalStateException("Host fragment is not a ForceBackupForSendSheet.Host")
+        super.host as? Host ?: throw IllegalStateException(
+            "Host fragment is not a ForceBackupForSendSheet.Host")
     }
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -78,7 +79,8 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                 onCtaClick()
             }
 
-            complete_title.text = getString(R.string.basic_transfer_complete_title, cryptoCurrency.displayTicker)
+            complete_title.text =
+                getString(R.string.basic_transfer_complete_title, cryptoCurrency.displayTicker)
 
             image.setCoinIcon(cryptoCurrency)
 
@@ -96,18 +98,18 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                 val availableFiat = fiatPrice.convert(availableBalance)
                 Triple(availableBalance, totalBalance, availableFiat)
             }
-            .observeOn(uiScheduler)
-            .doOnSubscribe { cta_button.isEnabled = false }
-            .subscribeBy(
-                onSuccess = { (available, total, fiat) ->
-                    valueToSend = available as CryptoValue
-                    updatePendingUi(view, available, total, fiat)
-                },
-                onError = {
-                    Timber.e(it)
-                    dismiss()
-                }
-            )
+                .observeOn(uiScheduler)
+                .doOnSubscribe { cta_button.isEnabled = false }
+                .subscribeBy(
+                    onSuccess = { (available, total, fiat) ->
+                        valueToSend = available as CryptoValue
+                        updatePendingUi(view, available, total, fiat)
+                    },
+                    onError = {
+                        Timber.e(it)
+                        dismiss()
+                    }
+                )
 
             disposables += token.defaultAccount()
                 .flatMap { targetAccount ->
@@ -143,6 +145,7 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                     available.toStringWithSymbol(),
                     (total - available).toStringWithSymbol()
                 )
+                locked_total_warning.text = msg
 
                 val linkTxt = stringUtils.getStringWithMappedLinks(
                     R.string.basic_transfer_lock_learn_more,
@@ -150,6 +153,10 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
                     requireActivity()
                 )
                 locked_total_learn_more.text = linkTxt
+
+                if (!available.isPositive) {
+                    cta_button.isEnabled = false
+                }
 
                 locked_total_warning.visible()
                 locked_total_learn_more.visible()
@@ -225,7 +232,8 @@ class BasicTransferToWallet : SlidingModalBottomDialog() {
             when (t) {
                 is SimpleBuyError.WithdrawalInsufficientFunds -> {
                     image.setImageDrawable(R.drawable.vector_pit_request_failure)
-                    complete_title.text = getString(R.string.basic_transfer_error_insufficient_funds_title)
+                    complete_title.text =
+                        getString(R.string.basic_transfer_error_insufficient_funds_title)
                     complete_message.text = getString(R.string.basic_transfer_error_insufficient_funds)
                 }
                 is SimpleBuyError.WithdrawalAlreadyPending -> {
