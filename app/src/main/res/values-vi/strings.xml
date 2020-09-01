@@ -349,17 +349,6 @@
  Địa chỉ bitcoin %1$s . Vui lòng quét mã QR. 
 </string>
   <string name="invalid_private_key">Khóa riêng không hợp lệ</string>
-  <string name="watch_only_import_warning">Bạn sắp nhập một địa chỉ không thể chi tiêu, một 
- địa chỉ (hoặc tập lệnh khóa công khai) 
- được lưu trữ trong ví mà không có khóa riêng tương ứng. Điều này 
- có nghĩa là tiền có thể được chi tiêu CHỈ nếu bạn có khóa riêng được lưu trữ ở nơi khác. nếu bạn 
- làm 
- không có khóa riêng được lưu trữ, KHÔNG hướng dẫn bất cứ ai gửi bitcoin cho bạn 
- không chi tiêu 
- Địa chỉ. 
-
- Các tùy chọn này chỉ được khuyến nghị cho người dùng nâng cao. Tiếp tục? 
-</string>
   <string name="scan_private_key">Quét khóa riêng</string>
   <string name="private_key_successfully_imported">Khóa riêng được nhập thành công.</string>
   <string name="private_key_not_matching_address">LƯU Ý: Khóa riêng được quét không 

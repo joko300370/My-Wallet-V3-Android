@@ -350,17 +350,6 @@
  Adresse Bitcoin %1$s . Veuillez scanner le code QR. 
 </string>
   <string name="invalid_private_key">Clé privée non valide</string>
-  <string name="watch_only_import_warning">Vous êtes sur le point d\'importer une adresse non utilisable, un 
- adresse (ou script de clé publique) 
- stocké dans le portefeuille sans la clé privée correspondante. Cette 
- signifie que les fonds peuvent être dépensés UNIQUEMENT si vous avez la clé privée stockée ailleurs. Si vous 
- faire 
- ne conservez pas la clé privée, n’informez personne de vous envoyer des bitcoins sur le 
- non dépensable 
- adresse. 
-
- Ces options sont recommandées uniquement pour les utilisateurs avancés. Continuer? 
-</string>
   <string name="scan_private_key">Analyser la clé privée</string>
   <string name="private_key_successfully_imported">Clé privée importée avec succès.</string>
   <string name="private_key_not_matching_address">REMARQUE: la clé privée analysée ne 

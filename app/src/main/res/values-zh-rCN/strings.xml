@@ -349,17 +349,6 @@
 比特币地址%1$s 。请扫描二维码。 
 </string>
   <string name="invalid_private_key">私钥无效</string>
-  <string name="watch_only_import_warning">您将要导入一个非消费性地址， 
-地址（或公共密钥脚本） 
-没有对应私钥的情况下存储在钱包中。这个
-意味着仅当您将私钥存储在其他位置时，才能使用这些资金。如果你
-做
-没有存储私钥，请勿指示任何人将您的比特币发送给
-不可消费
-地址。 
-
-仅建议高级用户使用这些选项。继续？ 
-</string>
   <string name="scan_private_key">扫描私钥</string>
   <string name="private_key_successfully_imported">私钥已成功导入。</string>
   <string name="private_key_not_matching_address">注意：扫描的私钥不
@@ -1123,7 +1112,6 @@
   <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
   <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
   <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
-  <string name="coinify">协整</string>
   <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
   <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>
   <string name="buy_sell_identification_verification">识别验证</string>

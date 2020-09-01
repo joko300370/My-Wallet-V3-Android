@@ -41,6 +41,7 @@
   <string name="item_the_exchange">Değiş tokuş</string>
   <string name="item_simple_buy">Basit satın alma</string>
   <string name="item_airdrops">Airdrops</string>
+  <string name="item_debug_homebrew" translatable="false"></string>
   <string name="toolbar_cmd_home">Ev</string>
   <string name="toolbar_cmd_send">Gönder</string>
   <string name="toolbar_cmd_receive_crypto">Teslim almak</string>
@@ -350,7 +351,6 @@
  Bitcoin adresi %1$s . Lütfen QR kodunu tarayın. 
 </string>
   <string name="invalid_private_key">Geçersiz özel anahtar</string>
-
   <string name="scan_private_key">Özel anahtarı tara</string>
   <string name="private_key_successfully_imported">Özel anahtar başarıyla içe aktarıldı.</string>
   <string name="private_key_not_matching_address">NOT: Taranan özel anahtar 
@@ -951,9 +951,11 @@
   <string name="airdrop_status_expired">Süresi doldu</string>
   <string name="airdrop_status_pending">Bekliyor</string>
   <string name="airdrop_status_unknown">-</string>
+  <string name="airdrop_sheet_stx_title" translatable="false"></string>
   <string name="airdrop_sheet_stx_body">Blockstack ile oluşturulmuş yüzlerce merkezi olmayan uygulama ile dijital kimliğinize ve verilerinize sahip olun.</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks_title">Yığınlarım nerede?</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks">Yığınlar (STX) Blockchain Cüzdanınızda saklanır. Bakiyenin şu anda aktarılamadığını lütfen unutmayın.</string>
+  <string name="airdrop_sheet_xlm_title" translatable="false"></string>
   <string name="custody_intro_title">Velayet Cüzdanınız.</string>
   <string name="custody_intro_body_1">Kripto satın aldığınızda, paranızı sizin için bir Kripto Ticaret Cüzdanında güvenli bir şekilde saklarız. Bu fonlar bizim tarafımızdan sizin adınıza saklanır. Onları bizimle güvende tutabilir veya kendinize ait ve saklamak için gözaltı olmayan Cüzdanınıza aktarabilirsiniz.</string>
   <string name="custody_intro_body_2">Bu fonları değiştirmek veya göndermek istiyorsanız, bunları bitcoin Cüzdanınıza aktarmanız gerekir.</string>
@@ -1114,7 +1116,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Adresine bir doğrulama bağlantısı gönderdik</string>
   <string name="buy_sell_unverified_email_verify_message2">Tıklayın ve işleminize devam etmek için buraya geri dönün.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-postayı Aç</string>
-
   <string name="buy_sell_verified_email_title">E-posta Doğrulandı!</string>
   <string name="buy_sell_verified_email_message">%1$s ortağımız bitcoin işleminizi gerçekleştirecek. Kabul Et ve \'Devam Et\'i tıklayarak %1$s ile bir hesap oluşturacaksınız.</string>
   <string name="buy_sell_identification_verification">Doğrulamayı tanımlayın</string>
@@ -1453,7 +1454,7 @@
   <string name="simple_buy_amount_to_send">Gönderilecek tutar</string>
   <string name="simple_buy_pending_buy_sheet_title">Bekleyen %1s Satın Al</string>
   <string name="recipient_name_must_match_eur">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.</string>
-  <string name="recipient_name_must_match_gbp">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.Bu hesaba para yatırarak, bankacılık ortağımız <annotation link="modular_terms_and_conditions"> Şartlar ve Koşulları </annotation> anno kabul edersiniz.</string>
+  <string name="recipient_name_must_match_gbp">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir. Bu hesaba para yatırarak, bankacılık ortağımız <annotation link="modular_terms_and_conditions"> Şartlar ve Koşulları </annotation> anno kabul edersiniz.</string>
   <string name="recipient_name_must_match">Yalnızca adınızdaki bir banka hesabından para gönderin. Aksi takdirde, depozitonuz ertelenebilir veya reddedilebilir.</string>
   <string name="simple_buy_no_currencies_available_title">Para birimi yok</string>
   <string name="simple_buy_no_currencies_available">Ne yazık ki, şu anda alım satım yapabileceğiniz herhangi bir para birimi yok :(</string>
@@ -1529,6 +1530,7 @@
   <string name="estimated_amount">Avustralya, Brezilya ve Kuzey Amerika ülkelerinin kullandığı saat uygulaması. Miktar</string>
   <string name="buying_fee">Alış Ücreti</string>
   <string name="purchase_bank_note">Paranızı aldıktan sonra, %1$s satın alma siparişinize başlayacağız. Nihai tutarınızın vadesi gelmiş piyasa etkinliğine göre değişebileceğini unutmayın. Ücret uygulanabilir.</string>
+  <string name="purchase_card_note">Ödeme yönteminizi 2 iş günü içinde borçlandıracağız. Nihai tutarınız piyasadaki faaliyetlerden dolayı değişebilir.</string>
   <string name="complete_payment">Ödemeyi tamamla</string>
   <string name="card_payment">Kartlı Ödeme</string>
   <string name="buy_now">Şimdi al</string>
@@ -1639,6 +1641,7 @@
   <string name="activity_details_historic_received">Alındığında değer</string>
   <string name="activity_details_historic_transferred">Aktarıldığında değer</string>
   <string name="activity_details_historic_value_load_fail">Geçmiş değer bilgileri yüklenemedi</string>
+  <string name="empty" translatable="false"></string>
   <string name="received_usdt">Alınan Tether</string>
   <string name="watch_only_not_supported">Harcama yapılamayan bir adresi (adres veya karşılık gelen özel anahtar olmayan 
 ortak anahtar komut dosyası) içe aktarma 
@@ -1703,7 +1706,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="fiat_funds_no_kyc_step_2_title">Para Yatırma</string>
   <string name="fiat_funds_no_kyc_step_2_description">Bankanızdan nakit aktarın ve nakit bakiyenizi etkinleştirin.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Nakit ile Kripto Satın Alın</string>
-  <string name="fiat_funds_no_kyc_step_3_description">BTC, ETH, XLM ve daha fazlasını satın almak için nakit cüzdanınızı ödeme yöntemi olarak kullanın.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">BTC, ETH, XLM ve daha fazlasını satın almak için nakit cüzdanınızı ödeme yöntemi olarak kullanın.</string>
   <string name="fiat_funds_no_kyc_positive_action">Kimliğimi Doğrula</string>
   <string name="fiat_funds_no_kyc_negative_action">Şimdi değil</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1731,4 +1734,102 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="send_state_not_supported">Gönderme bu hesapta desteklenmiyor</string>
   <string name="send_state_not_enough_gas">ETH bakiyesi düşük, ağ ücreti ödenemiyor</string>
   <string name="send_state_send_in_flight">Bekleyen işlem nedeniyle kullanılamıyor.</string>
+  <string name="common_send">Gönder</string>
+  <string name="common_receive">Al</string>
+  <string name="common_swap">Takas Et</string>
+  <string name="common_from">Gönderen</string>
+  <string name="common_to">Alıcı</string>
+  <string name="common_yes">Evet</string>
+  <string name="common_no">Hayır</string>
+  <string name="common_ok">Tamam</string>
+  <string name="common_cancel">İptal</string>
+  <string name="common_total">Toplam</string>
+  <string name="common_deposit">Para Yatırma</string>
+  <string name="common_transfer">Aktarma</string>
+  <string name="common_error">Bir şeyler ters gitti lütfen tekrar deneyin</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Onayla</string>
+  <string name="toolbar_cmd_transfer">Aktarma</string>
+  <string name="notification_2fa_summary">İki Aşamalı Kimlik Doğrulama Bildirimleri</string>
+  <string name="notification_2fa_description">İki Faktörlü Kimlik Doğrulama ile ilgili bildirimler</string>
+  <string name="notification_payments_summary">Ödeme Bildirimleri</string>
+  <string name="notification_payments_description">Ödemeler ile ilgili bildirimler</string>
+  <string name="enable_cloud_backup">Bulut Yedeklemelerini Etkinleştir</string>
+  <string name="enable_cloud_backup_summary">Şifrelenmiş yedeğinizi var olan Google Drive hesabınızda saklayın. Bu sayede cihazınızı kaybetseniz bile Cüzdanınızı geri alabilirsiniz.
+</string>
+  <string name="tx_title_interest">%1$s faiz kazanıldı</string>
+  <string name="dashboard_asset_actions_send_dsc">İstediğin Cüzdana %1$s aktar</string>
+  <string name="dashboard_asset_actions_receive_dsc">Kabul edin ya da %1$s adresinizi paylaşın</string>
+  <string name="dashboard_asset_actions_swap_dsc">Başka bir Kripto ile %1$s takas edin</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Faiz Cüzdanınıza %1$s ekleyin</string>
+  <string name="dashboard_asset_actions_summary_title">Faiz Özeti</string>
+  <string name="dashboard_asset_actions_summary_dsc">Tahakkuk eden %1$s Faizinizi görüntüleyin</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Faiz ayrıntıları yüklenemedi</string>
+  <string name="asset_details_chart_load_failed_toast">Grafik ayrıntıları yüklenemedi, lütfen tekrar deneyin</string>
+  <string name="asset_details_load_failed_toast">Cüzdan ayrıntıları yüklenemedi, lütfen tekrar deneyin</string>
+  <string name="asset_details_exchange_load_failed_toast">Kur bilgileri yüklenemedi, lütfen tekrar deneyin</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Halihazırda devam eden bir işlem var, lütfen tamamlanana kadar bekleyin</string>
+  <string name="cloud_backup_card_title">Bulut Yedeklemeleri Ile Tanışın</string>
+  <string name="cloud_backup_card_body">Artık cüzdanınızı güvenli bir şekilde buluta yedekleyebilirsiniz. Cüzdan ayarlarınızdan yedeklemeleri devre dışı bırakabilirsiniz.</string>
+  <string name="cloud_backup_card_cta">Daha fazla bilgi edinin</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Çekilebilecek mevcut bakiyeniz %1s . Kalan %2s bakiyesi 7 gün içinde çekilmeye hazır olacaktır.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">Daha fazla bilgi</annotation>.</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Yetersiz bakiye</string>
+  <string name="basic_transfer_error_insufficient_funds">Bu işlemi tamamlamak için hesabınızda yeterli bakiye yok.</string>
+  <string name="basic_transfer_error_locked_funds">Kripto paranız 7 gün içinde çekilmeye hazır olacak. <annotation link="balance_lock">Daha fazla bilgi</annotation> .</string>
+  <string name="erc20_need_more_eth_error_body_1">%1$s göndermek için ETH\'ye ihtiyacınız olacak</string>
+  <string name="purchase_card_note_1">Nihai tutar, piyasa hareketliliği nedeniyle değişebilir. Paranıza 7 günlük bir vade uygulanacaktır.</string>
+  <string name="select_deposit_source_title">Transferi gönderen:</string>
+  <string name="activity_state_cleared">Teyit edildi</string>
+  <string name="activity_state_rejected">Reddedildi</string>
+  <string name="activity_state_refunded">Geri Ödendi</string>
+  <string name="activity_details_label_manual_review">Manuel İnceleme</string>
+  <string name="activity_details_label_processing">İşleniyor</string>
+  <string name="activity_details_title_deposit">Para Yatırma</string>
+  <string name="activity_details_title_interest_earned">Kazanılan Faiz</string>
+  <string name="activity_details_title_withdraw">Para çekme</string>
+  <string name="transfer_receive_crypto">Kripto al</string>
+  <string name="send_select_target_title">Hedef</string>
+  <string name="send_enter_amount_from">Gönderen: %1$s</string>
+  <string name="send_enter_amount_to">Alıcı: %1$s</string>
+  <string name="send_enter_amount_title">%1$s gönder</string>
+  <string name="send_enter_amount_available">Mevcut</string>
+  <string name="send_enter_amount_max">Maksimumunu Gönder</string>
+  <string name="send_enter_amount_deposit_max">Maksimumunu Aktar</string>
+  <string name="send_enter_amount_min_deposit">En az %1$s aktarımı gerekli</string>
+  <string name="send_confirmation_title">%1$s gönder</string>
+  <string name="send_confirmation_fee">Ücret - Normal</string>
+  <string name="send_confirmation_regular_estimation">(Tahmini Varış Zamanı 60 Dakika)</string>
+  <string name="send_confirmation_fee_loading">Yükleniyor…</string>
+  <string name="send_confirmation_fee_error">Ücret yüklenirken hata oluştu</string>
+  <string name="send_confirmation_add_note_hint">Bir not ekle</string>
+  <string name="send_confirmation_add_note_success">Not başarıyla eklendi</string>
+  <string name="send_confirmation_cta_button">%1$s gönder</string>
+  <string name="send_confirmation_deposit_cta_button">Aktarımı Onayla</string>
+  <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos">Hizmet Şartları</annotation> ve <annotation link="interest_pp">Gizlilik Politikasını</annotation> okudum ve kabul ediyorum.</string>
+  <string name="send_confirmation_interest_holding_period_1">Bunu kabul ederek, Bitcoin Cüzdanınızdan Faiz Hesabınıza</string>
+  <string name="send_confirmation_interest_holding_period_2"> (%1$s) aktarmayı kabul etmiş olursunuz. Paranıza başlangıç olarak 7 günlük bir vade uygulanacaktır.</string>
+  <string name="send_confirmation_progress_title">%1$s Aktarılıyor</string>
+  <string name="send_confirmation_progress_message">Size ait %1$s şu anda aktarılıyor.</string>
+  <string name="send_confirmation_success_title">%1$s Aktarıldı</string>
+  <string name="send_confirmation_success_message">Size ait %1$s başarıyla aktarıldı.</string>
+  <string name="send_progress_sending_title">%1$s gönderiliyor</string>
+  <string name="send_progress_sending_subtitle">İşleminizi şimdi gönderiyoruz.</string>
+  <string name="send_progress_complete_title">%1$s Gönderildi</string>
+  <string name="send_progress_complete_subtitle">%1$s başarıyla gönderildi.</string>
+  <string name="send_progress_error_title">Hata! Bir şeyler ters gitti.</string>
+  <string name="send_progress_error_subtitle">Endişelenmeyin. Paranız güvende. Lütfen tekrar deneyin veya yardım için Destek Ekibimize başvurun.</string>
+  <string name="send_enter_asset_address_hint">%1s Adresi</string>
+  <string name="send_warn_internal_send_only">Yalnızca Dahili Gönderme</string>
+  <string name="send_scan_qr_code">QR Kodu Tara</string>
+  <string name="send_error_not_valid_asset_address">Geçerli bir %1s adresi değil</string>
+  <string name="send_error_address_is_eth_contract">Adres bir kullanıcı adresi değil</string>
+  <string name="send_enter_amount_error_insufficient_funds">Cüzdanında yeterli %1$s yok.</string>
+  <string name="send_enter_amount_error_invalid_amount">0,00000001 %1$s veya daha fazlasını gönderin.</string>
+  <string name="send_enter_invalid_password">Şifre yanlış.</string>
+  <string name="send_enter_unexpected_error">Beklenmedik bir hata oldu. Lütfen daha sonra tekrar deneyin.</string>
+  <string name="send_enter_insufficient_gas">Bu işlemi gerçekleştirmek içinsize ait yeterli ETH bulunmuyor.</string>
+  <string name="send_select_a_wallet_title">veya Bir Cüzdan Seçin</string>
+  <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %1$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
+  <string name="purchase_funds_note">Nihai tutar, piyasa hareketliliğinden dolayı değişebilir.</string>
 </resources>

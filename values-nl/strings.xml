@@ -350,17 +350,6 @@
  Bitcoin-adres %1$s . Scan de QR-code. 
 </string>
   <string name="invalid_private_key">Ongeldige privésleutel</string>
-  <string name="watch_only_import_warning">U staat op het punt een niet-besteedbaar adres te importeren, een 
- adres (of script met openbare sleutel) 
- opgeslagen in de portemonnee zonder de bijbehorende privésleutel. Deze 
- betekent dat het geld ALLEEN kan worden uitgegeven als u de privésleutel ergens anders heeft opgeslagen. als jij 
- Doen 
- niet de privésleutel hebben opgeslagen, instrueer niemand om u bitcoin naar de 
- niet besteedbaar 
- adres. 
-
- Deze opties worden alleen aanbevolen voor gevorderde gebruikers. Doorgaan met? 
-</string>
   <string name="scan_private_key">Privésleutel scannen</string>
   <string name="private_key_successfully_imported">Privésleutel succesvol geïmporteerd.</string>
   <string name="private_key_not_matching_address">OPMERKING: de gescande privésleutel niet 

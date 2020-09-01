@@ -352,17 +352,6 @@
  Bitcoinová adresa %1$s . Naskenujte prosím QR kód. 
 </string>
   <string name="invalid_private_key">Neplatný soukromý klíč</string>
-  <string name="watch_only_import_warning">Chystáte se importovat nevyměnitelnou adresu 
- adresa (nebo skript veřejného klíče) 
- uložené v peněžence bez odpovídajícího soukromého klíče. Tento 
- znamená, že prostředky lze utratit POUZE, pokud máte soukromý klíč uložen jinde. jestli ty 
- dělat 
- Nemáte-li uložen soukromý klíč, NELÁTE nikomu pokyn, aby vám poslal bitcoiny na server 
- nevratný 
- adresa. 
-
- Tyto možnosti jsou doporučeny pouze pro pokročilé uživatele. Pokračovat? 
-</string>
   <string name="scan_private_key">Skenovat soukromý klíč</string>
   <string name="private_key_successfully_imported">Soukromý klíč byl úspěšně importován.</string>
   <string name="private_key_not_matching_address">POZNÁMKA: Naskenovaný soukromý klíč ne 

@@ -349,17 +349,6 @@
 ビットコインアドレス%1$s QRコードをスキャンしてください。 
 </string>
   <string name="invalid_private_key">秘密鍵が無効です</string>
-  <string name="watch_only_import_warning">使用できないアドレスをインポートしようとしています。 
-アドレス（または公開鍵スクリプト） 
-対応する秘密鍵なしでウォレットに保存されます。この
-秘密鍵を別の場所に保存している場合にのみ、資金を使用できることを意味します。もし、あんたが
-行う
-秘密鍵が保存されていないため、ビットコインを
-支出不可
-住所。 
-
-これらのオプションは、上級ユーザーのみにお勧めします。継続する？ 
-</string>
   <string name="scan_private_key">秘密鍵をスキャンする</string>
   <string name="private_key_successfully_imported">秘密鍵が正常にインポートされました。</string>
   <string name="private_key_not_matching_address">注：スキャンされた秘密キーは

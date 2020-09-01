@@ -349,17 +349,6 @@
  Alamat Bitcoin %1$s . Silakan pindai kode QR. 
 </string>
   <string name="invalid_private_key">Kunci pribadi tidak valid</string>
-  <string name="watch_only_import_warning">Anda akan mengimpor alamat yang tidak dapat dihabiskan, sebuah 
- alamat (atau skrip kunci publik) 
- disimpan di dompet tanpa kunci pribadi yang sesuai. Ini 
- berarti bahwa dana tersebut dapat dihabiskan HANYA jika Anda memiliki kunci pribadi yang disimpan di tempat lain. Jika kamu 
- melakukan 
- tidak memiliki kunci pribadi yang disimpan, JANGAN menginstruksikan siapa pun untuk mengirimi Anda bitcoin ke 
- tidak bisa dihabiskan 
- alamat. 
-
- Opsi ini direkomendasikan hanya untuk pengguna tingkat lanjut. Terus? 
-</string>
   <string name="scan_private_key">Pindai kunci pribadi</string>
   <string name="private_key_successfully_imported">Kunci pribadi berhasil diimpor.</string>
   <string name="private_key_not_matching_address">CATATAN: Kunci pribadi yang dipindai tidak 

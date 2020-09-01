@@ -15,14 +15,14 @@
     <item>двенадцатое слово</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ Строка / xlm_memo_text</item>
+    <item>\@ Строка / xlm_memo_id</item>
+    <item>\@ Строка / xlm_memo_hash</item>
+    <item>\@ Строка / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ Строка / xlm_memo_text</item>
+    <item>\@ Строка / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 импортированный адрес</item>
@@ -43,6 +43,7 @@
   <string name="item_the_exchange">обмен</string>
   <string name="item_simple_buy">Простая покупка</string>
   <string name="item_airdrops">Airdrops</string>
+  <string name="item_debug_homebrew" translatable="false"></string>
   <string name="toolbar_cmd_home">Дом</string>
   <string name="toolbar_cmd_send">послать</string>
   <string name="toolbar_cmd_receive_crypto">Получать</string>
@@ -352,7 +353,6 @@
  Биткойн-адрес %1$s . Пожалуйста, отсканируйте QR-код. 
 </string>
   <string name="invalid_private_key">Неверный закрытый ключ</string>
-
   <string name="scan_private_key">Сканирование закрытого ключа</string>
   <string name="private_key_successfully_imported">Закрытый ключ успешно импортирован.</string>
   <string name="private_key_not_matching_address">ПРИМЕЧАНИЕ. Отсканированный закрытый ключ не 
@@ -953,9 +953,11 @@
   <string name="airdrop_status_expired">Истекший</string>
   <string name="airdrop_status_pending">В ожидании</string>
   <string name="airdrop_status_unknown">-</string>
+  <string name="airdrop_sheet_stx_title" translatable="false"></string>
   <string name="airdrop_sheet_stx_body">Имейте свою цифровую идентификацию и данные с сотнями децентрализованных приложений, созданных с Blockstack.</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks_title">Где мои стеки?</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks">Стеки (STX) хранятся в вашем кошельке Blockchain. Обратите внимание, что баланс в настоящее время не подлежит передаче.</string>
+  <string name="airdrop_sheet_xlm_title" translatable="false"></string>
   <string name="custody_intro_title">Ваш Хранитель Кошелек.</string>
   <string name="custody_intro_body_1">Когда вы покупаете crypto, мы надежно храним ваши средства в кошельке Crypto Trading. Эти средства хранятся нами от вашего имени. Вы можете хранить их в безопасности у нас или перевести на свой кошелек, не связанный с тюремным заключением, для хранения и хранения.</string>
   <string name="custody_intro_body_2">Если вы хотите обменять или отправить эти средства, вам необходимо перевести их на свой биткойн-кошелек.</string>
@@ -1116,7 +1118,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Мы отправили ссылку для подтверждения</string>
   <string name="buy_sell_unverified_email_verify_message2">Нажмите на нее и вернитесь сюда, чтобы продолжить транзакцию.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Открыть электронную почту</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Согласитесь с Coinify <a href="ignored"> правилами и условиями </a></string>
   <string name="buy_sell_verified_email_title">Email подтвержден!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обработает вашу биткойн-транзакцию. Нажав «Согласен» и «Продолжить», вы создадите учетную запись с %1$s .</string>
   <string name="buy_sell_identification_verification">Определить подтверждение</string>
@@ -1286,7 +1288,7 @@
   <string name="kyc_settings_gold_level_in_review">Золотой уровень - в обзоре</string>
   <string name="kyc_settings_gold_level_approved">Золотой уровень - утвержден</string>
   <string name="kyc_settings_silver_level_approved">Уровень серебра - Утверждено</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ Строка / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Ошибка при получении статуса KYC</string>
   <string name="kyc_status_title_in_progress">Проверка в процессе</string>
   <string name="kyc_status_title_approved">Аккаунт утвержден</string>
@@ -1535,6 +1537,7 @@
   <string name="estimated_amount">Стандартное восточное время. Количество</string>
   <string name="buying_fee">Плата за покупку</string>
   <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>
+  <string name="purchase_card_note">Мы выберем способ оплаты в течение 2 рабочих дней. Ваша итоговая сумма может измениться из-за активности рынка.</string>
   <string name="complete_payment">Полная оплата</string>
   <string name="card_payment">Оплата картой</string>
   <string name="buy_now">купить сейчас</string>
@@ -1645,6 +1648,7 @@
   <string name="activity_details_historic_received">Значение при получении</string>
   <string name="activity_details_historic_transferred">Значение при передаче</string>
   <string name="activity_details_historic_value_load_fail">Не удалось загрузить информацию об историческом значении</string>
+  <string name="empty" translatable="false"></string>
   <string name="received_usdt">Получено Tether</string>
   <string name="watch_only_not_supported">Импорт нерасходуемого адреса (адрес или скрипт с открытым ключом 
  без соответствующего закрытого ключа) не поддерживается. Пожалуйста, попробуйте еще раз с 
@@ -1735,4 +1739,103 @@
   <string name="send_state_not_supported">Отправка в этом аккаунте не поддерживается</string>
   <string name="send_state_not_enough_gas">Низкий баланс ETH, невозможно внести сетевую плату</string>
   <string name="send_state_send_in_flight">Недоступно из-за ожидающей транзакции.</string>
+  <string name="common_send">Отправить</string>
+  <string name="common_receive">Получить</string>
+  <string name="common_swap">Обмен</string>
+  <string name="common_from">От</string>
+  <string name="common_to">Кому</string>
+  <string name="common_yes">Да</string>
+  <string name="common_no">Нет</string>
+  <string name="common_ok">Хорошо</string>
+  <string name="common_cancel">Отменить</string>
+  <string name="common_total">Всего</string>
+  <string name="common_deposit">Депозит</string>
+  <string name="common_transfer">Перевести</string>
+  <string name="common_error">Что-то пошло не так, пожалуйста, попробуйте еще раз</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Подтвердить</string>
+  <string name="toolbar_cmd_transfer">Перевести</string>
+  <string name="notification_2fa_summary">Уведомления 2FA</string>
+  <string name="notification_2fa_description">Уведомления, связанные с двухфакторной аутентификацией</string>
+  <string name="notification_payments_summary">Уведомления о платежах</string>
+  <string name="notification_payments_description">Уведомления, связанные с платежами</string>
+  <string name="enable_cloud_backup">Включить облачное резервное копирование</string>
+  <string name="enable_cloud_backup_summary">Сохраните зашифрованную резервную копию в своем аккаунте на Google Диске, 
+         если он доступен. Это позволит восстановить кошелек, если вы потеряете это устройство.
+    </string>
+  <string name="tx_title_interest">%1$s процентов заработано</string>
+  <string name="dashboard_asset_actions_send_dsc">Перевести %1$s в любой кошелек</string>
+  <string name="dashboard_asset_actions_receive_dsc">Принять или поделиться своим адресом %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Обменять %1$s на другую криптовалюту</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Добавьте %1$s в свой процентный кошелек</string>
+  <string name="dashboard_asset_actions_summary_title">Сводка по процентам</string>
+  <string name="dashboard_asset_actions_summary_dsc">Просмотреть накопленные проценты %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Не удалось загрузить сведения о процентах</string>
+  <string name="asset_details_chart_load_failed_toast">Не удалось загрузить данные диаграммы, пожалуйста, попробуйте еще раз</string>
+  <string name="asset_details_load_failed_toast">Не удалось загрузить данные кошелька, попробуйте еще раз</string>
+  <string name="asset_details_exchange_load_failed_toast">Не удалось получить информацию о курсе, пожалуйста, попробуйте еще раз.</string>
+  <string name="dashboard_asset_actions_tx_in_progress">В данный момент уже выполняется транзакция. Пожалуйста, подождите, пока она завершится</string>
+  <string name="cloud_backup_card_title">Введение в облачное резервное копирование</string>
+  <string name="cloud_backup_card_body">Теперь вы можете безопасно сделать резервную копию своего кошелька в облаке. Вы можете отказаться от резервного копирования в настройках своего кошелька.</string>
+  <string name="cloud_backup_card_cta">Подробнее</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Ваш доступный для вывода баланс составляет %1s. Оставшийся баланс %2s будет доступен для вывода в течение 7 дней.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">Подробнее</annotation>.</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Недостаточно средств</string>
+  <string name="basic_transfer_error_insufficient_funds">Для выполнения этой транзакции у вас на счете недостаточно средств.</string>
+  <string name="basic_transfer_error_locked_funds">Ваша криптовалюта будет доступна для вывода в течение 7 дней. <annotation link="balance_lock">Подробнее</annotation>.</string>
+  <string name="erc20_need_more_eth_error_body_1">Вам понадобится ETH для отправки %1$s</string>
+  <string name="purchase_card_note_1">Ваша окончательная сумма может измениться из-за активности на рынке. К вашим средствам будет применен первоначальный период удержания в 7 дней.</string>
+  <string name="select_deposit_source_title">Перевод от</string>
+  <string name="activity_state_cleared">Очищено</string>
+  <string name="activity_state_rejected">Отклонено</string>
+  <string name="activity_state_refunded">Возвращено</string>
+  <string name="activity_details_label_manual_review">Ручная проверка</string>
+  <string name="activity_details_label_processing">Обработка</string>
+  <string name="activity_details_title_deposit">Депозит</string>
+  <string name="activity_details_title_interest_earned">Заработанные проценты</string>
+  <string name="activity_details_title_withdraw">Вывод</string>
+  <string name="transfer_receive_crypto">Получить криптовалюту</string>
+  <string name="send_select_target_title">Место назначения</string>
+  <string name="send_enter_amount_from">От: %1$s</string>
+  <string name="send_enter_amount_to">Кому: %1$s</string>
+  <string name="send_enter_amount_title">Отправить %1$s</string>
+  <string name="send_enter_amount_available">Доступно</string>
+  <string name="send_enter_amount_max">Отправить Max</string>
+  <string name="send_enter_amount_deposit_max">Перевести Max</string>
+  <string name="send_enter_amount_min_deposit">Требуется минимальный перевод в размере %1$s</string>
+  <string name="send_confirmation_title">Отправить %1$s</string>
+  <string name="send_confirmation_fee">Комиссия - регулярная</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 минут)</string>
+  <string name="send_confirmation_fee_loading">Загрузка...</string>
+  <string name="send_confirmation_fee_error">Ошибка загрузки комиссии</string>
+  <string name="send_confirmation_add_note_hint">Добавить заметку</string>
+  <string name="send_confirmation_add_note_success">Заметка успешно добавлена</string>
+  <string name="send_confirmation_cta_button">Отправить %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Подтвердить перевод</string>
+  <string name="send_confirmation_interest_tos_pp">Я прочитал и принимаю <annotation link="interest_tos">Условия обслуживания</annotation> и <annotation link="interest_pp">Политику конфиденциальности</annotation>.</string>
+  <string name="send_confirmation_interest_holding_period_1">Принимая это, вы соглашаетесь перевести </string>
+  <string name="send_confirmation_interest_holding_period_2">  (%1$s) из вашего биткойн-кошелька на ваш процентный счет. К вашим средствам будет применен первоначальный период удержания в размере 7 дней.</string>
+  <string name="send_confirmation_progress_title">Перевод %1$s</string>
+  <string name="send_confirmation_progress_message">Сейчас мы выполняем перевод ваших %1$s.</string>
+  <string name="send_confirmation_success_title">%1$s переведены</string>
+  <string name="send_confirmation_success_message">Ваши %1$s были успешно переведены.</string>
+  <string name="send_progress_sending_title">Отправка %1$s</string>
+  <string name="send_progress_sending_subtitle">Сейчас мы осуществляем вашу трансакцию.</string>
+  <string name="send_progress_complete_title">%1$s отправлены</string>
+  <string name="send_progress_complete_subtitle">Ваши %1$s успешно отправлены.</string>
+  <string name="send_progress_error_title">Ой! Что-то пошло не так.</string>
+  <string name="send_progress_error_subtitle">Не беспокойтесь. Ваши деньги в безопасности. Пожалуйста, попробуйте еще раз или обратитесь за помощью в нашу службу поддержки.</string>
+  <string name="send_enter_asset_address_hint">%1s адрес</string>
+  <string name="send_warn_internal_send_only">Только внутренняя отправка</string>
+  <string name="send_scan_qr_code">Отсканируйте QR-код</string>
+  <string name="send_error_not_valid_asset_address">Недействительный адрес %1s</string>
+  <string name="send_error_address_is_eth_contract">Адрес не является адресом пользователя</string>
+  <string name="send_enter_amount_error_insufficient_funds">В вашем кошельке недостаточно %1$s.</string>
+  <string name="send_enter_amount_error_invalid_amount">Отправьте 0,00000001 %1$s или больше.</string>
+  <string name="send_enter_invalid_password">Неверный пароль.</string>
+  <string name="send_enter_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
+  <string name="send_enter_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
+  <string name="send_select_a_wallet_title">или выберите кошелек</string>
+  <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %1$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
+  <string name="purchase_funds_note">Ваша итоговая сумма может измениться из-за активности рынка.</string>
 </resources>

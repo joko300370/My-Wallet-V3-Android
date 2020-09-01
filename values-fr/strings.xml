@@ -41,6 +41,7 @@
   <string name="item_the_exchange">Échange</string>
   <string name="item_simple_buy">Achat simple</string>
   <string name="item_airdrops">Airdrops</string>
+  <string name="item_debug_homebrew" translatable="false"></string>
   <string name="toolbar_cmd_home">Accueil</string>
   <string name="toolbar_cmd_send">Envoyer</string>
   <string name="toolbar_cmd_receive_crypto">Recevoir</string>
@@ -350,7 +351,6 @@
  Adresse Bitcoin %1$s . Veuillez scanner le code QR. 
 </string>
   <string name="invalid_private_key">Clé privée non valide</string>
-
   <string name="scan_private_key">Analyser la clé privée</string>
   <string name="private_key_successfully_imported">Clé privée importée avec succès.</string>
   <string name="private_key_not_matching_address">REMARQUE: la clé privée analysée ne 
@@ -951,9 +951,11 @@
   <string name="airdrop_status_expired">Expiré</string>
   <string name="airdrop_status_pending">En attente</string>
   <string name="airdrop_status_unknown">-</string>
+  <string name="airdrop_sheet_stx_title" translatable="false"></string>
   <string name="airdrop_sheet_stx_body">Possédez votre identité numérique et vos données avec des centaines d\'applications décentralisées construites avec Blockstack.</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks_title">Où sont mes piles?</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks">Les piles (STX) sont stockées dans votre portefeuille Blockchain. Veuillez noter que le solde est actuellement non transférable.</string>
+  <string name="airdrop_sheet_xlm_title" translatable="false"></string>
   <string name="custody_intro_title">Votre portefeuille de garde.</string>
   <string name="custody_intro_body_1">Lorsque vous achetez de la crypto, nous stockons vos fonds en toute sécurité pour vous dans un portefeuille de trading de crypto. Ces fonds sont stockés par nous en votre nom. Vous pouvez les garder en sécurité avec nous ou les transférer sur votre portefeuille non-gardien pour posséder et stocker vous-même.</string>
   <string name="custody_intro_body_2">Si vous souhaitez échanger ou envoyer ces fonds, vous devez les transférer sur votre portefeuille Bitcoin.</string>
@@ -1114,7 +1116,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Nous avons envoyé un lien de vérification à</string>
   <string name="buy_sell_unverified_email_verify_message2">Cliquez dessus et revenez ici pour poursuivre votre transaction.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail ouvert</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Acceptez de Coinify <a href="ignored"> Termes et conditions </a></string>
   <string name="buy_sell_verified_email_title">Email verifié!</string>
   <string name="buy_sell_verified_email_message">Notre partenaire %1$s traitera votre transaction bitcoin. En cliquant sur Accepter et sur «Continuer», vous créerez un compte avec %1$s .</string>
   <string name="buy_sell_identification_verification">Identifier la vérification</string>
@@ -1533,6 +1535,7 @@
   <string name="estimated_amount">Est. Montant</string>
   <string name="buying_fee">Frais d\'achat</string>
   <string name="purchase_bank_note">Une fois que nous aurons reçu vos fonds, nous commencerons votre commande d\'achat %1$s . Notez que votre montant final peut changer en fonction de l\'activité du marché. Des frais peuvent s\'appliquer.</string>
+  <string name="purchase_card_note">Nous débiterons votre mode de paiement dans les 2 jours ouvrables. Votre montant final peut changer en raison de l\'activité du marché.</string>
   <string name="complete_payment">Paiement complet</string>
   <string name="card_payment">Paiement par carte</string>
   <string name="buy_now">Acheter maintenant</string>
@@ -1643,6 +1646,7 @@
   <string name="activity_details_historic_received">Valeur à la réception</string>
   <string name="activity_details_historic_transferred">Valeur lors du transfert</string>
   <string name="activity_details_historic_value_load_fail">Impossible de charger les informations de valeur historique</string>
+  <string name="empty" translatable="false"></string>
   <string name="received_usdt">Tether reçue</string>
   <string name="watch_only_not_supported">L\'importation d\'une adresse non utilisable (une adresse ou un script de clé publique 
  sans la clé privée correspondante) n\'est pas pris en charge. Veuillez réessayer avec 
@@ -1705,7 +1709,7 @@ Veuillez réessayer plus tard.</string>
   <string name="fiat_funds_no_kyc_step_2_title">Dépôt d\'espèces</string>
   <string name="fiat_funds_no_kyc_step_2_description">Transférez de l\'argent de votre banque et activez vos soldes.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Achetez de la crypto avec des espèces</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Utilisez votre portefeuille électronique comme mode de paiement pour acheter des BTC, ETH, XLM et autres.</string>
+  <string name="fiat_funds_no_kyc_step_3_description">Utilisez votre portefeuille électronique comme mode de paiement pour acheter des BTC, ETH, XLM et autres</string>
   <string name="fiat_funds_no_kyc_positive_action">Vérifier mon identité</string>
   <string name="fiat_funds_no_kyc_negative_action">Pas maintenant</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1733,4 +1737,103 @@ Veuillez réessayer plus tard.</string>
   <string name="send_state_not_supported">Envoi non pris en charge sur ce compte</string>
   <string name="send_state_not_enough_gas">Solde ETH faible, impossible de payer les frais de réseau</string>
   <string name="send_state_send_in_flight">Indisponible en raison d\'une transaction en attente.</string>
+  <string name="common_send">Envoyer</string>
+  <string name="common_receive">Recevoir</string>
+  <string name="common_swap">Échanger</string>
+  <string name="common_from">De</string>
+  <string name="common_to">À</string>
+  <string name="common_yes">Oui</string>
+  <string name="common_no">Non</string>
+  <string name="common_ok">OK</string>
+  <string name="common_cancel">Annuler</string>
+  <string name="common_total">Total</string>
+  <string name="common_deposit">Dépôt</string>
+  <string name="common_transfer">Transfert</string>
+  <string name="common_error">Une erreur s\'est produite, veuillez réessayer</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">Confirmer</string>
+  <string name="toolbar_cmd_transfer">Transfert</string>
+  <string name="notification_2fa_summary">Notifications 2FA</string>
+  <string name="notification_2fa_description">Notifications relatives à l\'authentification à deux facteurs</string>
+  <string name="notification_payments_summary">Notifications de paiement</string>
+  <string name="notification_payments_description">Notifications relatives aux paiements</string>
+  <string name="enable_cloud_backup">Activer les sauvegardes sur le cloud</string>
+  <string name="enable_cloud_backup_summary">Stockez la sauvegarde cryptée dans votre compte Google Drive,
+        si disponible. Cela vous permet de restaurer votre portefeuille si vous perdez cet appareil.
+    </string>
+  <string name="tx_title_interest">%1$s intérêts gagnés</string>
+  <string name="dashboard_asset_actions_send_dsc">Transférer %1$s dans n\'importe quel portefeuille</string>
+  <string name="dashboard_asset_actions_receive_dsc">Accepter ou partager votre adresse %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">Échanger %1$s contre une autre cryptomonnaie</string>
+  <string name="dashboard_asset_actions_deposit_dsc">Ajouter %1$s à votre portefeuille d\'intérêts</string>
+  <string name="dashboard_asset_actions_summary_title">Résumé des intérêts</string>
+  <string name="dashboard_asset_actions_summary_dsc">Afficher vos intérêts courus de %1$s</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">Impossible de charger les détails des intérêts</string>
+  <string name="asset_details_chart_load_failed_toast">Échec du chargement des détails du graphique, veuillez réessayer</string>
+  <string name="asset_details_load_failed_toast">Échec du chargement des détails du portefeuille, veuillez réessayer</string>
+  <string name="asset_details_exchange_load_failed_toast">Échec de l\'échange des informations sur les taux de chance, veuillez réessayer</string>
+  <string name="dashboard_asset_actions_tx_in_progress">Une transaction est déjà en cours, veuillez patienter jusqu\'à ce qu\'elle soit effectuée</string>
+  <string name="cloud_backup_card_title">Présentation des sauvegardes sur le cloud</string>
+  <string name="cloud_backup_card_body">Vous pouvez maintenant sauvegarder votre portefeuille en toute sécurité sur le cloud. Vous pouvez désactiver les sauvegardes dans les paramètres de votre portefeuille.</string>
+  <string name="cloud_backup_card_cta">En savoir plus</string>
+  <string name="basic_transfer_lock_warn" formatted="false">Votre solde disponible pour le retrait est de %1s. Le solde restant (%2s) pourra être retiré sous 7 jours.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">En savoir plus</annotation>.</string>
+  <string name="basic_transfer_error_insufficient_funds_title">Fonds insuffisants</string>
+  <string name="basic_transfer_error_insufficient_funds">Vous ne disposez pas de suffisamment de fonds sur votre compte pour effectuer cette transaction.</string>
+  <string name="basic_transfer_error_locked_funds">Votre cryptomonnaie pourra être retirée sous 7 jours. <annotation link="balance_lock">En savoir plus</annotation>.</string>
+  <string name="erc20_need_more_eth_error_body_1">Vous aurez besoin d\'ETH pour envoyer votre %1$s</string>
+  <string name="purchase_card_note_1">Votre montant final peut changer en raison de l\'activité du marché. Une période de retenue initiale de 7 jours sera appliquée à vos fonds.</string>
+  <string name="select_deposit_source_title">Transfert à partir de</string>
+  <string name="activity_state_cleared">Effacé</string>
+  <string name="activity_state_rejected">Rejeté</string>
+  <string name="activity_state_refunded">Remboursé</string>
+  <string name="activity_details_label_manual_review">Examen manuel</string>
+  <string name="activity_details_label_processing">En cours de traitement</string>
+  <string name="activity_details_title_deposit">Dépôt</string>
+  <string name="activity_details_title_interest_earned">Intérêts gagnés</string>
+  <string name="activity_details_title_withdraw">Retrait</string>
+  <string name="transfer_receive_crypto">Recevoir de la cryptomonnaie</string>
+  <string name="send_select_target_title">Destination</string>
+  <string name="send_enter_amount_from">De : %1$s</string>
+  <string name="send_enter_amount_to">À : %1$s</string>
+  <string name="send_enter_amount_title">Envoyer %1$s</string>
+  <string name="send_enter_amount_available">Disponible</string>
+  <string name="send_enter_amount_max">Envoi Max</string>
+  <string name="send_enter_amount_deposit_max">Transfert max</string>
+  <string name="send_enter_amount_min_deposit">Transfert minimum de %1$s requis</string>
+  <string name="send_confirmation_title">Envoyer %1$s</string>
+  <string name="send_confirmation_fee">Frais - Standard</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 minutes)</string>
+  <string name="send_confirmation_fee_loading">Chargement…</string>
+  <string name="send_confirmation_fee_error">Erreur de chargement des frais</string>
+  <string name="send_confirmation_add_note_hint">Ajouter une note</string>
+  <string name="send_confirmation_add_note_success">Note ajoutée avec succès</string>
+  <string name="send_confirmation_cta_button">Envoyer %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">Confirmer le transfert</string>
+  <string name="send_confirmation_interest_tos_pp">J\'ai lu et j\'accepte les <annotation link="interest_tos">Conditions d\'utilisation</annotation> et la <annotation link="interest_pp">politique de confidentialité</annotation>.</string>
+  <string name="send_confirmation_interest_holding_period_1">En acceptant cela, vous acceptez de transférer </string>
+  <string name="send_confirmation_interest_holding_period_2">  (%1$s) de votre portefeuille Bitcoin vers votre compte d\'intérêts. Une période de retenue initiale de 7 jours sera appliquée à vos fonds.</string>
+  <string name="send_confirmation_progress_title">Transfert de %1$s</string>
+  <string name="send_confirmation_progress_message">Votre %1$s est en cours de transfert</string>
+  <string name="send_confirmation_success_title">%1$s transféré</string>
+  <string name="send_confirmation_success_message">Votre %1$s a été transféré avec succès.</string>
+  <string name="send_progress_sending_title">Envoi de %1$s</string>
+  <string name="send_progress_sending_subtitle">Votre transaction est en cours d\'envoi.</string>
+  <string name="send_progress_complete_title">%1$s envoyé</string>
+  <string name="send_progress_complete_subtitle">Votre %1$s a été envoyé avec succès.</string>
+  <string name="send_progress_error_title">Oups ! Un problème est survenu.</string>
+  <string name="send_progress_error_subtitle">Ne vous inquiétez pas. Votre argent est en sécurité. Veuillez réessayer ou contacter notre équipe d\'assistance pour obtenir de l\'aide.</string>
+  <string name="send_enter_asset_address_hint">Adresse %1s</string>
+  <string name="send_warn_internal_send_only">Envoi interne uniquement</string>
+  <string name="send_scan_qr_code">Scanner le code QR</string>
+  <string name="send_error_not_valid_asset_address">Ce n\'est pas une adresse %1s valide</string>
+  <string name="send_error_address_is_eth_contract">L\'adresse n\'est pas une adresse d\'utilisateur</string>
+  <string name="send_enter_amount_error_insufficient_funds">Pas assez de %1$s dans votre portefeuille.</string>
+  <string name="send_enter_amount_error_invalid_amount">Envoyez 0,00000001 %1$s ou plus.</string>
+  <string name="send_enter_invalid_password">Le mot de passe est incorrect.</string>
+  <string name="send_enter_unexpected_error">Une erreur inattendue s\'est produite. Veuillez réessayer.</string>
+  <string name="send_enter_insufficient_gas">Vous ne disposez pas de suffisamment d\'ETH pour traiter cette transaction.</string>
+  <string name="send_select_a_wallet_title">ou sélectionnez un portefeuille</string>
+  <string name="send_internal_transfer_message">À l\'heure actuelle, vous ne pouvez transférer que %1$s de votre portefeuille commercial %1$s vers vos portefeuilles de coffre-fort. Une fois que %1$s est dans votre portefeuille de coffre-fort, vous pouvez le transférer à des adresses externes.</string>
+  <string name="purchase_funds_note">Votre montant final peut changer en raison de l\'activité du marché.</string>
 </resources>

@@ -350,17 +350,6 @@
  Bitcoin-Adresse %1$s . Bitte scannen Sie den QR-Code. 
 </string>
   <string name="invalid_private_key">Ungültiger privater Schlüssel</string>
-  <string name="watch_only_import_warning">Sie sind dabei, eine nicht ausgabefähige Adresse zu importieren 
- Adresse (oder öffentliches Schlüsselskript) 
- ohne den entsprechenden privaten Schlüssel in der Brieftasche gespeichert. Dies 
- bedeutet, dass das Geld NUR ausgegeben werden kann, wenn Sie den privaten Schlüssel an einer anderen Stelle gespeichert haben. Wenn du 
- tun 
- Wenn der private Schlüssel nicht gespeichert ist, weisen Sie niemanden an, Ihnen Bitcoin an den zu senden 
- nicht ausgabefähig 
- Adresse. 
-
- Diese Optionen werden nur fortgeschrittenen Benutzern empfohlen. Fortsetzen? 
-</string>
   <string name="scan_private_key">Privaten Schlüssel scannen</string>
   <string name="private_key_successfully_imported">Privater Schlüssel erfolgreich importiert.</string>
   <string name="private_key_not_matching_address">HINWEIS: Der gescannte private Schlüssel funktioniert nicht 

@@ -352,17 +352,6 @@
  Adres Bitcoin %1$s . Zeskanuj kod QR. 
 </string>
   <string name="invalid_private_key">Nieprawidłowy klucz prywatny</string>
-  <string name="watch_only_import_warning">Zamierzasz zaimportować adres, którego nie można wydać, an 
- adres (lub skrypt klucza publicznego) 
- przechowywane w portfelu bez odpowiedniego klucza prywatnego. To 
- oznacza, że fundusze można wydać WYŁĄCZNIE, jeśli klucz prywatny jest przechowywany w innym miejscu. Jeśli ty 
- robić 
- nie przechowuj klucza prywatnego, NIE instruuj nikogo, aby wysyłał Ci bitcoiny do 
- niewymienialne 
- adres. 
-
- Te opcje są zalecane tylko dla zaawansowanych użytkowników. Kontyntynuj? 
-</string>
   <string name="scan_private_key">Skanuj klucz prywatny</string>
   <string name="private_key_successfully_imported">Klucz prywatny został pomyślnie zaimportowany.</string>
   <string name="private_key_not_matching_address">UWAGA: Zeskanowany klucz prywatny nie 

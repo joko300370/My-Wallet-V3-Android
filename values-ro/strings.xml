@@ -351,17 +351,6 @@
  Adresa Bitcoin %1$s . Vă rugăm să scanați codul QR. 
 </string>
   <string name="invalid_private_key">Cheie privată nevalidă</string>
-  <string name="watch_only_import_warning">Ești pe cale să importezi o adresă care nu poate fi cheltuită, an 
- adresa (sau script-ul cu cheie publică) 
- stocate în portofel fără cheia privată corespunzătoare. Acest 
- înseamnă că fondurile pot fi cheltuite DOAR dacă aveți cheia privată stocată în altă parte. daca tu 
- do 
- nu aveți cheia privată stocată, NU instruiți pe nimeni să vă trimită bitcoin la 
- non-spendable 
- abordare. 
-
- Aceste opțiuni sunt recomandate numai pentru utilizatorii avansați. Continua? 
-</string>
   <string name="scan_private_key">Scanează cheia privată</string>
   <string name="private_key_successfully_imported">Cheia privată a fost importată cu succes.</string>
   <string name="private_key_not_matching_address">NOTĂ: Cheia privată scanată nu 

@@ -350,17 +350,6 @@
  Endereço de Bitcoin %1$s . Por favor, digitalize o código QR. 
 </string>
   <string name="invalid_private_key">Chave privada inválida</string>
-  <string name="watch_only_import_warning">Você está prestes a importar um endereço não consumível, um 
- endereço (ou script de chave pública) 
- armazenado na carteira sem a chave privada correspondente. este 
- significa que os fundos só podem ser gastos se você tiver a chave privada armazenada em outro local. Se vocês 
- Faz 
- não tiver a chave privada armazenada, NÃO instrua ninguém a enviar bitcoin para o 
- não gastável 
- endereço. 
-
- Essas opções são recomendadas apenas para usuários avançados. Continuar? 
-</string>
   <string name="scan_private_key">Digitalizar chave privada</string>
   <string name="private_key_successfully_imported">Chave privada importada com sucesso.</string>
   <string name="private_key_not_matching_address">NOTA: A chave privada digitalizada não 

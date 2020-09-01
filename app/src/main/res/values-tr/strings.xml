@@ -350,17 +350,6 @@
  Bitcoin adresi %1$s . Lütfen QR kodunu tarayın. 
 </string>
   <string name="invalid_private_key">Geçersiz özel anahtar</string>
-  <string name="watch_only_import_warning">Harcanabilir olmayan bir adresi, 
- adres (veya ortak anahtar betiği) 
- ilgili özel anahtar olmadan cüzdanda saklanır. Bu 
- paranın SADECE başka bir yerde saklanmış özel anahtarınız varsa harcanabileceği anlamına gelir. Eğer sen 
- yapmak 
- özel anahtar depolanmamışsa, kimseye size bitcoin göndermesi için talimat vermeyin. 
- olmayan harcanabilir 
- adres. 
-
- Bu seçenekler yalnızca ileri düzey kullanıcılar için önerilir. Devam et? 
-</string>
   <string name="scan_private_key">Özel anahtarı tara</string>
   <string name="private_key_successfully_imported">Özel anahtar başarıyla içe aktarıldı.</string>
   <string name="private_key_not_matching_address">NOT: Taranan özel anahtar 

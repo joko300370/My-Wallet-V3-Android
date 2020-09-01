@@ -219,7 +219,6 @@
     <string name="privx_required">Chave Privada Requerida</string>
     <string name="watch_only_spend_instructions">Esta ação requer a chave privada do endereço Bitcoin %1$s. Por favor, escaneie o código QR.</string>
     <string name="invalid_private_key">Chave privada inválida</string>
-    <string name="watch_only_import_warning">Você está prestes a importar um endereço watch only, um endereço (ou script de chave pública) armazenado na carteira sem a chave privada correspondente. Isto significa que os fundos podem ser utilizados SOMENTE se você tiver a chave privada armazenada em algum lugar. Se você não tiver a chave privada armazenada, NÃO instrua ninguém a enviar bitcoins para o endereço watch only.\n\nEstas opções são recomendadas apenas para usuários avançados. Deseja continuar? </string>
     <string name="scan_private_key">Escanear chave privada</string>
     <string name="private_key_successfully_imported">Chave privada importada com êxito.</string>
     <string name="watch_only">Watch Only</string>

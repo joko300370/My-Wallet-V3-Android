@@ -350,17 +350,6 @@
  Dirección de Bitcoin %1$s . Por favor escanee el código QR. 
 </string>
   <string name="invalid_private_key">Clave privada inválida</string>
-  <string name="watch_only_import_warning">Está a punto de importar una dirección no gastable, un 
- dirección (o script de clave pública) 
- almacenado en la billetera sin la clave privada correspondiente. Esta 
- significa que los fondos pueden gastarse SOLO si tiene la clave privada almacenada en otro lugar. Si tu 
- hacer 
- no tiene la clave privada almacenada, NO le indique a nadie que le envíe bitcoins al 
- no gastable 
- habla a. 
-
- Estas opciones se recomiendan solo para usuarios avanzados. ¿Seguir? 
-</string>
   <string name="scan_private_key">Escanear clave privada</string>
   <string name="private_key_successfully_imported">Clave privada importada con éxito.</string>
   <string name="private_key_not_matching_address">NOTA: La clave privada escaneada no 
@@ -1124,7 +1113,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Enviamos un enlace de verificación a</string>
   <string name="buy_sell_unverified_email_verify_message2">Haga clic y regrese aquí para continuar con su transacción.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Abrir correo electrónico</string>
-  <string name="coinify">Acuñar</string>
   <string name="buy_sell_verified_email_title">¡Correo verificado!</string>
   <string name="buy_sell_verified_email_message">Nuestro socio %1$s procesará su transacción de bitcoin. Al hacer clic en Aceptar y \'Continuar\', creará una cuenta con %1$s .</string>
   <string name="buy_sell_identification_verification">Identificar verificación</string>

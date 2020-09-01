@@ -349,17 +349,6 @@
  비트 코인 주소 %1$s . QR 코드를 스캔하십시오. 
 </string>
   <string name="invalid_private_key">잘못된 개인 키</string>
-  <string name="watch_only_import_warning">사용할 수없는 주소를 가져 오려고합니다. 
- 주소 (또는 공개 키 스크립트) 
- 해당 개인 키없이 지갑에 저장됩니다. 이 
- 개인 키가 다른 곳에 저장된 경우에만 자금을 사용할 수 있습니다. 만약 너라면 
- 하다 
- 개인 키가 저장되어 있지 않은 사람에게 비트 코인을 보내도록 지시하지 마십시오. 
- 사용할 수없는 
- 주소. 
-
- 이 옵션은 고급 사용자에게만 권장됩니다. 계속하다? 
-</string>
   <string name="scan_private_key">개인 키 스캔</string>
   <string name="private_key_successfully_imported">개인 키를 성공적으로 가져 왔습니다.</string>
   <string name="private_key_not_matching_address">참고 : 스캔 한 개인 키는 

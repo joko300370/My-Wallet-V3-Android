@@ -350,17 +350,6 @@
  Indirizzo bitcoin %1$s . Si prega di scansionare il codice QR. 
 </string>
   <string name="invalid_private_key">Chiave privata non valida</string>
-  <string name="watch_only_import_warning">Stai per importare un indirizzo non spendibile, un 
- indirizzo (o script di chiave pubblica) 
- memorizzato nel portafoglio senza la chiave privata corrispondente. Questo 
- significa che i fondi possono essere spesi SOLO se la chiave privata è archiviata altrove. Se tu 
- fare 
- non avere la chiave privata memorizzata, NON dare istruzioni a nessuno di inviarti bitcoin a 
- non spendibili 
- indirizzo. 
-
- Queste opzioni sono consigliate solo per utenti esperti. Continua? 
-</string>
   <string name="scan_private_key">Scansione chiave privata</string>
   <string name="private_key_successfully_imported">Chiave privata importata correttamente.</string>
   <string name="private_key_not_matching_address">NOTA: la chiave privata scansionata no 

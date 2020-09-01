@@ -350,17 +350,6 @@
  Bitcoin-adress %1$s . Skanna QR-koden. 
 </string>
   <string name="invalid_private_key">Ogiltig privat nyckel</string>
-  <string name="watch_only_import_warning">Du håller på att importera en adress som inte kan spendera, en 
- adress (eller public key script) 
- lagras i plånboken utan motsvarande privat nyckel. Detta 
- innebär att medlen endast kan användas om du har den privata nyckeln lagrad någon annanstans. Om du 
- do 
- inte ha den privata nyckeln lagrad, instruera INTE någon att skicka dig bitcoin till 
- icke-spendable 
- adress. 
-
- Dessa alternativ rekommenderas endast för avancerade användare. Fortsätta? 
-</string>
   <string name="scan_private_key">Skanna privat nyckel</string>
   <string name="private_key_successfully_imported">Privat nyckel importeras.</string>
   <string name="private_key_not_matching_address">OBS! Den skannade privata nyckeln gör det inte 

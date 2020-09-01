@@ -349,17 +349,6 @@
  Alamat Bitcoin %1$s . Sila imbas kod QR. 
 </string>
   <string name="invalid_private_key">Kunci peribadi tidak sah</string>
-  <string name="watch_only_import_warning">Anda akan mengimport alamat tidak boleh dibelanjakan, a 
- alamat (atau skrip utama awam) 
- disimpan dalam dompet tanpa kunci persendirian yang sepadan. Ini 
- bermaksud dana boleh dibelanjakan SAHAJA jika anda mempunyai kekunci peribadi yang disimpan di tempat lain. Jika awak 
- buat 
- tidak mempunyai kunci peribadi yang disimpan, TIDAK memberi arahan kepada sesiapa sahaja untuk menghantar bitcoin kepada anda 
- tidak boleh dibelanjakan 
- alamat. 
-
- Pilihan ini disarankan untuk pengguna canggih sahaja. Teruskan? 
-</string>
   <string name="scan_private_key">Imbas kekunci persendirian</string>
   <string name="private_key_successfully_imported">Kunci peribadi berjaya diimport.</string>
   <string name="private_key_not_matching_address">NOTA: Kunci peribadi yang diimbas tidak 
@@ -1123,7 +1112,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami menghantar pautan pengesahan kepada</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk meneruskan transaksi anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka E-mel</string>
-  <string name="coinify">Mencukupi</string>
   <string name="buy_sell_verified_email_title">E-mel Disahkan!</string>
   <string name="buy_sell_verified_email_message">Rakan kongsi kami %1$s akan memproses transaksi bitcoin anda. Dengan mengklik Setuju dan \'Teruskan\', anda akan membuat akaun dengan %1$s .</string>
   <string name="buy_sell_identification_verification">Kenal pasti pengesahan</string>
