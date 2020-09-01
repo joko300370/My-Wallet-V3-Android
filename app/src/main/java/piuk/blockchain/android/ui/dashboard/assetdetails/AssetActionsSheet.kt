@@ -286,7 +286,7 @@ class AssetActionsSheet :
                             model.process(SelectSendingAccount)
                         }
                         it.accounts.size == 1 -> {
-                            processAction(AssetAction.Deposit)
+                            model.process(HandleActionIntent(AssetAction.Deposit))
                         }
                         else -> {
                             throw IllegalStateException("No accounts available to deposit into interest")
