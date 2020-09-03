@@ -55,7 +55,9 @@ private class AgreementTextItemViewHolder(val parent: View) :
 
         itemView.confirm_details_checkbox.isChecked = option?.value ?: false
 
-        itemView.confirm_details_checkbox.setOnCheckedChangeListener { _, isChecked ->
+        itemView.confirm_details_checkbox.isEnabled = true
+        itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
+            view.isEnabled = false
             option?.let {
                 model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
             }

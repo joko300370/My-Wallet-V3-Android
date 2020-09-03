@@ -29,7 +29,7 @@
         android:id="@+id/asset_actions_title"
         style="@style/Text.Semibold.16"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginTop="@dimen/standard_margin"
         android:ellipsize="end"
@@ -42,15 +42,16 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/asset_actions_details"
         style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/tiny_margin"
         android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintEnd_toStartOf="@id/asset_actions_crypto_value"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@id/asset_actions_title"
         app:layout_constraintTop_toBottomOf="@id/asset_actions_title"
-        tools:text="my account description" />
+        tools:text="my account description thats very long" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/asset_actions_asset_icon"
