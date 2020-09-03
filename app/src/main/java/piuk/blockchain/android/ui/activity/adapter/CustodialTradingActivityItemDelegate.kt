@@ -79,8 +79,8 @@ private class CustodialTradingActivityItemViewHolder(
             if (txStatus == OrderState.FINISHED) {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
                 status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
-                asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.black))
-                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+                asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.black))
             } else {
                 tx_type.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
                 status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
