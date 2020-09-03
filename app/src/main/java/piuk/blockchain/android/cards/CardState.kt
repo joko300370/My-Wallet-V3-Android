@@ -20,7 +20,7 @@ data class CardState(
 data class EverypayAuthOptions(val paymentLink: String, val exitLink: String)
 
 sealed class CardRequestStatus {
-    object Error : CardRequestStatus()
+    class Error(val type: CardError) : CardRequestStatus()
     object Loading : CardRequestStatus()
     class Success(val card: PaymentMethod.Card) : CardRequestStatus()
 }
@@ -31,3 +31,7 @@ fun CardType.icon() =
         CardType.MASTERCARD -> R.drawable.ic_mastercard
         else -> this.frontResource
     }
+
+enum class CardError {
+    CREATION_FAILED, ACTIVATION_FAIL, PENDING_AFTER_POLL, LINK_FAILED
+}

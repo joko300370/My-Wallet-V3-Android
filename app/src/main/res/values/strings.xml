@@ -1937,4 +1937,8 @@
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
     <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %1$s Trade Wallet to your Vault Wallets. Once %1$s is in your Vault Wallet you can transfer to external addresses.</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
+    <string name="could_not_save_card">We could not save your card. Please contact support.</string>
+    <string name="could_not_activate_card">We could not activate your card. Please contact support.</string>
+    <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>
+    <string name="card_link_failed">Card failed to link. Please try again or contact support if you believe this occurred in error.</string>
 </resources>

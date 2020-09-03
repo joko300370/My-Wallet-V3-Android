@@ -189,7 +189,7 @@ class SimpleBuyInteractor(
 
     fun pollForCardStatus(cardId: String): Single<CardIntent.CardUpdated> =
         custodialWalletManager.getCardDetails(cardId)
-            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 20)) }
+            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 24)) }
             .takeUntil {
                 it.status == CardStatus.BLOCKED ||
                         it.status == CardStatus.EXPIRED ||
