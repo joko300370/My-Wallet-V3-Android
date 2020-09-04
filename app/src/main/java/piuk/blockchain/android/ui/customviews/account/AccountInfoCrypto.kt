@@ -14,11 +14,14 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.coincore.InterestAccount
+import piuk.blockchain.android.coincore.NonCustodialAccount
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
@@ -31,6 +34,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
+    private val coincore: Coincore by scopedInject()
 
     init {
         LayoutInflater.from(context)
@@ -46,11 +50,37 @@ class AccountInfoCrypto @JvmOverloads constructor(
     }
 
     private fun updateView(account: CryptoAccount, disposables: CompositeDisposable) {
-        val crypto = account.asset
-        icon.setCoinIcon(crypto)
-        asset_account_icon.goneIf(account.isCustodial().not())
-        wallet_name.text = account.label
+        updateAccountDetails(account, disposables)
 
+        when (account) {
+            is InterestAccount -> setInterestAccountDetails(account, disposables)
+            is TradingAccount -> asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
+            is NonCustodialAccount -> asset_account_icon.gone()
+            else -> asset_account_icon.gone()
+        }
+    }
+
+    private fun setInterestAccountDetails(account: CryptoAccount, disposables: CompositeDisposable) {
+        asset_account_icon.setImageResource(R.drawable.ic_account_badge_interest)
+
+        disposables += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    asset_name.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
+                },
+                onError = {
+                    asset_name.text = resources.getString(
+                        R.string.dashboard_asset_actions_interest_dsc_failed)
+
+                    Timber.e("AssetActions error loading Interest rate: $it")
+                }
+            )
+    }
+
+    private fun updateAccountDetails(account: CryptoAccount, disposables: CompositeDisposable) {
+        val crypto = account.asset
+        wallet_name.text = account.label
+        icon.setCoinIcon(crypto)
         icon.visible()
 
         asset_name.setText(crypto.assetName())
@@ -76,5 +106,5 @@ class AccountInfoCrypto @JvmOverloads constructor(
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
-        }
+    }
 }

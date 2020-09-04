@@ -191,10 +191,8 @@ class AssetDetailSheet :
         }
 
         state.assetDisplayMap?.get(assetFilter)?.let {
-            val currentBalance = it.amount
-            val currentFiatBalance = it.fiatValue
             model.process(
-                ShowAssetActionsIntent(account, assetFilter, currentBalance, currentFiatBalance)
+                ShowAssetActionsIntent(account)
             )
         }
     }

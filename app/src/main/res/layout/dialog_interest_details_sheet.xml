@@ -30,10 +30,11 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/interest_details_title"
         style="@style/Text.Semibold.16"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:ellipsize="end"
         app:layout_constraintEnd_toStartOf="@id/interest_details_crypto_value"
         app:layout_constraintHorizontal_bias="0"
@@ -44,8 +45,9 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/interest_details_label"
         style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/tiny_margin"
         android:ellipsize="end"
         app:layout_constraintEnd_toStartOf="@id/interest_details_fiat_value"
         app:layout_constraintHorizontal_bias="0"
@@ -107,11 +109,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fadingEdge="vertical"
-        app:layout_constraintBottom_toTopOf="@id/interest_details_disclaimer"
-        app:layout_constraintTop_toBottomOf="@id/interest_details_separator"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
-        app:layout_constrainedHeight="true" />
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/interest_details_disclaimer"
+        app:layout_constraintTop_toBottomOf="@id/interest_details_separator" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/interest_details_disclaimer"

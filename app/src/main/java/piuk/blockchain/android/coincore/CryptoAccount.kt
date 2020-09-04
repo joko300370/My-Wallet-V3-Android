@@ -46,6 +46,12 @@ enum class SendState {
     NOT_SUPPORTED
 }
 
+interface InterestAccount
+
+interface TradingAccount
+
+interface NonCustodialAccount
+
 typealias SingleAccountList = List<SingleAccount>
 
 interface CryptoAccount : SingleAccount {

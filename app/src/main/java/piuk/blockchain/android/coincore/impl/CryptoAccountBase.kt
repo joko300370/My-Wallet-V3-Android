@@ -14,11 +14,12 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -88,7 +89,7 @@ abstract class CryptoNonCustodialAccount(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     protected val payloadManager: PayloadDataManager,
     override val asset: CryptoCurrency
-) : CryptoAccountBase() {
+) : CryptoAccountBase(), NonCustodialAccount {
 
     override val isFunded: Boolean = true
 

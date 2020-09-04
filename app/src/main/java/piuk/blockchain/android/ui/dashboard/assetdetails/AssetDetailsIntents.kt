@@ -1,10 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -13,19 +11,13 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
 class ShowAssetActionsIntent(
-    private val account: BlockchainAccount,
-    private val assetFilter: AssetFilter,
-    private val currentBalance: Money,
-    private val currentFiatBalance: Money
+    private val account: BlockchainAccount
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             selectedAccount = account,
             errorState = AssetDetailsError.NONE,
-            assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS,
-            assetFilter = assetFilter,
-            selectedAccountCryptoBalance = currentBalance,
-            selectedAccountFiatBalance = currentFiatBalance
+            assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS
         )
 }
 

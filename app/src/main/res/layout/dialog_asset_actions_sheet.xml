@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,82 +24,19 @@
         app:layout_constraintTop_toBottomOf="@id/asset_actions_sheet_indicator"
         app:srcCompat="@drawable/ic_arrow_back_blue" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_actions_title"
-        style="@style/Text.Semibold.16"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="@dimen/small_margin"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:ellipsize="end"
-        app:layout_constraintEnd_toStartOf="@id/asset_actions_crypto_value"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/asset_actions_asset_icon"
-        app:layout_constraintTop_toBottomOf="@id/asset_actions_back"
-        tools:text="My account name" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_actions_details"
-        style="@style/Text.Light.14"
-        android:layout_width="0dp"
+    <piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
+        android:id="@+id/asset_actions_account_details"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/asset_actions_crypto_value"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="@id/asset_actions_title"
-        app:layout_constraintTop_toBottomOf="@id/asset_actions_title"
-        tools:text="my account description thats very long" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/asset_actions_asset_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="@dimen/standard_margin"
-        app:layout_constraintBottom_toBottomOf="@id/asset_actions_details"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/asset_actions_title"
-        tools:src="@drawable/vector_bitcoin_colored" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/asset_actions_acc_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:translationX="-8dp"
-        android:translationY="-12dp"
-        app:layout_constraintStart_toEndOf="@id/asset_actions_asset_icon"
-        app:layout_constraintTop_toBottomOf="@id/asset_actions_asset_icon"
-        tools:src="@drawable/ic_account_badge_custodial" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_actions_fiat_value"
-        style="@style/Text.Semibold.16"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/asset_actions_title"
-        tools:text="£99999.999" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/asset_actions_crypto_value"
-        style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/asset_actions_details"
-        tools:text="10000 BTC" />
+        app:layout_constraintTop_toBottomOf="@id/asset_actions_back" />
 
     <View
         android:id="@+id/asset_actions_separator"
         style="@style/SeparatorWithoutMargins"
-        android:layout_marginTop="@dimen/small_margin"
         android:paddingTop="@dimen/tiny_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/asset_actions_crypto_value" />
+        app:layout_constraintTop_toBottomOf="@id/asset_actions_account_details" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/asset_actions_list"

@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
@@ -26,7 +27,7 @@ internal class CryptoInterestAccount(
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoAccountBase() {
+) : CryptoAccountBase(), InterestAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)

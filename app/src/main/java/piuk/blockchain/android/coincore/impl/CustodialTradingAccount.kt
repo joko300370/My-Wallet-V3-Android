@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -33,7 +34,7 @@ open class CustodialTradingAccount(
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
     private val isNoteSupported: Boolean = false
-) : CryptoAccountBase() {
+) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)

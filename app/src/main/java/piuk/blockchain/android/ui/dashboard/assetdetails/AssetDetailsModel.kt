@@ -6,7 +6,6 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
@@ -18,7 +17,6 @@ data class AssetDetailsState(
     val asset: CryptoAsset? = null,
     val selectedAccount: BlockchainAccount? = null,
     val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
-    val assetFilter: AssetFilter? = null,
     val assetDisplayMap: AssetDisplayMap? = null,
     val assetFiatPrice: String = "",
     val timeSpan: TimeSpan = TimeSpan.DAY,
