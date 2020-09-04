@@ -5,7 +5,9 @@ import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
@@ -92,5 +94,24 @@ class BuySellFlowNavigatorTest {
         val test = subject.navigateTo().test()
 
         test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false))
+    }
+
+    @Test
+    fun `whenBuyStateIsPendingConfirmationOrderIsCancelledAndBuySellUiIsDisplayed`() {
+        whenever(simpleBuyModel.state).thenReturn(
+            Observable.just(SimpleBuyState(id = "ORDERID", orderState = OrderState.PENDING_CONFIRMATION))
+        )
+        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "USD")))
+        whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("USD"))
+            .thenReturn(Single.just(true))
+        whenever(custodialWalletManager.deleteBuyOrder("ORDERID"))
+            .thenReturn(Completable.complete())
+
+        val test = subject.navigateTo().test()
+
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(true))
+        verify(custodialWalletManager).deleteBuyOrder("ORDERID")
     }
 }
