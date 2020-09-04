@@ -164,7 +164,7 @@ class LauncherPresenter(
                     onSuccess = { simpleBuyShouldLaunched ->
                         view.updateProgressVisibility(false)
                         if (simpleBuyShouldLaunched) {
-                            startSimpleBuy()
+                            launchBuySellIntro()
                         } else {
                             startMainActivity()
                         }
@@ -229,8 +229,8 @@ class LauncherPresenter(
         view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
     }
 
-    private fun startSimpleBuy() {
-        view.startSimpleBuy()
+    private fun launchBuySellIntro() {
+        view.launchBuySellIntro()
     }
 
     private fun setCurrencyUnits(settings: Settings) {

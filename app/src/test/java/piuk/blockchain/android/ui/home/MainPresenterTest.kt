@@ -29,7 +29,6 @@ import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -44,7 +43,6 @@ class MainPresenterTest {
     private val payloadDataManager: PayloadDataManager = mock()
     private val credentialsWiper: CredentialsWiper = mock()
     private val exchangeRateFactory: ExchangeRateDataManager = mock()
-    private val currencyState: CurrencyState = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val kycStatusHelper: KycStatusHelper = mock()
     private val lockboxDataManager: LockboxDataManager = mock()
@@ -89,7 +87,6 @@ class MainPresenterTest {
             credentialsWiper = credentialsWiper,
             payloadDataManager = payloadDataManager,
             exchangeRateFactory = exchangeRateFactory,
-            currencyState = currencyState,
             environmentSettings = environmentSettings,
             kycStatusHelper = kycStatusHelper,
             lockboxDataManager = lockboxDataManager,
@@ -104,7 +101,8 @@ class MainPresenterTest {
             crashLogger = crashLogger,
             simpleBuyAvailability = mock(),
             cacheCredentialsWiper = mock(),
-            analytics = mock()
+            analytics = mock(),
+            appUtil = mock()
         )
 
         subject.attachView(view)

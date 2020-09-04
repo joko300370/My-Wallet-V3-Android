@@ -14,7 +14,7 @@ class AssetBalancesRepository(balancesProvider: BalancesProvider) {
         cacheLifetimeSeconds = CACHE_LIFETIME,
         refreshFn = {
             balancesProvider.getBalanceForAllAssets()
-                .doOnSuccess { Timber.e("Balance response: $it") }
+                .doOnSuccess { Timber.d("Balance response: $it") }
         }
     )
 

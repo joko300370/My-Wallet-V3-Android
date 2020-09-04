@@ -339,7 +339,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 }
 
 private fun FiatAccount.icon(): Int = when (fiatCurrency) {
-    "EUR" -> R.drawable.ic_euro_funds
+    "EUR" -> R.drawable.ic_funds_euro
     "GBP" -> R.drawable.ic_funds_gbp
     else -> R.drawable.ic_vector_dollar
 }

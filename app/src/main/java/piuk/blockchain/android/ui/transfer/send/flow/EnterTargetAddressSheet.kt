@@ -5,6 +5,7 @@ import android.content.Intent
 import android.text.Editable
 import android.view.View
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
@@ -16,14 +17,12 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -48,44 +47,49 @@ class EnterTargetAddressSheet(
         with(dialogView) {
             if (state.sendingAccount != newState.sendingAccount) {
                 from_details.updateAccount(newState.sendingAccount, disposables)
-                setupTransferList(newState.sendingAccount)
+                setupTransferList(newState.sendingAccount, newState)
             }
             cta_button.isEnabled = newState.nextEnabled
 
-            if (newState.sendingAccount.isCustodial()) {
-                showCustodialInput(newState)
-            } else {
+            if (customiser.selectTargetShowManualEnterAddress(newState)) {
                 showNonCustodialInput(newState)
+            } else {
+                showCustodialInput(newState)
             }
 
             customiser.errorFlashMessage(newState)?.let {
+                address_entry.setBackgroundColor(
+                    ContextCompat.getColor(requireContext(), R.color.red_000))
                 error_msg.apply {
                     text = it
                     visible()
                 }
-            } ?: error_msg.invisible()
+            } ?: hideErrorState()
 
             title.text = customiser.selectTargetAddressTitle(newState)
         }
         state = newState
     }
 
+    private fun hideErrorState() {
+        dialogView.error_msg.invisible()
+        dialogView.address_entry.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.grey_000))
+    }
+
     private fun showNonCustodialInput(newState: SendState) {
         val address = if (newState.sendTarget is CryptoAddress) {
             newState.sendTarget.address
         } else {
-            null
+            ""
         }
-
-        val asset = newState.asset
 
         with(dialogView) {
             address_entry.removeTextChangedListener(addressTextWatcher)
-            address_entry.setText(address, TextView.BufferType.EDITABLE)
-            address_entry.hint = getString(
-                R.string.send_enter_asset_address_hint,
-                getString(asset.assetName())
-            )
+            if (address.isNotEmpty()) {
+                address_entry.setText(address, TextView.BufferType.EDITABLE)
+            }
+            address_entry.hint = customiser.selectTargetAddressInputHint(newState)
             address_entry.addTextChangedListener(addressTextWatcher)
 
             input_switcher.displayedChild = NONCUSTODIAL_INPUT
@@ -94,10 +98,11 @@ class EnterTargetAddressSheet(
 
     private fun showCustodialInput(newState: SendState) {
         with(dialogView) {
-            internal_warning.text = getString(
-                R.string.send_internal_transfer_message,
-                newState.asset.displayTicker
-            )
+            internal_warning.text = customiser.selectTargetAddressCustodialLabel(newState)
+
+            internal_send_close.setOnClickListener {
+                input_switcher.gone()
+            }
 
             title_pick.gone()
             input_switcher.displayedChild = CUSTODIAL_INPUT
@@ -106,10 +111,14 @@ class EnterTargetAddressSheet(
 
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
-            val asset = state.asset
             val address = s.toString()
 
-            addressEntered(address, asset)
+            if (address.isEmpty()) {
+                model.process(SendIntent.EnteredAddressReset)
+            } else {
+                val asset = state.asset
+                addressEntered(address, asset)
+            }
         }
     }
 
@@ -130,13 +139,12 @@ class EnterTargetAddressSheet(
         }
     }
 
-    private fun setupTransferList(account: CryptoAccount) {
+    private fun setupTransferList(account: CryptoAccount, state: SendState) {
         val accountFilter = customiser.targetAccountFilter(state)
         dialogView.wallet_select.initialise(
             coincore.canTransferTo(account)
                 .map {
-                    it.filter(accountFilter)
-                    it.map { it as BlockchainAccount }
+                    it.filter(accountFilter).map { it as BlockchainAccount }
                 }
         )
     }

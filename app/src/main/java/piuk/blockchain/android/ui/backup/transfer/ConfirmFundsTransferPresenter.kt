@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.backup.transfer
 
 import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -9,11 +10,10 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.ui.chooser.WalletAccountHelper
+import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.events.PaymentFailedEvent
 import piuk.blockchain.androidcore.data.events.PaymentSentEvent
@@ -27,12 +27,14 @@ class ConfirmFundsTransferPresenter(
     private val fundsDataManager: TransferFundsDataManager,
     private val payloadDataManager: PayloadDataManager,
     private val stringUtils: StringUtils,
-    private val currencyState: CurrencyState,
-    private val exchangeRates: ExchangeRateDataManager
+    private val exchangeRates: ExchangeRateDataManager,
+    currencyPrefs: CurrencyPrefs
 ) : BasePresenter<ConfirmFundsTransferView>() {
 
     @VisibleForTesting
     internal val pendingTransactions: MutableList<PendingTransaction> = mutableListOf()
+
+    private val userFiat: String = currencyPrefs.selectedFiatCurrency
 
     override fun onViewReady() {
         updateToAddress(payloadDataManager.defaultAccountIndex)
@@ -99,8 +101,8 @@ class ConfirmFundsTransferPresenter(
             )
         )
 
-        val fiatAmount = totalToSend.toFiat(exchangeRates, currencyState.fiatUnit).toStringWithSymbol()
-        val fiatFee = totalFee.toFiat(exchangeRates, currencyState.fiatUnit).toStringWithSymbol()
+        val fiatAmount = totalToSend.toFiat(exchangeRates, userFiat).toStringWithSymbol()
+        val fiatFee = totalFee.toFiat(exchangeRates, userFiat).toStringWithSymbol()
 
         view.updateTransferAmountBtc(
             totalToSend.toStringWithSymbol()

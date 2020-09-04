@@ -2,12 +2,13 @@ package piuk.blockchain.android.simplebuy
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.google.gson.Gson
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -206,7 +207,7 @@ class SimpleBuySyncFactory(
         }
     }
 
-    private fun BuyOrder.isCardPayment() =
+    private fun BuySellOrder.isCardPayment() =
         paymentMethodType == PaymentMethodType.PAYMENT_CARD
 
     private fun updateWithRemote(localState: SimpleBuyState): Maybe<SimpleBuyState> =
@@ -251,7 +252,7 @@ class SimpleBuySyncFactory(
 }
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
+fun BuySellOrder.toSimpleBuyState(): SimpleBuyState =
     SimpleBuyState(
         id = id,
         amount = fiat,
@@ -259,7 +260,7 @@ fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
         selectedCryptoCurrency = crypto.currency,
         orderState = state,
         fee = fee,
-        orderValue = orderValue,
+        orderValue = orderValue as? CryptoValue,
         orderExchangePrice = price,
         selectedPaymentMethod = SelectedPaymentMethod(
             id = paymentMethodId,

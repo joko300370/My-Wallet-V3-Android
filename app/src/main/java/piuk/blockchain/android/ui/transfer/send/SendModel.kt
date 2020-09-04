@@ -127,6 +127,8 @@ class SendModel(
             is SendIntent.FiatRateUpdated -> null
             is SendIntent.CryptoRateUpdated -> null
             is SendIntent.ValidateTransaction -> processValidateTransaction()
+            is SendIntent.EnteredAddressReset -> null
+            is SendIntent.InvalidateTransaction -> processInvalidateTransaction()
         }
     }
 
@@ -137,6 +139,17 @@ class SendModel(
     override fun onStateUpdate(s: SendState) {
         Timber.v("!SEND!> Send Model: state update -> $s")
     }
+
+    private fun processInvalidateTransaction(): Disposable? =
+        interactor.invalidateTransaction()
+            .subscribeBy(
+                onComplete = {
+                    process(SendIntent.ReturnToPreviousStep)
+                },
+                onError = {
+                    process(SendIntent.FatalTransactionError(it))
+                }
+            )
 
     private fun processPasswordValidation(password: String) =
         interactor.validatePassword(password)

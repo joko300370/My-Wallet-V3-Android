@@ -44,7 +44,7 @@ internal class CryptoInterestAccount(
         Single.just(false)
 
     override val accountBalance: Single<Money>
-        get() = custodialWalletManager.getInterestAccountDetails(asset)
+        get() = custodialWalletManager.getInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
             )
@@ -109,10 +109,9 @@ internal class CryptoInterestAccount(
 
     override val actions: AvailableActions =
         if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
-            // TODO coming soon - AssetAction.Summary
-            setOf(AssetAction.Deposit, AssetAction.ViewActivity)
+            setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
         } else {
-            setOf(AssetAction.ViewActivity)
+            setOf(AssetAction.Summary, AssetAction.ViewActivity)
         }
 
     companion object {

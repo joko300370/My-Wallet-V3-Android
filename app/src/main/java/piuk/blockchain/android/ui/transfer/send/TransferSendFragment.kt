@@ -2,16 +2,16 @@ package piuk.blockchain.android.ui.transfer.send
 
 import android.os.Bundle
 import android.view.View
-import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
+import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
+import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 
@@ -19,13 +19,25 @@ class TransferSendFragment :
     AccountSelectorFragment(),
     DialogFlow.FlowHost {
 
-    private val coincore: Coincore by scopedInject()
     private var flow: SendFlow? = null
+
+    override val filterFn: AccountListFilterFn = { account ->
+        (account is CryptoAccount) &&
+            account.isFunded &&
+            account.actions.intersect(
+                listOf(AssetAction.NewSend, AssetAction.Send)
+            ).isNotEmpty()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setBlurbText(getString(R.string.transfer_send_crypto))
+        setHeaderDetails(
+            R.string.transfer_send_crypto_title,
+            R.string.transfer_send_crypto_label,
+            R.drawable.ic_send_blue_circle
+        )
+
         initialiseAccountSelector(
             statusDecorator = ::statusDecorator,
             onAccountSelected = ::doOnAccountSelected
@@ -38,11 +50,12 @@ class TransferSendFragment :
                 .map { sendState ->
                     object : AccountDecorator {
                         override val enabled: Boolean
-                            get() = true
+                            get() = sendState == SendState.CAN_SEND
                         override val status: String
                             get() = when (sendState) {
                                 SendState.NO_FUNDS -> getString(R.string.send_state_no_funds)
                                 SendState.NOT_SUPPORTED -> getString(R.string.send_state_not_supported)
+                                SendState.FUNDS_LOCKED -> getString(R.string.send_state_locked_funds)
                                 SendState.NOT_ENOUGH_GAS -> getString(R.string.send_state_not_enough_gas)
                                 SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
                                 SendState.CAN_SEND -> ""
@@ -59,14 +72,18 @@ class TransferSendFragment :
         }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
-        if (account is CryptoAccount) {
-            startFlowForAccount(account)
+        require(account is CryptoAccount)
+
+        if (account.actions.contains(AssetAction.NewSend)) {
+            startNewSend(account)
+        } else {
+            startOldSend(account)
         }
     }
 
-    private fun startFlowForAccount(account: CryptoAccount) {
+    private fun startNewSend(fromAccount: CryptoAccount) {
         flow = SendFlow(
-            sourceAccount = account,
+            sourceAccount = fromAccount,
             action = AssetAction.NewSend
         ).apply {
             startFlow(
@@ -74,6 +91,10 @@ class TransferSendFragment :
                 host = this@TransferSendFragment
             )
         }
+    }
+
+    private fun startOldSend(account: CryptoAccount) {
+        SendActivity.start(requireContext(), account)
     }
 
     override fun onFlowFinished() {

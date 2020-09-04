@@ -4,8 +4,10 @@ data class InterestResponse(
     val rate: Double
 )
 
-data class InterestAccountBalanceResponse(
-    val balance: String
+data class InterestAccountDetailsResponse(
+    val balance: String,
+    val pendingInterest: String,
+    val totalInterest: String
 )
 
 data class InterestAddressResponse(

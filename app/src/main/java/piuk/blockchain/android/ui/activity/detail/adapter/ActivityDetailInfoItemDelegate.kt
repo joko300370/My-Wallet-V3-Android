@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_activity_detail_info.view.*
+import kotlinx.android.synthetic.main.item_list_info_row.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.activity.detail.Action
 import piuk.blockchain.android.ui.activity.detail.ActivityDetailsType
@@ -38,7 +38,7 @@ class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         InfoItemViewHolder(
-            parent.inflate(R.layout.item_activity_detail_info)
+            parent.inflate(R.layout.item_list_info_row)
         )
 
     override fun onBindViewHolder(
@@ -56,8 +56,8 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
         get() = itemView
 
     fun bind(item: ActivityDetailsType) {
-        itemView.item_activity_detail_title.text = getHeaderForType(item)
-        itemView.item_activity_detail_description.text = getValueForType(item)
+        itemView.item_list_info_row_title.text = getHeaderForType(item)
+        itemView.item_list_info_row_description.text = getValueForType(item)
     }
 
     private fun getHeaderForType(infoType: ActivityDetailsType): String =

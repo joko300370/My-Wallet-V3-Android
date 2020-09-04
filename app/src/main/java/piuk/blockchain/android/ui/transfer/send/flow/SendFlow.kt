@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendModel
 import piuk.blockchain.android.ui.transfer.send.SendState
@@ -59,7 +60,7 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
     }
 
     companion object {
-        const val SHEET_FRAGMENT_TAG = "BOTTOM_SHEET"
+        const val SHEET_FRAGMENT_TAG = BOTTOM_SHEET
     }
 }
 
@@ -94,12 +95,13 @@ class SendFlow(
             .subscribeBy(
                 onSuccess = { passwordRequired ->
                     if (targetAccount !is NullCryptoAccount &&
-                        sourceAccount !is NullCryptoAccount) {
-                            model.process(
-                                SendIntent.InitialiseWithSourceAndTargetAccount(
-                                    action, sourceAccount, targetAccount, passwordRequired
-                                )
+                        sourceAccount !is NullCryptoAccount
+                    ) {
+                        model.process(
+                            SendIntent.InitialiseWithSourceAndTargetAccount(
+                                action, sourceAccount, targetAccount, passwordRequired
                             )
+                        )
                     } else if (sourceAccount !is NullCryptoAccount) {
                         model.process(
                             SendIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)

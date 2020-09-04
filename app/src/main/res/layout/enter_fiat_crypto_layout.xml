@@ -12,15 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:gravity="center"
+        android:background="@android:color/transparent"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:gravity="center"
         android:inputType="numberDecimal"
         android:digits="0123456789-.,"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@android:color/transparent"
         tools:text="$1241" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -28,9 +28,9 @@
         style="@style/Text.Semibold.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="@dimen/tiny_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
         tools:text="12423" />
@@ -46,11 +46,12 @@
         app:srcCompat="@drawable/ic_currency_type_swap" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        style="@style/Text.Error"
         android:id="@+id/error"
-        android:layout_marginTop="@dimen/tiny_margin"
+        style="@style/Text.Error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"

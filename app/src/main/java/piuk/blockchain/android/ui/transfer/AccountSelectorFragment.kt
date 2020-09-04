@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -19,7 +20,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
 
-open class AccountSelectorFragment : Fragment() {
+abstract class AccountSelectorFragment : Fragment() {
 
     private val coincore: Coincore by scopedInject()
 
@@ -29,8 +30,7 @@ open class AccountSelectorFragment : Fragment() {
         savedInstanceState: Bundle?
     ) = inflater.inflate(R.layout.fragment_transfer_account_selector, container, false)
 
-    private val filterFn: AccountListFilterFn =
-        { account -> (account is CryptoAccount) && account.isFunded }
+    protected abstract val filterFn: AccountListFilterFn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,13 +50,13 @@ open class AccountSelectorFragment : Fragment() {
         )
     }
 
-    fun setBlurbText(value: String) {
-        account_selector_blurb.text = value
+    protected fun setHeaderDetails(@StringRes title: Int, @StringRes label: Int, @DrawableRes icon: Int) {
+        account_selector_header.setDetails(title, label, icon)
     }
 
     private fun doOnEmptyList() {
         account_selector_account_list.gone()
-        account_selector_blurb.gone()
+        account_selector_header.gone()
         account_selector_empty_view.visible()
         account_selector_button_buy_crypto.setOnClickListener {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))

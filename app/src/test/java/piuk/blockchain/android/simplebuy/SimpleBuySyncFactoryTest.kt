@@ -2,7 +2,7 @@ package piuk.blockchain.android.simplebuy
 
 import android.annotation.SuppressLint
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
@@ -132,7 +132,7 @@ class SimpleBuySyncFactoryTest {
     fun `there is a remote buy, in an awaiting funds state, and no other buys in progress`() {
         whenSimpleBuyIsEnabled()
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -164,7 +164,7 @@ class SimpleBuySyncFactoryTest {
     fun `there is a remote buy, in a pending state, and no other buys in progress`() {
         whenSimpleBuyIsEnabled()
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -198,7 +198,7 @@ class SimpleBuySyncFactoryTest {
 
         whenSimpleBuyIsEnabled()
 
-        val remoteInput1 = BuyOrder(
+        val remoteInput1 = BuySellOrder(
             id = ORDER_ID_2,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -210,7 +210,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput2 = BuyOrder(
+        val remoteInput2 = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -221,7 +221,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput3 = BuyOrder(
+        val remoteInput3 = BuySellOrder(
             id = ORDER_ID_3,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -259,7 +259,7 @@ class SimpleBuySyncFactoryTest {
         // Which shouldn't ever happen, but it does.
         whenSimpleBuyIsEnabled()
 
-        val remoteInput1 = BuyOrder(
+        val remoteInput1 = BuySellOrder(
             id = ORDER_ID_1,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -270,7 +270,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput2 = BuyOrder(
+        val remoteInput2 = BuySellOrder(
             id = ORDER_ID_2,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -281,7 +281,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput3 = BuyOrder(
+        val remoteInput3 = BuySellOrder(
             id = ORDER_ID_3,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -292,7 +292,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput4 = BuyOrder(
+        val remoteInput4 = BuySellOrder(
             id = ORDER_ID_4,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -331,7 +331,7 @@ class SimpleBuySyncFactoryTest {
 
         whenSimpleBuyIsEnabled()
 
-        val remoteInput1 = BuyOrder(
+        val remoteInput1 = BuySellOrder(
             id = ORDER_ID_2,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -342,7 +342,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput2 = BuyOrder(
+        val remoteInput2 = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -353,7 +353,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput3 = BuyOrder(
+        val remoteInput3 = BuySellOrder(
             id = ORDER_ID_2,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -364,7 +364,7 @@ class SimpleBuySyncFactoryTest {
             paymentMethodType = PaymentMethodType.BANK_ACCOUNT
         )
 
-        val remoteInput4 = BuyOrder(
+        val remoteInput4 = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -415,7 +415,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.KYC
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -463,7 +463,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.KYC
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -511,7 +511,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.KYC
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -559,7 +559,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.KYC
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -650,7 +650,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.BANK_DETAILS
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -689,7 +689,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.BANK_DETAILS
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -728,7 +728,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.BANK_DETAILS
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -767,7 +767,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.BANK_DETAILS
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),
@@ -806,7 +806,7 @@ class SimpleBuySyncFactoryTest {
             currentScreen = FlowScreen.BANK_DETAILS
         )
 
-        val remoteInput = BuyOrder(
+        val remoteInput = BuySellOrder(
             id = EXPECTED_ORDER_ID,
             pair = "EUR-BTC",
             fiat = FiatValue.fromMinor("EUR", 10000),

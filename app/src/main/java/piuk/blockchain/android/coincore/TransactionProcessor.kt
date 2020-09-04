@@ -1,5 +1,8 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.extensions.replace
+import com.blockchain.koin.payloadScope
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -8,7 +11,9 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import org.koin.core.KoinComponent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
 open class TransferError(msg: String) : Exception(msg)
@@ -40,8 +45,9 @@ data class PendingTx(
     val amount: Money,
     val available: Money,
     val fees: Money,
+    val selectedFiat: String,
     val feeLevel: FeeLevel = FeeLevel.Regular,
-    val options: Set<TxOptionValue> = emptySet(),
+    val options: List<TxOptionValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
     val validationState: ValidationState = ValidationState.UNINITIALISED
@@ -57,28 +63,43 @@ enum class TxOption {
     DESCRIPTION,
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
-    READ_ONLY_QUOTE
+    READ_ONLY,
+    AMOUNT
 }
 
-sealed class TxOptionValue {
-    abstract val option: TxOption
+sealed class TxOptionValue(val option: TxOption) {
 
-    data class TxTextOption(
-        override val option: TxOption,
-        val text: String = ""
-    ) : TxOptionValue()
+    data class ExchangePriceOption(val money: Money, val asset: CryptoCurrency) :
+        TxOptionValue(TxOption.READ_ONLY)
 
-    data class TxBooleanOption(
-        override val option: TxOption,
+    data class FeedTotal(val amount: Money, val fee: Money) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class From(val from: String) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class To(val to: String) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class Total(val total: Money) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class Fee(val fee: Money) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
+
+    data class TxBooleanOption<T>(
+        private val _option: TxOption,
+        val data: T? = null,
         val value: Boolean = false
-    ) : TxOptionValue()
+    ) : TxOptionValue(_option)
 }
 
 abstract class TransactionProcessor(
     protected val sendingAccount: CryptoAccount,
     protected val sendTarget: SendTarget,
     protected val exchangeRates: ExchangeRateDataManager
-) {
+) : KoinComponent {
+
+    protected val userFiat: String by unsafeLazy {
+        payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
+    }
 
     // This may be moved into options at some point in the near future.
     abstract val feeOptions: Set<FeeLevel>
@@ -111,14 +132,13 @@ abstract class TransactionProcessor(
     // in the original list when the pendingTx is created. And if it is not supported, then trying to
     // update it will cause an error.
     fun setOption(newOption: TxOptionValue): Completable {
+
         val pendingTx = getPendingTx()
         if (!pendingTx.hasOption(newOption.option)) {
             throw IllegalArgumentException("Unsupported TxOption: ${newOption.option}")
         }
-        val opts = pendingTx.options.toMutableSet()
-        val old = opts.find { it.option == newOption.option }
-        opts.remove(old)
-        opts.add(newOption)
+        val old = pendingTx.options.find { it.option == newOption.option }
+        val opts = pendingTx.options.replace(old, newOption).filterNotNull()
 
         return doValidateAll(pendingTx.copy(options = opts))
             .doOnSuccess { updatePendingTx(it) }
@@ -167,10 +187,12 @@ abstract class TransactionProcessor(
     // Check the validity of a pending transactions.
     fun validateAll(): Completable {
         val pendingTx = getPendingTx()
-        return doValidateAll(pendingTx)
-            .doOnSuccess { updatePendingTx(it) }
-            .ignoreElement()
+        return doBuildConfirmations(pendingTx).flatMap {
+            doValidateAll(it)
+        }.doOnSuccess { updatePendingTx(it) }.ignoreElement()
     }
+
+    abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
 
     // Execute the transaction.
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
@@ -187,7 +209,7 @@ abstract class TransactionProcessor(
             }.flatMapCompletable {
                 doExecute(it, secondPassword)
             }
-        }
+    }
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates
     // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
@@ -221,10 +243,10 @@ fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
     this.toSingle {
         pendingTx.copy(validationState = ValidationState.CAN_EXECUTE)
     }
-    .onErrorReturn {
-        if (it is TxValidationFailure) {
-            pendingTx.copy(validationState = it.state)
-        } else {
-            throw it
+        .onErrorReturn {
+            if (it is TxValidationFailure) {
+                pendingTx.copy(validationState = it.state)
+            } else {
+                throw it
+            }
         }
-    }

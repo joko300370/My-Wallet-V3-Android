@@ -10,7 +10,6 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -42,11 +41,7 @@ open class CustodialTransferProcessor(
                 available = CryptoValue.zero(sendingAccount.asset),
                 fees = CryptoValue.zero(sendingAccount.asset),
                 feeLevel = FeeLevel.None,
-                options = if (isNoteSupported) {
-                    setOf(TxOptionValue.TxTextOption(TxOption.DESCRIPTION))
-                } else {
-                    emptySet()
-                }
+                selectedFiat = userFiat
             )
         )
 
@@ -63,6 +58,18 @@ open class CustodialTransferProcessor(
                 )
             }
     }
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            pendingTx.copy(options = listOf(
+                TxOptionValue.From(from = sendingAccount.label),
+                TxOptionValue.To(to = sendTarget.label),
+                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees)
+            ).apply {
+                if (isNoteSupported) {
+                    toMutableList().add(TxOptionValue.Description())
+                }
+            }))
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx).updateTxValidity(pendingTx)

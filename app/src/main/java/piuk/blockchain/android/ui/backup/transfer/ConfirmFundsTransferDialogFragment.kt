@@ -16,10 +16,7 @@ import com.blockchain.ui.password.SecondPasswordHandler
 import org.koin.android.ext.android.inject
 import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
 import com.blockchain.ui.dialog.MaterialProgressDialog
-import piuk.blockchain.android.data.currency.CurrencyState
-
 import piuk.blockchain.androidcore.data.events.ActionEvent
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -32,8 +29,6 @@ class ConfirmFundsTransferDialogFragment :
 
     private val confirmFundsTransferPresenter: ConfirmFundsTransferPresenter by scopedInject()
     private val rxBus: RxBus by inject()
-    private val currencyState: CurrencyState by inject()
-    private val exchangeRates: ExchangeRateDataManager by scopedInject()
 
     private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
@@ -76,9 +71,7 @@ class ConfirmFundsTransferDialogFragment :
             requireContext(),
             R.layout.spinner_item,
             presenter.getReceiveToList(),
-            true,
-            currencyState,
-            exchangeRates
+            true
         ).apply { setDropDownViewResource(R.layout.spinner_dropdown) }
         spinner_destination.adapter = receiveToAdapter
         spinner_destination.onItemSelectedListener =

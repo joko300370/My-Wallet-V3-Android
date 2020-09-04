@@ -9,8 +9,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
-class TransactionProgressView(context: Context, attrs: AttributeSet)
-    : ConstraintLayout(context, attrs) {
+class TransactionProgressView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
     init {
         inflate(context, R.layout.view_transaction_progress, this)

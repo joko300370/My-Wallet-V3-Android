@@ -3,6 +3,7 @@ package com.blockchain.swap.nabu.service
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
+import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
@@ -31,6 +32,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -241,11 +243,13 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         action: String,
         currencyPair: String,
+        currency: String,
         amount: String
     ): Single<SimpleBuyQuoteResponse> = service.getSimpleBuyQuote(
         authorization = sessionToken.authHeader,
         action = action,
         currencyPair = currencyPair,
+        currency = currency,
         amount = amount
     )
 
@@ -289,10 +293,24 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun getOutstandingBuyOrders(
+    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse) = service.withdrawFee(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    internal fun createWithdrawOrder(
+        sessionToken: NabuSessionTokenResponse,
+        amount: String,
+        currency: String,
+        beneficiaryId: String
+    ) = service.withdrawOrder(
+        sessionToken.authHeader,
+        WithdrawRequestBody(beneficiary = beneficiaryId, amount = amount, currency = currency)
+    ).wrapErrorMessage()
+
+    internal fun getOutstandingOrders(
         sessionToken: NabuSessionTokenResponse,
         pendingOnly: Boolean
-    ) = service.getBuyOrders(
+    ) = service.getOrders(
         sessionToken.authHeader,
         pendingOnly
     ).wrapErrorMessage()
@@ -444,7 +462,7 @@ class NabuService(retrofit: Retrofit) {
     fun getInterestAccountBalance(
         sessionToken: NabuSessionTokenResponse,
         currency: String
-    ) = service.getInterestAccountBalance(
+    ) = service.getInterestAccountDetails(
         authorization = sessionToken.authHeader,
         cryptoSymbol = currency
     ).flatMapMaybe {
@@ -452,6 +470,22 @@ class NabuService(retrofit: Retrofit) {
             200 -> Maybe.just(it.body())
             204 -> Maybe.empty()
             else -> Maybe.error(HttpException(it))
+        }
+    }.wrapErrorMessage()
+
+    fun getInterestAccountDetails(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAccountDetails(
+        authorization = sessionToken.authHeader,
+        cryptoSymbol = currency
+    ).flatMap {
+        when (it.code()) {
+            200 -> Single.just(it.body())
+            204 -> Single.just(
+                InterestAccountDetailsResponse("0", "0", "0")
+            )
+            else -> Single.error(HttpException(it))
         }
     }.wrapErrorMessage()
 

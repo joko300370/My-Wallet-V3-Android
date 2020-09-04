@@ -1,11 +1,13 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
+import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -22,8 +24,14 @@ internal class BtcCryptoWalletAccount(
     override val label: String,
     private val address: String,
     override val isDefault: Boolean = false,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    private val networkParameters: NetworkParameters,
+    // TEMP keep a copy of the metadata account, for interop with the old send flow
+    // this can and will be removed when BTC is moved over and has a on-chain
+    // TransactionProcessor defined;
+    val internalAccount: JsonSerializableAccount
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
+
     private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
@@ -45,7 +53,7 @@ internal class BtcCryptoWalletAccount(
             payloadManager.getAccount(payloadManager.defaultAccountIndex)
         ).singleOrError()
             .map {
-                BtcAddress(it, label)
+                BtcAddress(it, label, networkParameters)
             }
 
     override val activity: Single<ActivitySummaryList>
@@ -70,24 +78,30 @@ internal class BtcCryptoWalletAccount(
         jsonAccount: Account,
         payloadManager: PayloadDataManager,
         isDefault: Boolean = false,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        networkParameters: NetworkParameters
     ) : this(
         payloadManager,
         jsonAccount.label,
         jsonAccount.xpub,
         isDefault,
-        exchangeRates
+        exchangeRates,
+        networkParameters,
+        jsonAccount
     )
 
     constructor(
         legacyAccount: LegacyAddress,
         payloadManager: PayloadDataManager,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        networkParameters: NetworkParameters
     ) : this(
         payloadManager,
         legacyAccount.label ?: legacyAccount.address,
         legacyAccount.address,
         false,
-        exchangeRates
+        exchangeRates,
+        networkParameters,
+        legacyAccount
     )
 }

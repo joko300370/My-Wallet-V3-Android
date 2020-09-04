@@ -40,10 +40,11 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.R
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.android.ui.send.SendView
-import piuk.blockchain.android.ui.send.SendConfirmationDetails
+import piuk.blockchain.android.ui.transfer.send.activity.SendConfirmationDetails
+import piuk.blockchain.android.ui.transfer.send.activity.SendView
+import piuk.blockchain.android.ui.transfer.send.activity.strategy.ResourceSendFundsResultLocalizer
+import piuk.blockchain.android.ui.transfer.send.activity.strategy.XlmSendStrategy
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -59,11 +60,6 @@ class XlmSendPresenterStrategyTest {
         ioTrampoline()
         computation(testScheduler)
     }
-
-    private val currencyState: CurrencyState = mock {
-            on { cryptoCurrency } itReturns CryptoCurrency.XLM
-            on { fiatUnit } itReturns TEST_FIAT
-        }
 
     private val nabuDataManager: NabuDataManager =
         mock {
@@ -121,7 +117,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -152,7 +147,6 @@ class XlmSendPresenterStrategyTest {
         val view = TestSendView()
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(AccountReference.Xlm("The Xlm account", ""))
                 on { getMaxSpendableAfterFees(FeeType.Regular) } `it returns` Single.just(150.lumens())
@@ -179,38 +173,6 @@ class XlmSendPresenterStrategyTest {
     }
 
     @Test
-    fun `on selectDefaultOrFirstFundedSendingAccount, it updates the address`() {
-
-        val view = TestSendView()
-
-        XlmSendStrategy(
-            currencyState = currencyState,
-            xlmDataManager = mock {
-                on { defaultAccount() } `it returns` Single.just(
-                    AccountReference.Xlm("The Xlm account", "")
-                )
-            },
-            xlmFeesFetcher = mock {
-                on { operationFee(FeeType.Regular) } `it returns` Single.just(999.stroops())
-            },
-            xlmTransactionSender = mock(),
-            walletOptionsDataManager = mock(),
-            exchangeRates = exchangeRates,
-            sendFundsResultLocalizer = mock(),
-            stringUtils = stringUtils,
-            nabuToken = nabuToken,
-            pitLinking = pitLinked,
-            analytics = mock(),
-            nabuDataManager = nabuDataManager,
-            prefs = prefs
-        ).apply {
-            attachView(view)
-        }.selectDefaultOrFirstFundedSendingAccount()
-        verify(view.mock).updateSendingAddress("The Xlm account")
-        verify(view.mock).updateFeeAmount(999.stroops(), 0.0.usd())
-    }
-
-    @Test
     fun `on onContinueClicked, it takes the address from the view, latest value and displays the send details`() {
         val view = TestSendView()
         val result = SendFundsResult(
@@ -230,7 +192,6 @@ class XlmSendPresenterStrategyTest {
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -297,7 +258,6 @@ class XlmSendPresenterStrategyTest {
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -352,7 +312,6 @@ class XlmSendPresenterStrategyTest {
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -409,7 +368,6 @@ class XlmSendPresenterStrategyTest {
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -466,7 +424,6 @@ class XlmSendPresenterStrategyTest {
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -532,7 +489,6 @@ class XlmSendPresenterStrategyTest {
             on { dryRunSendFunds(any()) } `it returns` Single.just(result)
         }
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm(
@@ -593,7 +549,6 @@ class XlmSendPresenterStrategyTest {
             on { dryRunSendFunds(any()) } `it returns` Single.error(Exception("Failure"))
         }
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm(
@@ -650,7 +605,6 @@ class XlmSendPresenterStrategyTest {
     fun `handle address scan valid address`() {
         val view = TestSendView()
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm(
@@ -685,7 +639,6 @@ class XlmSendPresenterStrategyTest {
     fun `handle address scan valid uri`() {
         val view = TestSendView()
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm(
@@ -740,7 +693,6 @@ class XlmSendPresenterStrategyTest {
         }
         val xlmAccountRef = AccountReference.Xlm("The Xlm account", "")
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     xlmAccountRef
@@ -824,7 +776,6 @@ class XlmSendPresenterStrategyTest {
             on { dryRunSendFunds(any()) } `it returns` Single.just(result)
         }
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = mock {
                 on { defaultAccount() } `it returns` Single.just(
                     AccountReference.Xlm(
@@ -892,7 +843,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         val strategy = XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -937,7 +887,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         val strategy = XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -982,7 +931,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -1029,7 +977,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -1083,7 +1030,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),
@@ -1131,7 +1077,6 @@ class XlmSendPresenterStrategyTest {
         }
 
         XlmSendStrategy(
-            currencyState = currencyState,
             xlmDataManager = dataManager,
             xlmFeesFetcher = feesFetcher,
             xlmTransactionSender = mock(),

@@ -14,7 +14,7 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
-import kotlinx.android.synthetic.main.fragment_simple_buy_checkout.*
+import kotlinx.android.synthetic.main.fragment_checkout.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -42,7 +42,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_simple_buy_checkout)
+    ) = container?.inflate(R.layout.fragment_checkout)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -235,7 +235,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     private fun paymentMethodLabel(selectedPaymentMethod: SelectedPaymentMethod, fiatCurrency: String): String =
         when (selectedPaymentMethod.paymentMethodType) {
             PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
-            PaymentMethodType.FUNDS -> getString(R.string.checkout_funds_transfer_label, fiatCurrency)
+            PaymentMethodType.FUNDS -> getString(R.string.currency_funds_wallet, fiatCurrency)
             else -> selectedPaymentMethod.label ?: ""
         }
 

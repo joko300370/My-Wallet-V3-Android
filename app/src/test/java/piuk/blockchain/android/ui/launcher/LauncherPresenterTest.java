@@ -150,7 +150,7 @@ public class LauncherPresenterTest {
         // Act
         subject.onViewReady();
         // Assert
-        verify(launcherActivity).onStartMainActivity(null);
+        verify(launcherActivity).onStartMainActivity(null, false);
     }
 
     /**
@@ -220,7 +220,7 @@ public class LauncherPresenterTest {
         subject.onViewReady();
         // Assert
         verify(prefsUtil).setValue(PersistentPrefs.KEY_SCHEME_URL, "bitcoin uri");
-        verify(launcherActivity).onStartMainActivity(null);
+        verify(launcherActivity).onStartMainActivity(null, false);
     }
 
     /**
@@ -276,7 +276,7 @@ public class LauncherPresenterTest {
         subject.onViewReady();
         // Assert
         verify(accessState).setLoggedIn(true);
-        verify(launcherActivity).onStartMainActivity(null);
+        verify(launcherActivity).onStartMainActivity(null, false);
     }
 
     /**

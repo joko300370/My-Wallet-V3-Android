@@ -829,25 +829,10 @@
     <string name="ether">Ether</string>
     <string name="bitcoin">Bitcoin</string>
 
-    <string name="eth_to_field_helper">Enter ETH address or select</string>
-    <string name="eth_to_field_helper_no_dropdown">Enter ether address</string>
-    <string name="eth_invalid_address">Invalid Ether address</string>
-    <string name="eth_support_contract_not_allowed">Contract addresses are not supported.</string>
-    <string name="eth_support_only_eth">At the moment we only support ETH - you cannot receive
-        tokens to this address
-    </string>
-    <string name="eth_unconfirmed_wait">Please wait until your previous transaction confirms
-    </string>
-    <string name="eth_transaction_complete">Transaction complete! Your transactions and balance will
-        update soon, this can take a few minutes.\n
-    </string>
-
     <!-- PAX/ERC 20 -->
     <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>
-    <string name="pax_to_field_helper_1">Enter USD-D/ETH address or select</string>
     <string name="pax_invalid_address_1">Invalid USD-D address</string>
     <string name="usdt_to_field_helper_no_dropdown_1">Enter TETHER/ETH address</string>
-    <string name="usdt_to_field_helper_1">Enter TETHER/ETH address or select</string>
     <string name="usdt_invalid_address_1">Invalid TETHER address</string>
 
     <!-- DASHBOARD -->
@@ -1176,6 +1161,21 @@
     <string name="kyc_airdrop_card_title">Want Free Crypto?</string>
     <string name="kyc_airdrop_card_body">Verify your identity to participate in our Airdrop program and receive free crypto from future Airdrops.</string>
     <string name="kyc_airdrop_card_cta">Start Verification</string>
+
+    <!-- Algorand announcement -->
+    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
+    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
+    <string name="algorand_announcement_action">Buy Algorand</string>
+
+    <!-- Tether announcement -->
+    <string name="tether_announcement_title">Say Hello to Tether!</string>
+    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
+    <string name="tether_announcement_action">Buy Tether Now</string>
+
+    <!-- Interest announcement -->
+    <string name="interest_announcement_title">Earn interest on your crypto today!</string>
+    <string name="interest_announcement_description">Transfer Crypto and start earning Interest on BTC, ETH and many more.</string>
+    <string name="interest_announcement_action">Learn More</string>
 
     <!-- Airdrop Status bottom sheet -->
     <string name="airdrop_received_sheet_heading">Airdrop</string>
@@ -1651,6 +1651,7 @@
     <string name="purchase_card_note_1">Your final amount might change due to market activity. An initial hold period of 7 days will be applied to your funds.</string>
     <string name="complete_payment">Complete Payment</string>
     <string name="buy_crypto">Buy %1$s</string>
+    <string name="buy_any_crypto">Buy Crypto</string>
     <string name="kyc_verifying_info">Verifying your information</string>
     <string name="kyc_verifying_time_info">Usually takes less than a minute.</string>
     <string name="kyc_verifying_manual_review_required_info">You’ve successfully submitted your application. A Blockchain Support Member will review your information.</string>
@@ -1764,6 +1765,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
+    <string name="currency_funds_wallet">My %1s Wallet</string>
     <string name="checkout_funds_label">Funds</string>
     <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
@@ -1850,8 +1852,14 @@
     <string name="most_popular">Most Popular</string>
 
     <!-- Fiat Funds -->
+    <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
+    <string name="fiat_funds_detail_withdraw_details">Cashout to Your Bank</string>
+    <string name="withdraw_currency">Withdraw %1$s</string>
+    <string name="withdraw_title">Withdraw</string>
+    <string name="withdraw_to">Withdraw to</string>
+    <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
     <string name="fiat_funds_no_kyc_announcement_title">Keep Cash in Your Wallet</string>
@@ -1870,32 +1878,34 @@
     <string name="fiat_funds_kyc_announcement_description">Hold cash in your Blockchain.com Wallet. Deposit and Withdraw at anytime.</string>
     <string name="fiat_funds_kyc_announcement_action">Link a Bank</string>
     <string name="transfer_wallet_buy_crypto">Buy Crypto</string>
-    <string name="transfer_send_crypto">Send crypto</string>
-    <string name="transfer_receive_crypto">Receive crypto</string>
+    <string name="transfer_send_crypto_title">Send Crypto</string>
+    <string name="transfer_send_crypto_label">Select the Wallet you want to send from.</string>
+    <string name="transfer_receive_crypto_title">Receive Crypto</string>
+    <string name="transfer_receive_crypto_label">Select a Wallet to receive crypto to.</string>
     <string name="transfer_second_pswd_title">2nd Password</string>
     <string name="transfer_second_pswd_desc">Please enter your 2nd password, you will then be able to continue sending.</string>
     <string name="transfer_second_pswd_hint">2nd password</string>
 
-    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
-    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
-    <string name="algorand_announcement_action">Buy Algorand</string>
+    <string name="withdraw_amount">Withdraw %1$s</string>
+    <string name="withdrawal_amount">%1$s Withdrawal</string>
+    <string name="withdrawing_amount">Withdrawing %1$s</string>
+    <string name="withdrawing_amount_message">We\'re completing your withdrawal now.</string>
+    <string name="withdrawal_success_message">Succeess! We\'re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
     <string name="currency_wallet">My %1s Wallet</string>
 
-    <string name="tether_announcement_title">Say Hello to Tether!</string>
-    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
-    <string name="tether_announcement_action">Buy Tether Now</string>
-    
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
     <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
-    <string name="send_select_target_title">Destination</string>
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
     <string name="send_enter_amount_title">Send %1$s</string>
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
+    <string name="sell_enter_amount_max">Sell Max</string>
+    <string name="sell_enter_amount_min_error">%1$s Min</string>
+    <string name="sell_enter_amount_max_error">%1$s Max</string>
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_confirmation_title">Send %1$s</string>
@@ -1906,6 +1916,10 @@
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_add_note_success">Note successfully added</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
+    <string name="sell_confirmation_cta_button">Sell %1$s</string>
+    <string name="sell_confirmation_progress_title">Selling %1$s</string>
+    <string name="sell_confirmation_progress_message">We\'re completing your sell now.</string>
+    <string name="sell_confirmation_success_message">Your cash is now available in your %1$s Wallet.</string>
     <string name="send_confirmation_deposit_cta_button">Confirm Transfer</string>
     <string name="send_confirmation_interest_tos_pp">I have read and agree to the <annotation link="interest_tos">Terms of Service</annotation> &amp; <annotation link="interest_pp">Privacy Policy</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">By accepting this, you agree to transfer&#160;</string>
@@ -1917,10 +1931,12 @@
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
+    <string name="send_state_locked_funds">Your funds will be available within 7 days</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
     <string name="send_progress_sending_title">Sending %1$s</string>
     <string name="send_progress_sending_subtitle">We\'re sending your transaction now.</string>
     <string name="send_progress_complete_title">%1$s Sent</string>
+    <string name="sell_progress_complete_title">%1$s Sold</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
     <string name="send_progress_error_title">Oops! Something Went Wrong.</string>
     <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
@@ -1935,8 +1951,58 @@
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
-    <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %1$s Trade Wallet to your Vault Wallets. Once %1$s is in your Vault Wallet you can transfer to external addresses.</string>
+    <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %2$s Trading Wallet to your %2$s Wallets. Once %1$s is in your %2$s Wallet you can transfer to external addresses.</string>
+
+    <!-- Interest -->
+    <string name="earn_interest">Earn Interest</string>
+    <string name="interest_summary_total">Total Interest Earned</string>
+    <string name="interest_summary_total_fail">Unable to load total interest</string>
+    <string name="interest_summary_next_payment">Next Interest Payment</string>
+    <string name="interest_summary_accrued">Accrued Interest This Month</string>
+    <string name="interest_summary_accrued_fail">Unable to load accrued interest</string>
+    <string name="interest_summary_hold_period">Initial Hold Period</string>
+    <string name="interest_summary_hold_period_days">%1$f Days</string>
+    <string name="interest_summary_hold_period_fail">Unable to load holding period details</string>
+    <string name="interest_summary_rate">Interest Rate</string>
+    <string name="interest_summary_rate_fail">Unable to load interest rate</string>
+    <string name="interest_dashboard_title">Interest Account</string>
+    <string name="interest_dashboard_item_balance_title">%1$s Balance</string>
+    <string name="interest_dashboard_item_accrued_title">Total Interest Earned</string>
+    <string name="interest_dashboard_item_action_earn">Earn Interest</string>
+    <string name="interest_dashboard_item_action_view">View</string>
+    <string name="interest_dashboard_item_rate_1">Earn up to&#160;</string>
+    <string name="interest_dashboard_item_rate_2">&#160;annually on your %1$s</string>
+    <string name="interest_dashboard_verify_title">Earn Interest on Your Crypto</string>
+    <string name="interest_dashboard_verify_label">Earn up to 12%% instantly when you transfer crypto to your Interest Account.</string>
+    <string name="interest_dashboard_verify_point_one_title">Verify Your Identity</string>
+    <string name="interest_dashboard_verify_point_one_label">To prevent identity theft or fraud, we\'ll need to make sure it\'s really you by uploading an ID.</string>
+    <string name="interest_dashboard_verify_point_two_title">Buy Crypto</string>
+    <string name="interest_dashboard_verify_point_two_label">Use your Bank, Debit or Credit card to fund any crypto purchase.</string>
+    <string name="interest_dashboard_verify_point_three_title">Earn Interest</string>
+    <string name="interest_dashboard_verify_point_three_label">Transfer to your Interest Account and get monthly Interest Payments.</string>
+    <string name="interest_summary_disclaimer_label">Use the Web wallet to withdraw your funds</string>
+
+    <string name="buy">Buy</string>
+    <string name="sell">Sell</string>
+    <string name="buy_and_sell">Buy &amp; Sell</string>
+    <string name="buy_with_cash">Buy with Cash or Card.</string>
+    <string name="select_crypto_you_want">Select the crypto you want to buy.</string>
+    <string name="sell_intro_kyc_title_1">Verify Your Identity</string>
+    <string name="sell_intro_kyc_subtitle_1">To prevent identity theft or fraud, we’ll need a make sure it’s really you by uploading an ID.</string>
+    <string name="sell_intro_kyc_title_2">Buy Crypto</string>
+    <string name="sell_intro_kyc_subtitle_2">Use your Bank, Debit or Credit card to fund any crypto buy.</string>
+    <string name="sell_intro_kyc_title_3">Sell at Anytime</string>
+    <string name="sell_intro_kyc_subtitle_3">Instantly sell your crypto for cash. Keep the cash in your wallet or withdraw to a linked bank.</string>
+    <string name="sell_crypto">Sell Crypto</string>
+    <string name="sell_crypto_subtitle">Verify your identity to sell crypto for cash.</string>
+    <string name="sell_for_cash">Sell Crypto for Cash</string>
+    <string name="select_wallet_to_sell">Select a wallet to sell from.</string>
+    <string name="common_to_coloned">To:</string>
+    <string name="common_from_coloned">From:</string>
+    <string name="common_sell">Sell</string>
+    <string name="sell_quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
+    <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>
     <string name="could_not_save_card">We could not save your card. Please contact support.</string>
     <string name="could_not_activate_card">We could not activate your card. Please contact support.</string>
     <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>

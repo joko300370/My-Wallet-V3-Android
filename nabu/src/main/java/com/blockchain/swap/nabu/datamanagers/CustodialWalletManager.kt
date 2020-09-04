@@ -7,11 +7,12 @@ import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -47,25 +48,31 @@ interface CustodialWalletManager {
         crypto: CryptoCurrency
     ): Maybe<CryptoValue>
 
-    fun getBuyLimitsAndSupportedCryptoCurrencies(
-        nabuOfflineTokenResponse: NabuOfflineTokenResponse,
+    fun getSupportedBuySellCryptoCurrencies(
         fiatCurrency: String
-    ): Single<SimpleBuyPairs>
+    ): Single<BuySellPairs>
 
-    fun getSupportedFiatCurrencies(
-        nabuOfflineTokenResponse: NabuOfflineTokenResponse
-    ): Single<List<String>>
+    fun getSupportedFiatCurrencies(): Single<List<String>>
 
-    fun getQuote(action: String, crypto: CryptoCurrency, amount: FiatValue): Single<Quote>
+    fun getQuote(
+        cryptoCurrency: CryptoCurrency,
+        fiatCurrency: String,
+        action: String,
+        currency: String,
+        amount: String
+    ): Single<Quote>
+
+    fun fetchWithdrawFee(currency: String): Single<FiatValue>
 
     fun createOrder(
-        cryptoCurrency: CryptoCurrency,
-        amount: FiatValue,
-        action: String,
-        paymentMethodId: String? = null,
-        paymentMethodType: PaymentMethodType,
+        custodialWalletOrder: CustodialWalletOrder,
         stateAction: String? = null
-    ): Single<BuyOrder>
+    ): Single<BuySellOrder>
+
+    fun createWithdrawOrder(
+        amount: FiatValue,
+        currency: String
+    ): Completable
 
     fun getPredefinedAmounts(
         currency: String
@@ -87,9 +94,12 @@ interface CustodialWalletManager {
 
     fun getOutstandingBuyOrders(crypto: CryptoCurrency): Single<BuyOrderList>
     fun getAllOutstandingBuyOrders(): Single<BuyOrderList>
+
+    fun getAllOutstandingOrders(): Single<List<BuySellOrder>>
+
     fun getAllBuyOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
 
-    fun getBuyOrder(orderId: String): Single<BuyOrder>
+    fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
     fun deleteBuyOrder(orderId: String): Completable
 
@@ -100,7 +110,7 @@ interface CustodialWalletManager {
     fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String>
 
     // For test/dev
-    fun cancelAllPendingBuys(): Completable
+    fun cancelAllPendingOrders(): Completable
 
     fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
 
@@ -121,9 +131,11 @@ interface CustodialWalletManager {
         states: List<CardStatus>
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
-    fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?): Single<BuyOrder>
+    fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?): Single<BuySellOrder>
 
-    fun getInterestAccountDetails(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+
+    fun getInterestAccountDetails(crypto: CryptoCurrency): Single<InterestAccountDetails?>
 
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
 
@@ -134,6 +146,8 @@ interface CustodialWalletManager {
     fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits>
 
     fun getInterestEnabledForAsset(crypto: CryptoCurrency): Single<Boolean>
+
+    fun getInterestEnabledAssets(): Single<List<CryptoCurrency>>
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
@@ -184,7 +198,13 @@ enum class InterestState {
     UNKNOWN
 }
 
-data class BuyOrder(
+data class InterestAccountDetails(
+    val balance: CryptoValue,
+    val pendingInterest: CryptoValue,
+    val totalInterest: CryptoValue
+)
+
+data class BuySellOrder(
     val id: String,
     val pair: String,
     val fiat: FiatValue,
@@ -197,20 +217,20 @@ data class BuyOrder(
     val created: Date = Date(),
     val fee: FiatValue? = null,
     val price: FiatValue? = null,
-    val orderValue: CryptoValue? = null,
+    val orderValue: Money? = null,
     val attributes: CardPaymentAttributes? = null
 )
 
-typealias BuyOrderList = List<BuyOrder>
+typealias BuyOrderList = List<BuySellOrder>
 
-data class OrderInput(private val symbol: String, private val amount: String)
+data class OrderInput(private val symbol: String, private val amount: String? = null)
 
-data class OrderOutput(private val symbol: String)
+data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
 data class LinkedBank(
     val id: String,
     val title: String,
-    private val account: String,
+    val account: String,
     val currency: String
 ) : Serializable {
 
@@ -238,15 +258,15 @@ enum class TransactionState {
     UNKNOWN
 }
 
-data class SimpleBuyPairs(val pairs: List<SimpleBuyPair>)
+data class BuySellPairs(val pairs: List<BuySellPair>)
 
-data class SimpleBuyPair(private val pair: String, val buyLimits: BuyLimits) {
+data class BuySellPair(private val pair: String, val buyLimits: BuySellLimits, val sellLimits: BuySellLimits) {
     val cryptoCurrency: CryptoCurrency
         get() = CryptoCurrency.values().first { it.networkTicker == pair.split("-")[0] }
     val fiatCurrency: String = pair.split("-")[1]
 }
 
-data class BuyLimits(private val min: Long, private val max: Long) {
+data class BuySellLimits(private val min: Long, private val max: Long) {
     fun minLimit(currency: String): FiatValue = FiatValue.fromMinor(currency, min)
     fun maxLimit(currency: String): FiatValue = FiatValue.fromMinor(currency, max)
 }

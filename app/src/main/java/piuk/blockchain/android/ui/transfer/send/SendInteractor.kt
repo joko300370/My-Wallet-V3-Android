@@ -19,14 +19,18 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import timber.log.Timber
-import java.lang.IllegalStateException
 
 class SendInteractor(
     private val coincore: Coincore,
     private val currencyPrefs: CurrencyPrefs,
     private val addressFactory: AddressFactory
 ) {
-    private lateinit var transactionProcessor: TransactionProcessor
+    private var transactionProcessor: TransactionProcessor? = null
+
+    fun invalidateTransaction() =
+        Completable.fromAction {
+            transactionProcessor = null
+        }
 
     fun validatePassword(password: String): Single<Boolean> =
         Single.just(coincore.validateSecondPassword(password))
@@ -52,7 +56,7 @@ class SendInteractor(
         sourceAccount.createSendProcessor(targetAddress)
             .doOnSubscribe { Timber.e("!SEND!> SUBSCRIBE") }
             .doOnSuccess {
-                if (::transactionProcessor.isInitialized)
+                if (transactionProcessor != null)
                     throw IllegalStateException("TxProcessor double init")
             }
             .doOnSuccess { transactionProcessor = it }
@@ -63,26 +67,27 @@ class SendInteractor(
             }
 
     val canTransactFiat: Boolean
-        get() = transactionProcessor.canTransactFiat
+        get() = transactionProcessor?.canTransactFiat ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun updateTransactionAmount(amount: Money): Completable =
-        transactionProcessor.updateAmount(amount)
+        transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun verifyAndExecute(): Completable =
-        transactionProcessor.execute()
+        transactionProcessor?.execute() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun modifyOptionValue(newOption: TxOptionValue): Completable =
-        transactionProcessor.setOption(newOption)
+        transactionProcessor?.setOption(newOption) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
-        transactionProcessor.userExchangeRate(currencyPrefs.selectedFiatCurrency)
-            .map { it as ExchangeRate.CryptoToFiat }
+        transactionProcessor?.userExchangeRate(currencyPrefs.selectedFiatCurrency)
+            ?.map { it as ExchangeRate.CryptoToFiat }
+            ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
-        transactionProcessor.targetExchangeRate()
+        transactionProcessor?.targetExchangeRate() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun validateTransaction(): Completable =
-        transactionProcessor.validateAll()
+        transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
 }
 
 private val Throwable.isUnexpectedContractError

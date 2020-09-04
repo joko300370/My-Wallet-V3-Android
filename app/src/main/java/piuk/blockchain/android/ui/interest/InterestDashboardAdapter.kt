@@ -1,0 +1,33 @@
+package piuk.blockchain.android.ui.interest
+
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import info.blockchain.balance.CryptoCurrency
+import io.reactivex.disposables.CompositeDisposable
+import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
+import piuk.blockchain.android.ui.adapters.DelegationAdapter
+
+class InterestDashboardAdapter(
+    disposables: CompositeDisposable,
+    custodialWalletManager: CustodialWalletManager,
+    verificationClicked: () -> Unit,
+    itemClicked: (CryptoCurrency, Boolean) -> Unit
+) :
+    DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
+
+    init {
+        // Add all necessary AdapterDelegate objects here
+        with(delegatesManager) {
+            addAdapterDelegate(
+                InterestDashboardAssetItem(disposables, custodialWalletManager, itemClicked))
+            addAdapterDelegate(InterestDashboardVerificationItem(verificationClicked))
+        }
+    }
+}
+
+sealed class InterestDashboardItem
+
+object InterestIdentityVerificationItem : InterestDashboardItem()
+class InterestAssetInfoItem(
+    val isKyc: Boolean,
+    val cryptoCurrency: CryptoCurrency
+) : InterestDashboardItem()

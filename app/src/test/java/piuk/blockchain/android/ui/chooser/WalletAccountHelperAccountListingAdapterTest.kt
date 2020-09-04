@@ -8,7 +8,6 @@ import com.blockchain.testutils.lumens
 import com.blockchain.ui.chooser.AccountChooserItem
 import com.blockchain.ui.chooser.AccountListing
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
@@ -18,20 +17,14 @@ import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.android.ui.account.WalletAccountHelperAccountListingAdapter
 import java.util.Locale
 
 class WalletAccountHelperAccountListingAdapterTest {
 
-    private val currencyState: CurrencyState = mock()
-    private val exchangeRates: ExchangeRateDataManager = mock()
-
     @Before
     fun setup() {
         Locale.setDefault(Locale.US)
-        whenever(currencyState.displayMode).thenReturn(CurrencyState.DisplayMode.Crypto)
     }
 
     @Test
@@ -239,9 +232,7 @@ class WalletAccountHelperAccountListingAdapterTest {
 
     private fun givenAccountListing(walletAccountHelper: WalletAccountHelper): AccountListing =
         WalletAccountHelperAccountListingAdapter(
-            walletAccountHelper,
-            currencyState,
-            exchangeRates
+            walletAccountHelper
         )
 }
 

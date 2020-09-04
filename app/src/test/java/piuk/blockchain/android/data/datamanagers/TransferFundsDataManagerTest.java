@@ -23,7 +23,7 @@ import org.mockito.MockitoAnnotations;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.ui.account.ItemAccount;
-import piuk.blockchain.android.ui.send.PendingTransaction;
+import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.payments.SendDataManager;
 

@@ -1,11 +1,15 @@
 package piuk.blockchain.android.ui.transfer.send.flow.adapter
 
 import android.app.Activity
+import android.net.Uri
 import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.ui.urllinks.INTEREST_PRIVACY_POLICY
+import com.blockchain.ui.urllinks.INTEREST_TERMS_OF_SERVICE
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.copyable_text_form_item.*
 import kotlinx.android.synthetic.main.item_send_confirm_agreement_tcs.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxOption
@@ -21,10 +25,8 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
     private val stringUtils: StringUtils,
     private val activityContext: Activity
 ) : AdapterDelegate<T> {
-    override fun isForViewType(items: List<T>, position: Int): Boolean {
-        val item = items[position] as ConfirmItemType
-        return item is ConfirmAgreementWithLinksItem
-    }
+    override fun isForViewType(items: List<T>, position: Int): Boolean =
+        (items[position] as? TxOptionValue)?.option == TxOption.AGREEMENT_INTEREST_T_AND_C
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AgreementItemViewHolder(
@@ -36,7 +38,7 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementItemViewHolder).bind(
-        items[position] as ConfirmAgreementWithLinksItem,
+        items[position] as TxOptionValue.TxBooleanOption<Unit>,
         model,
         stringUtils,
         activityContext
@@ -51,31 +53,30 @@ private class AgreementItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        item: ConfirmAgreementWithLinksItem,
+        item: TxOptionValue.TxBooleanOption<Unit>,
         model: SendModel,
         stringUtils: StringUtils,
         activityContext: Activity
     ) {
 
+        val linksMap = mapOf<String, Uri>(
+            "interest_tos" to Uri.parse(INTEREST_TERMS_OF_SERVICE),
+            "interest_pp" to Uri.parse(INTEREST_PRIVACY_POLICY)
+        )
+
         itemView.confirm_details_checkbox_text.text = stringUtils.getStringWithMappedLinks(
-            item.mappedString,
-            item.uriMap,
+            R.string.send_confirmation_interest_tos_pp,
+            linksMap,
             activityContext
         )
 
         itemView.confirm_details_checkbox_text.movementMethod = LinkMovementMethod.getInstance()
 
-        val option = item.state.pendingTx?.getOption<TxOptionValue.TxBooleanOption>(
-            TxOption.AGREEMENT_INTEREST_T_AND_C)
+        itemView.confirm_details_checkbox.isChecked = item.value
 
-        itemView.confirm_details_checkbox.isChecked = option?.value ?: false
-
-        itemView.confirm_details_checkbox.isEnabled = true
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
+            model.process(SendIntent.ModifyTxOption(item.copy(value = isChecked)))
             view.isEnabled = false
-            option?.let {
-                model.process(SendIntent.ModifyTxOption(it.copy(value = isChecked)))
-            }
         }
     }
 }

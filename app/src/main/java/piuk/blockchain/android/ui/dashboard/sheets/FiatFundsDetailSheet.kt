@@ -31,6 +31,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     interface Host : SlidingModalBottomDialog.Host {
         fun depositFiat(account: FiatAccount)
         fun gotoActivityFor(account: BlockchainAccount)
+        fun withdrawFiat(currency: String)
         fun showFundsKyc()
     }
 
@@ -94,6 +95,11 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                         showErrorToast()
                     }
                 )
+
+            funds_withdraw_holder.setOnClickListener {
+                dismiss()
+                host.withdrawFiat(account.fiatCurrency)
+            }
 
             funds_activity_holder.setOnClickListener {
                 dismiss()

@@ -10,7 +10,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.bitcoinj.core.Address
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.send.strategy.removeBchUri
+import piuk.blockchain.android.ui.transfer.send.activity.strategy.removeBchUri
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager

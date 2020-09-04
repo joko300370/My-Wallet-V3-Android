@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/funds_kyc_sheet_indicator"
+        android:id="@+id/kyc_benefits_sheet_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/tiny_margin"
@@ -16,17 +16,17 @@
         app:srcCompat="@drawable/vector_sheet_indicator_small" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/funds_kyc_default_symbol"
+        android:id="@+id/kyc_benefits_default_symbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/very_small_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/funds_kyc_sheet_indicator"
+        app:layout_constraintTop_toBottomOf="@id/kyc_benefits_sheet_indicator"
         tools:src="@drawable/ic_vector_euro" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/funds_kyc_intro_title"
+        android:id="@+id/kyc_benefits_intro_title"
         style="@style/Text.Semibold.20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,27 +37,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/funds_kyc_default_symbol" />
+        app:layout_constraintTop_toBottomOf="@id/kyc_benefits_default_symbol" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/funds_kyc_intro_description"
+        android:id="@+id/kyc_benefits_intro_description"
         style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_margin"
-        android:paddingStart="@dimen/standard_margin"
-        android:paddingEnd="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/fiat_funds_no_kyc_sheet_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/funds_kyc_intro_title" />
+        app:layout_constraintTop_toBottomOf="@id/kyc_benefits_intro_title" />
 
     <View
-        android:id="@+id/funds_kyc_header_separator"
+        android:id="@+id/kyc_benefits_header_separator"
         style="@style/SeparatorWithoutMargins"
         android:layout_marginTop="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/funds_kyc_intro_description" />
+        app:layout_constraintTop_toBottomOf="@id/kyc_benefits_intro_description" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_benefits"
@@ -65,24 +65,24 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/standard_margin"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/funds_kyc_negative_action"
+        app:layout_constraintBottom_toTopOf="@+id/kyc_benefits_negative_action"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/funds_kyc_header_separator"
+        app:layout_constraintTop_toBottomOf="@id/kyc_benefits_header_separator"
         app:layout_goneMarginBottom="@dimen/standard_margin" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/funds_kyc_negative_action"
+        android:id="@+id/kyc_benefits_negative_action"
         style="@style/CtaButton.White"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/tiny_margin"
         android:text="@string/fiat_funds_no_kyc_negative_action"
-        app:layout_constraintBottom_toTopOf="@id/funds_kyc_positive_action"
+        app:layout_constraintBottom_toTopOf="@id/kyc_benefits_positive_action"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/funds_kyc_positive_action"
+        android:id="@+id/kyc_benefits_positive_action"
         style="@style/CtaButton.Blue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

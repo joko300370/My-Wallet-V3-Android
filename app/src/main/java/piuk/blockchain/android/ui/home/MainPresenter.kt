@@ -26,7 +26,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
@@ -38,6 +37,7 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -60,7 +60,6 @@ interface MainView : MvpView, HomeNavigator {
     fun hideProgressDialog()
     fun clearAllDynamicShortcuts()
     fun setPitEnabled(enabled: Boolean)
-    fun setSimpleBuyEnabled(enabled: Boolean)
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
@@ -78,7 +77,6 @@ class MainPresenter internal constructor(
     private val credentialsWiper: CredentialsWiper,
     private val payloadDataManager: PayloadDataManager,
     private val exchangeRateFactory: ExchangeRateDataManager,
-    private val currencyState: CurrencyState,
     private val environmentSettings: EnvironmentConfig,
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
@@ -93,6 +91,7 @@ class MainPresenter internal constructor(
     private val analytics: Analytics,
     private val simpleBuyAvailability: SimpleBuyAvailability,
     private val cacheCredentialsWiper: CacheCredentialsWiper,
+    private val appUtil: AppUtil,
     nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
 
@@ -106,12 +105,6 @@ class MainPresenter internal constructor(
         .fetchNabuToken()
         .flatMap {
             nabuDataManager.getUser(it)
-        }
-
-    internal var cryptoCurrency: CryptoCurrency
-        get() = currencyState.cryptoCurrency
-        set(v) {
-            currencyState.cryptoCurrency = v
         }
 
     override fun onViewAttached() {
@@ -130,18 +123,6 @@ class MainPresenter internal constructor(
 
             checkPitAvailability()
         }
-    }
-
-    private fun initSimpleBuyState() {
-        compositeDisposable +=
-            simpleBuyAvailability.isAvailable()
-                .doOnSubscribe { view?.setSimpleBuyEnabled(false) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        view?.setSimpleBuyEnabled(it)
-                    }
-                )
     }
 
     override fun onViewDetached() {}
@@ -170,7 +151,6 @@ class MainPresenter internal constructor(
 
     internal fun doTestnetCheck() {
         if (environmentSettings.environment == Environment.TESTNET) {
-            cryptoCurrency = CryptoCurrency.BTC
             view?.showTestnetWarning()
         }
     }
@@ -210,7 +190,6 @@ class MainPresenter internal constructor(
                 onComplete = {
                     checkKycStatus()
                     setDebugExchangeVisibility()
-                    initSimpleBuyState()
                     checkForPendingLinks()
                 },
                 onError = { throwable ->
@@ -375,17 +354,6 @@ class MainPresenter internal constructor(
 
     fun onThePitMenuClicked() {
         showThePitOrPitLinkingView("")
-    }
-
-    fun onSimpleBuyClicked() {
-        compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.showProgress()
-            }.doOnComplete {
-                view?.hideProgress()
-            }.subscribe {
-                view?.launchSimpleBuy()
-            }
     }
 
     private fun showThePitOrPitLinkingView(linkId: String) {

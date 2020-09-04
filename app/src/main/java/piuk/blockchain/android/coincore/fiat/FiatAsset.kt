@@ -71,7 +71,9 @@ class FiatAsset(
         }
 
     override fun transferList(account: SingleAccount): Single<SingleAccountList> =
-        Single.just(emptyList())
+        fetchFiatWallets().map {
+            it.accounts
+        }.toSingle(emptyList())
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()
 }

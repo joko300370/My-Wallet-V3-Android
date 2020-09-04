@@ -10,10 +10,8 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
-import java.lang.Exception
 
-private class CoincoreInitFailure(msg: String, e: Throwable)
-    : Exception(msg, e)
+private class CoincoreInitFailure(msg: String, e: Throwable) : Exception(msg, e)
 
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
@@ -55,9 +53,9 @@ class Coincore internal constructor(
                 it.accountGroup().map { grp -> grp.accounts }
             }
         ).reduce { a, l -> a + l }
-        .map { list ->
-            AllWalletsAccount(list, defaultLabels) as AccountGroup
-        }.toSingle()
+            .map { list ->
+                AllWalletsAccount(list, defaultLabels) as AccountGroup
+            }.toSingle()
 
     fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
     // We only support transfers between similar assets and (soon; to - but not from - fiat)
@@ -69,12 +67,18 @@ class Coincore internal constructor(
             crypto + fiat
         }
 
+    // It should be a fixed ID, really. And not a label. Since labels can be edited. TODO
+    fun findAccountByName(name: String): Single<SingleAccount> =
+        allWallets().map { it.accounts }
+            .map {
+                it.firstOrNull { it.label == name } ?: throw NoSuchElementException("Account not found")
+            }
+
     fun findAccountByAddress(
         cryptoCurrency: CryptoCurrency,
         address: String
     ): Maybe<SingleAccount> =
-        filterAccountsByAddress(assetMap.getValue(cryptoCurrency).accountGroup(AssetFilter.All),
-            address)
+        filterAccountsByAddress(assetMap.getValue(cryptoCurrency).accountGroup(AssetFilter.All), address)
 
     private fun filterAccountsByAddress(
         accountGroup: Maybe<AccountGroup>,

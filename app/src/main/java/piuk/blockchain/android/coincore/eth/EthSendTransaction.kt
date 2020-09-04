@@ -35,10 +35,10 @@ open class EthSendTransaction(
     sendTarget: CryptoAddress,
     requireSecondPassword: Boolean
 ) : OnChainTxProcessorBase(
-        sendingAccount,
-        sendTarget,
-        exchangeRates,
-        requireSecondPassword
+    sendingAccount,
+    sendTarget,
+    exchangeRates,
+    requireSecondPassword
 ) {
     init {
         require(asset == CryptoCurrency.ETHER)
@@ -53,13 +53,19 @@ open class EthSendTransaction(
                 available = CryptoValue.ZeroEth,
                 fees = CryptoValue.ZeroEth,
                 feeLevel = FeeLevel.Regular,
-                options = setOf(
-                    TxOptionValue.TxTextOption(
-                        option = TxOption.DESCRIPTION
-                    )
-                )
+                selectedFiat = userFiat
             )
         )
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            pendingTx.copy(options = listOf(
+                TxOptionValue.From(from = sendingAccount.label),
+                TxOptionValue.To(to = sendTarget.label),
+                TxOptionValue.Fee(fee = pendingTx.fees),
+                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees),
+                TxOptionValue.Description()
+            )))
 
     private fun absoluteFee(): Single<CryptoValue> =
         feeOptions().map {
@@ -111,11 +117,11 @@ open class EthSendTransaction(
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-            .doOnSuccess { hash ->
-                pendingTx.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)?.let { notes ->
+            .flatMapCompletable { hash ->
+                pendingTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let { notes ->
                     ethDataManager.updateErc20TransactionNotes(hash, notes.text)
-                }
-            }.ignoreElement()
+                } ?: Completable.complete()
+            }
 
     private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> {
         require(sendTarget is CryptoAddress)

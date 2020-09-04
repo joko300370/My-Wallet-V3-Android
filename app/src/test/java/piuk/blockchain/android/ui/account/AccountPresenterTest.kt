@@ -37,15 +37,13 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
-import piuk.blockchain.android.ui.send.PendingTransaction
+import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -70,9 +68,7 @@ class AccountPresenterTest {
     private val appUtil: AppUtil = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val privateKeyFactory = PrivateKeyFactory()
-    private val currencyState: CurrencyState = mock()
     private val coinsWebSocketStrategy: CoinsWebSocketStrategy = mock()
-    private val exchangeRates: ExchangeRateDataManager = mock()
 
     @Before
     fun setUp() {
@@ -87,16 +83,12 @@ class AccountPresenterTest {
             appUtil,
             privateKeyFactory,
             environmentSettings,
-            currencyState,
             mock(),
-            coinsWebSocketStrategy,
-            exchangeRates
+            coinsWebSocketStrategy
         )
 
         subject.initView(activity)
         whenever(activity.locale).thenReturn(Locale.US)
-        // TODO: This is cheating for now to ensure all tests pass
-        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
 
         // TODO: These will break things when fully testing onViewReady()
         val btcAccount = Account().apply {
@@ -469,10 +461,6 @@ class AccountPresenterTest {
             .thenReturn(Observable.just(legacyAddress))
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
             .thenReturn(Observable.empty())
-
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
-        whenever(currencyState.displayMode).thenReturn(CurrencyState.DisplayMode.Crypto)
-        whenever(currencyState.isDisplayingCryptoCurrency).thenReturn(true)
 
         // Act
         subject.handlePrivateKey(mockECKey, null)

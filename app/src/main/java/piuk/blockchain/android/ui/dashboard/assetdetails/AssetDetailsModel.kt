@@ -27,7 +27,8 @@ data class AssetDetailsState(
     val errorState: AssetDetailsError = AssetDetailsError.NONE,
     val hostAction: AssetAction? = null,
     val selectedAccountCryptoBalance: Money? = null,
-    val selectedAccountFiatBalance: Money? = null
+    val selectedAccountFiatBalance: Money? = null,
+    val navigateToInterestDashboard: Boolean = false
 ) : MviState
 
 enum class AssetDetailsError {
@@ -97,7 +98,8 @@ class AssetDetailsModel(
             is ReturnToPreviousStep,
             is ClearSheetDataIntent,
             is CustodialSheetFinished,
-            is TransactionInFlight -> null
+            is TransactionInFlight,
+            is ShowInterestDashboard -> null
         }
     }
 

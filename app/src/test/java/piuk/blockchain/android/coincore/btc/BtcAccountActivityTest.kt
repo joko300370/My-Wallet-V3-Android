@@ -6,23 +6,22 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Single
+import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigInteger
 
 class BtcAccountActivityTest {
 
-    private val currencyState: CurrencyState = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val networkParameters: NetworkParameters = mock()
 
     private val subject =
         BtcCryptoWalletAccount(
@@ -30,7 +29,9 @@ class BtcAccountActivityTest {
             address = "",
             payloadManager = payloadDataManager,
             isDefault = true,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            networkParameters = networkParameters,
+            internalAccount = mock()
         )
 
     @get:Rule
@@ -43,7 +44,6 @@ class BtcAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
     }
 
     @Test

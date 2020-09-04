@@ -11,7 +11,6 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS
 import piuk.blockchain.android.coincore.CryptoAddress
@@ -74,20 +73,17 @@ internal class EthAsset(
 
     @CommonCode("Exists in UsdtAsset and PaxAsset")
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
-        Singles.zip(
-            Single.just(isValidAddress(address)),
-            ethDataManager.isContractAddress(address)
-        ) { isValid, isContract ->
-                when {
-                    isContract -> throw AddressParseError(ETH_UNEXPECTED_CONTRACT_ADDRESS)
-                    isValid -> address
-                    else -> ""
+        Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
+            if (isValid) {
+                ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
+                    if (isContract) {
+                        throw AddressParseError(ETH_UNEXPECTED_CONTRACT_ADDRESS)
+                    } else {
+                        Maybe.just(EthAddress(address))
+                    }
                 }
-        }.flatMapMaybe { a ->
-            if (a.isEmpty()) {
-                Maybe.empty<ReceiveAddress>()
             } else {
-                Maybe.just(EthAddress(address))
+                Maybe.empty<ReceiveAddress>()
             }
         }
 

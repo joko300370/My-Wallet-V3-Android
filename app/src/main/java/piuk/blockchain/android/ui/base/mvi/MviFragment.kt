@@ -66,15 +66,19 @@ abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> :
 
     @UiThread
     fun showBottomSheet(bottomSheet: BottomSheetDialogFragment?) =
-        bottomSheet?.show(childFragmentManager, "BOTTOM_SHEET")
+        bottomSheet?.show(childFragmentManager, BOTTOM_SHEET)
 
     @UiThread
     fun clearBottomSheet() {
-        val dlg = childFragmentManager.findFragmentByTag("BOTTOM_SHEET")
+        val dlg = childFragmentManager.findFragmentByTag(BOTTOM_SHEET)
 
         dlg?.let {
             (it as? SlidingModalBottomDialog)?.dismiss()
-                ?: throw IllegalStateException("Fragment is not a bottom sheet")
+                ?: throw IllegalStateException("Fragment is not a $BOTTOM_SHEET")
         }
+    }
+
+    companion object {
+        const val BOTTOM_SHEET = "BOTTOM_SHEET"
     }
 }

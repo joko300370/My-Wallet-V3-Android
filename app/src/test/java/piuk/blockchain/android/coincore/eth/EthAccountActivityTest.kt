@@ -6,7 +6,6 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import io.reactivex.Single
@@ -15,7 +14,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -27,7 +25,6 @@ class EthAccountActivityTest {
     private val payloadManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
     private val feeDataManager: FeeDataManager = mock()
-    private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
 
@@ -51,7 +48,6 @@ class EthAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.ETHER)
     }
 
     @Test

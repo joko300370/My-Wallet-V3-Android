@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import java.io.Serializable
 
 interface BlockchainAccount {
+
     val label: String
 
     val accountBalance: Single<Money> // Total balance, including uncleared and locked
@@ -39,6 +40,7 @@ interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
 enum class SendState {
     CAN_SEND,
     NO_FUNDS,
+    FUNDS_LOCKED,
     NOT_ENOUGH_GAS,
     SEND_IN_FLIGHT,
     NOT_SUPPORTED
@@ -66,12 +68,9 @@ internal fun BlockchainAccount.isCustodial(): Boolean =
     this is CustodialTradingAccount
 
 object NullCryptoAddress : CryptoAddress {
-    override val asset: CryptoCurrency
-        get() = CryptoCurrency.BTC
-    override val address: String
-        get() = ""
-    override val label: String
-        get() = ""
+    override val asset: CryptoCurrency = CryptoCurrency.BTC
+    override val label: String = ""
+    override val address = ""
 }
 
 // Stub invalid accounts; use as an initialisers to avoid nulls.

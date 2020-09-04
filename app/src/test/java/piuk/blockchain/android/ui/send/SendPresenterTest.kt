@@ -13,16 +13,20 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.any
+import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
 import org.bitcoinj.params.BitcoinCashMainNetParams
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Test
+import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.data.api.bitpay.models.BitPayPaymentRequestOutput
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentInstructions
 import piuk.blockchain.android.data.api.bitpay.models.RawPaymentRequest
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
-import piuk.blockchain.android.ui.send.strategy.BitcoinSendStrategy
-import piuk.blockchain.android.ui.send.strategy.SendStrategy
+import piuk.blockchain.android.ui.transfer.send.activity.SendPresenter
+import piuk.blockchain.android.ui.transfer.send.activity.SendView
+import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinSendStrategy
+import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendStrategy
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -42,10 +46,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = mock(),
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = xlmStrategy,
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -61,7 +62,6 @@ class SendPresenterTest {
 
         verify(xlmStrategy).processURIScanAddress("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
         verify(xlmStrategy).onCurrencySelected()
-        verify(view).setSelectedCurrency(CryptoCurrency.XLM)
     }
 
     @Test
@@ -79,10 +79,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -132,10 +129,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -195,10 +189,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -229,6 +220,11 @@ class SendPresenterTest {
     fun `handles bitpay address entered`() {
         val view: SendView = mock()
         val btcStrategy: BitcoinSendStrategy = mock()
+
+        val btcAccount: BtcCryptoWalletAccount = mock {
+            on { asset } itReturns(CryptoCurrency.BTC)
+        }
+
         val exchangeRateFactory = mock<ExchangeRateDataManager> {
             on { updateTickers() } `it returns` Completable.complete()
         }
@@ -258,10 +254,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -274,7 +267,7 @@ class SendPresenterTest {
             analytics = analytics
         ).apply {
             attachView(view)
-            onCurrencySelected(CryptoCurrency.BTC)
+            setSourceAccount(btcAccount)
             onAddressTextChange(bitpayBitcoinURI)
         }
 
@@ -309,10 +302,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = bchStrategy,
-            etherStrategy = etherStrategy,
             xlmStrategy = xlmStrategy,
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -343,10 +333,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -376,10 +363,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -408,10 +392,7 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            etherStrategy = mock(),
             xlmStrategy = mock(),
-            paxStrategy = mock(),
-            usdtStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),

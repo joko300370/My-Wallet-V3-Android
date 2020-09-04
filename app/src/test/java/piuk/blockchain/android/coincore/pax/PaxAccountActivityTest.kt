@@ -17,7 +17,6 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.pax.PaxCryptoWalletAccount
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -28,7 +27,6 @@ class PaxAccountActivityTest {
 
     private val payloadManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
-    private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
 
@@ -54,7 +52,6 @@ class PaxAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.PAX)
         whenever(paxAccount.ethDataManager).thenReturn(ethDataManager)
     }
 

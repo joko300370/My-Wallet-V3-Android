@@ -38,9 +38,9 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
-import piuk.blockchain.android.ui.send.PendingTransaction
-import piuk.blockchain.android.ui.send.SendModel
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
+import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
+import piuk.blockchain.android.ui.transfer.send.activity.SendModel
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Contents
 import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder

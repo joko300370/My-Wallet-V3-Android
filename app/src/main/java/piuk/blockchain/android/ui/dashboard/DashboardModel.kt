@@ -13,6 +13,7 @@ import io.reactivex.disposables.Disposable
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
@@ -98,7 +99,8 @@ enum class DashboardSheet {
     SIMPLE_BUY_CANCEL_ORDER,
     FIAT_FUNDS_DETAILS,
     LINK_OR_DEPOSIT,
-    FIAT_FUNDS_NO_KYC
+    FIAT_FUNDS_NO_KYC,
+    INTEREST_SUMMARY
 }
 
 data class DashboardState(
@@ -114,7 +116,9 @@ data class DashboardState(
     @Deprecated("Moving to new send")
     val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
-    val selectedFiatAccount: FiatAccount? = null
+    val selectedFiatAccount: FiatAccount? = null,
+    val selectedCryptoAccount: SingleAccount? = null,
+    val selectedAsset: CryptoCurrency? = null
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -245,7 +249,8 @@ class DashboardModel(
             is ShowDashboardSheet,
             is TransferFunds,
             is UpdateLaunchDialogFlow,
-            is ClearBottomSheet -> null
+            is ClearBottomSheet,
+            is UpdateSelectedCryptoAccount -> null
         }
     }
 

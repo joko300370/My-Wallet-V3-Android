@@ -48,7 +48,7 @@ class EnterAmountSheet(
     @SuppressLint("SetTextI18n")
     override fun render(newState: SendState) {
         Timber.d("!SEND!> Rendering! EnterAmountSheet")
-
+        state = newState
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
@@ -60,7 +60,6 @@ class EnterAmountSheet(
                     cryptoCurrency = newState.sendingAccount.asset,
                     predefinedAmount = newState.sendAmount
                 )
-
                 showKeyboard()
             }
 
@@ -74,7 +73,7 @@ class EnterAmountSheet(
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                            "(${availableBalance.toStringWithSymbol()})"
+                                "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -91,8 +90,6 @@ class EnterAmountSheet(
                 amount_sheet_back.gone()
             }
         }
-
-        state = newState
     }
 
     override fun initControls(view: View) {
@@ -100,7 +97,7 @@ class EnterAmountSheet(
             amount_sheet_use_max.setOnClickListener { onUseMaxClick() }
             amount_sheet_cta_button.setOnClickListener { onCtaClick() }
             amount_sheet_back.setOnClickListener {
-                model.process(SendIntent.ReturnToPreviousStep)
+                model.process(SendIntent.InvalidateTransaction)
             }
         }
 

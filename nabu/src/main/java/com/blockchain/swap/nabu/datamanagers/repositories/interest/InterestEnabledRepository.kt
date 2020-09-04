@@ -16,6 +16,9 @@ class InterestEnabledRepository(interestEnabledProvider: InterestEnabledProvider
             Single.just(enabledList.contains(ccy))
         }.onErrorResumeNext(Single.just(false))
 
+    fun getEnabledAssets(): Single<List<CryptoCurrency>> =
+        cache.getCachedSingle()
+
     companion object {
         private const val CACHE_LIFETIME = 3600L // this is unlikely to change in one user session
     }

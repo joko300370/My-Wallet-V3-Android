@@ -11,13 +11,13 @@ import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
+import piuk.blockchain.android.coincore.eth.EthAddress
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -76,20 +76,17 @@ internal class UsdtAsset(
 
     @CommonCode("Exists in EthAsset and PaxAsset")
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
-        Singles.zip(
-            Single.just(isValidAddress(address)),
-            erc20Account.ethDataManager.isContractAddress(address)
-        ) { isValid, isContract ->
-            when {
-                isContract -> throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
-                isValid -> address
-                else -> ""
-            }
-        }.flatMapMaybe { a ->
-            if (a.isEmpty()) {
-                Maybe.empty<ReceiveAddress>()
+        Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
+            if (isValid) {
+                erc20Account.ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
+                    if (isContract) {
+                        throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
+                    } else {
+                        Maybe.just(EthAddress(address))
+                    }
+                }
             } else {
-                Maybe.just(UsdtAddress(address))
+                Maybe.empty<ReceiveAddress>()
             }
         }
 

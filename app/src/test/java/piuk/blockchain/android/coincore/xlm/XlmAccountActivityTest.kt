@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigInteger
@@ -27,7 +26,6 @@ import kotlin.test.assertFalse
 class XlmAccountActivityTest {
 
     private val payloadManager: PayloadDataManager = mock()
-    private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
 
@@ -52,7 +50,6 @@ class XlmAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.XLM)
     }
 
     @Test

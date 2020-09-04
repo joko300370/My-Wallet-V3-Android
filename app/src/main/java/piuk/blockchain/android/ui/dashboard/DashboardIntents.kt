@@ -196,7 +196,8 @@ object ClearBottomSheet : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
             showDashboardSheet = null,
-            activeFlow = null
+            activeFlow = null,
+            selectedAsset = null
         )
 }
 
@@ -235,6 +236,17 @@ object TransferFunds : DashboardIntent() {
 
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
+}
+
+class UpdateSelectedCryptoAccount(
+    private val singleAccount: SingleAccount,
+    private val asset: CryptoCurrency
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            selectedCryptoAccount = singleAccount,
+            selectedAsset = asset
+        )
 }
 
 class LaunchSendFlow(

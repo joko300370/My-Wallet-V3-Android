@@ -11,7 +11,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.coincore.TransactionProcessor
@@ -86,10 +85,8 @@ abstract class Erc20NonCustodialAccount(
         get() = super.actions.let {
             if (it.contains(AssetAction.Send)) {
                 it.toMutableSet().apply {
-                    if (ENABLE_NEW_SEND_ACTION) {
-                        remove(AssetAction.Send)
-                        add(AssetAction.NewSend)
-                    }
+                    remove(AssetAction.Send)
+                    add(AssetAction.NewSend)
                 }
             } else {
                 it

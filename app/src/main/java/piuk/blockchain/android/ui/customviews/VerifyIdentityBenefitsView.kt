@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.verify_identinty_benefits_layout.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
@@ -21,17 +22,18 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         description: String,
         @DrawableRes icon: Int,
         primaryButton: ButtonOptions,
-        secondaryButton: ButtonOptions
+        secondaryButton: ButtonOptions,
+        showSheetIndicator: Boolean = true
     ) {
-        funds_kyc_intro_title.text = title
-        funds_kyc_intro_description.text = description
-        funds_kyc_default_symbol.setImageResource(icon)
-        funds_kyc_negative_action.visibleIf { secondaryButton.visible }
-        funds_kyc_positive_action.visibleIf { primaryButton.visible }
-        funds_kyc_positive_action.setOnClickListener {
+        kyc_benefits_intro_title.text = title
+        kyc_benefits_intro_description.text = description
+        kyc_benefits_default_symbol.setImageResource(icon)
+        kyc_benefits_negative_action.visibleIf { secondaryButton.visible }
+        kyc_benefits_positive_action.visibleIf { primaryButton.visible }
+        kyc_benefits_positive_action.setOnClickListener {
             primaryButton.cta()
         }
-        funds_kyc_negative_action.setOnClickListener {
+        kyc_benefits_negative_action.setOnClickListener {
             secondaryButton.cta()
         }
 
@@ -41,6 +43,10 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
 
         rv_benefits.layoutManager = LinearLayoutManager(context)
         rv_benefits.adapter = adapter
+
+        if (!showSheetIndicator) {
+            kyc_benefits_sheet_indicator.gone()
+        }
     }
 }
 

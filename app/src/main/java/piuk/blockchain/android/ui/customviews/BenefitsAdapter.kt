@@ -32,9 +32,9 @@ class BenefitsAdapter : RecyclerView.Adapter<BenefitsAdapter.BenefitsViewHolder>
     }
 
     class BenefitsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val titleView = itemView.benefit_title
-        val subtitleView = itemView.benefit_subtitle
-        val indexView = itemView.benefit_index
+        private val titleView = itemView.benefit_title
+        private val subtitleView = itemView.benefit_subtitle
+        private val indexView = itemView.benefit_index
 
         fun bind(benefit: VerifyIdentityBenefit, index: Int) {
             titleView.text = benefit.title

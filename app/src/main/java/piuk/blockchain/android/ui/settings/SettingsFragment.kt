@@ -59,6 +59,7 @@ import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
@@ -418,11 +419,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun removeBank(bank: LinkedBank) {
-        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, "BOTTOM_SHEET")
+        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     private fun linkBankWithCurrency(currency: String) {
-        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, "BOTTOM_SHEET")
+        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
@@ -436,7 +437,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             cardsPref?.addPreference(
                 CardPreference(context = requireContext(), card = card).apply {
                     onClick {
-                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, "BOTTOM_SHEET")
+                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, BOTTOM_SHEET)
                     }
                     key = card.cardId
                 }

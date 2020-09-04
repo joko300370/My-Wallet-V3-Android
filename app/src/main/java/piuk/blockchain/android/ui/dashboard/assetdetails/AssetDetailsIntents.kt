@@ -143,6 +143,11 @@ object TransactionInFlight : AssetDetailsIntent() {
         oldState.copy(errorState = AssetDetailsError.TX_IN_FLIGHT)
 }
 
+object ShowInterestDashboard : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(navigateToInterestDashboard = true)
+}
+
 class ShowRelevantAssetDetailsSheet(
     val cryptoCurrency: CryptoCurrency
 ) : AssetDetailsIntent() {

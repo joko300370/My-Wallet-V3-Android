@@ -15,7 +15,6 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
@@ -41,12 +40,15 @@ class AssetDetailsFlow(
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
+        fun goToSellFrom(account: CryptoAccount)
         fun goToDeposit(
             fromAccount: SingleAccount,
             toAccount: SingleAccount,
-            cryptoAsset: CryptoAsset,
             action: AssetAction
         )
+
+        fun goToSummary(account: SingleAccount, asset: CryptoCurrency)
+        fun goToInterestDashboard()
     }
 
     private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
@@ -86,6 +88,10 @@ class AssetDetailsFlow(
 
         if (newState.hostAction != null) {
             handleHostAction(newState, assetFlowHost)
+        }
+
+        if (newState.navigateToInterestDashboard) {
+            assetFlowHost.goToInterestDashboard()
         }
     }
 
@@ -133,7 +139,10 @@ class AssetDetailsFlow(
                 host.gotoSwap(account)
                 finishFlow()
             }
-            AssetAction.Summary -> TODO()
+            AssetAction.Sell -> {
+                host.goToSellFrom(account)
+            }
+            AssetAction.Summary -> getInterestAccountAndNavigate(account, newState.hostAction)
             AssetAction.Deposit -> newState.asset!!.accountGroup(AssetFilter.NonCustodial)
                 .subscribeBy {
                     getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
@@ -157,12 +166,17 @@ class AssetDetailsFlow(
                     model.process(TransactionInFlight)
                 } else {
                     ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
-                        assetFlowHost.goToDeposit(
-                            account,
-                            ag.accounts.first(),
-                            ca,
-                            assetAction)
-                        finishFlow()
+                        if (assetAction == AssetAction.Deposit) {
+                            assetFlowHost.goToDeposit(
+                                account,
+                                ag.accounts.first(),
+                                assetAction)
+                        } else if (assetAction == AssetAction.Summary) {
+                            localState.asset?.asset?.let {
+                                assetFlowHost.goToSummary(ag.accounts.first(), it)
+                            } ?: throw IllegalStateException("No crypto defined for Interest Summary")
+                            finishFlow()
+                        }
                     }
                 }
             }

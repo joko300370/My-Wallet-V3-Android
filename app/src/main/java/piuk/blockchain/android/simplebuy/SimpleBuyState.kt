@@ -5,7 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
+import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -25,7 +25,7 @@ import java.util.regex.Pattern
  */
 data class SimpleBuyState(
     val id: String? = null,
-    val supportedPairsAndLimits: List<SimpleBuyPair>? = null,
+    val supportedPairsAndLimits: List<BuySellPair>? = null,
     private val amount: FiatValue? = null,
     val fiatCurrency: String = "USD",
     val predefinedAmounts: List<FiatValue> = emptyList(),
@@ -36,7 +36,7 @@ data class SimpleBuyState(
     val kycStartedButNotCompleted: Boolean = false,
     val kycVerificationState: KycState? = null,
     val bankAccount: BankAccount? = null,
-    val currentScreen: FlowScreen = FlowScreen.INTRO,
+    val currentScreen: FlowScreen = FlowScreen.ENTER_AMOUNT,
     val selectedPaymentMethod: SelectedPaymentMethod? = null,
     val orderExchangePrice: FiatValue? = null,
     val orderValue: CryptoValue? = null,
@@ -167,7 +167,7 @@ enum class KycState {
 }
 
 enum class FlowScreen {
-    INTRO, CURRENCY_SELECTOR, ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
+    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
 }
 
 enum class InputError {

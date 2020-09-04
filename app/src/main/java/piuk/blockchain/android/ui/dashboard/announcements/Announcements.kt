@@ -36,6 +36,7 @@ interface AnnouncementHost {
     fun startSimpleBuyPaymentDetail()
     fun finishSimpleBuySignup()
     fun startSimpleBuy()
+    fun startInterestDashboard()
 
     fun showFiatFundsKyc()
     fun showBankLinking()

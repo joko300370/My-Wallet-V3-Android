@@ -1,14 +1,15 @@
 package piuk.blockchain.android.simplebuy
 
 import com.blockchain.swap.nabu.datamanagers.BankAccount
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -131,12 +132,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     }
 
     data class UpdatedBuyLimitsAndSupportedCryptoCurrencies(
-        val simpleBuyPairs: SimpleBuyPairs,
+        val buySellPairs: BuySellPairs,
         private val selectedCryptoCurrency: CryptoCurrency?
     ) : SimpleBuyIntent() {
 
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
-            val supportedPairsAndLimits = simpleBuyPairs.pairs.filter { it.fiatCurrency == oldState.fiatCurrency }
+            val supportedPairsAndLimits = buySellPairs.pairs.filter { it.fiatCurrency == oldState.fiatCurrency }
 
             if (supportedPairsAndLimits.isEmpty()) {
                 return oldState.copy(errorState = ErrorState.NoAvailableCurrenciesToTrade)
@@ -190,8 +191,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         }
     }
 
-    data class FetchBuyLimits(val fiatCurrency: String) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(fiatCurrency = fiatCurrency)
+    data class FetchBuyLimits(val fiatCurrency: String, val cryptoCurrency: CryptoCurrency) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(fiatCurrency = fiatCurrency, selectedCryptoCurrency = cryptoCurrency)
     }
 
     data class FlowCurrentScreen(val flowScreen: FlowScreen) : SimpleBuyIntent() {
@@ -279,14 +281,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     }
 
     class OrderCreated(
-        private val buyOrder: BuyOrder
+        private val buyOrder: BuySellOrder
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(orderState = buyOrder.state,
                 expirationDate = buyOrder.expires,
                 id = buyOrder.id,
                 fee = buyOrder.fee,
-                orderValue = buyOrder.orderValue,
+                orderValue = buyOrder.orderValue as CryptoValue,
                 orderExchangePrice = buyOrder.price,
                 paymentSucceeded = buyOrder.state == OrderState.FINISHED,
                 isLoading = false

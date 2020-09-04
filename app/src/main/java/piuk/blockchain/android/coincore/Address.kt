@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
 
@@ -24,6 +25,8 @@ object NullAddress : ReceiveAddress {
 interface CryptoAddress : ReceiveAddress {
     val asset: CryptoCurrency
     val address: String
+
+    fun toUrl(amount: CryptoValue = CryptoValue.zero(asset)) = address
 }
 
 interface AddressFactory {

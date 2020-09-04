@@ -30,8 +30,7 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 import timber.log.Timber
 import java.lang.Exception
 
-private class DashboardBalanceFailure(msg: String, e: Throwable)
-    : Exception(msg, e)
+private class DashboardBalanceFailure(msg: String, e: Throwable) : Exception(msg, e)
 
 class DashboardInteractor(
     private val coincore: Coincore,
@@ -123,13 +122,13 @@ class DashboardInteractor(
     private fun checkForFiatBalances(model: DashboardModel): Disposable =
         coincore.fiatAssets.accountGroup()
             .flattenAsObservable { g -> g.accounts }
-            .flatMapSingle {
-                    a -> a.accountBalance.map { balance ->
-                        FiatBalanceInfo(
-                            balance,
-                            balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
-                            a as FiatAccount
-                        )
+            .flatMapSingle { a ->
+                a.accountBalance.map { balance ->
+                    FiatBalanceInfo(
+                        balance,
+                        balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
+                        a as FiatAccount
+                    )
                 }
             }
             .toList()
@@ -163,11 +162,11 @@ class DashboardInteractor(
         } else {
             Single.just(FLATLINE_CHART)
         }
-        .map { PriceHistoryUpdate(crypto, it) }
-        .subscribeBy(
-            onSuccess = { model.process(it) },
-            onError = { Timber.e(it) }
-        )
+            .map { PriceHistoryUpdate(crypto, it) }
+            .subscribeBy(
+                onSuccess = { model.process(it) },
+                onError = { Timber.e(it) }
+            )
 
     fun checkForCustodialBalance(model: DashboardModel, crypto: CryptoCurrency): Disposable? {
         return coincore[crypto].accountGroup(AssetFilter.Custodial)

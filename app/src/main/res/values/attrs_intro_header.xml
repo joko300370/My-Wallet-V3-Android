@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="IntroHeaderView">
+        <attr name="intro_header_title" format="string" />
+        <attr name="intro_header_label" format="string" />
+        <attr name="intro_header_icon" format="reference" />
+    </declare-styleable>
+</resources>

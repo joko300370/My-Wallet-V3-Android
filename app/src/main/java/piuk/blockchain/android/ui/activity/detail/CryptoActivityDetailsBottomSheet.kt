@@ -133,7 +133,8 @@ class CryptoActivityDetailsBottomSheet :
             showBuyUi(state, view)
         } else if (state.transactionType == TransactionSummary.TransactionType.INTEREST_EARNED ||
             state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
-            state.transactionType == TransactionSummary.TransactionType.WITHDRAW) {
+            state.transactionType == TransactionSummary.TransactionType.WITHDRAW
+        ) {
 
             showInterestUi(state, dialogView)
         }
@@ -158,7 +159,7 @@ class CryptoActivityDetailsBottomSheet :
                 compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
                     AndroidSchedulers.mainThread())
                     .subscribe {
-                        startActivity(SimpleBuyActivity.newInstance(requireContext(), true))
+                        startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
                         dismiss()
                     }
             }
@@ -194,7 +195,7 @@ class CryptoActivityDetailsBottomSheet :
 
                 status.text = getString(when {
                     transactionType == TransactionSummary.TransactionType.SENT ||
-                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }

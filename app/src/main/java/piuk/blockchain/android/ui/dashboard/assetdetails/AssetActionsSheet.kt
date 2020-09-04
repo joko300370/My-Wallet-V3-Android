@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,8 +22,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.dialog_asset_actions_sheet.view.*
 import kotlinx.android.synthetic.main.item_asset_action.view.*
-import kotlinx.android.synthetic.main.sheet_asset_actions.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -48,6 +50,8 @@ class AssetActionsSheet :
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val labels: DefaultLabels by scopedInject()
+    private val kycTierService: TierService by scopedInject()
+
     override val model: AssetDetailsModel by scopedInject()
 
     private val itemAdapter: AssetActionAdapter by lazy {
@@ -55,7 +59,7 @@ class AssetActionsSheet :
     }
 
     override val layoutResource: Int
-        get() = R.layout.sheet_asset_actions
+        get() = R.layout.dialog_asset_actions_sheet
 
     override fun render(newState: AssetDetailsState) {
         if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
@@ -215,7 +219,6 @@ class AssetActionsSheet :
     ): List<AssetActionItem> {
         view.asset_actions_acc_icon.setImageResource(
             R.drawable.ic_account_badge_custodial)
-
         showTextAndAssetIcon(view, getString(firstAccount.asset.assetName()),
             labels.getDefaultCustodialWalletLabel(firstAccount.asset),
             firstAccount.asset.drawableResFilled())
@@ -248,6 +251,7 @@ class AssetActionsSheet :
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker), asset) {
                     processAction(AssetAction.Send)
+                    dismiss()
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
@@ -260,6 +264,7 @@ class AssetActionsSheet :
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
                     processAction(AssetAction.Receive)
+                    dismiss()
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
@@ -272,15 +277,44 @@ class AssetActionsSheet :
                 R.drawable.ic_tx_interest,
                 getString(R.string.dashboard_asset_actions_summary_dsc, asset.displayTicker),
                 asset) {
-                // TODO in upcoming story
-                Timber.e("---- summary clicked")
+                goToSummary()
             }
             AssetAction.Deposit -> AssetActionItem(getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset) {
+                checkForKycStatus {
+                    goToDeposit(asset)
+                }
+            }
+            AssetAction.Sell -> AssetActionItem(getString(R.string.common_sell),
+                R.drawable.ic_tx_sell,
+                getString(R.string.convert_your_crypto_to_cash),
+                asset) {
+                processAction(AssetAction.Sell)
+            }
+        }
 
-                disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial).subscribeBy {
+    private fun checkForKycStatus(action: () -> Unit) {
+        disposables += kycTierService.tiers().subscribeBy(
+            onSuccess = { tiers ->
+                if (tiers.isApprovedFor(KycTierLevel.GOLD)) {
+                    action()
+                } else {
+                    model.process(ShowInterestDashboard)
+                    dismiss()
+                }
+            },
+            onError = {
+                Timber.e("Error getting tiers in asset actions sheet $it")
+            }
+        )
+    }
+
+    private fun goToDeposit(asset: CryptoCurrency) {
+        checkForKycStatus {
+            disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial)
+                .subscribeBy {
                     when {
                         it.accounts.size > 1 -> {
                             model.process(SelectSendingAccount)
@@ -289,12 +323,20 @@ class AssetActionsSheet :
                             model.process(HandleActionIntent(AssetAction.Deposit))
                         }
                         else -> {
-                            throw IllegalStateException("No accounts available to deposit into interest")
+                            throw IllegalStateException(
+                                "No accounts available to deposit into interest"
+                            )
                         }
                     }
                 }
             }
         }
+
+    private fun goToSummary() {
+        checkForKycStatus {
+            processAction(AssetAction.Summary)
+        }
+    }
 
     private fun processAction(action: AssetAction) {
         model.process(HandleActionIntent(action))

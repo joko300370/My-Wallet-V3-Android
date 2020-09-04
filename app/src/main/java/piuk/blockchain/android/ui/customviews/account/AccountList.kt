@@ -177,18 +177,20 @@ private class CryptoSingleAccountViewHolder(
             container.alpha = 1f
 
             statusDecorator.let {
-                disposables += it(account).subscribeBy(
-                    onSuccess = { decorator ->
-                        itemView.crypto_status.status = decorator.status
-                        itemView.crypto_status.goneIf(decorator.status.isBlank())
-                        if (decorator.enabled) {
-                            setOnClickListener { onAccountClicked(account) }
-                            container.alpha = 1f
-                        } else {
-                            container.alpha = .6f
+                disposables += it(account)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onSuccess = { decorator ->
+                            itemView.crypto_status.status = decorator.status
+                            itemView.crypto_status.goneIf(decorator.status.isBlank())
+                            if (decorator.enabled) {
+                                setOnClickListener { onAccountClicked(account) }
+                                container.alpha = 1f
+                            } else {
+                                container.alpha = .6f
+                            }
                         }
-                    }
-                )
+                    )
             }
         }
     }

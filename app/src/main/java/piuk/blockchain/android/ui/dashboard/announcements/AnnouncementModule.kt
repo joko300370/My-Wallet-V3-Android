@@ -14,6 +14,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.BuyBitcoinAnnounc
 import piuk.blockchain.android.ui.dashboard.announcements.rule.CloudBackupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsKycAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsNoKycAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.InterestAvailableAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
@@ -245,6 +246,12 @@ val dashboardAnnouncementsModule = module {
 
         factory {
             CloudBackupAnnouncement(
+                dismissRecorder = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            InterestAvailableAnnouncement(
                 dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)

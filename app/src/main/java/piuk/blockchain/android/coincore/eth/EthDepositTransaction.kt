@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -38,18 +39,23 @@ class EthDepositTransaction(
                 custodialWalletManager.getInterestLimits(asset).toSingle().map {
                     pendingTx.copy(minLimit = it.minDepositAmount)
                 }
-            }.map {
-                it.copy(
-                    options = setOf(
-                        TxOptionValue.TxBooleanOption(
-                            option = TxOption.AGREEMENT_INTEREST_T_AND_C
-                        ),
-                        TxOptionValue.TxBooleanOption(
-                            option = TxOption.AGREEMENT_INTEREST_TRANSFER
-                        )
-                    )
-                )
             }
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            pendingTx.copy(options = listOf(
+                TxOptionValue.From(from = sendingAccount.label),
+                TxOptionValue.To(to = sendTarget.label),
+                TxOptionValue.Fee(fee = pendingTx.fees),
+                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees),
+                TxOptionValue.TxBooleanOption<Unit>(
+                    _option = TxOption.AGREEMENT_INTEREST_T_AND_C
+                ),
+                TxOptionValue.TxBooleanOption(
+                    _option = TxOption.AGREEMENT_INTEREST_TRANSFER,
+                    data = pendingTx.amount
+                )
+            )))
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         super.doValidateAmount(pendingTx)
@@ -72,13 +78,12 @@ class EthDepositTransaction(
             }
 
     private fun areOptionsValid(pendingTx: PendingTx): Boolean {
-        val terms = pendingTx.getOption<TxOptionValue.TxBooleanOption>(
+        val terms = pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
             TxOption.AGREEMENT_INTEREST_T_AND_C
         )?.value ?: false
-        val transfer = pendingTx.getOption<TxOptionValue.TxBooleanOption>(
+        val transfer = pendingTx.getOption<TxOptionValue.TxBooleanOption<Money>>(
             TxOption.AGREEMENT_INTEREST_TRANSFER
         )?.value ?: false
-
         return (terms && transfer)
     }
 }

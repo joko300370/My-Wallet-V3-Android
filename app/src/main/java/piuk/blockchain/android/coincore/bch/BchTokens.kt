@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -23,6 +24,8 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
+
+private const val BCH_URL_PREFIX = "bitcoincash:"
 
 internal class BchAsset(
     payloadManager: PayloadDataManager,
@@ -83,15 +86,22 @@ internal class BchAsset(
         }
 
     private fun isValidAddress(address: String): Boolean =
-        FormatsUtil.isValidBitcoinCashAddress(
+        FormatsUtil.isValidBCHAddress(
             environmentSettings.bitcoinCashNetworkParameters,
             address
         )
 }
 
 internal class BchAddress(
-    override val address: String,
-    override val label: String = address
+    address_: String,
+    override val label: String = address_
 ) : CryptoAddress {
+    override val address: String = address_.removeBchUri()
     override val asset: CryptoCurrency = CryptoCurrency.BCH
+
+    override fun toUrl(amount: CryptoValue): String {
+        return "$BCH_URL_PREFIX$address"
+    }
 }
+
+private fun String.removeBchUri(): String = this.replace(BCH_URL_PREFIX, "")

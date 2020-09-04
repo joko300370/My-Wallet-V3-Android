@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.backup.transfer
 
 import android.annotation.SuppressLint
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.testutils.satoshi
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
@@ -26,10 +27,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
 import piuk.blockchain.android.ui.account.ItemAccount
-import piuk.blockchain.android.ui.receive.WalletAccountHelper
-import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.ui.chooser.WalletAccountHelper
+import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.events.PaymentFailedEvent
 import piuk.blockchain.androidcore.data.events.PaymentSentEvent
@@ -45,16 +45,18 @@ class ConfirmFundsTransferPresenterTest {
     private val transferFundsDataManager: TransferFundsDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val stringUtils: StringUtils = mock()
-    private val currencyState: CurrencyState = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
+    private val currencyPrefs: CurrencyPrefs = mock {
+        on { selectedFiatCurrency }.thenReturn("USD")
+    }
 
     private val subject = ConfirmFundsTransferPresenter(
             walletAccountHelper,
             transferFundsDataManager,
             payloadDataManager,
             stringUtils,
-            currencyState,
-            exchangeRates
+            exchangeRates,
+            currencyPrefs
         )
 
     @Before
@@ -113,7 +115,6 @@ class ConfirmFundsTransferPresenterTest {
         val fee = 10000.satoshi()
 
         whenever(stringUtils.getQuantityString(anyInt(), anyInt())).thenReturn("test string")
-        whenever(currencyState.fiatUnit).thenReturn("USD")
         whenever(exchangeRates.getLastPrice(any(), any())).thenReturn(100.0)
 
         // Act

@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 val coincoreModule = module {
 
@@ -38,7 +39,7 @@ val coincoreModule = module {
         scoped {
             BtcAsset(
                 exchangeRates = get(),
-                environmentSettings = get(),
+                networkParameters = get<EnvironmentConfig>().bitcoinNetworkParameters,
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadManager = get(),

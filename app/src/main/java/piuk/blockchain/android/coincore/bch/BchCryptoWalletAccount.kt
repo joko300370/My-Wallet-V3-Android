@@ -27,13 +27,27 @@ internal class BchCryptoWalletAccount(
     private val bchManager: BchDataManager,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
-    private val networkParams: NetworkParameters
+    private val networkParams: NetworkParameters,
+    // TEMP keep a copy of the metadata account, for interop with the old send flow
+    // this can and will be removed when BCH is moved over and has a on-chain
+    // TransactionProcessor defined;
+    val internalAccount: GenericMetadataAccount
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
+
+    // From receive presenter:
+//    compositeDisposable += bchDataManager.updateAllBalances()
+//    .doOnSubscribe { view?.showQrLoading() }
+//    .andThen(
+//    bchDataManager.getWalletTransactions(50, 0)
+//    .onErrorReturn { emptyList() }
+//    )
+//    .flatMap { bchDataManager.getNextReceiveAddress(position) }
+// it may be that we need to update tx's etc to get a legitimat receive address
 
     override val accountBalance: Single<Money>
         get() = bchManager.getBalance(address)
@@ -58,7 +72,7 @@ internal class BchCryptoWalletAccount(
             }
             .singleOrError()
             .map {
-                BtcAddress(it, label)
+                BtcAddress(it, label, networkParams)
             }
 
     override val activity: Single<ActivitySummaryList>
@@ -86,6 +100,7 @@ internal class BchCryptoWalletAccount(
         bchManager,
         isDefault,
         exchangeRates,
-        networkParams
+        networkParams,
+        jsonAccount
     )
 }

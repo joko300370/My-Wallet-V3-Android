@@ -73,6 +73,18 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="Text.Red">
+        <item name="android:textColor">@color/red_400</item>
+    </style>
+
+    <style name="Text.Red.Semibold">
+        <item name="fontFamily">@font/inter_medium</item>
+    </style>
+
+    <style name="Text.Red.Semibold.12">
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="Text.Blue.Semibold">
         <item name="fontFamily">@font/inter_medium</item>
     </style>

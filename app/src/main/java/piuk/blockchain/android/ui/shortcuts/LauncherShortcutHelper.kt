@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent
 import org.koin.core.get
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.receive.ReceiveQrActivity
+import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

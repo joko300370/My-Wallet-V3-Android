@@ -12,7 +12,13 @@ import java.util.Date
 
 data class SimpleBuyPairsResp(val pairs: List<SimpleBuyPairResp>)
 
-data class SimpleBuyPairResp(val pair: String, val buyMin: Long, val buyMax: Long) {
+data class SimpleBuyPairResp(
+    val pair: String,
+    val buyMin: Long,
+    val buyMax: Long,
+    val sellMin: Long,
+    val sellMax: Long
+) {
     fun isCryptoCurrencySupported() =
         CryptoCurrency.values().firstOrNull { it.networkTicker == pair.split("-")[0] } != null
 }
@@ -68,6 +74,8 @@ data class SimpleBuyAllBalancesResponse(
     val USDT: SimpleBuyBalanceResponse? = null,
     @Json(name = "EUR")
     val EUR: SimpleBuyBalanceResponse? = null,
+    @Json(name = "USD")
+    val USD: SimpleBuyBalanceResponse? = null,
     @Json(name = "GBP")
     val GBP: SimpleBuyBalanceResponse? = null
 ) {
@@ -88,6 +96,7 @@ data class SimpleBuyAllBalancesResponse(
         return when (fiat) {
             "EUR" -> EUR
             "GBP" -> GBP
+            "USD" -> USD
             else -> null
         }
     }
@@ -102,16 +111,25 @@ data class TransferFundsResponse(
     }
 }
 
+data class FeesResponse(
+    val fees: List<CurrencyFeeResponse>
+)
+
+data class CurrencyFeeResponse(
+    val symbol: String,
+    val value: BigDecimal
+)
+
 data class CustodialWalletOrder(
     private val pair: String,
     private val action: String,
     private val input: OrderInput,
     private val output: OrderOutput,
-    private val paymentMethodId: String?,
-    private val paymentType: String
+    private val paymentMethodId: String? = null,
+    private val paymentType: String? = null
 )
 
-data class BuyOrderResponse(
+data class BuySellOrderResponse(
     val id: String,
     val pair: String,
     val inputCurrency: String,
@@ -126,7 +144,8 @@ data class BuyOrderResponse(
     val fee: String?,
     val attributes: CardPaymentAttributes?,
     val expiresAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val side: String
 ) {
     companion object {
         const val PENDING_DEPOSIT = "PENDING_DEPOSIT"
@@ -181,6 +200,12 @@ data class ConfirmOrderRequestBody(
     private val attributes: CardPartnerAttributes?
 )
 
+data class WithdrawRequestBody(
+    private val beneficiary: String,
+    private val currency: String,
+    private val amount: String
+)
+
 data class TransactionsResponse(
     val items: List<TransactionResponse>
 )
@@ -220,4 +245,4 @@ data class CardPartnerAttributes(
 
 data class EveryPayAttrs(private val customerUrl: String)
 
-typealias BuyOrderListResponse = List<BuyOrderResponse>
+typealias BuyOrderListResponse = List<BuySellOrderResponse>

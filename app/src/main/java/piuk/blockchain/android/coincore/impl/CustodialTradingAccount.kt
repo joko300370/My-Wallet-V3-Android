@@ -1,6 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import info.blockchain.balance.CryptoCurrency
@@ -8,6 +8,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
@@ -15,7 +16,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
-import piuk.blockchain.android.coincore.ENABLE_NEW_SEND_ACTION
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SendTarget
@@ -103,16 +104,28 @@ open class CustodialTradingAccount(
                     isNoteSupported = isNoteSupported
                 )
             }
+            is FiatAccount -> Single.just(
+                CustodialSellProcessor(
+                    sendingAccount = this,
+                    sendTarget = sendTo,
+                    walletManager = custodialWalletManager,
+                    exchangeRates = exchangeRates
+                )
+            )
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
         }
 
     override val sendState: Single<SendState>
-        get() = accountBalance.map { balance ->
-                if (balance <= CryptoValue.zero(asset))
-                    SendState.NO_FUNDS
-                else
-                    SendState.CAN_SEND
+        get() = Singles.zip(
+            accountBalance,
+            actionableBalance
+        ) { total, available ->
+            when {
+                total <= CryptoValue.zero(asset) -> SendState.NO_FUNDS
+                total - available <= CryptoValue.zero(asset) -> SendState.FUNDS_LOCKED
+                else -> SendState.CAN_SEND
             }
+        }
 
     override val actions: AvailableActions
         get() =
@@ -120,15 +133,12 @@ open class CustodialTradingAccount(
                 AssetAction.ViewActivity
             ).apply {
                 if (isFunded) {
-                    if (ENABLE_NEW_SEND_ACTION) {
-                        add(AssetAction.NewSend)
-                    } else {
-                        add(AssetAction.Send)
-                    }
+                    add(AssetAction.Sell)
+                    add(AssetAction.NewSend)
                 }
             }
 
-    private fun buyOrderToSummary(buyOrder: BuyOrder): ActivitySummaryItem =
+    private fun buyOrderToSummary(buyOrder: BuySellOrder): ActivitySummaryItem =
         CustodialTradingActivitySummaryItem(
             exchangeRates = exchangeRates,
             cryptoCurrency = buyOrder.crypto.currency,

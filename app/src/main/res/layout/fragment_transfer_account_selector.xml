@@ -7,14 +7,14 @@
     tools:context=".ui.transfer.AccountSelectorFragment"
     android:background="@color/white">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/account_selector_blurb"
-        style="@style/Text.Semibold.20"
+    <piuk.blockchain.android.ui.customviews.IntroHeaderView
+        android:id="@+id/account_selector_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard_margin"
-        android:paddingBottom="@dimen/standard_margin"
-        android:text="@string/transfer_send_crypto"
+        app:intro_header_icon="@drawable/ic_send_blue_circle"
+        app:intro_header_label="@string/transfer_send_crypto_label"
+        app:intro_header_title="@string/transfer_send_crypto_title"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
@@ -24,7 +24,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_selector_blurb" />
+        app:layout_constraintTop_toBottomOf="@id/account_selector_header" />
 
     <LinearLayout
         android:id="@+id/account_selector_empty_view"

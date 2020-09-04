@@ -63,7 +63,7 @@ sealed class SendIntent : MviIntent<SendState> {
             } else {
                 SendStep.ENTER_AMOUNT
             }
-        }
+    }
 
     class ValidatePassword(
         val password: String
@@ -234,6 +234,14 @@ sealed class SendIntent : MviIntent<SendState> {
             ).updateBackstack(oldState)
     }
 
+    object InvalidateTransaction : SendIntent() {
+        override fun reduce(oldState: SendState): SendState =
+            oldState.copy(
+                pendingTx = null,
+                nextEnabled = false
+            ).updateBackstack(oldState)
+    }
+
     object UpdateTransactionComplete : SendIntent() {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
@@ -267,6 +275,11 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState = oldState
     }
 
+    object EnteredAddressReset : SendIntent() {
+        override fun reduce(oldState: SendState): SendState = oldState.copy(
+            errorState = SendErrorState.NONE)
+    }
+
     fun SendState.updateBackstack(oldState: SendState) =
         if (oldState.currentStep != this.currentStep && oldState.currentStep.addToBackStack) {
             val updatedStack = oldState.stepsBackStack
@@ -290,5 +303,5 @@ private fun ValidationState.mapToSendError() =
         ValidationState.UNDER_MIN_LIMIT -> SendErrorState.BELOW_MIN_LIMIT
         ValidationState.HAS_TX_IN_FLIGHT, // TODO: Map there better - perhaps add a param for failing txoption?
         ValidationState.OPTION_INVALID,
-        ValidationState.OVER_MAX_LIMIT -> SendErrorState.UNEXPECTED_ERROR
+        ValidationState.OVER_MAX_LIMIT -> SendErrorState.ABOVE_MAX_LIMIT
     }

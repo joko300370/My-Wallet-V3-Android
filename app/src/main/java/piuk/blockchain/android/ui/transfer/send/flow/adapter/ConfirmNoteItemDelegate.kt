@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_note.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
@@ -22,8 +21,7 @@ class ConfirmNoteItemDelegate<in T>(
     private val model: SendModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        val item = items[position] as ConfirmItemType
-        return item is ConfirmNoteItem
+        return items[position] is TxOptionValue.Description
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -36,7 +34,7 @@ class ConfirmNoteItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as NoteItemViewHolder).bind(
-        items[position] as ConfirmNoteItem,
+        items[position] as TxOptionValue.Description,
         model
     )
 }
@@ -49,7 +47,7 @@ private class NoteItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        item: ConfirmNoteItem,
+        item: TxOptionValue.Description,
         model: SendModel
     ) {
 
@@ -59,18 +57,14 @@ private class NoteItemViewHolder(val parent: View) :
 
             setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
-
-                    item.state.pendingTx?.getOption<TxOptionValue.TxTextOption>(TxOption.DESCRIPTION)
-                        ?.let {
-                            model.process(
-                                SendIntent.ModifyTxOption(it.copy(text = v.text.toString())))
-                        }
+                    model.process(
+                        SendIntent.ModifyTxOption(TxOptionValue.Description(text = v.text.toString())))
                     clearFocus()
                 }
                 false
             }
 
-            setText(item.hint, TextView.BufferType.EDITABLE)
+            setText(item.text, TextView.BufferType.EDITABLE)
         }
     }
 }
