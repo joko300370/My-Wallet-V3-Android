@@ -68,6 +68,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
                 CampaignType.Blockstack -> AnalyticsEvents.KycBlockstackStart
                 CampaignType.SimpleBuy -> AnalyticsEvents.KycSimpleBuyStart
                 CampaignType.FiatFunds -> AnalyticsEvents.KycFiatFundsStart
+                CampaignType.Interest -> AnalyticsEvents.KycFiatFundsStart
             }
         )
 
@@ -78,6 +79,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
             CampaignType.Resubmission,
             CampaignType.FiatFunds -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
+            CampaignType.Interest -> R.string.earn_interest
         }
 
         progressListener.setHostTitle(title)

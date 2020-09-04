@@ -64,8 +64,7 @@ class InterestDashboardActivity : BlockchainActivity(),
     }
 
     override fun startKyc() {
-        // TODO campaign type with analytics events??
-        KycNavHostActivity.start(this, CampaignType.FiatFunds)
+        KycNavHostActivity.start(this, CampaignType.Interest)
     }
 
     override fun showInterestSummarySheet(account: SingleAccount, cryptoCurrency: CryptoCurrency) {
