@@ -1,43 +1,43 @@
 package piuk.blockchain.android.ui.account
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import android.text.InputFilter
 import android.text.InputType
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.ui.dialog.MaterialProgressDialog
+import com.blockchain.ui.password.SecondPasswordHandler
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.listener.single.CompositePermissionListener
 import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
+import info.blockchain.balance.CryptoCurrency
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
 import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.events.ActionEvent
+import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import com.blockchain.ui.password.SecondPasswordHandler
-import org.koin.android.ext.android.inject
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import piuk.blockchain.androidcore.data.events.ActionEvent
-import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
@@ -45,7 +45,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.toast
 import timber.log.Timber
 
 class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresenter>(),
-    AccountEditView, ConfirmPaymentDialog.OnConfirmDialogInteractionListener {
+    AccountEditView {
 
     override val activityIntent: Intent by unsafeLazy { intent }
     private val dialogRunnable = Runnable {
@@ -184,7 +184,8 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     }
 
     override fun showPaymentDetails(details: PaymentConfirmationDetails) {
-        ConfirmPaymentDialog.newInstance(details, null, null, false)
+        ConfirmPaymentDialog.newInstance(details, null, null, false,
+            { presenter.submitPayment() })
             .show(supportFragmentManager, ConfirmPaymentDialog::class.java.simpleName)
 
         if (details.isLargeTransaction) {
@@ -192,16 +193,8 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
         }
     }
 
-    override fun onChangeFeeClicked() {
-        // No-op
-    }
-
     override fun hideMerchantCopy() {
         binding.tvExtendedXpubDescription.setText(R.string.extended_public_key_description_bch_only)
-    }
-
-    override fun onSendClicked() {
-        presenter.submitPayment()
     }
 
     private fun onShowLargeTransactionWarning() {

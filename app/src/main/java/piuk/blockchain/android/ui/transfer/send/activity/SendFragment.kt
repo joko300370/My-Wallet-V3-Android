@@ -953,7 +953,9 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     ) {
         fragmentManager?.let { fragmentManager ->
             confirmPaymentDialog =
-                ConfirmPaymentDialog.newInstance(confirmationDetails, note, noteDescription, allowFeeChange)
+                ConfirmPaymentDialog.newInstance(confirmationDetails, note, noteDescription,
+                    allowFeeChange,
+                    { onSendClicked() }, { onChangeFeeClicked() })
                     .also {
                         it.show(fragmentManager, ConfirmPaymentDialog::class.java.simpleName)
                     }
@@ -1302,5 +1304,6 @@ private fun Memo?.describeType(resources: Resources) =
     }
 
 enum class PitAddressFieldState {
-    FILLED, CLEARED
+    FILLED,
+    CLEARED
 }

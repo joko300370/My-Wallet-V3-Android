@@ -2,15 +2,15 @@ package piuk.blockchain.android.ui.transfer.send.activity.strategy
 
 import android.annotation.SuppressLint
 import com.blockchain.annotations.CommonCode
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.SendAnalytics
+import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
+import com.blockchain.serialization.JsonSerializableAccount
+import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.models.nabu.NabuApiException
 import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
 import com.blockchain.swap.nabu.models.nabu.State
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.SendAnalytics
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
-import com.blockchain.serialization.JsonSerializableAccount
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.google.android.material.snackbar.Snackbar
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -40,13 +40,13 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.account.PitAccount
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.transfer.send.activity.FeeType
 import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.android.ui.transfer.send.activity.SendView
+import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -155,7 +155,7 @@ class BitcoinCashSendStrategy(
     }
 
     override fun onResume() {
-        onCurrencySelected()
+        // do nothing
     }
 
     override fun reset() {

@@ -2,16 +2,16 @@ package piuk.blockchain.android.ui.transfer.send.activity.strategy
 
 import android.annotation.SuppressLint
 import com.blockchain.annotations.CommonCode
-import com.google.android.material.snackbar.Snackbar
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
-import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.swap.nabu.models.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
+import com.blockchain.swap.nabu.models.nabu.State
+import com.google.android.material.snackbar.Snackbar
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -186,7 +186,7 @@ class BitcoinSendStrategy(
     }
 
     override fun onResume() {
-        onCurrencySelected()
+        // do nothing
     }
 
     override fun reset() {
@@ -457,11 +457,10 @@ class BitcoinSendStrategy(
 
     private fun resetAccountList() {
         compositeDisposable += pitLinking.isPitLinked()
-            .filter { it }
-            .flatMapSingle {
+            .flatMap {
                 nabuToken.fetchNabuToken()
-            }.flatMap {
-                nabuDataManager.fetchCryptoAddressFromThePit(it, CryptoCurrency.BTC)
+            }.flatMap { token ->
+                nabuDataManager.fetchCryptoAddressFromThePit(token, CryptoCurrency.BTC)
             }.applySchedulers()
             .doOnSubscribe {
                 view?.updateReceivingHintAndAccountDropDowns(

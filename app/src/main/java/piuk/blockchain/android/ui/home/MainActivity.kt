@@ -18,7 +18,6 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
-import com.blockchain.annotations.ButWhy
 import com.blockchain.koin.scopedInject
 import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.NotificationsUtil
@@ -52,7 +51,6 @@ import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
@@ -73,7 +71,6 @@ import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.transfer.send.activity.SendFragment
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
@@ -90,8 +87,7 @@ import java.util.ArrayList
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
-    IntroTourHost,
-    ConfirmPaymentDialog.OnConfirmDialogInteractionListener {
+    IntroTourHost {
 
     override val presenter: MainPresenter by scopedInject()
     override val view: MainView = this
@@ -583,23 +579,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         if (AndroidUtils.is25orHigher()) {
             getSystemService(ShortcutManager::class.java)!!.removeAllDynamicShortcuts()
         }
-    }
-
-    @ButWhy("Who calls this... it looks crazy")
-    override fun onChangeFeeClicked() {
-        val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
-        fragment?.onChangeFeeClicked()
-    }
-
-    @ButWhy("Who calls this")
-    // Turns out this is called by the confirm transfer dlg. That can, however, be invoked from
-    // both the account edit screen (when transferring between wallets) and the send screen.
-    // (As can onChangeFeeClicked()) so the send fragment might not exist. This needs cleaning up. TODO
-    override fun onSendClicked() {
-        val fragment = supportFragmentManager
-            .findFragmentByTag(SendFragment::class.java.simpleName) as? SendFragment
-        fragment?.onSendClicked()
     }
 
     override fun showTestnetWarning() {

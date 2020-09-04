@@ -1,21 +1,18 @@
 package piuk.blockchain.android.ui.confirm
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
-import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.SendAnalytics
 import kotlinx.android.synthetic.main.dialog_confirm_transaction.*
-
 import org.apache.commons.lang3.NotImplementedException
 import org.koin.android.ext.android.inject
-
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
@@ -29,7 +26,8 @@ class ConfirmPaymentDialog : BaseDialogFragment<ConfirmPaymentView, ConfirmPayme
     private val confirmPaymentPresenter: ConfirmPaymentPresenter by scopedInject()
     private val analytics: Analytics by inject()
 
-    private var listener: OnConfirmDialogInteractionListener? = null
+    private lateinit var onSendClicked: () -> Unit
+    private lateinit var onFeeChangeClicked: () -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,9 +64,9 @@ class ConfirmPaymentDialog : BaseDialogFragment<ConfirmPaymentView, ConfirmPayme
         super.onViewCreated(view, savedInstanceState)
 
         toolbar.setNavigationOnClickListener { dismiss() }
-        button_change_fee.setOnClickListener { listener?.onChangeFeeClicked() }
+        button_change_fee.setOnClickListener { onFeeChangeClicked() }
         button_send.setOnClickListener {
-            listener?.onSendClicked()
+            onSendClicked()
             analytics.logEvent(SendAnalytics.SummarySendClick(paymentDetails.crypto))
         }
 
@@ -160,25 +158,7 @@ class ConfirmPaymentDialog : BaseDialogFragment<ConfirmPaymentView, ConfirmPayme
 
     override fun getMvpView(): ConfirmPaymentView = this
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        listener = context as? OnConfirmDialogInteractionListener
-            ?: throw RuntimeException(context!!.toString() + " must implement OnConfirmDialogInteractionListener")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
-    }
-
-    interface OnConfirmDialogInteractionListener {
-        fun onChangeFeeClicked()
-        fun onSendClicked()
-    }
-
     companion object {
-
         private const val PAYMENT_DETAILS = "PAYMENT_DETAILS"
         private const val CONTACT_NOTE = "CONTACT_NOTE"
         private const val CONTACT_NOTE_DESCRIPTION = "CONTACT_NOTE_DESCRIPTION"
@@ -188,17 +168,25 @@ class ConfirmPaymentDialog : BaseDialogFragment<ConfirmPaymentView, ConfirmPayme
             details: PaymentConfirmationDetails,
             note: String?,
             noteDescription: String?,
-            showFeeChoice: Boolean
+            showFeeChoice: Boolean,
+            doOnSendClicked: () -> Unit,
+            doOnFeeChange: () -> Unit = {}
         ): ConfirmPaymentDialog {
             return ConfirmPaymentDialog().apply {
                 setStyle(DialogFragment.STYLE_NO_TITLE, R.style.FullscreenDialog)
                 arguments = Bundle().apply {
                     putParcelable(PAYMENT_DETAILS, details)
                     putBoolean(SHOW_FEE_CHOICE, showFeeChoice)
-                    if (note != null)
+
+                    if (note != null) {
                         putString(CONTACT_NOTE, note)
-                    if (noteDescription != null)
+                    }
+                    if (noteDescription != null) {
                         putString(CONTACT_NOTE_DESCRIPTION, noteDescription)
+                    }
+
+                    onSendClicked = doOnSendClicked
+                    onFeeChangeClicked = doOnFeeChange
                 }
             }
         }

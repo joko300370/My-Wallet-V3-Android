@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/coordinator_layout"
@@ -32,16 +31,25 @@
                 android:paddingTop="@dimen/standard_margin"
                 android:paddingBottom="@dimen/standard_margin">
 
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_margin"
+                    android:layout_marginEnd="@dimen/small_margin"
+                    android:paddingBottom="@dimen/tiny_margin"
+                    android:text="@string/common_from"
+                    android:textColor="@color/primary_grey_dark" />
+
                 <TextView
                     android:id="@+id/fromAccountName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="start"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:gravity="start"
                     tools:text="@string/default_wallet_name" />
 
                 <View
