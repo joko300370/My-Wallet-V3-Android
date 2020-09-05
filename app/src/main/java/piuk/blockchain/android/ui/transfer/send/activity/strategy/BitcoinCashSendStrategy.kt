@@ -40,13 +40,13 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.android.ui.account.PitAccount
+import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.transfer.send.activity.FeeType
 import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.android.ui.transfer.send.activity.SendView
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -155,7 +155,6 @@ class BitcoinCashSendStrategy(
     }
 
     override fun onResume() {
-        // do nothing
     }
 
     override fun reset() {

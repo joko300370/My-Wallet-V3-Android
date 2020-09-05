@@ -2003,7 +2003,6 @@
     <string name="sell_quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
     <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>
-
     <string name="could_not_save_card">We could not save your card. Please contact support.</string>
     <string name="could_not_activate_card">We could not activate your card. Please contact support.</string>
     <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>

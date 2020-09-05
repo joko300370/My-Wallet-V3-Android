@@ -186,7 +186,6 @@ class BitcoinSendStrategy(
     }
 
     override fun onResume() {
-        // do nothing
     }
 
     override fun reset() {

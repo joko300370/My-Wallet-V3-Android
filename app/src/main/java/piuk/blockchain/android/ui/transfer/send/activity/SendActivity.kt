@@ -1,12 +1,12 @@
 package piuk.blockchain.android.ui.transfer.send.activity
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.koin.scopedInject
+import android.Manifest
 import android.view.Menu
 import android.view.MenuItem
-import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.karumi.dexter.Dexter
@@ -23,9 +23,9 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.base.BlockchainActivity
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import timber.log.Timber
@@ -53,7 +53,7 @@ class SendActivity : BlockchainActivity(), SendFragment.SendFragmentHost {
                     supportFragmentManager.beginTransaction().replace(R.id.content, fragment).commit()
                 },
                 onError = {
-                    Timber.e("Failed to find account for receive")
+                    Timber.e("Faied to find account for receive")
                 }
             )
     }
