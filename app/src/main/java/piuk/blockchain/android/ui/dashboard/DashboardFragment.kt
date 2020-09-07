@@ -377,8 +377,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             navigator().resumeSimpleBuyKyc()
         }
 
-        override fun startSimpleBuy() {
-            navigator().startSimpleBuy()
+        override fun startSimpleBuy(cryptoCurrency: CryptoCurrency) {
+            navigator().startSimpleBuy(cryptoCurrency)
         }
 
         override fun startInterestDashboard() {

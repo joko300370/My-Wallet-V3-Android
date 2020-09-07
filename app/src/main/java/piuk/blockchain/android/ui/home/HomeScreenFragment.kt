@@ -45,7 +45,7 @@ interface HomeNavigator {
     fun goToWithdraw(currency: String)
 
     fun resumeSimpleBuyKyc()
-    fun startSimpleBuy()
+    fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
     fun startInterestDashboard()
 }
 

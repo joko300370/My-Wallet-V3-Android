@@ -686,11 +686,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
-    override fun startSimpleBuy() {
+    override fun startSimpleBuy(cryptoCurrency: CryptoCurrency) {
         startActivity(
             SimpleBuyActivity.newInstance(
                 context = this,
-                launchFromNavigationBar = true
+                launchFromNavigationBar = true,
+                cryptoCurrency = cryptoCurrency
             )
         )
     }
