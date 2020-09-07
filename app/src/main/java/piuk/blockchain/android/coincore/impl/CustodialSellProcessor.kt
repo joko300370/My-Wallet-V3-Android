@@ -70,17 +70,17 @@ class CustodialSellProcessor(
                     maxLimit = maxLimit(amount, pendingTx),
                     minLimit = minLimit(amount, pendingTx)
                 )
-            }.doOnSuccess {
+            }.doOnSuccess { tx ->
                 order = CustodialWalletOrder(
                     pair = "${sendingAccount.asset.networkTicker}-${(sendTarget as FiatAccount).fiatCurrency}",
                     action = "SELL",
                     input = OrderInput(
                         sendingAccount.asset.toString(),
-                        pendingTx.amount.takeIf { it is CryptoValue }?.toBigInteger().toString()
+                        tx.amount.takeIf { it is CryptoValue }?.toBigInteger().toString()
                     ),
                     output = OrderOutput(
                         sendTarget.fiatCurrency,
-                        pendingTx.amount.takeIf { it is FiatValue }?.toBigInteger().toString()
+                        tx.amount.takeIf { it is FiatValue }?.toBigInteger().toString()
                     )
                 )
             }
