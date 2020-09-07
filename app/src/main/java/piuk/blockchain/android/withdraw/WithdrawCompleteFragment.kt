@@ -112,5 +112,6 @@ private fun String.resource(): Int =
     when (this) {
         "EUR" -> R.drawable.ic_funds_euro_masked
         "GBP" -> R.drawable.ic_funds_gbp_masked
+        "USD" -> R.drawable.ic_funds_usd_masked
         else -> R.drawable.ic_funds_usd_masked
     }

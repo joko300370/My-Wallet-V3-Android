@@ -415,6 +415,7 @@ fun PaymentMethod.Funds.icon() =
     when (fiatCurrency) {
         "GBP" -> R.drawable.ic_funds_gbp
         "EUR" -> R.drawable.ic_funds_euro
+        "USD" -> R.drawable.ic_funds_usd
         else -> throw IllegalStateException("Unsupported currency")
     }
 
@@ -422,5 +423,6 @@ fun PaymentMethod.Funds.label() =
     when (fiatCurrency) {
         "GBP" -> R.string.pounds
         "EUR" -> R.string.euros
+        "USD" -> R.string.us_dollars
         else -> throw IllegalStateException("Unsupported currency")
     }

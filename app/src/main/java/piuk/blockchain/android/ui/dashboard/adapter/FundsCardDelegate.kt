@@ -139,6 +139,7 @@ private fun TextView.setStringFromTicker(context: Context, ticker: String) {
         when (ticker) {
             "EUR" -> R.string.euros
             "GBP" -> R.string.pounds
+            "USD" -> R.string.us_dollars
             else -> R.string.empty
         }
     )

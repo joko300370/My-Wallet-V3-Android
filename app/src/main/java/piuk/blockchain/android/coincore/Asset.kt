@@ -20,6 +20,7 @@ enum class AssetAction {
     ViewActivity,
     Send,
     NewSend,
+    Withdraw,
     Receive,
     Swap,
     Sell,

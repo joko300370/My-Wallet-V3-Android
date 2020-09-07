@@ -1839,6 +1839,7 @@
 
     <string name="pounds">Pounds</string>
     <string name="euros">Euros</string>
+    <string name="us_dollars">US Dollars</string>
     <string name="deposit_cash">Deposit Cash</string>
     <string name="send_me_instructions">Send Me the Instructions</string>
     <string name="bank_transfer_only">Bank Transfer Only</string>

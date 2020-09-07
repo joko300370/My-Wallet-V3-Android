@@ -70,7 +70,10 @@ internal class FiatCustodialAccount(
             }
         }
 
-    override val actions: AvailableActions = setOf(AssetAction.ViewActivity)
+    override val actions: AvailableActions =
+        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit, AssetAction.Withdraw)
+        else
+            setOf(AssetAction.ViewActivity)
 
     override val isFunded: Boolean
         get() = hasFunds.get()

@@ -527,9 +527,9 @@ class LiveCustodialWalletManager(
     override fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String> =
         authenticator.authenticate { sessionToken ->
             nabuService.getInterestAddress(sessionToken, crypto.networkTicker).map {
-                    it.body()?.accountRef ?: ""
-                }
+                it.body()?.accountRef ?: ""
             }
+        }
 
     override fun getInterestActivity(crypto: CryptoCurrency): Single<List<InterestActivityItem>> =
         kycFeatureEligibility.isEligibleFor(Feature.INTEREST_RATES)
@@ -637,7 +637,7 @@ class LiveCustodialWalletManager(
         private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
 
         private val SUPPORTED_FUNDS_CURRENCIES = listOf(
-            "GBP", "EUR"
+            "GBP", "EUR", "USD"
         )
     }
 }

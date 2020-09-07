@@ -58,25 +58,25 @@ data class SimpleBuyBalanceResponse(
 )
 
 data class SimpleBuyAllBalancesResponse(
-    @Json(name = "BTC")
+    @field:Json(name = "BTC")
     val BTC: SimpleBuyBalanceResponse? = null,
-    @Json(name = "BCH")
+    @field:Json(name = "BCH")
     val BCH: SimpleBuyBalanceResponse? = null,
-    @Json(name = "ETH")
+    @field:Json(name = "ETH")
     val ETH: SimpleBuyBalanceResponse? = null,
-    @Json(name = "XLM")
+    @field:Json(name = "XLM")
     val XLM: SimpleBuyBalanceResponse? = null,
-    @Json(name = "PAX")
+    @field:Json(name = "PAX")
     val PAX: SimpleBuyBalanceResponse? = null,
-    @Json(name = "ALGO")
+    @field:Json(name = "ALGO")
     val ALGO: SimpleBuyBalanceResponse? = null,
-    @Json(name = "USDT")
+    @field:Json(name = "USDT")
     val USDT: SimpleBuyBalanceResponse? = null,
-    @Json(name = "EUR")
+    @field:Json(name = "EUR")
     val EUR: SimpleBuyBalanceResponse? = null,
-    @Json(name = "USD")
+    @field:Json(name = "USD")
     val USD: SimpleBuyBalanceResponse? = null,
-    @Json(name = "GBP")
+    @field:Json(name = "GBP")
     val GBP: SimpleBuyBalanceResponse? = null
 ) {
     operator fun get(ccy: CryptoCurrency): SimpleBuyBalanceResponse? {

@@ -165,6 +165,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                 asset) {
                 processAction(AssetAction.Sell)
             }
+            AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
         }
 
     private fun checkForKycStatus(action: () -> Unit) {

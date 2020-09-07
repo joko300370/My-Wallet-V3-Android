@@ -17,6 +17,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
@@ -96,6 +97,10 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                     }
                 )
 
+            funds_withdraw_holder.visibleIf { account.actions.contains(AssetAction.Withdraw) }
+            funds_deposit_holder.visibleIf { account.actions.contains(AssetAction.Deposit) }
+            funds_activity_holder.visibleIf { account.actions.contains(AssetAction.ViewActivity) }
+
             funds_withdraw_holder.setOnClickListener {
                 dismiss()
                 host.withdrawFiat(account.fiatCurrency)
@@ -126,6 +131,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
             when (ticker) {
                 "EUR" -> R.string.euros
                 "GBP" -> R.string.pounds
+                "USD" -> R.string.us_dollars
                 else -> R.string.empty
             }
         )

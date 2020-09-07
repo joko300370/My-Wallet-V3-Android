@@ -210,7 +210,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
-                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(state.selectedFiatAccount!!)
+                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
+                    state.selectedFiatAccount
+                    ?: return
+                )
                 DashboardSheet.LINK_OR_DEPOSIT -> {
                     state.selectedFiatAccount?.let {
                         LinkBankAccountDetailsBottomSheet.newInstance(it)
