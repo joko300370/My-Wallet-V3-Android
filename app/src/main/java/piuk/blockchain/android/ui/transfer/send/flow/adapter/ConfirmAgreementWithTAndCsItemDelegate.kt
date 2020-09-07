@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.ui.urllinks.INTEREST_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.INTEREST_TERMS_OF_SERVICE
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.copyable_text_form_item.*
 import kotlinx.android.synthetic.main.item_send_confirm_agreement_tcs.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxOption

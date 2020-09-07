@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.dialog_asset_actions_sheet.view.*
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -123,7 +122,6 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker), asset) {
                     processAction(AssetAction.Send)
-                    dismiss()
                 }
             AssetAction.NewSend ->
                 AssetActionItem(getString(R.string.common_send), R.drawable.ic_tx_sent,
@@ -136,7 +134,6 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                     getString(R.string.dashboard_asset_actions_receive_dsc,
                         asset.displayTicker), asset) {
                     processAction(AssetAction.Receive)
-                    dismiss()
                 }
             AssetAction.Swap -> AssetActionItem(getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
@@ -155,9 +152,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset) {
-                checkForKycStatus {
-                    goToDeposit(asset)
-                }
+                goToDeposit()
             }
             AssetAction.Sell -> AssetActionItem(getString(R.string.common_sell),
                 R.drawable.ic_tx_sell,
@@ -167,6 +162,18 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
         }
+
+    private fun goToDeposit() {
+        checkForKycStatus {
+            processAction(AssetAction.Deposit)
+        }
+    }
+
+    private fun goToSummary() {
+        checkForKycStatus {
+            processAction(AssetAction.Summary)
+        }
+    }
 
     private fun checkForKycStatus(action: () -> Unit) {
         disposables += kycTierService.tiers().subscribeBy(
@@ -182,33 +189,6 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                 Timber.e("Error getting tiers in asset actions sheet $it")
             }
         )
-    }
-
-    private fun goToDeposit(asset: CryptoCurrency) {
-        checkForKycStatus {
-            disposables += coincore[asset].accountGroup(AssetFilter.NonCustodial)
-                .subscribeBy {
-                    when {
-                        it.accounts.size > 1 -> {
-                            model.process(SelectSendingAccount)
-                        }
-                        it.accounts.size == 1 -> {
-                            model.process(HandleActionIntent(AssetAction.Deposit))
-                        }
-                        else -> {
-                            throw IllegalStateException(
-                                "No accounts available to deposit into interest"
-                            )
-                        }
-                    }
-                }
-        }
-    }
-
-    private fun goToSummary() {
-        checkForKycStatus {
-            processAction(AssetAction.Summary)
-        }
     }
 
     private fun processAction(action: AssetAction) {

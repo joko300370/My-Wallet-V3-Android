@@ -15,8 +15,11 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
+import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import timber.log.Timber
@@ -76,7 +79,7 @@ class AssetDetailsFlow(
     private fun handleStateChange(
         newState: AssetDetailsState
     ) {
-        localState = newState
+
         if (currentStep != newState.assetDetailsCurrentStep) {
             currentStep = newState.assetDetailsCurrentStep
             if (currentStep == AssetDetailsStep.ZERO) {
@@ -86,13 +89,15 @@ class AssetDetailsFlow(
             }
         }
 
-        if (newState.hostAction != null) {
+        if (newState.hostAction != null && newState.hostAction != localState.hostAction) {
             handleHostAction(newState, assetFlowHost)
         }
 
         if (newState.navigateToInterestDashboard) {
             assetFlowHost.goToInterestDashboard()
         }
+
+        localState = newState
     }
 
     private fun showFlowStep(step: AssetDetailsStep) {
@@ -103,12 +108,18 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
-                    this, interestAccountsFilter(), R.string.select_deposit_source_title)
+                    this, fundedNonCustodialAccounts(),
+                    when (localState.hostAction) {
+                        AssetAction.Deposit -> R.string.select_deposit_source_title
+                        AssetAction.Send,
+                        AssetAction.NewSend -> R.string.select_send_sheet_title
+                        else -> R.string.select_account_sheet_title
+                    })
             }
         )
     }
 
-    private fun interestAccountsFilter(): Single<List<BlockchainAccount>> =
+    private fun fundedNonCustodialAccounts(): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
             .map { it.filter { a -> a.isFunded } }
@@ -117,37 +128,106 @@ class AssetDetailsFlow(
         newState: AssetDetailsState,
         host: AssetDetailsHost
     ) {
-        val account = newState.selectedAccount.selectFirstAccount()
         when (newState.hostAction) {
             AssetAction.ViewActivity -> {
-                host.gotoActivityFor(account)
-                finishFlow()
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        launchActivity(it)
+                    }
+                )
             }
             AssetAction.Send -> {
-                host.gotoSendFor(account)
-                finishFlow()
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        launchSend(it)
+                    }
+                )
             }
             AssetAction.NewSend -> {
-                host.launchNewSendFor(account, newState.hostAction)
-                finishFlow()
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        launchNewSend(it)
+                    }
+                )
             }
             AssetAction.Receive -> {
-                host.goToReceiveFor(account)
-                finishFlow()
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        launchReceive(it)
+                    }
+                )
             }
             AssetAction.Swap -> {
-                host.gotoSwap(account)
-                finishFlow()
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        launchSwap(it)
+                    }
+                )
             }
             AssetAction.Sell -> {
-                host.goToSellFrom(account)
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        host.goToSellFrom(it as CryptoAccount)
+                        finishFlow()
+                    }
+                )
             }
-            AssetAction.Summary -> getInterestAccountAndNavigate(account, newState.hostAction)
-            AssetAction.Deposit -> newState.asset!!.accountGroup(AssetFilter.NonCustodial)
-                .subscribeBy {
-                    getInterestAccountAndNavigate(it.accounts.first(), newState.hostAction)
-                }
+            AssetAction.Summary -> getInterestAccountAndNavigate(
+                newState.selectedAccount.selectFirstAccount(), newState.hostAction)
+            AssetAction.Deposit -> {
+                selectAccountOrPerformAction(
+                    state = newState,
+                    singleAccountAction = {
+                        getInterestAccountAndNavigate(it, newState.hostAction)
+                    }
+                )
+            }
         }
+    }
+
+    private fun selectAccountOrPerformAction(
+        state: AssetDetailsState,
+        singleAccountAction: (SingleAccount) -> Unit
+    ) {
+        state.selectedAccount?.let {
+            when (it) {
+                is CryptoAccountCustodialGroup -> {
+                    if (it.accounts.first() is InterestAccount) {
+                        selectFromAccounts(state, singleAccountAction)
+                    } else {
+                        singleAccountAction(it.accounts.first())
+                    }
+                }
+                is CryptoAccountNonCustodialGroup -> {
+                    selectFromAccounts(state, singleAccountAction)
+                }
+                else -> throw IllegalStateException("Unsupported Account type $it")
+            }
+        }
+    }
+
+    private fun selectFromAccounts(
+        state: AssetDetailsState,
+        singleAccountAction: (SingleAccount) -> Unit
+    ) {
+        disposables += coincore[state.asset!!.asset].accountGroup(AssetFilter.NonCustodial)
+            .subscribeBy { ag ->
+                when {
+                    ag.accounts.size > 1 -> {
+                        model.process(SelectAccount)
+                    }
+                    ag.accounts.size == 1 -> {
+                        singleAccountAction(ag.accounts.first())
+                    }
+                    else -> throw IllegalStateException("Error when getting non-custodial accounts")
+                }
+            }
     }
 
     override fun finishFlow() {
@@ -156,7 +236,17 @@ class AssetDetailsFlow(
     }
 
     override fun onAccountSelected(account: BlockchainAccount) {
-        getInterestAccountAndNavigate(account as SingleAccount, AssetAction.Deposit)
+        val singleAccount = account as SingleAccount
+        when (localState.hostAction) {
+            AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
+            AssetAction.NewSend -> launchNewSend(singleAccount)
+            AssetAction.Send -> launchSend(singleAccount)
+            AssetAction.ViewActivity -> launchActivity(singleAccount)
+            AssetAction.Swap -> launchSwap(singleAccount)
+            AssetAction.Receive -> launchReceive(singleAccount)
+            else -> throw IllegalStateException(
+                "Account selection not supported for this action ${localState.hostAction}")
+        }
     }
 
     private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
@@ -183,6 +273,31 @@ class AssetDetailsFlow(
         } ?: throw IllegalStateException("No asset defined in local state - action: $assetAction")
     }
 
+    private fun launchNewSend(account: SingleAccount) {
+        assetFlowHost.launchNewSendFor(account, AssetAction.NewSend)
+        finishFlow()
+    }
+
+    private fun launchSend(account: SingleAccount) {
+        assetFlowHost.gotoSendFor(account)
+        finishFlow()
+    }
+
+    private fun launchReceive(account: SingleAccount) {
+        assetFlowHost.goToReceiveFor(account)
+        finishFlow()
+    }
+
+    private fun launchSwap(account: SingleAccount) {
+        assetFlowHost.gotoSwap(account)
+        finishFlow()
+    }
+
+    private fun launchActivity(account: SingleAccount) {
+        assetFlowHost.gotoActivityFor(account)
+        finishFlow()
+    }
+
     override fun onAccountSelectorBack() {
         model.process(ReturnToPreviousStep)
     }
@@ -194,9 +309,9 @@ class AssetDetailsFlow(
     }
 
     private fun resetFlow() {
+        model.process(ClearSheetDataIntent)
         disposables.clear()
         currentStep = AssetDetailsStep.ZERO
-        model.process(ClearSheetDataIntent)
     }
 }
 
