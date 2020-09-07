@@ -13,11 +13,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:background="@android:color/transparent"
+        android:digits="0123456789-.,"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:gravity="center"
         android:inputType="numberDecimal"
-        android:digits="0123456789-.,"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,18 +43,24 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
-        app:srcCompat="@drawable/ic_currency_type_swap" />
+        app:srcCompat="@drawable/ic_currency_type_swap"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/error"
         style="@style/Text.Error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/tiny_margin"
         android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginEnd="@dimen/tiny_margin"
+        android:gravity="center"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/currency_swap"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
-        tools:text="$ 200000 Max" />
+        tools:text="$ 200000 Max"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
