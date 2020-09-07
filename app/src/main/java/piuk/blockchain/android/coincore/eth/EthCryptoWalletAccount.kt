@@ -5,7 +5,6 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
@@ -138,16 +137,15 @@ internal class EthCryptoWalletAccount(
         }
 
     override val sendState: Single<SendState>
-        get() = Singles.zip(
-                accountBalance,
-                ethDataManager.isLastTxPending()
-            ) { balance: Money, hasUnconfirmed: Boolean ->
-                when {
-                    balance.isZero -> SendState.NO_FUNDS
-                    hasUnconfirmed -> SendState.SEND_IN_FLIGHT
-                    else -> SendState.CAN_SEND
+        get() = super.sendState.flatMap { state ->
+            ethDataManager.isLastTxPending().map { hasUnconfirmed ->
+                if (hasUnconfirmed) {
+                    SendState.SEND_IN_FLIGHT
+                } else {
+                    state
                 }
             }
+        }
 
     override val actions: AvailableActions
         get() = super.actions.let {

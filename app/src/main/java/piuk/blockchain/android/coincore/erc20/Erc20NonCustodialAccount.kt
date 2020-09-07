@@ -94,14 +94,13 @@ abstract class Erc20NonCustodialAccount(
         }
 
     override val sendState: Single<SendState>
-        get() = Singles.zip(
-            accountBalance,
-            ethDataManager.isLastTxPending()
-        ) { balance: Money, hasUnconfirmed: Boolean ->
-            when {
-                balance.isZero -> SendState.NO_FUNDS
-                hasUnconfirmed -> SendState.SEND_IN_FLIGHT
-                else -> SendState.CAN_SEND
+        get() = super.sendState.flatMap { state ->
+            ethDataManager.isLastTxPending().map { hasUnconfirmed ->
+                if (hasUnconfirmed) {
+                    SendState.SEND_IN_FLIGHT
+                } else {
+                    state
+                }
             }
         }
 

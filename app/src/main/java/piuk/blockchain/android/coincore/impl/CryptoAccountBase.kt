@@ -107,6 +107,14 @@ abstract class CryptoNonCustodialAccount(
                 }
             }
 
+    override val sendState: Single<SendState>
+        get() = actionableBalance.map {
+            if (it.isZero) {
+                SendState.NO_FUNDS
+            } else {
+                SendState.CAN_SEND
+            }
+        }
     override fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
 
