@@ -35,6 +35,14 @@ class CustodialSellProcessor(
 
     private lateinit var order: CustodialWalletOrder
 
+    // The reason that we are using these values is that the API responds with fiatvalues as limits, so when
+    // user swaps to crypto we convert the limits to Crypto if we swap again we convert these values again to fiat and
+    // sometimes due to rounding there are values like 4.99 or 5.01 displayed in the UI
+    // instead of 5 that was originally returned from the API.
+
+    private lateinit var minApiFiatAmount: FiatValue
+    private lateinit var maxApiFiatAmount: FiatValue
+
     override val userFiat: String
         get() = (sendTarget as? FiatAccount)?.fiatCurrency
             ?: throw IllegalStateException("send target should be fiat account")
@@ -58,6 +66,9 @@ class CustodialSellProcessor(
                     minLimit = pair.sellLimits.minLimit(sendTarget.fiatCurrency),
                     feeLevel = FeeLevel.None
                 ))
+        }.doOnSuccess {
+            minApiFiatAmount = it.minLimit as FiatValue
+            maxApiFiatAmount = it.maxLimit as FiatValue
         }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
@@ -88,7 +99,7 @@ class CustodialSellProcessor(
 
     private fun maxLimit(amount: Money, pendingTx: PendingTx): Money? =
         when (amount) {
-            is FiatValue -> pendingTx.maxLimit?.toFiat(exchangeRates, amount.currencyCode)
+            is FiatValue -> maxApiFiatAmount
             is CryptoValue -> (pendingTx.maxLimit as? FiatValue)?.let {
                 it.toCrypto(exchangeRates, amount.currency)
             } ?: pendingTx.maxLimit
@@ -97,7 +108,7 @@ class CustodialSellProcessor(
 
     private fun minLimit(amount: Money, pendingTx: PendingTx): Money? =
         when (amount) {
-            is FiatValue -> pendingTx.minLimit?.toFiat(exchangeRates, amount.currencyCode)
+            is FiatValue -> minApiFiatAmount
             is CryptoValue -> (pendingTx.minLimit as? FiatValue)?.let {
                 it.toCrypto(exchangeRates, amount.currency)
             } ?: pendingTx.minLimit
