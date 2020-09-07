@@ -8,7 +8,7 @@
 
     <piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
         android:id="@+id/enter_amount"
-        style="@style/Text.Semibold.48"
+        style="@style/Text.Semibold.40"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"

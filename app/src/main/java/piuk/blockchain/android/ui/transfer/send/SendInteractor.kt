@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transfer.send
 
-import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -22,7 +21,6 @@ import timber.log.Timber
 
 class SendInteractor(
     private val coincore: Coincore,
-    private val currencyPrefs: CurrencyPrefs,
     private val addressFactory: AddressFactory
 ) {
     private var transactionProcessor: TransactionProcessor? = null
@@ -79,7 +77,7 @@ class SendInteractor(
         transactionProcessor?.setOption(newOption) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
-        transactionProcessor?.userExchangeRate(currencyPrefs.selectedFiatCurrency)
+        transactionProcessor?.userExchangeRate()
             ?.map { it as ExchangeRate.CryptoToFiat }
             ?: throw IllegalStateException("TxProcessor not initialised")
 

@@ -53,14 +53,16 @@ class EnterAmountSheet(
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
             if (!amount_sheet_input.isConfigured) {
-                amount_sheet_input.configuration = FiatCryptoViewConfiguration(
-                    input = CurrencyType.Crypto,
-                    output = CurrencyType.Crypto,
-                    fiatCurrency = currencyPrefs.selectedFiatCurrency,
-                    cryptoCurrency = newState.sendingAccount.asset,
-                    predefinedAmount = newState.sendAmount
-                )
-                showKeyboard()
+                newState.pendingTx?.selectedFiat?.let {
+                    amount_sheet_input.configuration = FiatCryptoViewConfiguration(
+                        input = CurrencyType.Crypto,
+                        output = CurrencyType.Crypto,
+                        fiatCurrency = it,
+                        cryptoCurrency = newState.sendingAccount.asset,
+                        predefinedAmount = newState.sendAmount
+                    )
+                    showKeyboard()
+                }
             }
 
             val availableBalance = newState.availableBalance

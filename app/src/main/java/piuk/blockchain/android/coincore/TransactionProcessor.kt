@@ -97,7 +97,7 @@ abstract class TransactionProcessor(
     protected val exchangeRates: ExchangeRateDataManager
 ) : KoinComponent {
 
-    protected val userFiat: String by unsafeLazy {
+    open val userFiat: String by unsafeLazy {
         payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
     }
 
@@ -173,7 +173,7 @@ abstract class TransactionProcessor(
     // Return a stream of the exchange rate between the source asset and the user's selected
     // fiat currency. This should always return at least once, but can safely either complete
     // or keep sending updated rates, depending on what is useful for Transaction context
-    open fun userExchangeRate(userFiat: String): Observable<ExchangeRate> =
+    open fun userExchangeRate(): Observable<ExchangeRate> =
         Observable.just(
             exchangeRates.getLastPrice(sendingAccount.asset, userFiat)
         ).map { rate ->

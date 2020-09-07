@@ -165,6 +165,10 @@
         <item name="android:textSize">48sp</item>
     </style>
 
+    <style name="Text.Semibold.40">
+        <item name="android:textSize">40sp</item>
+    </style>
+
     <style name="Text.Semibold.14">
         <item name="android:textSize">14sp</item>
     </style>

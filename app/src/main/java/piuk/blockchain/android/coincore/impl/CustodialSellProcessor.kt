@@ -35,7 +35,7 @@ class CustodialSellProcessor(
 
     private lateinit var order: CustodialWalletOrder
 
-    private val fiatCurrency: String
+    override val userFiat: String
         get() = (sendTarget as? FiatAccount)?.fiatCurrency
             ?: throw IllegalStateException("send target should be fiat account")
 
@@ -53,7 +53,7 @@ class CustodialSellProcessor(
                     amount = FiatValue.zero(sendTarget.fiatCurrency),
                     available = CryptoValue.zero(sendingAccount.asset),
                     fees = CryptoValue.zero(sendingAccount.asset),
-                    selectedFiat = sendTarget.fiatCurrency,
+                    selectedFiat = userFiat,
                     maxLimit = pair.sellLimits.maxLimit(sendTarget.fiatCurrency),
                     minLimit = pair.sellLimits.minLimit(sendTarget.fiatCurrency),
                     feeLevel = FeeLevel.None
@@ -119,7 +119,7 @@ class CustodialSellProcessor(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return walletManager.getQuote(
             cryptoCurrency = sendingAccount.asset,
-            fiatCurrency = fiatCurrency,
+            fiatCurrency = userFiat,
             amount = pendingTx.amount.toBigInteger().toString(),
             action = "SELL",
             currency = pendingTx.amount.currencyCode
@@ -135,7 +135,7 @@ class CustodialSellProcessor(
             TxOptionValue.From(sendingAccount.label),
             TxOptionValue.To(sendTarget.label),
             TxOptionValue.Total(if (pendingTx.amount is FiatValue) pendingTx.amount else
-                FiatValue.fromMajor(fiatCurrency,
+                FiatValue.fromMajor(userFiat,
                     pendingTx.amount.toBigDecimal().times(quote.rate.toBigDecimal()))
             )
         )
