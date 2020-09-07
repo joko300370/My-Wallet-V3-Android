@@ -49,7 +49,7 @@ interface CustodialWalletManager {
     ): Maybe<CryptoValue>
 
     fun getSupportedBuySellCryptoCurrencies(
-        fiatCurrency: String
+        fiatCurrency: String? = null
     ): Single<BuySellPairs>
 
     fun getSupportedFiatCurrencies(): Single<List<String>>

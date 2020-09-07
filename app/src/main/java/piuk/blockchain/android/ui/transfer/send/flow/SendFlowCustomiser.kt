@@ -55,6 +55,7 @@ class SendFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_enter_asset_address_hint,
                 resources.getString(state.asset.assetName()))
+            AssetAction.Sell -> ""
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
 
@@ -64,6 +65,7 @@ class SendFlowCustomiserImpl(
                 R.string.send_internal_transfer_message,
                 resources.getString(state.asset.assetName()),
                 state.asset.displayTicker)
+            AssetAction.Sell -> ""
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
 

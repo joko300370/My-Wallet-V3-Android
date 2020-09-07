@@ -138,7 +138,7 @@ class LiveCustodialWalletManager(
         }
 
     override fun getSupportedBuySellCryptoCurrencies(
-        fiatCurrency: String
+        fiatCurrency: String?
     ): Single<BuySellPairs> =
         nabuService.getSupportedCurrencies(fiatCurrency)
             .map {
