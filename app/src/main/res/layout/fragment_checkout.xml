@@ -73,13 +73,26 @@
         style="@style/Text.Semibold.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/small_margin"
-        android:paddingBottom="@dimen/small_margin"
-        app:layout_constraintBottom_toTopOf="@id/button_cancel"
+        android:paddingTop="@dimen/tiny_margin"
+        android:paddingBottom="@dimen/smallest_margin"
+        app:layout_constraintBottom_toTopOf="@id/purchase_note_1"
         app:layout_constraintEnd_toEndOf="@id/button_action"
         app:layout_constraintStart_toStartOf="@id/button_action"
         app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:text="@string/purchase_card_note_1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/purchase_note_1"
+        style="@style/Text.Semibold.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/smallest_margin"
+        android:paddingBottom="@dimen/very_small_margin"
+        app:layout_constraintBottom_toTopOf="@id/button_cancel"
+        app:layout_constraintEnd_toEndOf="@id/button_action"
+        app:layout_constraintStart_toStartOf="@id/button_action"
+        app:layout_goneMarginBottom="@dimen/standard_margin"
+        tools:text="@string/purchase_card_note_2" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_cancel"

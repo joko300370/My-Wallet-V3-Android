@@ -93,7 +93,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 transaction_progress_view.showTxSuccess(
                     getString(R.string.card_purchased, value.formatOrSymbolForZero()),
                     getString(R.string.card_purchased_available_now,
-                        getString(value.currency.assetName())))
+                        getString(value.currency.assetName())), true, requireActivity())
             }
             loading && value != null -> {
                 transaction_progress_view.showTxInProgress(
