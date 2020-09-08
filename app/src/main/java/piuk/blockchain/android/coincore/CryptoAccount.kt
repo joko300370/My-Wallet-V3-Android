@@ -47,9 +47,7 @@ enum class SendState {
 }
 
 interface InterestAccount
-
 interface TradingAccount
-
 interface NonCustodialAccount
 
 typealias SingleAccountList = List<SingleAccount>

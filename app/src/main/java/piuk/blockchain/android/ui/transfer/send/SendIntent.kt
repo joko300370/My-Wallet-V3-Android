@@ -230,6 +230,7 @@ sealed class SendIntent : MviIntent<SendState> {
         override fun reduce(oldState: SendState): SendState =
             oldState.copy(
                 nextEnabled = true,
+                currentStep = SendStep.IN_PROGRESS,
                 executionStatus = TxExecutionStatus.ERROR
             ).updateBackstack(oldState)
     }

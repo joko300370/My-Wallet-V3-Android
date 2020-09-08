@@ -245,6 +245,12 @@ class SendFlowCustomiserImpl(
                     it is FiatAccount
                 }
             }
+            AssetAction.NewSend,
+            AssetAction.Send -> {
+                {
+                    it !is FiatAccount
+                }
+            }
             else -> {
                 { true }
             }

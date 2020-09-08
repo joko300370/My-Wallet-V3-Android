@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class FiatAsset(
@@ -71,6 +72,12 @@ class FiatAsset(
         }
 
     override fun transferList(account: SingleAccount): Single<SingleAccountList> =
+        when (account) {
+            is TradingAccount -> getFiatAccountList()
+            else -> Single.just(emptyList())
+        }
+
+    private fun getFiatAccountList(): Single<SingleAccountList> =
         fetchFiatWallets().map {
             it.accounts
         }.toSingle(emptyList())

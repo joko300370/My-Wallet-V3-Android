@@ -16,8 +16,10 @@ import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -184,10 +186,8 @@ internal abstract class CryptoAssetBase(
         require(account.asset == asset)
 
         return when (account) {
-            is CustodialTradingAccount -> getNonCustodialAccountList()
-            is CryptoInterestAccount -> Single.just(emptyList())
-            is CryptoExchangeAccount -> Single.just(emptyList())
-            is CryptoNonCustodialAccount ->
+            is TradingAccount -> getNonCustodialAccountList()
+            is NonCustodialAccount ->
                 Maybe.concat(
                     listOf(getPitLinkingAccount(), getInterestAccount())
                 ).toList()
