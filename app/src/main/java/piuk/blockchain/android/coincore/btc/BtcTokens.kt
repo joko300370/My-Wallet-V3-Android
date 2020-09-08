@@ -25,7 +25,7 @@ import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
-private const val BTC_URL_PREFIX = "bitcoin::"
+private const val BTC_URL_PREFIX = "bitcoin:"
 
 internal class BtcAsset(
     payloadManager: PayloadDataManager,
