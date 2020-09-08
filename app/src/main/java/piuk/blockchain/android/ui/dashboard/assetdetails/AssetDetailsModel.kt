@@ -76,8 +76,8 @@ class AssetDetailsModel(
                     onSuccess = {
                         process(AssetExchangeRateLoaded(it))
                     }, onError = {
-                        process(AssetExchangeRateFailed)
-                    })
+                    process(AssetExchangeRateFailed)
+                })
             is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
             is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
             is HandleActionIntent,
@@ -97,7 +97,8 @@ class AssetDetailsModel(
             is ClearSheetDataIntent,
             is CustodialSheetFinished,
             is TransactionInFlight,
-            is ShowInterestDashboard -> null
+            is ShowInterestDashboard,
+            is ClearActionStates -> null
         }
     }
 

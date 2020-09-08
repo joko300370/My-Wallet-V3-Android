@@ -75,6 +75,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         }
 
         view.asset_actions_back.setOnClickListener {
+            model.process(ClearActionStates)
             model.process(ReturnToPreviousStep)
             dispose()
         }
@@ -172,7 +173,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
     private fun goToDeposit() {
         checkForKycStatus {
-            processAction(AssetAction.Deposit)
+            model.process(HandleActionIntent(AssetAction.Deposit))
         }
     }
 

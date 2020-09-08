@@ -137,6 +137,14 @@ object TransactionInFlight : AssetDetailsIntent() {
         oldState.copy(errorState = AssetDetailsError.TX_IN_FLIGHT)
 }
 
+object ClearActionStates : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NONE,
+            hostAction = null
+        )
+}
+
 object ShowInterestDashboard : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(navigateToInterestDashboard = true)

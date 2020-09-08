@@ -89,7 +89,7 @@ class AssetDetailsFlow(
             }
         }
 
-        if (newState.hostAction != null && newState.hostAction != localState.hostAction) {
+        if (newState.hostAction != null && localState.hostAction != newState.hostAction) {
             handleHostAction(newState, assetFlowHost)
         }
 
