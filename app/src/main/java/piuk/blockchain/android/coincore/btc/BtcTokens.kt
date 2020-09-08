@@ -92,7 +92,9 @@ internal class BtcAsset(
             if (isValidAddress(address)) {
                 BtcAddress(
                     address = address,
-                    networkParams = networkParameters)
+                    networkParams = networkParameters,
+                    scanUri = address
+                )
             } else {
                 null
             }
@@ -107,6 +109,7 @@ internal class BtcAsset(
 
 internal class BtcAddress(
     override val address: String,
+    override val scanUri: String? = null,
     override val label: String = address,
     private val networkParams: NetworkParameters
 ) : CryptoAddress {

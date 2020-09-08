@@ -99,10 +99,8 @@ class MainPresenterTest {
             nabuToken = nabuToken,
             nabuDataManager = nabuDatamanager,
             crashLogger = crashLogger,
-            simpleBuyAvailability = mock(),
             cacheCredentialsWiper = mock(),
-            analytics = mock(),
-            appUtil = mock()
+            analytics = mock()
         )
 
         subject.attachView(view)

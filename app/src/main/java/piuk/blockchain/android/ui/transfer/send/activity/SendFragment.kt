@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transfer.send.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,6 +11,7 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -40,9 +40,6 @@ import com.blockchain.ui.chooser.AccountMode
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.widget.textChanges
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.MULTI_WALLET
 import info.blockchain.balance.CryptoValue
@@ -51,15 +48,18 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.alert_watch_only_spend.view.*
 import kotlinx.android.synthetic.main.fragment_send.*
+import kotlinx.android.synthetic.main.fragment_send.coordinator_layout
 import kotlinx.android.synthetic.main.include_amount_row.*
 import kotlinx.android.synthetic.main.include_amount_row.view.*
 import kotlinx.android.synthetic.main.include_to_row_editable.*
 import kotlinx.android.synthetic.main.include_to_row_editable.view.*
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.SendTarget
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
@@ -73,7 +73,6 @@ import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
@@ -205,6 +204,27 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         amountContainer.currencyCrypto.text = asset.displayTicker
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_qr_main -> {
+                openQrScan()
+                analytics.logEvent(SendAnalytics.QRButtonClicked)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun openQrScan() {
+        QrScanHandler.requestScanPermissions(
+            activity = requireActivity(),
+            rootView = coordinator_layout
+        ) {
+            QrScanHandler.startQrScanActivity(this, appUtil)
+        }
+        analytics.logEvent(SendAnalytics.QRButtonClicked)
+    }
+
     @CallSuper
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
@@ -328,24 +348,21 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     override fun finishPage() =
         requireActivity().finish()
 
-    private fun startScanActivity() {
-        if (!appUtil.isCameraOpen) {
-            val intent = Intent(activity, CaptureActivity::class.java)
-            startActivityForResult(intent, SCAN_PRIVX)
-        } else {
-            showSnackbar(R.string.camera_unavailable, Snackbar.LENGTH_LONG)
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         handlingActivityResult = true
         if (resultCode != AppCompatActivity.RESULT_OK) return
         resetPitAddressState()
         when (requestCode) {
-            SCAN_PRIVX -> presenter.handlePrivxScan(data?.getStringExtra(CaptureActivity.SCAN_RESULT))
+            QrScanHandler.SCAN_URI_RESULT -> handleQrScanResult(data)
             REQUEST_CODE_BTC_RECEIVING -> presenter.selectReceivingAccount(unpackAccountResult(data))
             REQUEST_CODE_BCH_RECEIVING -> presenter.selectReceivingAccount(unpackAccountResult(data))
             else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun handleQrScanResult(intent: Intent?) {
+        intent?.getStringExtra(CaptureActivity.SCAN_RESULT)?.let {
+            presenter.processScanResult(it, asset)
         }
     }
 
@@ -469,11 +486,10 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     }
 
     private fun handleIncomingArguments() {
-        if (!handlePredefinedInput(arguments.inputDeeplinked)) {
-            val source = account
-            require(source != null)
-            presenter.setSourceAccount(source)
-        }
+        val source = account
+        require(source != null)
+        presenter.setSourceAccount(source)
+        handlePredefinedInput(arguments.inputDeeplinked)
     }
 
     private fun handlePredefinedInput(isDeeplinked: Boolean): Boolean {
@@ -856,29 +872,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         }
     }
 
-    override fun showWatchOnlyWarning(address: String) {
-        activity.run {
-            val dialogView = layoutInflater.inflate(R.layout.alert_watch_only_spend, null)
-            val alertDialog = AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setView(dialogView.rootView)
-                .setCancelable(false)
-                .create()
-
-            dialogView.confirm_cancel.setOnClickListener {
-                toContainer.toAddressEditTextView.setText("")
-                presenter.setWarnWatchOnlySpend(!dialogView.confirm_dont_ask_again.isChecked)
-                alertDialog.dismiss()
-            }
-
-            dialogView.confirm_continue.setOnClickListener {
-                presenter.setWarnWatchOnlySpend(!dialogView.confirm_dont_ask_again.isChecked)
-                alertDialog.dismiss()
-            }
-
-            alertDialog.show()
-        }
-    }
-
     override fun getClipboardContents(): String? {
         val clipMan = activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = clipMan.primaryClip
@@ -887,44 +880,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         } else null
     }
 
-    override fun showSpendFromWatchOnlyWarning(address: String) {
-        showAlert(
-            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
-                .setTitle(R.string.privx_required)
-                .setMessage(
-                    getString(
-                        R.string.watch_only_spend_instructions,
-                        address
-                    )
-                )
-                .setCancelable(false)
-                .setPositiveButton(R.string.dialog_continue) { _, _ -> requestScanPermissions() }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-        )
-    }
-
-    private fun requestScanPermissions() {
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(coordinator_layout, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { requestScanPermissions() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            startScanActivity()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(requireActivity())
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
-    }
-
-    override fun showSecondPasswordDialog() {
+    override fun showSecondPasswordDialogIfRequired() {
         secondPasswordHandler.validate(object : SecondPasswordHandler.ResultListener {
             override fun onNoSecondPassword() {
                 presenter.onNoSecondPassword()
@@ -1209,6 +1165,15 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         }
     }
 
+    override fun showInvalidScanToast() {
+        ToastCustom.makeText(
+            requireContext(),
+            getText(R.string.scan_mismatch_transaction_target),
+            ToastCustom.LENGTH_SHORT,
+            ToastCustom.TYPE_ERROR
+        )
+    }
+
     override fun onBitPayAddressScanned() {
         bitPayAddressScanned = true
         hidePitAddressIcon()
@@ -1248,25 +1213,23 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     }
 
     companion object {
-        const val SCAN_PRIVX = 2011
         private const val ARGUMENT_SEND_INPUT = "send_input"
         private const val ARGUMENT_SEND_INPUT_DEEPLINKED = "send_input_deeplinked"
 
         private const val REQUEST_CODE_BTC_RECEIVING = 911
         private const val REQUEST_CODE_BCH_RECEIVING = 913
-        private const val REQUEST_CODE_MEMO = 915
 
         fun newInstance(
-            account: CryptoAccount?,
-            scanUri: String? = null,
+            sourceAccount: CryptoAccount?,
+            target: SendTarget? = null,
             isDeeplink: Boolean = false
         ): SendFragment {
             val fragment = SendFragment()
             fragment.arguments = Bundle().apply {
-                urlInput = scanUri
+                urlInput = (target as? CryptoAddress)?.scanUri
                 inputDeeplinked = isDeeplink
             }
-            fragment.account = account
+            fragment.account = sourceAccount
             return fragment
         }
 

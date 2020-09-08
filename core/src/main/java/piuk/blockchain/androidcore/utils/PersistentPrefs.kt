@@ -72,6 +72,5 @@ interface PersistentPrefs :
 
         // Send screen
         const val KEY_WARN_ADVANCED_FEE = "pref_warn_advanced_fee"
-        const val KEY_WARN_WATCH_ONLY_SPEND = "pref_warn_watch_only_spend"
     }
 }

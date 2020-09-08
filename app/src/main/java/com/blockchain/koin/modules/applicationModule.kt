@@ -312,10 +312,8 @@ val applicationModule = module {
                 nabuToken = get(),
                 simpleBuySync = get(),
                 crashLogger = get(),
-                simpleBuyAvailability = get(),
                 cacheCredentialsWiper = get(),
-                analytics = get(),
-                appUtil = get()
+                analytics = get()
             )
         }
 

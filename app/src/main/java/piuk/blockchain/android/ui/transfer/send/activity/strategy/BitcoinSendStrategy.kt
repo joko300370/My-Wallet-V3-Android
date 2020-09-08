@@ -68,9 +68,9 @@ import java.math.BigInteger
 import java.util.concurrent.TimeUnit
 
 interface BitPayProtocol {
-    fun setbitpayMerchant(merchant: String)
+    fun setBitpayMerchant(merchant: String)
 
-    fun setbitpayReceivingAddress(address: String)
+    fun setBitpayReceivingAddress(address: String)
 
     fun setIsBitpayPaymentRequest(isBitPay: Boolean)
 
@@ -168,11 +168,11 @@ class BitcoinSendStrategy(
         view?.updateReceivingAddress(address)
     }
 
-    override fun setbitpayMerchant(merchant: String) {
+    override fun setBitpayMerchant(merchant: String) {
         pendingTransaction.bitpayMerchant = "BitPay[$merchant]"
     }
 
-    override fun setbitpayReceivingAddress(address: String) {
+    override fun setBitpayReceivingAddress(address: String) {
         pendingTransaction.receivingAddress = address
     }
 
@@ -208,17 +208,8 @@ class BitcoinSendStrategy(
             .doAfterTerminate { view?.dismissProgressDialog() }
             .subscribe({ (validated, errorMessage) ->
                 if (validated) {
-                    if (pendingTransaction.isWatchOnly) {
-                        // returns to spendFromWatchOnly*BIP38 -> showPaymentReview()
-                        val address = pendingTransaction.sendingObject!!.accountObject as LegacyAddress
-                        view?.showSpendFromWatchOnlyWarning((address).address)
-                    } else if (pendingTransaction.isWatchOnly && verifiedSecondPassword != null) {
-                        // Second password already verified
-                        showPaymentReview()
-                    } else {
-                        // Checks if second pw needed then -> onNoSecondPassword()
-                        view?.showSecondPasswordDialog()
-                    }
+                    // Checks if second pw needed then -> onNoSecondPassword()
+                    view?.showSecondPasswordDialogIfRequired()
                 } else {
                     view?.showSnackbar(errorMessage, Snackbar.LENGTH_LONG)
                 }
@@ -641,14 +632,7 @@ class BitcoinSendStrategy(
         pendingTransaction.receivingAddress = legacyAddress.address
 
         view?.updateReceivingAddress(label)
-
-        if (legacyAddress.isWatchOnly && shouldWarnWatchOnly()) {
-            view?.showWatchOnlyWarning(legacyAddress.address)
-        }
     }
-
-    private fun shouldWarnWatchOnly(): Boolean =
-        prefs.getValue(PersistentPrefs.KEY_WARN_WATCH_ONLY_SPEND, true)
 
     @SuppressLint("CheckResult")
     private fun onReceivingBtcAccountSelected(account: Account) {

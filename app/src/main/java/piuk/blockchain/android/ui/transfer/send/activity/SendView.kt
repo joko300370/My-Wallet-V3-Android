@@ -110,11 +110,7 @@ interface SendView : MvpView {
 
     fun showBIP38PassphrasePrompt(scanData: String)
 
-    fun showWatchOnlyWarning(address: String)
-
-    fun showSpendFromWatchOnlyWarning(address: String)
-
-    fun showSecondPasswordDialog()
+    fun showSecondPasswordDialogIfRequired()
 
     fun showPaymentDetails(
         confirmationDetails: PaymentConfirmationDetails,
@@ -142,4 +138,6 @@ interface SendView : MvpView {
     fun updateRequiredLabelVisibility(isVisible: Boolean)
 
     fun isPitEnabled(enabled: Boolean)
+
+    fun showInvalidScanToast()
 }

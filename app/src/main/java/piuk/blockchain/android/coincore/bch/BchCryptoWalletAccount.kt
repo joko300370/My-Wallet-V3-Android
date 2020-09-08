@@ -72,7 +72,7 @@ internal class BchCryptoWalletAccount(
             }
             .singleOrError()
             .map {
-                BtcAddress(it, label, networkParams)
+                BtcAddress(address = it, label = label, networkParams = networkParams)
             }
 
     override val activity: Single<ActivitySummaryList>

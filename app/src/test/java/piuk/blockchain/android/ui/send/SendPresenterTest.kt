@@ -35,36 +35,6 @@ class SendPresenterTest {
     private val analytics: Analytics = mock()
 
     @Test
-    fun `handles xlm address scan, delegates to xlm strategy`() {
-        val view: SendView = mock()
-        val xlmStrategy: SendStrategy<SendView> = mock()
-
-        val exchangeRateFactory = mock<ExchangeRateDataManager> {
-            on { updateTickers() } `it returns` Completable.complete()
-        }
-
-        SendPresenter(
-            btcStrategy = mock(),
-            bchStrategy = mock(),
-            xlmStrategy = xlmStrategy,
-            prefs = mock(),
-            exchangeRates = mock(),
-            stringUtils = mock(),
-            envSettings = mock(),
-            exchangeRateFactory = exchangeRateFactory,
-            pitLinkingFeatureFlag = mock(),
-            bitpayDataManager = mock(),
-            analytics = analytics
-        ).apply {
-            attachView(view)
-            handlePredefinedInput("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4", CryptoCurrency.BTC, false)
-        }
-
-        verify(xlmStrategy).processURIScanAddress("GDYULVJK2T6G7HFUC76LIBKZEMXPKGINSG6566EPWJKCLXTYVWJ7XPY4")
-        verify(xlmStrategy).onCurrencySelected()
-    }
-
-    @Test
     fun `handles btc address scan, delegates to btc strategy`() {
         val view: SendView = mock()
         val btcStrategy: SendStrategy<SendView> = mock()
@@ -286,9 +256,7 @@ class SendPresenterTest {
         val view: SendView = mock()
         val btcStrategy: SendStrategy<SendView> = mock()
         val bchStrategy: SendStrategy<SendView> = mock()
-        val etherStrategy: SendStrategy<SendView> = mock()
         val xlmStrategy: SendStrategy<SendView> = mock()
-        val erc20Strategy: SendStrategy<SendView> = mock()
 
         val exchangeRateFactory = mock<ExchangeRateDataManager> {
             on { updateTickers() } `it returns` Completable.complete()
@@ -318,9 +286,7 @@ class SendPresenterTest {
 
         verify(btcStrategy, never()).processURIScanAddress(any())
         verify(bchStrategy, never()).processURIScanAddress(any())
-        verify(etherStrategy, never()).processURIScanAddress(any())
         verify(xlmStrategy, never()).processURIScanAddress(any())
-        verify(erc20Strategy, never()).processURIScanAddress(any())
         verify(analytics, never()).logEvent(any())
     }
 

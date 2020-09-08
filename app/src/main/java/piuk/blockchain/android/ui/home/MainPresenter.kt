@@ -22,28 +22,28 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
+import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
-import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.secondPasswordEvent
 import timber.log.Timber
@@ -53,14 +53,12 @@ interface MainView : MvpView, HomeNavigator {
     @Deprecated("Used for processing deep links. Find a way to get rid of this")
     fun getStartIntent(): Intent
 
-    fun onHandleInput(strUri: String)
     fun refreshAnnouncements()
     fun kickToLauncherPage()
     fun showProgressDialog(@StringRes message: Int)
     fun hideProgressDialog()
     fun clearAllDynamicShortcuts()
     fun setPitEnabled(enabled: Boolean)
-    fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
     fun displayLockboxMenu(lockboxAvailable: Boolean)
@@ -69,6 +67,8 @@ interface MainView : MvpView, HomeNavigator {
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
+
+    fun startTransactionFlowWithTarget(targets: Collection<CryptoAddress>)
 }
 
 class MainPresenter internal constructor(
@@ -89,9 +89,7 @@ class MainPresenter internal constructor(
     private val simpleBuySync: SimpleBuySyncFactory,
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
-    private val simpleBuyAvailability: SimpleBuyAvailability,
     private val cacheCredentialsWiper: CacheCredentialsWiper,
-    private val appUtil: AppUtil,
     nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
 
@@ -182,7 +180,7 @@ class MainPresenter internal constructor(
                 val strUri = prefs.getValue(PersistentPrefs.KEY_SCHEME_URL, "")
                 if (strUri.isNotEmpty()) {
                     prefs.removeValue(PersistentPrefs.KEY_SCHEME_URL)
-                    view?.onHandleInput(strUri)
+                    processScanResult(strUri)
                 }
                 view?.refreshAnnouncements()
             }
@@ -365,5 +363,19 @@ class MainPresenter internal constructor(
                     view?.launchThePitLinking(linkId)
                 }
             })
+    }
+
+    fun processScanResult(scanData: String) {
+        compositeDisposable += QrScanHandler.processScan(scanData)
+            .subscribeBy(
+                onSuccess = {
+                    when (it) {
+                        is ScanResult.HttpUri -> handlePossibleDeepLink(scanData)
+                        is ScanResult.TransactionTarget -> {
+                            view?.startTransactionFlowWithTarget(it.targets.filterIsInstance<CryptoAddress>())
+                        }
+                    }
+                }
+            )
     }
 }

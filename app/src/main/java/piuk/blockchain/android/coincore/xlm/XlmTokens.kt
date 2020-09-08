@@ -2,7 +2,10 @@ package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.fromStellarUri
+import com.blockchain.sunriver.isValidXlmQr
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
@@ -63,10 +66,19 @@ internal class XlmAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address)) {
-                XlmAddress(address)
+            if (address.isValidXlmQr()) {
+                val payment = address.fromStellarUri()
+                XlmAddress(
+                    address = payment.public.accountId,
+                    stellarPayment = payment,
+                    scanUri = address
+                )
             } else {
-                null
+                if (isValidAddress(address)) {
+                    XlmAddress(address, address)
+                } else {
+                    null
+                }
             }
         }
 
@@ -74,9 +86,25 @@ internal class XlmAsset(
         xlmDataManager.isAddressValid(address)
 }
 
-internal class XlmAddress(
+internal data class XlmAddress(
     override val address: String,
-    override val label: String = address
+    override val scanUri: String?,
+    override val label: String = address,
+    val stellarPayment: StellarPayment? = null
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.XLM
+
+    override fun equals(other: Any?): Boolean {
+        return (other is XlmAddress) &&
+            (other.asset == asset && other.address == address && other.label == label)
+    }
+
+    override fun hashCode(): Int {
+        var result = address.hashCode()
+        result = 31 * result + (scanUri?.hashCode() ?: 0)
+        result = 31 * result + label.hashCode()
+        result = 31 * result + (stellarPayment?.hashCode() ?: 0)
+        result = 31 * result + asset.hashCode()
+        return result
+    }
 }

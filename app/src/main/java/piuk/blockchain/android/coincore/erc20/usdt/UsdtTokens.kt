@@ -97,4 +97,6 @@ internal class UsdtAsset(
 internal class UsdtAddress(
     address: String,
     label: String = address
-) : Erc20Address(CryptoCurrency.USDT, address, label)
+) : Erc20Address(CryptoCurrency.USDT, address, label) {
+    override val scanUri: String? = null
+}

@@ -85,4 +85,5 @@ internal class StxAddress(
     override val label: String = address
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.STX
+    override val scanUri: String? = null
 }

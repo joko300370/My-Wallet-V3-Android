@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.home
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutManager
@@ -9,7 +9,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.View.FIND_VIEWS_WITH_TEXT
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -21,7 +20,6 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.koin.scopedInject
 import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.NotificationsUtil
-import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
@@ -32,26 +30,26 @@ import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.customviews.callbacks.OnTouchOutsideViewListener
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
 import piuk.blockchain.android.ui.interest.InterestDashboardActivity
@@ -71,13 +69,15 @@ import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
+import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -87,7 +87,8 @@ import java.util.ArrayList
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
-    IntroTourHost {
+    IntroTourHost,
+    DialogFlow.FlowHost {
 
     override val presenter: MainPresenter by scopedInject()
     override val view: MainView = this
@@ -104,9 +105,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private var activityResultAction: () -> Unit = {}
 
     private var backPressed: Long = 0
-
-    // Fragment callbacks for currency header
-    private val touchOutsideViews = HashMap<View, OnTouchOutsideViewListener>()
 
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
@@ -239,7 +237,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 true
             }
             R.id.action_qr_main -> {
-                requestScan()
+                val fragment = currentFragment::class.simpleName ?: "unknown"
+                QrScanHandler.requestScanPermissions(
+                    activity = this,
+                    rootView = coordinator_layout
+                ) {
+                    QrScanHandler.startQrScanActivity(this, appUtil)
+                }
                 analytics.logEvent(SendAnalytics.QRButtonClicked)
                 true
             }
@@ -252,12 +256,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         // We create a lambda so we handle the result after the view is attached to the presenter (onResume)
         activityResultAction = {
             when (requestCode) {
-                SCAN_URI -> {
-                    if (resultCode == RESULT_OK && data != null &&
-                        data.getStringExtra(CaptureActivity.SCAN_RESULT) != null
-                    ) {
-                        val strResult = data.getStringExtra(CaptureActivity.SCAN_RESULT)
-                        handlePredefinedInput(strResult, false)
+                QrScanHandler.SCAN_URI_RESULT -> {
+                    val scanData = data?.getStringExtra(CaptureActivity.SCAN_RESULT)
+                    if (resultCode == RESULT_OK && scanData != null) {
+                        presenter.processScanResult(scanData)
                     }
                 }
                 SETTINGS_EDIT,
@@ -343,63 +345,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_GENERAL)
     }
-
-    private fun startScanActivity() {
-        if (!appUtil.isCameraOpen) {
-            val intent = Intent(this@MainActivity, CaptureActivity::class.java)
-            startActivityForResult(intent, SCAN_URI)
-        } else {
-            ToastCustom.makeText(
-                this@MainActivity,
-                getString(R.string.camera_unavailable),
-                ToastCustom.LENGTH_SHORT,
-                ToastCustom.TYPE_ERROR
-            )
-        }
-    }
-
-    private fun handlePredefinedInput(strResult: String, isDeeplinked: Boolean) {
-        when {
-            strResult.isBTCorBCHAddress() -> disambiguateBTCandBCHQrScans(strResult)
-            strResult.isETHAddress() -> disambiguateETHQrScans(strResult)
-            strResult.isHttpUri() -> presenter.handlePossibleDeepLink(strResult)
-            else -> startTransferFragmentFromScan(null, strResult, isDeeplinked)
-        }
-    }
-
-    private fun disambiguateBTCandBCHQrScans(uri: String) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.confirm_currency)
-            .setMessage(R.string.confirm_currency_message)
-            .setCancelable(true)
-            .setPositiveButton(R.string.bitcoin_cash) { _, _ ->
-                startTransferFragmentFromScan(CryptoCurrency.BCH, uri)
-            }
-            .setNegativeButton(R.string.bitcoin) { _, _ ->
-                startTransferFragmentFromScan(CryptoCurrency.BTC, uri)
-            }
-            .create()
-            .show()
-    }
-
-    private fun disambiguateETHQrScans(uri: String) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.confirm_currency)
-            .setMessage(R.string.confirm_currency_message)
-            .setCancelable(true)
-            .setPositiveButton(R.string.ether) { _, _ ->
-                startTransferFragmentFromScan(CryptoCurrency.ETHER, uri)
-            }
-            .setNegativeButton(R.string.usd_pax_1) { _, _ ->
-                startTransferFragmentFromScan(CryptoCurrency.PAX, uri)
-            }
-            .create()
-            .show()
-    }
-
-    private fun String.isHttpUri(): Boolean = startsWith("http")
-    private fun String.isBTCorBCHAddress(): Boolean = FormatsUtil.isValidBitcoinAddress(this)
-    private fun String.isETHAddress(): Boolean = FormatsUtil.isValidEthereumAddress(this)
 
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
@@ -497,34 +442,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    private fun requestScan() {
-
-        val fragment = currentFragment::class.simpleName ?: "unknown"
-
-        analytics.logEvent(object : AnalyticsEvent {
-            override val event = "qr_scan_requested"
-            override val params = mapOf("fragment" to fragment)
-        })
-
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(coordinator_layout, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { requestScan() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            startScanActivity()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
-    }
-
     private fun startSingleActivity(clazz: Class<*>) {
         val intent = Intent(this@MainActivity, clazz)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -562,10 +479,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         presenter.startSwapOrKyc(toCurrency = targetCurrency, fromCurrency = fromCryptoCurrency)
     }
 
-    override fun onHandleInput(strUri: String) {
-        handlePredefinedInput(strUri, true)
-    }
-
     override fun getStartIntent(): Intent {
         return intent
     }
@@ -600,16 +513,52 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
-        ToastCustom.makeText(this, getString(message), ToastCustom.LENGTH_SHORT, toastType)
-    }
-
     override fun displayDialog(title: Int, message: Int) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(android.R.string.ok, null)
             .show()
+    }
+
+    @SuppressLint("CheckResult")
+    override fun startTransactionFlowWithTarget(targets: Collection<CryptoAddress>) {
+        if (targets.size > 1) {
+            disambiguateSendScan(targets)
+        } else {
+            val targetAddress = targets.first()
+            QrScanHandler.selectSourceAccount(this, targetAddress)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { sourceAccount ->
+                        if (AssetAction.NewSend in sourceAccount.actions) {
+                            SendFlow(
+                                sourceAccount = sourceAccount,
+                                targetAccount = targetAddress,
+                                action = AssetAction.NewSend
+                            ).apply {
+                                startFlow(
+                                    fragmentManager = currentFragment.childFragmentManager,
+                                    host = this@MainActivity
+                                )
+                            }
+                        } else {
+                            SendActivity.start(this, sourceAccount, targetAddress)
+                        }
+                    },
+                    onError = { Timber.e("Unable to select source account for scan") }
+                )
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun disambiguateSendScan(targets: Collection<CryptoAddress>) {
+        QrScanHandler.disambiguateScan(this, targets)
+            .subscribeBy(
+                onSuccess = {
+                    startTransactionFlowWithTarget(listOf(it))
+                }
+            )
     }
 
     override fun displayLockboxMenu(lockboxAvailable: Boolean) {
@@ -619,13 +568,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override fun showHomebrewDebugMenu() {
         menu.findItem(R.id.nav_debug_swap).isVisible = true
     }
-
-//    fun setOnTouchOutsideViewListener(
-//        view: View,
-//        onTouchOutsideViewListener: OnTouchOutsideViewListener
-//    ) {
-//        touchOutsideViews[view] = onTouchOutsideViewListener
-//    }
 
     override fun showNavigation() {
         bottom_navigation.restoreBottomNavigation()
@@ -652,10 +594,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         ViewUtils.setElevation(appbar_layout, 0f)
         val buySellFragment = BuySellFragment.newInstance()
         replaceContentFragment(buySellFragment)
-    }
-
-    private fun startTransferFragmentFromScan(asset: CryptoCurrency?, uri: String, isDeepLink: Boolean = false) {
-        // TODO: Implement this?
     }
 
     override fun gotoDashboard() {
@@ -760,7 +698,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
-        const val SCAN_URI = 2007
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
@@ -865,5 +802,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override fun showTourDialog(dlg: BottomSheetDialogFragment) {
         val fm = supportFragmentManager
         dlg.show(fm, "TOUR_SHEET")
+    }
+
+    override fun onFlowFinished() {
     }
 }

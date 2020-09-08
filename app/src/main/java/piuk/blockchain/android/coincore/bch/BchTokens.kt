@@ -79,7 +79,7 @@ internal class BchAsset(
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
             if (isValidAddress(address)) {
-                BchAddress(address)
+                BchAddress(address, address)
             } else {
                 null
             }
@@ -94,6 +94,7 @@ internal class BchAsset(
 
 internal class BchAddress(
     address_: String,
+    override val scanUri: String?,
     override val label: String = address_
 ) : CryptoAddress {
     override val address: String = address_.removeBchUri()

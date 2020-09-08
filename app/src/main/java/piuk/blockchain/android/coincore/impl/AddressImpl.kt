@@ -7,7 +7,9 @@ internal class ExchangeAddress(
     override val asset: CryptoCurrency,
     override val address: String,
     override val label: String // labels.getDefaultExchangeWalletLabel(asset)
-) : CryptoAddress
+) : CryptoAddress {
+    override val scanUri: String? = null
+}
 
 // internal class CustodialAddress(
 //    asset: CryptoCurrency,

@@ -157,4 +157,5 @@ internal open class Erc20Address(
     init {
         require(asset.hasFeature(CryptoCurrency.IS_ERC20))
     }
+    override val scanUri: String? = null
 }

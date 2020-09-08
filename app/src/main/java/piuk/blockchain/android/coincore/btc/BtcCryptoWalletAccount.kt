@@ -53,7 +53,7 @@ internal class BtcCryptoWalletAccount(
             payloadManager.getAccount(payloadManager.defaultAccountIndex)
         ).singleOrError()
             .map {
-                BtcAddress(it, label, networkParameters)
+                BtcAddress(address = it, label = label, networkParams = networkParameters)
             }
 
     override val activity: Single<ActivitySummaryList>

@@ -186,17 +186,7 @@ class BitcoinCashSendStrategy(
             .subscribe(
                 { (validated, errorMessage) ->
                     if (validated) {
-                        if (pendingTransaction.isWatchOnly) {
-                            // returns to spendFromWatchOnly*BIP38 -> showPaymentReview()
-                            val address = pendingTransaction.senderAsLegacyAddress
-                            view?.showSpendFromWatchOnlyWarning((address).address)
-                        } else if (pendingTransaction.isWatchOnly && verifiedSecondPassword != null) {
-                            // Second password already verified
-                            showPaymentReview()
-                        } else {
-                            // Checks if second pw needed then -> onNoSecondPassword()
-                            view?.showSecondPasswordDialog()
-                        }
+                        view?.showSecondPasswordDialogIfRequired()
                     } else {
                         view?.showSnackbar(errorMessage, Snackbar.LENGTH_LONG)
                     }
@@ -796,13 +786,7 @@ class BitcoinCashSendStrategy(
         pendingTransaction.receivingAddress = cashAddress
 
         view?.updateReceivingAddress(label.removeBchUri())
-
-        if (legacyAddress.isWatchOnly && shouldWarnWatchOnly()) {
-            view?.showWatchOnlyWarning(cashAddress)
-        }
     }
-
-    private fun shouldWarnWatchOnly(): Boolean = prefs.getValue(PersistentPrefs.KEY_WARN_WATCH_ONLY_SPEND, true)
 
     private fun onReceivingBchAccountSelected(account: GenericMetadataAccount) {
         var label = account.label

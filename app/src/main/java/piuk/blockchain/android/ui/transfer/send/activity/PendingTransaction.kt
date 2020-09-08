@@ -34,19 +34,6 @@ class PendingTransaction {
         @JsonIgnore
         get() = bigIntAmount.add(bigIntFee)
 
-    val isWatchOnly: Boolean
-        @JsonIgnore
-        get() {
-            var watchOnly = false
-
-            if (sendingObject!!.accountObject is LegacyAddress) {
-                val legacyAddress = senderAsLegacyAddress
-                watchOnly = legacyAddress.isWatchOnly && legacyAddress.privateKey.isNullOrEmpty()
-            }
-
-            return watchOnly
-        }
-
     val displayableReceivingLabel: String?
         @JsonIgnore
         get() = if (receivingObject != null && !receivingObject!!.label.isNullOrEmpty()) {

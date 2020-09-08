@@ -96,4 +96,5 @@ internal class EthAddress(
     override val label: String = address
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.ETHER
+    override val scanUri: String? = null
 }

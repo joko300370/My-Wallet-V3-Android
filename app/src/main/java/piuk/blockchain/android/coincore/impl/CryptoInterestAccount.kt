@@ -129,4 +129,6 @@ internal class InterestAddress(
     override val address: String,
     override val label: String = address,
     override val asset: CryptoCurrency
-) : CryptoAddress
+) : CryptoAddress {
+    override val scanUri: String? = null
+}

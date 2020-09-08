@@ -9,8 +9,11 @@ import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_send_address.view.*
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -23,6 +26,7 @@ import piuk.blockchain.android.ui.transfer.send.SendIntent
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -160,13 +164,15 @@ class EnterTargetAddressSheet(
     }
 
     private fun onLaunchAddressScan() {
-        if (!appUtil.isCameraOpen) {
-            startActivityForResult(
-                Intent(activity, CaptureActivity::class.java),
-                SCAN_QR_ADDRESS
+        QrScanHandler.requestScanPermissions(
+            activity = requireActivity(),
+            rootView = dialogView
+        ) {
+            QrScanHandler.startQrScanActivity(
+                this,
+                appUtil
+                // this::class.simpleName ?: "Unknown"
             )
-        } else {
-            showErrorToast(R.string.camera_unavailable)
         }
     }
 
@@ -176,18 +182,37 @@ class EnterTargetAddressSheet(
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
         when (requestCode) {
-            SCAN_QR_ADDRESS -> handleScanResult(resultCode, data)
+            QrScanHandler.SCAN_URI_RESULT -> handleScanResult(resultCode, data)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
 
     private fun handleScanResult(resultCode: Int, data: Intent?) {
         Timber.d("Got QR scan result!")
         if (resultCode == Activity.RESULT_OK && data != null) {
-            data.getStringExtra(CaptureActivity.SCAN_RESULT)?.let {
-                val asset = state.asset
-                val address = it
-
-                addressEntered(address, asset)
+            data.getStringExtra(CaptureActivity.SCAN_RESULT)?.let { rawScan ->
+                disposables += QrScanHandler.processScan(rawScan, false)
+                    .flatMapMaybe { QrScanHandler.selectAssetTargetFromScan(state.asset, it) }
+                    .subscribeBy(
+                        onSuccess = {
+                            model.process(SendIntent.TargetSelectionConfirmed(it))
+                        },
+                        onComplete = {
+                            ToastCustom.makeText(
+                                requireContext(),
+                                getText(R.string.scan_mismatch_transaction_target),
+                                ToastCustom.LENGTH_SHORT,
+                                ToastCustom.TYPE_GENERAL
+                            )
+                        },
+                        onError = {
+                            ToastCustom.makeText(
+                                requireContext(),
+                                getText(R.string.scan_failed),
+                                ToastCustom.LENGTH_SHORT,
+                                ToastCustom.TYPE_GENERAL
+                            )
+                        }
+                    )
             }
         }
     }
@@ -196,8 +221,6 @@ class EnterTargetAddressSheet(
         model.process(SendIntent.TargetSelectionConfirmed(state.sendTarget))
 
     companion object {
-        const val SCAN_QR_ADDRESS = 2985
-
         private const val NONCUSTODIAL_INPUT = 0
         private const val CUSTODIAL_INPUT = 1
     }

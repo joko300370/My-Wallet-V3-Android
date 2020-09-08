@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.account
 
-import android.Manifest
+import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,17 +13,12 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -37,12 +32,11 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import timber.log.Timber
 
 class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresenter>(),
     AccountEditView {
@@ -57,7 +51,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     @Suppress("MemberVisibilityCanBePrivate")
     private val accountEditPresenter: AccountEditPresenter by scopedInject()
     private val appUtil: AppUtil by inject()
-    private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
 
     private lateinit var binding: ActivityAccountEditBinding
@@ -134,23 +127,10 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
     }
 
     override fun startScanActivity() {
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(binding.mainLayout, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { startScanActivity() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            startCameraIfAvailable()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
+        QrScanHandler.requestScanPermissions(
+            activity = this,
+            rootView = binding.mainLayout
+        ) { startCameraIfAvailable() }
     }
 
     private fun startCameraIfAvailable() {

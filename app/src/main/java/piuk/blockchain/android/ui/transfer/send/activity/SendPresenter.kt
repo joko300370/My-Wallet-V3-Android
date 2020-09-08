@@ -19,10 +19,13 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
+import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitPayProtocol
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendStrategy
@@ -148,6 +151,31 @@ class SendPresenter<View : SendView>(
         delegate.onCurrencySelected()
     }
 
+    fun processScanResult(
+        scanData: String,
+        asset: CryptoCurrency
+    ) {
+        compositeDisposable += QrScanHandler.processScan(scanData)
+            .subscribeBy(
+                onSuccess = {
+                    if (it is ScanResult.TransactionTarget) {
+                        // Make sure this is a vaible send target for the selected asset
+                        val target = it.targets.filterIsInstance<CryptoAddress>()
+                            .firstOrNull { target -> target.asset == asset }
+
+                        if (target != null) {
+                            handlePredefinedInput(scanData, asset, false)
+                        } else {
+                            view?.showInvalidScanToast()
+                        }
+                    } else {
+                        view?.showInvalidScanToast()
+                    }
+                },
+                onError = { view?.showInvalidScanToast() }
+            )
+    }
+
     fun handlePredefinedInput(
         untrimmedscanData: String,
         defaultCurrency: CryptoCurrency,
@@ -156,22 +184,17 @@ class SendPresenter<View : SendView>(
         val address: String
 
         if (untrimmedscanData.isValidXlmQr()) {
-            onCurrencySelected(CryptoCurrency.XLM)
             address = untrimmedscanData
         } else {
-
             var scanData = untrimmedscanData.trim { it <= ' ' }
-                .replace("ethereum:", "")
 
             scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
 
             when {
                 FormatsUtil.isValidBCHAddress(envSettings.bitcoinCashNetworkParameters, scanData) -> {
-                    onCurrencySelected(CryptoCurrency.BCH)
                     address = scanData
                 }
                 FormatsUtil.isBitcoinUri(envSettings.bitcoinNetworkParameters, scanData) -> {
-                    onCurrencySelected(CryptoCurrency.BTC)
                     address = FormatsUtil.getBitcoinAddress(scanData)
 
                     val amount: String = FormatsUtil.getBitcoinAmount(scanData)
@@ -202,31 +225,12 @@ class SendPresenter<View : SendView>(
                 }
                 FormatsUtil.isValidBitcoinAddress(envSettings.bitcoinNetworkParameters, scanData) -> {
                     address = if (selectedCrypto == CryptoCurrency.BTC) {
-                        onCurrencySelected(CryptoCurrency.BTC)
                         scanData
                     } else {
-                        onCurrencySelected(CryptoCurrency.BCH)
                         scanData
                     }
                 }
-                FormatsUtil.isValidEthereumAddress(scanData) -> {
-                    when (selectedCrypto) {
-                        CryptoCurrency.ETHER -> onCurrencySelected(CryptoCurrency.ETHER)
-                        CryptoCurrency.PAX -> onCurrencySelected(CryptoCurrency.PAX)
-                        else -> {
-                            if (defaultCurrency in listOf(CryptoCurrency.ETHER, CryptoCurrency.PAX)) {
-                                onCurrencySelected(defaultCurrency)
-                            } else {
-                                onCurrencySelected(CryptoCurrency.ETHER) // Default to ETH
-                            }
-                        }
-                    }
-
-                    address = scanData
-                    view?.updateCryptoAmount(CryptoValue.zero(selectedCrypto))
-                }
                 else -> {
-                    onCurrencySelected(CryptoCurrency.BTC)
                     view?.showSnackbar(R.string.invalid_address, Snackbar.LENGTH_LONG)
                     return
                 }
@@ -245,8 +249,8 @@ class SendPresenter<View : SendView>(
                 val merchant = it.memo.split(merchantPattern)[1]
                 val bitpayProtocol: BitPayProtocol? = delegate as? BitPayProtocol ?: return@doOnSuccess
 
-                bitpayProtocol?.setbitpayReceivingAddress(it.instructions[0].outputs[0].address)
-                bitpayProtocol?.setbitpayMerchant(merchant)
+                bitpayProtocol?.setBitpayReceivingAddress(it.instructions[0].outputs[0].address)
+                bitpayProtocol?.setBitpayMerchant(merchant)
                 bitpayProtocol?.setInvoiceId(invoiceId)
                 bitpayProtocol?.setIsBitpayPaymentRequest(true)
                 view?.let { view ->
@@ -260,7 +264,11 @@ class SendPresenter<View : SendView>(
                 }
             }.doOnError {
                 Timber.e(it)
-            }.subscribe()
+            }.subscribeBy(
+                onError = {
+                    view?.finishPage()
+                }
+            )
     }
 
     private fun String.isBitpayAddress(): Boolean {
@@ -270,8 +278,6 @@ class SendPresenter<View : SendView>(
         return amount == "0.0000" &&
                 paymentRequestUrl.contains(bitpayInvoiceUrl)
     }
-
-    fun handlePrivxScan(scanData: String?) = delegate.handlePrivxScan(scanData)
 
     fun clearReceivingObject() = delegate.clearReceivingObject()
 
@@ -370,10 +376,6 @@ class SendPresenter<View : SendView>(
 
     fun shouldShowAdvancedFeeWarning(): Boolean =
         prefs.getValue(PersistentPrefs.KEY_WARN_ADVANCED_FEE, true)
-
-    fun setWarnWatchOnlySpend(warn: Boolean) {
-        prefs.setValue(PersistentPrefs.KEY_WARN_WATCH_ONLY_SPEND, warn)
-    }
 
     companion object {
         const val MEMO_TEXT_NONE = -1
