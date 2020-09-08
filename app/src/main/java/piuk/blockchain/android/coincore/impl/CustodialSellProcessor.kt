@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.extensions.then
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import java.lang.IllegalStateException
 import java.math.RoundingMode
 
@@ -51,24 +52,26 @@ class CustodialSellProcessor(
         get() = sendingAccount.asset
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        walletManager.getSupportedBuySellCryptoCurrencies((sendTarget as FiatAccount).fiatCurrency).map {
-            it.pairs.first {
-                it.cryptoCurrency == sendingAccount.asset && it.fiatCurrency == sendTarget.fiatCurrency
+        walletManager.cancelAllPendingOrders().onErrorComplete().thenSingle {
+            walletManager.getSupportedBuySellCryptoCurrencies((sendTarget as FiatAccount).fiatCurrency).map {
+                it.pairs.first {
+                    it.cryptoCurrency == sendingAccount.asset && it.fiatCurrency == sendTarget.fiatCurrency
+                }
+            }.flatMap { pair ->
+                Single.just(
+                    PendingTx(
+                        amount = FiatValue.zero(sendTarget.fiatCurrency),
+                        available = CryptoValue.zero(sendingAccount.asset),
+                        fees = CryptoValue.zero(sendingAccount.asset),
+                        selectedFiat = userFiat,
+                        maxLimit = pair.sellLimits.maxLimit(sendTarget.fiatCurrency),
+                        minLimit = pair.sellLimits.minLimit(sendTarget.fiatCurrency),
+                        feeLevel = FeeLevel.None
+                    ))
+            }.doOnSuccess {
+                minApiFiatAmount = it.minLimit as FiatValue
+                maxApiFiatAmount = it.maxLimit as FiatValue
             }
-        }.flatMap { pair ->
-            Single.just(
-                PendingTx(
-                    amount = FiatValue.zero(sendTarget.fiatCurrency),
-                    available = CryptoValue.zero(sendingAccount.asset),
-                    fees = CryptoValue.zero(sendingAccount.asset),
-                    selectedFiat = userFiat,
-                    maxLimit = pair.sellLimits.maxLimit(sendTarget.fiatCurrency),
-                    minLimit = pair.sellLimits.minLimit(sendTarget.fiatCurrency),
-                    feeLevel = FeeLevel.None
-                ))
-        }.doOnSuccess {
-            minApiFiatAmount = it.minLimit as FiatValue
-            maxApiFiatAmount = it.maxLimit as FiatValue
         }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {

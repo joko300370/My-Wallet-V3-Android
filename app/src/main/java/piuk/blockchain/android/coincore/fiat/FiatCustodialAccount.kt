@@ -71,7 +71,7 @@ internal class FiatCustodialAccount(
         }
 
     override val actions: AvailableActions =
-        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit, AssetAction.Withdraw)
+        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit)
         else
             setOf(AssetAction.ViewActivity)
 
