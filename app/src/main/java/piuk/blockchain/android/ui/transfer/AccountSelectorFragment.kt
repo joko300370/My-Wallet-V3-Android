@@ -13,7 +13,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -40,13 +39,11 @@ abstract class AccountSelectorFragment : Fragment() {
     }
 
     fun initialiseAccountSelector(
-        statusDecorator: StatusDecorator,
         onAccountSelected: (BlockchainAccount) -> Unit
     ) {
         account_selector_account_list.onAccountSelected = onAccountSelected
         account_selector_account_list.initialise(
-            coincore.allWallets().map { it.accounts.filter(filterFn) },
-            status = statusDecorator
+            coincore.allWallets().map { it.accounts.filter(filterFn) }
         )
     }
 

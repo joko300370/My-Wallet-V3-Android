@@ -26,6 +26,7 @@ import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.android.util.statusDecorator
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -152,7 +153,6 @@ private class CryptoAccountDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as CryptoSingleAccountViewHolder).bind(
         items[position] as CryptoAccount,
-        statusDecorator,
         onAccountClicked
     )
 }
@@ -165,7 +165,6 @@ private class CryptoSingleAccountViewHolder(
 
     internal fun bind(
         account: CryptoAccount,
-        statusDecorator: StatusDecorator,
         onAccountClicked: (CryptoAccount) -> Unit
     ) {
         with(itemView) {
@@ -176,25 +175,23 @@ private class CryptoSingleAccountViewHolder(
             itemView.crypto_status.gone()
             container.alpha = 1f
 
-            statusDecorator.let {
-                disposables += it(account)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onSuccess = { decorator ->
-                            itemView.crypto_status.status = decorator.status
-                            itemView.crypto_status.goneIf(decorator.status.isBlank())
-                            if (decorator.enabled) {
-                                setOnClickListener { onAccountClicked(account) }
-                                container.alpha = 1f
-                            } else {
-                                container.alpha = .6f
-                            }
+            account.statusDecorator(itemView.context)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { decorator ->
+                        itemView.crypto_status.status = decorator.status
+                        itemView.crypto_status.goneIf(decorator.status.isBlank())
+                        if (decorator.enabled) {
+                            setOnClickListener { onAccountClicked(account) }
+                            container.alpha = 1f
+                        } else {
+                            container.alpha = .6f
                         }
-                    )
+                    }
+                )
             }
         }
     }
-}
 
 private class FiatAccountDelegate<in T>(
     private val statusDecorator: StatusDecorator,

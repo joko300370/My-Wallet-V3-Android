@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/item_account_parent"
     android:orientation="horizontal"
-    android:paddingTop="@dimen/smallest_margin"
-    android:paddingBottom="@dimen/smallest_margin"
+    android:padding="@dimen/smallest_margin"
     android:background="@drawable/bkgd_status_expired">
 
     <ImageView
