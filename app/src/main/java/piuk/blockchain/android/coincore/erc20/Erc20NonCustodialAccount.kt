@@ -25,6 +25,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class Erc20NonCustodialAccount(
     payloadManager: PayloadDataManager,
@@ -33,6 +34,11 @@ abstract class Erc20NonCustodialAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(payloadManager, asset) {
+
+    private val hasFunds = AtomicBoolean(false)
+
+    override val isFunded: Boolean
+        get() = hasFunds.get()
 
     abstract val erc20Account: Erc20Account
 
@@ -46,7 +52,9 @@ abstract class Erc20NonCustodialAccount(
             .map { CryptoValue.fromMinor(asset, it) }
 
     override val actionableBalance: Single<Money>
-        get() = accountBalance
+        get() = accountBalance.doOnSuccess {
+            hasFunds.set(it.isPositive)
+        }
 
     override val activity: Single<ActivitySummaryList>
         get() {
