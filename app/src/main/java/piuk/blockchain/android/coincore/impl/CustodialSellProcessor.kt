@@ -86,7 +86,7 @@ class CustodialSellProcessor(
                     pair = "${sendingAccount.asset.networkTicker}-${(sendTarget as FiatAccount).fiatCurrency}",
                     action = "SELL",
                     input = OrderInput(
-                        sendingAccount.asset.toString(),
+                        sendingAccount.asset.networkTicker,
                         tx.amount.takeIf { it is CryptoValue }?.toBigInteger().toString()
                     ),
                     output = OrderOutput(
