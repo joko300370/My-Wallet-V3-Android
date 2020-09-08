@@ -4,6 +4,8 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -41,14 +43,17 @@ class ActivityDetailsInteractor(
         val list = mutableListOf(
             TransactionId(summaryItem.txId),
             Created(Date(summaryItem.timeStampMs)),
-            BuyPurchaseAmount(summaryItem.fundedFiat),
-            BuyCryptoWallet(summaryItem.cryptoCurrency),
+            if (summaryItem.type == OrderType.BUY) BuyPurchaseAmount(summaryItem.fundedFiat) else
+                SellPurchaseAmount(summaryItem.fundedFiat),
+            if (summaryItem.type == OrderType.BUY) BuyCryptoWallet(summaryItem.cryptoCurrency) else
+                SellCryptoWallet(summaryItem.fundedFiat.currencyCode),
             BuyFee(summaryItem.fee)
         )
 
-        return if (summaryItem.paymentMethodId != PaymentMethod.BANK_PAYMENT_ID) {
+        return if (summaryItem.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
             custodialWalletManager.getCardDetails(
-                summaryItem.paymentMethodId)
+                summaryItem.paymentMethodId
+            )
                 .map { paymentMethod ->
                     addPaymentDetailsToList(list, paymentMethod,
                         summaryItem)

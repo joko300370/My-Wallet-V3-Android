@@ -3,6 +3,8 @@ package piuk.blockchain.android.ui.activity.detail
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -53,7 +55,9 @@ class ActivityDetailsModelTest {
         status = OrderState.FINISHED,
         fee = mock(),
         account = mock(),
-        paymentMethodId = "123"
+        paymentMethodId = "123",
+        paymentMethodType = PaymentMethodType.PAYMENT_CARD,
+        type = OrderType.BUY
     )
 
     private val custodialInterestItem = CustodialInterestActivitySummaryItem(

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
@@ -48,7 +49,7 @@ private class CustodialTradingActivityItemViewHolder(
         onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
     ) {
         with(itemView) {
-            icon.setIcon(tx.status)
+            icon.setIcon(tx.status, tx.type)
             if (tx.status.isPending().not()) {
                 icon.setAssetIconColours(tx.cryptoCurrency, context)
             } else {
@@ -56,7 +57,7 @@ private class CustodialTradingActivityItemViewHolder(
                 icon.setColorFilter(Color.TRANSPARENT)
             }
 
-            tx_type.setTxLabel(tx.cryptoCurrency)
+            tx_type.setTxLabel(tx.cryptoCurrency, tx.type)
 
             status_date.setTxStatus(tx)
             setTextColours(tx.status)
@@ -93,13 +94,13 @@ private class CustodialTradingActivityItemViewHolder(
 
 private fun OrderState.isPending(): Boolean =
     this == OrderState.PENDING_CONFIRMATION ||
-        this == OrderState.PENDING_EXECUTION ||
-        this == OrderState.AWAITING_FUNDS
+            this == OrderState.PENDING_EXECUTION ||
+            this == OrderState.AWAITING_FUNDS
 
-private fun ImageView.setIcon(status: OrderState) =
+private fun ImageView.setIcon(status: OrderState, type: OrderType) =
     setImageResource(
         when (status) {
-            OrderState.FINISHED -> R.drawable.ic_tx_buy
+            OrderState.FINISHED -> if (type == OrderType.BUY) R.drawable.ic_tx_buy else R.drawable.ic_tx_sell
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_CONFIRMATION,
             OrderState.PENDING_EXECUTION -> R.drawable.ic_tx_confirming
@@ -107,12 +108,13 @@ private fun ImageView.setIcon(status: OrderState) =
             OrderState.INITIALISED,
             OrderState.UNKNOWN,
             OrderState.CANCELED,
-            OrderState.FAILED -> R.drawable.ic_tx_buy
+            OrderState.FAILED -> if (type == OrderType.BUY) R.drawable.ic_tx_buy else R.drawable.ic_tx_sell
         }
     )
 
-private fun TextView.setTxLabel(cryptoCurrency: CryptoCurrency) {
-    text = context.resources.getString(R.string.tx_title_buy, cryptoCurrency.displayTicker)
+private fun TextView.setTxLabel(cryptoCurrency: CryptoCurrency, type: OrderType) {
+    text = context.resources.getString(
+        if (type == OrderType.BUY) R.string.tx_title_buy else R.string.tx_title_sell, cryptoCurrency.displayTicker)
 }
 
 private fun TextView.setTxStatus(tx: CustodialTradingActivitySummaryItem) {

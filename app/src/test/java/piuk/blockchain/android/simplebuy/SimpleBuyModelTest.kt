@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
@@ -125,7 +126,8 @@ class SimpleBuyModelTest {
                 updated = Date(),
                 paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
                 fiat = FiatValue.zero("USD"),
-                pair = "USD-BTC"
+                pair = "USD-BTC",
+                type = OrderType.BUY
             ))))
 
         val testObserver = model.state.test()
@@ -177,7 +179,8 @@ class SimpleBuyModelTest {
                     attributes = CardPaymentAttributes(
                         EverypayPaymentAttrs(paymentLink = paymentLink,
                             paymentState = EverypayPaymentAttrs.WAITING_3DS)
-                    )
+                    ),
+                    type = OrderType.BUY
                 )
             ))
 

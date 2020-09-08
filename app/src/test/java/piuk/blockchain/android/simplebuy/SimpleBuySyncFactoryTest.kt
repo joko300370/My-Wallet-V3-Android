@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.atLeastOnce
@@ -140,7 +141,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = Date(),
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(null)
@@ -172,7 +174,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             expires = Date(),
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(null)
@@ -207,7 +210,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             expires = MIDDLE_ORDER_DATE,
             fee = FiatValue.zero("EUR"),
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput2 = BuySellOrder(
@@ -218,7 +222,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             expires = LAST_ORDER_DATE,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput3 = BuySellOrder(
@@ -229,7 +234,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = EARLY_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(null)
@@ -267,7 +273,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.CANCELED,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = MIDDLE_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput2 = BuySellOrder(
@@ -278,7 +285,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput3 = BuySellOrder(
@@ -289,7 +297,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.FINISHED,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = EARLY_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput4 = BuySellOrder(
@@ -301,7 +310,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.FAILED,
             expires = EARLY_ORDER_DATE,
             fee = FiatValue.zero("EUR"),
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(null)
@@ -339,7 +349,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = MIDDLE_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput2 = BuySellOrder(
@@ -350,7 +361,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = EARLY_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput3 = BuySellOrder(
@@ -361,7 +373,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = EARLY_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         val remoteInput4 = BuySellOrder(
@@ -372,7 +385,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_CONFIRMATION,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(null)
@@ -423,7 +437,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.FINISHED,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -471,7 +486,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -519,7 +535,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -567,7 +584,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = MIDDLE_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -658,7 +676,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.AWAITING_FUNDS,
             paymentMethodId = PaymentMethod.BANK_PAYMENT_ID,
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -697,7 +716,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.PENDING_EXECUTION,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -736,7 +756,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.FINISHED,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -775,7 +796,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.CANCELED,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)
@@ -814,7 +836,8 @@ class SimpleBuySyncFactoryTest {
             state = OrderState.FAILED,
             paymentMethodId = "123-123",
             expires = LAST_ORDER_DATE,
-            paymentMethodType = PaymentMethodType.BANK_ACCOUNT
+            paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+            type = OrderType.BUY
         )
 
         whenever(localState.fetch()).thenReturn(localInput)

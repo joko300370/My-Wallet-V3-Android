@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
@@ -97,7 +98,7 @@ interface CustodialWalletManager {
 
     fun getAllOutstandingOrders(): Single<List<BuySellOrder>>
 
-    fun getAllBuyOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
+    fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
 
     fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
@@ -218,7 +219,8 @@ data class BuySellOrder(
     val fee: FiatValue? = null,
     val price: FiatValue? = null,
     val orderValue: Money? = null,
-    val attributes: CardPaymentAttributes? = null
+    val attributes: CardPaymentAttributes? = null,
+    val type: OrderType
 )
 
 typealias BuyOrderList = List<BuySellOrder>

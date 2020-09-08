@@ -70,8 +70,8 @@ open class CustodialTradingAccount(
             .map { it as Money }
 
     override val activity: Single<ActivitySummaryList>
-        get() = custodialWalletManager.getAllBuyOrdersFor(asset)
-            .mapList { buyOrderToSummary(it) }
+        get() = custodialWalletManager.getAllOrdersFor(asset)
+            .mapList { orderToSummary(it) }
             .filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
@@ -139,7 +139,7 @@ open class CustodialTradingAccount(
                 }
             }
 
-    private fun buyOrderToSummary(buyOrder: BuySellOrder): ActivitySummaryItem =
+    private fun orderToSummary(buyOrder: BuySellOrder): ActivitySummaryItem =
         CustodialTradingActivitySummaryItem(
             exchangeRates = exchangeRates,
             cryptoCurrency = buyOrder.crypto.currency,
@@ -150,7 +150,9 @@ open class CustodialTradingAccount(
             status = buyOrder.state,
             fee = buyOrder.fee ?: FiatValue.zero(buyOrder.fiat.currencyCode),
             account = this,
-            paymentMethodId = buyOrder.paymentMethodId
+            type = buyOrder.type,
+            paymentMethodId = buyOrder.paymentMethodId,
+            paymentMethodType = buyOrder.paymentMethodType
         )
 
     // Stop gap filter, until we finalise which item we wish to display to the user.

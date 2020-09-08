@@ -207,7 +207,8 @@ class CryptoActivityDetailsBottomSheet :
                         }
                         R.string.activity_details_label_pending
                     }
-                    transactionType == TransactionSummary.TransactionType.BUY ->
+                    transactionType == TransactionSummary.TransactionType.BUY ||
+                            transactionType == TransactionSummary.TransactionType.SELL ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds

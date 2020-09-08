@@ -252,7 +252,7 @@ class LiveCustodialWalletManager(
                 .filter { order -> order.state != OrderState.UNKNOWN }
         }
 
-    override fun getAllBuyOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList> =
+    override fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList> =
         authenticator.authenticate {
             nabuService.getOutstandingOrders(
                 sessionToken = it,
@@ -263,7 +263,10 @@ class LiveCustodialWalletManager(
         }
 
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
-        this.filter { order -> order.outputCurrency == crypto.networkTicker }
+        this.filter { order ->
+            order.outputCurrency == crypto.networkTicker ||
+                    order.inputCurrency == crypto.networkTicker
+        }
             .map { order -> order.toBuySellOrder() }
 
     override fun getBuyOrder(orderId: String): Single<BuySellOrder> =
@@ -746,7 +749,8 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             CryptoValue.fromMinor(cryptoCurrency, cryptoAmount)
         else
             FiatValue.fromMinor(outputCurrency, outputQuantity.toLongOrDefault(0)),
-        attributes = attributes
+        attributes = attributes,
+        type = type()
     )
 }
 

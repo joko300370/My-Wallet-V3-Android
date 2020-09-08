@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
@@ -58,7 +59,8 @@ class LoadCustodialTradingHeaderDataIntent(
 ) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState.copy(
-            transactionType = TransactionSummary.TransactionType.BUY,
+            transactionType = if (summaryItem.type == OrderType.BUY) TransactionSummary.TransactionType.BUY else
+                TransactionSummary.TransactionType.SELL,
             amount = summaryItem.value,
             isPending = summaryItem.status == OrderState.AWAITING_FUNDS,
             isPendingExecution = summaryItem.status == OrderState.PENDING_EXECUTION,
@@ -120,7 +122,9 @@ object DescriptionUpdatedIntent : ActivityDetailsIntents() {
             descriptionState = DescriptionState.UPDATE_SUCCESS
         )
     }
-} object DescriptionUpdateFailedIntent : ActivityDetailsIntents() {
+}
+
+object DescriptionUpdateFailedIntent : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState.copy(
             descriptionState = DescriptionState.UPDATE_ERROR
