@@ -37,6 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/action_bar_height"
+                android:layout_marginBottom="@dimen/xlarge_margin"
                 android:background="@color/white" />
 
             <!--The bottom navigation panel -->

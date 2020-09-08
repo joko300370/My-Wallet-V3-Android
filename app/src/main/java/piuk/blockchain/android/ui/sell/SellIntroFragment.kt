@@ -140,7 +140,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             description = getString(R.string.sell_crypto_subtitle),
             icon = R.drawable.ic_cart,
             secondaryButton = ButtonOptions(false) {},
-            primaryButton = ButtonOptions(true) {}
+            primaryButton = ButtonOptions(true) {},
+            showSheetIndicator = false
         )
     }
 

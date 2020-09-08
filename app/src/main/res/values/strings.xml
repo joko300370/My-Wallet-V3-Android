@@ -1978,7 +1978,7 @@
     <string name="interest_dashboard_item_rate_1">Earn up to&#160;</string>
     <string name="interest_dashboard_item_rate_2">&#160;annually on your %1$s</string>
     <string name="interest_dashboard_verify_title">Earn Interest on Your Crypto</string>
-    <string name="interest_dashboard_verify_label">Earn up to 12%% instantly when you transfer crypto to your Interest Account.</string>
+    <string name="interest_dashboard_verify_label">Earn up to 12\% instantly when you transfer crypto to your Interest Account.</string>
     <string name="interest_dashboard_verify_point_one_title">Verify Your Identity</string>
     <string name="interest_dashboard_verify_point_one_label">To prevent identity theft or fraud, we\'ll need to make sure it\'s really you by uploading an ID.</string>
     <string name="interest_dashboard_verify_point_two_title">Buy Crypto</string>
