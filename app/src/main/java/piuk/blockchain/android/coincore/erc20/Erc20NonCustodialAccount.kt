@@ -50,11 +50,15 @@ abstract class Erc20NonCustodialAccount(
     override val accountBalance: Single<Money>
         get() = erc20Account.getBalance()
             .map { CryptoValue.fromMinor(asset, it) }
+            .doOnSuccess {
+                hasFunds.set(it.isPositive)
+            }
+            .map {
+                it
+            }
 
     override val actionableBalance: Single<Money>
-        get() = accountBalance.doOnSuccess {
-            hasFunds.set(it.isPositive)
-        }
+        get() = accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() {

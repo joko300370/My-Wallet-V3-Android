@@ -17,7 +17,6 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
-import piuk.blockchain.android.coincore.eth.EthAddress
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
@@ -82,7 +81,7 @@ internal class UsdtAsset(
                     if (isContract) {
                         throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
                     } else {
-                        Maybe.just(EthAddress(address))
+                        Maybe.just(UsdtAddress(address))
                     }
                 }
             } else {
