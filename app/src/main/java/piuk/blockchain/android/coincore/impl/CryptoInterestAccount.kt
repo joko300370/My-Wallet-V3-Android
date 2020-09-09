@@ -106,7 +106,13 @@ internal class CryptoInterestAccount(
         Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
+        get() = Single.just(
+            if (nabuAccountExists.get()) {
+                SendState.CAN_SEND
+            } else {
+                SendState.NOT_SUPPORTED
+            }
+        )
 
     override val actions: AvailableActions =
         if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
