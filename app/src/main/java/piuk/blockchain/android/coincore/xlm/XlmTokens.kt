@@ -56,10 +56,10 @@ internal class XlmAsset(
             .map {
                 listOf(
                     XlmCryptoWalletAccount(
-                        payloadManager,
-                        it,
-                        xlmDataManager,
-                        exchangeRates
+                        payloadManager = payloadManager,
+                        account = it,
+                        xlmManager = xlmDataManager,
+                        exchangeRates = exchangeRates
                     )
                 )
             }
@@ -88,8 +88,8 @@ internal class XlmAsset(
 
 internal data class XlmAddress(
     override val address: String,
-    override val scanUri: String?,
     override val label: String = address,
+    override val scanUri: String? = null,
     val stellarPayment: StellarPayment? = null
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.XLM

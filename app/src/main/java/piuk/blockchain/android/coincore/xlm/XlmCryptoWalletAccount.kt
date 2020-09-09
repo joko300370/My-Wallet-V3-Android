@@ -42,7 +42,7 @@ internal class XlmCryptoWalletAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
-            XlmAddress(address, label)
+            XlmAddress(address = address, label = label)
         )
 
     override val activity: Single<ActivitySummaryList>
@@ -61,5 +61,11 @@ internal class XlmCryptoWalletAccount(
         account: AccountReference.Xlm,
         xlmManager: XlmDataManager,
         exchangeRates: ExchangeRateDataManager
-    ) : this(payloadManager, account.label, account.accountId, xlmManager, exchangeRates)
+    ) : this(
+        payloadManager = payloadManager,
+        label = account.label,
+        address = account.accountId,
+        xlmManager = xlmManager,
+        exchangeRates = exchangeRates
+    )
 }
