@@ -181,6 +181,11 @@ internal abstract class CryptoAssetBase(
             }
         }
 
+    private fun getCustodialAccount(): Maybe<SingleAccount> =
+        accountGroup(AssetFilter.NonCustodial)
+            .map { it.accounts.first() }
+            .onErrorComplete()
+
     final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)
@@ -189,7 +194,11 @@ internal abstract class CryptoAssetBase(
             is TradingAccount -> getNonCustodialAccountList()
             is NonCustodialAccount ->
                 Maybe.concat(
-                    listOf(getPitLinkingAccount(), getInterestAccount())
+                    listOf(
+                        getPitLinkingAccount(),
+                        getInterestAccount(),
+                        getCustodialAccount()
+                    )
                 ).toList()
                     .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())

@@ -180,7 +180,7 @@ object QrScanHandler {
                 (r as ScanResult.TransactionTarget).targets
                 .filterIsInstance<CryptoAddress>()
                 .first { a -> a.asset == asset }
-            }
+            }.onErrorComplete()
 
     @SuppressLint("CheckResult")
     fun selectSourceAccount(

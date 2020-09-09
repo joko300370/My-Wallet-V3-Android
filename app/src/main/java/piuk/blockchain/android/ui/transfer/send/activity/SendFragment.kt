@@ -1168,7 +1168,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     override fun showInvalidScanToast() {
         ToastCustom.makeText(
             requireContext(),
-            getText(R.string.scan_mismatch_transaction_target),
+            getString(R.string.scan_mismatch_transaction_target, asset.displayTicker),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_ERROR
         )

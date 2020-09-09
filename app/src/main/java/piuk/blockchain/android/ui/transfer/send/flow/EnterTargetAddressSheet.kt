@@ -207,7 +207,7 @@ class EnterTargetAddressSheet(
                         onComplete = {
                             ToastCustom.makeText(
                                 requireContext(),
-                                getText(R.string.scan_mismatch_transaction_target),
+                                getString(R.string.scan_mismatch_transaction_target, state.asset.displayTicker),
                                 ToastCustom.LENGTH_SHORT,
                                 ToastCustom.TYPE_GENERAL
                             )
@@ -215,7 +215,7 @@ class EnterTargetAddressSheet(
                         onError = {
                             ToastCustom.makeText(
                                 requireContext(),
-                                getText(R.string.scan_failed),
+                                getString(R.string.scan_failed),
                                 ToastCustom.LENGTH_SHORT,
                                 ToastCustom.TYPE_GENERAL
                             )

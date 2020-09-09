@@ -78,8 +78,7 @@ class SendPresenter<View : SendView>(
     }
 
     private val bitpayInvoiceUrl = "$BITPAY_LIVE_BASE$PATH_BITPAY_INVOICE/"
-    private var selectedMemoType: Int =
-        MEMO_TEXT_NONE
+    private var selectedMemoType: Int = MEMO_TEXT_NONE
     private var selectedCrypto: CryptoCurrency = CryptoCurrency.BTC
     private val merchantPattern: Pattern = Pattern.compile("for merchant ")
 
@@ -159,7 +158,7 @@ class SendPresenter<View : SendView>(
             .subscribeBy(
                 onSuccess = {
                     if (it is ScanResult.TransactionTarget) {
-                        // Make sure this is a vaible send target for the selected asset
+                        // Make sure this is a viable send target for the selected asset
                         val target = it.targets.filterIsInstance<CryptoAddress>()
                             .firstOrNull { target -> target.asset == asset }
 
