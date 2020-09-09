@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
-import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -16,6 +14,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.transfer.send.FlowInputSheet
@@ -32,7 +31,6 @@ class EnterAmountSheet(
     override val layoutResource: Int = R.layout.dialog_send_enter_amount
 
     private var state: SendState = SendState()
-    private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val customiser: SendFlowCustomiser by inject()
     private val compositeDisposable = CompositeDisposable()
 
@@ -75,7 +73,7 @@ class EnterAmountSheet(
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                                "(${availableBalance.toStringWithSymbol()})"
+                            "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -116,6 +114,13 @@ class EnterAmountSheet(
                 )
             }
         }
+
+        view.amount_sheet_input.listener = object : FiatCryptoInputView.FiatCryptoInputViewListener {
+            override fun onBackButtonPressed() {
+                hideKeyboard()
+                dismiss()
+            }
+        }
     }
 
     private fun updatePendingTxDetails(state: SendState) {
@@ -137,8 +142,12 @@ class EnterAmountSheet(
     }
 
     private fun onCtaClick() {
-        imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
+        hideKeyboard()
         model.process(SendIntent.PrepareTransaction)
+    }
+
+    private fun hideKeyboard() {
+        imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
     }
 
     private fun showKeyboard() {

@@ -31,6 +31,7 @@ import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.util.assetName
@@ -104,6 +105,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     it is PaymentMethod.Undefined
                 },
                     it.canAddCard, it.canLinkFunds))
+            }
+        }
+
+        input_amount.listener = object : FiatCryptoInputView.FiatCryptoInputViewListener {
+            override fun onBackButtonPressed() {
+                // do nothing
             }
         }
     }

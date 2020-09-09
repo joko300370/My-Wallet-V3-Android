@@ -232,7 +232,9 @@ class SendFlowCustomiserImpl(
                     state.pendingTx?.minLimit?.toStringWithSymbol())
                 AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_min_error,
                     state.pendingTx?.minLimit?.toStringWithSymbol())
-                else -> throw IllegalArgumentException("Action not supported by Send Flow")
+                AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_min_send,
+                    state.pendingTx?.minLimit?.toStringWithSymbol())
+                else -> throw IllegalArgumentException("Action not supported by Send Flow ${state.action}")
             }
             SendErrorState.ABOVE_MAX_LIMIT -> resources.getString(R.string.sell_enter_amount_max_error,
                 state.pendingTx?.maxLimit?.toStringWithSymbol())

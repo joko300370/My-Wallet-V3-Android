@@ -1916,6 +1916,7 @@
     <string name="sell_enter_amount_max_error">%1$s Max</string>
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
+    <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>

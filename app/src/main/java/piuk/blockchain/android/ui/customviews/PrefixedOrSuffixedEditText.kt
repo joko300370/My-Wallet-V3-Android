@@ -4,18 +4,24 @@ import android.content.Context
 import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
+import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
-import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import kotlin.properties.Delegates
 
 class PrefixedOrSuffixedEditText : AppCompatEditText {
+    interface PrefixedOrSuffixedEditTextListener {
+        fun onBackButtonPressed()
+    }
+
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
         defStyle)
+
+    lateinit var listener: PrefixedOrSuffixedEditTextListener
 
     init {
         addTextChangedListener(object : AfterTextChangedWatcher() {
@@ -40,6 +46,17 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
         isEnabled = false
     }
 
+    override fun onKeyPreIme(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (::listener.isInitialized) {
+                listener.onBackButtonPressed()
+            } else {
+                throw IllegalStateException("PrefixedOrSuffixedEditTextListener not initialised")
+            }
+        }
+        return false
+    }
+
     private val digitsOnlyRegex by lazy {
         ("[\\d.]").toRegex()
     }
@@ -61,7 +78,8 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
 
     private var suffix: String? = null
 
-    internal var configuration: Configuration by Delegates.observable(Configuration()) { _, oldValue, newValue ->
+    internal var configuration: Configuration by Delegates.observable(
+        Configuration()) { _, oldValue, newValue ->
         if (newValue != oldValue) {
             if (newValue.isPrefix) {
                 suffix = null
