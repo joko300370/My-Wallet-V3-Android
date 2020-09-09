@@ -166,6 +166,7 @@ object ReturnToPreviousStep : AssetDetailsIntent() {
         val previousStep = steps[currentStep - 1]
 
         return oldState.copy(
+            hostAction = null,
             assetDetailsCurrentStep = previousStep
         )
     }
