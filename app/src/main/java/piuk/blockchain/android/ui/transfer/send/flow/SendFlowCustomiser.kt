@@ -15,7 +15,7 @@ interface SendFlowCustomiser {
     fun selectSourceAddressTitle(state: SendState): String
     fun selectTargetAddressTitle(state: SendState): String
     fun selectTargetAddressInputHint(state: SendState): String
-    fun selectTargetAddressCustodialLabel(state: SendState): String
+    fun selectTargetNoAddressMessageText(state: SendState): String?
     fun selectTargetShowManualEnterAddress(state: SendState): Boolean
     fun enterAmountTitle(state: SendState): String
     fun enterAmountActionIcon(state: SendState): Int
@@ -59,14 +59,14 @@ class SendFlowCustomiserImpl(
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
 
-    override fun selectTargetAddressCustodialLabel(state: SendState): String =
+    override fun selectTargetNoAddressMessageText(state: SendState): String? =
         when (state.action) {
             AssetAction.NewSend -> resources.getString(
                 R.string.send_internal_transfer_message,
                 resources.getString(state.asset.assetName()),
-                state.asset.displayTicker)
-            AssetAction.Sell -> ""
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+                state.asset.displayTicker
+            )
+            else -> null
         }
 
     override fun selectTargetAddressTitle(state: SendState): String =

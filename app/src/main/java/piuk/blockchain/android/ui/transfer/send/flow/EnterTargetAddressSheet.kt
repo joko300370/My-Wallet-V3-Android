@@ -56,9 +56,9 @@ class EnterTargetAddressSheet(
             cta_button.isEnabled = newState.nextEnabled
 
             if (customiser.selectTargetShowManualEnterAddress(newState)) {
-                showNonCustodialInput(newState)
+                showManualAddressEntry(newState)
             } else {
-                showCustodialInput(newState)
+                hideManualAddressEntry(newState)
             }
 
             customiser.errorFlashMessage(newState)?.let {
@@ -81,7 +81,7 @@ class EnterTargetAddressSheet(
             ContextCompat.getColor(requireContext(), R.color.grey_000))
     }
 
-    private fun showNonCustodialInput(newState: SendState) {
+    private fun showManualAddressEntry(newState: SendState) {
         val address = if (newState.sendTarget is CryptoAddress) {
             newState.sendTarget.address
         } else {
@@ -100,16 +100,24 @@ class EnterTargetAddressSheet(
         }
     }
 
-    private fun showCustodialInput(newState: SendState) {
+    private fun hideManualAddressEntry(newState: SendState) {
+        val msg = customiser.selectTargetNoAddressMessageText(newState)
+
         with(dialogView) {
-            internal_warning.text = customiser.selectTargetAddressCustodialLabel(newState)
+            if (msg != null) {
+                input_switcher.visible()
+                no_manual_enter_msg.text = msg
 
-            internal_send_close.setOnClickListener {
+                internal_send_close.setOnClickListener {
+                    input_switcher.gone()
+                }
+
+                title_pick.gone()
+                input_switcher.displayedChild = CUSTODIAL_INPUT
+            } else {
                 input_switcher.gone()
+                title_pick.gone()
             }
-
-            title_pick.gone()
-            input_switcher.displayedChild = CUSTODIAL_INPUT
         }
     }
 
