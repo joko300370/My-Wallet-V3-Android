@@ -137,7 +137,7 @@ private fun TextView.setTxLabel(
 ) {
     text = when (type) {
         TransactionSummary.TransactionType.DEPOSIT -> context.resources.getString(
-            R.string.tx_title_deposit,
+            R.string.tx_title_transfer,
             cryptoCurrency.displayTicker)
         TransactionSummary.TransactionType.INTEREST_EARNED -> context.resources.getString(
             R.string.tx_title_interest,
@@ -145,7 +145,7 @@ private fun TextView.setTxLabel(
         TransactionSummary.TransactionType.WITHDRAW -> context.resources.getString(
             R.string.tx_title_withdraw,
             cryptoCurrency.displayTicker)
-        else -> context.resources.getString(R.string.tx_title_deposit,
+        else -> context.resources.getString(R.string.tx_title_transfer,
             cryptoCurrency.displayTicker)
     }
 }

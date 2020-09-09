@@ -1801,7 +1801,7 @@
     <string name="activity_details_title_buy">Buy</string>
     <string name="activity_details_title_sell">Sell</string>
     <string name="activity_details_title_swap">Swap</string>
-    <string name="activity_details_title_deposit">Deposit</string>
+    <string name="activity_details_title_deposit">Transfer</string>
     <string name="activity_details_title_interest_earned">Interest Earned</string>
     <string name="activity_details_title_withdraw">Withdrawal</string>
     <string name="activity_details_label_confirming">Confirming</string>
