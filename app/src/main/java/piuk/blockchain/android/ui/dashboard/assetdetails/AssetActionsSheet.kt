@@ -14,6 +14,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -23,10 +24,13 @@ import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SendState
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import piuk.blockchain.android.ui.customviews.account.AccountDecorator
+import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetTint
-import piuk.blockchain.android.util.statusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -41,7 +45,8 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
     private val itemAdapter: AssetActionAdapter by lazy {
         AssetActionAdapter(
-            disposable = disposables
+            disposable = disposables,
+            statusDecorator = ::statusDecorator
         )
     }
 
@@ -86,6 +91,30 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         model.process(ClearSheetDataIntent)
         dispose()
     }
+
+    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
+        if (account is CryptoAccount) {
+            account.sendState
+                .map { sendState ->
+                    object : AccountDecorator {
+                        override val enabled: Boolean
+                            get() = sendState == SendState.CAN_SEND
+                        override val status: String
+                            get() = when (sendState) {
+                                SendState.FUNDS_LOCKED -> getString(R.string.send_state_locked_funds)
+                                SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
+                                else -> ""
+                            }
+                    }
+                }
+        } else {
+            Single.just(object : AccountDecorator {
+                override val enabled: Boolean
+                    get() = true
+                override val status: String
+                    get() = ""
+            })
+        }
 
     private fun showError(error: AssetDetailsError) =
         when (error) {
@@ -210,7 +239,8 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 }
 
 private class AssetActionAdapter(
-    val disposable: CompositeDisposable
+    val disposable: CompositeDisposable,
+    val statusDecorator: StatusDecorator
 ) : RecyclerView.Adapter<AssetActionAdapter.ActionItemViewHolder>() {
     var itemList: List<AssetActionItem> = emptyList()
         set(value) {
@@ -224,15 +254,16 @@ private class AssetActionAdapter(
     override fun getItemCount(): Int = itemList.size
 
     override fun onBindViewHolder(holder: ActionItemViewHolder, position: Int) =
-        holder.bind(itemList[position], disposable)
+        holder.bind(itemList[position], disposable, statusDecorator)
 
     private class ActionItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
         fun bind(
             item: AssetActionItem,
-            disposable: CompositeDisposable
+            disposable: CompositeDisposable,
+            statusDecorator: StatusDecorator
         ) {
 
-            addDecorator(item, disposable, view.context)
+            addDecorator(item, disposable, view.context, statusDecorator)
 
             view.apply {
                 item_action_icon.setImageResource(item.icon)
@@ -245,10 +276,11 @@ private class AssetActionAdapter(
         private fun addDecorator(
             item: AssetActionItem,
             disposable: CompositeDisposable,
-            context: Context
+            context: Context,
+            statusDecorator: StatusDecorator
         ) {
             item.account?.let { account ->
-                disposable += account.statusDecorator(context)
+                disposable += statusDecorator(account)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = { decorator ->
