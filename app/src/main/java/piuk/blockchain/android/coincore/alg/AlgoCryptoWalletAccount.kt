@@ -6,6 +6,8 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import org.apache.commons.lang3.NotImplementedException
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -32,4 +34,7 @@ internal class AlgoCryptoWalletAccount(
 
     override val isFunded: Boolean
         get() = false
+
+    override val actions: AvailableActions
+        get() = setOf(AssetAction.ViewActivity)
 }
