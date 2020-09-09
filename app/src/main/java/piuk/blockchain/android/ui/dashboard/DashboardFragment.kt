@@ -451,7 +451,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun goToReceiveFor(account: SingleAccount) =
         when (account) {
-            is CryptoNonCustodialAccount -> startOldReceiveFor(account)
+            is CryptoNonCustodialAccount -> {
+                clearBottomSheet()
+                startOldReceiveFor(account)
+            }
             else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
         }.exhaustive
 
@@ -489,10 +492,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun gotoSwap(account: SingleAccount) =
         when (account) {
-            is CryptoNonCustodialAccount -> navigator().launchSwapOrKyc(
-                fromCryptoCurrency = account.asset,
-                targetCurrency = account.asset.defaultSwapTo
-            )
+            is CryptoNonCustodialAccount -> {
+                clearBottomSheet()
+                navigator().launchSwapOrKyc(
+                    fromCryptoCurrency = account.asset,
+                    targetCurrency = account.asset.defaultSwapTo
+                )
+            }
             else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")
         }.exhaustive
 
