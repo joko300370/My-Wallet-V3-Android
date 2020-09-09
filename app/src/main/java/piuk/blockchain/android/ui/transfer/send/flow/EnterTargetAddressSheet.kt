@@ -27,6 +27,7 @@ import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -55,6 +56,7 @@ class EnterTargetAddressSheet(
             }
             cta_button.isEnabled = newState.nextEnabled
 
+            state = newState
             if (customiser.selectTargetShowManualEnterAddress(newState)) {
                 showManualAddressEntry(newState)
             } else {
@@ -72,7 +74,6 @@ class EnterTargetAddressSheet(
 
             title.text = customiser.selectTargetAddressTitle(newState)
         }
-        state = newState
     }
 
     private fun hideErrorState() {
@@ -89,12 +90,10 @@ class EnterTargetAddressSheet(
         }
 
         with(dialogView) {
-            address_entry.removeTextChangedListener(addressTextWatcher)
-            if (address.isNotEmpty()) {
+            if (address.isNotEmpty() && address != address_entry.getTextString()) {
                 address_entry.setText(address, TextView.BufferType.EDITABLE)
             }
             address_entry.hint = customiser.selectTargetAddressInputHint(newState)
-            address_entry.addTextChangedListener(addressTextWatcher)
 
             input_switcher.displayedChild = NONCUSTODIAL_INPUT
         }

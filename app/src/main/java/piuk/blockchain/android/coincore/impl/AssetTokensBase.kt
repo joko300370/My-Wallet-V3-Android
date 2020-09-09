@@ -182,7 +182,7 @@ internal abstract class CryptoAssetBase(
         }
 
     private fun getCustodialAccount(): Maybe<SingleAccount> =
-        accountGroup(AssetFilter.NonCustodial)
+        accountGroup(AssetFilter.Custodial)
             .map { it.accounts.first() }
             .onErrorComplete()
 
