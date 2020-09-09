@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.transfer.AccountSelectorFragment"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".ui.transfer.AccountSelectorFragment">
 
     <piuk.blockchain.android.ui.customviews.IntroHeaderView
         android:id="@+id/account_selector_header"
@@ -38,17 +38,19 @@
         tools:visibility="gone">
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/account_selector_empty_title"
             style="@style/Text.Semibold.Centered.20"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/transfer_wallets_empty_title" />
+            tools:text="@string/transfer_wallets_empty_title" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/account_selector_empty_desc"
             style="@style/Text.Standard.Centered.14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/tiny_margin"
-            android:text="@string/transfer_wallets_empty_details" />
+            tools:text="@string/transfer_wallets_empty_details" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
@@ -58,12 +60,12 @@
             app:srcCompat="@drawable/ic_wallet_intro_image" />
 
         <Button
-            android:id="@+id/account_selector_button_buy_crypto"
+            android:id="@+id/account_selector_cta"
             style="@style/CtaButton.Blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/transfer_wallet_buy_crypto"
+            tools:text="@string/transfer_wallet_buy_crypto"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/account_selector_account_list" />
 

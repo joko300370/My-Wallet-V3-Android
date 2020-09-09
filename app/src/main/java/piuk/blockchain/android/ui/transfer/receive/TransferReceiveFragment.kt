@@ -27,6 +27,11 @@ class TransferReceiveFragment : AccountSelectorFragment() {
             R.drawable.ic_receive_blue_circle
         )
 
+        setEmptyStateDetails(R.string.transfer_receive_empty_title,
+            R.string.transfer_receive_empty_details, R.string.transfer_receive_empty_cta) {
+            refreshItems()
+        }
+
         initialiseAccountSelector(
             statusDecorator = {
                 Single.just(object : AccountDecorator {

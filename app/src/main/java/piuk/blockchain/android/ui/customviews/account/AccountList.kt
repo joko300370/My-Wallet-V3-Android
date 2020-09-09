@@ -40,6 +40,7 @@ class AccountList @JvmOverloads constructor(
 
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
+    private val itemList = mutableListOf<BlockchainAccount>()
 
     init {
         LayoutInflater.from(context)
@@ -56,9 +57,6 @@ class AccountList @JvmOverloads constructor(
     }
 
     fun initialise(source: Single<List<BlockchainAccount>>, status: StatusDecorator = defaultDecorator) {
-
-        val itemList = mutableListOf<BlockchainAccount>()
-
         with(list) {
             addItemDecoration(
                 DividerItemDecoration(
@@ -81,6 +79,10 @@ class AccountList @JvmOverloads constructor(
             theAdapter.items = itemList
         }
 
+        loadItems(source)
+    }
+
+    fun loadItems(source: Single<List<BlockchainAccount>>) {
         disposables += source
             .observeOn(uiScheduler)
             .subscribeBy(

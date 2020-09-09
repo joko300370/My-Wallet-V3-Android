@@ -8,6 +8,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
@@ -37,6 +38,11 @@ class TransferSendFragment :
             R.string.transfer_send_crypto_label,
             R.drawable.ic_send_blue_circle
         )
+
+        setEmptyStateDetails(R.string.transfer_wallets_empty_title,
+            R.string.transfer_wallets_empty_details, R.string.transfer_wallet_buy_crypto) {
+            startActivity(SimpleBuyActivity.newInstance(requireContext()))
+        }
 
         initialiseAccountSelector(
             statusDecorator = ::statusDecorator,

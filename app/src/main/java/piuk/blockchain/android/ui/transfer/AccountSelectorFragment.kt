@@ -12,7 +12,6 @@ import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -50,17 +49,38 @@ abstract class AccountSelectorFragment : Fragment() {
         )
     }
 
-    protected fun setHeaderDetails(@StringRes title: Int, @StringRes label: Int, @DrawableRes icon: Int) {
+    fun refreshItems() {
+        account_selector_account_list.loadItems(
+            coincore.allWallets().map { it.accounts.filter(filterFn) }
+        )
+    }
+
+    protected fun setHeaderDetails(
+        @StringRes title: Int,
+        @StringRes label: Int,
+        @DrawableRes icon: Int
+    ) {
         account_selector_header.setDetails(title, label, icon)
+    }
+
+    protected fun setEmptyStateDetails(
+        @StringRes title: Int,
+        @StringRes label: Int,
+        @StringRes ctaText: Int,
+        action: () -> Unit
+    ) {
+        account_selector_empty_title.text = getString(title)
+        account_selector_empty_desc.text = getString(label)
+        account_selector_cta.text = getString(ctaText)
+        account_selector_cta.setOnClickListener {
+            action()
+        }
     }
 
     private fun doOnEmptyList() {
         account_selector_account_list.gone()
         account_selector_header.gone()
         account_selector_empty_view.visible()
-        account_selector_button_buy_crypto.setOnClickListener {
-            startActivity(SimpleBuyActivity.newInstance(requireContext()))
-        }
     }
 
     private fun doOnLoadError(t: Throwable) {

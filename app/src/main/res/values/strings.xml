@@ -1832,6 +1832,9 @@
     <string name="transfer_wallets_empty_title">No crypto to send</string>
     <string name="transfer_wallets_empty_details">Looks like your wallets are empty, we can help you buy crypto</string>
     <string name="transfer_wallets_load_error">There was an error loading your wallets, please try again later</string>
+    <string name="transfer_receive_empty_title">Can\'t load your Wallets</string>
+    <string name="transfer_receive_empty_details">Looks like there is an issue with your internet connection. Please check and try again</string>
+    <string name="transfer_receive_empty_cta">Tap to refresh</string>
 
     <string name="order_pending">Pending</string>
     <string name="order_complete">Complete</string>
