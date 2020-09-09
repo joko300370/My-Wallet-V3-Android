@@ -1901,7 +1901,6 @@
 
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
-    <string name="usdt_asset_label">Full Send and Receive functionality are available on the Web wallet.</string>
 
     <!-- new send -->
     <string name="send_enter_amount_from">From: %1$s</string>

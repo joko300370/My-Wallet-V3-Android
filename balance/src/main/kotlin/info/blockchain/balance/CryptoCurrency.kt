@@ -78,7 +78,7 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12, // Same as ETHER
-        featureFlags = CryptoCurrency.CUSTODIAL_ONLY or CryptoCurrency.IS_ERC20
+        featureFlags = CryptoCurrency.IS_ERC20
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))

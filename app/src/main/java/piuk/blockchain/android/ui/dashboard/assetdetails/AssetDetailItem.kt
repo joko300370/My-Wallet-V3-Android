@@ -93,7 +93,6 @@ class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(token: CryptoAsset) {
         itemView.asset_label_description.text = when (token.asset) {
             CryptoCurrency.ALGO -> context.getString(R.string.algorand_asset_label)
-            CryptoCurrency.USDT -> context.getString(R.string.usdt_asset_label)
             else -> ""
         }
     }
