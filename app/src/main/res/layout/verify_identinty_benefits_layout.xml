@@ -44,8 +44,8 @@
         style="@style/Text.Light.14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_margin"
         android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/fiat_funds_no_kyc_sheet_description"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,13 +62,29 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_benefits"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        tools:listitem="@layout/verify_identity_benefit_layout"
+        tools:itemCount="5"
         android:layout_marginBottom="@dimen/standard_margin"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/kyc_benefits_negative_action"
+        app:layout_constraintBottom_toTopOf="@+id/footer_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/kyc_benefits_header_separator"
+        app:layout_constraintVertical_bias="0"
         app:layout_goneMarginBottom="@dimen/standard_margin" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/footer_text"
+        style="@style/Text.Light.12"
+        android:layout_width="match_parent"
+        tools:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/kyc_benefits_negative_action"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="If you think this was a mistake or would like a manual review of your account, please contact support." />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/kyc_benefits_negative_action"
@@ -76,6 +92,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/tiny_margin"
+        app:layout_goneMarginBottom="@dimen/standard_margin"
         android:text="@string/fiat_funds_no_kyc_negative_action"
         app:layout_constraintBottom_toTopOf="@id/kyc_benefits_positive_action"
         app:layout_constraintEnd_toEndOf="parent"
@@ -86,6 +103,7 @@
         style="@style/CtaButton.Blue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        tools:visibility="gone"
         android:layout_marginBottom="@dimen/standard_margin"
         android:text="@string/fiat_funds_no_kyc_positive_action"
         app:layout_constraintBottom_toBottomOf="parent"

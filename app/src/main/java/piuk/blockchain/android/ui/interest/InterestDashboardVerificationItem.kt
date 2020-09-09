@@ -58,7 +58,7 @@ private class InterestAssetVerificationViewHolder(val parent: View) :
             title = parent.context.getString(R.string.interest_dashboard_verify_title),
             description = parent.context.getString(R.string.interest_dashboard_verify_label),
             icon = R.drawable.ic_interest_blue_circle,
-            primaryButton = ButtonOptions(true, verificationClicked),
+            primaryButton = ButtonOptions(true, cta = verificationClicked),
             secondaryButton = ButtonOptions(false),
             showSheetIndicator = false
         )

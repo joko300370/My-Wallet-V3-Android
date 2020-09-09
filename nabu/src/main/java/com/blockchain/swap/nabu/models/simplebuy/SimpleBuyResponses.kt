@@ -23,7 +23,7 @@ data class SimpleBuyPairResp(
         CryptoCurrency.values().firstOrNull { it.networkTicker == pair.split("-")[0] } != null
 }
 
-data class SimpleBuyEligibility(val eligible: Boolean)
+data class SimpleBuyEligibility(val simpleBuyTradingEligible: Boolean)
 
 data class SimpleBuyCurrency(val currency: String)
 

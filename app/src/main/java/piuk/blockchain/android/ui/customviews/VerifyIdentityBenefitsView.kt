@@ -23,6 +23,7 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         @DrawableRes icon: Int,
         primaryButton: ButtonOptions,
         secondaryButton: ButtonOptions,
+        footerText: String = "",
         showSheetIndicator: Boolean = true
     ) {
         kyc_benefits_intro_title.text = title
@@ -33,9 +34,19 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         kyc_benefits_positive_action.setOnClickListener {
             primaryButton.cta()
         }
+        primaryButton.text?.let {
+            kyc_benefits_positive_action.text = it
+        }
+
+        secondaryButton.text?.let {
+            kyc_benefits_negative_action.text = it
+        }
+
         kyc_benefits_negative_action.setOnClickListener {
             secondaryButton.cta()
         }
+        footer_text.visibleIf { footerText.isNotEmpty() }
+        footer_text.text = footerText
 
         val adapter = BenefitsAdapter().apply {
             items = benefits
@@ -51,4 +62,4 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
 }
 
 data class VerifyIdentityBenefit(val title: String, val subtitle: String)
-data class ButtonOptions(val visible: Boolean, val cta: () -> Unit = {})
+data class ButtonOptions(val visible: Boolean, val text: String? = null, val cta: () -> Unit = {})

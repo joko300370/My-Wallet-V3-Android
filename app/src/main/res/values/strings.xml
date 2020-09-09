@@ -2021,5 +2021,14 @@
     <string name="card_link_failed">Card failed to link. Please try again or contact support if you believe this occurred in error.</string>
 
     <string name="tx_view_locked_funds">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to 7 days.&#160;</string>
+    <string name="unable_to_verify_id">Unable to Verify Your ID</string>
+    <string name="unable_to_verify_id_description">We were unable to verify your identity. This can happen for a few reasons.</string>
+    <string name="invalid_id">Invalid ID</string>
+    <string name="invalid_id_description">The image or document uploaded did not match the requirements.</string>
+    <string name="information_missmatch">Information Mismatch</string>
+    <string name="information_missmatch_description">All information must appear exactly as it does on your legal documents. note: Please do not use a nickname.</string>
+    <string name="blocked_by_local_laws">Blocked by Local Laws</string>
+    <string name="blocked_by_local_laws_description">At Blockchain.com, we strive to adhere to any and all local laws. Based on your location, we cannot allow the buying or selling digital currencies at this time.</string>
+    <string name="error_contact_support">If you think this was a mistake or would like a manual review of your account, please contact support.</string>
 
 </resources>

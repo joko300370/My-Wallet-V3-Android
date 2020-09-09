@@ -210,7 +210,7 @@ class LiveCustodialWalletManager(
         authenticator.authenticate {
             nabuService.isEligibleForSimpleBuy(it, fiatCurrency, PAYMENT_METHODS)
         }.map {
-            it.eligible
+            it.simpleBuyTradingEligible
         }.onErrorReturn {
             false
         }

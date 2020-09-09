@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.sell
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -52,14 +55,82 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         compositeDisposable += tierService.tiers()
+            .zipWith(custodialWalletManager.isEligibleForSimpleBuy(currencyPrefs.selectedFiatCurrency))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onSuccess = {
-                if (it.isApprovedFor(KycTierLevel.GOLD)) {
-                    renderKycedUserUi()
-                } else
-                    renderNonKycedUserUi()
+            .subscribeBy(onSuccess = { (kyc, eligible) ->
+                when {
+                    kyc.isApprovedFor(KycTierLevel.GOLD) && eligible -> {
+                        renderKycedUserUi()
+                    }
+                    kyc.isRejectedFor(KycTierLevel.GOLD) -> {
+                        renderRejectedKycedUserUi()
+                    }
+                    kyc.isApprovedFor(KycTierLevel.GOLD) && !eligible -> {
+                        renderRejectedKycedUserUi()
+                    }
+                    else -> {
+                        renderNonKycedUserUi()
+                    }
+                }
             }, onError = {})
+    }
+
+    private fun renderRejectedKycedUserUi() {
+        kyc_benefits.visible()
+        accounts_list.gone()
+        intro_header_parent.gone()
+        kyc_benefits.initWithBenefits(
+            benefits = listOf(
+                VerifyIdentityBenefit(
+                    getString(R.string.invalid_id),
+                    getString(R.string.invalid_id_description)
+                ), VerifyIdentityBenefit(
+                    getString(R.string.information_missmatch),
+                    getString(R.string.information_missmatch_description)
+                ),
+                VerifyIdentityBenefit(
+                    getString(R.string.blocked_by_local_laws),
+                    getString(R.string.sell_intro_kyc_subtitle_3)
+                )
+            ),
+            title = getString(R.string.unable_to_verify_id),
+            description = getString(R.string.unable_to_verify_id_description),
+            icon = R.drawable.ic_cart,
+            secondaryButton = ButtonOptions(true, getString(R.string.contact_support)) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_CONTACT_SUPPORT)))
+            },
+            primaryButton = ButtonOptions(false) {},
+            showSheetIndicator = false,
+            footerText = getString(R.string.error_contact_support)
+        )
+    }
+
+    private fun renderNonKycedUserUi() {
+        kyc_benefits.visible()
+        accounts_list.gone()
+        intro_header_parent.gone()
+        kyc_benefits.initWithBenefits(
+            benefits = listOf(
+                VerifyIdentityBenefit(
+                    getString(R.string.sell_intro_kyc_title_1),
+                    getString(R.string.sell_intro_kyc_subtitle_1)
+                ), VerifyIdentityBenefit(
+                    getString(R.string.sell_intro_kyc_title_2),
+                    getString(R.string.sell_intro_kyc_subtitle_2)
+                ),
+                VerifyIdentityBenefit(
+                    getString(R.string.sell_intro_kyc_title_3),
+                    getString(R.string.sell_intro_kyc_subtitle_3)
+                )
+            ),
+            title = getString(R.string.sell_crypto),
+            description = getString(R.string.sell_crypto_subtitle),
+            icon = R.drawable.ic_cart,
+            secondaryButton = ButtonOptions(false) {},
+            primaryButton = ButtonOptions(true) {},
+            showSheetIndicator = false
+        )
     }
 
     private fun renderKycedUserUi() {
@@ -116,33 +187,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 supportedPairs.pairs.filter { availableFiats.contains(it.fiatCurrency) }
                     .map { it.cryptoCurrency }
             }
-    }
-
-    private fun renderNonKycedUserUi() {
-        kyc_benefits.visible()
-        accounts_list.gone()
-        intro_header_parent.gone()
-        kyc_benefits.initWithBenefits(
-            benefits = listOf(
-                VerifyIdentityBenefit(
-                    getString(R.string.sell_intro_kyc_title_1),
-                    getString(R.string.sell_intro_kyc_subtitle_1)
-                ), VerifyIdentityBenefit(
-                    getString(R.string.sell_intro_kyc_title_2),
-                    getString(R.string.sell_intro_kyc_subtitle_2)
-                ),
-                VerifyIdentityBenefit(
-                    getString(R.string.sell_intro_kyc_title_3),
-                    getString(R.string.sell_intro_kyc_subtitle_3)
-                )
-            ),
-            title = getString(R.string.sell_crypto),
-            description = getString(R.string.sell_crypto_subtitle),
-            icon = R.drawable.ic_cart,
-            secondaryButton = ButtonOptions(false) {},
-            primaryButton = ButtonOptions(true) {},
-            showSheetIndicator = false
-        )
     }
 
     companion object {

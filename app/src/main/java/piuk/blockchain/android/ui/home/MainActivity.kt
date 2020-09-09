@@ -708,8 +708,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         private const val ITEM_ACTIVITY = 0
         private const val ITEM_SWAP = 1
         private const val ITEM_HOME = 2
-        private const val ITEM_TRANSFER = 3
-        private const val ITEM_BUY_SELL = 4
+        private const val ITEM_BUY_SELL = 3
+        private const val ITEM_TRANSFER = 4
 
         private fun toolbarNavigationItems(): List<AHBottomNavigationItem> =
             listOf(AHBottomNavigationItem(
@@ -725,12 +725,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 R.drawable.ic_vector_toolbar_home,
                 R.color.white
             ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_transfer,
-                R.drawable.ic_vector_toolbar_transfer,
-                R.color.white
-            ), AHBottomNavigationItem(
                 R.string.buy_and_sell,
                 R.drawable.ic_tab_cart,
+                R.color.white
+            ), AHBottomNavigationItem(
+                R.string.toolbar_cmd_transfer,
+                R.drawable.ic_vector_toolbar_transfer,
                 R.color.white
             ))
 
