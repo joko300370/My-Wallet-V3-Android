@@ -106,7 +106,10 @@
                 android:background="@color/grey_000"
                 android:hint="@string/send_enter_asset_address_hint"
                 android:inputType="textNoSuggestions"
-                android:padding="@dimen/very_small_margin"
+                android:paddingTop="@dimen/very_small_margin"
+                android:paddingBottom="@dimen/very_small_margin"
+                android:paddingStart="@dimen/very_small_margin"
+                android:paddingEnd="@dimen/xlarge_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
