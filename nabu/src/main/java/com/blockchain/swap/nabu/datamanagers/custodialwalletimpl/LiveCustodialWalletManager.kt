@@ -5,9 +5,11 @@ import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.datamanagers.BankAccount
 import com.blockchain.swap.nabu.datamanagers.BillingAddress
+import com.blockchain.swap.nabu.datamanagers.BuyOrderList
 import com.blockchain.swap.nabu.datamanagers.BuySellLimits
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
-import com.blockchain.swap.nabu.datamanagers.BuyOrderList
+import com.blockchain.swap.nabu.datamanagers.BuySellPair
+import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
@@ -21,8 +23,6 @@ import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
-import com.blockchain.swap.nabu.datamanagers.BuySellPair
-import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
@@ -204,6 +204,13 @@ class LiveCustodialWalletManager(
         }.map { response ->
             paymentAccountMapperMappers[currency]?.map(response)
                 ?: throw IllegalStateException("Not valid Account returned")
+        }
+
+    override fun getCustodialAccountAddress(cryptoCurrency: CryptoCurrency): Single<String> =
+        authenticator.authenticate {
+            nabuService.getSimpleBuyBankAccountDetails(it, cryptoCurrency.networkTicker)
+        }.map { response ->
+            response.address
         }
 
     override fun isEligibleForSimpleBuy(fiatCurrency: String): Single<Boolean> =

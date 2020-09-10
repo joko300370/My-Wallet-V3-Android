@@ -40,7 +40,13 @@ open class CustodialTradingAccount(
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = Single.error(NotImplementedError("Custodial accounts don't support receive"))
+        get() = custodialWalletManager.getCustodialAccountAddress(asset).map {
+            TradingAddress(
+                address = it,
+                label = label,
+                asset = asset
+            )
+        }
 
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
@@ -172,4 +178,12 @@ open class CustodialTradingAccount(
             OrderState.PENDING_EXECUTION
         )
     }
+}
+
+internal class TradingAddress(
+    override val address: String,
+    override val label: String = address,
+    override val asset: CryptoCurrency
+) : CryptoAddress {
+    override val scanUri: String? = null
 }
