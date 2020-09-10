@@ -351,6 +351,17 @@
  Adresa Bitcoin %1$s . Vă rugăm să scanați codul QR. 
 </string>
   <string name="invalid_private_key">Cheie privată nevalidă</string>
+  <string name="watch_only_import_warning">Ești pe cale să importezi o adresă care nu poate fi cheltuită, an 
+ adresa (sau script-ul cu cheie publică) 
+ stocate în portofel fără cheia privată corespunzătoare. Acest 
+ înseamnă că fondurile pot fi cheltuite DOAR dacă aveți cheia privată stocată în altă parte. daca tu 
+ do 
+ nu aveți cheia privată stocată, NU instruiți pe nimeni să vă trimită bitcoin la 
+ non-spendable 
+ abordare. 
+
+ Aceste opțiuni sunt recomandate numai pentru utilizatorii avansați. Continua? 
+</string>
   <string name="scan_private_key">Scanează cheia privată</string>
   <string name="private_key_successfully_imported">Cheia privată a fost importată cu succes.</string>
   <string name="private_key_not_matching_address">NOTĂ: Cheia privată scanată nu 
@@ -1114,7 +1125,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Am trimis un link de verificare la</string>
   <string name="buy_sell_unverified_email_verify_message2">Faceți clic pe el și reveniți aici pentru a continua cu tranzacția.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Deschideți e-mail</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Sunt de acord să coinificați <a href="ignored"> termeni și condiții </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Verificat prin e-mail!</string>
   <string name="buy_sell_verified_email_message">Partenerul nostru %1$s va procesa tranzacția bitcoin. Făcând clic pe De acord și pe „Continuare” veți crea un cont cu %1$s .</string>
   <string name="buy_sell_identification_verification">Identificați verificarea</string>
@@ -1805,7 +1817,7 @@
   <string name="send_confirmation_add_note_success">Notă adăugată cu succes</string>
   <string name="send_confirmation_cta_button">Trimite %1$s</string>
   <string name="send_confirmation_deposit_cta_button">Confirmați Transferul</string>
-  <string name="send_confirmation_interest_tos_pp">Am citit și sunt de acord cu <annotation link="interest_tos"> Termenii condițiile </annotation> & <annotation link="interest_pp"> Politica de confidențialitate </annotation>.</string>
+  <string name="send_confirmation_interest_tos_pp">Am citit și sunt de acord cu <annotation link="interest_tos"> Termenii condițiile </annotation> &amp; <annotation link="interest_pp"> Politica de confidențialitate </annotation>.</string>
   <string name="send_confirmation_interest_holding_period_1">Acceptând acest lucru, sunteți de acord să transferați</string>
   <string name="send_confirmation_interest_holding_period_2">( %1$s ) din portofelul Bitcoin în contul dvs. de interese. O perioadă inițială de reținere de 7 zile se va aplica fondurilor dvs.</string>
   <string name="send_confirmation_progress_title">Transferul %1$s</string>
@@ -1831,4 +1843,107 @@
   <string name="send_select_a_wallet_title">sau Selectați un portofel</string>
   <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %1$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
   <string name="purchase_funds_note">Suma finală se poate modifica din cauza activității de pe piață.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Aflați mai multe. </annotation>
+  </string>
+  <string name="interest_announcement_title">Câștigă interes pentru cripta ta astăzi!</string>
+  <string name="interest_announcement_description">Transferă Crypto și începe să câștigi dobândă pentru BTC, ETH și multe altele.</string>
+  <string name="interest_announcement_action">Aflați mai multe</string>
+  <string name="purchase_card_note_2">Cripto-ul dvs. va fi disponibil pentru a fi retras în interior</string>
+  <string name="purchase_card_note_2_1">7 zile.</string>
+  <string name="buy_any_crypto">Cumpărați Crypto</string>
+  <string name="select_send_sheet_title">Trimis de la</string>
+  <string name="select_send_source_title">Trimis de la</string>
+  <string name="currency_funds_wallet">Portofelul meu %1s</string>
+  <string name="transfer_receive_empty_title">Nu vă pot încărca portofelele</string>
+  <string name="transfer_receive_empty_details">Se pare că există o problemă cu conexiunea la internet. Vă rugăm să verificați și să încercați din nou</string>
+  <string name="transfer_receive_empty_cta">Atingeți pentru a actualiza</string>
+  <string name="us_dollars">Dolari americani</string>
+  <string name="fiat_funds_detail_withdraw_details">Rambursarea către banca dvs.</string>
+  <string name="withdraw_currency">Retrageți %1$s</string>
+  <string name="withdraw_title">Retrage</string>
+  <string name="withdraw_to">Retrase la</string>
+  <string name="add_a_bank">Adăugați o bancă</string>
+  <string name="transfer_send_crypto_title">Trimiteți Crypto</string>
+  <string name="transfer_send_crypto_label">Selectați portofelul de la care doriți să trimiteți.</string>
+  <string name="transfer_receive_crypto_title">Primiți Crypto</string>
+  <string name="transfer_receive_crypto_label">Selectați un portofel pentru a primi cripto.</string>
+  <string name="withdraw_amount">Retrageți %1$s</string>
+  <string name="withdrawal_amount">Retragere %1$s</string>
+  <string name="withdrawing_amount">Retragerea %1$s</string>
+  <string name="withdrawing_amount_message">Vă finalizăm retragerea acum.</string>
+  <string name="withdrawal_success_message">Succes! Acum retragem banii din portofelul dvs. %1$s . Fondurile ar trebui să fie în banca dvs. în 1-3 zile lucrătoare.</string>
+  <string name="sell_enter_amount_max">Vindeți max</string>
+  <string name="sell_enter_amount_min_error">%1$s Min</string>
+  <string name="sell_enter_amount_max_error">%1$s Max</string>
+  <string name="send_enter_amount_min_send">Este necesară trimiterea minimă de %1$s</string>
+  <string name="sell_confirmation_cta_button">Vindeți %1$s</string>
+  <string name="sell_confirmation_progress_title">Se vinde %1$s</string>
+  <string name="sell_confirmation_progress_message">Vă finalizăm vânzarea acum.</string>
+  <string name="sell_confirmation_success_message">Numerarul dvs. este acum disponibil în portofelul dvs. %1$s .</string>
+  <string name="send_state_locked_funds">Fondurile dvs. vor fi disponibile în termen de 7 zile</string>
+  <string name="sell_progress_complete_title">%1$s vândut</string>
+  <string name="earn_interest">Câștigă interes</string>
+  <string name="interest_summary_total">Dobândă totală obținută</string>
+  <string name="interest_summary_total_fail">Nu se poate încărca dobânda totală</string>
+  <string name="interest_summary_next_payment">Următoarea plată a dobânzii</string>
+  <string name="interest_summary_accrued">Dobânda acumulată luna aceasta</string>
+  <string name="interest_summary_accrued_fail">Nu se pot încărca dobânzile acumulate</string>
+  <string name="interest_summary_hold_period">Perioada inițială de reținere</string>
+  <string name="interest_summary_hold_period_days">%1$f Zile</string>
+  <string name="interest_summary_hold_period_fail">Nu se pot încărca detaliile perioadei de păstrare</string>
+  <string name="interest_summary_rate">Rata dobânzii</string>
+  <string name="interest_summary_rate_fail">Nu se poate încărca rata dobânzii</string>
+  <string name="interest_dashboard_title">Cont de dobândă</string>
+  <string name="interest_dashboard_item_balance_title">Sold %1$s</string>
+  <string name="interest_dashboard_item_accrued_title">Dobândă totală obținută</string>
+  <string name="interest_dashboard_item_action_earn">Câștigă interes</string>
+  <string name="interest_dashboard_item_action_view">Vedere</string>
+  <string name="interest_dashboard_item_rate_1">Câștigă până la</string>
+  <string name="interest_dashboard_item_rate_2">anual pe %1$s</string>
+  <string name="interest_dashboard_verify_title">Câștigați interes pentru cripta dvs.</string>
+  <string name="interest_dashboard_verify_label">Câștigați până la 12 \% instantaneu când transferați cripto în contul dvs. de dobândă.</string>
+  <string name="interest_dashboard_verify_point_one_title">verifica-ti identitatea</string>
+  <string name="interest_dashboard_verify_point_one_label">Pentru a preveni furtul de identitate sau frauda, va trebui să ne asigurăm că sunteți cu adevărat dvs., încărcând un ID.</string>
+  <string name="interest_dashboard_verify_point_two_title">Cumpărați Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Folosiți-vă banca, cardul de debit sau de credit pentru a finanța orice achiziție criptografică.</string>
+  <string name="interest_dashboard_verify_point_three_title">Câștigă interes</string>
+  <string name="interest_dashboard_verify_point_three_label">Transferați-vă în contul dvs. de dobândă și primiți plăți lunare de dobândă.</string>
+  <string name="interest_summary_disclaimer_label">Utilizați portofelul Web pentru a vă retrage fondurile</string>
+  <string name="buy">Cumpără</string>
+  <string name="sell">Vinde</string>
+  <string name="buy_and_sell">Vânzare-cumpărare</string>
+  <string name="buy_with_cash">Cumpărați cu numerar sau card.</string>
+  <string name="select_crypto_you_want">Selectați cripto-ul pe care doriți să îl cumpărați.</string>
+  <string name="sell_intro_kyc_title_1">verifica-ti identitatea</string>
+  <string name="sell_intro_kyc_subtitle_1">Pentru a preveni furtul de identitate sau frauda, vom avea nevoie să ne asigurăm că sunteți cu adevărat dvs., încărcând un ID.</string>
+  <string name="sell_intro_kyc_title_2">Cumpărați Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Folosiți-vă banca, cardul de debit sau de credit pentru a finanța orice cumpărare criptografică.</string>
+  <string name="sell_intro_kyc_title_3">Vindeți oricând</string>
+  <string name="sell_intro_kyc_subtitle_3">Vindeți instant cripto-ul dvs. în numerar. Păstrați banii în portofel sau retrageți la o bancă legată.</string>
+  <string name="sell_crypto">Vindeți Crypto</string>
+  <string name="sell_crypto_subtitle">Verificați-vă identitatea pentru a vinde cripto în numerar.</string>
+  <string name="sell_for_cash">Vindeți Crypto pentru numerar</string>
+  <string name="select_wallet_to_sell">Selectați un portofel de la care vindeți.</string>
+  <string name="common_to_coloned">La:</string>
+  <string name="common_from_coloned">Din:</string>
+  <string name="common_sell">Vinde</string>
+  <string name="sell_quote_price">Preț %1$s</string>
+  <string name="convert_your_crypto_to_cash">Convertiți cripto-ul în numerar</string>
+  <string name="scan_mismatch_transaction_target">Codul scanat nu este un cod QR %1$s .</string>
+  <string name="scan_failed">Codul QR nu este recunoscut, vă rugăm să încercați din nou.</string>
+  <string name="could_not_save_card">Nu v-am putut salva cardul. Vă rugăm să contactați asistența.</string>
+  <string name="could_not_activate_card">Nu v-am putut activa cardul. Vă rugăm să contactați asistența.</string>
+  <string name="card_still_pending">Am așteptat două minute și nu am primit nicio actualizare de la furnizorul nostru de carduri. Cardul dvs. poate fi aprobat în continuare ulterior. Vă rugăm să contactați asistența dacă aveți întrebări.</string>
+  <string name="card_link_failed">Cardul nu a putut fi conectat. Încercați din nou sau contactați asistența dacă credeți că acest lucru a apărut din greșeală.</string>
+  <string name="tx_view_locked_funds">Aceste fonduri vor fi disponibile pentru a fi vândute imediat într-un portofel Fiat %1$s , dar nu veți putea trimite sau retrage aceste fonduri de pe Blockchain.com timp de până la 7 zile.</string>
+  <string name="unable_to_verify_id">Imposibil de verificat ID-ul dvs.</string>
+  <string name="unable_to_verify_id_description">Nu am putut verifica identitatea dvs. Acest lucru se poate întâmpla din câteva motive.</string>
+  <string name="invalid_id">ID invalid</string>
+  <string name="invalid_id_description">Imaginea sau documentul încărcat nu corespundea cerințelor.</string>
+  <string name="information_missmatch">Nepotrivirea informațiilor</string>
+  <string name="information_missmatch_description">Toate informațiile trebuie să apară exact așa cum apar pe documentele dvs. legale. notă: Vă rugăm să nu utilizați o poreclă.</string>
+  <string name="blocked_by_local_laws">Blocat de legile locale</string>
+  <string name="blocked_by_local_laws_description">La Blockchain.com, ne străduim să respectăm toate legile locale. Pe baza locației dvs., nu putem permite cumpărarea sau vânzarea de monede digitale în acest moment.</string>
+  <string name="error_contact_support">Dacă credeți că aceasta a fost o greșeală sau doriți o revizuire manuală a contului dvs., vă rugăm să contactați asistența.</string>
 </resources>

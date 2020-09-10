@@ -352,7 +352,17 @@
  Bitcoinová adresa %1$s . Naskenujte prosím QR kód. 
 </string>
   <string name="invalid_private_key">Neplatný soukromý klíč</string>
+  <string name="watch_only_import_warning">Chystáte se importovat nevyměnitelnou adresu 
+ adresa (nebo skript veřejného klíče) 
+ uložené v peněžence bez odpovídajícího soukromého klíče. Tento 
+ znamená, že prostředky lze utratit POUZE, pokud máte soukromý klíč uložen jinde. jestli ty 
+ dělat 
+ Nemáte-li uložen soukromý klíč, NELÁTE nikomu pokyn, aby vám poslal bitcoiny na server 
+ nevratný 
+ adresa. 
 
+ Tyto možnosti jsou doporučeny pouze pro pokročilé uživatele. Pokračovat? 
+</string>
   <string name="scan_private_key">Skenovat soukromý klíč</string>
   <string name="private_key_successfully_imported">Soukromý klíč byl úspěšně importován.</string>
   <string name="private_key_not_matching_address">POZNÁMKA: Naskenovaný soukromý klíč ne 
@@ -1116,7 +1126,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Souhlasíte s Coinify <a href="ignored"> smluvními podmínkami </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>
@@ -1457,7 +1468,9 @@
   <string name="simple_buy_amount_to_send">Částka k odeslání</string>
   <string name="simple_buy_pending_buy_sheet_title">Čeká se na nákup %1s</string>
   <string name="recipient_name_must_match_eur">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.</string>
-  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
+  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.
+
+ Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
   <string name="recipient_name_must_match">Prostředky zasílejte pouze z vašeho bankovního účtu. Pokud ne, váš vklad může být zpožděn nebo odmítnut.</string>
   <string name="simple_buy_no_currencies_available_title">K dispozici nejsou žádné měny</string>
   <string name="simple_buy_no_currencies_available">Bohužel v současné době neexistují žádné měny, se kterými můžete obchodovat :(</string>
@@ -1659,7 +1672,7 @@
   <string name="bank_transfer">Bankovní převod</string>
   <string name="instantly_buy_crypto_with_card">Okamžitě si zakupte kryptografii s jakýmkoli Visa nebo Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Pošlete peníze přímo z vaší banky do vaší peněženky Blockchain. Jakmile obdržíme manuální převod, použijte tuto hotovost na zakoupení krypto.</string>
-  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
+  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation>, našeho bankovního partnera.</string>
   <string name="add_bank_with_currency">Přidejte banku %1s</string>
   <string name="deposit_currency">Vložte %1s</string>
   <string name="currency_bank_transfer">Bankovní převod</string>
@@ -1706,7 +1719,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Vklad hotovosti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Převeďte hotovost z banky a aktivujte své hotovostní zůstatky.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koupit kryptografii za hotovost</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.</string>
   <string name="fiat_funds_no_kyc_positive_action">Ověřte moji identitu</string>
   <string name="fiat_funds_no_kyc_negative_action">Teď ne</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1833,4 +1846,107 @@
   <string name="send_select_a_wallet_title">nebo Vyberte Peněženku</string>
   <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %1$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
   <string name="purchase_funds_note">Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Další informace. </annotation>
+  </string>
+  <string name="interest_announcement_title">Získejte úroky ze své kryptoměny ještě dnes!</string>
+  <string name="interest_announcement_description">Převeďte krypto a začněte vydělávat úroky na BTC, ETH a mnoha dalších.</string>
+  <string name="interest_announcement_action">Zjistit více</string>
+  <string name="purchase_card_note_2">Vaše krypto bude k dispozici k výběru uvnitř</string>
+  <string name="purchase_card_note_2_1">7 dní.</string>
+  <string name="buy_any_crypto">Koupit krypto</string>
+  <string name="select_send_sheet_title">Odeslat z</string>
+  <string name="select_send_source_title">Odeslat z</string>
+  <string name="currency_funds_wallet">Moje peněženka %1s</string>
+  <string name="transfer_receive_empty_title">Peněženky nelze načíst</string>
+  <string name="transfer_receive_empty_details">Zdá se, že došlo k problému s připojením k internetu. Zkontrolujte to a zkuste to znovu</string>
+  <string name="transfer_receive_empty_cta">Klepnutím obnovíte</string>
+  <string name="us_dollars">Americké dolary</string>
+  <string name="fiat_funds_detail_withdraw_details">Výplata do vaší banky</string>
+  <string name="withdraw_currency">Výběr %1$s</string>
+  <string name="withdraw_title">Ustoupit</string>
+  <string name="withdraw_to">Výběr do</string>
+  <string name="add_a_bank">Přidejte banku</string>
+  <string name="transfer_send_crypto_title">Poslat krypto</string>
+  <string name="transfer_send_crypto_label">Vyberte peněženku, ze které chcete odeslat.</string>
+  <string name="transfer_receive_crypto_title">Získejte krypto</string>
+  <string name="transfer_receive_crypto_label">Vyberte peněženku, do které chcete krypto přijímat.</string>
+  <string name="withdraw_amount">Výběr %1$s</string>
+  <string name="withdrawal_amount">%1$s</string>
+  <string name="withdrawing_amount">Výběr %1$s</string>
+  <string name="withdrawing_amount_message">Nyní dokončujeme váš výběr.</string>
+  <string name="withdrawal_success_message">Úspěch! Nyní vybíráme hotovost z vaší peněženky %1$s . Prostředky by měly být ve vaší bance za 1–3 pracovní dny.</string>
+  <string name="sell_enter_amount_max">Prodat Max</string>
+  <string name="sell_enter_amount_min_error">%1$s min</string>
+  <string name="sell_enter_amount_max_error">%1$s Max</string>
+  <string name="send_enter_amount_min_send">%1$s vyžadováno minimální odeslání %1$s</string>
+  <string name="sell_confirmation_cta_button">Prodat %1$s</string>
+  <string name="sell_confirmation_progress_title">Prodej %1$s</string>
+  <string name="sell_confirmation_progress_message">Nyní dokončujeme váš prodej.</string>
+  <string name="sell_confirmation_success_message">Vaše hotovost je nyní k dispozici ve vaší peněžence %1$s .</string>
+  <string name="send_state_locked_funds">Vaše prostředky budou k dispozici do 7 dnů</string>
+  <string name="sell_progress_complete_title">%1$s Prodáno</string>
+  <string name="earn_interest">Získejte úrok</string>
+  <string name="interest_summary_total">Celkový úrok</string>
+  <string name="interest_summary_total_fail">Nelze načíst celkový zájem</string>
+  <string name="interest_summary_next_payment">Další splátka úroku</string>
+  <string name="interest_summary_accrued">Nashromážděný úrok tento měsíc</string>
+  <string name="interest_summary_accrued_fail">Nelze načíst nahromaděný úrok</string>
+  <string name="interest_summary_hold_period">Počáteční období pozastavení</string>
+  <string name="interest_summary_hold_period_days">%1$f dnů</string>
+  <string name="interest_summary_hold_period_fail">Nelze načíst podrobnosti doby zadržení</string>
+  <string name="interest_summary_rate">Úroková sazba</string>
+  <string name="interest_summary_rate_fail">Nelze načíst úrokovou sazbu</string>
+  <string name="interest_dashboard_title">Úrokový účet</string>
+  <string name="interest_dashboard_item_balance_title">Zůstatek %1$s</string>
+  <string name="interest_dashboard_item_accrued_title">Celkový úrok</string>
+  <string name="interest_dashboard_item_action_earn">Získejte úrok</string>
+  <string name="interest_dashboard_item_action_view">Pohled</string>
+  <string name="interest_dashboard_item_rate_1">Vydělávejte až</string>
+  <string name="interest_dashboard_item_rate_2">ročně na %1$s</string>
+  <string name="interest_dashboard_verify_title">Získejte úrok z kryptoměny</string>
+  <string name="interest_dashboard_verify_label">Získejte až 12 \% okamžitě převodem kryptoměny na svůj úrokový účet.</string>
+  <string name="interest_dashboard_verify_point_one_title">potvrďte vaši identitu</string>
+  <string name="interest_dashboard_verify_point_one_label">Abychom zabránili krádeži identity nebo podvodu, nahráním ID se budeme muset ujistit, že jste to opravdu vy.</string>
+  <string name="interest_dashboard_verify_point_two_title">Koupit krypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Použijte svou bankovní, debetní nebo kreditní kartu k financování jakéhokoli nákupu kryptoměny.</string>
+  <string name="interest_dashboard_verify_point_three_title">Získejte úrok</string>
+  <string name="interest_dashboard_verify_point_three_label">Převeďte na svůj úrokový účet a získejte měsíční platby úroků.</string>
+  <string name="interest_summary_disclaimer_label">K výběru svých prostředků použijte webovou peněženku</string>
+  <string name="buy">Koupit</string>
+  <string name="sell">Prodat</string>
+  <string name="buy_and_sell">Koupit prodat</string>
+  <string name="buy_with_cash">Nakupujte v hotovosti nebo kartou.</string>
+  <string name="select_crypto_you_want">Vyberte kryptoměnu, kterou chcete koupit.</string>
+  <string name="sell_intro_kyc_title_1">potvrďte vaši identitu</string>
+  <string name="sell_intro_kyc_subtitle_1">Abychom zabránili krádeži identity nebo podvodu, potřebujeme nahrát ID, abychom se ujistili, že jste to opravdu vy.</string>
+  <string name="sell_intro_kyc_title_2">Koupit krypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Použijte svou bankovní, debetní nebo kreditní kartu k financování jakéhokoli nákupu kryptoměny.</string>
+  <string name="sell_intro_kyc_title_3">Prodávejte kdykoli</string>
+  <string name="sell_intro_kyc_subtitle_3">Okamžitě prodejte své kryptoměny za hotovost. Uchovávejte hotovost v peněžence nebo vybírejte do propojené banky.</string>
+  <string name="sell_crypto">Prodejte krypto</string>
+  <string name="sell_crypto_subtitle">Chcete-li prodávat kryptoměny za hotovost, ověřte svou totožnost.</string>
+  <string name="sell_for_cash">Prodejte krypto za hotovost</string>
+  <string name="select_wallet_to_sell">Vyberte peněženku, ze které chcete prodat.</string>
+  <string name="common_to_coloned">Na:</string>
+  <string name="common_from_coloned">Z:</string>
+  <string name="common_sell">Prodat</string>
+  <string name="sell_quote_price">Cena %1$s</string>
+  <string name="convert_your_crypto_to_cash">Převeďte svou kryptoměnu na hotovost</string>
+  <string name="scan_mismatch_transaction_target">Naskenovaný kód není %1$s QR kód.</string>
+  <string name="scan_failed">QR kód nebyl rozpoznán, zkuste to prosím znovu.</string>
+  <string name="could_not_save_card">Vaši kartu jsme nemohli uložit. Kontaktujte podporu.</string>
+  <string name="could_not_activate_card">Vaši kartu jsme nemohli aktivovat. Kontaktujte podporu.</string>
+  <string name="card_still_pending">Čekali jsme dvě minuty a neobdrželi jsme aktualizaci od našeho poskytovatele karet. Vaše karta může být i nadále schválena později. V případě dotazů kontaktujte podporu.</string>
+  <string name="card_link_failed">Propojení karty se nezdařilo. Zkuste to znovu nebo se obraťte na podporu, pokud se domníváte, že k tomu došlo omylem.</string>
+  <string name="tx_view_locked_funds">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete je moci posílat ani vybírat z Blockchain.com až 7 dní.</string>
+  <string name="unable_to_verify_id">Nelze ověřit vaše ID</string>
+  <string name="unable_to_verify_id_description">Nepodařilo se nám ověřit vaši identitu. To se může stát z několika důvodů.</string>
+  <string name="invalid_id">Neplatné ID</string>
+  <string name="invalid_id_description">Nahraný obrázek nebo dokument neodpovídal požadavkům.</string>
+  <string name="information_missmatch">Neshoda informací</string>
+  <string name="information_missmatch_description">Všechny informace musí být uvedeny přesně tak, jak jsou uvedeny na vašich právních dokumentech. poznámka: Nepoužívejte přezdívku.</string>
+  <string name="blocked_by_local_laws">Blokováno místními zákony</string>
+  <string name="blocked_by_local_laws_description">Na webu Blockchain.com se snažíme dodržovat veškeré místní zákony. Na základě vaší polohy nemůžeme v tuto chvíli povolit nákup nebo prodej digitálních měn.</string>
+  <string name="error_contact_support">Pokud si myslíte, že to byla chyba, nebo byste chtěli provést manuální kontrolu vašeho účtu, kontaktujte podporu.</string>
 </resources>

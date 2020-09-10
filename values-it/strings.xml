@@ -350,6 +350,17 @@
  Indirizzo bitcoin %1$s . Si prega di scansionare il codice QR. 
 </string>
   <string name="invalid_private_key">Chiave privata non valida</string>
+  <string name="watch_only_import_warning">Stai per importare un indirizzo non spendibile, un 
+ indirizzo (o script di chiave pubblica) 
+ memorizzato nel portafoglio senza la chiave privata corrispondente. Questo 
+ significa che i fondi possono essere spesi SOLO se la chiave privata è archiviata altrove. Se tu 
+ fare 
+ non avere la chiave privata memorizzata, NON dare istruzioni a nessuno di inviarti bitcoin a 
+ non spendibili 
+ indirizzo. 
+
+ Queste opzioni sono consigliate solo per utenti esperti. Continua? 
+</string>
   <string name="scan_private_key">Scansione chiave privata</string>
   <string name="private_key_successfully_imported">Chiave privata importata correttamente.</string>
   <string name="private_key_not_matching_address">NOTA: la chiave privata scansionata no 
@@ -1113,7 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Abbiamo inviato un link di verifica a</string>
   <string name="buy_sell_unverified_email_verify_message2">Fare clic e tornare qui per continuare con la transazione.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Apri email</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Accetta di monetizzare <a href="ignored"> termini e condizioni </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email verificata!</string>
   <string name="buy_sell_verified_email_message">Il nostro partner %1$s elaborerà la tua transazione bitcoin. Facendo clic su Accetto e \"Continua\", creerai un account con %1$s .</string>
   <string name="buy_sell_identification_verification">Identificare la verifica</string>
@@ -1832,4 +1844,107 @@
   <string name="send_select_a_wallet_title">o Seleziona un portafoglio</string>
   <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %1$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
   <string name="purchase_funds_note">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Ulteriori informazioni. </annotation>
+  </string>
+  <string name="interest_announcement_title">Guadagna interesse per la tua crittografia oggi!</string>
+  <string name="interest_announcement_description">Trasferisci Crypto e inizia a guadagnare interessi su BTC, ETH e molti altri.</string>
+  <string name="interest_announcement_action">Per saperne di più</string>
+  <string name="purchase_card_note_2">La tua crittografia sarà disponibile per essere ritirata all\'interno</string>
+  <string name="purchase_card_note_2_1">7 giorni.</string>
+  <string name="buy_any_crypto">Acquista Crypto</string>
+  <string name="select_send_sheet_title">Invia da</string>
+  <string name="select_send_source_title">Invia da</string>
+  <string name="currency_funds_wallet">Il mio portafoglio %1s</string>
+  <string name="transfer_receive_empty_title">Impossibile caricare i tuoi portafogli</string>
+  <string name="transfer_receive_empty_details">Sembra che ci sia un problema con la tua connessione Internet. Si prega di verificare e riprovare</string>
+  <string name="transfer_receive_empty_cta">Tocca per aggiornare</string>
+  <string name="us_dollars">Dollari americani</string>
+  <string name="fiat_funds_detail_withdraw_details">Cashout sulla tua banca</string>
+  <string name="withdraw_currency">Preleva %1$s</string>
+  <string name="withdraw_title">Ritira</string>
+  <string name="withdraw_to">Ritira a</string>
+  <string name="add_a_bank">Aggiungi una banca</string>
+  <string name="transfer_send_crypto_title">Invia Crypto</string>
+  <string name="transfer_send_crypto_label">Seleziona il Portafoglio da cui desideri inviare.</string>
+  <string name="transfer_receive_crypto_title">Ricevi Crypto</string>
+  <string name="transfer_receive_crypto_label">Seleziona un portafoglio a cui ricevere criptovalute.</string>
+  <string name="withdraw_amount">Preleva %1$s</string>
+  <string name="withdrawal_amount">Ritiro di %1$s</string>
+  <string name="withdrawing_amount">Ritiro di %1$s</string>
+  <string name="withdrawing_amount_message">Stiamo completando il tuo ritiro ora.</string>
+  <string name="withdrawal_success_message">Successo! Stiamo ritirando i contanti dal tuo portafoglio %1$s ora. I fondi dovrebbero essere nella tua banca entro 1–3 giorni lavorativi.</string>
+  <string name="sell_enter_amount_max">Vendi max</string>
+  <string name="sell_enter_amount_min_error">%1$s min</string>
+  <string name="sell_enter_amount_max_error">%1$s max</string>
+  <string name="send_enter_amount_min_send">È richiesto un invio minimo di %1$s</string>
+  <string name="sell_confirmation_cta_button">Vendi %1$s</string>
+  <string name="sell_confirmation_progress_title">Vendita di %1$s</string>
+  <string name="sell_confirmation_progress_message">Stiamo completando la tua vendita ora.</string>
+  <string name="sell_confirmation_success_message">Il tuo denaro è ora disponibile nel tuo portafoglio %1$s .</string>
+  <string name="send_state_locked_funds">I tuoi fondi saranno disponibili entro 7 giorni</string>
+  <string name="sell_progress_complete_title">%1$s venduti</string>
+  <string name="earn_interest">Guadagna interesse</string>
+  <string name="interest_summary_total">Interesse totale guadagnato</string>
+  <string name="interest_summary_total_fail">Impossibile caricare l\'interesse totale</string>
+  <string name="interest_summary_next_payment">Prossimo pagamento degli interessi</string>
+  <string name="interest_summary_accrued">Interessi maturati questo mese</string>
+  <string name="interest_summary_accrued_fail">Impossibile caricare gli interessi maturati</string>
+  <string name="interest_summary_hold_period">Periodo di sospensione iniziale</string>
+  <string name="interest_summary_hold_period_days">%1$f giorni</string>
+  <string name="interest_summary_hold_period_fail">Impossibile caricare i dettagli del periodo di attesa</string>
+  <string name="interest_summary_rate">Tasso d\'interesse</string>
+  <string name="interest_summary_rate_fail">Impossibile caricare il tasso di interesse</string>
+  <string name="interest_dashboard_title">Conto interessi</string>
+  <string name="interest_dashboard_item_balance_title">%1$s Saldo</string>
+  <string name="interest_dashboard_item_accrued_title">Interesse totale guadagnato</string>
+  <string name="interest_dashboard_item_action_earn">Guadagna interesse</string>
+  <string name="interest_dashboard_item_action_view">Visualizza</string>
+  <string name="interest_dashboard_item_rate_1">Guadagna fino a</string>
+  <string name="interest_dashboard_item_rate_2">ogni anno sul tuo %1$s</string>
+  <string name="interest_dashboard_verify_title">Guadagna interesse per la tua crittografia</string>
+  <string name="interest_dashboard_verify_label">Guadagna fino al 12 \% istantaneamente quando trasferisci criptovalute sul tuo conto interessi.</string>
+  <string name="interest_dashboard_verify_point_one_title">verifica la tua identità</string>
+  <string name="interest_dashboard_verify_point_one_label">Per prevenire furti di identità o frodi, dovremo assicurarci che sia davvero tu caricando un ID.</string>
+  <string name="interest_dashboard_verify_point_two_title">Acquista Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Usa la tua banca, carta di debito o credito per finanziare qualsiasi acquisto di criptovaluta.</string>
+  <string name="interest_dashboard_verify_point_three_title">Guadagna interesse</string>
+  <string name="interest_dashboard_verify_point_three_label">Trasferisci sul tuo conto interessi e ricevi pagamenti mensili degli interessi.</string>
+  <string name="interest_summary_disclaimer_label">Usa il portafoglio Web per prelevare i tuoi fondi</string>
+  <string name="buy">Acquistare</string>
+  <string name="sell">Vendere</string>
+  <string name="buy_and_sell">Comprare vendere</string>
+  <string name="buy_with_cash">Acquista in contanti o con carta.</string>
+  <string name="select_crypto_you_want">Seleziona la crittografia che desideri acquistare.</string>
+  <string name="sell_intro_kyc_title_1">verifica la tua identità</string>
+  <string name="sell_intro_kyc_subtitle_1">Per prevenire il furto di identità o le frodi, dovremo assicurarci che sia davvero tu caricando un ID.</string>
+  <string name="sell_intro_kyc_title_2">Acquista Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Usa la tua banca, carta di debito o credito per finanziare qualsiasi acquisto di criptovalute.</string>
+  <string name="sell_intro_kyc_title_3">Vendi in qualsiasi momento</string>
+  <string name="sell_intro_kyc_subtitle_3">Vendi istantaneamente la tua criptovaluta in contanti. Conserva i contanti nel tuo portafoglio o ritirali presso una banca collegata.</string>
+  <string name="sell_crypto">Vendi Crypto</string>
+  <string name="sell_crypto_subtitle">Verifica la tua identità per vendere criptovalute in contanti.</string>
+  <string name="sell_for_cash">Vendi Crypto per contanti</string>
+  <string name="select_wallet_to_sell">Seleziona un portafoglio da cui vendere.</string>
+  <string name="common_to_coloned">Per:</string>
+  <string name="common_from_coloned">A partire dal:</string>
+  <string name="common_sell">Vendere</string>
+  <string name="sell_quote_price">Prezzo %1$s</string>
+  <string name="convert_your_crypto_to_cash">Converti le tue criptovalute in contanti</string>
+  <string name="scan_mismatch_transaction_target">Il codice scansionato non è un codice QR %1$s .</string>
+  <string name="scan_failed">Codice QR non riconosciuto, riprova.</string>
+  <string name="could_not_save_card">Impossibile salvare la tua carta. Contatta l\'assistenza.</string>
+  <string name="could_not_activate_card">Non è stato possibile attivare la tua carta. Contatta l\'assistenza.</string>
+  <string name="card_still_pending">Abbiamo aspettato due minuti e non abbiamo ricevuto alcun aggiornamento dal nostro fornitore della carta. La tua carta potrebbe essere ancora approvata in seguito. In caso di domande, contatta l\'assistenza.</string>
+  <string name="card_link_failed">Collegamento della carta non riuscito. Riprova o contatta l\'assistenza se ritieni che si sia verificato un errore.</string>
+  <string name="tx_view_locked_funds">Questi fondi saranno disponibili per essere venduti immediatamente in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com per un massimo di 7 giorni.</string>
+  <string name="unable_to_verify_id">Impossibile verificare il tuo ID</string>
+  <string name="unable_to_verify_id_description">Non siamo riusciti a verificare la tua identità. Ciò può accadere per diversi motivi.</string>
+  <string name="invalid_id">ID non valido</string>
+  <string name="invalid_id_description">L\'immagine o il documento caricato non corrispondeva ai requisiti.</string>
+  <string name="information_missmatch">Mancata corrispondenza delle informazioni</string>
+  <string name="information_missmatch_description">Tutte le informazioni devono apparire esattamente come sui tuoi documenti legali. nota: si prega di non utilizzare un soprannome.</string>
+  <string name="blocked_by_local_laws">Bloccato dalle leggi locali</string>
+  <string name="blocked_by_local_laws_description">Su Blockchain.com, ci sforziamo di aderire a tutte le leggi locali. In base alla tua posizione, al momento non possiamo consentire l\'acquisto o la vendita di valute digitali.</string>
+  <string name="error_contact_support">Se ritieni che sia stato un errore o desideri una revisione manuale del tuo account, contatta l\'assistenza.</string>
 </resources>

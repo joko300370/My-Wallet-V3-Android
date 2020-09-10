@@ -350,6 +350,17 @@
  Bitcoin-Adresse %1$s . Bitte scannen Sie den QR-Code. 
 </string>
   <string name="invalid_private_key">Ungültiger privater Schlüssel</string>
+  <string name="watch_only_import_warning">Sie sind dabei, eine nicht ausgabefähige Adresse zu importieren 
+ Adresse (oder öffentliches Schlüsselskript) 
+ ohne den entsprechenden privaten Schlüssel in der Brieftasche gespeichert. Dies 
+ bedeutet, dass das Geld NUR ausgegeben werden kann, wenn Sie den privaten Schlüssel an einer anderen Stelle gespeichert haben. Wenn du 
+ tun 
+ Wenn der private Schlüssel nicht gespeichert ist, weisen Sie niemanden an, Ihnen Bitcoin an den zu senden 
+ nicht ausgabefähig 
+ Adresse. 
+
+ Diese Optionen werden nur fortgeschrittenen Benutzern empfohlen. Fortsetzen? 
+</string>
   <string name="scan_private_key">Privaten Schlüssel scannen</string>
   <string name="private_key_successfully_imported">Privater Schlüssel erfolgreich importiert.</string>
   <string name="private_key_not_matching_address">HINWEIS: Der gescannte private Schlüssel funktioniert nicht 
@@ -1113,7 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Wir haben einen Bestätigungslink an gesendet</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicken Sie darauf und kehren Sie hierher zurück, um mit Ihrer Transaktion fortzufahren.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öffnen Sie die E-Mail</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Stimmen Sie zu, <a href="ignored"> Geschäftsbedingungen </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email überprüft!</string>
   <string name="buy_sell_verified_email_message">Unser Partner %1$s wird Ihre Bitcoin-Transaktion abwickeln. Wenn Sie auf Zustimmen und dann auf Weiter klicken, erstellen Sie ein Konto mit %1$s .</string>
   <string name="buy_sell_identification_verification">Identifizieren Sie die Überprüfung</string>
@@ -1454,7 +1466,7 @@
   <string name="simple_buy_amount_to_send">Zu sendender Betrag</string>
   <string name="simple_buy_pending_buy_sheet_title">Ausstehender %1s-Kauf</string>
   <string name="recipient_name_must_match_eur">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.</string>
-  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.\n\nDurch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
+  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt. Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
   <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
   <string name="simple_buy_no_currencies_available_title">Keine Währungen verfügbar</string>
   <string name="simple_buy_no_currencies_available">Leider gibt es derzeit keine Währungen, mit denen Sie handeln können :(</string>
@@ -1656,7 +1668,7 @@
   <string name="bank_transfer">Banküberweisung</string>
   <string name="instantly_buy_crypto_with_card">Kaufen Sie Krypto sofort mit einem Visum oder einer Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Senden Sie Geld direkt von Ihrer Bank an Ihre Blockchain Wallet. Sobald wir die manuelle Überweisung erhalten haben, verwenden Sie dieses Geld, um Krypto zu kaufen.</string>
-  <string name="by_depositing_funds_terms_and_conds">Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
+  <string name="by_depositing_funds_terms_and_conds">Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr</annotation>, unserem Bankpartner, zu.</string>
   <string name="add_bank_with_currency">Fügen Sie eine %1s Bank hinzu</string>
   <string name="deposit_currency">Einzahlung %1s</string>
   <string name="currency_bank_transfer">Banküberweisung</string>
@@ -1774,7 +1786,7 @@
   <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Weitere </annotation>.</string>
   <string name="basic_transfer_error_insufficient_funds_title">Unzureichende Mittel</string>
   <string name="basic_transfer_error_insufficient_funds">Sie haben nicht genügend Guthaben auf Ihrem Konto, um diese Transaktion abzuschließen.</string>
-  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden.<annotation link="balance_lock"> Weitere </annotation>.</string>
+  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden. <annotation link="balance_lock"> Weitere </annotation>.</string>
   <string name="erc20_need_more_eth_error_body_1">Sie benötigen die ETH, um Ihre %1$s zu senden</string>
   <string name="purchase_card_note_1">Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
   <string name="select_deposit_source_title">Übertragen von</string>
@@ -1830,4 +1842,105 @@
   <string name="send_select_a_wallet_title">oder Wählen Sie eine Brieftasche</string>
   <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %1$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
   <string name="purchase_funds_note">Ihr endgültiger Betrag kann sich aufgrund von Marktaktivitäten ändern.</string>
+  <string name="common_linked_learn_more"><annotation link="learn_more_link"> Weitere </annotation>.</string>
+  <string name="interest_announcement_title">Verdienen Sie noch heute Interesse an Ihrer Krypto!</string>
+  <string name="interest_announcement_description">Übertragen Sie Crypto und verdienen Sie Zinsen für BTC, ETH und viele mehr.</string>
+  <string name="interest_announcement_action">Mehr erfahren</string>
+  <string name="purchase_card_note_2">Ihre Krypto kann innerhalb von abgerufen werden</string>
+  <string name="purchase_card_note_2_1">7 Tage.</string>
+  <string name="buy_any_crypto">Crypto kaufen</string>
+  <string name="select_send_sheet_title">Senden von</string>
+  <string name="select_send_source_title">Senden von</string>
+  <string name="currency_funds_wallet">Meine %1s Brieftasche</string>
+  <string name="transfer_receive_empty_title">Ihre Brieftaschen können nicht geladen werden</string>
+  <string name="transfer_receive_empty_details">Anscheinend liegt ein Problem mit Ihrer Internetverbindung vor. Bitte überprüfen Sie es und versuchen Sie es erneut</string>
+  <string name="transfer_receive_empty_cta">Tippen Sie zum Aktualisieren auf</string>
+  <string name="us_dollars">US Dollar</string>
+  <string name="fiat_funds_detail_withdraw_details">Auszahlung an Ihre Bank</string>
+  <string name="withdraw_currency">%1$s abheben</string>
+  <string name="withdraw_title">Abheben</string>
+  <string name="withdraw_to">Zurückziehen auf</string>
+  <string name="add_a_bank">Fügen Sie eine Bank hinzu</string>
+  <string name="transfer_send_crypto_title">Krypto senden</string>
+  <string name="transfer_send_crypto_label">Wählen Sie die Brieftasche aus, von der Sie senden möchten.</string>
+  <string name="transfer_receive_crypto_title">Krypto erhalten</string>
+  <string name="transfer_receive_crypto_label">Wählen Sie eine Brieftasche aus, an die Krypto empfangen werden soll.</string>
+  <string name="withdraw_amount">%1$s abheben</string>
+  <string name="withdrawal_amount">%1$s Auszahlung</string>
+  <string name="withdrawing_amount">%1$s abheben</string>
+  <string name="withdrawing_amount_message">Wir schließen Ihre Auszahlung jetzt ab.</string>
+  <string name="withdrawal_success_message">Erfolg! Wir ziehen jetzt das Geld von Ihrer %1$s Brieftasche ab. Das Geld sollte innerhalb von 1 bis 3 Werktagen bei Ihrer Bank sein.</string>
+  <string name="sell_enter_amount_max">Verkaufe max</string>
+  <string name="sell_enter_amount_min_error">%1$s min</string>
+  <string name="sell_enter_amount_max_error">%1$s max</string>
+  <string name="send_enter_amount_min_send">Mindestversand von %1$s erforderlich</string>
+  <string name="sell_confirmation_cta_button">Verkaufe %1$s</string>
+  <string name="sell_confirmation_progress_title">Verkauf von %1$s</string>
+  <string name="sell_confirmation_progress_message">Wir schließen Ihren Verkauf jetzt ab.</string>
+  <string name="sell_confirmation_success_message">Ihr Geld ist jetzt in Ihrer %1$s Brieftasche verfügbar.</string>
+  <string name="send_state_locked_funds">Ihr Geld wird innerhalb von 7 Tagen verfügbar sein</string>
+  <string name="sell_progress_complete_title">%1$s Verkauft</string>
+  <string name="earn_interest">Interesse gewinnen</string>
+  <string name="interest_summary_total">Verdiente Gesamtzinsen</string>
+  <string name="interest_summary_total_fail">Gesamtzins kann nicht geladen werden</string>
+  <string name="interest_summary_next_payment">Nächste Zinszahlung</string>
+  <string name="interest_summary_accrued">In diesem Monat aufgelaufene Zinsen</string>
+  <string name="interest_summary_accrued_fail">Aufgelaufene Zinsen können nicht geladen werden</string>
+  <string name="interest_summary_hold_period">Anfängliche Haltezeit</string>
+  <string name="interest_summary_hold_period_days">%1$f Tage</string>
+  <string name="interest_summary_hold_period_fail">Details zur Haltezeit können nicht geladen werden</string>
+  <string name="interest_summary_rate">Zinsrate</string>
+  <string name="interest_summary_rate_fail">Zinssatz kann nicht geladen werden</string>
+  <string name="interest_dashboard_title">Zinskonto</string>
+  <string name="interest_dashboard_item_balance_title">%1$s Guthaben</string>
+  <string name="interest_dashboard_item_accrued_title">Verdiente Gesamtzinsen</string>
+  <string name="interest_dashboard_item_action_earn">Interesse gewinnen</string>
+  <string name="interest_dashboard_item_action_view">Aussicht</string>
+  <string name="interest_dashboard_item_rate_1">Verdienen bis zu</string>
+  <string name="interest_dashboard_item_rate_2">jährlich auf Ihre %1$s</string>
+  <string name="interest_dashboard_verify_title">Verdienen Sie Interesse an Ihrer Krypto</string>
+  <string name="interest_dashboard_verify_label">Verdienen Sie sofort bis zu 12%, wenn Sie Krypto auf Ihr Zinskonto übertragen.</string>
+  <string name="interest_dashboard_verify_point_one_title">Bestätigen Sie Ihre Identität</string>
+  <string name="interest_dashboard_verify_point_one_label">Um Identitätsdiebstahl oder Betrug zu verhindern, müssen wir durch Hochladen einer ID sicherstellen, dass Sie es wirklich sind.</string>
+  <string name="interest_dashboard_verify_point_two_title">Crypto kaufen</string>
+  <string name="interest_dashboard_verify_point_two_label">Verwenden Sie Ihre Bank-, Debit- oder Kreditkarte, um einen Kryptokauf zu finanzieren.</string>
+  <string name="interest_dashboard_verify_point_three_title">Interesse gewinnen</string>
+  <string name="interest_dashboard_verify_point_three_label">Überweisen Sie auf Ihr Zinskonto und erhalten Sie monatliche Zinszahlungen.</string>
+  <string name="interest_summary_disclaimer_label">Verwenden Sie die Web-Brieftasche, um Ihr Geld abzuheben</string>
+  <string name="buy">Kaufen</string>
+  <string name="sell">Verkaufen</string>
+  <string name="buy_and_sell">Kaufen Verkaufen</string>
+  <string name="buy_with_cash">Kaufen Sie mit Bargeld oder Karte.</string>
+  <string name="select_crypto_you_want">Wählen Sie die Krypto aus, die Sie kaufen möchten.</string>
+  <string name="sell_intro_kyc_title_1">Bestätigen Sie Ihre Identität</string>
+  <string name="sell_intro_kyc_subtitle_1">Um Identitätsdiebstahl oder Betrug zu verhindern, müssen wir sicherstellen, dass Sie es wirklich sind, indem Sie eine ID hochladen.</string>
+  <string name="sell_intro_kyc_title_2">Crypto kaufen</string>
+  <string name="sell_intro_kyc_subtitle_2">Verwenden Sie Ihre Bank-, Debit- oder Kreditkarte, um einen Kryptokauf zu finanzieren.</string>
+  <string name="sell_intro_kyc_title_3">Verkaufen Sie jederzeit</string>
+  <string name="sell_intro_kyc_subtitle_3">Verkaufen Sie Ihre Krypto sofort gegen Bargeld. Bewahren Sie das Geld in Ihrer Brieftasche auf oder ziehen Sie es bei einer verbundenen Bank ab.</string>
+  <string name="sell_crypto">Krypto verkaufen</string>
+  <string name="sell_crypto_subtitle">Überprüfen Sie Ihre Identität, um Krypto gegen Bargeld zu verkaufen.</string>
+  <string name="sell_for_cash">Verkaufe Crypto gegen Bargeld</string>
+  <string name="select_wallet_to_sell">Wählen Sie eine Brieftasche aus, aus der Sie verkaufen möchten.</string>
+  <string name="common_to_coloned">Zu:</string>
+  <string name="common_from_coloned">Von:</string>
+  <string name="common_sell">Verkaufen</string>
+  <string name="sell_quote_price">%1$s Preis</string>
+  <string name="convert_your_crypto_to_cash">Wandeln Sie Ihre Krypto in Bargeld um</string>
+  <string name="scan_mismatch_transaction_target">Der gescannte Code ist kein %1$s QR-Code.</string>
+  <string name="scan_failed">QR-Code nicht erkannt, bitte erneut versuchen.</string>
+  <string name="could_not_save_card">Wir konnten Ihre Karte nicht speichern. Bitte wenden Sie sich an den Support.</string>
+  <string name="could_not_activate_card">Wir konnten Ihre Karte nicht aktivieren. Bitte wenden Sie sich an den Support.</string>
+  <string name="card_still_pending">Wir haben zwei Minuten gewartet und kein Update von unserem Kartenanbieter erhalten. Ihre Karte wird möglicherweise später noch genehmigt. Bei Fragen wenden Sie sich bitte an den Support.</string>
+  <string name="card_link_failed">Karte konnte nicht verknüpft werden. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support, wenn Sie glauben, dass dies ein Fehler ist.</string>
+  <string name="tx_view_locked_funds">Diese Gelder können sofort in eine Fiat-Geldbörse von %1$s werden. Sie können diese Gelder jedoch bis zu 7 Tage lang nicht von Blockchain.com senden oder abheben.</string>
+  <string name="unable_to_verify_id">Ihre ID kann nicht überprüft werden</string>
+  <string name="unable_to_verify_id_description">Wir konnten Ihre Identität nicht überprüfen. Dies kann aus mehreren Gründen geschehen.</string>
+  <string name="invalid_id">Ungültige ID</string>
+  <string name="invalid_id_description">Das hochgeladene Bild oder Dokument entsprach nicht den Anforderungen.</string>
+  <string name="information_missmatch">Informationsinkongruenz</string>
+  <string name="information_missmatch_description">Alle Informationen müssen genau so erscheinen wie in Ihren Rechtsdokumenten. Hinweis: Bitte verwenden Sie keinen Spitznamen.</string>
+  <string name="blocked_by_local_laws">Durch lokale Gesetze blockiert</string>
+  <string name="blocked_by_local_laws_description">Bei Blockchain.com bemühen wir uns, alle lokalen Gesetze einzuhalten. Aufgrund Ihres Standorts können wir derzeit den Kauf oder Verkauf digitaler Währungen nicht zulassen.</string>
+  <string name="error_contact_support">Wenn Sie der Meinung sind, dass dies ein Fehler war oder eine manuelle Überprüfung Ihres Kontos wünschen, wenden Sie sich an den Support.</string>
 </resources>

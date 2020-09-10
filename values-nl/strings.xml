@@ -350,6 +350,17 @@
  Bitcoin-adres %1$s . Scan de QR-code. 
 </string>
   <string name="invalid_private_key">Ongeldige privésleutel</string>
+  <string name="watch_only_import_warning">U staat op het punt een niet-besteedbaar adres te importeren, een 
+ adres (of script met openbare sleutel) 
+ opgeslagen in de portemonnee zonder de bijbehorende privésleutel. Deze 
+ betekent dat het geld ALLEEN kan worden uitgegeven als u de privésleutel ergens anders heeft opgeslagen. als jij 
+ Doen 
+ niet de privésleutel hebben opgeslagen, instrueer niemand om u bitcoin naar de 
+ niet besteedbaar 
+ adres. 
+
+ Deze opties worden alleen aanbevolen voor gevorderde gebruikers. Doorgaan met? 
+</string>
   <string name="scan_private_key">Privésleutel scannen</string>
   <string name="private_key_successfully_imported">Privésleutel succesvol geïmporteerd.</string>
   <string name="private_key_not_matching_address">OPMERKING: de gescande privésleutel niet 
@@ -1113,7 +1124,6 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>
@@ -1832,4 +1842,107 @@
   <string name="send_select_a_wallet_title">of Selecteer een portemonnee</string>
   <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %1$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
   <string name="purchase_funds_note">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Meer informatie. </annotation>
+  </string>
+  <string name="interest_announcement_title">Verdien vandaag nog rente over uw crypto!</string>
+  <string name="interest_announcement_description">Draag Crypto over en begin met het verdienen van rente op BTC, ETH en nog veel meer.</string>
+  <string name="interest_announcement_action">Leer meer</string>
+  <string name="purchase_card_note_2">Uw crypto zal binnen beschikbaar zijn om te worden opgenomen</string>
+  <string name="purchase_card_note_2_1">7 dagen.</string>
+  <string name="buy_any_crypto">Koop Crypto</string>
+  <string name="select_send_sheet_title">Verzenden vanaf</string>
+  <string name="select_send_source_title">Verzenden vanaf</string>
+  <string name="currency_funds_wallet">Mijn %1s portemonnee</string>
+  <string name="transfer_receive_empty_title">Kan uw portemonnee niet laden</string>
+  <string name="transfer_receive_empty_details">Het lijkt erop dat er een probleem is met uw internetverbinding. Controleer het en probeer het opnieuw</string>
+  <string name="transfer_receive_empty_cta">Tik om te vernieuwen</string>
+  <string name="us_dollars">Amerikaanse dollars</string>
+  <string name="fiat_funds_detail_withdraw_details">Uitbetaling naar uw bank</string>
+  <string name="withdraw_currency">%1$s</string>
+  <string name="withdraw_title">Intrekken</string>
+  <string name="withdraw_to">Trek je terug naar</string>
+  <string name="add_a_bank">Voeg een bank toe</string>
+  <string name="transfer_send_crypto_title">Stuur Crypto</string>
+  <string name="transfer_send_crypto_label">Selecteer de portemonnee waaruit u wilt verzenden.</string>
+  <string name="transfer_receive_crypto_title">Ontvang Crypto</string>
+  <string name="transfer_receive_crypto_label">Selecteer een portemonnee om crypto te ontvangen.</string>
+  <string name="withdraw_amount">%1$s</string>
+  <string name="withdrawal_amount">%1$s Intrekking</string>
+  <string name="withdrawing_amount">%1$s</string>
+  <string name="withdrawing_amount_message">We voltooien uw opname nu.</string>
+  <string name="withdrawal_success_message">Succes! We halen nu het geld uit uw %1$s portemonnee. Het geld zou binnen 1 à 3 werkdagen op uw bank moeten staan.</string>
+  <string name="sell_enter_amount_max">Verkoop Max</string>
+  <string name="sell_enter_amount_min_error">%1$s Min</string>
+  <string name="sell_enter_amount_max_error">%1$s Max</string>
+  <string name="send_enter_amount_min_send">Minimale verzending van %1$s vereist</string>
+  <string name="sell_confirmation_cta_button">Verkoop %1$s</string>
+  <string name="sell_confirmation_progress_title">%1$s verkopen</string>
+  <string name="sell_confirmation_progress_message">We zijn nu klaar met verkopen.</string>
+  <string name="sell_confirmation_success_message">Uw geld is nu beschikbaar in uw %1$s portemonnee.</string>
+  <string name="send_state_locked_funds">Uw geld is binnen 7 dagen beschikbaar</string>
+  <string name="sell_progress_complete_title">%1$s verkocht</string>
+  <string name="earn_interest">Verdien rente</string>
+  <string name="interest_summary_total">Totale verdiende rente</string>
+  <string name="interest_summary_total_fail">Kan totale rente niet laden</string>
+  <string name="interest_summary_next_payment">Volgende rentebetaling</string>
+  <string name="interest_summary_accrued">Opgebouwde rente deze maand</string>
+  <string name="interest_summary_accrued_fail">Kan opgebouwde rente niet laden</string>
+  <string name="interest_summary_hold_period">Initiële wachtperiode</string>
+  <string name="interest_summary_hold_period_days">%1$f dagen</string>
+  <string name="interest_summary_hold_period_fail">Kan details van de holdingsperiode niet laden</string>
+  <string name="interest_summary_rate">Rente</string>
+  <string name="interest_summary_rate_fail">Kan rentetarief niet laden</string>
+  <string name="interest_dashboard_title">Renterekening</string>
+  <string name="interest_dashboard_item_balance_title">%1$s saldo</string>
+  <string name="interest_dashboard_item_accrued_title">Totale verdiende rente</string>
+  <string name="interest_dashboard_item_action_earn">Verdien rente</string>
+  <string name="interest_dashboard_item_action_view">Visie</string>
+  <string name="interest_dashboard_item_rate_1">Verdien tot</string>
+  <string name="interest_dashboard_item_rate_2">jaarlijks op uw %1$s</string>
+  <string name="interest_dashboard_verify_title">Verdien rente op uw crypto</string>
+  <string name="interest_dashboard_verify_label">Verdien direct tot 12 \% wanneer u crypto overboekt naar uw renteaccount.</string>
+  <string name="interest_dashboard_verify_point_one_title">Verifieer uw identiteit</string>
+  <string name="interest_dashboard_verify_point_one_label">Om identiteitsdiefstal of fraude te voorkomen, moeten we ervoor zorgen dat u het echt bent door een ID te uploaden.</string>
+  <string name="interest_dashboard_verify_point_two_title">Koop Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Gebruik uw bank-, debet- of creditcard om elke crypto-aankoop te financieren.</string>
+  <string name="interest_dashboard_verify_point_three_title">Verdien rente</string>
+  <string name="interest_dashboard_verify_point_three_label">Maak over naar uw renteaccount en ontvang maandelijkse rentebetalingen.</string>
+  <string name="interest_summary_disclaimer_label">Gebruik de webportemonnee om uw geld op te nemen</string>
+  <string name="buy">Kopen</string>
+  <string name="sell">Verkopen</string>
+  <string name="buy_and_sell">Kopen verkopen</string>
+  <string name="buy_with_cash">Koop met contant geld of kaart.</string>
+  <string name="select_crypto_you_want">Selecteer de crypto die u wilt kopen.</string>
+  <string name="sell_intro_kyc_title_1">Verifieer uw identiteit</string>
+  <string name="sell_intro_kyc_subtitle_1">Om identiteitsdiefstal of fraude te voorkomen, moeten we controleren of u het echt bent door een ID te uploaden.</string>
+  <string name="sell_intro_kyc_title_2">Koop Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Gebruik uw bank-, debet- of creditcard om een crypto-aankoop te financieren.</string>
+  <string name="sell_intro_kyc_title_3">Verkoop op elk moment</string>
+  <string name="sell_intro_kyc_subtitle_3">Verkoop uw crypto direct voor contant geld. Bewaar het geld in uw portemonnee of neem het op bij een gekoppelde bank.</string>
+  <string name="sell_crypto">Verkoop Crypto</string>
+  <string name="sell_crypto_subtitle">Verifieer uw identiteit om crypto voor contant geld te verkopen.</string>
+  <string name="sell_for_cash">Verkoop Crypto voor contant geld</string>
+  <string name="select_wallet_to_sell">Selecteer een portemonnee om van te verkopen.</string>
+  <string name="common_to_coloned">Naar:</string>
+  <string name="common_from_coloned">Van:</string>
+  <string name="common_sell">Verkopen</string>
+  <string name="sell_quote_price">%1$s prijs</string>
+  <string name="convert_your_crypto_to_cash">Converteer uw crypto naar contant geld</string>
+  <string name="scan_mismatch_transaction_target">De gescande code is geen QR-code van %1$s .</string>
+  <string name="scan_failed">QR-code niet herkend, probeer het opnieuw.</string>
+  <string name="could_not_save_card">We konden uw kaart niet opslaan. Neem contact op met ondersteuning.</string>
+  <string name="could_not_activate_card">We konden uw kaart niet activeren. Neem contact op met ondersteuning.</string>
+  <string name="card_still_pending">We hebben twee minuten gewacht en hebben geen update ontvangen van onze kaartaanbieder. Mogelijk wordt uw kaart later nog goedgekeurd. Neem bij vragen contact op met de klantenservice.</string>
+  <string name="card_link_failed">Kaart kan niet worden gekoppeld. Probeer het opnieuw of neem contact op met de ondersteuning als u denkt dat dit ten onrechte is gebeurd.</string>
+  <string name="tx_view_locked_funds">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot 7 dagen niet verzenden naar of opnemen van Blockchain.com.</string>
+  <string name="unable_to_verify_id">Kan uw ID niet verifiëren</string>
+  <string name="unable_to_verify_id_description">We konden uw identiteit niet verifiëren. Dit kan verschillende redenen hebben.</string>
+  <string name="invalid_id">ongeldig identiteitsbewijs</string>
+  <string name="invalid_id_description">De geüploade afbeelding of het document kwam niet overeen met de vereisten.</string>
+  <string name="information_missmatch">Informatie komt niet overeen</string>
+  <string name="information_missmatch_description">Alle informatie moet precies zo verschijnen als op uw juridische documenten. opmerking: gebruik alstublieft geen bijnaam.</string>
+  <string name="blocked_by_local_laws">Geblokkeerd door lokale wetten</string>
+  <string name="blocked_by_local_laws_description">Bij Blockchain.com streven we ernaar om ons te houden aan alle lokale wetten. Op basis van uw locatie kunnen we op dit moment het kopen of verkopen van digitale valuta niet toestaan.</string>
+  <string name="error_contact_support">Als u denkt dat dit een vergissing was of als u een handmatige beoordeling van uw account wilt, neem dan contact op met de ondersteuning.</string>
 </resources>

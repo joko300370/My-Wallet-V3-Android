@@ -352,6 +352,17 @@
  Біткойн-адреса %1$s . Будь ласка, скануйте QR-код. 
 </string>
   <string name="invalid_private_key">Недійсний приватний ключ</string>
+  <string name="watch_only_import_warning">Ви збираєтесь імпортувати не витрачається адресу, 
+ адреса (або сценарій відкритого ключа) 
+ зберігається в гаманці без відповідного приватного ключа. Це 
+ означає, що кошти можна витратити ТІЛЬКИ, якщо приватний ключ зберігається в іншому місці. Якщо ти 
+ робити 
+ не зберігайте приватний ключ, НЕ дайте вказівки нікому надсилати вам біткойн 
+ не витрачається 
+ адреса. 
+
+ Ці параметри рекомендуються лише для досвідчених користувачів. Продовжувати? 
+</string>
   <string name="scan_private_key">Сканувати приватний ключ</string>
   <string name="private_key_successfully_imported">Приватний ключ успішно імпортований.</string>
   <string name="private_key_not_matching_address">ПРИМІТКА. Сканований приватний ключ не працює 
@@ -1115,7 +1126,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Ми надіслали посилання для підтвердження до</string>
   <string name="buy_sell_unverified_email_verify_message2">Клацніть по ньому та поверніться сюди, щоб продовжити транзакцію.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Відкрити електронну пошту</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Погодьтеся, щоб Coinify <a href="ignored"> положення та умови </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Підтверджено електронною поштою!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обробить вашу біткойн-транзакцію. Натиснувши «Погодитися» та «Продовжити», ви створите обліковий запис за допомогою %1$s .</string>
   <string name="buy_sell_identification_verification">Визначте верифікацію</string>
@@ -1834,4 +1846,107 @@
   <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
   <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
   <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Докладніше. </annotation>
+  </string>
+  <string name="interest_announcement_title">Заробляйте інтерес на своїй криптографії вже сьогодні!</string>
+  <string name="interest_announcement_description">Передайте Crypto і почніть заробляти відсотки на BTC, ETH та багатьох інших.</string>
+  <string name="interest_announcement_action">Вчи більше</string>
+  <string name="purchase_card_note_2">Вашу криптовалюту можна буде вилучити протягом</string>
+  <string name="purchase_card_note_2_1">7 днів.</string>
+  <string name="buy_any_crypto">Придбайте Crypto</string>
+  <string name="select_send_sheet_title">Надіслати від</string>
+  <string name="select_send_source_title">Надіслати від</string>
+  <string name="currency_funds_wallet">Мій %1s гаманець</string>
+  <string name="transfer_receive_empty_title">Не вдається завантажити ваші гаманці</string>
+  <string name="transfer_receive_empty_details">Схоже, є проблема з підключенням до Інтернету. Будь ласка, перевірте та повторіть спробу</string>
+  <string name="transfer_receive_empty_cta">Торкніться, щоб оновити</string>
+  <string name="us_dollars">Долари США</string>
+  <string name="fiat_funds_detail_withdraw_details">Виведення коштів у ваш банк</string>
+  <string name="withdraw_currency">Вивести %1$s</string>
+  <string name="withdraw_title">Зняти</string>
+  <string name="withdraw_to">Вийти до</string>
+  <string name="add_a_bank">Додайте банк</string>
+  <string name="transfer_send_crypto_title">Надішліть Crypto</string>
+  <string name="transfer_send_crypto_label">Виберіть гаманець, з якого ви бажаєте надіслати.</string>
+  <string name="transfer_receive_crypto_title">Отримати Crypto</string>
+  <string name="transfer_receive_crypto_label">Виберіть гаманець для отримання криптовалюти.</string>
+  <string name="withdraw_amount">Вивести %1$s</string>
+  <string name="withdrawal_amount">%1$s Виведення</string>
+  <string name="withdrawing_amount">Вилучення %1$s</string>
+  <string name="withdrawing_amount_message">Зараз ми завершуємо ваше відкликання.</string>
+  <string name="withdrawal_success_message">Успіху! Зараз ми знімаємо готівку з вашого гаманця %1$s . Кошти повинні бути у вашому банку через 1–3 робочі дні.</string>
+  <string name="sell_enter_amount_max">Продам Макс</string>
+  <string name="sell_enter_amount_min_error">%1$s хв</string>
+  <string name="sell_enter_amount_max_error">%1$s Макс</string>
+  <string name="send_enter_amount_min_send">Необхідно надіслати мінімум %1$s</string>
+  <string name="sell_confirmation_cta_button">Продам %1$s</string>
+  <string name="sell_confirmation_progress_title">Продаж %1$s</string>
+  <string name="sell_confirmation_progress_message">Зараз ми завершуємо ваш продаж.</string>
+  <string name="sell_confirmation_success_message">Ваші готівкові гроші тепер доступні у вашому гаманці %1$s .</string>
+  <string name="send_state_locked_funds">Ваші кошти будуть доступні протягом 7 днів</string>
+  <string name="sell_progress_complete_title">%1$s продано</string>
+  <string name="earn_interest">Заробляйте відсотки</string>
+  <string name="interest_summary_total">Загальний зароблений відсоток</string>
+  <string name="interest_summary_total_fail">Не вдається завантажити загальний відсоток</string>
+  <string name="interest_summary_next_payment">Наступна виплата відсотків</string>
+  <string name="interest_summary_accrued">Нараховані відсотки цього місяця</string>
+  <string name="interest_summary_accrued_fail">Неможливо завантажити нараховані відсотки</string>
+  <string name="interest_summary_hold_period">Початковий період утримання</string>
+  <string name="interest_summary_hold_period_days">%1$f днів</string>
+  <string name="interest_summary_hold_period_fail">Не вдається завантажити деталі періоду витримки</string>
+  <string name="interest_summary_rate">Процентна ставка</string>
+  <string name="interest_summary_rate_fail">Неможливо завантажити процентну ставку</string>
+  <string name="interest_dashboard_title">Процентний рахунок</string>
+  <string name="interest_dashboard_item_balance_title">%1$s Баланс</string>
+  <string name="interest_dashboard_item_accrued_title">Загальний зароблений відсоток</string>
+  <string name="interest_dashboard_item_action_earn">Заробляйте відсотки</string>
+  <string name="interest_dashboard_item_action_view">Переглянути</string>
+  <string name="interest_dashboard_item_rate_1">Заробляйте до</string>
+  <string name="interest_dashboard_item_rate_2">щорічно на %1$s</string>
+  <string name="interest_dashboard_verify_title">Заробляйте відсотки на своєму крипто</string>
+  <string name="interest_dashboard_verify_label">Миттєво заробляйте до 12 \% при переведенні криптовалюти на свій процентний рахунок.</string>
+  <string name="interest_dashboard_verify_point_one_title">Підтвердьте свою особу</string>
+  <string name="interest_dashboard_verify_point_one_label">Щоб запобігти крадіжці особистих даних або шахрайству, нам потрібно переконатися, що це справді ви, завантаживши посвідчення особи.</string>
+  <string name="interest_dashboard_verify_point_two_title">Придбайте Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Використовуйте свою банківську, дебетову або кредитну картку для фінансування будь-якої криптовалюти.</string>
+  <string name="interest_dashboard_verify_point_three_title">Заробляйте відсотки</string>
+  <string name="interest_dashboard_verify_point_three_label">Перекажіть на свій процентний рахунок і отримуйте щомісячні виплати відсотків.</string>
+  <string name="interest_summary_disclaimer_label">Використовуйте веб-гаманець для виведення коштів</string>
+  <string name="buy">Купуйте</string>
+  <string name="sell">Продавати</string>
+  <string name="buy_and_sell">Купуйте та продавайте</string>
+  <string name="buy_with_cash">Купуйте готівкою або карткою.</string>
+  <string name="select_crypto_you_want">Виберіть криптовалюту, яку ви хочете придбати.</string>
+  <string name="sell_intro_kyc_title_1">Підтвердьте свою особу</string>
+  <string name="sell_intro_kyc_subtitle_1">Щоб запобігти крадіжці особистих даних або шахрайству, нам потрібно переконатися, що це справді ви, завантаживши посвідчення особи.</string>
+  <string name="sell_intro_kyc_title_2">Придбайте Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Використовуйте свою банківську, дебетову або кредитну картку для фінансування будь-якої криптовалюти.</string>
+  <string name="sell_intro_kyc_title_3">Продавати в будь-який час</string>
+  <string name="sell_intro_kyc_subtitle_3">Миттєво продайте свою криптовалюту за готівку. Зберігайте готівку у своєму гаманці або знімайте кошти у пов’язаному банку.</string>
+  <string name="sell_crypto">Продаємо Crypto</string>
+  <string name="sell_crypto_subtitle">Підтвердьте свою особу, щоб продавати криптовалюту за готівку.</string>
+  <string name="sell_for_cash">Продайте Crypto for Cash</string>
+  <string name="select_wallet_to_sell">Виберіть гаманець, з якого продаватимете.</string>
+  <string name="common_to_coloned">Кому:</string>
+  <string name="common_from_coloned">Від:</string>
+  <string name="common_sell">Продавати</string>
+  <string name="sell_quote_price">%1$s Ціна</string>
+  <string name="convert_your_crypto_to_cash">Конвертуйте свою криптовалюту в готівку</string>
+  <string name="scan_mismatch_transaction_target">Відсканований код не є QR-кодом %1$s .</string>
+  <string name="scan_failed">QR-код не розпізнано. Повторіть спробу.</string>
+  <string name="could_not_save_card">Не вдалося зберегти вашу картку. Зверніться до служби підтримки.</string>
+  <string name="could_not_activate_card">Ми не змогли активувати вашу картку. Зверніться до служби підтримки.</string>
+  <string name="card_still_pending">Ми почекали дві хвилини і не отримали оновлення від нашого постачальника карток. Ваша картка може бути затверджена пізніше. Зверніться до служби підтримки, якщо у вас виникли запитання.</string>
+  <string name="card_link_failed">Не вдалося зв’язати картку. Повторіть спробу або зв’яжіться зі службою підтримки, якщо ви вважаєте, що це сталося помилково.</string>
+  <string name="tx_view_locked_funds">Ці кошти можна буде негайно продати у %1$s гаманця Fiat, але ви не зможете надіслати або вивести ці кошти з Blockchain.com протягом 7 днів.</string>
+  <string name="unable_to_verify_id">Неможливо підтвердити свій ідентифікатор</string>
+  <string name="unable_to_verify_id_description">Нам не вдалося підтвердити вашу особу. Це може статися з кількох причин.</string>
+  <string name="invalid_id">Недійсний ідентифікатор</string>
+  <string name="invalid_id_description">Завантажене зображення або документ не відповідають вимогам.</string>
+  <string name="information_missmatch">Невідповідність інформації</string>
+  <string name="information_missmatch_description">Вся інформація повинна відображатися точно так, як це зазначено у ваших юридичних документах. Примітка. Будь ласка, не використовуйте псевдонім.</string>
+  <string name="blocked_by_local_laws">Заблоковано місцевими законами</string>
+  <string name="blocked_by_local_laws_description">На Blockchain.com ми прагнемо дотримуватися будь-яких місцевих законів. Враховуючи ваше місцезнаходження, наразі ми не можемо дозволити купувати або продавати цифрові валюти.</string>
+  <string name="error_contact_support">Якщо ви вважаєте, що це помилка або хочете перевірити свій обліковий запис вручну, зв’яжіться зі службою підтримки.</string>
 </resources>

@@ -41,7 +41,6 @@
   <string name="item_the_exchange">Troca</string>
   <string name="item_simple_buy">Compra simples</string>
   <string name="item_airdrops">Airdrops</string>
-  <string name="item_debug_homebrew" translatable="false"></string>
   <string name="toolbar_cmd_home">Casa</string>
   <string name="toolbar_cmd_send">Mandar</string>
   <string name="toolbar_cmd_receive_crypto">Receber</string>
@@ -351,6 +350,17 @@
  Endereço de Bitcoin %1$s . Por favor, digitalize o código QR. 
 </string>
   <string name="invalid_private_key">Chave privada inválida</string>
+  <string name="watch_only_import_warning">Você está prestes a importar um endereço não consumível, um 
+ endereço (ou script de chave pública) 
+ armazenado na carteira sem a chave privada correspondente. este 
+ significa que os fundos só podem ser gastos se você tiver a chave privada armazenada em outro local. Se vocês 
+ Faz 
+ não tiver a chave privada armazenada, NÃO instrua ninguém a enviar bitcoin para o 
+ não gastável 
+ endereço. 
+
+ Essas opções são recomendadas apenas para usuários avançados. Continuar? 
+</string>
   <string name="scan_private_key">Digitalizar chave privada</string>
   <string name="private_key_successfully_imported">Chave privada importada com sucesso.</string>
   <string name="private_key_not_matching_address">NOTA: A chave privada digitalizada não 
@@ -951,11 +961,9 @@
   <string name="airdrop_status_expired">Expirado</string>
   <string name="airdrop_status_pending">Pendente</string>
   <string name="airdrop_status_unknown">-</string>
-  <string name="airdrop_sheet_stx_title" translatable="false"></string>
   <string name="airdrop_sheet_stx_body">Possui sua identidade e dados digitais com centenas de aplicativos descentralizados criados com o Blockstack.</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks_title">Onde estão minhas pilhas?</string>
   <string name="airdrop_sheet_stx_where_are_my_stacks">As pilhas (STX) são armazenadas na sua Carteira Blockchain. Observe que o saldo não é transferível no momento.</string>
-  <string name="airdrop_sheet_xlm_title" translatable="false"></string>
   <string name="custody_intro_title">Sua Carteira de Custódia.</string>
   <string name="custody_intro_body_1">Quando você compra criptografia, armazenamos seus fundos com segurança em uma Carteira de negociação criptográfica. Esses fundos são armazenados por nós em seu nome. Você pode mantê-los em segurança conosco ou transferi-los para sua Carteira virtual sem custódia para possuir e armazenar você mesmo.</string>
   <string name="custody_intro_body_2">Se você deseja trocar ou enviar esses fundos, é necessário transferi-los para sua Carteira Bitcoin.</string>
@@ -1116,6 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Enviamos um link de verificação para</string>
   <string name="buy_sell_unverified_email_verify_message2">Clique nele e retorne aqui para continuar com sua transação.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Abrir Email</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Concorde em Coinificar <a href="ignored"> termos e condições </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email verificado!</string>
   <string name="buy_sell_verified_email_message">Nosso parceiro %1$s processará sua transação de bitcoin. Ao clicar em Concordo e em \'Continuar\', você criará uma conta com %1$s .</string>
   <string name="buy_sell_identification_verification">Identificar verificação</string>
@@ -1645,7 +1655,6 @@
   <string name="activity_details_historic_received">Valor quando recebido</string>
   <string name="activity_details_historic_transferred">Valor quando transferido</string>
   <string name="activity_details_historic_value_load_fail">Não foi possível carregar informações de valor histórico</string>
-  <string name="empty" translatable="false"></string>
   <string name="received_usdt">Tether recebido</string>
   <string name="watch_only_not_supported">A importação de um endereço não gastável (um endereço ou um script de chave pública
         sem a chave privada correspondente) não é suportado. Tente novamente com
@@ -1834,4 +1843,107 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="send_select_a_wallet_title">ou selecione uma carteira</string>
   <string name="send_internal_transfer_message">No momento, só pode transferir %1$s de sua %1$s Carteira Comercial para as suas Carteiras Vault. Assim que %1$s estiver na sua carteira do Vault,  pode transferir para endereços externos.a</string>
   <string name="purchase_funds_note">O seu valor final pode mudar devido à atividade do mercado.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Saiba mais. </annotation>
+  </string>
+  <string name="interest_announcement_title">Ganhe juros em sua criptografia hoje!</string>
+  <string name="interest_announcement_description">Transfira Crypto e comece a ganhar juros em BTC, ETH e muitos mais.</string>
+  <string name="interest_announcement_action">Saber mais</string>
+  <string name="purchase_card_note_2">Sua criptografia estará disponível para ser retirada em</string>
+  <string name="purchase_card_note_2_1">7 dias.</string>
+  <string name="buy_any_crypto">Compre Crypto</string>
+  <string name="select_send_sheet_title">Enviar de</string>
+  <string name="select_send_source_title">Enviar de</string>
+  <string name="currency_funds_wallet">Minha carteira %1s</string>
+  <string name="transfer_receive_empty_title">Não é possível carregar suas carteiras</string>
+  <string name="transfer_receive_empty_details">Parece que há um problema com sua conexão com a Internet. Por favor verifique e tente novamente</string>
+  <string name="transfer_receive_empty_cta">Toque para atualizar</string>
+  <string name="us_dollars">Dólares americanos</string>
+  <string name="fiat_funds_detail_withdraw_details">Saque para o seu banco</string>
+  <string name="withdraw_currency">Retirar %1$s</string>
+  <string name="withdraw_title">Retirar</string>
+  <string name="withdraw_to">Retirar para</string>
+  <string name="add_a_bank">Adicionar um banco</string>
+  <string name="transfer_send_crypto_title">Enviar criptografia</string>
+  <string name="transfer_send_crypto_label">Selecione a Carteira da qual deseja enviar.</string>
+  <string name="transfer_receive_crypto_title">Receber criptografia</string>
+  <string name="transfer_receive_crypto_label">Selecione uma carteira para receber criptografia.</string>
+  <string name="withdraw_amount">Retirar %1$s</string>
+  <string name="withdrawal_amount">Retirada de %1$s</string>
+  <string name="withdrawing_amount">Retirando %1$s</string>
+  <string name="withdrawing_amount_message">Estamos concluindo sua retirada agora.</string>
+  <string name="withdrawal_success_message">Sucesso! Estamos retirando o dinheiro de sua carteira %1$s agora. Os fundos devem estar em seu banco em 1–3 dias úteis.</string>
+  <string name="sell_enter_amount_max">Vender Max</string>
+  <string name="sell_enter_amount_min_error">%1$s min</string>
+  <string name="sell_enter_amount_max_error">%1$s máx.</string>
+  <string name="send_enter_amount_min_send">Requer envio mínimo de %1$s</string>
+  <string name="sell_confirmation_cta_button">Vender %1$s</string>
+  <string name="sell_confirmation_progress_title">Vendendo %1$s</string>
+  <string name="sell_confirmation_progress_message">Estamos concluindo sua venda agora.</string>
+  <string name="sell_confirmation_success_message">Seu dinheiro agora está disponível em sua carteira %1$s .</string>
+  <string name="send_state_locked_funds">Seus fundos estarão disponíveis em 7 dias</string>
+  <string name="sell_progress_complete_title">%1$s vendido</string>
+  <string name="earn_interest">Ganhe juros</string>
+  <string name="interest_summary_total">Total de juros ganhos</string>
+  <string name="interest_summary_total_fail">Não é possível carregar o interesse total</string>
+  <string name="interest_summary_next_payment">Próximo Pagamento de Juros</string>
+  <string name="interest_summary_accrued">Juros acumulados este mês</string>
+  <string name="interest_summary_accrued_fail">Incapaz de carregar juros acumulados</string>
+  <string name="interest_summary_hold_period">Período de espera inicial</string>
+  <string name="interest_summary_hold_period_days">%1$f dias</string>
+  <string name="interest_summary_hold_period_fail">Incapaz de carregar os detalhes do período de espera</string>
+  <string name="interest_summary_rate">Taxa de juro</string>
+  <string name="interest_summary_rate_fail">Incapaz de carregar taxa de juros</string>
+  <string name="interest_dashboard_title">Conta de juros</string>
+  <string name="interest_dashboard_item_balance_title">Saldo de %1$s</string>
+  <string name="interest_dashboard_item_accrued_title">Total de juros ganhos</string>
+  <string name="interest_dashboard_item_action_earn">Ganhe juros</string>
+  <string name="interest_dashboard_item_action_view">Visão</string>
+  <string name="interest_dashboard_item_rate_1">Ganhe até</string>
+  <string name="interest_dashboard_item_rate_2">anualmente em seu %1$s</string>
+  <string name="interest_dashboard_verify_title">Ganhe juros em sua criptografia</string>
+  <string name="interest_dashboard_verify_label">Ganhe até 12 \% instantaneamente ao transferir criptografia para sua conta de juros.</string>
+  <string name="interest_dashboard_verify_point_one_title">verifique sua identidade</string>
+  <string name="interest_dashboard_verify_point_one_label">Para evitar roubo de identidade ou fraude, precisamos nos certificar de que é você mesmo, enviando um documento de identidade.</string>
+  <string name="interest_dashboard_verify_point_two_title">Compre Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Use seu banco, cartão de débito ou crédito para financiar qualquer compra de criptografia.</string>
+  <string name="interest_dashboard_verify_point_three_title">Ganhe juros</string>
+  <string name="interest_dashboard_verify_point_three_label">Transfira para sua conta de juros e receba pagamentos de juros mensais.</string>
+  <string name="interest_summary_disclaimer_label">Use a carteira da Web para retirar seus fundos</string>
+  <string name="buy">Comprar</string>
+  <string name="sell">Vender</string>
+  <string name="buy_and_sell">Compra venda</string>
+  <string name="buy_with_cash">Compre com dinheiro ou cartão.</string>
+  <string name="select_crypto_you_want">Selecione a criptografia que deseja comprar.</string>
+  <string name="sell_intro_kyc_title_1">verifique sua identidade</string>
+  <string name="sell_intro_kyc_subtitle_1">Para evitar roubo de identidade ou fraude, precisamos ter certeza de que é você mesmo, carregando um documento de identidade.</string>
+  <string name="sell_intro_kyc_title_2">Compre Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Use seu banco, cartão de débito ou crédito para financiar qualquer compra de criptografia.</string>
+  <string name="sell_intro_kyc_title_3">Venda a qualquer hora</string>
+  <string name="sell_intro_kyc_subtitle_3">Venda instantaneamente sua criptografia por dinheiro. Guarde o dinheiro na carteira ou faça saques em um banco vinculado.</string>
+  <string name="sell_crypto">Vender criptografia</string>
+  <string name="sell_crypto_subtitle">Verifique sua identidade para vender criptografia por dinheiro.</string>
+  <string name="sell_for_cash">Venda criptografia por dinheiro</string>
+  <string name="select_wallet_to_sell">Selecione uma carteira para vender.</string>
+  <string name="common_to_coloned">Para:</string>
+  <string name="common_from_coloned">De:</string>
+  <string name="common_sell">Vender</string>
+  <string name="sell_quote_price">Preço de %1$s</string>
+  <string name="convert_your_crypto_to_cash">Converta sua criptografia em dinheiro</string>
+  <string name="scan_mismatch_transaction_target">O código lido não é um código QR %1$s .</string>
+  <string name="scan_failed">Código QR não reconhecido, tente novamente.</string>
+  <string name="could_not_save_card">Não foi possível salvar seu cartão. Entre em contato com o suporte.</string>
+  <string name="could_not_activate_card">Não foi possível ativar seu cartão. Entre em contato com o suporte.</string>
+  <string name="card_still_pending">Esperamos dois minutos e não recebemos nenhuma atualização do fornecedor do cartão. Seu cartão ainda pode ser aprovado mais tarde. Entre em contato com o suporte se tiver alguma dúvida.</string>
+  <string name="card_link_failed">Falha ao vincular o cartão. Tente novamente ou entre em contato com o suporte se achar que isso ocorreu por engano.</string>
+  <string name="tx_view_locked_funds">Esses fundos estarão disponíveis para venda em uma carteira Fiat %1$s imediatamente, mas você não poderá enviar ou sacar esses fundos do Blockchain.com por até 7 dias.</string>
+  <string name="unable_to_verify_id">Incapaz de verificar sua identidade</string>
+  <string name="unable_to_verify_id_description">Não foi possível verificar sua identidade. Isso pode acontecer por alguns motivos.</string>
+  <string name="invalid_id">ID Inválido</string>
+  <string name="invalid_id_description">A imagem ou documento carregado não atendeu aos requisitos.</string>
+  <string name="information_missmatch">Incompatibilidade de informações</string>
+  <string name="information_missmatch_description">Todas as informações devem aparecer exatamente como aparecem em seus documentos legais. nota: por favor, não use um apelido.</string>
+  <string name="blocked_by_local_laws">Bloqueado por Leis Locais</string>
+  <string name="blocked_by_local_laws_description">No Blockchain.com, nós nos esforçamos para cumprir todas e quaisquer leis locais. Com base na sua localização, não podemos permitir a compra ou venda de moedas digitais no momento.</string>
+  <string name="error_contact_support">Se você acha que isso foi um engano ou gostaria de fazer uma revisão manual da sua conta, entre em contato com o suporte.</string>
 </resources>

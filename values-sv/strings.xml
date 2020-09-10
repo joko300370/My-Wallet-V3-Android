@@ -15,14 +15,14 @@
     <item>tolfte ordet</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ Sträng / xlm_memo_text</item>
+    <item>\@ Sträng / xlm_memo_id</item>
+    <item>\@ Sträng / xlm_memo_hash</item>
+    <item>\@ Sträng / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ Sträng / xlm_memo_text</item>
+    <item>\@ Sträng / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importerad adress</item>
@@ -350,6 +350,17 @@
  Bitcoin-adress %1$s . Skanna QR-koden. 
 </string>
   <string name="invalid_private_key">Ogiltig privat nyckel</string>
+  <string name="watch_only_import_warning">Du håller på att importera en adress som inte kan spendera, en 
+ adress (eller public key script) 
+ lagras i plånboken utan motsvarande privat nyckel. Detta 
+ innebär att medlen endast kan användas om du har den privata nyckeln lagrad någon annanstans. Om du 
+ do 
+ inte ha den privata nyckeln lagrad, instruera INTE någon att skicka dig bitcoin till 
+ icke-spendable 
+ adress. 
+
+ Dessa alternativ rekommenderas endast för avancerade användare. Fortsätta? 
+</string>
   <string name="scan_private_key">Skanna privat nyckel</string>
   <string name="private_key_successfully_imported">Privat nyckel importeras.</string>
   <string name="private_key_not_matching_address">OBS! Den skannade privata nyckeln gör det inte 
@@ -1113,7 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Vi skickade en verifieringslänk till</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicka på den och gå tillbaka hit för att fortsätta med din transaktion.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öppna e-post</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Håller med att Coinify <a href="ignored"> villkor </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-post bekräftad!</string>
   <string name="buy_sell_verified_email_message">Vår partner %1$s kommer att behandla din bitcoin-transaktion. Genom att klicka på Agree och \'Fortsätt\' skapar du ett konto med %1$s .</string>
   <string name="buy_sell_identification_verification">Identifiera verifiering</string>
@@ -1220,7 +1232,7 @@
   <string name="kyc_email_title">Verifiera din epost</string>
   <string name="kyc_email_message">Vi måste verifiera din e-postadress som ett extra lager av säkerhet.</string>
   <string name="kyc_email_hint_focused">Din email</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ Sträng / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fel vid sparande av e-post, försök igen</string>
   <string name="kyc_email_send_verification">Skicka epost</string>
   <string name="kyc_email_validation_header">Kolla din inkorg.</string>
@@ -1245,7 +1257,7 @@
   <string name="kyc_onfido_splash_verification_error">Fel vid verifiering av ID, försök igen</string>
   <string name="kyc_veriff_splash_country_supported_header">Stöds mitt land?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Inte alla länder stöds just nu. Kontrollera vår uppdaterade <annotation link="country_list"> lista över länder </annotation> innan du fortsätter.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ Sträng / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
   <string name="kyc_veriff_splash_header">Låt oss bekräfta att det är du</string>
   <string name="kyc_veriff_splash_subtitle">Du behöver 1 av ID-typerna nedan för att fortsätta.</string>
@@ -1267,11 +1279,11 @@
   <string name="kyc_complete_device_verified">Enheten har verifierats</string>
   <string name="kyc_complete_id_uploaded">ID laddat upp</string>
   <string name="kyc_complete_video_uploaded">Video laddad upp</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ Sträng / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Vårt supportteam för Blockchain har skrivit hjälpguider som förklarar varför vi måste verifiera din identitet.</string>
   <string name="kyc_help_dialog_read_now">Läs nu</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/CONTACT_SUPPORT</string>
+  <string name="kyc_help_dialog_contact_support">\@ Sträng / CONTACT_SUPPORT</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitetsverifiering</string>
   <string name="kyc_settings_status_none">Unverified</string>
@@ -1283,7 +1295,7 @@
   <string name="kyc_settings_gold_level_in_review">Guldnivå - Granskning</string>
   <string name="kyc_settings_gold_level_approved">Guldnivå - Godkänd</string>
   <string name="kyc_settings_silver_level_approved">Silvernivå - Godkänd</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ Sträng / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fel vid hämtning av KYC-status</string>
   <string name="kyc_status_title_in_progress">Verifiering pågår</string>
   <string name="kyc_status_title_approved">Kontot godkänd</string>
@@ -1307,10 +1319,10 @@
   <string name="kyc_drop_off_card_description">Plocka upp var du slutade och slutför din identitetsverifiering.</string>
   <string name="kyc_drop_off_card_button">Fortsätt verifieringen</string>
   <string name="kyc_documents_needed">Dokument behövs</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ Sträng / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Vi hade några problem med dokumenten du har levererat. Försök att ladda upp dokumenten igen för att fortsätta med verifieringen.</string>
   <string name="kyc_resubmission_card_button">Ladda upp dokument</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ Sträng / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Vi kan inte verifiera din identitet och behöver att du laddar upp de nödvändiga dokumenten.</string>
   <string name="kyc_resubmission_splash_description_2">De viktigaste orsakerna till att detta händer:</string>
   <string name="kyc_resubmission_splash_description_3">De nödvändiga fotona saknas.</string>
@@ -1832,4 +1844,107 @@
   <string name="send_select_a_wallet_title">eller Välj en plånbok</string>
   <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %1$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
   <string name="purchase_funds_note">Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Läs mer. </annotation>
+  </string>
+  <string name="interest_announcement_title">Tjäna intresse för din krypto idag!</string>
+  <string name="interest_announcement_description">Överför Crypto och börja tjäna ränta på BTC, ETH och många fler.</string>
+  <string name="interest_announcement_action">Läs mer</string>
+  <string name="purchase_card_note_2">Din krypto kommer att kunna tas bort inom</string>
+  <string name="purchase_card_note_2_1">7 dagar.</string>
+  <string name="buy_any_crypto">Köp Crypto</string>
+  <string name="select_send_sheet_title">Skicka från</string>
+  <string name="select_send_source_title">Skicka från</string>
+  <string name="currency_funds_wallet">Min %1s plånbok</string>
+  <string name="transfer_receive_empty_title">Det går inte att ladda dina plånböcker</string>
+  <string name="transfer_receive_empty_details">Det verkar som om det finns ett problem med din internetanslutning. Kontrollera och försök igen</string>
+  <string name="transfer_receive_empty_cta">Tryck för att uppdatera</string>
+  <string name="us_dollars">US dollar</string>
+  <string name="fiat_funds_detail_withdraw_details">Utbetalning till din bank</string>
+  <string name="withdraw_currency">Ta ut %1$s</string>
+  <string name="withdraw_title">Dra tillbaka</string>
+  <string name="withdraw_to">Dra tillbaka till</string>
+  <string name="add_a_bank">Lägg till en bank</string>
+  <string name="transfer_send_crypto_title">Skicka Crypto</string>
+  <string name="transfer_send_crypto_label">Välj plånboken du vill skicka från.</string>
+  <string name="transfer_receive_crypto_title">Ta emot krypto</string>
+  <string name="transfer_receive_crypto_label">Välj en plånbok att ta emot krypto till.</string>
+  <string name="withdraw_amount">Ta ut %1$s</string>
+  <string name="withdrawal_amount">%1$s</string>
+  <string name="withdrawing_amount">Återkallar %1$s</string>
+  <string name="withdrawing_amount_message">Vi slutför ditt uttag nu.</string>
+  <string name="withdrawal_success_message">Framgång! Vi tar ut kontanter från din %1$s plånbok nu. Pengarna ska finnas i din bank inom 1–3 arbetsdagar.</string>
+  <string name="sell_enter_amount_max">Sälj Max</string>
+  <string name="sell_enter_amount_min_error">%1$s Min</string>
+  <string name="sell_enter_amount_max_error">%1$s Max</string>
+  <string name="send_enter_amount_min_send">Minsta sändning av %1$s krävs</string>
+  <string name="sell_confirmation_cta_button">Sälj %1$s</string>
+  <string name="sell_confirmation_progress_title">Säljer %1$s</string>
+  <string name="sell_confirmation_progress_message">Vi slutför din försäljning nu.</string>
+  <string name="sell_confirmation_success_message">Dina kontanter är nu tillgängliga i din %1$s plånbok.</string>
+  <string name="send_state_locked_funds">Dina medel kommer att finnas tillgängliga inom sju dagar</string>
+  <string name="sell_progress_complete_title">%1$s såld</string>
+  <string name="earn_interest">Tjäna ränta</string>
+  <string name="interest_summary_total">Totalt intjänat intresse</string>
+  <string name="interest_summary_total_fail">Det gick inte att ladda totalränta</string>
+  <string name="interest_summary_next_payment">Nästa räntebetalning</string>
+  <string name="interest_summary_accrued">Upplupet ränta den här månaden</string>
+  <string name="interest_summary_accrued_fail">Det går inte att ladda upplupen ränta</string>
+  <string name="interest_summary_hold_period">Inledande hållperiod</string>
+  <string name="interest_summary_hold_period_days">%1$f dagar</string>
+  <string name="interest_summary_hold_period_fail">Det gick inte att ladda information om innehavsperiod</string>
+  <string name="interest_summary_rate">Ränta</string>
+  <string name="interest_summary_rate_fail">Det gick inte att ladda räntan</string>
+  <string name="interest_dashboard_title">Räntekonto</string>
+  <string name="interest_dashboard_item_balance_title">%1$s saldo</string>
+  <string name="interest_dashboard_item_accrued_title">Totalt intjänat intresse</string>
+  <string name="interest_dashboard_item_action_earn">Tjäna ränta</string>
+  <string name="interest_dashboard_item_action_view">Se</string>
+  <string name="interest_dashboard_item_rate_1">Tjäna upp till</string>
+  <string name="interest_dashboard_item_rate_2">årligen på dina %1$s</string>
+  <string name="interest_dashboard_verify_title">Tjäna intresse för din krypto</string>
+  <string name="interest_dashboard_verify_label">Tjäna upp till 12 \% direkt när du överför krypto till ditt intressekonto.</string>
+  <string name="interest_dashboard_verify_point_one_title">Verifiera din identitet</string>
+  <string name="interest_dashboard_verify_point_one_label">För att förhindra identitetsstöld eller bedrägeri måste vi se till att det verkligen är du genom att ladda upp ett ID.</string>
+  <string name="interest_dashboard_verify_point_two_title">Köp Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Använd ditt bank-, betalkort- eller kreditkort för att finansiera kryptoköp.</string>
+  <string name="interest_dashboard_verify_point_three_title">Tjäna ränta</string>
+  <string name="interest_dashboard_verify_point_three_label">Överför till ditt räntekonto och få månatliga räntebetalningar.</string>
+  <string name="interest_summary_disclaimer_label">Använd webbplånboken för att ta ut dina pengar</string>
+  <string name="buy">köpa</string>
+  <string name="sell">Sälja</string>
+  <string name="buy_and_sell">Köpa sälja</string>
+  <string name="buy_with_cash">Köp med kontanter eller kort.</string>
+  <string name="select_crypto_you_want">Välj krypten du vill köpa.</string>
+  <string name="sell_intro_kyc_title_1">Verifiera din identitet</string>
+  <string name="sell_intro_kyc_subtitle_1">För att förhindra identitetsstöld eller bedrägeri måste vi se till att det verkligen är du genom att ladda upp ett ID.</string>
+  <string name="sell_intro_kyc_title_2">Köp Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Använd ditt bank-, bankkort- eller kreditkort för att finansiera kryptoköp.</string>
+  <string name="sell_intro_kyc_title_3">Sälj när som helst</string>
+  <string name="sell_intro_kyc_subtitle_3">Sälj omedelbart din krypto för kontanter. Förvara kontanten i din plånbok eller ta ut till en länkad bank.</string>
+  <string name="sell_crypto">Sälj Crypto</string>
+  <string name="sell_crypto_subtitle">Verifiera din identitet för att sälja krypto mot kontanter.</string>
+  <string name="sell_for_cash">Sälj Crypto för kontanter</string>
+  <string name="select_wallet_to_sell">Välj en plånbok att sälja från.</string>
+  <string name="common_to_coloned">Till:</string>
+  <string name="common_from_coloned">Från:</string>
+  <string name="common_sell">Sälja</string>
+  <string name="sell_quote_price">%1$s Pris</string>
+  <string name="convert_your_crypto_to_cash">Konvertera din krypto till kontanter</string>
+  <string name="scan_mismatch_transaction_target">Den skannade koden är inte en %1$s QR-kod.</string>
+  <string name="scan_failed">QR-kod känns inte igen, försök igen.</string>
+  <string name="could_not_save_card">Vi kunde inte spara ditt kort. Kontakta support.</string>
+  <string name="could_not_activate_card">Vi kunde inte aktivera ditt kort. Kontakta support.</string>
+  <string name="card_still_pending">Vi väntade två minuter och fick ingen uppdatering från vår kortleverantör. Ditt kort kan fortfarande godkännas senare. Kontakta support om du har några frågor.</string>
+  <string name="card_link_failed">Det gick inte att länka kortet. Försök igen eller kontakta support om du tror att detta inträffade av misstag.</string>
+  <string name="tx_view_locked_funds">Dessa medel kommer att kunna säljas till en %1$s Fiat-plånbok omedelbart, men du kommer inte att kunna skicka eller ta ut dessa medel från Blockchain.com på upp till 7 dagar.</string>
+  <string name="unable_to_verify_id">Det går inte att verifiera ditt ID</string>
+  <string name="unable_to_verify_id_description">Vi kunde inte verifiera din identitet. Detta kan hända av några anledningar.</string>
+  <string name="invalid_id">ogiltigt ID</string>
+  <string name="invalid_id_description">Den uppladdade bilden eller dokumentet matchade inte kraven.</string>
+  <string name="information_missmatch">Informationsfel</string>
+  <string name="information_missmatch_description">All information måste visas exakt som i dina juridiska dokument. Obs: Använd inte ett smeknamn.</string>
+  <string name="blocked_by_local_laws">Blockerad av lokala lagar</string>
+  <string name="blocked_by_local_laws_description">På Blockchain.com strävar vi efter att följa alla lokala lagar. Baserat på din plats kan vi inte tillåta att köpa eller sälja digitala valutor just nu.</string>
+  <string name="error_contact_support">Om du tror att detta var ett misstag eller vill ha en manuell granskning av ditt konto, vänligen kontakta supporten.</string>
 </resources>

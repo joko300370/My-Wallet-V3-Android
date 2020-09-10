@@ -15,14 +15,14 @@
     <item>คำที่สิบสอง</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_hash</item>
+    <item>\@ สตริง / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d ที่อยู่ที่นำเข้า</item>
@@ -349,6 +349,17 @@
  ที่อยู่ Bitcoin %1$s กรุณาสแกนรหัส QR 
 </string>
   <string name="invalid_private_key">รหัสส่วนตัวไม่ถูกต้อง</string>
+  <string name="watch_only_import_warning">คุณกำลังจะนำเข้าที่อยู่ที่ไม่สามารถใช้จ่ายได้ 
+ ที่อยู่ (หรือสคริปต์กุญแจสาธารณะ) 
+ เก็บไว้ในกระเป๋าโดยไม่มีรหัสส่วนตัวที่เกี่ยวข้อง นี้ 
+ หมายความว่าสามารถใช้เงินได้เฉพาะเมื่อคุณมีรหัสส่วนตัวที่เก็บไว้ที่อื่น ถ้าคุณ 
+ ทำ 
+ ไม่มีคีย์ส่วนตัวที่เก็บไว้อย่าสั่งให้ใครส่ง bitcoin ให้คุณ 
+ ไม่ใช่ spendable 
+ ที่อยู่ 
+
+ แนะนำให้ใช้ตัวเลือกเหล่านี้สำหรับผู้ใช้ขั้นสูงเท่านั้น ต่อหรือไม่? 
+</string>
   <string name="scan_private_key">สแกนรหัสส่วนตัว</string>
   <string name="private_key_successfully_imported">นำเข้ากุญแจส่วนตัวสำเร็จแล้ว</string>
   <string name="private_key_not_matching_address">หมายเหตุ: รหัสส่วนตัวที่สแกนไม่ได้ 
@@ -1112,7 +1123,8 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">ยอมรับการ Coinify <a href="ignored"> ข้อกำหนดในการให้บริการ </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>
@@ -1219,7 +1231,7 @@
   <string name="kyc_email_title">ยืนยันอีเมลของคุณ</string>
   <string name="kyc_email_message">เราจำเป็นต้องยืนยันที่อยู่อีเมลของคุณเพื่อเพิ่มระดับความปลอดภัย</string>
   <string name="kyc_email_hint_focused">อีเมลของคุณ</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ สตริง / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">เกิดข้อผิดพลาดในการบันทึกอีเมลโปรดลองอีกครั้ง</string>
   <string name="kyc_email_send_verification">ส่งอีเมล</string>
   <string name="kyc_email_validation_header">ตรวจสอบกล่องจดหมายของคุณ.</string>
@@ -1244,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">เกิดข้อผิดพลาดในการยืนยัน ID โปรดลองอีกครั้ง</string>
   <string name="kyc_veriff_splash_country_supported_header">ประเทศของฉันรองรับหรือไม่</string>
   <string name="kyc_veriff_splash_country_supported_subheader">ไม่รองรับทุกประเทศในขณะนี้ ตรวจสอบ <annotation link="country_list"> รายการประเทศ </annotation> ก่อนดำเนินการต่อ</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ตรวจสอบเงินแล้ว</string>
   <string name="kyc_veriff_splash_header">มายืนยันกันเถอะ</string>
   <string name="kyc_veriff_splash_subtitle">คุณจะต้องมี 1 ประเภท ID ด้านล่างนี้เพื่อดำเนินการต่อ</string>
@@ -1266,11 +1278,11 @@
   <string name="kyc_complete_device_verified">ตรวจสอบอุปกรณ์แล้ว</string>
   <string name="kyc_complete_id_uploaded">อัปโหลด ID</string>
   <string name="kyc_complete_video_uploaded">วิดีโอที่อัปโหลด</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ สตริง / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ทีมสนับสนุน Blockchain ของเราได้เขียนคำแนะนำช่วยเหลืออธิบายว่าทำไมเราต้องยืนยันตัวตนของคุณ</string>
   <string name="kyc_help_dialog_read_now">อ่านตอนนี้</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ สตริง / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">การยืนยันตัวตน</string>
   <string name="kyc_settings_status_none">ไม่สอบ</string>
@@ -1282,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">ระดับทอง - อยู่ระหว่างการตรวจสอบ</string>
   <string name="kyc_settings_gold_level_approved">ระดับทอง - ได้รับการอนุมัติ</string>
   <string name="kyc_settings_silver_level_approved">ระดับเงิน - อนุมัติแล้ว</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ สตริง / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">เกิดข้อผิดพลาดในการดึงสถานะ KYC</string>
   <string name="kyc_status_title_in_progress">กำลังตรวจสอบความคืบหน้า</string>
   <string name="kyc_status_title_approved">บัญชีได้รับการอนุมัติ</string>
@@ -1306,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">เลือกสถานที่ที่คุณค้างไว้และทำการยืนยันตัวตนให้เสร็จสมบูรณ์</string>
   <string name="kyc_drop_off_card_button">ทำการตรวจสอบต่อ</string>
   <string name="kyc_documents_needed">เอกสารที่จำเป็น</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">เรามีปัญหากับเอกสารที่คุณให้มา โปรดลองอัปโหลดเอกสารอีกครั้งเพื่อดำเนินการยืนยันต่อ</string>
   <string name="kyc_resubmission_card_button">อัพโหลดเอกสาร</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ สตริง / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">เราไม่สามารถยืนยันตัวตนของคุณและต้องการให้คุณอัปโหลดเอกสารที่จำเป็นอีกครั้ง</string>
   <string name="kyc_resubmission_splash_description_2">สาเหตุหลักที่ทำให้สิ่งนี้เกิดขึ้น:</string>
   <string name="kyc_resubmission_splash_description_3">ภาพถ่ายที่ต้องการหายไป</string>
@@ -1833,4 +1845,107 @@
   <string name="send_select_a_wallet_title">หรือเลือกกระเป๋าเงิน</string>
   <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
   <string name="purchase_funds_note">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> เรียนรู้เพิ่มเติม </annotation>
+  </string>
+  <string name="interest_announcement_title">รับความสนใจในการเข้ารหัสของคุณวันนี้!</string>
+  <string name="interest_announcement_description">โอน Crypto และเริ่มรับดอกเบี้ย BTC, ETH และอื่น ๆ อีกมากมาย</string>
+  <string name="interest_announcement_action">เรียนรู้เพิ่มเติม</string>
+  <string name="purchase_card_note_2">การเข้ารหัสลับของคุณจะสามารถถอนได้ภายใน</string>
+  <string name="purchase_card_note_2_1">7 วัน.</string>
+  <string name="buy_any_crypto">ซื้อ Crypto</string>
+  <string name="select_send_sheet_title">ส่งจาก</string>
+  <string name="select_send_source_title">ส่งจาก</string>
+  <string name="currency_funds_wallet">กระเป๋าเงิน %1s ของฉัน</string>
+  <string name="transfer_receive_empty_title">ไม่สามารถโหลดกระเป๋าสตางค์ของคุณ</string>
+  <string name="transfer_receive_empty_details">ดูเหมือนว่าจะมีปัญหากับการเชื่อมต่ออินเทอร์เน็ตของคุณ กรุณาตรวจสอบและลองอีกครั้ง</string>
+  <string name="transfer_receive_empty_cta">แตะเพื่อรีเฟรช</string>
+  <string name="us_dollars">ดอลลาร์สหรัฐ</string>
+  <string name="fiat_funds_detail_withdraw_details">ถอนเงินไปยังธนาคารของคุณ</string>
+  <string name="withdraw_currency">ถอน %1$s</string>
+  <string name="withdraw_title">ถอน</string>
+  <string name="withdraw_to">ถอนเป็น</string>
+  <string name="add_a_bank">เพิ่มธนาคาร</string>
+  <string name="transfer_send_crypto_title">ส่ง Crypto</string>
+  <string name="transfer_send_crypto_label">เลือกกระเป๋าเงินที่คุณต้องการส่ง</string>
+  <string name="transfer_receive_crypto_title">รับ Crypto</string>
+  <string name="transfer_receive_crypto_label">เลือก Wallet เพื่อรับ crypto</string>
+  <string name="withdraw_amount">ถอน %1$s</string>
+  <string name="withdrawal_amount">%1$s ถอน %1$s</string>
+  <string name="withdrawing_amount">กำลังถอน %1$s</string>
+  <string name="withdrawing_amount_message">เรากำลังดำเนินการถอนของคุณตอนนี้</string>
+  <string name="withdrawal_success_message">ความสำเร็จ! เรากำลังถอนเงินสดออกจาก %1$s Wallet %1$s ตอนนี้ เงินควรจะอยู่ในธนาคารของคุณภายใน 1-3 วันทำการ</string>
+  <string name="sell_enter_amount_max">ขาย Max</string>
+  <string name="sell_enter_amount_min_error">%1$s นาที</string>
+  <string name="sell_enter_amount_max_error">%1$s สูงสุด</string>
+  <string name="send_enter_amount_min_send">ต้องส่งขั้นต่ำ %1$s</string>
+  <string name="sell_confirmation_cta_button">ขาย %1$s</string>
+  <string name="sell_confirmation_progress_title">ขาย %1$s</string>
+  <string name="sell_confirmation_progress_message">เรากำลังดำเนินการขายของคุณให้เสร็จสิ้นในขณะนี้</string>
+  <string name="sell_confirmation_success_message">ตอนนี้เงินสดของคุณอยู่ในกระเป๋า %1$s</string>
+  <string name="send_state_locked_funds">เงินของคุณจะพร้อมใช้งานภายใน 7 วัน</string>
+  <string name="sell_progress_complete_title">%1$s ขายแล้ว</string>
+  <string name="earn_interest">รับดอกเบี้ย</string>
+  <string name="interest_summary_total">ดอกเบี้ยรวมที่ได้รับ</string>
+  <string name="interest_summary_total_fail">ไม่สามารถโหลดดอกเบี้ยทั้งหมด</string>
+  <string name="interest_summary_next_payment">การจ่ายดอกเบี้ยครั้งต่อไป</string>
+  <string name="interest_summary_accrued">ดอกเบี้ยคงค้างของเดือนนี้</string>
+  <string name="interest_summary_accrued_fail">ไม่สามารถโหลดดอกเบี้ยค้างรับ</string>
+  <string name="interest_summary_hold_period">ระยะเวลาการระงับเริ่มต้น</string>
+  <string name="interest_summary_hold_period_days">%1$f วัน</string>
+  <string name="interest_summary_hold_period_fail">ไม่สามารถโหลดรายละเอียดระยะเวลาการถือครอง</string>
+  <string name="interest_summary_rate">อัตราดอกเบี้ย</string>
+  <string name="interest_summary_rate_fail">ไม่สามารถโหลดอัตราดอกเบี้ย</string>
+  <string name="interest_dashboard_title">บัญชีดอกเบี้ย</string>
+  <string name="interest_dashboard_item_balance_title">%1$s ยอดคงเหลือ</string>
+  <string name="interest_dashboard_item_accrued_title">ดอกเบี้ยรวมที่ได้รับ</string>
+  <string name="interest_dashboard_item_action_earn">รับดอกเบี้ย</string>
+  <string name="interest_dashboard_item_action_view">ดู</string>
+  <string name="interest_dashboard_item_rate_1">รับสูงถึง</string>
+  <string name="interest_dashboard_item_rate_2">เป็นประจำทุกปีใน %1$s</string>
+  <string name="interest_dashboard_verify_title">รับความสนใจจาก Crypto ของคุณ</string>
+  <string name="interest_dashboard_verify_label">รับสูงถึง 12 \% ทันทีเมื่อคุณโอนเงินดิจิทัลไปยังบัญชีดอกเบี้ยของคุณ</string>
+  <string name="interest_dashboard_verify_point_one_title">ยืนยันตัวตนของคุณ</string>
+  <string name="interest_dashboard_verify_point_one_label">เพื่อป้องกันการขโมยข้อมูลประจำตัวหรือการฉ้อโกงเราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆโดยการอัปโหลด ID</string>
+  <string name="interest_dashboard_verify_point_two_title">ซื้อ Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">ใช้บัตรธนาคารบัตรเดบิตหรือบัตรเครดิตของคุณเพื่อใช้ในการซื้อ crypto</string>
+  <string name="interest_dashboard_verify_point_three_title">รับดอกเบี้ย</string>
+  <string name="interest_dashboard_verify_point_three_label">โอนไปยังบัญชีดอกเบี้ยของคุณและรับการชำระดอกเบี้ยรายเดือน</string>
+  <string name="interest_summary_disclaimer_label">ใช้ Web wallet เพื่อถอนเงินของคุณ</string>
+  <string name="buy">ซื้อ</string>
+  <string name="sell">ขาย</string>
+  <string name="buy_and_sell">ซื้อขาย</string>
+  <string name="buy_with_cash">ซื้อด้วยเงินสดหรือบัตร</string>
+  <string name="select_crypto_you_want">เลือก crypto ที่คุณต้องการซื้อ</string>
+  <string name="sell_intro_kyc_title_1">ยืนยันตัวตนของคุณ</string>
+  <string name="sell_intro_kyc_subtitle_1">เพื่อป้องกันการโจรกรรมข้อมูลส่วนบุคคลหรือการฉ้อโกงเราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆโดยการอัปโหลด ID</string>
+  <string name="sell_intro_kyc_title_2">ซื้อ Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">ใช้บัตรธนาคารเดบิตหรือบัตรเครดิตของคุณในการซื้อ crypto ใด ๆ</string>
+  <string name="sell_intro_kyc_title_3">ขายได้ตลอดเวลา</string>
+  <string name="sell_intro_kyc_subtitle_3">ขาย crypto ของคุณเป็นเงินสดทันที เก็บเงินสดไว้ในกระเป๋าเงินของคุณหรือถอนไปยังธนาคารที่เชื่อมโยง</string>
+  <string name="sell_crypto">ขาย Crypto</string>
+  <string name="sell_crypto_subtitle">ยืนยันตัวตนของคุณเพื่อขาย crypto เป็นเงินสด</string>
+  <string name="sell_for_cash">ขาย Crypto เป็นเงินสด</string>
+  <string name="select_wallet_to_sell">เลือกกระเป๋าเงินที่จะขายจาก</string>
+  <string name="common_to_coloned">ถึง:</string>
+  <string name="common_from_coloned">จาก:</string>
+  <string name="common_sell">ขาย</string>
+  <string name="sell_quote_price">%1$s ราคา</string>
+  <string name="convert_your_crypto_to_cash">แปลงเงินดิจิทัลของคุณเป็นเงินสด</string>
+  <string name="scan_mismatch_transaction_target">รหัสที่สแกนไม่ใช่รหัส QR %1$s</string>
+  <string name="scan_failed">ไม่รู้จักรหัส QR โปรดลองอีกครั้ง</string>
+  <string name="could_not_save_card">เราไม่สามารถบันทึกบัตรของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
+  <string name="could_not_activate_card">เราไม่สามารถเปิดใช้งานบัตรของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
+  <string name="card_still_pending">เรารอสองนาทีและไม่ได้รับการอัปเดตจากผู้ให้บริการบัตรของเรา บัตรของคุณอาจยังคงได้รับการอนุมัติในภายหลัง โปรดติดต่อฝ่ายสนับสนุนหากคุณมีคำถามใด ๆ</string>
+  <string name="card_link_failed">ลิงก์การ์ดไม่สำเร็จ โปรดลองอีกครั้งหรือติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่าเกิดจากข้อผิดพลาด</string>
+  <string name="tx_view_locked_funds">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้นานถึง 7 วัน</string>
+  <string name="unable_to_verify_id">ไม่สามารถยืนยัน ID ของคุณ</string>
+  <string name="unable_to_verify_id_description">เราไม่สามารถยืนยันตัวตนของคุณได้ สิ่งนี้อาจเกิดขึ้นได้จากสาเหตุบางประการ</string>
+  <string name="invalid_id">ID ไม่ถูกต้อง</string>
+  <string name="invalid_id_description">รูปภาพหรือเอกสารที่อัพโหลดไม่ตรงกับข้อกำหนด</string>
+  <string name="information_missmatch">ข้อมูลไม่ตรงกัน</string>
+  <string name="information_missmatch_description">ข้อมูลทั้งหมดจะต้องปรากฏทุกประการตามที่ปรากฏในเอกสารทางกฎหมายของคุณ หมายเหตุ: โปรดอย่าใช้ชื่อเล่น</string>
+  <string name="blocked_by_local_laws">ถูกปิดกั้นโดยกฎหมายท้องถิ่น</string>
+  <string name="blocked_by_local_laws_description">ที่ Blockchain.com เรามุ่งมั่นที่จะปฏิบัติตามกฎหมายท้องถิ่นใด ๆ และทั้งหมด ตามตำแหน่งของคุณเราไม่สามารถอนุญาตให้ซื้อหรือขายสกุลเงินดิจิทัลได้ในขณะนี้</string>
+  <string name="error_contact_support">หากคุณคิดว่านี่เป็นความผิดพลาดหรือต้องการให้ตรวจสอบบัญชีของคุณด้วยตนเองโปรดติดต่อฝ่ายสนับสนุน</string>
 </resources>

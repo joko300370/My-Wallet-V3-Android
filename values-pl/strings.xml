@@ -352,6 +352,17 @@
  Adres Bitcoin %1$s . Zeskanuj kod QR. 
 </string>
   <string name="invalid_private_key">Nieprawidłowy klucz prywatny</string>
+  <string name="watch_only_import_warning">Zamierzasz zaimportować adres, którego nie można wydać, an 
+ adres (lub skrypt klucza publicznego) 
+ przechowywane w portfelu bez odpowiedniego klucza prywatnego. To 
+ oznacza, że fundusze można wydać WYŁĄCZNIE, jeśli klucz prywatny jest przechowywany w innym miejscu. Jeśli ty 
+ robić 
+ nie przechowuj klucza prywatnego, NIE instruuj nikogo, aby wysyłał Ci bitcoiny do 
+ niewymienialne 
+ adres. 
+
+ Te opcje są zalecane tylko dla zaawansowanych użytkowników. Kontyntynuj? 
+</string>
   <string name="scan_private_key">Skanuj klucz prywatny</string>
   <string name="private_key_successfully_imported">Klucz prywatny został pomyślnie zaimportowany.</string>
   <string name="private_key_not_matching_address">UWAGA: Zeskanowany klucz prywatny nie 
@@ -1115,7 +1126,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Wysłaliśmy link weryfikacyjny do</string>
   <string name="buy_sell_unverified_email_verify_message2">Kliknij i wróć tutaj, aby kontynuować transakcję.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otwórz e-mail</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Zgadzam się na Coinify <a href="ignored"> warunki handlowe </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-mail zweryfikowany!</string>
   <string name="buy_sell_verified_email_message">Nasz partner %1$s przetworzy Twoją transakcję bitcoin. Klikając przycisk Zgadzam się i kontynuuj, utworzysz konto z %1$s .</string>
   <string name="buy_sell_identification_verification">Zidentyfikuj weryfikację</string>
@@ -1658,7 +1670,7 @@
   <string name="bank_transfer">Przelew bankowy</string>
   <string name="instantly_buy_crypto_with_card">Natychmiast kupuj kryptowaluty za pomocą dowolnej karty Visa lub Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Wysyłaj środki bezpośrednio ze swojego banku do portfela Blockchain. Gdy otrzymamy przelew ręczny, użyj tej gotówki na zakup kryptowalut.</string>
-  <string name="by_depositing_funds_terms_and_conds">środki na to konto, wyrażasz zgodę na <annotation link="modular_terms_and_conditions"> Warunki korzystania z usługi Modulr </annotation> , naszego partnera bankowego.</string>
+  <string name="by_depositing_funds_terms_and_conds">środki na to konto, wyrażasz zgodę na <annotation link="modular_terms_and_conditions"> Warunki korzystania z usługi Modulr</annotation>, naszego partnera bankowego.</string>
   <string name="add_bank_with_currency">Dodaj bank %1s</string>
   <string name="deposit_currency">Wpłać %1s</string>
   <string name="currency_bank_transfer">Przelew bankowy</string>
@@ -1832,4 +1844,107 @@
   <string name="send_select_a_wallet_title">lub Wybierz portfel</string>
   <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %1$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
   <string name="purchase_funds_note">Twoja ostateczna kwota może ulec zmianie ze względu na aktywność na rynku.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Dowiedz się więcej. </annotation>
+  </string>
+  <string name="interest_announcement_title">Zarabiaj odsetki na swoim krypto już dziś!</string>
+  <string name="interest_announcement_description">Przenieś Crypto i zacznij zarabiać odsetki na BTC, ETH i wielu innych.</string>
+  <string name="interest_announcement_action">Ucz się więcej</string>
+  <string name="purchase_card_note_2">Twoje krypto będzie dostępne do wypłaty w ciągu</string>
+  <string name="purchase_card_note_2_1">7 dni.</string>
+  <string name="buy_any_crypto">Kup Crypto</string>
+  <string name="select_send_sheet_title">Wyślij z</string>
+  <string name="select_send_source_title">Wyślij z</string>
+  <string name="currency_funds_wallet">Mój portfel %1s</string>
+  <string name="transfer_receive_empty_title">Nie można wczytać Twoich portfeli</string>
+  <string name="transfer_receive_empty_details">Wygląda na to, że wystąpił problem z połączeniem internetowym. Sprawdź i spróbuj ponownie</string>
+  <string name="transfer_receive_empty_cta">Dotknij, aby odświeżyć</string>
+  <string name="us_dollars">Dolary amerykańskie</string>
+  <string name="fiat_funds_detail_withdraw_details">Wypłata do Twojego banku</string>
+  <string name="withdraw_currency">Wypłać %1$s</string>
+  <string name="withdraw_title">Wycofać</string>
+  <string name="withdraw_to">Wypłać do</string>
+  <string name="add_a_bank">Dodaj bank</string>
+  <string name="transfer_send_crypto_title">Wyślij Crypto</string>
+  <string name="transfer_send_crypto_label">Wybierz portfel, z którego chcesz wysyłać.</string>
+  <string name="transfer_receive_crypto_title">Odbierz Crypto</string>
+  <string name="transfer_receive_crypto_label">Wybierz portfel, do którego chcesz otrzymać krypto.</string>
+  <string name="withdraw_amount">Wypłać %1$s</string>
+  <string name="withdrawal_amount">Wypłata %1$s</string>
+  <string name="withdrawing_amount">Wypłacam %1$s</string>
+  <string name="withdrawing_amount_message">Teraz kończymy Twoją wypłatę.</string>
+  <string name="withdrawal_success_message">Sukces! Właśnie pobieramy gotówkę z Twojego portfela %1$s . Środki powinny znaleźć się w Twoim banku w ciągu 1-3 dni roboczych.</string>
+  <string name="sell_enter_amount_max">Sprzedaj Max</string>
+  <string name="sell_enter_amount_min_error">%1$s min</string>
+  <string name="sell_enter_amount_max_error">%1$s maks</string>
+  <string name="send_enter_amount_min_send">Wymagane minimum wysyłania %1$s</string>
+  <string name="sell_confirmation_cta_button">Sprzedaj %1$s</string>
+  <string name="sell_confirmation_progress_title">Sprzedaję %1$s</string>
+  <string name="sell_confirmation_progress_message">Kończymy teraz Twoją sprzedaż.</string>
+  <string name="sell_confirmation_success_message">Twoja gotówka jest teraz dostępna w Twoim portfelu %1$s .</string>
+  <string name="send_state_locked_funds">Twoje środki będą dostępne w ciągu 7 dni</string>
+  <string name="sell_progress_complete_title">%1$s sprzedane</string>
+  <string name="earn_interest">Zarabiaj odsetki</string>
+  <string name="interest_summary_total">Łączne zarobione odsetki</string>
+  <string name="interest_summary_total_fail">Nie można załadować całkowitych odsetek</string>
+  <string name="interest_summary_next_payment">Następna płatność odsetek</string>
+  <string name="interest_summary_accrued">Narosłe odsetki w tym miesiącu</string>
+  <string name="interest_summary_accrued_fail">Nie można załadować narosłych odsetek</string>
+  <string name="interest_summary_hold_period">Początkowy okres wstrzymania</string>
+  <string name="interest_summary_hold_period_days">%1$f dni</string>
+  <string name="interest_summary_hold_period_fail">Nie można załadować szczegółów okresu utrzymywania</string>
+  <string name="interest_summary_rate">Oprocentowanie</string>
+  <string name="interest_summary_rate_fail">Nie można załadować stopy procentowej</string>
+  <string name="interest_dashboard_title">Konto odsetkowe</string>
+  <string name="interest_dashboard_item_balance_title">Saldo %1$s</string>
+  <string name="interest_dashboard_item_accrued_title">Łączne zarobione odsetki</string>
+  <string name="interest_dashboard_item_action_earn">Zarabiaj odsetki</string>
+  <string name="interest_dashboard_item_action_view">Widok</string>
+  <string name="interest_dashboard_item_rate_1">Zarabiaj do</string>
+  <string name="interest_dashboard_item_rate_2">rocznie na %1$s</string>
+  <string name="interest_dashboard_verify_title">Zarabiaj odsetki na swoim krypto</string>
+  <string name="interest_dashboard_verify_label">Zarabiaj do 12 \% natychmiast po przeniesieniu krypto na swoje konto odsetkowe.</string>
+  <string name="interest_dashboard_verify_point_one_title">zweryfikować Twoją tożsamość</string>
+  <string name="interest_dashboard_verify_point_one_label">Aby zapobiec kradzieży tożsamości lub oszustwom, musimy upewnić się, że to naprawdę Ty, przesyłając dowód tożsamości.</string>
+  <string name="interest_dashboard_verify_point_two_title">Kup Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">Skorzystaj z karty bankowej, debetowej lub kredytowej, aby sfinansować dowolny zakup kryptowalut.</string>
+  <string name="interest_dashboard_verify_point_three_title">Zarabiaj odsetki</string>
+  <string name="interest_dashboard_verify_point_three_label">Przelej na swoje konto odsetkowe i otrzymuj miesięczne wypłaty odsetek.</string>
+  <string name="interest_summary_disclaimer_label">Użyj portfela internetowego do wypłaty środków</string>
+  <string name="buy">Kup</string>
+  <string name="sell">Sprzedać</string>
+  <string name="buy_and_sell">Kupić sprzedać</string>
+  <string name="buy_with_cash">Kup gotówką lub kartą.</string>
+  <string name="select_crypto_you_want">Wybierz kryptowalutę, którą chcesz kupić.</string>
+  <string name="sell_intro_kyc_title_1">zweryfikować Twoją tożsamość</string>
+  <string name="sell_intro_kyc_subtitle_1">Aby zapobiec kradzieży tożsamości lub oszustwom, musimy upewnić się, że to naprawdę Ty, przesyłając dowód tożsamości.</string>
+  <string name="sell_intro_kyc_title_2">Kup Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">Skorzystaj z karty bankowej, debetowej lub kredytowej, aby sfinansować dowolny zakup kryptowalut.</string>
+  <string name="sell_intro_kyc_title_3">Sprzedawaj w dowolnym momencie</string>
+  <string name="sell_intro_kyc_subtitle_3">Natychmiast sprzedaj swoje krypto za gotówkę. Zatrzymaj gotówkę w portfelu lub wypłać do połączonego banku.</string>
+  <string name="sell_crypto">Sprzedaj Crypto</string>
+  <string name="sell_crypto_subtitle">Zweryfikuj swoją tożsamość, aby sprzedawać kryptowaluty za gotówkę.</string>
+  <string name="sell_for_cash">Sprzedaj kryptowaluty za gotówkę</string>
+  <string name="select_wallet_to_sell">Wybierz portfel do sprzedaży.</string>
+  <string name="common_to_coloned">Do:</string>
+  <string name="common_from_coloned">Z:</string>
+  <string name="common_sell">Sprzedać</string>
+  <string name="sell_quote_price">%1$s</string>
+  <string name="convert_your_crypto_to_cash">Zamień swoje krypto na gotówkę</string>
+  <string name="scan_mismatch_transaction_target">Zeskanowany kod nie jest kodem QR %1$s .</string>
+  <string name="scan_failed">Nie rozpoznano kodu QR, spróbuj ponownie.</string>
+  <string name="could_not_save_card">Nie mogliśmy zapisać Twojej karty. Skontaktuj się z pomocą techniczną.</string>
+  <string name="could_not_activate_card">Nie mogliśmy aktywować Twojej karty. Skontaktuj się z pomocą techniczną.</string>
+  <string name="card_still_pending">Czekaliśmy dwie minuty i nie otrzymaliśmy aktualizacji od naszego dostawcy karty. Twoja karta może zostać zatwierdzona później. Jeśli masz jakieś pytania, skontaktuj się z pomocą techniczną.</string>
+  <string name="card_link_failed">Karta nie powiodła się. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.</string>
+  <string name="tx_view_locked_funds">Środki te będą dostępne do natychmiastowej sprzedaży do portfela Fiata %1$s , ale nie będzie można ich wysyłać ani wypłacać z Blockchain.com przez okres do 7 dni.</string>
+  <string name="unable_to_verify_id">Nie można zweryfikować Twojej tożsamości</string>
+  <string name="unable_to_verify_id_description">Nie mogliśmy zweryfikować Twojej tożsamości. Może się tak zdarzyć z kilku powodów.</string>
+  <string name="invalid_id">nieważny numer identyfikacyjny</string>
+  <string name="invalid_id_description">Przesłany obraz lub dokument nie spełnia wymagań.</string>
+  <string name="information_missmatch">Niezgodność informacji</string>
+  <string name="information_missmatch_description">Wszystkie informacje muszą znajdować się dokładnie tak, jak w dokumentach prawnych. uwaga: nie używaj pseudonimu.</string>
+  <string name="blocked_by_local_laws">Zablokowany przez lokalne przepisy</string>
+  <string name="blocked_by_local_laws_description">W Blockchain.com staramy się przestrzegać wszelkich lokalnych przepisów. Na podstawie Twojej lokalizacji nie możemy obecnie zezwolić na kupowanie ani sprzedawanie walut cyfrowych.</string>
+  <string name="error_contact_support">Jeśli uważasz, że to pomyłka lub chcesz ręcznie sprawdzić swoje konto, skontaktuj się z pomocą.</string>
 </resources>

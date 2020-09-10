@@ -349,6 +349,17 @@
 比特币地址%1$s 。请扫描二维码。 
 </string>
   <string name="invalid_private_key">私钥无效</string>
+  <string name="watch_only_import_warning">您将要导入一个非消费性地址， 
+地址（或公共密钥脚本） 
+没有对应私钥的情况下存储在钱包中。这个
+意味着仅当您将私钥存储在其他位置时，才能使用这些资金。如果你
+做
+没有存储私钥，请勿指示任何人将您的比特币发送给
+不可消费
+地址。 
+
+仅建议高级用户使用这些选项。继续？ 
+</string>
   <string name="scan_private_key">扫描私钥</string>
   <string name="private_key_successfully_imported">私钥已成功导入。</string>
   <string name="private_key_not_matching_address">注意：扫描的私钥不
@@ -1112,6 +1123,8 @@
   <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
   <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
   <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意Coinify <a href="ignored">条款</a></string>
+  <string name="coinify">协整</string>
   <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
   <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>
   <string name="buy_sell_identification_verification">识别验证</string>
@@ -1703,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">存入现金</string>
   <string name="fiat_funds_no_kyc_step_2_description">从您的银行转移现金，并启用您的现金余额。</string>
   <string name="fiat_funds_no_kyc_step_3_title">用现金购买加密货币</string>
-  <string name="fiat_funds_no_kyc_step_3_description">使用您的现金钱包作为购买BTC，ETH，XLM等的付款方式</string>
+  <string name="fiat_funds_no_kyc_step_3_description">使用您的现金钱包作为购买BTC，ETH，XLM等的付款方式。</string>
   <string name="fiat_funds_no_kyc_positive_action">验证我的身份</string>
   <string name="fiat_funds_no_kyc_negative_action">现在不要</string>
   <string name="fiat_funds_no_kyc_step_1_label">1个</string>
@@ -1830,4 +1843,107 @@
   <string name="send_select_a_wallet_title">或选择一个钱包</string>
   <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
   <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link">了解更多信息。 </annotation>
+  </string>
+  <string name="interest_announcement_title">今天就对您的加密货币感兴趣！</string>
+  <string name="interest_announcement_description">转移加密货币并开始赚取BTC，ETH等的利息。</string>
+  <string name="interest_announcement_action">学到更多</string>
+  <string name="purchase_card_note_2">您的加密货币将可在以下时间内提取</string>
+  <string name="purchase_card_note_2_1">7天。</string>
+  <string name="buy_any_crypto">购买加密</string>
+  <string name="select_send_sheet_title">从发送</string>
+  <string name="select_send_source_title">从发送</string>
+  <string name="currency_funds_wallet">我的%1s钱包</string>
+  <string name="transfer_receive_empty_title">无法加载您的钱包</string>
+  <string name="transfer_receive_empty_details">看来您的网际网路连线有问题。请检查并重试</string>
+  <string name="transfer_receive_empty_cta">点按即可刷新</string>
+  <string name="us_dollars">美元</string>
+  <string name="fiat_funds_detail_withdraw_details">兑现到您的银行</string>
+  <string name="withdraw_currency">提现%1$s</string>
+  <string name="withdraw_title">退出</string>
+  <string name="withdraw_to">撤回</string>
+  <string name="add_a_bank">添加银行</string>
+  <string name="transfer_send_crypto_title">发送加密</string>
+  <string name="transfer_send_crypto_label">选择您要发送的电子钱包。</string>
+  <string name="transfer_receive_crypto_title">接收加密</string>
+  <string name="transfer_receive_crypto_label">选择一个钱包以接收加密货币。</string>
+  <string name="withdraw_amount">提现%1$s</string>
+  <string name="withdrawal_amount">%1$s提款</string>
+  <string name="withdrawing_amount">提现%1$s</string>
+  <string name="withdrawing_amount_message">我们正在完成您的提款。</string>
+  <string name="withdrawal_success_message">成功！我们现在正在从您的%1$s电子钱包中提取现金。资金应在1-3个工作日内存入您的银行。</string>
+  <string name="sell_enter_amount_max">卖出最高</string>
+  <string name="sell_enter_amount_min_error">%1$s</string>
+  <string name="sell_enter_amount_max_error">最多%1$s</string>
+  <string name="send_enter_amount_min_send">最少需要发送%1$s</string>
+  <string name="sell_confirmation_cta_button">出售%1$s</string>
+  <string name="sell_confirmation_progress_title">出售%1$s</string>
+  <string name="sell_confirmation_progress_message">我们现在完成您的出售。</string>
+  <string name="sell_confirmation_success_message">现在，您可以在%1$s电子钱包中使用现金了。</string>
+  <string name="send_state_locked_funds">您的资金将在7天内可用</string>
+  <string name="sell_progress_complete_title">已售出%1$s</string>
+  <string name="earn_interest">赚取利息</string>
+  <string name="interest_summary_total">赚取的总利息</string>
+  <string name="interest_summary_total_fail">无法加载总利息</string>
+  <string name="interest_summary_next_payment">下次利息支付</string>
+  <string name="interest_summary_accrued">本月应计利息</string>
+  <string name="interest_summary_accrued_fail">无法加载应计利息</string>
+  <string name="interest_summary_hold_period">初始保留期</string>
+  <string name="interest_summary_hold_period_days">%1$f天</string>
+  <string name="interest_summary_hold_period_fail">无法加载保留期详细信息</string>
+  <string name="interest_summary_rate">利率</string>
+  <string name="interest_summary_rate_fail">无法加载利率</string>
+  <string name="interest_dashboard_title">利息账户</string>
+  <string name="interest_dashboard_item_balance_title">%1$s余额</string>
+  <string name="interest_dashboard_item_accrued_title">赚取的总利息</string>
+  <string name="interest_dashboard_item_action_earn">赚取利息</string>
+  <string name="interest_dashboard_item_action_view">视图</string>
+  <string name="interest_dashboard_item_rate_1">赚取高达</string>
+  <string name="interest_dashboard_item_rate_2">每年在您的%1$s</string>
+  <string name="interest_dashboard_verify_title">在您的加密货币上赚取利息</string>
+  <string name="interest_dashboard_verify_label">当您将加密货币转移到您的利息帐户时，即刻赚取高达12％的收益。</string>
+  <string name="interest_dashboard_verify_point_one_title">验证您的身份</string>
+  <string name="interest_dashboard_verify_point_one_label">为了防止身份盗用或欺诈，我们需要通过上传ID来确保您确实是您。</string>
+  <string name="interest_dashboard_verify_point_two_title">购买加密</string>
+  <string name="interest_dashboard_verify_point_two_label">使用您的银行，借记卡或信用卡为任何加密货币购买提供资金。</string>
+  <string name="interest_dashboard_verify_point_three_title">赚取利息</string>
+  <string name="interest_dashboard_verify_point_three_label">转入您的利息帐户并获得每月利息支付。</string>
+  <string name="interest_summary_disclaimer_label">使用网络钱包提取资金</string>
+  <string name="buy">购买</string>
+  <string name="sell">卖</string>
+  <string name="buy_and_sell">买卖</string>
+  <string name="buy_with_cash">用现金或卡购买。</string>
+  <string name="select_crypto_you_want">选择您要购买的加密货币。</string>
+  <string name="sell_intro_kyc_title_1">验证您的身份</string>
+  <string name="sell_intro_kyc_subtitle_1">为了防止身份盗用或欺诈，我们需要通过上传ID来确保您确实是您。</string>
+  <string name="sell_intro_kyc_title_2">购买加密</string>
+  <string name="sell_intro_kyc_subtitle_2">使用您的银行，借记卡或信用卡为任何加密货币购买提供资金。</string>
+  <string name="sell_intro_kyc_title_3">随时出售</string>
+  <string name="sell_intro_kyc_subtitle_3">立即以现金出售您的加密货币。将现金存放在钱包中或提取到关联的银行。</string>
+  <string name="sell_crypto">出售加密货币</string>
+  <string name="sell_crypto_subtitle">验证您的身份以出售现金加密货币。</string>
+  <string name="sell_for_cash">以现金出售加密货币</string>
+  <string name="select_wallet_to_sell">选择要出售的钱包。</string>
+  <string name="common_to_coloned">至：</string>
+  <string name="common_from_coloned">从：</string>
+  <string name="common_sell">卖</string>
+  <string name="sell_quote_price">%1$s价格</string>
+  <string name="convert_your_crypto_to_cash">将您的加密货币转换为现金</string>
+  <string name="scan_mismatch_transaction_target">扫描的代码不是%1$s QR码。</string>
+  <string name="scan_failed">无法识别QR码，请重试。</string>
+  <string name="could_not_save_card">我们无法保存您的卡。请联系支持。</string>
+  <string name="could_not_activate_card">我们无法激活您的卡。请联系支持。</string>
+  <string name="card_still_pending">我们等待了两分钟，没有收到银行卡提供商的更新。您的卡可能仍会在以后获得批准。如有任何疑问，请联系支持。</string>
+  <string name="card_link_failed">卡无法链接。如果您认为这是错误的，请重试或联系支持人员。</string>
+  <string name="tx_view_locked_funds">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在7天内从Blockchain.com上发送或提取这些资金。</string>
+  <string name="unable_to_verify_id">无法验证您的ID</string>
+  <string name="unable_to_verify_id_description">我们无法验证您的身份。发生这种情况可能有几个原因。</string>
+  <string name="invalid_id">无效的ID</string>
+  <string name="invalid_id_description">上传的图像或文档不符合要求。</string>
+  <string name="information_missmatch">信息不匹配</string>
+  <string name="information_missmatch_description">所有信息必须与您的法律文件上显示的完全一样。注意：请勿使用昵称。</string>
+  <string name="blocked_by_local_laws">被当地法律封锁</string>
+  <string name="blocked_by_local_laws_description">在Blockchain.com，我们努力遵守所有当地法律。根据您所在的位置，我们目前不允许购买或出售数字货币。</string>
+  <string name="error_contact_support">如果您认为这是错误的操作或想要对帐户进行人工审核，请与支持人员联系。</string>
 </resources>

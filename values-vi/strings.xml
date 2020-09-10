@@ -15,14 +15,14 @@
     <item>từ thứ mười hai</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo bản</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ chuỗi / xlm_memo bản</item>
+    <item>\@ chuỗi / xlm_memo_id</item>
+    <item>\@ chuỗi / xlm_memo_hash</item>
+    <item>\@ chuỗi / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo bản</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ chuỗi / xlm_memo bản</item>
+    <item>\@ chuỗi / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d địa chỉ đã nhập</item>
@@ -349,6 +349,17 @@
  Địa chỉ bitcoin %1$s . Vui lòng quét mã QR. 
 </string>
   <string name="invalid_private_key">Khóa riêng không hợp lệ</string>
+  <string name="watch_only_import_warning">Bạn sắp nhập một địa chỉ không thể chi tiêu, một 
+ địa chỉ (hoặc tập lệnh khóa công khai) 
+ được lưu trữ trong ví mà không có khóa riêng tương ứng. Điều này 
+ có nghĩa là tiền có thể được chi tiêu CHỈ nếu bạn có khóa riêng được lưu trữ ở nơi khác. nếu bạn 
+ làm 
+ không có khóa riêng được lưu trữ, KHÔNG hướng dẫn bất cứ ai gửi bitcoin cho bạn 
+ không chi tiêu 
+ Địa chỉ. 
+
+ Các tùy chọn này chỉ được khuyến nghị cho người dùng nâng cao. Tiếp tục? 
+</string>
   <string name="scan_private_key">Quét khóa riêng</string>
   <string name="private_key_successfully_imported">Khóa riêng được nhập thành công.</string>
   <string name="private_key_not_matching_address">LƯU Ý: Khóa riêng được quét không 
@@ -1112,7 +1123,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Chúng tôi đã gửi một liên kết xác minh đến</string>
   <string name="buy_sell_unverified_email_verify_message2">Nhấn vào đó và trở lại đây để tiếp tục với giao dịch của bạn.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Mở email</string>
-
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Đồng ý với Coinify <a href="ignored"> điều khoản và điều kiện </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email đã kích hoạt!</string>
   <string name="buy_sell_verified_email_message">Đối tác của chúng tôi %1$s sẽ xử lý giao dịch bitcoin của bạn. Bằng cách nhấp vào Đồng ý và \'Tiếp tục\', bạn sẽ tạo một tài khoản với %1$s .</string>
   <string name="buy_sell_identification_verification">Xác định xác minh</string>
@@ -1219,7 +1231,7 @@
   <string name="kyc_email_title">Xác nhận email của bạn</string>
   <string name="kyc_email_message">Chúng tôi cần xác minh địa chỉ email của bạn dưới dạng một lớp bảo mật được thêm vào.</string>
   <string name="kyc_email_hint_focused">Email của bạn</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_f Focused</string>
+  <string name="kyc_email_hint_unfocused">\@ chuỗi / kyc_email_hint_f Focused</string>
   <string name="kyc_email_error_saving_email">Lỗi lưu email, vui lòng thử lại</string>
   <string name="kyc_email_send_verification">Gửi email</string>
   <string name="kyc_email_validation_header">Kiểm tra hộp thư của bạn.</string>
@@ -1244,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">Lỗi khi xác minh ID, vui lòng thử lại</string>
   <string name="kyc_veriff_splash_country_supported_header">Đất nước tôi có được hỗ trợ không?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Không phải tất cả các quốc gia được hỗ trợ tại thời điểm này. Kiểm tra của chúng tôi được cập nhật <annotation link="country_list"> danh sách các nước </annotation> trước khi tiếp tục.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_document_needed</string>
+  <string name="kyc_veriff_splash_title">\@ chuỗi / kyc_document_needed</string>
   <string name="kyc_veriff_splash_error_silver">BẠC XÁC MINH</string>
   <string name="kyc_veriff_splash_header">Hãy xác nhận đó là bạn</string>
   <string name="kyc_veriff_splash_subtitle">Bạn sẽ cần 1 trong số các loại ID dưới đây để tiếp tục.</string>
@@ -1266,11 +1278,11 @@
   <string name="kyc_complete_device_verified">Đã xác minh thiết bị</string>
   <string name="kyc_complete_id_uploaded">Đã tải lên ID</string>
   <string name="kyc_complete_video_uploaded">Video được tải lên</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ chuỗi / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Nhóm hỗ trợ Blockchain của chúng tôi đã viết Hướng dẫn trợ giúp giải thích lý do tại sao chúng tôi cần xác minh danh tính của bạn.</string>
   <string name="kyc_help_dialog_read_now">Đọc ngay</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/c chuyên mục000001135512-Ententity -Verifying</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ chuỗi / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Xác minh danh tính</string>
   <string name="kyc_settings_status_none">Chưa được xác minh</string>
@@ -1282,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">Cấp vàng - Đang xem xét</string>
   <string name="kyc_settings_gold_level_approved">Cấp vàng - Đã được phê duyệt</string>
   <string name="kyc_settings_silver_level_approved">Cấp bạc - Đã được phê duyệt</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_sinstall_status_Vjection</string>
+  <string name="kyc_settings_tier_status_failed">\@ chuỗi / kyc_sinstall_status_Vjection</string>
   <string name="kyc_status_error">Lỗi khi tìm nạp trạng thái KYC</string>
   <string name="kyc_status_title_in_progress">Đang xác minh</string>
   <string name="kyc_status_title_approved">Tài khoản được phê duyệt</string>
@@ -1306,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">Chọn nơi bạn rời đi và hoàn thành xác minh danh tính của bạn.</string>
   <string name="kyc_drop_off_card_button">Tiếp tục xác minh</string>
   <string name="kyc_documents_needed">Tài liệu cần thiết</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_document_needed</string>
+  <string name="kyc_resubmission_card_title">\@ chuỗi / kyc_document_needed</string>
   <string name="kyc_resubmission_card_description">Chúng tôi đã có một số vấn đề với các tài liệu bạn đã cung cấp. Vui lòng thử tải lên các tài liệu một lần nữa để tiếp tục xác minh của bạn.</string>
   <string name="kyc_resubmission_card_button">Tải lên Tài liệu</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ chuỗi / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Chúng tôi không thể xác minh danh tính của bạn và cần bạn tải lên lại các tài liệu cần thiết.</string>
   <string name="kyc_resubmission_splash_description_2">Lý do chính cho điều này xảy ra:</string>
   <string name="kyc_resubmission_splash_description_3">Những bức ảnh yêu cầu bị thiếu.</string>
@@ -1831,4 +1843,107 @@
   <string name="send_select_a_wallet_title">hoặc Chọn một Ví</string>
   <string name="send_internal_transfer_message">Tại thời điểm này, bạn chỉ có thể chuyển %1$s từ Ví thương mại %1$s sang Ví Vault của mình. Sau khi %1$s có trong Ví Vault, bạn có thể chuyển đến các địa chỉ bên ngoài.</string>
   <string name="purchase_funds_note">Số tiền cuối cùng của bạn có thể thay đổi do hoạt động thị trường.</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> Tìm hiểu thêm. </annotation>
+  </string>
+  <string name="interest_announcement_title">Kiếm tiền lãi từ tiền điện tử của bạn ngay hôm nay!</string>
+  <string name="interest_announcement_description">Chuyển tiền điện tử và bắt đầu kiếm tiền lãi từ BTC, ETH và nhiều hơn nữa.</string>
+  <string name="interest_announcement_action">Tìm hiểu thêm</string>
+  <string name="purchase_card_note_2">Tiền điện tử của bạn sẽ có sẵn để rút trong</string>
+  <string name="purchase_card_note_2_1">7 ngày.</string>
+  <string name="buy_any_crypto">Mua tiền điện tử</string>
+  <string name="select_send_sheet_title">Gửi từ</string>
+  <string name="select_send_source_title">Gửi từ</string>
+  <string name="currency_funds_wallet">Ví %1s của tôi</string>
+  <string name="transfer_receive_empty_title">Không thể tải Ví của bạn</string>
+  <string name="transfer_receive_empty_details">Có vẻ như đã xảy ra sự cố với kết nối Internet của bạn. Vui lòng kiểm tra và thử lại</string>
+  <string name="transfer_receive_empty_cta">Nhấn để làm mới</string>
+  <string name="us_dollars">Đô la Mỹ</string>
+  <string name="fiat_funds_detail_withdraw_details">Rút tiền đến Ngân hàng của bạn</string>
+  <string name="withdraw_currency">Rút %1$s</string>
+  <string name="withdraw_title">Rút tiền</string>
+  <string name="withdraw_to">Rút tiền về</string>
+  <string name="add_a_bank">Thêm ngân hàng</string>
+  <string name="transfer_send_crypto_title">Gửi tiền điện tử</string>
+  <string name="transfer_send_crypto_label">Chọn Ví bạn muốn gửi từ đó.</string>
+  <string name="transfer_receive_crypto_title">Nhận tiền điện tử</string>
+  <string name="transfer_receive_crypto_label">Chọn một Ví để nhận tiền điện tử.</string>
+  <string name="withdraw_amount">Rút %1$s</string>
+  <string name="withdrawal_amount">Rút tiền %1$s</string>
+  <string name="withdrawing_amount">Rút %1$s</string>
+  <string name="withdrawing_amount_message">Chúng tôi đang hoàn tất việc rút tiền của bạn ngay bây giờ.</string>
+  <string name="withdrawal_success_message">Không thành công! Chúng tôi hiện đang rút tiền mặt từ Ví %1$s . Tiền sẽ đến ngân hàng của bạn sau 1–3 ngày làm việc.</string>
+  <string name="sell_enter_amount_max">Bán tối đa</string>
+  <string name="sell_enter_amount_min_error">%1$s Tối thiểu</string>
+  <string name="sell_enter_amount_max_error">%1$s Tối đa</string>
+  <string name="send_enter_amount_min_send">Yêu cầu gửi tối thiểu %1$s</string>
+  <string name="sell_confirmation_cta_button">Bán %1$s</string>
+  <string name="sell_confirmation_progress_title">Bán %1$s</string>
+  <string name="sell_confirmation_progress_message">Chúng tôi đang hoàn thành việc bán hàng của bạn.</string>
+  <string name="sell_confirmation_success_message">Tiền mặt của bạn hiện có sẵn trong Ví %1$s .</string>
+  <string name="send_state_locked_funds">Tiền của bạn sẽ có sẵn trong vòng 7 ngày</string>
+  <string name="sell_progress_complete_title">%1$s Đã bán</string>
+  <string name="earn_interest">Kiếm tiền lãi</string>
+  <string name="interest_summary_total">Tổng số tiền lãi kiếm được</string>
+  <string name="interest_summary_total_fail">Không thể tải tổng số tiền lãi</string>
+  <string name="interest_summary_next_payment">Thanh toán lãi suất tiếp theo</string>
+  <string name="interest_summary_accrued">Tiền lãi tích lũy trong tháng này</string>
+  <string name="interest_summary_accrued_fail">Không thể tải lãi tích lũy</string>
+  <string name="interest_summary_hold_period">Thời gian giữ ban đầu</string>
+  <string name="interest_summary_hold_period_days">%1$f Ngày</string>
+  <string name="interest_summary_hold_period_fail">Không thể tải chi tiết thời gian lưu giữ</string>
+  <string name="interest_summary_rate">Lãi suất</string>
+  <string name="interest_summary_rate_fail">Không thể tải lãi suất</string>
+  <string name="interest_dashboard_title">Tài khoản lãi suất</string>
+  <string name="interest_dashboard_item_balance_title">Số dư %1$s</string>
+  <string name="interest_dashboard_item_accrued_title">Tổng số tiền lãi kiếm được</string>
+  <string name="interest_dashboard_item_action_earn">Kiếm tiền lãi</string>
+  <string name="interest_dashboard_item_action_view">Lượt xem</string>
+  <string name="interest_dashboard_item_rate_1">Kiếm được đến</string>
+  <string name="interest_dashboard_item_rate_2">hàng năm trên %1$s</string>
+  <string name="interest_dashboard_verify_title">Kiếm tiền lãi từ tiền điện tử của bạn</string>
+  <string name="interest_dashboard_verify_label">Kiếm tới 12 \% ngay lập tức khi bạn chuyển tiền điện tử vào Tài khoản lãi suất của mình.</string>
+  <string name="interest_dashboard_verify_point_one_title">Xác minh danh tính của bạn</string>
+  <string name="interest_dashboard_verify_point_one_label">Để ngăn chặn hành vi trộm cắp hoặc gian lận danh tính, chúng tôi cần đảm bảo đó thực sự là bạn bằng cách tải lên ID.</string>
+  <string name="interest_dashboard_verify_point_two_title">Mua tiền điện tử</string>
+  <string name="interest_dashboard_verify_point_two_label">Sử dụng thẻ Ngân hàng, Ghi nợ hoặc Tín dụng của bạn để tài trợ cho bất kỳ giao dịch mua tiền điện tử nào.</string>
+  <string name="interest_dashboard_verify_point_three_title">Kiếm tiền lãi</string>
+  <string name="interest_dashboard_verify_point_three_label">Chuyển vào Tài khoản Lãi suất của bạn và nhận Thanh toán Lãi suất hàng tháng.</string>
+  <string name="interest_summary_disclaimer_label">Sử dụng ví Web để rút tiền của bạn</string>
+  <string name="buy">Mua</string>
+  <string name="sell">Bán</string>
+  <string name="buy_and_sell">Mua bán</string>
+  <string name="buy_with_cash">Mua bằng tiền mặt hoặc thẻ.</string>
+  <string name="select_crypto_you_want">Chọn tiền điện tử bạn muốn mua.</string>
+  <string name="sell_intro_kyc_title_1">Xác minh danh tính của bạn</string>
+  <string name="sell_intro_kyc_subtitle_1">Để ngăn chặn hành vi trộm cắp hoặc gian lận danh tính, chúng tôi cần đảm bảo đó thực sự là bạn bằng cách tải lên ID.</string>
+  <string name="sell_intro_kyc_title_2">Mua tiền điện tử</string>
+  <string name="sell_intro_kyc_subtitle_2">Sử dụng thẻ Ngân hàng, Ghi nợ hoặc Tín dụng của bạn để tài trợ cho bất kỳ giao dịch mua tiền điện tử nào.</string>
+  <string name="sell_intro_kyc_title_3">Bán bất cứ lúc nào</string>
+  <string name="sell_intro_kyc_subtitle_3">Bán tiền điện tử của bạn ngay lập tức để lấy tiền mặt. Giữ tiền mặt trong ví của bạn hoặc rút đến một ngân hàng được liên kết.</string>
+  <string name="sell_crypto">Bán tiền điện tử</string>
+  <string name="sell_crypto_subtitle">Xác minh danh tính của bạn để bán tiền điện tử lấy tiền mặt.</string>
+  <string name="sell_for_cash">Bán tiền điện tử để lấy tiền mặt</string>
+  <string name="select_wallet_to_sell">Chọn một ví để bán.</string>
+  <string name="common_to_coloned">Đến:</string>
+  <string name="common_from_coloned">Từ:</string>
+  <string name="common_sell">Bán</string>
+  <string name="sell_quote_price">%1$s</string>
+  <string name="convert_your_crypto_to_cash">Chuyển đổi tiền điện tử của bạn thành tiền mặt</string>
+  <string name="scan_mismatch_transaction_target">Mã được quét không phải %1$s mã QR %1$s .</string>
+  <string name="scan_failed">Mã QR không được nhận dạng, vui lòng thử lại.</string>
+  <string name="could_not_save_card">Chúng tôi không thể lưu thẻ của bạn. Vui lòng liên hệ với bộ phận hỗ trợ.</string>
+  <string name="could_not_activate_card">Chúng tôi không thể kích hoạt thẻ của bạn. Vui lòng liên hệ với bộ phận hỗ trợ.</string>
+  <string name="card_still_pending">Chúng tôi đã đợi hai phút và không nhận được thông tin cập nhật từ nhà cung cấp thẻ của chúng tôi. Thẻ của bạn vẫn có thể được phê duyệt sau đó. Vui lòng liên hệ với bộ phận hỗ trợ nếu bạn có bất kỳ câu hỏi nào.</string>
+  <string name="card_link_failed">Không liên kết được thẻ. Vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ nếu bạn cho rằng điều này xảy ra do lỗi.</string>
+  <string name="tx_view_locked_funds">Các khoản tiền này sẽ có sẵn để bán vào ví Fiat %1$s ngay lập tức, nhưng bạn sẽ không thể gửi hoặc rút các khoản tiền này từ Blockchain.com trong tối đa 7 ngày.</string>
+  <string name="unable_to_verify_id">Không thể xác minh ID của bạn</string>
+  <string name="unable_to_verify_id_description">Chúng tôi không thể xác minh danh tính của bạn. Điều này có thể xảy ra vì một vài lý do.</string>
+  <string name="invalid_id">ID không hợp lệ</string>
+  <string name="invalid_id_description">Hình ảnh hoặc tài liệu được tải lên không phù hợp với yêu cầu.</string>
+  <string name="information_missmatch">Thông tin không khớp</string>
+  <string name="information_missmatch_description">Tất cả thông tin phải xuất hiện chính xác như trên các tài liệu pháp lý của bạn. lưu ý: Vui lòng không sử dụng biệt hiệu.</string>
+  <string name="blocked_by_local_laws">Bị chặn bởi Luật địa phương</string>
+  <string name="blocked_by_local_laws_description">Tại Blockchain.com, chúng tôi cố gắng tuân thủ bất kỳ và tất cả các luật địa phương. Dựa trên vị trí của bạn, chúng tôi không thể cho phép mua hoặc bán các loại tiền kỹ thuật số vào lúc này.</string>
+  <string name="error_contact_support">Nếu bạn cho rằng đây là một sự nhầm lẫn hoặc muốn xem xét thủ công tài khoản của mình, vui lòng liên hệ với bộ phận hỗ trợ.</string>
 </resources>
