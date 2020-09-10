@@ -53,7 +53,7 @@ class EnterAmountSheet(
             if (!amount_sheet_input.isConfigured) {
                 newState.pendingTx?.selectedFiat?.let {
                     amount_sheet_input.configuration = FiatCryptoViewConfiguration(
-                        input = customiser.enterAmountInputCurrencyType(newState),
+                        input = CurrencyType.Crypto,
                         output = CurrencyType.Crypto,
                         fiatCurrency = it,
                         cryptoCurrency = newState.sendingAccount.asset,
