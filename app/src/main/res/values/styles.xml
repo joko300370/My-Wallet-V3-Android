@@ -445,7 +445,7 @@
         <item name="errorTextAppearance">@style/ErrorText</item>
     </style>
 
-    <style name="FloatingBottomSheet" parent="Theme.Design.Light.BottomSheetDialog">
+    <style name="FloatingBottomSheet" parent="BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowSoftInputMode">adjustResize</item>

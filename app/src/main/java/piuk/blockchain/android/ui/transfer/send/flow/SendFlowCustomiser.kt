@@ -6,6 +6,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transfer.send.SendErrorState
 import piuk.blockchain.android.ui.transfer.send.SendState
 import piuk.blockchain.android.util.assetName
@@ -20,6 +21,7 @@ interface SendFlowCustomiser {
     fun enterAmountTitle(state: SendState): String
     fun enterAmountActionIcon(state: SendState): Int
     fun enterAmountMaxButton(state: SendState): String
+    fun enterAmountInputCurrencyType(state: SendState): CurrencyType
     fun confirmTitle(state: SendState): String
     fun confirmCtaText(state: SendState): String
     fun confirmListItemTitle(assetAction: AssetAction): String
@@ -105,6 +107,12 @@ class SendFlowCustomiserImpl(
             // AssetAction.Swap -> "Swap..."
             AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_max)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
+        }
+
+    override fun enterAmountInputCurrencyType(state: SendState): CurrencyType =
+        when (state.action) {
+            AssetAction.Sell -> CurrencyType.Fiat
+            else -> CurrencyType.Crypto
         }
 
     override fun confirmTitle(state: SendState): String {
@@ -234,7 +242,8 @@ class SendFlowCustomiserImpl(
                     state.pendingTx?.minLimit?.toStringWithSymbol())
                 AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_min_send,
                     state.pendingTx?.minLimit?.toStringWithSymbol())
-                else -> throw IllegalArgumentException("Action not supported by Send Flow ${state.action}")
+                else -> throw IllegalArgumentException(
+                    "Action not supported by Send Flow ${state.action}")
             }
             SendErrorState.ABOVE_MAX_LIMIT -> resources.getString(R.string.sell_enter_amount_max_error,
                 state.pendingTx?.maxLimit?.toStringWithSymbol())
