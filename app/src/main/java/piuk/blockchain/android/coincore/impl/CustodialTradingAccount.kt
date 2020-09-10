@@ -129,7 +129,7 @@ open class CustodialTradingAccount(
         ) { total, available ->
             when {
                 total <= CryptoValue.zero(asset) -> SendState.NO_FUNDS
-                total - available <= CryptoValue.zero(asset) -> SendState.FUNDS_LOCKED
+                available <= CryptoValue.zero(asset) -> SendState.FUNDS_LOCKED
                 else -> SendState.CAN_SEND
             }
         }

@@ -49,7 +49,7 @@ open class CustodialTransferProcessor(
         require(amount is CryptoValue)
         require(amount.currency == asset)
 
-        return sendingAccount.accountBalance
+        return sendingAccount.actionableBalance
             .map { it as CryptoValue }
             .map { available ->
                 pendingTx.copy(
@@ -78,7 +78,7 @@ open class CustodialTransferProcessor(
         validateAmounts(pendingTx).updateTxValidity(pendingTx)
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
-        sendingAccount.accountBalance
+        sendingAccount.actionableBalance
             .flatMapCompletable { max ->
                 if (max >= pendingTx.amount) {
                     Completable.complete()
