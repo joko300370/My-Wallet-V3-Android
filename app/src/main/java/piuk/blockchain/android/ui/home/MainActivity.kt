@@ -38,12 +38,12 @@ import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
@@ -763,7 +763,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 name = "Step_Two",
                 lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_TRANSFER) },
                 analyticsEvent = IntroTourAnalyticsEvent.IntroSendViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_send,
+                msgIcon = R.drawable.ic_vector_toolbar_transfer,
                 msgTitle = R.string.tour_step_two_title,
                 msgBody = R.string.tour_step_two_body,
                 msgButton = R.string.tour_step_two_btn
