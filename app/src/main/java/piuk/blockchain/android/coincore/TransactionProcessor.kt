@@ -72,15 +72,20 @@ sealed class TxOptionValue(val option: TxOption) {
     data class ExchangePriceOption(val money: Money, val asset: CryptoCurrency) :
         TxOptionValue(TxOption.READ_ONLY)
 
-    data class FeedTotal(val amount: Money, val fee: Money) : TxOptionValue(TxOption.READ_ONLY)
+    data class FeedTotal(
+        val amount: Money,
+        val fee: Money,
+        val exchangeAmount: Money? = null,
+        val exchangeFee: Money? = null
+    ) : TxOptionValue(TxOption.READ_ONLY)
 
     data class From(val from: String) : TxOptionValue(TxOption.READ_ONLY)
 
     data class To(val to: String) : TxOptionValue(TxOption.READ_ONLY)
 
-    data class Total(val total: Money) : TxOptionValue(TxOption.READ_ONLY)
+    data class Total(val total: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
 
-    data class Fee(val fee: Money) : TxOptionValue(TxOption.READ_ONLY)
+    data class Fee(val fee: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
 
     data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
 

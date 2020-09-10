@@ -60,8 +60,13 @@ open class Erc20OnChainTransaction(
             pendingTx.copy(options = listOf(
                 TxOptionValue.From(from = sendingAccount.label),
                 TxOptionValue.To(to = sendTarget.label),
-                TxOptionValue.Fee(fee = pendingTx.fees),
-                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees),
+                TxOptionValue.Fee(fee = pendingTx.fees, exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
+                TxOptionValue.FeedTotal(
+                    amount = pendingTx.amount,
+                    fee = pendingTx.fees,
+                    exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                ),
                 TxOptionValue.Description()
             )))
 
