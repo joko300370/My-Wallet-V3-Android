@@ -198,10 +198,15 @@ class AssetDetailsFlow(
         state.selectedAccount?.let {
             when (it) {
                 is CryptoAccountCustodialGroup -> {
-                    if (it.accounts.first() is InterestAccount) {
-                        selectFromAccounts(state, singleAccountAction)
+                    val firstAccount = it.accounts.first()
+                    if (firstAccount is InterestAccount) {
+                        if (state.hostAction == AssetAction.ViewActivity) {
+                            singleAccountAction(firstAccount)
+                        } else {
+                            selectFromAccounts(state, singleAccountAction)
+                        }
                     } else {
-                        singleAccountAction(it.accounts.first())
+                        singleAccountAction(firstAccount)
                     }
                 }
                 is CryptoAccountNonCustodialGroup -> {
