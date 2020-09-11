@@ -167,7 +167,7 @@ class SendFlowCustomiserImpl(
         return when (state.action) {
             AssetAction.NewSend -> resources.getString(R.string.send_progress_sending_subtitle)
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_progress_message,
-                state.sendingAccount.asset.name)
+                state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_message)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
@@ -194,10 +194,10 @@ class SendFlowCustomiserImpl(
     override fun transactionCompleteMessage(state: SendState): String {
         return when (state.action) {
             AssetAction.NewSend -> resources.getString(
-                R.string.send_progress_complete_subtitle, state.sendingAccount.asset.name
+                R.string.send_progress_complete_subtitle, state.sendingAccount.asset.displayTicker
             )
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_success_message,
-                state.sendingAccount.asset.name)
+                state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_success_message,
                 (state.sendTarget as? FiatAccount)?.fiatCurrency)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")

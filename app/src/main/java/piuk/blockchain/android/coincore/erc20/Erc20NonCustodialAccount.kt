@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.InterestAddress
+import piuk.blockchain.android.coincore.impl.TradingAddress
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -145,11 +146,11 @@ abstract class Erc20NonCustodialAccount(
                     feeManager = fees,
                     exchangeRates = exchangeRates,
                     sendingAccount = this,
-                    sendTarget = sendTo as Erc20Address,
+                    sendTarget = Erc20Address(asset, (it as TradingAddress).address, it.label),
                     requireSecondPassword = ethDataManager.requireSecondPassword
                 )
             }
-            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
+            else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
         }
 }
 

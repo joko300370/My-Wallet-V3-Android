@@ -48,6 +48,7 @@ class InterestDashboardFragment : Fragment() {
 
     private val listAdapter: InterestDashboardAdapter by lazy {
         InterestDashboardAdapter(
+            coincore = coincore,
             disposables = disposables,
             custodialWalletManager = custodialWalletManager,
             verificationClicked = ::startKyc,

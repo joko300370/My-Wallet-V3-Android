@@ -592,10 +592,12 @@
     <string name="email_request_subject_eth">Ether payment request</string>
     <string name="email_request_subject_bch">Bitcoin Cash payment request</string>
     <string name="email_request_subject_pax_1">USD Digital payment request</string>
+    <string name="email_request_subject_usdt_1">Tether payment request</string>
     <string name="email_request_subject_xlm">Xlm payment request</string>
     <string name="email_request_body_btc">Please send %1$s BTC to the Bitcoin address %2$s.</string>
     <string name="email_request_body_eth">Please send ETH to the Ether address %1$s.</string>
     <string name="email_request_body_pax_1">Please send USD-D to the USD Digital address %1$s.</string>
+    <string name="email_request_body_usdt_1">Please send USDT to the Tether address %1$s.</string>
     <string name="email_request_body_bch">Please send BCH to the Bitcoin Cash address %1$s.</string>
     <string name="email_request_body_xlm">Please send XLM to the Stellar address %1$s.</string>
     <string name="email_request_body_fallback">attached</string>
