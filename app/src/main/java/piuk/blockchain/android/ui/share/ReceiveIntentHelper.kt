@@ -63,7 +63,7 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
                 CryptoCurrency.PAX -> emailIntent.setupIntentForEmailPax(uri)
                 CryptoCurrency.STX -> TODO("STX is not fully supported yet")
                 CryptoCurrency.ALGO -> TODO("ALGO is not fully supported yet")
-                CryptoCurrency.USDT -> TODO("USDT is not fully supported yet")
+                CryptoCurrency.USDT -> emailIntent.setupIntentForEmailUsdt(uri)
             }.exhaustive
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }
@@ -170,6 +170,14 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
 
         putExtra(Intent.EXTRA_TEXT, body)
         putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_pax_1))
+    }
+
+    private fun Intent.setupIntentForEmailUsdt(uri: String) {
+        val address = uri.removePrefix("ethereum:")
+        val body = String.format(context.getString(R.string.email_request_body_usdt_1), address)
+
+        putExtra(Intent.EXTRA_TEXT, body)
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_usdt_1))
     }
 
     private fun Intent.setupIntentForEmailXlm(payment: StellarPayment) {
