@@ -75,7 +75,7 @@ class CustodialSellProcessor(
         }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        return sendingAccount.actionableBalance
+        return sendingAccount.accountBalance
             .map { it as CryptoValue }
             .map { available ->
                 pendingTx.copy(
@@ -167,7 +167,7 @@ class CustodialSellProcessor(
     }
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
-        sendingAccount.actionableBalance.map { it as CryptoValue }
+        sendingAccount.accountBalance.map { it as CryptoValue }
             .flatMapCompletable { balance ->
                 val cryptoAmount = (pendingTx.amount as? FiatValue)?.toCrypto(exchangeRates, cryptoCurrency)
                     ?: pendingTx.amount as CryptoValue
