@@ -4,6 +4,9 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.service.TierService
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -22,14 +25,17 @@ class BuySellFlowNavigatorTest {
     private val currencyPrefs: CurrencyPrefs = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val sellFeatureFlag: FeatureFlag = mock()
+    private val tierService: TierService = mock()
     private lateinit var subject: BuySellFlowNavigator
 
     @Before
     fun setUp() {
         subject = BuySellFlowNavigator(
-            simpleBuyModel, currencyPrefs, custodialWalletManager, sellFeatureFlag
+            simpleBuyModel, currencyPrefs, custodialWalletManager, tierService, sellFeatureFlag
         )
         whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
+        whenever(tierService.tiers()).thenReturn(Single.just(KycTiers.default()))
+        whenever(custodialWalletManager.isEligibleForSimpleBuy(any())).thenReturn(Single.just(true))
     }
 
     @Test
@@ -79,7 +85,7 @@ class BuySellFlowNavigatorTest {
 
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(true))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = true))
     }
 
     @Test
@@ -93,7 +99,7 @@ class BuySellFlowNavigatorTest {
 
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = false))
     }
 
     @Test
@@ -111,7 +117,7 @@ class BuySellFlowNavigatorTest {
 
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(true))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = true))
         verify(custodialWalletManager).deleteBuyOrder("ORDERID")
     }
 }

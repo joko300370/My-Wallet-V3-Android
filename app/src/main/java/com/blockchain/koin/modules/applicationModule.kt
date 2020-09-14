@@ -699,7 +699,8 @@ val applicationModule = module {
                 simpleBuyModel = get(),
                 custodialWalletManager = get(),
                 currencyPrefs = get(),
-                sellFeatureFlag = get(sellFeatureFlag)
+                sellFeatureFlag = get(sellFeatureFlag),
+                tierService = get()
             )
         }
 

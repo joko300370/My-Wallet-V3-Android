@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class BuySellFragment :
     HomeScreenFragment, Fragment(),
@@ -67,7 +68,10 @@ class BuySellFragment :
                     when (it) {
                         is BuySellIntroAction.NavigateToCurrencySelection ->
                             goToCurrencySelection(it.supportedCurrencies)
-                        is BuySellIntroAction.DisplayBuySellIntro -> renderBuySellUi(it.sellEnabled)
+                        is BuySellIntroAction.DisplayBuySellIntro -> {
+                            if (!it.isGoldButNotEligible) renderBuySellUi(it.sellEnabled)
+                            else renderNotEligibleUi()
+                        }
                         else -> startActivity(SimpleBuyActivity.newInstance(
                             context = activity as Context,
                             launchFromNavigationBar = true, launchKycResume = false
@@ -76,6 +80,13 @@ class BuySellFragment :
                 },
                 onError = {}
             )
+    }
+
+    private fun renderNotEligibleUi() {
+        pager.gone()
+        not_eligible_icon.visible()
+        not_eligible_title.visible()
+        not_eligible_description.visible()
     }
 
     private fun renderBuySellUi(sellEnabled: Boolean) {
@@ -92,6 +103,11 @@ class BuySellFragment :
             sellEnabled,
             childFragmentManager
         )
+
+        pager.visible()
+        not_eligible_icon.gone()
+        not_eligible_title.gone()
+        not_eligible_description.gone()
     }
 
     private fun goToCurrencySelection(supportedCurrencies: List<String>) {
