@@ -96,24 +96,117 @@ sealed class TxOptionValue(val option: TxOption) {
     ) : TxOptionValue(_option)
 }
 
-abstract class TransactionProcessor(
-    protected val sendingAccount: CryptoAccount,
-    protected val sendTarget: SendTarget,
+abstract class TxEngine : KoinComponent {
+
+    private lateinit var _sourceAccount: CryptoAccount
+    private lateinit var _txTarget: TransactionTarget
+    private lateinit var _exchangeRates: ExchangeRateDataManager
+
+    protected val sourceAccount: CryptoAccount
+        get() = _sourceAccount
+
+    protected val txTarget: TransactionTarget
+        get() = _txTarget
+
     protected val exchangeRates: ExchangeRateDataManager
-) : KoinComponent {
+        get() = _exchangeRates
+
+    open fun start(
+        sourceAccount: CryptoAccount,
+        txTarget: TransactionTarget,
+        exchangeRates: ExchangeRateDataManager
+    ) {
+        this._sourceAccount = sourceAccount
+        this._txTarget = txTarget
+        this._exchangeRates = exchangeRates
+    }
+
+    // Optionally assert, via require() etc, that sourceAccounts and txTarget
+    // are valid for this engine.
+    open fun assertInputsValid() {}
+
+    abstract val feeOptions: Set<FeeLevel>
 
     open val userFiat: String by unsafeLazy {
         payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
     }
 
-    // This may be moved into options at some point in the near future.
-    abstract val feeOptions: Set<FeeLevel>
-
     protected val asset: CryptoCurrency
-        get() = sendingAccount.asset
+        get() = sourceAccount.asset
 
     open val requireSecondPassword: Boolean = false
+
+    // Does this engine accept fiat input amounts
     open val canTransactFiat: Boolean = false
+
+    // Return a stream of the exchange rate between the source asset and the user's selected
+    // fiat currency. This should always return at least once, but can safely either complete
+    // or keep sending updated rates, depending on what is useful for Transaction context
+    open fun userExchangeRate(): Observable<ExchangeRate> =
+        Observable.just(
+            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
+        ).map { rate ->
+            ExchangeRate.CryptoToFiat(
+                sourceAccount.asset,
+                userFiat,
+                rate.toBigDecimal()
+            )
+        }
+
+    abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
+
+    // If the source and target assets are not the same this MAY return a stream of the exchange rates
+    // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
+    // sell and or swap are fully integrated into this flow
+    open fun targetExchangeRate(): Observable<ExchangeRate> =
+        Observable.empty()
+
+    // Implementation interface:
+    // Call this first to initialise the processor. Construct and initialise a pendingTx object.
+    abstract fun doInitialiseTx(): Single<PendingTx>
+
+    // Update the transaction with a new amount. This method should check balances, calculate fees and
+    // Return a new PendingTx with the state updated for the UI to update. The pending Tx will
+    // be passed to validate after this call.
+    abstract fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx>
+
+    // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
+    // Else set it to the appropriate error, and then return the updated PendingTx
+    abstract fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx>
+
+    // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
+    // Else set it to the appropriate error, and then return the updated PendingTx
+    abstract fun doValidateAll(pendingTx: PendingTx): Single<PendingTx>
+
+    // Execute the transaction, it will have been validated before this is called, so the expectation
+    // is that it will succeed.
+    abstract fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable
+}
+
+class TransactionProcessor(
+    sourceAccount: CryptoAccount,
+    txTarget: TransactionTarget,
+    exchangeRates: ExchangeRateDataManager,
+    private val engine: TxEngine
+) {
+    init {
+        engine.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+        engine.assertInputsValid()
+    }
+
+    // This may be moved into options at some point in the near future.
+    val feeOptions: Set<FeeLevel>
+        get() = engine.feeOptions
+
+    val requireSecondPassword: Boolean
+        get() = engine.requireSecondPassword
+
+    val canTransactFiat: Boolean
+        get() = engine.canTransactFiat
 
     private val txObservable: BehaviorSubject<PendingTx> = BehaviorSubject.create()
 
@@ -126,7 +219,7 @@ abstract class TransactionProcessor(
     // Initialise the tx as required.
     // This will start propagating the pendingTx to the client code.
     fun initialiseTx(): Observable<PendingTx> =
-        doInitialiseTx()
+        engine.doInitialiseTx()
             .doOnSuccess {
                 updatePendingTx(it)
             }.flatMapObservable {
@@ -145,7 +238,7 @@ abstract class TransactionProcessor(
         val old = pendingTx.options.find { it.option == newOption.option }
         val opts = pendingTx.options.replace(old, newOption).filterNotNull()
 
-        return doValidateAll(pendingTx.copy(options = opts))
+        return engine.doValidateAll(pendingTx.copy(options = opts))
             .doOnSuccess { updatePendingTx(it) }
             .ignoreElement()
     }
@@ -156,10 +249,10 @@ abstract class TransactionProcessor(
         if (!canTransactFiat && amount is FiatValue)
             throw IllegalArgumentException("The processor does not support fiat values")
 
-        return doUpdateAmount(amount, pendingTx)
+        return engine.doUpdateAmount(amount, pendingTx)
             .flatMap {
                 val isFreshTx = it.validationState == ValidationState.UNINITIALISED
-                doValidateAmount(it)
+                engine.doValidateAmount(it)
                     .map { pendingTx ->
                         // Remove initial "insufficient funds' warning
                         if (amount.isZero && isFreshTx) {
@@ -178,26 +271,16 @@ abstract class TransactionProcessor(
     // Return a stream of the exchange rate between the source asset and the user's selected
     // fiat currency. This should always return at least once, but can safely either complete
     // or keep sending updated rates, depending on what is useful for Transaction context
-    open fun userExchangeRate(): Observable<ExchangeRate> =
-        Observable.just(
-            exchangeRates.getLastPrice(sendingAccount.asset, userFiat)
-        ).map { rate ->
-            ExchangeRate.CryptoToFiat(
-                sendingAccount.asset,
-                userFiat,
-                rate.toBigDecimal()
-            )
-        }
+    fun userExchangeRate(): Observable<ExchangeRate> =
+        engine.userExchangeRate()
 
     // Check the validity of a pending transactions.
     fun validateAll(): Completable {
         val pendingTx = getPendingTx()
-        return doBuildConfirmations(pendingTx).flatMap {
-            doValidateAll(it)
+        return engine.doBuildConfirmations(pendingTx).flatMap {
+            engine.doValidateAll(it)
         }.doOnSuccess { updatePendingTx(it) }.ignoreElement()
     }
-
-    abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
 
     // Execute the transaction.
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
@@ -207,41 +290,20 @@ abstract class TransactionProcessor(
             throw IllegalArgumentException("Second password not supplied")
 
         val pendingTx = getPendingTx()
-        return doValidateAll(pendingTx)
+        return engine.doValidateAll(pendingTx)
             .doOnSuccess {
                 if (it.validationState != ValidationState.CAN_EXECUTE)
                     throw IllegalStateException("PendingTx is not executable")
             }.flatMapCompletable {
-                doExecute(it, secondPassword)
+                engine.doExecute(it, secondPassword)
             }
     }
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates
     // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
     // sell and or swap are fully integrated into this flow
-    open fun targetExchangeRate(): Observable<ExchangeRate> =
-        Observable.empty()
-
-    // Implementation interface:
-    // Call this first to initialise the processor. Construct and initialise a pendingTx object.
-    protected abstract fun doInitialiseTx(): Single<PendingTx>
-
-    // Update the transaction with a new amount. This method should check balances, calculate fees and
-    // Return a new PendingTx with the state updated for the UI to update. The pending Tx will
-    // be passed to validate after this call.
-    protected abstract fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx>
-
-    // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
-    // Else set it to the appropriate error, and then return the updated PendingTx
-    protected abstract fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx>
-
-    // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
-    // Else set it to the appropriate error, and then return the updated PendingTx
-    protected abstract fun doValidateAll(pendingTx: PendingTx): Single<PendingTx>
-
-    // Execute the transaction, it will have been validated before this is called, so the expectation
-    // is that it will succeed.
-    protected abstract fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable
+    fun targetExchangeRate(): Observable<ExchangeRate> =
+        engine.targetExchangeRate()
 }
 
 fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =

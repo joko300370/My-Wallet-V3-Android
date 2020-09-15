@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.getSendTarget
@@ -50,7 +50,7 @@ class SendActivity : BlockchainActivity(), SendFragment.SendFragmentHost {
         private const val TX_SOURCE = "SOURCE"
         private const val TX_TARGET = "TARGET"
 
-        fun start(ctx: Context, source: CryptoAccount, target: SendTarget? = null) {
+        fun start(ctx: Context, source: CryptoAccount, target: TransactionTarget? = null) {
             require(source !is NullCryptoAccount)
             ctx.startActivity(
                 Intent(ctx, SendActivity::class.java).apply {

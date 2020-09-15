@@ -186,7 +186,7 @@ internal abstract class CryptoAssetBase(
             .map { it.accounts.first() }
             .onErrorComplete()
 
-    final override fun transferList(account: SingleAccount): Single<SingleAccountList> {
+    final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)
 

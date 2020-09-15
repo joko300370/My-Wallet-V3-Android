@@ -12,12 +12,13 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -101,46 +102,54 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
-        when (sendTo) {
-            is CryptoAddress -> Single.just(
-                EthSendTransaction(
-                    ethDataManager = ethDataManager,
-                    feeManager = fees,
+    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
+        when (target) {
+            is CryptoInterestAccount -> target.receiveAddress.map {
+                TransactionProcessor(
                     exchangeRates = exchangeRates,
-                    sendingAccount = this,
-                    sendTarget = sendTo,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
-                )
-            )
-            is CryptoInterestAccount -> sendTo.receiveAddress.map {
-                EthDepositTransaction(
-                    ethDataManager = ethDataManager,
-                    feeManager = fees,
-                    exchangeRates = exchangeRates,
-                    sendingAccount = this,
-                    sendTarget = it as CryptoAddress,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
+                    sourceAccount = this,
+                    txTarget = it,
+                    engine = InterestDepositTxEngine(
+                        onChainTxEngine = EthOnChainTxEngine(
+                            ethDataManager = ethDataManager,
+                            feeManager = fees,
+                            requireSecondPassword = ethDataManager.requireSecondPassword
+                        )
+                    )
                 )
             }
-            is CryptoAccount -> sendTo.receiveAddress.map {
-                EthSendTransaction(
-                    ethDataManager = ethDataManager,
-                    feeManager = fees,
+            is CryptoAddress -> Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = this,
+                        txTarget = target,
+                        engine = EthOnChainTxEngine(
+                            ethDataManager = ethDataManager,
+                            feeManager = fees,
+                            requireSecondPassword = ethDataManager.requireSecondPassword
+                        )
+                    )
+                )
+            is CryptoAccount -> target.receiveAddress.map {
+                TransactionProcessor(
                     exchangeRates = exchangeRates,
-                    sendingAccount = this,
-                    sendTarget = it as CryptoAddress,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
+                    sourceAccount = this,
+                    txTarget = it,
+                    engine = EthOnChainTxEngine(
+                        ethDataManager = ethDataManager,
+                        feeManager = fees,
+                        requireSecondPassword = ethDataManager.requireSecondPassword
+                    )
                 )
             }
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
         }
 
-    override val sendState: Single<SendState>
-        get() = super.sendState.flatMap { state ->
+    override val sourceState: Single<TxSourceState>
+        get() = super.sourceState.flatMap { state ->
             ethDataManager.isLastTxPending().map { hasUnconfirmed ->
                 if (hasUnconfirmed) {
-                    SendState.SEND_IN_FLIGHT
+                    TxSourceState.TRANSACTION_IN_FLIGHT
                 } else {
                     state
                 }

@@ -16,8 +16,8 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -43,8 +43,8 @@ abstract class CryptoAccountBase : CryptoAccount {
         this.hasTransactions = hasTransactions
     }
 
-    override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
+    override val sourceState: Single<TxSourceState>
+        get() = Single.just(TxSourceState.NOT_SUPPORTED)
 }
 
 // To handle Send to PIT
@@ -76,7 +76,7 @@ internal class CryptoExchangeAccount(
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> =
         Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
 
     override val activity: Single<ActivitySummaryList>
@@ -107,20 +107,16 @@ abstract class CryptoNonCustodialAccount(
                 }
             }
 
-    override val sendState: Single<SendState>
+    override val sourceState: Single<TxSourceState>
         get() = actionableBalance.map {
             if (it.isZero) {
-                SendState.NO_FUNDS
+                TxSourceState.NO_FUNDS
             } else {
-                SendState.CAN_SEND
+                TxSourceState.CAN_TRANSACT
             }
         }
     override fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
-
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> {
-        TODO("Implement me")
-    }
 }
 
 // Currently only one custodial account is supported for each asset,

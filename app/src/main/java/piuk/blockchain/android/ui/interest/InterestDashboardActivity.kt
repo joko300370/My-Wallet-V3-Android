@@ -15,8 +15,8 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
@@ -96,10 +96,11 @@ class InterestDashboardActivity : BlockchainActivity(),
         toAccount: SingleAccount,
         assetAction: AssetAction
     ) {
-        SendFlow(
+        TransactionFlow(
             sourceAccount = fromAccount as CryptoAccount,
-            targetAccount = toAccount,
-            action = assetAction).startFlow(supportFragmentManager, this)
+            target = toAccount,
+            action = assetAction
+        ).startFlow(supportFragmentManager, this)
     }
 
     companion object {

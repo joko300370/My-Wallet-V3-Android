@@ -59,7 +59,7 @@ class FiatAssetTransferTest {
 
         val sourceAccount: CustodialTradingAccount = mock()
 
-        subject.transferList(sourceAccount)
+        subject.transactionTargets(sourceAccount)
             .test()
             .assertNoErrors()
             .assertComplete()
@@ -72,7 +72,7 @@ class FiatAssetTransferTest {
     fun transferListForInterestSource() {
         val sourceAccount: CryptoInterestAccount = mock()
 
-        subject.transferList(sourceAccount)
+        subject.transactionTargets(sourceAccount)
             .test()
             .assertNoErrors()
             .assertResult(emptyList())
@@ -82,7 +82,7 @@ class FiatAssetTransferTest {
     fun transferListForNonCustodialSource() {
         val sourceAccount: CryptoNonCustodialAccount = mock()
 
-        subject.transferList(sourceAccount)
+        subject.transactionTargets(sourceAccount)
             .test()
             .assertNoErrors()
             .assertResult(emptyList())
@@ -92,7 +92,7 @@ class FiatAssetTransferTest {
     fun transferListForFiatSource() {
         val sourceAccount: FiatCustodialAccount = mock()
 
-        subject.transferList(sourceAccount)
+        subject.transactionTargets(sourceAccount)
             .test()
             .assertNoErrors()
             .assertResult(emptyList())

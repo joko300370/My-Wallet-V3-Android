@@ -35,8 +35,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.transactions.Memo
-import com.blockchain.ui.chooser.AccountChooserActivity
-import com.blockchain.ui.chooser.AccountMode
+import piuk.blockchain.android.ui.account.chooser.AccountChooserActivity
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.widget.textChanges
@@ -59,12 +58,12 @@ import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
+import piuk.blockchain.android.ui.account.chooser.AccountMode
 import piuk.blockchain.android.ui.base.MvpFragment
-import piuk.blockchain.android.ui.confirm.ConfirmPaymentDialog
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.android.util.AppUtil
@@ -1221,7 +1220,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
 
         fun newInstance(
             sourceAccount: CryptoAccount?,
-            target: SendTarget? = null,
+            target: TransactionTarget? = null,
             isDeeplink: Boolean = false
         ): SendFragment {
             val fragment = SendFragment()

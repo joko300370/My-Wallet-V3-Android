@@ -36,7 +36,7 @@ interface Asset {
 
     fun accountGroup(filter: AssetFilter = AssetFilter.All): Maybe<AccountGroup>
 
-    fun transferList(account: SingleAccount): Single<SingleAccountList>
+    fun transactionTargets(account: SingleAccount): Single<SingleAccountList>
 
     fun parseAddress(address: String): Maybe<ReceiveAddress>
 }

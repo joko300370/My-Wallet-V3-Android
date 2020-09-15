@@ -7,20 +7,20 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 
 class TransferSendFragment :
     AccountSelectorFragment(),
     DialogFlow.FlowHost {
 
-    private var flow: SendFlow? = null
+    private var flow: TransactionFlow? = null
 
     override val filterFn: AccountListFilterFn = { account ->
         (account is CryptoAccount) &&
@@ -52,21 +52,21 @@ class TransferSendFragment :
 
     private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
         if (account is CryptoAccount) {
-            account.sendState
+            account.sourceState
                 .map { sendState ->
                     object : AccountDecorator {
                         override val enabled: Boolean
-                            get() = sendState == SendState.CAN_SEND
+                            get() = sendState == TxSourceState.CAN_TRANSACT
                         override val status: String
                             get() = when (sendState) {
-                                SendState.NO_FUNDS -> getString(R.string.send_state_no_funds)
-                                SendState.NOT_SUPPORTED -> getString(
+                                TxSourceState.NO_FUNDS -> getString(R.string.send_state_no_funds)
+                                TxSourceState.NOT_SUPPORTED -> getString(
                                     R.string.send_state_not_supported)
-                                SendState.FUNDS_LOCKED -> getString(
+                                TxSourceState.FUNDS_LOCKED -> getString(
                                     R.string.send_state_locked_funds)
-                                SendState.NOT_ENOUGH_GAS -> getString(
+                                TxSourceState.NOT_ENOUGH_GAS -> getString(
                                     R.string.send_state_not_enough_gas)
-                                SendState.SEND_IN_FLIGHT -> getString(
+                                TxSourceState.TRANSACTION_IN_FLIGHT -> getString(
                                     R.string.send_state_send_in_flight)
                                 else -> ""
                             }
@@ -92,7 +92,7 @@ class TransferSendFragment :
     }
 
     private fun startNewSend(fromAccount: CryptoAccount) {
-        flow = SendFlow(
+        flow = TransactionFlow(
             sourceAccount = fromAccount,
             action = AssetAction.NewSend
         ).apply {

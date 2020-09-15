@@ -1,11 +1,11 @@
 package piuk.blockchain.android.ui.account
 
-import com.blockchain.ui.chooser.AccountChooserItem
-import com.blockchain.ui.chooser.AccountListing
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
+import piuk.blockchain.android.ui.account.chooser.AccountChooserItem
+import piuk.blockchain.android.ui.account.chooser.AccountListing
 
 class WalletAccountHelperAccountListingAdapter(
     private val walletAccountHelper: WalletAccountHelper

@@ -32,8 +32,8 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -169,7 +169,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
         )
 
     private fun startSellFlow(it: CryptoAccount) {
-        SendFlow(
+        TransactionFlow(
             sourceAccount = it,
             action = AssetAction.Sell
         ).apply {

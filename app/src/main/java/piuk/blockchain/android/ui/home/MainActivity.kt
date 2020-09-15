@@ -70,8 +70,8 @@ import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
@@ -532,9 +532,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 .subscribeBy(
                     onSuccess = { sourceAccount ->
                         if (AssetAction.NewSend in sourceAccount.actions) {
-                            SendFlow(
+                            TransactionFlow(
                                 sourceAccount = sourceAccount,
-                                targetAccount = targetAddress,
+                                target = targetAddress,
                                 action = AssetAction.NewSend
                             ).apply {
                                 startFlow(

@@ -39,7 +39,6 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.account.PitAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -439,13 +438,14 @@ class BitcoinCashSendStrategy(
                 it is NabuApiException && it.getErrorCode() == NabuErrorCodes.Bad2fa
             ) { view?.show2FANotAvailableError() }
         }) {
-            pitAccount = PitAccount(
-                stringUtils.getFormattedString(
-                    R.string.exchange_default_account_label,
-                    CryptoCurrency.BCH.displayTicker
-                ),
-                it.address
-            )
+            pitAccount =
+                PitAccount(
+                    stringUtils.getFormattedString(
+                        R.string.exchange_default_account_label,
+                        CryptoCurrency.BCH.displayTicker
+                    ),
+                    it.address
+                )
             view?.updateReceivingHintAndAccountDropDowns(CryptoCurrency.BCH,
                 getAddressList().size,
                 it.state == State.ACTIVE && it.address.isNotEmpty()) {

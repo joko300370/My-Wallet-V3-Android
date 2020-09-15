@@ -37,7 +37,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.xlm.XlmCryptoWalletAccount
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.android.ui.account.PitAccount
 import piuk.blockchain.android.ui.transfer.send.activity.SendConfirmationDetails
 import piuk.blockchain.android.ui.transfer.send.activity.SendView
 import piuk.blockchain.android.util.StringUtils
@@ -360,14 +359,15 @@ class XlmSendStrategy(
                 ) { view?.show2FANotAvailableError() }
             }) {
                 val components = it.address.split(":")
-                pitAccount = PitAccount(
-                    label = stringUtils.getFormattedString(
-                        R.string.exchange_default_account_label,
-                        CryptoCurrency.XLM.displayTicker
-                    ),
-                    address = components[0],
-                    memo = components[1]
-                )
+                pitAccount =
+                    PitAccount(
+                        label = stringUtils.getFormattedString(
+                            R.string.exchange_default_account_label,
+                            CryptoCurrency.XLM.displayTicker
+                        ),
+                        address = components[0],
+                        memo = components[1]
+                    )
                 view?.updateReceivingHintAndAccountDropDowns(CryptoCurrency.XLM, 1,
                     it.state == State.ACTIVE && it.address.isNotEmpty()) { view?.fillOrClearAddress() }
             }

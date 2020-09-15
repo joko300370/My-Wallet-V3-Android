@@ -11,14 +11,13 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.android.coincore.impl.InterestAddress
-import piuk.blockchain.android.coincore.impl.TradingAddress
+import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -106,48 +105,55 @@ abstract class Erc20NonCustodialAccount(
             }
         }
 
-    override val sendState: Single<SendState>
-        get() = super.sendState.flatMap { state ->
+    override val sourceState: Single<TxSourceState>
+        get() = super.sourceState.flatMap { state ->
             ethDataManager.isLastTxPending().map { hasUnconfirmed ->
                 if (hasUnconfirmed) {
-                    SendState.SEND_IN_FLIGHT
+                    TxSourceState.TRANSACTION_IN_FLIGHT
                 } else {
                     state
                 }
             }
         }
 
-    final override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
-        when (sendTo) {
-            is CryptoAddress -> Single.just(
-                Erc20OnChainTransaction(
-                    erc20Account = erc20Account,
-                    feeManager = fees,
+    final override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
+        when (target) {
+            is CryptoInterestAccount -> target.receiveAddress.map {
+                TransactionProcessor(
                     exchangeRates = exchangeRates,
-                    sendingAccount = this,
-                    sendTarget = sendTo as Erc20Address,
-                    requireSecondPassword = ethDataManager.requireSecondPassword
+                    sourceAccount = this,
+                    txTarget = it,
+                    engine = InterestDepositTxEngine(
+                        onChainTxEngine = Erc20OnChainTxEngine(
+                            erc20Account = erc20Account,
+                            feeManager = fees,
+                            requireSecondPassword = ethDataManager.requireSecondPassword
+                        )
+                    )
                 )
-            )
-            is CryptoInterestAccount ->
-                sendTo.receiveAddress.map {
-                    Erc20DepositTransaction(
+            }
+            is CryptoAddress -> Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = this,
+                    txTarget = target,
+                    engine = Erc20OnChainTxEngine(
                         erc20Account = erc20Account,
                         feeManager = fees,
-                        exchangeRates = exchangeRates,
-                        sendingAccount = this,
-                        sendTarget = Erc20Address(asset, (it as InterestAddress).address, it.label),
                         requireSecondPassword = ethDataManager.requireSecondPassword
                     )
-                }
-            is CryptoAccount -> sendTo.receiveAddress.map {
-                Erc20OnChainTransaction(
-                    erc20Account = erc20Account,
-                    feeManager = fees,
+                )
+            )
+            is CryptoAccount -> target.receiveAddress.map {
+                TransactionProcessor(
                     exchangeRates = exchangeRates,
-                    sendingAccount = this,
-                    sendTarget = Erc20Address(asset, (it as TradingAddress).address, it.label),
-                    requireSecondPassword = ethDataManager.requireSecondPassword
+                    sourceAccount = this,
+                    txTarget = target,
+                    engine = Erc20OnChainTxEngine(
+                        erc20Account = erc20Account,
+                        feeManager = fees,
+                        requireSecondPassword = ethDataManager.requireSecondPassword
+                    )
                 )
             }
             else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))

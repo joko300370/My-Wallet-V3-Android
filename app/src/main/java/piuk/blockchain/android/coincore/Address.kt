@@ -13,11 +13,11 @@ class AddressParseError(val error: Error) : Exception("Error Parsing address") {
     }
 }
 
-interface SendTarget {
+interface TransactionTarget {
     val label: String
 }
 
-interface ReceiveAddress : SendTarget
+interface ReceiveAddress : TransactionTarget
 
 object NullAddress : ReceiveAddress {
     override val label: String = ""

@@ -32,7 +32,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncements
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
 import piuk.blockchain.android.ui.start.startupUiModule
-import piuk.blockchain.android.ui.transfer.send.transferModule
+import piuk.blockchain.android.ui.transactionflow.transactionModule
 import timber.log.Timber
 
 object KoinStarter {
@@ -52,7 +52,7 @@ object KoinStarter {
                 applicationModule,
                 campaignModule,
                 coincoreModule,
-                transferModule,
+                transactionModule,
                 okHttpModule,
                 coreModule,
                 coreUiModule,

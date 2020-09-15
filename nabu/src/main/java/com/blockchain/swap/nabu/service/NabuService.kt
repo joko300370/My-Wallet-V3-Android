@@ -398,24 +398,6 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader
     ).wrapErrorMessage()
 
-//    fun transferFunds(
-//        sessionToken: NabuSessionTokenResponse,
-//        request: TransferRequest
-//    ): Completable = service.transferFunds(
-//        sessionToken.authHeader,
-//        request
-//    ).onErrorResumeNext {
-//        if (it is HttpException) {
-//            when (it.code()) {
-//                403 -> Completable.error(SimpleBuyError.WithdrawlAlreadyPending)
-//                409 -> Completable.error(SimpleBuyError.WithdrawlInsufficientFunds)
-//                else -> Completable.error(it)
-//            }
-//        } else {
-//            Completable.error(it)
-//        }
-//    }.wrapErrorMessage()
-
     fun transferFunds(
         sessionToken: NabuSessionTokenResponse,
         request: TransferRequest
@@ -425,7 +407,7 @@ class NabuService(retrofit: Retrofit) {
     ).map {
         when (it.code()) {
             200 -> it.body()?.id ?: ""
-            203 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
+            403 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
                         throw SimpleBuyError.WithdrawalBalanceLocked
                     else
                         throw SimpleBuyError.WithdrawalAlreadyPending

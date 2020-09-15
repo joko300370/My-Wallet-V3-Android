@@ -25,7 +25,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
@@ -94,15 +94,15 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
     private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
         if (account is CryptoAccount) {
-            account.sendState
+            account.sourceState
                 .map { sendState ->
                     object : AccountDecorator {
                         override val enabled: Boolean
-                            get() = sendState == SendState.CAN_SEND
+                            get() = sendState == TxSourceState.CAN_TRANSACT
                         override val status: String
                             get() = when (sendState) {
-                                SendState.FUNDS_LOCKED -> getString(R.string.send_state_locked_funds)
-                                SendState.SEND_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
+                                TxSourceState.FUNDS_LOCKED -> getString(R.string.send_state_locked_funds)
+                                TxSourceState.TRANSACTION_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
                                 else -> ""
                             }
                     }

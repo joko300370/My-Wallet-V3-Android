@@ -57,22 +57,38 @@ class Coincore internal constructor(
                 AllWalletsAccount(list, defaultLabels) as AccountGroup
             }.toSingle()
 
-    fun canTransferTo(sourceAccount: CryptoAccount): Single<SingleAccountList> =
-    // We only support transfers between similar assets and (soon; to - but not from - fiat)
+    fun getTransactionTargets(
+        sourceAccount: CryptoAccount,
+        action: AssetAction
+    ): Single<SingleAccountList> =
+        // We only support transfers between similar assets and (soon; to - but not from - fiat)
         // at this time. If and when, say, swap is supported this will need revisiting
         Singles.zip(
-            get(sourceAccount.asset).transferList(sourceAccount),
-            fiatAsset.transferList(sourceAccount)
+            get(sourceAccount.asset).transactionTargets(sourceAccount),
+            fiatAsset.transactionTargets(sourceAccount)
         ) { crypto, fiat ->
             crypto + fiat
-        }
+        }.flattenAsObservable { it }
+            .filter(getActionFilter(action))
+            .toList()
 
-    // It should be a fixed ID, really. And not a label. Since labels can be edited. TODO
-    fun findAccountByName(name: String): Single<SingleAccount> =
-        allWallets().map { it.accounts }
-            .map {
-                it.firstOrNull { it.label == name } ?: throw NoSuchElementException("Account not found")
+    private fun getActionFilter(action: AssetAction): (SingleAccount) -> Boolean =
+        when (action) {
+            AssetAction.Sell -> {
+                {
+                    it is FiatAccount
+                }
             }
+            AssetAction.NewSend,
+            AssetAction.Send -> {
+                {
+                    it !is FiatAccount
+                }
+            }
+            else -> {
+                { true }
+            }
+        }
 
     fun findAccountByAddress(
         cryptoCurrency: CryptoCurrency,
@@ -108,4 +124,11 @@ class Coincore internal constructor(
                 else
                     Maybe.just(it.first())
             }
+
+    fun createTransactionProcessor(
+        source: SingleAccount,
+        target: TransactionTarget,
+        action: AssetAction
+    ): Single<TransactionProcessor> =
+        source.createTransactionProcessor(target)
 }

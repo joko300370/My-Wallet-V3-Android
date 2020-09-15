@@ -33,7 +33,6 @@ import com.blockchain.network.websocket.newBlockchainWebSocket
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.CurrentContextAccess
-import com.blockchain.ui.chooser.AccountListing
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
@@ -88,7 +87,6 @@ import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.account.WalletAccountHelperAccountListingAdapter
-import piuk.blockchain.android.ui.confirm.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
@@ -123,6 +121,9 @@ import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
 import piuk.blockchain.android.ui.transfer.send.activity.SendPresenter
 import piuk.blockchain.android.ui.transfer.send.activity.SendView
+import piuk.blockchain.android.ui.account.chooser.AccountChooserPresenter
+import piuk.blockchain.android.ui.account.chooser.AccountListing
+import piuk.blockchain.android.ui.transfer.send.activity.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinCashSendStrategy
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinSendStrategy
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.ResourceSendFundsResultLocalizer
@@ -251,6 +252,10 @@ val applicationModule = module {
                 usdtAccount = get(usdtAccount),
                 crashLogger = get()
             )
+        }
+
+        factory {
+            AccountChooserPresenter(get(), get())
         }
 
         factory {

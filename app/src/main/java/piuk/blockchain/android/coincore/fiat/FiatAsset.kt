@@ -71,7 +71,7 @@ class FiatAsset(
             )
         }
 
-    override fun transferList(account: SingleAccount): Single<SingleAccountList> =
+    override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> =
         when (account) {
             is TradingAccount -> getFiatAccountList()
             else -> Single.just(emptyList())

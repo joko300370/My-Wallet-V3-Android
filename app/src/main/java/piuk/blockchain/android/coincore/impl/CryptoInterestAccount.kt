@@ -15,8 +15,8 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendState
-import piuk.blockchain.android.coincore.SendTarget
+import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -102,18 +102,18 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> =
         Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
-    override val sendState: Single<SendState>
+    // TODO: Where is this called?
+    override val sourceState: Single<TxSourceState>
         get() = Single.just(
             if (nabuAccountExists.get()) {
-                SendState.CAN_SEND
+                TxSourceState.CAN_TRANSACT
             } else {
-                SendState.NOT_SUPPORTED
+                TxSourceState.NOT_SUPPORTED
             }
         )
-
     override val actions: AvailableActions =
         if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
             setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)

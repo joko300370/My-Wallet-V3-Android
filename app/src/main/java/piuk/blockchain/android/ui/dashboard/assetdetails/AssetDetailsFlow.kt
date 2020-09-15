@@ -16,12 +16,12 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
-import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import timber.log.Timber
 
 enum class AssetDetailsStep {
@@ -256,8 +256,8 @@ class AssetDetailsFlow(
 
     private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
         localState.asset?.let { ca ->
-            disposables += account.sendState.subscribeBy {
-                if (it == SendState.SEND_IN_FLIGHT) {
+            disposables += account.sourceState.subscribeBy {
+                if (it == TxSourceState.TRANSACTION_IN_FLIGHT) {
                     model.process(TransactionInFlight)
                 } else {
                     ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->

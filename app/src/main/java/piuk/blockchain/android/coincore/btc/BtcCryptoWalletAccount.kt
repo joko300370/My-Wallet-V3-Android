@@ -11,6 +11,8 @@ import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
@@ -73,6 +75,10 @@ internal class BtcCryptoWalletAccount(
         }.doOnSuccess {
             setHasTransactions(it.isNotEmpty())
         }
+
+    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> {
+        TODO("Implement me")
+    }
 
     constructor(
         jsonAccount: Account,

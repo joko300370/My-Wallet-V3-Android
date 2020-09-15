@@ -7,7 +7,6 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
-import java.io.Serializable
 
 interface BlockchainAccount {
 
@@ -26,23 +25,24 @@ interface BlockchainAccount {
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
 
-interface SingleAccount : BlockchainAccount, SendTarget, Serializable {
+interface SingleAccount : BlockchainAccount, TransactionTarget {
     val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
 
     // Available balance, not including uncleared and locked, that may be used for transactions
     val actionableBalance: Single<Money>
 
-    val sendState: Single<SendState>
-    fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor>
+    val sourceState: Single<TxSourceState>
+
+    fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor>
 }
 
-enum class SendState {
-    CAN_SEND,
+enum class TxSourceState {
+    CAN_TRANSACT,
     NO_FUNDS,
     FUNDS_LOCKED,
     NOT_ENOUGH_GAS,
-    SEND_IN_FLIGHT,
+    TRANSACTION_IN_FLIGHT,
     NOT_SUPPORTED
 }
 
@@ -91,11 +91,11 @@ class NullCryptoAccount(
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
-    override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
+    override val sourceState: Single<TxSourceState>
+        get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
     override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.ZeroBtc)
@@ -128,11 +128,11 @@ object NullFiatAccount : FiatAccount {
     override val isDefault: Boolean
         get() = false
 
-    override fun createSendProcessor(sendTo: SendTarget): Single<TransactionProcessor> =
+    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
         Single.error(NotImplementedError("Dummy Account"))
 
-    override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
+    override val sourceState: Single<TxSourceState>
+        get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
     override val label: String = ""
 

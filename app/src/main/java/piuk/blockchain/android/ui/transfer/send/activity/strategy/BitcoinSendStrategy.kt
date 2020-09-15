@@ -45,7 +45,6 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
-import piuk.blockchain.android.ui.account.PitAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
@@ -467,13 +466,14 @@ class BitcoinSendStrategy(
                     ) { view?.show2FANotAvailableError() }
                 },
                 onSuccess = {
-                    pitAccount = PitAccount(
-                        stringUtils.getFormattedString(
-                            R.string.exchange_default_account_label,
-                            CryptoCurrency.BTC.displayTicker
-                        ),
-                        it.address
-                    )
+                    pitAccount =
+                        PitAccount(
+                            stringUtils.getFormattedString(
+                                R.string.exchange_default_account_label,
+                                CryptoCurrency.BTC.displayTicker
+                            ),
+                            it.address
+                        )
                     view?.updateReceivingHintAndAccountDropDowns(
                         CryptoCurrency.BTC,
                         getAddressList().size,

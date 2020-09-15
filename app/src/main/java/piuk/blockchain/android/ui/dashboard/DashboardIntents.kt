@@ -9,7 +9,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
-import piuk.blockchain.android.ui.transfer.send.flow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import java.math.BigInteger
 
