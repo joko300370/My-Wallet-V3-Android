@@ -14,7 +14,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
-import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -115,10 +114,20 @@ class EnterAmountSheet(
             }
         }
 
-        view.amount_sheet_input.listener = object : FiatCryptoInputView.FiatCryptoInputViewListener {
-            override fun onBackButtonPressed() {
-                hideKeyboard()
-                dismiss()
+        compositeDisposable += view.amount_sheet_input.onImeAction.subscribe {
+            when (it) {
+                PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
+                    if (state.nextEnabled) {
+                        onCtaClick()
+                    }
+                }
+                PrefixedOrSuffixedEditText.ImeOptions.BACK -> {
+                    hideKeyboard()
+                    dismiss()
+                }
+                else -> {
+                    // do nothing
+                }
             }
         }
     }

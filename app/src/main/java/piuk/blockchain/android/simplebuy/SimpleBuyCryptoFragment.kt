@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
@@ -31,8 +32,8 @@ import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.CurrencyType
-import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
+import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
@@ -75,7 +76,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
+
         model.process(SimpleBuyIntent.FetchBuyLimits(currencyPrefs.selectedFiatCurrency, cryptoCurrency))
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
         model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
@@ -90,13 +94,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
 
         btn_continue.setOnClickListener {
-            model.process(SimpleBuyIntent.BuyButtonClicked)
-            model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
-            analytics.logEvent(buyConfirmClicked(
-                lastState?.order?.amount?.valueMinor.toString(),
-                lastState?.fiatCurrency ?: "",
-                lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: "")
-            )
+            startBuy()
         }
 
         payment_method_details_root.setOnClickListener {
@@ -108,9 +106,28 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
         }
 
-        input_amount.listener = object : FiatCryptoInputView.FiatCryptoInputViewListener {
-            override fun onBackButtonPressed() {
-                // do nothing
+        compositeDesposable += input_amount.onImeAction.subscribe {
+            when (it) {
+                PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
+                    startBuy()
+                }
+                else -> {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    private fun startBuy() {
+        lastState?.let {
+            if (canContinue(it)) {
+                model.process(SimpleBuyIntent.BuyButtonClicked)
+                model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
+                analytics.logEvent(buyConfirmClicked(
+                    lastState?.order?.amount?.valueMinor.toString(),
+                    lastState?.fiatCurrency ?: "",
+                    lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: "")
+                )
             }
         }
     }

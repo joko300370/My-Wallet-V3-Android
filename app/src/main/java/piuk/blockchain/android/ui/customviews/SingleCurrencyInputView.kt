@@ -20,12 +20,16 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
-import java.util.Locale
 import java.util.Currency
+import java.util.Locale
 import kotlin.properties.Delegates
 
 class SingleCurrencyInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs),
     KoinComponent {
+
+    val onImeAction: Observable<PrefixedOrSuffixedEditText.ImeOptions> by lazy {
+        enter_amount.onImeAction
+    }
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
     private val currencyPrefs: CurrencyPrefs by inject()

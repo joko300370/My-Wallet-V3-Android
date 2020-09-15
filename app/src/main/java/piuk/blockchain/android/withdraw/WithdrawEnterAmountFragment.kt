@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
@@ -13,13 +14,13 @@ import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_withdraw_enter_amount.*
-import kotlinx.android.synthetic.main.fragment_withdraw_enter_amount.input_amount
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.ErrorState
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.customviews.SingleInputViewConfiguration
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
@@ -36,6 +37,7 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
     override val model: WithdrawModel by scopedInject()
     private val compositeDisposable = CompositeDisposable()
     private lateinit var confirmAmountEvent: () -> AnalyticsEvent
+    private var state: WithdrawState = WithdrawState()
 
     private val currency: String by unsafeLazy {
         arguments?.getString(CURRENCY_KEY)
@@ -48,8 +50,11 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         activity.setupToolbar(R.string.withdraw_title)
+
         model.process(WithdrawIntent.UpdateCurrency(currency))
+
         compositeDisposable += input_amount.amount.subscribe {
             (it as? FiatValue)?.let {
                 model.process(WithdrawIntent.AmountUpdated(it))
@@ -59,6 +64,23 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
         analytics.logEvent(SimpleBuyAnalytics.WITHDRAWAL_FORM_SHOWN)
 
         btn_continue.setOnClickListener {
+            onNext()
+        }
+
+        compositeDisposable += input_amount.onImeAction.subscribe {
+            when (it) {
+                PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
+                    onNext()
+                }
+                else -> {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    private fun onNext() {
+        if (state.selectedBank != null && state.amountIsValid()) {
             navigator().goToCheckout()
             analytics.logEvent(confirmAmountEvent())
         }
@@ -107,6 +129,8 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
         }
 
         btn_continue.isEnabled = newState.selectedBank != null && newState.amountIsValid()
+
+        state = newState
     }
 
     private fun showErrorState(errorState: ErrorState) {

@@ -30,11 +30,10 @@ import java.util.Locale
 import kotlin.properties.Delegates
 
 class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
-    interface FiatCryptoInputViewListener {
-        fun onBackButtonPressed()
-    }
 
-    lateinit var listener: FiatCryptoInputViewListener
+    val onImeAction: Observable<PrefixedOrSuffixedEditText.ImeOptions> by lazy {
+        enter_amount.onImeAction
+    }
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
 
@@ -81,16 +80,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 }
             }
         })
-
-        enter_amount.listener = object : PrefixedOrSuffixedEditText.PrefixedOrSuffixedEditTextListener {
-            override fun onBackButtonPressed() {
-                if (::listener.isInitialized) {
-                    listener.onBackButtonPressed()
-                } else {
-                    throw IllegalStateException("FiatCryptoInputViewListener not initialised")
-                }
-            }
-        }
 
         currency_swap.setOnClickListener {
             configuration =

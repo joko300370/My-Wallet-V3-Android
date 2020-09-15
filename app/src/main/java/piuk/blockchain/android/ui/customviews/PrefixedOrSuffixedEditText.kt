@@ -5,13 +5,18 @@ import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import kotlin.properties.Delegates
 
 class PrefixedOrSuffixedEditText : AppCompatEditText {
-    interface PrefixedOrSuffixedEditTextListener {
-        fun onBackButtonPressed()
+
+    enum class ImeOptions {
+        BACK,
+        NEXT
     }
 
     constructor(context: Context?) : super(context)
@@ -21,9 +26,14 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
         attrs,
         defStyle)
 
-    lateinit var listener: PrefixedOrSuffixedEditTextListener
+    private val imeActionsSubject: PublishSubject<ImeOptions> = PublishSubject.create()
+
+    val onImeAction: Observable<ImeOptions>
+        get() = imeActionsSubject
 
     init {
+        imeOptions = EditorInfo.IME_ACTION_NEXT
+
         addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(s: Editable?) {
                 prefix?.let {
@@ -43,16 +53,20 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
                 setText(text.toString().replace(digitsOnlyRegex, ""))
             }
         }
+
+        setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                imeActionsSubject.onNext(ImeOptions.NEXT)
+            }
+            true
+        }
+
         isEnabled = false
     }
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (::listener.isInitialized) {
-                listener.onBackButtonPressed()
-            } else {
-                throw IllegalStateException("PrefixedOrSuffixedEditTextListener not initialised")
-            }
+            imeActionsSubject.onNext(ImeOptions.BACK)
         }
         return false
     }
