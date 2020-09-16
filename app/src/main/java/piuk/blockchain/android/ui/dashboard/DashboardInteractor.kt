@@ -9,15 +9,18 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
+import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
+import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
@@ -27,10 +30,13 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
 import java.lang.Exception
+import java.util.concurrent.TimeUnit
 
-private class DashboardBalanceFailure(msg: String, e: Throwable) : Exception(msg, e)
+private class DashboardGroupLoadFailure(msg: String, e: Throwable) : Exception(msg, e)
+private class DashboardBalanceLoadFailure(msg: String, e: Throwable) : Exception(msg, e)
 
 class DashboardInteractor(
     private val coincore: Coincore,
@@ -54,58 +60,11 @@ class DashboardInteractor(
 
         CryptoCurrency.activeCurrencies()
             .filter { !it.hasFeature(CryptoCurrency.IS_ERC20) }
-            .forEach {
-                cd += coincore[it].accountGroup(balanceFilter)
-                    .flatMapSingle { group -> group.accountBalance }
-                    .map { balance -> balance as CryptoValue }
-                    .doOnSuccess { value ->
-                        if (value.currency == CryptoCurrency.ETHER) {
-                            cd += coincore[CryptoCurrency.PAX].accountGroup(balanceFilter)
-                                .flatMapSingle { asset -> asset.accountBalance }
-                                .subscribeBy(
-                                    onSuccess = { balance ->
-                                        Timber.d("*****> Got balance for PAX")
-                                        model.process(BalanceUpdate(CryptoCurrency.PAX, balance))
-                                    },
-                                    onError = { e ->
-                                        Timber.e("Failed getting balance for PAX: $e")
-                                        logBalanceLoadError(CryptoCurrency.PAX, e)
-                                        model.process(BalanceUpdateError(CryptoCurrency.PAX))
-                                    }
-                                )
-                            cd += coincore[CryptoCurrency.USDT].accountGroup(balanceFilter)
-                                .flatMapSingle { asset -> asset.accountBalance }
-                                .subscribeBy(
-                                    onSuccess = { balance ->
-                                        Timber.d("*****> Got balance for USDT")
-                                        model.process(BalanceUpdate(CryptoCurrency.USDT, balance))
-                                    },
-                                    onError = { e ->
-                                        Timber.e("Failed getting balance for USDT: $e")
-                                        logBalanceLoadError(CryptoCurrency.USDT, e)
-                                        model.process(BalanceUpdateError(CryptoCurrency.USDT))
-                                    }
-                                )
-                        }
-                    }
-                    .doOnError { _ ->
-                        if (it == CryptoCurrency.ETHER) {
-                            // If we can't get ETH, then we can't get erc20 tokens... so...
-                            model.process(BalanceUpdateError(CryptoCurrency.PAX))
-                            model.process(BalanceUpdateError(CryptoCurrency.USDT))
-                        }
-                    }
-                    .subscribeBy(
-                        onSuccess = { balance ->
-                            Timber.d("*****> Got balance for $it")
-                            model.process(BalanceUpdate(it, balance))
-                        },
-                        onError = { e ->
-                            Timber.e("Failed getting balance for $it: $e")
-                            logBalanceLoadError(it, e)
-                            model.process(BalanceUpdateError(it))
-                        }
-                    )
+            .forEach { asset ->
+                cd += refreshAssetBalance(asset, model, balanceFilter)
+                    .ifEthLoadedGetErc20Balance(model, balanceFilter, cd)
+                    .ifEthFailedThenErc20Failed(asset, model)
+                    .emptySubscribe()
             }
 
         cd += checkForFiatBalances(model)
@@ -113,11 +72,71 @@ class DashboardInteractor(
         return cd
     }
 
-    private fun logBalanceLoadError(asset: CryptoCurrency, e: Throwable) {
-        crashLogger.logException(
-            DashboardBalanceFailure("Cannot load ${asset.networkTicker}", e)
-        )
+    private fun refreshAssetBalance(
+        asset: CryptoCurrency,
+        model: DashboardModel,
+        balanceFilter: AssetFilter
+    ): Single<CryptoValue> =
+        coincore[asset].accountGroup(balanceFilter)
+            .logGroupLoadError(asset, balanceFilter)
+            .flatMapSingle { group ->
+                group.accountBalance
+                    .logBalanceLoadError(asset, balanceFilter)
+            }
+            .map { balance -> balance as CryptoValue }
+            .doOnError { e ->
+                Timber.e("Failed getting balance for ${asset.networkTicker}: $e")
+                model.process(BalanceUpdateError(asset))
+            }
+            .doOnSuccess { v ->
+                Timber.d("Got balance for ${asset.networkTicker}")
+                model.process(BalanceUpdate(asset, v))
+            }
+            .retryOnError()
+
+    private fun <T> Single<T>.retryOnError() =
+        this.retryWhen { f ->
+            f.take(RETRY_COUNT)
+                .delay(RETRY_INTERVAL_MS, TimeUnit.MILLISECONDS)
+        }
+
+    private fun Single<CryptoValue>.ifEthLoadedGetErc20Balance(
+        model: DashboardModel,
+        balanceFilter: AssetFilter,
+        disposables: CompositeDisposable
+    ) = this.doOnSuccess { value ->
+        if (value.currency == CryptoCurrency.ETHER) {
+            disposables += refreshAssetBalance(CryptoCurrency.PAX, model, balanceFilter)
+                .emptySubscribe()
+            disposables += refreshAssetBalance(CryptoCurrency.USDT, model, balanceFilter)
+                .emptySubscribe()
+        }
     }
+
+    private fun Single<CryptoValue>.ifEthFailedThenErc20Failed(
+        asset: CryptoCurrency,
+        model: DashboardModel
+    ) = this.doOnError {
+        if (asset == CryptoCurrency.ETHER) {
+            // If we can't get ETH, then we can't get erc20 tokens... so...
+            model.process(BalanceUpdateError(CryptoCurrency.PAX))
+            model.process(BalanceUpdateError(CryptoCurrency.USDT))
+        }
+    }
+
+    private fun Maybe<AccountGroup>.logGroupLoadError(asset: CryptoCurrency, filter: AssetFilter) =
+        this.doOnError { e ->
+            crashLogger.logException(
+                DashboardGroupLoadFailure("Cannot load group for ${asset.networkTicker} - $filter:", e)
+            )
+        }
+
+    private fun Single<Money>.logBalanceLoadError(asset: CryptoCurrency, filter: AssetFilter) =
+        this.doOnError { e ->
+            crashLogger.logException(
+                DashboardBalanceLoadFailure("Cannot load balance for ${asset.networkTicker} - $filter:", e)
+            )
+        }
 
     private fun checkForFiatBalances(model: DashboardModel): Disposable =
         coincore.fiatAssets.accountGroup()
@@ -252,5 +271,8 @@ class DashboardInteractor(
             PriceDatum(price = 1.0, timestamp = 0),
             PriceDatum(price = 1.0, timestamp = System.currentTimeMillis() / 1000)
         )
+
+        private const val RETRY_INTERVAL_MS = 3000L
+        private const val RETRY_COUNT = 3L
     }
 }
