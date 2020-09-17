@@ -8,6 +8,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
+import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
@@ -17,6 +18,7 @@ class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
     private val assetMap: Map<CryptoCurrency, CryptoAsset>,
+    private val txProcessorFactory: TxProcessorFactory,
     private val defaultLabels: DefaultLabels,
     private val fiatAsset: Asset,
     private val crashLogger: CrashLogger
@@ -130,5 +132,9 @@ class Coincore internal constructor(
         target: TransactionTarget,
         action: AssetAction
     ): Single<TransactionProcessor> =
-        source.createTransactionProcessor(target)
+        txProcessorFactory.createProcessor(
+            source as CryptoAccount,
+            target,
+            action
+        )
 }

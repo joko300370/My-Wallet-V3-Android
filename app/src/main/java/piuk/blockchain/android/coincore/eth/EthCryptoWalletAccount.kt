@@ -9,16 +9,10 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransferError
-import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -102,49 +96,6 @@ internal class EthCryptoWalletAccount(
 
     override val isDefault: Boolean = true // Only one ETH account, so always default
 
-    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
-        when (target) {
-            is CryptoInterestAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = it,
-                    engine = InterestDepositTxEngine(
-                        onChainTxEngine = EthOnChainTxEngine(
-                            ethDataManager = ethDataManager,
-                            feeManager = fees,
-                            requireSecondPassword = ethDataManager.requireSecondPassword
-                        )
-                    )
-                )
-            }
-            is CryptoAddress -> Single.just(
-                    TransactionProcessor(
-                        exchangeRates = exchangeRates,
-                        sourceAccount = this,
-                        txTarget = target,
-                        engine = EthOnChainTxEngine(
-                            ethDataManager = ethDataManager,
-                            feeManager = fees,
-                            requireSecondPassword = ethDataManager.requireSecondPassword
-                        )
-                    )
-                )
-            is CryptoAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = it,
-                    engine = EthOnChainTxEngine(
-                        ethDataManager = ethDataManager,
-                        feeManager = fees,
-                        requireSecondPassword = ethDataManager.requireSecondPassword
-                    )
-                )
-            }
-            else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
-        }
-
     override val sourceState: Single<TxSourceState>
         get() = super.sourceState.flatMap { state ->
             ethDataManager.isLastTxPending().map { hasUnconfirmed ->
@@ -155,6 +106,13 @@ internal class EthCryptoWalletAccount(
                 }
             }
         }
+
+    override fun createTxEngine(): TxEngine =
+        EthOnChainTxEngine(
+            ethDataManager = ethDataManager,
+            feeManager = fees,
+            requireSecondPassword = ethDataManager.requireSecondPassword
+        )
 
     override val actions: AvailableActions
         get() = super.actions.let {

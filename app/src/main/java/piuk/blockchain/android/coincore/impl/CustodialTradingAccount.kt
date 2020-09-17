@@ -13,18 +13,11 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
-import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransferError
-import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -35,7 +28,7 @@ open class CustodialTradingAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
-    private val isNoteSupported: Boolean = false
+    val isNoteSupported: Boolean = false
 ) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
@@ -92,43 +85,6 @@ open class CustodialTradingAccount(
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
-
-    final override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
-        when (target) {
-            is CryptoAddress ->
-                Single.just(
-                    TransactionProcessor(
-                        exchangeRates = exchangeRates,
-                        sourceAccount = this,
-                        txTarget = target,
-                        engine = TradingToOnChainTxEngine(
-                            walletManager = custodialWalletManager,
-                            isNoteSupported = isNoteSupported
-                        )
-                    )
-                )
-            is CryptoAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = it,
-                    engine = TradingToOnChainTxEngine(
-                        walletManager = custodialWalletManager,
-                        isNoteSupported = isNoteSupported
-                    )
-                )
-            }
-            is FiatAccount ->
-                Single.just(TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = target,
-                    engine = CustodialSellTxEngine(
-                        walletManager = custodialWalletManager
-                    )
-                ))
-            else -> throw TransferError("Cannot send custodial crypto to a non-crypto target")
-        }
 
     override val sourceState: Single<TxSourceState>
         get() = Singles.zip(

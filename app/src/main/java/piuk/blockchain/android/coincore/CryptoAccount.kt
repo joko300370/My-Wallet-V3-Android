@@ -33,8 +33,6 @@ interface SingleAccount : BlockchainAccount, TransactionTarget {
     val actionableBalance: Single<Money>
 
     val sourceState: Single<TxSourceState>
-
-    fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor>
 }
 
 enum class TxSourceState {
@@ -91,9 +89,6 @@ class NullCryptoAccount(
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BTC
 
-    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
-        Single.error(NotImplementedError("Dummy Account"))
-
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
@@ -127,9 +122,6 @@ object NullFiatAccount : FiatAccount {
 
     override val isDefault: Boolean
         get() = false
-
-    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
-        Single.error(NotImplementedError("Dummy Account"))
 
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)

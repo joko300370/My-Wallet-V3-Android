@@ -9,8 +9,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -40,7 +39,7 @@ internal class AlgoCryptoWalletAccount(
     override val actions: AvailableActions
         get() = setOf(AssetAction.ViewActivity)
 
-    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> {
-        TODO("Implement me")
+    override fun createTxEngine(): TxEngine {
+        TODO("Not yet implemented")
     }
 }

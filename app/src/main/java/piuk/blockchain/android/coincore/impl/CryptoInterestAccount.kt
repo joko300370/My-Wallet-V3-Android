@@ -16,8 +16,6 @@ import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -101,9 +99,6 @@ internal class CryptoInterestAccount(
 
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
-
-    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> =
-        Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Interest Wallet"))
 
     // TODO: Where is this called?
     override val sourceState: Single<TxSourceState>

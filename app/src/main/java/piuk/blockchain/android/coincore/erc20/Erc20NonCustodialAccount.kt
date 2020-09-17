@@ -9,15 +9,10 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransferError
-import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -116,48 +111,12 @@ abstract class Erc20NonCustodialAccount(
             }
         }
 
-    final override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> =
-        when (target) {
-            is CryptoInterestAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = it,
-                    engine = InterestDepositTxEngine(
-                        onChainTxEngine = Erc20OnChainTxEngine(
-                            erc20Account = erc20Account,
-                            feeManager = fees,
-                            requireSecondPassword = ethDataManager.requireSecondPassword
-                        )
-                    )
-                )
-            }
-            is CryptoAddress -> Single.just(
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = target,
-                    engine = Erc20OnChainTxEngine(
-                        erc20Account = erc20Account,
-                        feeManager = fees,
-                        requireSecondPassword = ethDataManager.requireSecondPassword
-                    )
-                )
-            )
-            is CryptoAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = this,
-                    txTarget = target,
-                    engine = Erc20OnChainTxEngine(
-                        erc20Account = erc20Account,
-                        feeManager = fees,
-                        requireSecondPassword = ethDataManager.requireSecondPassword
-                    )
-                )
-            }
-            else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
-        }
+    override fun createTxEngine(): TxEngine =
+        Erc20OnChainTxEngine(
+            erc20Account = erc20Account,
+            feeManager = fees,
+            requireSecondPassword = ethDataManager.requireSecondPassword
+        )
 }
 
 internal open class Erc20Address(

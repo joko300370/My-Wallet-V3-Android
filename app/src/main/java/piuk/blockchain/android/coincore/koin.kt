@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -170,8 +171,16 @@ val coincoreModule = module {
                     CryptoCurrency.ALGO to get<AlgoAsset>(),
                     CryptoCurrency.USDT to get<UsdtAsset>()
                 ),
+                txProcessorFactory = get(),
                 defaultLabels = get(),
                 crashLogger = get()
+            )
+        }
+
+        scoped {
+            TxProcessorFactory(
+                exchangeRates = get(),
+                walletManager = get()
             )
         }
 

@@ -17,9 +17,8 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.SingleAccountList
-import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -76,9 +75,6 @@ internal class CryptoExchangeAccount(
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
-    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> =
-        Single.error<TransactionProcessor>(NotImplementedError("Cannot Send from Exchange Wallet"))
-
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
@@ -117,6 +113,8 @@ abstract class CryptoNonCustodialAccount(
         }
     override fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadManager.isDoubleEncrypted }
+
+    abstract fun createTxEngine(): TxEngine
 }
 
 // Currently only one custodial account is supported for each asset,

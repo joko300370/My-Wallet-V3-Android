@@ -5,8 +5,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -35,7 +34,7 @@ class StxCryptoWalletAccount(
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
-    override fun createTransactionProcessor(sendTo: TransactionTarget): Single<TransactionProcessor> {
-        TODO("Implement me")
+    override fun createTxEngine(): TxEngine {
+        TODO("Not yet implemented")
     }
 }

@@ -9,8 +9,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionProcessor
-import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -58,8 +57,8 @@ internal class XlmCryptoWalletAccount(
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
-    override fun createTransactionProcessor(target: TransactionTarget): Single<TransactionProcessor> {
-        TODO("Implement me")
+    override fun createTxEngine(): TxEngine {
+        TODO("Not yet implemented")
     }
 
     constructor(
