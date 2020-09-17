@@ -52,14 +52,14 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
     }
 
     fun showTxInProgress(title: String, subtitle: String) {
-        tx_progress.visible()
+        progress.visible()
         tx_state_indicator.gone()
         tx_ok_btn.gone()
         setText(title, subtitle)
     }
 
     fun showTxPending(title: String, subtitle: String) {
-        tx_progress.gone()
+        progress.gone()
         tx_state_indicator.visible()
         tx_ok_btn.visible()
         tx_state_indicator.setImageResource(R.drawable.ic_pending_clock)
@@ -131,7 +131,7 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
     }
 
     private fun showEndStateUi() {
-        tx_progress.gone()
+        progress.gone()
         tx_ok_btn.visible()
     }
 

@@ -118,16 +118,15 @@ open class CustodialTradingAccount(
                     )
                 )
             }
-            is FiatAccount -> target.receiveAddress.map {
-                TransactionProcessor(
+            is FiatAccount ->
+                Single.just(TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = this,
-                    txTarget = it,
+                    txTarget = target,
                     engine = CustodialSellTxEngine(
                         walletManager = custodialWalletManager
                     )
-                )
-            }
+                ))
             else -> throw TransferError("Cannot send custodial crypto to a non-crypto target")
         }
 

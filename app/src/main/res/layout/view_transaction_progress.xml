@@ -16,7 +16,7 @@
         app:srcCompat="@drawable/ic_btc_circled_mask" />
 
     <ProgressBar
-        android:id="@+id/tx_progress"
+        android:id="@+id/progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminateDrawable="@drawable/ic_payment_progress_indeterminate"

@@ -39,11 +39,13 @@ class CustodialSellTxEngine(
     private lateinit var minApiFiatAmount: FiatValue
     private lateinit var maxApiFiatAmount: FiatValue
 
-    private val fiatTarget = txTarget as FiatAccount
+    private val fiatTarget: FiatAccount by lazy {
+        txTarget as FiatAccount
+    }
 
-    override val userFiat: String
-        get() = (txTarget as? FiatAccount)?.fiatCurrency
-            ?: throw IllegalStateException("send target should be fiat account")
+    override val userFiat: String by lazy {
+        fiatTarget.fiatCurrency
+    }
 
     private val cryptoCurrency: CryptoCurrency
         get() = sourceAccount.asset
