@@ -21,6 +21,7 @@ class ConfirmTransactionDelegateAdapter(
         with(delegatesManager) {
             addAdapterDelegate(ConfirmInfoItemDelegate(mapper))
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
+            addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(
                 model,
                 stringUtils,

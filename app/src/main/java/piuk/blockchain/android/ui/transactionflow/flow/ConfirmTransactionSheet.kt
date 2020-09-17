@@ -40,7 +40,7 @@ class ConfirmTransactionSheet(
     }
 
     override fun render(newState: TransactionState) {
-        Timber.d("!SEND!> Rendering! ConfirmTransactionSheet")
+        Timber.d("!TRANSACTION!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == TransactionStep.CONFIRM_DETAIL)
 
         // We _should_ always have a pending Tx when we get here

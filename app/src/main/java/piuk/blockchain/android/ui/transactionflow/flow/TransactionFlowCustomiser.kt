@@ -237,5 +237,6 @@ class TransactionFlowCustomiserImpl(
                 state.pendingTx?.maxLimit?.toStringWithSymbol())
             TransactionErrorState.TRANSACTION_IN_FLIGHT -> resources.getString(R.string.send_error_tx_in_flight)
             TransactionErrorState.TX_OPTION_INVALID -> resources.getString(R.string.send_error_tx_option_invalid)
+            TransactionErrorState.UNKNOWN_ERROR -> resources.getString(R.string.send_error_tx_option_invalid)
         }
 }

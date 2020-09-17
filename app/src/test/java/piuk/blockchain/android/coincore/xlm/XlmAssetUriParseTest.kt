@@ -4,17 +4,18 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
-import org.junit.Test
-
 import org.junit.Rule
+import org.junit.Test
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
 class XlmAssetUriParseTest {
 
@@ -27,6 +28,8 @@ class XlmAssetUriParseTest {
 
     private val payloadManager: PayloadDataManager = mock()
     private val xlmDataManager: XlmDataManager = mock()
+    private val xlmFeesFetcher: XlmFeesFetcher = mock()
+    private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val custodialManager: CustodialWalletManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val historicRates: ChartsDataManager = mock()
@@ -39,6 +42,8 @@ class XlmAssetUriParseTest {
     private val subject = XlmAsset(
         payloadManager,
         xlmDataManager,
+        xlmFeesFetcher,
+        walletOptionsDataManager,
         custodialManager,
         exchangeRates,
         historicRates,

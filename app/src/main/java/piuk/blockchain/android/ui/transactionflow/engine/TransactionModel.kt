@@ -13,8 +13,8 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.ui.base.mvi.MviModel
@@ -43,7 +43,8 @@ enum class TransactionErrorState {
     NOT_ENOUGH_GAS,
     UNEXPECTED_ERROR,
     TRANSACTION_IN_FLIGHT,
-    TX_OPTION_INVALID
+    TX_OPTION_INVALID,
+    UNKNOWN_ERROR
 }
 
 enum class TxExecutionStatus {
@@ -95,7 +96,7 @@ class TransactionModel(
     mainScheduler
 ) {
     override fun performAction(previousState: TransactionState, intent: TransactionIntent): Disposable? {
-        Timber.v("!SEND!> Send Model: performAction: ${intent.javaClass.simpleName}")
+        Timber.v("!TRANSACTION!> Send Model: performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
             is TransactionIntent.InitialiseWithSourceAccount -> null
@@ -141,11 +142,11 @@ class TransactionModel(
     }
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.e("!SEND!> Send Model: loop error -> $t")
+        Timber.e("!TRANSACTION!> Send Model: loop error -> $t")
     }
 
     override fun onStateUpdate(s: TransactionState) {
-        Timber.v("!SEND!> Send Model: state update -> $s")
+        Timber.v("!TRANSACTION!> Send Model: state update -> $s")
     }
 
     private fun processInvalidateTransaction(): Disposable? =
@@ -223,19 +224,11 @@ class TransactionModel(
             .doOnFirst { onFirstUpdate(amount) }
             .subscribeBy(
                 onNext = {
-                    process(
-                        TransactionIntent.PendingTxUpdated(
-                            it
-                        )
-                    )
+                    process(TransactionIntent.PendingTxUpdated(it))
                 },
                 onError = {
-                    Timber.e("!SEND!> Processor failed: $it")
-                    process(
-                        TransactionIntent.FatalTransactionError(
-                            it
-                        )
-                    )
+                    Timber.e("!TRANSACTION!> Processor failed: $it")
+                    process(TransactionIntent.FatalTransactionError(it))
                 }
             )
 
@@ -260,7 +253,7 @@ class TransactionModel(
         interactor.updateTransactionAmount(amount)
             .subscribeBy(
                 onError = {
-                    Timber.e("!SEND!> Unable to get update available balance")
+                    Timber.e("!TRANSACTION!> Unable to get update available balance")
                     process(
                         TransactionIntent.FatalTransactionError(
                             it
@@ -276,7 +269,7 @@ class TransactionModel(
                     process(TransactionIntent.UpdateTransactionComplete)
                 },
                 onError = {
-                    Timber.e("!SEND!> Unable to execute transaction: $it")
+                    Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
                     process(
                         TransactionIntent.FatalTransactionError(
                             it
@@ -339,12 +332,11 @@ class TransactionModel(
         interactor.validateTransaction()
             .subscribeBy(
                 onError = {
-                    Timber.e("!SEND!> Unable to validate transaction: $it")
-                    process(
-                        TransactionIntent.FatalTransactionError(
-                            it
-                        )
-                    )
+                    Timber.e("!TRANSACTION!> Unable to validate transaction: $it")
+                    process(TransactionIntent.FatalTransactionError(it))
+                },
+                onComplete = {
+                    Timber.d("!TRANSACTION!> Tx validation complete")
                 }
             )
 }

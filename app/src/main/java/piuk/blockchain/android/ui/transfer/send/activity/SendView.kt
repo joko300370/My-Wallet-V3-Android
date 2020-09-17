@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transfer.send.activity
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import com.blockchain.transactions.Memo
 import com.google.android.material.snackbar.Snackbar
 import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import info.blockchain.balance.CryptoCurrency
@@ -65,18 +64,6 @@ interface SendView : MvpView {
 
     fun hideFeePriority()
 
-    fun showMemo()
-
-    fun hideMemo()
-
-    fun displayMemo(usersMemo: Memo)
-
-    fun enableMemo(enabled: Boolean)
-
-    fun showInfoLink()
-
-    fun hideInfoLink()
-
     // Enable / Disable
     fun enableFeeDropdown()
 
@@ -134,8 +121,6 @@ interface SendView : MvpView {
     fun hidePitIconForValidAddress()
 
     fun showPitIconIfAvailable()
-
-    fun updateRequiredLabelVisibility(isVisible: Boolean)
 
     fun isPitEnabled(enabled: Boolean)
 

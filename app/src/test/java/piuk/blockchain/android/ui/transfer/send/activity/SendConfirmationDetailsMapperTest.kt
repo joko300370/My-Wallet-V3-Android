@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.transfer.send.activity
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.usd
-import com.blockchain.transactions.SendDetails
+import com.blockchain.sunriver.SendDetails
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import org.amshove.kluent.`should equal`

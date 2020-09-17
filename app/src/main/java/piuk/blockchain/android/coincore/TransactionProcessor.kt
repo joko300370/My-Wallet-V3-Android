@@ -29,7 +29,8 @@ enum class ValidationState {
     ADDRESS_IS_CONTRACT,
     OPTION_INVALID,
     UNDER_MIN_LIMIT,
-    OVER_MAX_LIMIT
+    OVER_MAX_LIMIT,
+    UNKNOWN_ERROR
 }
 
 class TxValidationFailure(val state: ValidationState) : TransferError("Invalid Send Tx: $state")
@@ -64,6 +65,7 @@ enum class TxOption {
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
     READ_ONLY,
+    MEMO,
     AMOUNT
 }
 
@@ -88,6 +90,8 @@ sealed class TxOptionValue(val option: TxOption) {
     data class Fee(val fee: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
 
     data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
+
+    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) : TxOptionValue(TxOption.MEMO)
 
     data class TxBooleanOption<T>(
         private val _option: TxOption,

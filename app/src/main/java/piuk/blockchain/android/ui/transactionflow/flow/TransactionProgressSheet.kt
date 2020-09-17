@@ -23,18 +23,18 @@ class TransactionProgressSheet(
         Timber.d("!SEND!> Rendering! TransactionProgressSheet")
         require(newState.currentStep == TransactionStep.IN_PROGRESS)
 
-        dialogView.tx_progress.setAssetIcon(newState.sendingAccount.asset.maskedAsset())
+        dialogView.tx_progress_view.setAssetIcon(newState.sendingAccount.asset.maskedAsset())
 
         when (newState.executionStatus) {
-            TxExecutionStatus.IN_PROGRESS -> dialogView.tx_progress.showTxInProgress(
+            TxExecutionStatus.IN_PROGRESS -> dialogView.tx_progress_view.showTxInProgress(
                 customiser.transactionProgressTitle(newState),
                 customiser.transactionProgressMessage(newState)
             )
-            TxExecutionStatus.COMPLETED -> dialogView.tx_progress.showTxSuccess(
+            TxExecutionStatus.COMPLETED -> dialogView.tx_progress_view.showTxSuccess(
                 customiser.transactionCompleteTitle(newState),
                 customiser.transactionCompleteMessage(newState)
             )
-            TxExecutionStatus.ERROR -> dialogView.tx_progress.showTxError(
+            TxExecutionStatus.ERROR -> dialogView.tx_progress_view.showTxError(
                 getString(R.string.send_progress_error_title),
                 getString(R.string.send_progress_error_subtitle)
             )
@@ -44,7 +44,7 @@ class TransactionProgressSheet(
     }
 
     override fun initControls(view: View) {
-        view.tx_progress.onCtaClick {
+        view.tx_progress_view.onCtaClick {
             dismiss()
         }
 

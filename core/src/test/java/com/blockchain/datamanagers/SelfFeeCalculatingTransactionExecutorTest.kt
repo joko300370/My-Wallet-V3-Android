@@ -5,7 +5,7 @@ import com.blockchain.datamanagers.fees.EthereumFees
 import com.blockchain.fees.FeeType
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
-import com.blockchain.transactions.Memo
+import com.blockchain.sunriver.Memo
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions

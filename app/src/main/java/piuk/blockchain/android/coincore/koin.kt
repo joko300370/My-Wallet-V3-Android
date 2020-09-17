@@ -73,6 +73,8 @@ val coincoreModule = module {
             XlmAsset(
                 payloadManager = get(),
                 xlmDataManager = get(),
+                xlmFeesFetcher = get(),
+                walletOptionsDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),

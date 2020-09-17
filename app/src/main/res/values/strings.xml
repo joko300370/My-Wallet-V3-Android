@@ -1554,40 +1554,16 @@
 
     <string name="not_enough_funds_with_currency">Not enough %1$s</string>
 
-    <!-- XLM Min balance explanation dlg -->
-    <string name="minimum_balance_body">Stellar requires that all Stellar accounts hold a minimum balance of lumens, or XLM.
-        This means you cannot send a balance out of your Stellar Wallet that would leave your Stellar Wallet with less than the minimum balance.
-        This also means that in order to send XLM to a new Stellar account, you must send enough XLM to meet the minimum balance requirement.
-        The current minimum balance requirement is 1 XLM.
-    </string>
-
-    <string name="minimum_balance_read_more_blurb">You can read more information about Stellar\'s minimum balance requirement at Stellar.org</string>
-    <string name="minimum_balance_explanation_title">Minimum Balance</string>
-    <string name="minimum_balance_read_more">Read more</string>
-    <string name="minimum_balance_total_funds">Total Funds</string>
-    <string name="minimum_balance_xlm_balance_requirement">XLM Balance Requirement</string>
-    <string name="minimum_balance_transaction_fee">Transaction Fee</string>
-    <string name="minimum_balance_available_to_send">Available to Send</string>
-
-    <string name="minimum_balance_url">https://www.stellar.org/developers/guides/concepts/fees.html#minimum-account-balance</string>
-
-    <string name="learn_more_lead">Learn about Stellar’s minimum balance requirement</string>
-
     <!-- XLM memo dlg -->
     <string name="xlm_memo_text">Memo Text</string>
     <string name="xlm_memo">Memo</string>
-    <string name="xlm_memo_sending_exchange">Sending to an exchange?</string>
-    <string name="xlm_memo_sending_exchange_description">Add a Memo to avoid losing funds or use Swap to exchange in this wallet.</string>
-    <string name="memo_required">Required</string>
     <string name="xlm_memo_id">Memo ID</string>
     <string name="xlm_memo_hash">Memo Hash</string>
     <string name="xlm_memo_return">Memo Return Hash</string>
 
-    <string name="xlm_memo_toolbar_title">Add Memo</string>
-
     <string name="xlm_memo_explain">Memos are used to communicate optional information to the recipient.</string>
 
-    <string name="xlm_memo_text_hint">Memo</string>
+    <string name="xlm_memo_text_hint">@string/xlm_memo</string>
     <string name="xlm_memo_id_hint">Numeric ID</string>
     <string name="xlm_memo_hash_hint">32 Byte Hexadecimal Hash</string>
     <string name="airdrop_activity_title">Airdrops</string>
@@ -1965,6 +1941,12 @@
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
     <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %2$s Trading Wallet to your %2$s Wallets. Once %1$s is in your %2$s Wallet you can transfer to external addresses.</string>
+    <string name="send_to_exchange_xlm_title">Sending to an exchange?</string>
+    <string name="send_to_exchange_xlm_blurb">&#160;Add a Memo to avoid losing funds.&#160;</string>
+    <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link">Learn more about balance requirements.</annotation></string>
+    <string name="send_confirm_memo_text_hint">Add a memo (max 28 chars)</string>
+    <string name="send_confirm_memo_id_hint">Add an ID</string>
+    <string name="send_invalid_option_dsc_memo">Invalid description/memo</string>
 
     <!-- Interest -->
     <string name="earn_interest">Earn Interest</string>

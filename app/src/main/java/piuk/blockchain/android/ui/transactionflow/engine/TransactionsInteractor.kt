@@ -12,9 +12,9 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -54,14 +54,14 @@ class TransactionInteractor(
         action: AssetAction
     ): Observable<PendingTx> =
         coincore.createTransactionProcessor(sourceAccount, target, action)
-            .doOnSubscribe { Timber.e("!SEND!> SUBSCRIBE") }
+            .doOnSubscribe { Timber.d("!TRANSACTION!> SUBSCRIBE") }
             .doOnSuccess {
                 if (transactionProcessor != null)
                     throw IllegalStateException("TxProcessor double init")
             }
             .doOnSuccess { transactionProcessor = it }
             .doOnError {
-                Timber.e("!SEND!> error initialising $it")
+                Timber.e("!TRANSACTION!> error initialising $it")
             }.flatMapObservable {
                 it.initialiseTx()
             }

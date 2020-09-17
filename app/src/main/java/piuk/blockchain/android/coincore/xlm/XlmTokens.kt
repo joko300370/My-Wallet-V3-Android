@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.sunriver.isValidXlmQr
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
@@ -21,10 +22,13 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
 internal class XlmAsset(
     payloadManager: PayloadDataManager,
     private val xlmDataManager: XlmDataManager,
+    private val xlmFeesFetcher: XlmFeesFetcher,
+    private val walletOptionsDataManager: WalletOptionsDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -59,7 +63,9 @@ internal class XlmAsset(
                         payloadManager = payloadManager,
                         account = it,
                         xlmManager = xlmDataManager,
-                        exchangeRates = exchangeRates
+                        exchangeRates = exchangeRates,
+                        xlmFeesFetcher = xlmFeesFetcher,
+                        walletOptionsDataManager = walletOptionsDataManager
                     )
                 )
             }

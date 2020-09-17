@@ -25,7 +25,6 @@ import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.xlm
-import com.blockchain.koin.xlmStrategy
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
@@ -126,10 +125,7 @@ import piuk.blockchain.android.ui.account.chooser.AccountListing
 import piuk.blockchain.android.ui.transfer.send.activity.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinCashSendStrategy
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinSendStrategy
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.ResourceSendFundsResultLocalizer
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendFundsResultLocalizer
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendStrategy
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.XlmSendStrategy
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
@@ -451,7 +447,6 @@ val applicationModule = module {
             SendPresenter(
                 btcStrategy = get(btcStrategy),
                 bchStrategy = get(bchStrategy),
-                xlmStrategy = get(xlmStrategy),
                 prefs = get(),
                 exchangeRates = get(),
                 stringUtils = get(),
@@ -505,29 +500,6 @@ val applicationModule = module {
                 pitLinking = get(),
                 envSettings = get(),
                 analytics = get()
-            )
-        }
-
-        factory {
-            ResourceSendFundsResultLocalizer(
-                resources = get()
-            )
-        }.bind(SendFundsResultLocalizer::class)
-
-        factory<SendStrategy<SendView>>(xlmStrategy) {
-            XlmSendStrategy(
-                xlmDataManager = get(),
-                xlmFeesFetcher = get(),
-                stringUtils = get(),
-                walletOptionsDataManager = get(),
-                xlmTransactionSender = get(),
-                exchangeRates = get(),
-                sendFundsResultLocalizer = get(),
-                nabuDataManager = get(),
-                nabuToken = get(),
-                pitLinking = get(),
-                analytics = get(),
-                prefs = get()
             )
         }
 

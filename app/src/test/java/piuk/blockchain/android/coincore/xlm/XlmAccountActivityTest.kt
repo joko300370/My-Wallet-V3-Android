@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
@@ -19,6 +20,7 @@ import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import java.math.BigInteger
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -30,6 +32,8 @@ class XlmAccountActivityTest {
     private val currencyPrefs: CurrencyPrefs = mock()
 
     private val xlmDataManager: XlmDataManager = mock()
+    private val xlmFeesFetcher: XlmFeesFetcher = mock()
+    private val walletOptionsDataManager: WalletOptionsDataManager = mock()
 
     private val subject =
         XlmCryptoWalletAccount(
@@ -37,7 +41,9 @@ class XlmAccountActivityTest {
             label = "Test Xlm Account",
             address = "Test XLM Address",
             xlmManager = xlmDataManager,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            xlmFeesFetcher = xlmFeesFetcher,
+            walletOptionsDataManager = walletOptionsDataManager
         )
 
     @get:Rule

@@ -5,11 +5,9 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.any
@@ -47,7 +45,6 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -97,7 +94,6 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -157,7 +153,6 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -222,7 +217,6 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -268,7 +262,6 @@ class SendPresenterTest {
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = bchStrategy,
-            xlmStrategy = xlmStrategy,
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -289,45 +282,13 @@ class SendPresenterTest {
     }
 
     @Test
-    fun `memo required should start with false and then get the strategy exposed value`() {
-        val btcStrategy: SendStrategy<SendView> = mock()
-        whenever(btcStrategy.memoRequired()).thenReturn(Observable.just(true))
-        val view: SendView = mock()
-
-        SendPresenter(
-            btcStrategy = btcStrategy,
-            bchStrategy = mock(),
-            xlmStrategy = mock(),
-            prefs = mock(),
-            exchangeRates = mock(),
-            stringUtils = mock(),
-            envSettings = mock(),
-            exchangeRateFactory = mock {
-                on { updateTickers() } `it returns` Completable.complete()
-            },
-            pitLinkingFeatureFlag = mock {
-                on { enabled } `it returns` Single.just(true)
-            },
-            bitpayDataManager = mock(),
-            analytics = analytics
-        ).apply {
-            attachView(view)
-            onViewReady()
-        }
-        verify(view).updateRequiredLabelVisibility(false)
-        verify(view).updateRequiredLabelVisibility(true)
-    }
-
-    @Test
     fun `when pit is enabled the correct value should propagated to the view`() {
         val btcStrategy: SendStrategy<SendView> = mock()
-        whenever(btcStrategy.memoRequired()).thenReturn(Observable.just(true))
         val view: SendView = mock()
 
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -350,13 +311,11 @@ class SendPresenterTest {
     @Test
     fun `when pit is disabled the correct value should propagated to the view`() {
         val btcStrategy: SendStrategy<SendView> = mock()
-        whenever(btcStrategy.memoRequired()).thenReturn(Observable.just(true))
         val view: SendView = mock()
 
         SendPresenter(
             btcStrategy = btcStrategy,
             bchStrategy = mock(),
-            xlmStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),

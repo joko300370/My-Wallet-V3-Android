@@ -16,9 +16,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.CallSuper
 import androidx.annotation.ColorRes
@@ -34,7 +31,7 @@ import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.serialization.JsonSerializableAccount
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.transactions.Memo
+import com.blockchain.sunriver.Memo
 import piuk.blockchain.android.ui.account.chooser.AccountChooserActivity
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.android.material.snackbar.Snackbar
@@ -164,8 +161,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         setupCryptoTextField()
         setupFiatTextField()
         setupFeesView()
-        setUpMemoEdittext()
-        setUpSpinner()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             this, object : OnBackPressedCallback(true) {
@@ -190,13 +185,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         max.setOnClickListener {
             analytics.logEvent(SendAnalytics.SendSpendableBalanceClicked(asset))
             presenter.onSpendMaxClicked()
-        }
-
-        info_link.setOnClickListener {
-            fragmentManager?.let {
-                MinBalanceExplanationDialog()
-                    .show(it, "Dialog")
-            }
         }
 
         amountContainer.currencyFiat.text = fiatCurrency
@@ -263,14 +251,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         compositeDisposable.clear()
     }
 
-    override fun updateRequiredLabelVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            required_label?.visible()
-        } else {
-            required_label?.gone()
-        }
-    }
-
     private fun setCustomKeypad() {
         keyboard.setDecimalSeparator(presenter.getDefaultDecimalSeparator())
 
@@ -288,58 +268,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
 
     private fun closeKeypad() {
         keyboard.setNumpadVisibility(View.GONE)
-    }
-
-    private val memoEditText: EditText?
-        get() = memo_text_edit
-
-    private fun setUpSpinner() {
-        memo_type_spinner.apply {
-            setupOptions(0)
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-                override fun onItemSelected(parent: AdapterView<*>, spinner: View, pos: Int, id: Long) {
-                    val newMemoType = if (pos == 0) SendPresenter.MEMO_TEXT_TYPE else SendPresenter.MEMO_ID_TYPE
-                    presenter.onMemoTypeChanged(newMemoType)
-                    if (pos == 0)
-                        memoEditText?.inputType = InputType.TYPE_CLASS_TEXT
-                    else
-                        memoEditText?.inputType = InputType.TYPE_CLASS_NUMBER
-                    post {
-                        if (memoEditText?.hasFocus() == true) {
-                            memoEditText?.requestFocus()
-                            memoEditText?.setText("")
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>) { }
-            }
-            setSelection(0)
-        }
-    }
-
-    private fun Spinner.setupOptions(selectedIndex: Int) {
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            arrayToDisplay(selectedIndex),
-            piuk.blockchain.androidcoreui.R.layout.dialog_edit_memo_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            this.adapter = adapter
-        }
-    }
-
-    private fun arrayToDisplay(selectedIndex: Int): Int {
-        val manualArraySize =
-            resources.getStringArray(R.array.xlm_memo_types_manual) ?: return 0
-        return if (selectedIndex < manualArraySize.size) {
-            R.array.xlm_memo_types_manual
-        } else {
-            R.array.xlm_memo_types_all
-        }
     }
 
     private fun isKeyboardVisible(): Boolean = keyboard.isVisible
@@ -627,7 +555,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
                     snackbar.setAction(R.string.ok_cap, null)
                 }
             }
-
             snackbar.show()
         }
     }
@@ -695,14 +622,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         textviewFeeTime.setText(R.string.fee_options_regular_time)
     }
 
-    private fun setUpMemoEdittext() {
-        memo_text_edit.addTextChangedListener(object : AfterTextChangedWatcher() {
-            override fun afterTextChanged(p0: Editable?) {
-                presenter.onMemoChange(p0?.toString() ?: return)
-            }
-        })
-    }
-
     override fun enableFeeDropdown() {
         spinnerPriority.isEnabled = true
         textviewFeeAbsolute.isEnabled = true
@@ -746,35 +665,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         progressBarMaxAvailable.visible()
     }
 
-    private var lastMemo: Memo = Memo.None
-        set(value) {
-            field = value
-            memo.text = value.toText(resources)
-        }
-
-    override fun showMemo() {
-        memo_container.visible()
-    }
-
-    override fun hideMemo() {
-        memo_container.gone()
-    }
-
-    override fun displayMemo(usersMemo: Memo) {
-        lastMemo = usersMemo
-        if (memo_text_edit.text.toString() != usersMemo.value) {
-            memo_text_edit.setText(usersMemo.value)
-        }
-        usersMemo.type?.let {
-            val position = if (it == "text") 0 else 1
-            memo_type_spinner.setSelection(position)
-        }
-    }
-
-    override fun enableMemo(enabled: Boolean) {
-        memo_text_edit.isEnabled = enabled
-    }
-
     override fun updateWarning(message: String) {
         arbitraryWarning?.apply {
             visible()
@@ -788,14 +678,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
             gone()
             text = ""
         }
-    }
-
-    override fun showInfoLink() {
-        info_link.visible()
-    }
-
-    override fun hideInfoLink() {
-        info_link.gone()
     }
 
     @SuppressLint("SetTextI18n")
@@ -1241,13 +1123,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
             set(v) = this?.putBoolean(ARGUMENT_SEND_INPUT_DEEPLINKED, v) ?: throw NullPointerException()
     }
 }
-
-private fun Memo?.toText(resources: Resources) =
-    toTextOrNull(resources) ?: resources.getString(R.string.sunriver_set_memo)
-
-private fun Memo?.toTextOrNull(resources: Resources) =
-    if (this == null || isEmpty()) null
-    else describeType(resources) + ": " + value
 
 private fun Memo?.valueTextOrNull() =
     if (this == null || isEmpty()) null

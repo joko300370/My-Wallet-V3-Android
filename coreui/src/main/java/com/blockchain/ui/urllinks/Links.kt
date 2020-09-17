@@ -56,6 +56,10 @@ const val INTEREST_PRIVACY_POLICY = "https://blockchain.com/legal/privacy"
 
 const val URL_SUPPORT_BALANCE_LOCKED = "https://support.blockchain.com/hc/en-us/articles/360048200392"
 
+const val URL_XLM_MIN_BALANCE =
+    "https://support.blockchain.com/hc/en-us/articles/360019105471-" +
+        "Why-do-Stellar-addresses-have-a-minimum-balance-requirement-"
+
 fun makeBlockExplorerUrl(
     cryptoCurrency: CryptoCurrency,
     transactionHash: String

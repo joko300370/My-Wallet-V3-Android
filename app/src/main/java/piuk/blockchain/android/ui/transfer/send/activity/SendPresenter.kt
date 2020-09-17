@@ -6,8 +6,6 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.serialization.JsonSerializableAccount
-import com.blockchain.sunriver.isValidXlmQr
-import com.blockchain.transactions.Memo
 import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -48,7 +46,6 @@ class DisplayFeeOptions(val title: String, val description: String)
 class SendPresenter<View : SendView>(
     private val btcStrategy: SendStrategy<View>,
     private val bchStrategy: SendStrategy<View>,
-    private val xlmStrategy: SendStrategy<View>,
     private val exchangeRates: ExchangeRateDataManager,
     private val envSettings: EnvironmentConfig,
     private val stringUtils: StringUtils,
@@ -78,7 +75,6 @@ class SendPresenter<View : SendView>(
     }
 
     private val bitpayInvoiceUrl = "$BITPAY_LIVE_BASE$PATH_BITPAY_INVOICE/"
-    private var selectedMemoType: Int = MEMO_TEXT_NONE
     private var selectedCrypto: CryptoCurrency = CryptoCurrency.BTC
     private val merchantPattern: Pattern = Pattern.compile("for merchant ")
 
@@ -110,10 +106,6 @@ class SendPresenter<View : SendView>(
 
     fun onSpendMaxClicked() = delegate.onSpendMaxClicked()
 
-    fun onMemoTypeChanged(memo: Int) {
-        this.selectedMemoType = memo
-    }
-
     fun onBroadcastReceived() {
         updateTicker()
         delegate.onBroadcastReceived()
@@ -140,7 +132,6 @@ class SendPresenter<View : SendView>(
         delegate = when (asset) {
             CryptoCurrency.BTC -> btcStrategy
             CryptoCurrency.BCH -> bchStrategy
-            CryptoCurrency.XLM -> xlmStrategy
             else -> throw IllegalArgumentException("Old send no longer supports: ${asset.networkTicker}")
         }
 
@@ -182,57 +173,52 @@ class SendPresenter<View : SendView>(
     ) {
         val address: String
 
-        if (untrimmedscanData.isValidXlmQr()) {
-            address = untrimmedscanData
-        } else {
-            var scanData = untrimmedscanData.trim { it <= ' ' }
+        var scanData = untrimmedscanData.trim { it <= ' ' }
+        scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
 
-            scanData = FormatsUtil.getURIFromPoorlyFormedBIP21(scanData)
+        when {
+            FormatsUtil.isValidBCHAddress(envSettings.bitcoinCashNetworkParameters, scanData) -> {
+                address = scanData
+            }
+            FormatsUtil.isBitcoinUri(envSettings.bitcoinNetworkParameters, scanData) -> {
+                address = FormatsUtil.getBitcoinAddress(scanData)
 
-            when {
-                FormatsUtil.isValidBCHAddress(envSettings.bitcoinCashNetworkParameters, scanData) -> {
-                    address = scanData
-                }
-                FormatsUtil.isBitcoinUri(envSettings.bitcoinNetworkParameters, scanData) -> {
-                    address = FormatsUtil.getBitcoinAddress(scanData)
+                val amount: String = FormatsUtil.getBitcoinAmount(scanData)
+                val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(scanData)
 
-                    val amount: String = FormatsUtil.getBitcoinAmount(scanData)
-                    val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(scanData)
-
-                    if (address.isEmpty() && scanData.isBitpayAddress()) {
-                        // get payment protocol request data from bitpay
-                        val invoiceId = paymentRequestUrl.replace(bitpayInvoiceUrl, "")
-                        if (isDeepLinked) {
-                            analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayUrlDeeplink.event,
-                                CryptoCurrency.BTC))
-                        } else {
-                            analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayAdrressScanned.event,
-                                CryptoCurrency.BTC))
-                        }
-                        handleBitPayInvoice(invoiceId)
+                if (address.isEmpty() && scanData.isBitpayAddress()) {
+                    // get payment protocol request data from bitpay
+                    val invoiceId = paymentRequestUrl.replace(bitpayInvoiceUrl, "")
+                    if (isDeepLinked) {
+                        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayUrlDeeplink.event,
+                            CryptoCurrency.BTC))
                     } else {
-                        // Convert to correct units
-                        try {
-                            val cryptoValue = CryptoValue(selectedCrypto, amount.toBigInteger())
-                            val fiatValue = cryptoValue.toFiat(exchangeRates, prefs.selectedFiatCurrency)
-                            view?.updateCryptoAmount(cryptoValue)
-                            view?.updateFiatAmount(fiatValue)
-                        } catch (e: Exception) {
-                            // ignore
-                        }
+                        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayAdrressScanned.event,
+                            CryptoCurrency.BTC))
+                    }
+                    handleBitPayInvoice(invoiceId)
+                } else {
+                    // Convert to correct units
+                    try {
+                        val cryptoValue = CryptoValue(selectedCrypto, amount.toBigInteger())
+                        val fiatValue = cryptoValue.toFiat(exchangeRates, prefs.selectedFiatCurrency)
+                        view?.updateCryptoAmount(cryptoValue)
+                        view?.updateFiatAmount(fiatValue)
+                    } catch (e: Exception) {
+                        // ignore
                     }
                 }
-                FormatsUtil.isValidBitcoinAddress(envSettings.bitcoinNetworkParameters, scanData) -> {
-                    address = if (selectedCrypto == CryptoCurrency.BTC) {
-                        scanData
-                    } else {
-                        scanData
-                    }
+            }
+            FormatsUtil.isValidBitcoinAddress(envSettings.bitcoinNetworkParameters, scanData) -> {
+                address = if (selectedCrypto == CryptoCurrency.BTC) {
+                    scanData
+                } else {
+                    scanData
                 }
-                else -> {
-                    view?.showSnackbar(R.string.invalid_address, Snackbar.LENGTH_LONG)
-                    return
-                }
+            }
+            else -> {
+                view?.showSnackbar(R.string.invalid_address, Snackbar.LENGTH_LONG)
+                return
             }
         }
 
@@ -334,16 +320,6 @@ class SendPresenter<View : SendView>(
         }
     }
 
-    fun onMemoChange(memoText: String) =
-        delegate.onMemoChange(Memo(memoText, getMemoTypeRawValue(selectedMemoType)))
-
-    private fun getMemoTypeRawValue(selectedMemoType: Int): String? =
-        when (selectedMemoType) {
-            MEMO_TEXT_TYPE -> "text"
-            MEMO_ID_TYPE -> "id"
-            else -> null
-        }
-
     fun spendFromWatchOnlyBIP38(pw: String, scanData: String) =
         delegate.spendFromWatchOnlyBIP38(pw, scanData)
 
@@ -360,9 +336,6 @@ class SendPresenter<View : SendView>(
         if (envSettings.environment == Environment.TESTNET) {
             selectedCrypto = CryptoCurrency.BTC
         }
-        compositeDisposable += delegate.memoRequired().startWith(false).subscribe {
-            view?.updateRequiredLabelVisibility(it)
-        }
 
         compositeDisposable += pitLinkingFeatureFlag.enabled.subscribeBy {
             view?.isPitEnabled(it)
@@ -375,10 +348,4 @@ class SendPresenter<View : SendView>(
 
     fun shouldShowAdvancedFeeWarning(): Boolean =
         prefs.getValue(PersistentPrefs.KEY_WARN_ADVANCED_FEE, true)
-
-    companion object {
-        const val MEMO_TEXT_NONE = -1
-        const val MEMO_TEXT_TYPE = 0
-        const val MEMO_ID_TYPE = 1
-    }
 }

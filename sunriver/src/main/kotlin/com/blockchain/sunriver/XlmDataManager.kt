@@ -3,15 +3,14 @@ package com.blockchain.sunriver
 import com.blockchain.account.BalanceAndMin
 import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.fees.FeeType
+import com.blockchain.logging.CustomEventBuilder
+import com.blockchain.logging.EventLogger
+import com.blockchain.logging.LastTxUpdater
 import com.blockchain.sunriver.datamanager.XlmAccount
 import com.blockchain.sunriver.datamanager.XlmMetaData
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
-import com.blockchain.transactions.SendConfirmationDetails
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.SendFundsResult
-import com.blockchain.transactions.TransactionSender
 import com.blockchain.utils.toHex
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
@@ -28,16 +27,17 @@ class XlmDataManager internal constructor(
     private val memoMapper: MemoMapper,
     private val xlmFeesFetcher: XlmFeesFetcher,
     private val xlmTimeoutFetcher: XlmTransactionTimeoutFetcher,
+    private val lastTxUpdater: LastTxUpdater,
+    private val eventLogger: EventLogger,
     xlmHorizonUrlFetcher: XlmHorizonUrlFetcher,
     xlmHorizonDefUrl: String
-) : TransactionSender,
-    DefaultAccountDataManager {
+) : DefaultAccountDataManager {
 
     private val xlmProxyUrl = xlmHorizonUrlFetcher.xlmHorizonUrl(xlmHorizonDefUrl).doOnSuccess {
         horizonProxy.update(it)
     }.cache()
 
-    override fun sendFunds(
+    fun sendFunds(
         sendDetails: SendDetails
     ): Single<SendFundsResult> =
         Single.defer {
@@ -55,9 +55,22 @@ class XlmDataManager internal constructor(
                     sendDetails.fee
                 )
             }.map { it.mapToSendFundsResult(sendDetails) }
+            .flatMap {
+                if (it.success) {
+                    val event = sendDetails.memo?.let { memo ->
+                        memoToEvent(memo)
+                    } ?: noMemoEvent
+
+                    eventLogger.logEvent(event)
+
+                    lastTxUpdater.updateLastTxTime().onErrorComplete().toSingleDefault(it)
+                } else {
+                    Single.just(it)
+                }
+            }
         }
 
-    override fun dryRunSendFunds(
+    fun dryRunSendFunds(
         sendDetails: SendDetails
     ): Single<SendFundsResult> =
         Single.defer {
@@ -169,6 +182,22 @@ class XlmDataManager internal constructor(
         xlmProxyUrl.flatMap {
             this
         }
+
+    fun memoToEvent(memo: Memo): CustomEventBuilder = if (memo.isEmpty()) {
+        noMemoEvent
+    } else {
+        MemoTypeLog().putMemoType(memo.type!!)
+    }
+
+    private val noMemoEvent = object : CustomEventBuilder("Memo not Used") {}
+
+    private class MemoTypeLog : CustomEventBuilder("Memo Used") {
+
+        fun putMemoType(type: String): MemoTypeLog {
+            putCustomAttribute("Type", type)
+            return this
+        }
+    }
 }
 
 internal fun HorizonProxy.SendResult.mapToSendFundsResult(sendDetails: SendDetails): SendFundsResult =
@@ -201,3 +230,83 @@ class XlmSendException(message: String) : RuntimeException(message)
 
 private fun XlmAccount.toReference() =
     AccountReference.Xlm(label ?: "", publicKey)
+
+/**
+ * Send funds, if it fails, it throws
+ */
+fun XlmDataManager.sendFundsOrThrow(
+    sendDetails: SendDetails
+): Single<SendFundsResult> =
+    sendFunds(sendDetails)
+        .doOnSuccess {
+            if (!it.success) {
+                throw SendException(it)
+            }
+        }
+
+class SendException(
+    result: SendFundsResult
+) : RuntimeException("SendException - code: ${result.errorCode}, extra: '${result.errorExtra}'") {
+    val errorCode = result.errorCode
+    val hash = result.hash
+    val details = result.sendDetails
+}
+
+data class SendDetails(
+    val from: AccountReference,
+    val value: CryptoValue,
+    val toAddress: String,
+    val toLabel: String = "",
+    val fee: CryptoValue,
+    val memo: Memo? = null
+) {
+    constructor(
+        from: AccountReference,
+        value: CryptoValue,
+        toAddress: String,
+        fee: CryptoValue,
+        memo: Memo? = null
+    ) : this(from, value, toAddress, "", fee, memo)
+}
+
+data class Memo(
+
+    val value: String,
+
+    /**
+     * This is open type for TransactionSender to interpret however it likes.
+     * For example, the types of memo available to Xlm are different to those available in other currencies.
+     */
+    val type: String? = null
+) {
+    fun isEmpty() = value.isBlank()
+
+    companion object {
+        val None = Memo("", null)
+        const val MEMO_TYPE_TEXT = "text"
+        const val MEMO_TYPE_ID = "id"
+    }
+}
+
+data class SendFundsResult(
+    val sendDetails: SendDetails,
+    /**
+     * Currency Specific error code, refer to the implementation
+     */
+    val errorCode: Int,
+    val confirmationDetails: SendConfirmationDetails?,
+    val hash: String?,
+    val errorValue: CryptoValue? = null,
+    val errorExtra: String? = null
+) {
+    val success = errorCode == 0 && hash != null
+}
+
+data class SendConfirmationDetails(
+    val sendDetails: SendDetails,
+    val fees: CryptoValue
+) {
+    val from: AccountReference = sendDetails.from
+    val to: String = sendDetails.toAddress
+    val amount: CryptoValue = sendDetails.value
+}

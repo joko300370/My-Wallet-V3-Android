@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.transfer.send.activity
 
-import com.blockchain.transactions.SendDetails
+import com.blockchain.sunriver.SendDetails
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue

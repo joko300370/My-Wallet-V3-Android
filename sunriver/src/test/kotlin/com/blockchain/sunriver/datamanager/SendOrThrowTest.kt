@@ -1,11 +1,11 @@
-package com.blockchain
+package com.blockchain.sunriver.datamanager
 
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.SendException
+import com.blockchain.sunriver.SendFundsResult
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.sendFundsOrThrow
 import com.blockchain.testutils.ether
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.SendException
-import com.blockchain.transactions.SendFundsResult
-import com.blockchain.transactions.TransactionSender
-import com.blockchain.transactions.sendFundsOrThrow
 import com.nhaarman.mockito_kotlin.mock
 import info.blockchain.balance.AccountReference
 import io.reactivex.Single
@@ -29,7 +29,7 @@ class SendOrThrowTest {
             hash = "123",
             sendDetails = details
         )
-        val mock = mock<TransactionSender> {
+        val mock = mock<XlmDataManager> {
             on { sendFunds(details) } `it returns` Single.just(
                 fundsResult
             )
@@ -53,7 +53,7 @@ class SendOrThrowTest {
             hash = "123",
             sendDetails = details
         )
-        val mock = mock<TransactionSender> {
+        val mock = mock<XlmDataManager> {
             on { sendFunds(details) } `it returns` Single.just(
                 fundsResult
             )
@@ -78,7 +78,7 @@ class SendOrThrowTest {
             hash = null,
             sendDetails = details
         )
-        val mock = mock<TransactionSender> {
+        val mock = mock<XlmDataManager> {
             on { sendFunds(details) } `it returns` Single.just(
                 fundsResult
             )
