@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.verify_identinty_benefits_layout.view.*
+import kotlinx.android.synthetic.main.verify_identity_benefits_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
@@ -13,7 +13,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
     init {
-        inflate(context, R.layout.verify_identinty_benefits_layout, this)
+        inflate(context, R.layout.verify_identity_benefits_layout, this)
     }
 
     fun initWithBenefits(
