@@ -1653,7 +1653,7 @@
     <string name="purchase_bank_note">Once we receive your funds, we’ll start your %1$s buy order. Note, your final amount might change to due market activity. Fees may apply.</string>
     <string name="purchase_card_note_1">Your final amount might change due to market activity.</string>
     <string name="purchase_card_note_2">Your crypto will be available to be withdrawn within</string>
-    <string name="purchase_card_note_2_1">&#160;7 days.&#160;</string>
+    <string name="purchase_card_note_2_1">&#160;3 days.&#160;</string>
     <string name="complete_payment">Complete Payment</string>
     <string name="buy_crypto">Buy %1$s</string>
     <string name="buy_any_crypto">Buy Crypto</string>
