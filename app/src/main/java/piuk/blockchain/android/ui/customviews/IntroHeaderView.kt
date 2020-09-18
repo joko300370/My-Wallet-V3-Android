@@ -8,7 +8,11 @@ import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.view_intro_header.view.*
 import piuk.blockchain.android.R
 
-class IntroHeaderView(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
+class IntroHeaderView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     init {
         inflate(context, R.layout.view_intro_header, this)
@@ -16,18 +20,20 @@ class IntroHeaderView(context: Context, attrs: AttributeSet) : LinearLayout(cont
         setupView(context, attrs)
     }
 
-    private fun setupView(context: Context, attrs: AttributeSet) {
+    private fun setupView(context: Context, attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.IntroHeaderView, 0, 0)
 
-        val title = attributes.getString(R.styleable.IntroHeaderView_intro_header_title)
-        val label = attributes.getString(R.styleable.IntroHeaderView_intro_header_label)
-        val icon = attributes.getDrawable(R.styleable.IntroHeaderView_intro_header_icon)
+        attributes?.let {
+            val title = it.getString(R.styleable.IntroHeaderView_intro_header_title)
+            val label = it.getString(R.styleable.IntroHeaderView_intro_header_label)
+            val icon = it.getDrawable(R.styleable.IntroHeaderView_intro_header_icon)
 
-        intro_header_title.text = title
-        intro_header_label.text = label
-        intro_header_icon.setImageDrawable(icon)
+            intro_header_title.text = title
+            intro_header_label.text = label
+            intro_header_icon.setImageDrawable(icon)
 
-        attributes.recycle()
+            attributes.recycle()
+        }
     }
 
     fun setDetails(@StringRes title: Int, @StringRes label: Int, @DrawableRes icon: Int) {

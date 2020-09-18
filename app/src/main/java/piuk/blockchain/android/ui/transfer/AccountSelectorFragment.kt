@@ -12,6 +12,7 @@ import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -49,18 +50,28 @@ abstract class AccountSelectorFragment : Fragment() {
         )
     }
 
-    fun refreshItems() {
-        account_selector_account_list.loadItems(
-            coincore.allWallets().map { it.accounts.filter(filterFn) }
-        )
-    }
-
-    protected fun setHeaderDetails(
+    fun initialiseAccountSelectorWithHeader(
+        statusDecorator: StatusDecorator,
+        onAccountSelected: (BlockchainAccount) -> Unit,
         @StringRes title: Int,
         @StringRes label: Int,
         @DrawableRes icon: Int
     ) {
-        account_selector_header.setDetails(title, label, icon)
+        val introHeaderView = IntroHeaderView(requireContext())
+        introHeaderView.setDetails(title, label, icon)
+
+        account_selector_account_list.onAccountSelected = onAccountSelected
+        account_selector_account_list.initialise(
+            coincore.allWallets().map { it.accounts.filter(filterFn) },
+            statusDecorator,
+            introHeaderView
+        )
+    }
+
+    fun refreshItems() {
+        account_selector_account_list.loadItems(
+            coincore.allWallets().map { it.accounts.filter(filterFn) }
+        )
     }
 
     protected fun setEmptyStateDetails(
@@ -79,7 +90,6 @@ abstract class AccountSelectorFragment : Fragment() {
 
     private fun doOnEmptyList() {
         account_selector_account_list.gone()
-        account_selector_header.gone()
         account_selector_empty_view.visible()
     }
 

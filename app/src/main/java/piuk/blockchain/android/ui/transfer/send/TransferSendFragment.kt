@@ -10,11 +10,11 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
-import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 
 class TransferSendFragment :
     AccountSelectorFragment(),
@@ -33,20 +33,23 @@ class TransferSendFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setHeaderDetails(
-            R.string.transfer_send_crypto_title,
-            R.string.transfer_send_crypto_label,
-            R.drawable.ic_send_blue_circle
-        )
+//        setHeaderDetails(
+//            R.string.transfer_send_crypto_title,
+//            R.string.transfer_send_crypto_label,
+//            R.drawable.ic_send_blue_circle
+//        )
 
         setEmptyStateDetails(R.string.transfer_wallets_empty_title,
             R.string.transfer_wallets_empty_details, R.string.transfer_wallet_buy_crypto) {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))
         }
 
-        initialiseAccountSelector(
+        initialiseAccountSelectorWithHeader(
             statusDecorator = ::statusDecorator,
-            onAccountSelected = ::doOnAccountSelected
+            onAccountSelected = ::doOnAccountSelected,
+            title = R.string.transfer_send_crypto_title,
+            label = R.string.transfer_send_crypto_label,
+            icon = R.drawable.ic_send_blue_circle
         )
     }
 

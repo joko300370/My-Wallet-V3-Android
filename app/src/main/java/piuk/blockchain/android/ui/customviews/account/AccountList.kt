@@ -2,10 +2,8 @@ package piuk.blockchain.android.ui.customviews.account
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,7 +15,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.item_account_select_crypto.view.*
 import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.item_account_select_group.view.*
-import kotlinx.android.synthetic.main.view_account_list.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -26,6 +23,7 @@ import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -34,18 +32,13 @@ typealias StatusDecorator = (BlockchainAccount) -> Single<AccountDecorator>
 
 class AccountList @JvmOverloads constructor(
     ctx: Context,
-    attr: AttributeSet? = null,
+    val attr: AttributeSet? = null,
     defStyle: Int = 0
-) : FrameLayout(ctx, attr, defStyle) {
+) : RecyclerView(ctx, attr, defStyle) {
 
     private val disposables = CompositeDisposable()
     private val uiScheduler = AndroidSchedulers.mainThread()
     private val itemList = mutableListOf<BlockchainAccount>()
-
-    init {
-        LayoutInflater.from(context)
-            .inflate(R.layout.view_account_list, this, true)
-    }
 
     private val defaultDecorator: StatusDecorator = {
         Single.just(object : AccountDecorator {
@@ -56,28 +49,40 @@ class AccountList @JvmOverloads constructor(
         })
     }
 
-    fun initialise(source: Single<List<BlockchainAccount>>, status: StatusDecorator = defaultDecorator) {
-        with(list) {
-            addItemDecoration(
-                DividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL
-                )
-            )
+    fun initialise(
+        source: Single<List<BlockchainAccount>>,
+        status: StatusDecorator = defaultDecorator,
+        introView: IntroHeaderView? = null
+    ) {
 
-            layoutManager = LinearLayoutManager(
+        addItemDecoration(
+            DividerItemDecoration(
                 context,
-                LinearLayoutManager.VERTICAL,
-                false
+                DividerItemDecoration.VERTICAL
             )
+        )
 
-            val theAdapter = AccountsDelegateAdapter(
-                statusDecorator = status,
-                onAccountClicked = { onAccountSelected(it) }
+        introView?.let {
+            addItemDecoration(
+                HeaderDecoration.with(context)
+                    .parallax(0.5f)
+                    .setView(it)
+                    .build()
             )
-            adapter = theAdapter
-            theAdapter.items = itemList
         }
+
+        layoutManager = LinearLayoutManager(
+            context,
+            VERTICAL,
+            false
+        )
+
+        val theAdapter = AccountsDelegateAdapter(
+            statusDecorator = status,
+            onAccountClicked = { onAccountSelected(it) }
+        )
+        adapter = theAdapter
+        theAdapter.items = itemList
 
         loadItems(source)
     }
@@ -89,7 +94,7 @@ class AccountList @JvmOverloads constructor(
                 onSuccess = {
                     itemList.clear()
                     itemList.addAll(it)
-                    list.adapter?.notifyDataSetChanged()
+                    adapter?.notifyDataSetChanged()
 
                     if (it.isEmpty()) {
                         onEmptyList()

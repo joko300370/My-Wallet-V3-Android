@@ -30,6 +30,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
+import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
@@ -79,16 +80,15 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderRejectedKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        intro_header_parent.gone()
         kyc_benefits.initWithBenefits(
             benefits = listOf(
                 VerifyIdentityBenefit(
                     getString(R.string.invalid_id),
                     getString(R.string.invalid_id_description)
                 ), VerifyIdentityBenefit(
-                    getString(R.string.information_missmatch),
-                    getString(R.string.information_missmatch_description)
-                ),
+                getString(R.string.information_missmatch),
+                getString(R.string.information_missmatch_description)
+            ),
                 VerifyIdentityBenefit(
                     getString(R.string.blocked_by_local_laws),
                     getString(R.string.sell_intro_kyc_subtitle_3)
@@ -109,16 +109,15 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderNonKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        intro_header_parent.gone()
         kyc_benefits.initWithBenefits(
             benefits = listOf(
                 VerifyIdentityBenefit(
                     getString(R.string.sell_intro_kyc_title_1),
                     getString(R.string.sell_intro_kyc_subtitle_1)
                 ), VerifyIdentityBenefit(
-                    getString(R.string.sell_intro_kyc_title_2),
-                    getString(R.string.sell_intro_kyc_subtitle_2)
-                ),
+                getString(R.string.sell_intro_kyc_title_2),
+                getString(R.string.sell_intro_kyc_subtitle_2)
+            ),
                 VerifyIdentityBenefit(
                     getString(R.string.sell_intro_kyc_title_3),
                     getString(R.string.sell_intro_kyc_subtitle_3)
@@ -135,20 +134,27 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderKycedUserUi() {
         kyc_benefits.gone()
-        intro_header_parent.visible()
 
         compositeDisposable += supportedCryptoCurrencies()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onSuccess = { supportedCryptos ->
+                val introHeaderView = IntroHeaderView(requireContext())
+                introHeaderView.setDetails(
+                    icon = R.drawable.ic_sell_minus,
+                    label = R.string.select_wallet_to_sell,
+                    title = R.string.sell_for_cash
+                )
+
                 accounts_list.initialise(
                     coincore.allWallets().map {
                         it.accounts.filter { account ->
                             account is CustodialTradingAccount &&
-                                    supportedCryptos.contains(account.asset)
+                                supportedCryptos.contains(account.asset)
                         }
                     },
-                    status = ::statusDecorator
+                    status = ::statusDecorator,
+                    introView = introHeaderView
                 )
                 accounts_list.onAccountSelected = { account ->
                     (account as? CryptoAccount)?.let {
@@ -181,7 +187,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     }
 
     private fun supportedCryptoCurrencies(): Single<List<CryptoCurrency>> {
-        val availableFiats = custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+        val availableFiats =
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
         return custodialWalletManager.getSupportedBuySellCryptoCurrencies()
             .zipWith(availableFiats) { supportedPairs, availableFiats ->
                 supportedPairs.pairs.filter { availableFiats.contains(it.fiatCurrency) }

@@ -26,6 +26,8 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.ui.customviews.IntroHeaderView
+import piuk.blockchain.android.ui.customviews.account.HeaderDecoration
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
@@ -47,7 +49,8 @@ class BuyIntroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         compositeDisposable +=
-            custodialWalletManager.getSupportedBuySellCryptoCurrencies(currencyPrefs.selectedFiatCurrency)
+            custodialWalletManager.getSupportedBuySellCryptoCurrencies(
+                currencyPrefs.selectedFiatCurrency)
                 .flatMap { pairs ->
                     Single.zip(pairs.pairs.map {
                         coinCore[it.cryptoCurrency].exchangeRate()
@@ -62,6 +65,20 @@ class BuyIntroFragment : Fragment() {
                 .trackLoading(appUtil.activityIndicator)
                 .subscribeBy(
                     onSuccess = { (exchangeRates, buyPairs) ->
+                        val introHeaderView = IntroHeaderView(requireContext())
+                        introHeaderView.setDetails(
+                            icon = R.drawable.ic_cart,
+                            label = R.string.select_crypto_you_want,
+                            title = R.string.buy_with_cash)
+
+                        rv_cryptos.addItemDecoration(
+                                HeaderDecoration.with(requireContext())
+                                    .parallax(0.5f)
+                                    .setView(introHeaderView)
+                                    .build()
+
+                        )
+
                         rv_cryptos.layoutManager = LinearLayoutManager(activity)
                         rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(buyPairs.pairs.map { pair ->
                             BuyCryptoItem(pair.cryptoCurrency,

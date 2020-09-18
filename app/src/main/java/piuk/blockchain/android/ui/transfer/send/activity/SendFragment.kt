@@ -45,7 +45,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_send.*
-import kotlinx.android.synthetic.main.fragment_send.coordinator_layout
+import kotlinx.android.synthetic.main.fragment_send.parent_constraint_layout
 import kotlinx.android.synthetic.main.include_amount_row.*
 import kotlinx.android.synthetic.main.include_amount_row.view.*
 import kotlinx.android.synthetic.main.include_to_row_editable.*
@@ -205,7 +205,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     private fun openQrScan() {
         QrScanHandler.requestScanPermissions(
             activity = requireActivity(),
-            rootView = coordinator_layout
+            rootView = parent_constraint_layout
         ) {
             QrScanHandler.startQrScanActivity(this, appUtil)
         }
@@ -539,7 +539,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
 
     override fun showSnackbar(message: String, @Nullable extraInfo: String?, duration: Int) {
         activity.run {
-            val snackbar = Snackbar.make(coordinator_layout, message, duration)
+            val snackbar = Snackbar.make(parent_constraint_layout, message, duration)
                 .setActionTextColor(ContextCompat.getColor(this, R.color.primary_blue_accent))
 
             if (extraInfo != null) {
@@ -800,7 +800,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     }
 
     override fun showLargeTransactionWarning() {
-        coordinator_layout.postDelayed({
+        parent_constraint_layout.postDelayed({
             activity.run {
                 AlertDialog.Builder(this, R.style.AlertDialogStyle)
                     .setCancelable(false)

@@ -18,9 +18,6 @@ interface HomeScreenFragment {
 }
 
 interface HomeNavigator {
-    fun showNavigation()
-    fun hideNavigation()
-
     fun gotoDashboard()
 
     fun launchSwapOrKyc(targetCurrency: CryptoCurrency? = null, fromCryptoCurrency: CryptoCurrency? = null)

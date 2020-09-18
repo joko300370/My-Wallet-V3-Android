@@ -68,10 +68,10 @@ import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.tour.SwapTourFragment
-import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
@@ -240,7 +240,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 val fragment = currentFragment::class.simpleName ?: "unknown"
                 QrScanHandler.requestScanPermissions(
                     activity = this,
-                    rootView = coordinator_layout
+                    rootView = parent_constraint_layout
                 ) {
                     QrScanHandler.startQrScanActivity(this, appUtil)
                 }
@@ -496,7 +496,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun showTestnetWarning() {
         val snack = Snackbar.make(
-            coordinator_layout,
+            parent_constraint_layout,
             R.string.testnet_warning,
             Snackbar.LENGTH_SHORT
         )
@@ -567,16 +567,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun showHomebrewDebugMenu() {
         menu.findItem(R.id.nav_debug_swap).isVisible = true
-    }
-
-    override fun showNavigation() {
-        bottom_navigation.restoreBottomNavigation()
-        bottom_navigation.isBehaviorTranslationEnabled = true
-    }
-
-    override fun hideNavigation() {
-        bottom_navigation.hideBottomNavigation()
-        bottom_navigation.isBehaviorTranslationEnabled = false
     }
 
     private fun startTransferFragment() {
@@ -681,8 +671,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         fragmentManager.beginTransaction()
             .replace(R.id.content_frame, fragment, fragment.javaClass.simpleName)
             .commitAllowingStateLoss()
-
-        showNavigation()
     }
 
     /*** Silently switch the current tab in the tab_bar */

@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <piuk.blockchain.android.ui.customviews.IntroHeaderView
-        android:id="@+id/intro_header_parent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:intro_header_icon="@drawable/ic_cart"
-        app:intro_header_label="@string/select_crypto_you_want"
-        app:intro_header_title="@string/buy_with_cash"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_cryptos"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intro_header_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/white" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

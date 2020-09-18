@@ -21,18 +21,18 @@ class TransferReceiveFragment : AccountSelectorFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setHeaderDetails(
-            R.string.transfer_receive_crypto_title,
-            R.string.transfer_receive_crypto_label,
-            R.drawable.ic_receive_blue_circle
-        )
+//        setHeaderDetails(
+//            R.string.transfer_receive_crypto_title,
+//            R.string.transfer_receive_crypto_label,
+//            R.drawable.ic_receive_blue_circle
+//        )
 
         setEmptyStateDetails(R.string.transfer_receive_empty_title,
             R.string.transfer_receive_empty_details, R.string.transfer_receive_empty_cta) {
             refreshItems()
         }
 
-        initialiseAccountSelector(
+        initialiseAccountSelectorWithHeader(
             statusDecorator = {
                 Single.just(object : AccountDecorator {
                     override val enabled: Boolean
@@ -41,7 +41,10 @@ class TransferReceiveFragment : AccountSelectorFragment() {
                         get() = ""
                 })
             },
-            onAccountSelected = ::doOnAccountSelected
+            onAccountSelected = ::doOnAccountSelected,
+            title = R.string.transfer_receive_crypto_title,
+            label = R.string.transfer_receive_crypto_label,
+            icon = R.drawable.ic_receive_blue_circle
         )
     }
 

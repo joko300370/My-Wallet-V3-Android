@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <piuk.blockchain.android.ui.customviews.IntroHeaderView
-        android:id="@+id/intro_header_parent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:intro_header_icon="@drawable/ic_sell_minus"
-        app:intro_header_label="@string/select_wallet_to_sell"
-        app:intro_header_title="@string/sell_for_cash"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <piuk.blockchain.android.ui.customviews.VerifyIdentityBenefitsView
         android:id="@+id/kyc_benefits"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intro_header_parent" />
+        android:layout_height="match_parent"
+        tools:visibility="visible"
+        android:visibility="gone" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/accounts_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intro_header_parent" />
+        android:layout_height="match_parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
