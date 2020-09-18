@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
@@ -24,7 +25,9 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class InterestDashboardFragment : Fragment() {
@@ -70,30 +73,65 @@ class InterestDashboardFragment : Fragment() {
             adapter = listAdapter
         }
 
-        val items = mutableListOf<InterestDashboardItem>()
+        loadInterestDetails()
+    }
+
+    private fun loadInterestDetails() {
 
         disposables +=
             Singles.zip(
                 kycTierService.tiers(),
                 custodialWalletManager.getInterestEnabledAssets()
-            ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onSuccess = { singles ->
-                    val isKycGold = singles.first.isApprovedFor(KycTierLevel.GOLD)
-                    if (!isKycGold) {
-                        items.add(InterestIdentityVerificationItem)
-                    }
-
-                    singles.second.map {
-                        items.add(InterestAssetInfoItem(isKycGold, it))
-                    }
-
-                    listAdapter.items = items
-                    listAdapter.notifyDataSetChanged()
-                },
-                onError = {
-                    Timber.e("Error loading interest summary details $it")
+            ).observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    interest_error.gone()
+                    interest_dashboard_progress.visible()
                 }
-            )
+                .subscribeBy(
+                    onSuccess = { (tiers, enabledAssets) ->
+                        renderInterestDetails(tiers, enabledAssets)
+                    },
+                    onError = {
+                        renderErrorState()
+                        Timber.e("Error loading interest summary details $it")
+                    }
+                )
+    }
+
+    private fun renderInterestDetails(
+        tiers: KycTiers,
+        enabledAssets: List<CryptoCurrency>
+    ) {
+        val items = mutableListOf<InterestDashboardItem>()
+
+        val isKycGold = tiers.isApprovedFor(KycTierLevel.GOLD)
+        if (!isKycGold) {
+            items.add(InterestIdentityVerificationItem)
+        }
+
+        enabledAssets.map {
+            items.add(InterestAssetInfoItem(isKycGold, it))
+        }
+
+        listAdapter.items = items
+        listAdapter.notifyDataSetChanged()
+
+        interest_dashboard_progress.gone()
+        interest_dashboard_list.visible()
+    }
+
+    private fun renderErrorState() {
+        interest_dashboard_list.gone()
+        interest_dashboard_progress.gone()
+
+        interest_error.setDetails(
+            title = R.string.interest_error_title,
+            description = R.string.interest_error_desc,
+            contactSupportEnabled = true
+        ) {
+            loadInterestDetails()
+        }
+        interest_error.visible()
     }
 
     fun refreshBalances() {

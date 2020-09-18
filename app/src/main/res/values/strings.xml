@@ -20,6 +20,9 @@
     <string name="common_company_name">Blockchain.com</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_linked_learn_more"><annotation link="learn_more_link">Learn more.</annotation></string>
+    <string name="common_empty_title">Can\'t load your Wallets</string>
+    <string name="common_empty_details">Looks like there is an issue with your internet connection. Please check and try again</string>
+    <string name="common_empty_cta">Tap to refresh</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -1810,9 +1813,6 @@
     <string name="transfer_wallets_empty_title">No crypto to send</string>
     <string name="transfer_wallets_empty_details">Looks like your wallets are empty, we can help you buy crypto</string>
     <string name="transfer_wallets_load_error">There was an error loading your wallets, please try again later</string>
-    <string name="transfer_receive_empty_title">Can\'t load your Wallets</string>
-    <string name="transfer_receive_empty_details">Looks like there is an issue with your internet connection. Please check and try again</string>
-    <string name="transfer_receive_empty_cta">Tap to refresh</string>
 
     <string name="order_pending">Pending</string>
     <string name="order_complete">Complete</string>
@@ -1976,6 +1976,8 @@
     <string name="interest_dashboard_verify_point_three_title">Earn Interest</string>
     <string name="interest_dashboard_verify_point_three_label">Transfer to your Interest Account and get monthly Interest Payments.</string>
     <string name="interest_summary_disclaimer_label">Use the Web wallet to withdraw your funds</string>
+    <string name="interest_error_title">Can\'t load Interest Details</string>
+    <string name="interest_error_desc">An error occurred while loading Interest Account details.\nPlease check your internet connection and try again or Contact Support if the issue persists.</string>
 
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>

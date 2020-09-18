@@ -16,50 +16,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <piuk.blockchain.android.ui.customviews.EmptyStateView
         android:id="@+id/account_selector_empty_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:padding="@dimen/standard_margin"
-        android:paddingBottom="@dimen/standard_margin"
         android:visibility="gone"
-        tools:visibility="gone">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/account_selector_empty_title"
-            style="@style/Text.Semibold.Centered.20"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="@string/transfer_wallets_empty_title" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/account_selector_empty_desc"
-            style="@style/Text.Standard.Centered.14"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/tiny_margin"
-            tools:text="@string/transfer_wallets_empty_details" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_wallet_intro_image" />
-
-        <Button
-            android:id="@+id/account_selector_cta"
-            style="@style/CtaButton.Blue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:text="@string/transfer_wallet_buy_crypto"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/account_selector_account_list" />
-
-
-    </LinearLayout>
-
+        tools:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

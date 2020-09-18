@@ -80,10 +80,9 @@ abstract class AccountSelectorFragment : Fragment() {
         @StringRes ctaText: Int,
         action: () -> Unit
     ) {
-        account_selector_empty_title.text = getString(title)
-        account_selector_empty_desc.text = getString(label)
-        account_selector_cta.text = getString(ctaText)
-        account_selector_cta.setOnClickListener {
+        account_selector_empty_view.setDetails(
+            title = title, description = label, ctaText = ctaText
+        ) {
             action()
         }
     }

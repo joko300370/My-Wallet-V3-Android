@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
+import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.trackLoading
 import info.blockchain.balance.CryptoCurrency
@@ -29,7 +30,9 @@ import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.account.HeaderDecoration
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class BuyIntroFragment : Fragment() {
 
@@ -48,6 +51,10 @@ class BuyIntroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadBuyDetails()
+    }
+
+    private fun loadBuyDetails() {
         compositeDisposable +=
             custodialWalletManager.getSupportedBuySellCryptoCurrencies(
                 currencyPrefs.selectedFiatCurrency)
@@ -62,40 +69,62 @@ class BuyIntroFragment : Fragment() {
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    buy_empty.gone()
+                }
                 .trackLoading(appUtil.activityIndicator)
                 .subscribeBy(
                     onSuccess = { (exchangeRates, buyPairs) ->
-                        val introHeaderView = IntroHeaderView(requireContext())
-                        introHeaderView.setDetails(
-                            icon = R.drawable.ic_cart,
-                            label = R.string.select_crypto_you_want,
-                            title = R.string.buy_with_cash)
-
-                        rv_cryptos.addItemDecoration(
-                                HeaderDecoration.with(requireContext())
-                                    .parallax(0.5f)
-                                    .setView(introHeaderView)
-                                    .build()
-
-                        )
-
-                        rv_cryptos.layoutManager = LinearLayoutManager(activity)
-                        rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(buyPairs.pairs.map { pair ->
-                            BuyCryptoItem(pair.cryptoCurrency,
-                                exchangeRates.first { it.from == pair.cryptoCurrency }.price()
-                            ) {
-                                simpleBuyPrefs.clearState()
-                                startActivity(SimpleBuyActivity.newInstance(
-                                    activity as Context,
-                                    pair.cryptoCurrency,
-                                    launchFromNavigationBar = true,
-                                    launchKycResume = false
-                                )
-                                )
-                            }
-                        })
-                    }, onError = {}
+                        renderBuyIntro(buyPairs, exchangeRates)
+                    },
+                    onError = {
+                        renderErrorState()
+                    }
                 )
+    }
+
+    private fun renderBuyIntro(
+        buyPairs: BuySellPairs,
+        exchangeRates: List<ExchangeRate.CryptoToFiat>
+    ) {
+        rv_cryptos.visible()
+        buy_empty.gone()
+
+        val introHeaderView = IntroHeaderView(requireContext())
+        introHeaderView.setDetails(
+            icon = R.drawable.ic_cart,
+            label = R.string.select_crypto_you_want,
+            title = R.string.buy_with_cash)
+
+        rv_cryptos.addItemDecoration(
+            HeaderDecoration.with(requireContext())
+                .parallax(0.5f)
+                .setView(introHeaderView)
+                .build()
+        )
+
+        rv_cryptos.layoutManager = LinearLayoutManager(activity)
+        rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(buyPairs.pairs.map { pair ->
+            BuyCryptoItem(pair.cryptoCurrency,
+                exchangeRates.first { it.from == pair.cryptoCurrency }.price()
+            ) {
+                simpleBuyPrefs.clearState()
+                startActivity(SimpleBuyActivity.newInstance(
+                    activity as Context,
+                    pair.cryptoCurrency,
+                    launchFromNavigationBar = true,
+                    launchKycResume = false
+                ))
+            }
+        })
+    }
+
+    private fun renderErrorState() {
+        rv_cryptos.gone()
+        buy_empty.setDetails {
+            loadBuyDetails()
+        }
+        buy_empty.visible()
     }
 
     override fun onDestroyView() {

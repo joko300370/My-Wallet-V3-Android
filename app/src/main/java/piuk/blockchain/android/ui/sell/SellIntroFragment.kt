@@ -55,9 +55,16 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        loadSellDetails()
+    }
+
+    private fun loadSellDetails() {
         compositeDisposable += tierService.tiers()
             .zipWith(custodialWalletManager.isEligibleForSimpleBuy(currencyPrefs.selectedFiatCurrency))
             .subscribeOn(Schedulers.io())
+            .doOnSubscribe {
+                sell_empty.gone()
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onSuccess = { (kyc, eligible) ->
                 when {
@@ -74,7 +81,17 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                         renderNonKycedUserUi()
                     }
                 }
-            }, onError = {})
+            }, onError = {
+                renderSellError()
+            })
+    }
+
+    private fun renderSellError() {
+        accounts_list.gone()
+        sell_empty.setDetails {
+            loadSellDetails()
+        }
+        sell_empty.visible()
     }
 
     private fun renderRejectedKycedUserUi() {
@@ -134,6 +151,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderKycedUserUi() {
         kyc_benefits.gone()
+        accounts_list.visible()
 
         compositeDisposable += supportedCryptoCurrencies()
             .subscribeOn(Schedulers.io())
@@ -161,7 +179,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                         startSellFlow(it)
                     }
                 }
-            }, onError = {})
+            }, onError = {
+                renderSellError()
+            })
     }
 
     private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =

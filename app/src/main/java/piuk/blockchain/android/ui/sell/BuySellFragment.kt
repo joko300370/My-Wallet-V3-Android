@@ -62,24 +62,46 @@ class BuySellFragment :
                 buySellFlowNavigator.navigateTo()
             }
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                buy_sell_empty.gone()
+            }
             .trackLoading(appUtil.activityIndicator)
             .subscribeBy(
                 onSuccess = {
-                    when (it) {
-                        is BuySellIntroAction.NavigateToCurrencySelection ->
-                            goToCurrencySelection(it.supportedCurrencies)
-                        is BuySellIntroAction.DisplayBuySellIntro -> {
-                            if (!it.isGoldButNotEligible) renderBuySellUi(it.sellEnabled)
-                            else renderNotEligibleUi()
-                        }
-                        else -> startActivity(SimpleBuyActivity.newInstance(
-                            context = activity as Context,
-                            launchFromNavigationBar = true, launchKycResume = false
-                        ))
-                    }
+                    renderBuySellFragments(it)
                 },
-                onError = {}
+                onError = {
+                    renderErrorState()
+                }
             )
+    }
+
+    private fun renderBuySellFragments(it: BuySellIntroAction?) {
+        buy_sell_empty.gone()
+        pager.visible()
+        when (it) {
+            is BuySellIntroAction.NavigateToCurrencySelection ->
+                goToCurrencySelection(it.supportedCurrencies)
+            is BuySellIntroAction.DisplayBuySellIntro -> {
+                if (!it.isGoldButNotEligible) {
+                    renderBuySellUi(it.sellEnabled)
+                } else {
+                    renderNotEligibleUi()
+                }
+            }
+            else -> startActivity(SimpleBuyActivity.newInstance(
+                context = activity as Context,
+                launchFromNavigationBar = true, launchKycResume = false
+            ))
+        }
+    }
+
+    private fun renderErrorState() {
+        pager.gone()
+        buy_sell_empty.setDetails {
+            subscribeForNavigation()
+        }
+        buy_sell_empty.visible()
     }
 
     private fun renderNotEligibleUi() {

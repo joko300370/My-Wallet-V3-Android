@@ -16,4 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <piuk.blockchain.android.ui.customviews.EmptyStateView
+        android:id="@+id/sell_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </FrameLayout>

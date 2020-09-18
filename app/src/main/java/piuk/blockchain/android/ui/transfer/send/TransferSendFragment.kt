@@ -33,12 +33,6 @@ class TransferSendFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        setHeaderDetails(
-//            R.string.transfer_send_crypto_title,
-//            R.string.transfer_send_crypto_label,
-//            R.drawable.ic_send_blue_circle
-//        )
-
         setEmptyStateDetails(R.string.transfer_wallets_empty_title,
             R.string.transfer_wallets_empty_details, R.string.transfer_wallet_buy_crypto) {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))

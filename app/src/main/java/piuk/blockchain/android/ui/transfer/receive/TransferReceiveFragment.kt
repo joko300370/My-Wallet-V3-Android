@@ -21,14 +21,8 @@ class TransferReceiveFragment : AccountSelectorFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        setHeaderDetails(
-//            R.string.transfer_receive_crypto_title,
-//            R.string.transfer_receive_crypto_label,
-//            R.drawable.ic_receive_blue_circle
-//        )
-
-        setEmptyStateDetails(R.string.transfer_receive_empty_title,
-            R.string.transfer_receive_empty_details, R.string.transfer_receive_empty_cta) {
+        setEmptyStateDetails(R.string.common_empty_title,
+            R.string.common_empty_details, R.string.common_empty_cta) {
             refreshItems()
         }
 
