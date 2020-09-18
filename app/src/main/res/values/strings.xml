@@ -2007,7 +2007,7 @@
     <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>
     <string name="card_link_failed">Card failed to link. Please try again or contact support if you believe this occurred in error.</string>
 
-    <string name="tx_view_locked_funds">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to 7 days.&#160;</string>
+    <string name="tx_view_locked_funds">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to 3 days.&#160;</string>
     <string name="unable_to_verify_id">Unable to Verify Your ID</string>
     <string name="unable_to_verify_id_description">We were unable to verify your identity. This can happen for a few reasons.</string>
     <string name="invalid_id">Invalid ID</string>
