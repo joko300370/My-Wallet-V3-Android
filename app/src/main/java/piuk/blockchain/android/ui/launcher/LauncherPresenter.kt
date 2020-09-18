@@ -97,13 +97,16 @@ class LauncherPresenter(
             // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
             // Legacy app has not been prompted for upgrade
-            isPinValidated && !payloadDataManager.wallet!!.isUpgraded -> promptUpgrade()
+            isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
             isPinValidated || accessState.isLoggedIn -> initSettings()
             // Something odd has happened, re-request PIN
             else -> view.onRequestPin()
         }
     }
+
+    private fun upgradeNeeded(): Boolean =
+        payloadDataManager.wallet?.isUpgraded == false
 
     fun clearCredentialsAndRestart() =
         appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)

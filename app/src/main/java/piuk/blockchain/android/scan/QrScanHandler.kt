@@ -37,6 +37,7 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
@@ -150,7 +151,9 @@ object QrScanHandler {
     fun disambiguateScan(activity: Activity, targets: Collection<CryptoAddress>): Single<CryptoAddress> {
         // TEMP while refactoring - replace with bottom sheet.
         val optionsList = ArrayList(targets)
-        val selectList = optionsList.map { it.asset.name }.toTypedArray()
+        val selectList = optionsList.map {
+            activity.resources.getString(it.asset.assetName())
+        }.toTypedArray()
 
         val subject = SingleSubject.create<CryptoAddress>()
 

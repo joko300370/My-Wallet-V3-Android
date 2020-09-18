@@ -56,7 +56,7 @@ class TxProcessorFactory(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
-                    txTarget = target,
+                    txTarget = it,
                     engine = onChainEngine
                 )
             }
@@ -93,14 +93,16 @@ class TxProcessorFactory(
                 )
             }
             is FiatAccount ->
-                Single.just(TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = source,
-                    txTarget = target,
-                    engine = CustodialSellTxEngine(
-                        walletManager = walletManager
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = CustodialSellTxEngine(
+                            walletManager = walletManager
+                        )
                     )
-                ))
+                )
             else -> Single.error(TransferError("Cannot send custodial crypto to a non-crypto target"))
         }
 }

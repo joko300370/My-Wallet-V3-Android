@@ -55,6 +55,7 @@ import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
@@ -65,6 +66,8 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppRate
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.getAccount
+import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -101,10 +104,19 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     private val appUtil: AppUtil by inject()
     private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
-    private var account: CryptoAccount? = null
+    private val account: CryptoAccount by lazy {
+        try {
+            arguments?.getAccount(ARGUMENT_SEND_SOURCE) as CryptoAccount
+        } catch (e: Throwable) {
+            // It shouldn't be possible for this to be null, but we have crash logs that
+            // say otherwise, if that happens then bow out gracefully
+            activity.finish()
+            NullCryptoAccount()
+        }
+    }
 
     private val asset: CryptoCurrency
-        get() = account?.asset ?: CryptoCurrency.BTC
+        get() = account.asset
 
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val fiatCurrency: String
@@ -414,17 +426,17 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
 
     private fun handleIncomingArguments() {
         val source = account
-        require(source != null)
+
         presenter.setSourceAccount(source)
-        handlePredefinedInput(arguments.inputDeeplinked)
+        handlePredefinedInput()
     }
 
-    private fun handlePredefinedInput(isDeeplinked: Boolean): Boolean {
+    private fun handlePredefinedInput(): Boolean {
         if (arguments != null) {
             val input = arguments.urlInput
             if (input != null) {
                 handlingActivityResult = true
-                presenter.handlePredefinedInput(input, asset, isDeeplinked)
+                presenter.handlePredefinedInput(input, asset, arguments.inputDeeplinked)
                 return true
             }
         }
@@ -1094,6 +1106,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
     }
 
     companion object {
+        private const val ARGUMENT_SEND_SOURCE = "send_source"
         private const val ARGUMENT_SEND_INPUT = "send_input"
         private const val ARGUMENT_SEND_INPUT_DEEPLINKED = "send_input_deeplinked"
 
@@ -1101,7 +1114,7 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         private const val REQUEST_CODE_BCH_RECEIVING = 913
 
         fun newInstance(
-            sourceAccount: CryptoAccount?,
+            sourceAccount: CryptoAccount,
             target: TransactionTarget? = null,
             isDeeplink: Boolean = false
         ): SendFragment {
@@ -1109,8 +1122,8 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
             fragment.arguments = Bundle().apply {
                 urlInput = (target as? CryptoAddress)?.scanUri
                 inputDeeplinked = isDeeplink
+                putAccount(ARGUMENT_SEND_SOURCE, sourceAccount)
             }
-            fragment.account = sourceAccount
             return fragment
         }
 
