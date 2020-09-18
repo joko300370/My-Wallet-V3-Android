@@ -78,7 +78,7 @@ internal class BchAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address)) {
+            if (isValidAddress(address.removePrefix(BCH_URL_PREFIX))) {
                 BchAddress(address, address)
             } else {
                 null

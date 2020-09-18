@@ -89,7 +89,7 @@ internal class BtcAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address)) {
+            if (isValidAddress(address.removePrefix(BTC_URL_PREFIX))) {
                 BtcAddress(
                     address = address,
                     networkParams = networkParameters,

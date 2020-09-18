@@ -235,7 +235,7 @@ class BitcoinCashSendStrategy(
                     view?.dismissConfirmationDialog()
                     incrementBchReceiveAddress()
                     analytics.logEvent(SendAnalytics.SummarySendSuccess(CryptoCurrency.BCH))
-                    handleSuccessfulPayment(hash, CryptoCurrency.BCH)
+                    handleSuccessfulPayment(hash)
                 },
                 {
                     Timber.e(it)
@@ -320,8 +320,8 @@ class BitcoinCashSendStrategy(
         }
     }
 
-    private fun handleSuccessfulPayment(hash: String, cryptoCurrency: CryptoCurrency): String {
-        view?.showTransactionSuccess(cryptoCurrency)
+    private fun handleSuccessfulPayment(hash: String): String {
+        view?.showTransactionSuccess(CryptoCurrency.BCH)
 
         pendingTransaction.clear()
         unspentApiResponsesBch.clear()
@@ -416,7 +416,8 @@ class BitcoinCashSendStrategy(
     override fun processURIScanAddress(address: String) {
         pendingTransaction.receivingObject = null
         pendingTransaction.receivingAddress = address
-        view?.updateReceivingAddress(address)
+
+        view?.updateReceivingAddress(address.removeBchUri())
     }
 
     private fun resetAccountList() {
