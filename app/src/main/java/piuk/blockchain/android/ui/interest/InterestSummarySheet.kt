@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.interest
 
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
@@ -22,6 +21,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -63,7 +63,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         view.interest_details_list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
             adapter = listAdapter
         }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
@@ -16,6 +15,7 @@ import piuk.blockchain.android.simplebuy.CheckoutAdapter
 import piuk.blockchain.android.simplebuy.CheckoutItem
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
 import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawState
@@ -83,8 +83,7 @@ class WithdrawCheckoutFragment : MviFragment<WithdrawModel, WithdrawIntent, With
         recycler.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = checkoutAdapter
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
         status.gone()
         progress.gone()

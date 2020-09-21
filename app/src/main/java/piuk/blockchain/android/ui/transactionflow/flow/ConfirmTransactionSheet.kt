@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -10,6 +9,7 @@ import kotlinx.android.synthetic.main.dialog_tx_flow_confirm.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
@@ -59,9 +59,7 @@ class ConfirmTransactionSheet(
         view.confirm_cta_button.setOnClickListener { onCtaClick() }
 
         with(view.confirm_details_list) {
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-            )
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
             layoutManager = LinearLayoutManager(
                 requireContext(),

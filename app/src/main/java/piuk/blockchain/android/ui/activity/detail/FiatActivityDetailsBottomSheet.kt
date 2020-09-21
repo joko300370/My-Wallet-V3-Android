@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.TransactionState
@@ -15,10 +14,10 @@ import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.extensions.toFormattedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
-import java.lang.IllegalStateException
 import java.util.Date
 
 class FiatActivityDetailsBottomSheet :
@@ -53,9 +52,7 @@ class FiatActivityDetailsBottomSheet :
                     configureForState(it.state)
                 }
                 with(details_list) {
-                    addItemDecoration(
-                        DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-                    )
+                    addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
                     layoutManager = LinearLayoutManager(
                         requireContext(),

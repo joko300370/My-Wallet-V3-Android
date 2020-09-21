@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
@@ -26,6 +25,7 @@ import piuk.blockchain.android.ui.activity.CryptoAccountType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CryptoActivityDetailsBottomSheet :
@@ -70,8 +70,7 @@ class CryptoActivityDetailsBottomSheet :
     override fun initControls(view: View) {
         view.details_list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
             adapter = listAdapter
         }
     }

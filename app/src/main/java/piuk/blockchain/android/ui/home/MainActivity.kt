@@ -115,11 +115,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 when (position) {
                     ITEM_HOME -> {
                         startDashboardFragment()
-                        ViewUtils.setElevation(appbar_layout, 4f)
                     }
                     ITEM_ACTIVITY -> {
                         startActivitiesFragment()
-                        ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
@@ -128,14 +126,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     }
                     ITEM_BUY_SELL -> {
                         startBuySellFragment()
-                        ViewUtils.setElevation(appbar_layout, 0f)
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
                     }
                     ITEM_TRANSFER -> {
                         startTransferFragment()
-                        ViewUtils.setElevation(appbar_layout, 0f)
                     }
                 }
+                ViewUtils.setElevation(appbar_layout, 4f)
             }
             true
         }

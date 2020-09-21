@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CustodialBalanceClicked
@@ -31,6 +30,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -123,9 +123,7 @@ class AssetDetailSheet :
                 adapter = detailsAdapter
 
                 layoutManager = LinearLayoutManager(requireContext())
-                addItemDecoration(
-                    DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-                )
+                addItemDecoration(BlockchainListDividerDecor(requireContext()))
             }
 
             model.process(LoadAssetDisplayDetails)

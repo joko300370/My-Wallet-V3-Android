@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
@@ -27,6 +26,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.util.assetFilter
@@ -73,9 +73,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         view.asset_actions_list.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            addItemDecoration(
-                DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-            )
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
             adapter = itemAdapter
         }
 

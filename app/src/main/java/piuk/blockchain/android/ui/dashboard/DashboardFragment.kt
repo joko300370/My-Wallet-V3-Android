@@ -33,6 +33,7 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -47,10 +48,10 @@ import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
-import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
+import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -270,6 +271,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         recycler_view.apply {
             layoutManager = theLayoutManager
             adapter = theAdapter
+
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
         theAdapter.items = displayList
     }
