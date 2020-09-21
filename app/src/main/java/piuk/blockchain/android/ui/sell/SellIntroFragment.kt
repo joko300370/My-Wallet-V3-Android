@@ -40,6 +40,14 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
+    interface SellIntroHost {
+        fun onSellFinished()
+    }
+
+    private val host: SellIntroHost by lazy {
+        parentFragment as? SellIntroHost ?: throw IllegalStateException(
+            "Host fragment is not a SellIntroHost")
+    }
 
     private val tierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
@@ -221,5 +229,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     }
 
     override fun onFlowFinished() {
+        host.onSellFinished()
     }
 }
