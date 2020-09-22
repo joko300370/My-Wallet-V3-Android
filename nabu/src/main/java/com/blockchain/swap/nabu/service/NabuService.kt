@@ -2,6 +2,7 @@ package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
 import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
@@ -32,6 +33,7 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -297,6 +299,12 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader
     ).wrapErrorMessage()
 
+    internal fun fetchWithdrawLocksRules(sessionToken: NabuSessionTokenResponse, paymentMethod: PaymentMethodType) =
+        service.getWithdrawalLocksCheck(
+            sessionToken.authHeader,
+            WithdrawLocksCheckRequestBody(paymentMethod.name)
+        ).wrapErrorMessage()
+
     internal fun createWithdrawOrder(
         sessionToken: NabuSessionTokenResponse,
         amount: String,
@@ -408,9 +416,9 @@ class NabuService(retrofit: Retrofit) {
         when (it.code()) {
             200 -> it.body()?.id ?: ""
             403 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
-                        throw SimpleBuyError.WithdrawalBalanceLocked
-                    else
-                        throw SimpleBuyError.WithdrawalAlreadyPending
+                throw SimpleBuyError.WithdrawalBalanceLocked
+            else
+                throw SimpleBuyError.WithdrawalAlreadyPending
             409 -> throw SimpleBuyError.WithdrawalInsufficientFunds
             else -> throw SimpleBuyError.UnexpectedError
         }

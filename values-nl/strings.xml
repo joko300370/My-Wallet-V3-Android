@@ -1937,7 +1937,6 @@
   <string name="could_not_activate_card">We konden uw kaart niet activeren. Neem contact op met ondersteuning.</string>
   <string name="card_still_pending">We hebben twee minuten gewacht en hebben geen update ontvangen van onze kaartaanbieder. Mogelijk wordt uw kaart later nog goedgekeurd. Neem bij vragen contact op met de klantenservice.</string>
   <string name="card_link_failed">Kaart kan niet worden gekoppeld. Probeer het opnieuw of neem contact op met de ondersteuning als u denkt dat dit ten onrechte is gebeurd.</string>
-  <string name="tx_view_locked_funds">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot 7 dagen niet verzenden naar of opnemen van Blockchain.com.</string>
   <string name="unable_to_verify_id">Kan uw ID niet verifiëren</string>
   <string name="unable_to_verify_id_description">We konden uw identiteit niet verifiëren. Dit kan verschillende redenen hebben.</string>
   <string name="invalid_id">ongeldig identiteitsbewijs</string>

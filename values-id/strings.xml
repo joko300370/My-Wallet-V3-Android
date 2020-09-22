@@ -1936,7 +1936,6 @@
   <string name="could_not_activate_card">Kami tidak dapat mengaktifkan kartu Anda. Silakan hubungi dukungan.</string>
   <string name="card_still_pending">Kami menunggu dua menit dan tidak menerima pembaruan dari penyedia kartu kami. Kartu Anda mungkin masih disetujui nanti. Silakan hubungi dukungan jika Anda memiliki pertanyaan.</string>
   <string name="card_link_failed">Kartu gagal ditautkan. Harap coba lagi atau hubungi dukungan jika Anda yakin ini terjadi karena kesalahan.</string>
-  <string name="tx_view_locked_funds">Dana ini akan segera tersedia untuk dijual ke dompet Fiat %1$s , tetapi Anda tidak akan dapat mengirim atau menarik dana ini dari Blockchain.com hingga 7 hari.</string>
   <string name="unable_to_verify_id">Tidak dapat memverifikasi ID Anda</string>
   <string name="unable_to_verify_id_description">Kami tidak dapat memverifikasi identitas Anda. Ini bisa terjadi karena beberapa alasan.</string>
   <string name="invalid_id">ID tidak valid</string>

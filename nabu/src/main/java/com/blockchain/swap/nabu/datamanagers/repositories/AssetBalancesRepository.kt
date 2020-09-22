@@ -46,6 +46,20 @@ class AssetBalancesRepository(balancesProvider: BalancesProvider) {
             } ?: Maybe.empty()
         }.onErrorResumeNext(Maybe.empty())
 
+    fun getPendingBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
+        cache.getCachedSingle().flatMapMaybe {
+            it[ccy]?.let { response ->
+                Maybe.just(CryptoValue.fromMinor(ccy, response.pending.toBigInteger()))
+            } ?: Maybe.empty()
+        }.onErrorResumeNext(Maybe.empty())
+
+    fun getPendingBalanceForAsset(fiat: String): Maybe<FiatValue> =
+        cache.getCachedSingle().flatMapMaybe {
+            it[fiat]?.let { response ->
+                Maybe.just(FiatValue.fromMinor(fiat, response.pending.toLong()))
+            } ?: Maybe.empty()
+        }.onErrorResumeNext(Maybe.empty())
+
     companion object {
         private const val CACHE_LIFETIME = 10L
     }

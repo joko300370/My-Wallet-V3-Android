@@ -1936,7 +1936,6 @@
   <string name="could_not_activate_card">我们无法激活您的卡。请联系支持。</string>
   <string name="card_still_pending">我们等待了两分钟，没有收到银行卡提供商的更新。您的卡可能仍会在以后获得批准。如有任何疑问，请联系支持。</string>
   <string name="card_link_failed">卡无法链接。如果您认为这是错误的，请重试或联系支持人员。</string>
-  <string name="tx_view_locked_funds">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在7天内从Blockchain.com上发送或提取这些资金。</string>
   <string name="unable_to_verify_id">无法验证您的ID</string>
   <string name="unable_to_verify_id_description">我们无法验证您的身份。发生这种情况可能有几个原因。</string>
   <string name="invalid_id">无效的ID</string>

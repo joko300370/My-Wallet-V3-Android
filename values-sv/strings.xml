@@ -1937,7 +1937,6 @@
   <string name="could_not_activate_card">Vi kunde inte aktivera ditt kort. Kontakta support.</string>
   <string name="card_still_pending">Vi väntade två minuter och fick ingen uppdatering från vår kortleverantör. Ditt kort kan fortfarande godkännas senare. Kontakta support om du har några frågor.</string>
   <string name="card_link_failed">Det gick inte att länka kortet. Försök igen eller kontakta support om du tror att detta inträffade av misstag.</string>
-  <string name="tx_view_locked_funds">Dessa medel kommer att kunna säljas till en %1$s Fiat-plånbok omedelbart, men du kommer inte att kunna skicka eller ta ut dessa medel från Blockchain.com på upp till 7 dagar.</string>
   <string name="unable_to_verify_id">Det går inte att verifiera ditt ID</string>
   <string name="unable_to_verify_id_description">Vi kunde inte verifiera din identitet. Detta kan hända av några anledningar.</string>
   <string name="invalid_id">ogiltigt ID</string>

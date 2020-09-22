@@ -25,9 +25,11 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
+import java.math.BigInteger
 
 class TransactionProgressView(context: Context, attrs: AttributeSet) :
     ConstraintLayout(context, attrs), KoinComponent {
@@ -69,58 +71,62 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
     fun showTxSuccess(
         title: String,
         subtitle: String,
-        showLockedFundsInfo: Boolean = false,
+        withdrawalLockPeriodSeconds: BigInteger = BigInteger.ZERO,
         activityContext: Activity? = null
     ) {
         tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_state_indicator.visible()
         showEndStateUi()
         setText(title, subtitle)
-        if (showLockedFundsInfo) {
-            require(activityContext != null)
 
-            // if we are showing transaction data, the user must be KYC.GOLD
-            compositeDisposable += walletManager.getSupportedFundsFiats(
-                currencyPrefs.selectedFiatCurrency, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        showLockedFunds(it, activityContext)
-                    },
-                    onError = {
-                        Timber.e("Error getting supported fiat currencies: $it")
-                    }
-                )
-        }
+        require(activityContext != null)
+
+        // if we are showing transaction data, the user must be KYC.GOLD
+        compositeDisposable += walletManager.getSupportedFundsFiats(
+            currencyPrefs.selectedFiatCurrency, true)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { currencies ->
+                    showLockedFunds(currencies, withdrawalLockPeriodSeconds, activityContext)
+                },
+                onError = {
+                    Timber.e("Error getting supported fiat currencies: $it")
+                }
+            )
     }
 
     private fun showLockedFunds(
-        it: List<String>,
+        currencies: List<String>,
+        withdrawalLockPeriodSeconds: BigInteger,
         activityContext: Activity
     ) {
-        val listOfSupportedCurrencies = it.joinToString("/")
-        val intro =
-            context.getString(R.string.tx_view_locked_funds, listOfSupportedCurrencies)
-        val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
 
-        val learnLink = stringUtils.getStringWithMappedLinks(
-            R.string.common_linked_learn_more,
-            map,
-            activityContext)
+        withdrawalLockPeriodSeconds.secondsToDays().takeIf { it > 0 }?.let { days ->
+            val listOfSupportedCurrencies = currencies.joinToString("/")
+            val intro =
+                context.getString(R.string.tx_view_locked_funds_1, listOfSupportedCurrencies,
+                    resources.getQuantityString(R.plurals.lock_days, days.toInt(), days.toInt()))
+            val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
 
-        val sb = SpannableStringBuilder()
-        sb.append(intro)
-        .append(learnLink)
-        .setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_600)),
-            intro.length, intro.length + learnLink.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            val learnLink = stringUtils.getStringWithMappedLinks(
+                R.string.common_linked_learn_more,
+                map,
+                activityContext)
 
-        tx_locked_funds.run {
-            setText(sb, TextView.BufferType.SPANNABLE)
-            movementMethod = LinkMovementMethod.getInstance()
-            visible()
-        }
+            val sb = SpannableStringBuilder()
+            sb.append(intro)
+                .append(learnLink)
+                .setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_600)),
+                    intro.length, intro.length + learnLink.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            tx_locked_funds.run {
+                setText(sb, TextView.BufferType.SPANNABLE)
+                movementMethod = LinkMovementMethod.getInstance()
+                visible()
+            }
+        } ?: tx_locked_funds.gone()
     }
 
     fun showTxError(title: String, subtitle: String) {

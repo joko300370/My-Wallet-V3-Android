@@ -1936,7 +1936,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="could_not_activate_card">Não foi possível ativar seu cartão. Entre em contato com o suporte.</string>
   <string name="card_still_pending">Esperamos dois minutos e não recebemos nenhuma atualização do fornecedor do cartão. Seu cartão ainda pode ser aprovado mais tarde. Entre em contato com o suporte se tiver alguma dúvida.</string>
   <string name="card_link_failed">Falha ao vincular o cartão. Tente novamente ou entre em contato com o suporte se achar que isso ocorreu por engano.</string>
-  <string name="tx_view_locked_funds">Esses fundos estarão disponíveis para venda em uma carteira Fiat %1$s imediatamente, mas você não poderá enviar ou sacar esses fundos do Blockchain.com por até 7 dias.</string>
   <string name="unable_to_verify_id">Incapaz de verificar sua identidade</string>
   <string name="unable_to_verify_id_description">Não foi possível verificar sua identidade. Isso pode acontecer por alguns motivos.</string>
   <string name="invalid_id">ID Inválido</string>

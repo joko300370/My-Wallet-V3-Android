@@ -206,6 +206,18 @@ data class WithdrawRequestBody(
     private val amount: String
 )
 
+data class WithdrawLocksCheckRequestBody(
+    private val paymentMethod: String
+)
+
+data class WithdrawLocksCheckResponse(
+    val rule: WithdrawLocksRuleResponse?
+)
+
+data class WithdrawLocksRuleResponse(
+    val lockTime: String
+)
+
 data class TransactionsResponse(
     val items: List<TransactionResponse>
 )

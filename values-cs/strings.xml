@@ -1937,7 +1937,6 @@
   <string name="could_not_activate_card">Vaši kartu jsme nemohli aktivovat. Kontaktujte podporu.</string>
   <string name="card_still_pending">Čekali jsme dvě minuty a neobdrželi jsme aktualizaci od našeho poskytovatele karet. Vaše karta může být i nadále schválena později. V případě dotazů kontaktujte podporu.</string>
   <string name="card_link_failed">Propojení karty se nezdařilo. Zkuste to znovu nebo se obraťte na podporu, pokud se domníváte, že k tomu došlo omylem.</string>
-  <string name="tx_view_locked_funds">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete je moci posílat ani vybírat z Blockchain.com až 7 dní.</string>
   <string name="unable_to_verify_id">Nelze ověřit vaše ID</string>
   <string name="unable_to_verify_id_description">Nepodařilo se nám ověřit vaši identitu. To se může stát z několika důvodů.</string>
   <string name="invalid_id">Neplatné ID</string>

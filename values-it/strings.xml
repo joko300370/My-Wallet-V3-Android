@@ -1937,7 +1937,6 @@
   <string name="could_not_activate_card">Non è stato possibile attivare la tua carta. Contatta l\'assistenza.</string>
   <string name="card_still_pending">Abbiamo aspettato due minuti e non abbiamo ricevuto alcun aggiornamento dal nostro fornitore della carta. La tua carta potrebbe essere ancora approvata in seguito. In caso di domande, contatta l\'assistenza.</string>
   <string name="card_link_failed">Collegamento della carta non riuscito. Riprova o contatta l\'assistenza se ritieni che si sia verificato un errore.</string>
-  <string name="tx_view_locked_funds">Questi fondi saranno disponibili per essere venduti immediatamente in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com per un massimo di 7 giorni.</string>
   <string name="unable_to_verify_id">Impossibile verificare il tuo ID</string>
   <string name="unable_to_verify_id_description">Non siamo riusciti a verificare la tua identità. Ciò può accadere per diversi motivi.</string>
   <string name="invalid_id">ID non valido</string>

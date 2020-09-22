@@ -1632,7 +1632,10 @@
     <string name="purchase_bank_note">Once we receive your funds, we’ll start your %1$s buy order. Note, your final amount might change to due market activity. Fees may apply.</string>
     <string name="purchase_card_note_1">Your final amount might change due to market activity.</string>
     <string name="purchase_card_note_2">Your crypto will be available to be withdrawn within</string>
-    <string name="purchase_card_note_2_1">&#160;3 days.&#160;</string>
+    <plurals name="lock_days">
+        <item quantity="one">&#160;%d day.&#160;</item>
+        <item quantity="other">&#160;%d days.&#160;</item>
+    </plurals>
     <string name="complete_payment">Complete Payment</string>
     <string name="buy_crypto">Buy %1$s</string>
     <string name="buy_any_crypto">Buy Crypto</string>
@@ -2008,8 +2011,7 @@
     <string name="could_not_activate_card">We could not activate your card. Please contact support.</string>
     <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>
     <string name="card_link_failed">Card failed to link. Please try again or contact support if you believe this occurred in error.</string>
-
-    <string name="tx_view_locked_funds">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to 3 days.&#160;</string>
+    <string name="tx_view_locked_funds_1">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to %2$s&#160;</string>
     <string name="unable_to_verify_id">Unable to Verify Your ID</string>
     <string name="unable_to_verify_id_description">We were unable to verify your identity. This can happen for a few reasons.</string>
     <string name="invalid_id">Invalid ID</string>

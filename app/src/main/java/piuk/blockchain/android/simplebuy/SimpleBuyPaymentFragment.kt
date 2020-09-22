@@ -19,6 +19,7 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import java.math.BigInteger
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen {
@@ -56,7 +57,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 newState.isLoading,
                 newState.paymentSucceeded,
                 newState.errorState != null,
-                newState.paymentPending
+                newState.paymentPending,
+                newState.withdrawalLockPeriod
             )
         } ?: renderTitleAndSubtitle(
             null,
@@ -86,14 +88,17 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         loading: Boolean,
         paymentSucceeded: Boolean,
         hasError: Boolean,
-        pending: Boolean
+        pending: Boolean,
+        lockedFundsTime: BigInteger = BigInteger.ZERO
     ) {
         when {
             paymentSucceeded && value != null -> {
                 transaction_progress_view.showTxSuccess(
                     getString(R.string.card_purchased, value.formatOrSymbolForZero()),
                     getString(R.string.card_purchased_available_now,
-                        getString(value.currency.assetName())), true, requireActivity())
+                        getString(value.currency.assetName())),
+                    lockedFundsTime,
+                    requireActivity())
             }
             loading && value != null -> {
                 transaction_progress_view.showTxInProgress(

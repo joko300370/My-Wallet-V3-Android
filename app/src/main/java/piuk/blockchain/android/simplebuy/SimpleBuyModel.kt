@@ -127,6 +127,17 @@ class SimpleBuyModel(
                     onSuccess = { process(it) },
                     onError = { }
                 )
+            is SimpleBuyIntent.FetchWithdrawLockTime -> {
+                require(previousState.selectedPaymentMethod != null)
+                interactor.fetchWithdrawLockTime(
+                    previousState.selectedPaymentMethod.paymentMethodType
+                )
+                    .subscribeBy(
+                        onSuccess = { process(it) },
+                        onError = { }
+                    )
+            }
+
             is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.fetchPaymentMethods(
                 intent.fiatCurrency,
                 intent.selectedPaymentMethodId

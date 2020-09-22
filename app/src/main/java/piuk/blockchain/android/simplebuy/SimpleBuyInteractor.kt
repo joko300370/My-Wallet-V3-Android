@@ -1,11 +1,9 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.BillingAddress
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
 import com.blockchain.swap.nabu.datamanagers.OrderState
@@ -13,6 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -33,7 +32,7 @@ import java.util.concurrent.TimeUnit
 class SimpleBuyInteractor(
     private val tierService: TierService,
     private val custodialWalletManager: CustodialWalletManager,
-    private val nabu: NabuToken,
+    private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
     private val coincore: Coincore
 ) {
@@ -42,9 +41,6 @@ class SimpleBuyInteractor(
             Single<BuySellPairs> =
         custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
             .trackLoading(appUtil.activityIndicator)
-
-    fun fetchTransactions(currency: String): Single<List<FiatTransaction>> =
-        custodialWalletManager.getTransactions(currency)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         custodialWalletManager.getSupportedFiatCurrencies()
@@ -92,6 +88,14 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.BankAccountUpdated(it)
         }
 
+    fun fetchWithdrawLockTime(paymentMethod: PaymentMethodType): Single<SimpleBuyIntent.WithdrawLocksTimeUpdated> =
+        withdrawLocksRepository.getWithdrawLockTypeForPaymentMethod(paymentMethod)
+            .map {
+                SimpleBuyIntent.WithdrawLocksTimeUpdated(it)
+            }.onErrorReturn {
+                SimpleBuyIntent.WithdrawLocksTimeUpdated()
+            }
+
     fun fetchQuote(cryptoCurrency: CryptoCurrency?, amount: FiatValue?): Single<SimpleBuyIntent.QuoteUpdated> =
         custodialWalletManager.getQuote(
             cryptoCurrency = cryptoCurrency ?: throw IllegalStateException("Missing Cryptocurrency "),
@@ -136,7 +140,8 @@ class SimpleBuyInteractor(
 
         return tierService.tiers().flatMap {
             when {
-                it.isApprovedFor(KycTierLevel.GOLD) -> custodialWalletManager.isEligibleForSimpleBuy(fiatCurrency)
+                it.isApprovedFor(KycTierLevel.GOLD) -> custodialWalletManager.isEligibleForSimpleBuy(
+                    fiatCurrency)
                     .map { eligible ->
                         if (eligible) {
                             SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)

@@ -1937,7 +1937,6 @@
   <string name="could_not_activate_card">Nie mogliśmy aktywować Twojej karty. Skontaktuj się z pomocą techniczną.</string>
   <string name="card_still_pending">Czekaliśmy dwie minuty i nie otrzymaliśmy aktualizacji od naszego dostawcy karty. Twoja karta może zostać zatwierdzona później. Jeśli masz jakieś pytania, skontaktuj się z pomocą techniczną.</string>
   <string name="card_link_failed">Karta nie powiodła się. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.</string>
-  <string name="tx_view_locked_funds">Środki te będą dostępne do natychmiastowej sprzedaży do portfela Fiata %1$s , ale nie będzie można ich wysyłać ani wypłacać z Blockchain.com przez okres do 7 dni.</string>
   <string name="unable_to_verify_id">Nie można zweryfikować Twojej tożsamości</string>
   <string name="unable_to_verify_id_description">Nie mogliśmy zweryfikować Twojej tożsamości. Może się tak zdarzyć z kilku powodów.</string>
   <string name="invalid_id">nieważny numer identyfikacyjny</string>

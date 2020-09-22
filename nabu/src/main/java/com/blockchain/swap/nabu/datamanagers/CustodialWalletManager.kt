@@ -20,6 +20,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
+import java.math.BigInteger
 import java.util.Date
 
 enum class OrderState {
@@ -64,6 +65,8 @@ interface CustodialWalletManager {
     ): Single<Quote>
 
     fun fetchWithdrawFee(currency: String): Single<FiatValue>
+
+    fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger>
 
     fun createOrder(
         custodialWalletOrder: CustodialWalletOrder,

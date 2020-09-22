@@ -30,15 +30,16 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
-class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
-    SimpleBuyScreen,
+class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
 
     override val model: SimpleBuyModel by scopedInject()
@@ -75,6 +76,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         )
         model.process(SimpleBuyIntent.FetchQuote)
         model.process(SimpleBuyIntent.FetchBankAccount)
+        model.process(SimpleBuyIntent.FetchWithdrawLockTime)
     }
 
     override fun backPressedHandled(): Boolean =
@@ -108,7 +110,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             else -> ""
         }
 
-        showLockedFunds()
+        showLockedFunds(newState.withdrawalLockPeriod.secondsToDays())
 
         if (newState.errorState != null) {
             showErrorState(newState.errorState)
@@ -144,9 +146,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
     }
 
-    private fun showLockedFunds() {
+    private fun showLockedFunds(days: Long) {
         val intro = getString(R.string.purchase_card_note_2)
-        val bold = getString(R.string.purchase_card_note_2_1)
+        val bold =
+            resources.getQuantityString(R.plurals.lock_days, days.toInt(), days.toInt())
         val map = mapOf(
             "learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED)
         )
@@ -166,9 +169,12 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             intro.length + bold.length, intro.length + bold.length + boldAndLinked.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        purchase_note_1.run {
-            movementMethod = LinkMovementMethod.getInstance()
-            setText(sb, TextView.BufferType.SPANNABLE)
+        purchase_note_1.apply {
+            if (days > 0) {
+                visible()
+                movementMethod = LinkMovementMethod.getInstance()
+                setText(sb, TextView.BufferType.SPANNABLE)
+            } else gone()
         }
     }
 
@@ -211,11 +217,11 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             if (state.selectedPaymentMethod?.isBank() == true) {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
                     "${state.quote?.rate?.toStringWithSymbol()} / " +
-                        "${state.selectedCryptoCurrency?.displayTicker}")
+                            "${state.selectedCryptoCurrency?.displayTicker}")
             } else {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
                     "${state.orderExchangePrice?.toStringWithSymbol()} / " +
-                        "${state.selectedCryptoCurrency?.displayTicker}")
+                            "${state.selectedCryptoCurrency?.displayTicker}")
             },
 
             CheckoutItem(getString(R.string.fees),

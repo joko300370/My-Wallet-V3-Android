@@ -1936,7 +1936,6 @@
   <string name="could_not_activate_card">Chúng tôi không thể kích hoạt thẻ của bạn. Vui lòng liên hệ với bộ phận hỗ trợ.</string>
   <string name="card_still_pending">Chúng tôi đã đợi hai phút và không nhận được thông tin cập nhật từ nhà cung cấp thẻ của chúng tôi. Thẻ của bạn vẫn có thể được phê duyệt sau đó. Vui lòng liên hệ với bộ phận hỗ trợ nếu bạn có bất kỳ câu hỏi nào.</string>
   <string name="card_link_failed">Không liên kết được thẻ. Vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ nếu bạn cho rằng điều này xảy ra do lỗi.</string>
-  <string name="tx_view_locked_funds">Các khoản tiền này sẽ có sẵn để bán vào ví Fiat %1$s ngay lập tức, nhưng bạn sẽ không thể gửi hoặc rút các khoản tiền này từ Blockchain.com trong tối đa 7 ngày.</string>
   <string name="unable_to_verify_id">Không thể xác minh ID của bạn</string>
   <string name="unable_to_verify_id_description">Chúng tôi không thể xác minh danh tính của bạn. Điều này có thể xảy ra vì một vài lý do.</string>
   <string name="invalid_id">ID không hợp lệ</string>

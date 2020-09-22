@@ -28,6 +28,7 @@ import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProviderImpl
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledRepository
@@ -184,6 +185,9 @@ val nabuModule = module {
 
         scoped {
             InterestEnabledRepository(interestEnabledProvider = get())
+        }
+        scoped {
+            WithdrawLocksRepository(custodialWalletManager = get())
         }
     }
 

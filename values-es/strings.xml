@@ -1933,7 +1933,6 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="could_not_activate_card">No pudimos activar su tarjeta. Póngase en contacto con el servicio de asistencia.</string>
   <string name="card_still_pending">Esperamos dos minutos y no recibimos una actualización de nuestro proveedor de tarjetas. Su tarjeta aún puede ser aprobada más tarde. Póngase en contacto con el servicio de asistencia si tiene alguna pregunta.</string>
   <string name="card_link_failed">La tarjeta no se pudo vincular. Vuelva a intentarlo o póngase en contacto con el servicio de asistencia si cree que se produjo un error.</string>
-  <string name="tx_view_locked_funds">Estos fondos estarán disponibles para vender en una billetera Fiat %1$s inmediato, pero no podrá enviar ni retirar estos fondos de Blockchain.com hasta por 7 días.</string>
   <string name="unable_to_verify_id">No se puede verificar su identificación</string>
   <string name="unable_to_verify_id_description">No pudimos verificar su identidad. Esto puede suceder por varias razones.</string>
   <string name="invalid_id">identificación invalida</string>

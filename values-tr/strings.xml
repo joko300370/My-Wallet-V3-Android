@@ -1934,7 +1934,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="could_not_activate_card">Kartınızı etkinleştiremedik. Lütfen desteğe başvurun.</string>
   <string name="card_still_pending">İki dakika bekledik ve kart sağlayıcımızdan bir güncelleme almadık. Kartınız daha sonra hala onaylanabilir. Herhangi bir sorunuz varsa lütfen destek ile iletişime geçin.</string>
   <string name="card_link_failed">Kart bağlanamadı. Lütfen tekrar deneyin veya bunun bir hata olduğunu düşünüyorsanız destek ile iletişime geçin.</string>
-  <string name="tx_view_locked_funds">Bu fonlar hemen %1$s Fiat cüzdanına satılabilecek, ancak bu fonları Blockchain.com\'dan 7 güne kadar gönderemez veya çekemezsiniz.</string>
   <string name="unable_to_verify_id">Kimliğiniz Doğrulanamıyor</string>
   <string name="unable_to_verify_id_description">Kimliğinizi doğrulayamadık. Bu birkaç nedenden dolayı olabilir.</string>
   <string name="invalid_id">geçersiz kimlik</string>

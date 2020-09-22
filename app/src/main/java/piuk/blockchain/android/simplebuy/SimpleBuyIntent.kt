@@ -13,6 +13,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import java.math.BigInteger
 
 sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
@@ -32,11 +33,6 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class AmountUpdated(private val amount: FiatValue) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(amount = amount)
-    }
-
-    class SyncLatestState(private val state: SimpleBuyState) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            state
     }
 
     class OrderPriceUpdated(private val price: FiatValue?) : SimpleBuyIntent() {
@@ -185,6 +181,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         }
     }
 
+    data class WithdrawLocksTimeUpdated(private val time: BigInteger = BigInteger.ZERO) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
+            return oldState.copy(withdrawalLockPeriod = time)
+        }
+    }
+
     data class QuoteUpdated(private val quote: Quote) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(quote = quote)
@@ -236,6 +238,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     }
 
     object FetchBankAccount : SimpleBuyIntent()
+
+    object FetchWithdrawLockTime : SimpleBuyIntent()
 
     object NavigationHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =

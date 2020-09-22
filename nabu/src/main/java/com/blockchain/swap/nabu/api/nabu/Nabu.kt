@@ -46,6 +46,8 @@ import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckResponse
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -263,6 +265,12 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("pendingOnly") pendingOnly: Boolean
     ): Single<BuyOrderListResponse>
+
+    @POST(NABU_WITHDRAW_LOCKS_CHECK)
+    fun getWithdrawalLocksCheck(
+        @Header("authorization") authorization: String,
+        @Body withdrawLocksCheckRequestBody: WithdrawLocksCheckRequestBody
+    ): Single<WithdrawLocksCheckResponse>
 
     @DELETE("$NABU_SIMPLE_BUY_ORDERS/{orderId}")
     fun deleteBuyOrder(

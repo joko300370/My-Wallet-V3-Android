@@ -1936,7 +1936,6 @@
   <string name="could_not_activate_card">Nu v-am putut activa cardul. Vă rugăm să contactați asistența.</string>
   <string name="card_still_pending">Am așteptat două minute și nu am primit nicio actualizare de la furnizorul nostru de carduri. Cardul dvs. poate fi aprobat în continuare ulterior. Vă rugăm să contactați asistența dacă aveți întrebări.</string>
   <string name="card_link_failed">Cardul nu a putut fi conectat. Încercați din nou sau contactați asistența dacă credeți că acest lucru a apărut din greșeală.</string>
-  <string name="tx_view_locked_funds">Aceste fonduri vor fi disponibile pentru a fi vândute imediat într-un portofel Fiat %1$s , dar nu veți putea trimite sau retrage aceste fonduri de pe Blockchain.com timp de până la 7 zile.</string>
   <string name="unable_to_verify_id">Imposibil de verificat ID-ul dvs.</string>
   <string name="unable_to_verify_id_description">Nu am putut verifica identitatea dvs. Acest lucru se poate întâmpla din câteva motive.</string>
   <string name="invalid_id">ID invalid</string>

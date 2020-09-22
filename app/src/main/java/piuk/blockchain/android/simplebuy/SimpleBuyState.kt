@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.math.BigInteger
 import java.util.Date
 import java.util.regex.Pattern
 
@@ -48,6 +49,7 @@ data class SimpleBuyState(
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
     val paymentSucceeded: Boolean = false,
+    val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,

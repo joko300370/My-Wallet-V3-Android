@@ -609,7 +609,7 @@ val applicationModule = module {
 
         factory {
             SimpleBuyInteractor(
-                nabu = get(),
+                withdrawLocksRepository = get(),
                 tierService = get(),
                 custodialWalletManager = get(),
                 appUtil = get(),

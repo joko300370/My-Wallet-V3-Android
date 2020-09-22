@@ -62,6 +62,7 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.flatMapIterable
 import io.reactivex.rxkotlin.zipWith
 import okhttp3.internal.toLongOrDefault
+import java.math.BigInteger
 import java.util.Calendar
 import java.util.Date
 import java.util.UnknownFormatConversionException
@@ -135,6 +136,15 @@ class LiveCustodialWalletManager(
             response.fees.firstOrNull { it.symbol == currency }?.let {
                 FiatValue.fromMajor(it.symbol, it.value)
             } ?: FiatValue.zero(currency)
+        }
+
+    override fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger> =
+        authenticator.authenticate {
+            nabuService.fetchWithdrawLocksRules(it, paymentMethodType)
+        }.flatMap { response ->
+            response.rule?.let {
+                Single.just(it.lockTime.toBigInteger())
+            } ?: Single.just(BigInteger.ZERO)
         }
 
     override fun getSupportedBuySellCryptoCurrencies(

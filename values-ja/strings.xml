@@ -1936,7 +1936,6 @@
   <string name="could_not_activate_card">カードを有効化できませんでした。サポートにお問い合わせください。</string>
   <string name="card_still_pending">私たちは2分間待機しましたが、カードプロバイダーから更新を受け取りませんでした。カードは後で承認される場合があります。ご不明な点がございましたら、サポートまでお問い合わせください。</string>
   <string name="card_link_failed">カードをリンクできませんでした。再試行するか、エラーが発生したと思われる場合はサポートにお問い合わせください。</string>
-  <string name="tx_view_locked_funds">これらの資金は、すぐに%1$sフィアットウォレットに売り込むことができますが、最大7日間、Blockchain.comからこれらの資金を送金または引き出しすることはできません。</string>
   <string name="unable_to_verify_id">IDを確認できません</string>
   <string name="unable_to_verify_id_description">本人確認ができませんでした。これにはいくつかの理由が考えられます。</string>
   <string name="invalid_id">無効なID</string>
