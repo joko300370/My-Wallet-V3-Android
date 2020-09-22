@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">Konfirmasi Transfer</string>
   <string name="send_confirmation_interest_tos_pp">Saya telah membaca dan menyetujui <annotation link="interest_tos"> Persyaratan Layanan </annotation> &amp; <annotation link="interest_pp"> Kebijakan Privasi </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Dengan menerima ini, Anda setuju untuk mentransfer</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dari Dompet Bitcoin Anda ke Akun Minat Anda. Periode penahanan awal selama 7 hari akan diterapkan ke dana Anda.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dari Dompet %2$s Anda ke Akun Minat Anda. Periode penahanan awal selama 7 hari akan diterapkan ke dana Anda.</string>
   <string name="send_confirmation_progress_title">Mentransfer %1$s</string>
   <string name="send_confirmation_progress_message">Kami sedang mentransfer %1$s sekarang.</string>
   <string name="send_confirmation_success_title">%1$s Ditransfer</string>

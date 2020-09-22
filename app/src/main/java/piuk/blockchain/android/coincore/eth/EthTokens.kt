@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -35,7 +36,8 @@ internal class EthAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService
+    tiersService: TierService,
+    environmentConfig: EnvironmentConfig
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -45,7 +47,8 @@ internal class EthAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService
+    tiersService,
+    environmentConfig
 ) {
 
     override val asset: CryptoCurrency

@@ -1822,7 +1822,7 @@
   <string name="send_confirmation_deposit_cta_button">Potvrďte převod</string>
   <string name="send_confirmation_interest_tos_pp">Přečetl jsem si a souhlasím s <annotation link="interest_tos"> Smluvní podmínky </annotation> &amp; <annotation link="interest_pp"> Zásady ochrany osobních údajů </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Přijetím tohoto souhlasíte s převodem</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) z vaší bitcoinové peněženky na váš zájmový účet. Na vaše prostředky se použije počáteční doba zadržení 7 dní.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) z vaší %2$s peněženky na váš zájmový účet. Na vaše prostředky se použije počáteční doba zadržení 7 dní.</string>
   <string name="send_confirmation_progress_title">Převádí se %1$s</string>
   <string name="send_confirmation_progress_message">Nyní převádíme vaše %1$s .</string>
   <string name="send_confirmation_success_title">Převedeno %1$s</string>

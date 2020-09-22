@@ -49,7 +49,8 @@ internal class BchAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService
+    tiersService,
+    environmentSettings
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH

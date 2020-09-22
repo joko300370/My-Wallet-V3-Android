@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">전송 확인</string>
   <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos"> 서비스 약관 </annotation> 및 <annotation link="interest_pp"> 개인 정보 보호 정책 </annotation> 을 읽었으며 이에 동의합니다.</string>
   <string name="send_confirmation_interest_holding_period_1">이를 수락하면 이전에 동의하는 것입니다.</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) 비트 코인 지갑에서 관심 계정으로. 7 일의 초기 보류 기간이 귀하의 자금에 적용됩니다.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) %2$s 지갑에서 관심 계정으로. 7 일의 초기 보류 기간이 귀하의 자금에 적용됩니다.</string>
   <string name="send_confirmation_progress_title">%1$s 전송</string>
   <string name="send_confirmation_progress_message">지금 귀하의 %1$s 전송합니다.</string>
   <string name="send_confirmation_success_title">%1$s 전송 됨</string>

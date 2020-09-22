@@ -1820,7 +1820,7 @@ Veuillez réessayer plus tard.</string>
   <string name="send_confirmation_deposit_cta_button">Confirmer le transfert</string>
   <string name="send_confirmation_interest_tos_pp">J\'ai lu et j\'accepte les <annotation link="interest_tos">Conditions d\'utilisation</annotation> et la <annotation link="interest_pp">politique de confidentialité</annotation>.</string>
   <string name="send_confirmation_interest_holding_period_1">En acceptant cela, vous acceptez de transférer </string>
-  <string name="send_confirmation_interest_holding_period_2">  (%1$s) de votre portefeuille Bitcoin vers votre compte d\'intérêts. Une période de retenue initiale de 7 jours sera appliquée à vos fonds.</string>
+  <string name="send_confirmation_interest_holding_period_2">  (%1$s) de votre portefeuille %2$s vers votre compte d\'intérêts. Une période de retenue initiale de 7 jours sera appliquée à vos fonds.</string>
   <string name="send_confirmation_progress_title">Transfert de %1$s</string>
   <string name="send_confirmation_progress_message">Votre %1$s est en cours de transfert</string>
   <string name="send_confirmation_success_title">%1$s transféré</string>

@@ -1818,7 +1818,7 @@
   <string name="send_confirmation_deposit_cta_button">Bevestig de overdracht</string>
   <string name="send_confirmation_interest_tos_pp">Ik heb de <annotation link="interest_tos"> Servicevoorwaarden </annotation> en <annotation link="interest_pp"> Privacybeleid </annotation> gelezen en ga hiermee akkoord.</string>
   <string name="send_confirmation_interest_holding_period_1">Door dit te accepteren, gaat u akkoord met overdracht</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) van uw Bitcoin Wallet naar uw Interest Account. Er wordt een initiële wachtperiode van 7 dagen op uw geld toegepast.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) van uw %2$s Wallet naar uw Interest Account. Er wordt een initiële wachtperiode van 7 dagen op uw geld toegepast.</string>
   <string name="send_confirmation_progress_title">%1$s overzetten</string>
   <string name="send_confirmation_progress_message">We maken nu uw %1$s .</string>
   <string name="send_confirmation_success_title">%1$s overgedragen</string>

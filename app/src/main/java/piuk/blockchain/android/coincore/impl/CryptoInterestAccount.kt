@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.extensions.exhaustive
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
@@ -11,11 +12,16 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.bch.BchAddress
+import piuk.blockchain.android.coincore.btc.BtcAddress
+import piuk.blockchain.android.coincore.erc20.Erc20Address
+import piuk.blockchain.android.coincore.eth.EthAddress
+import piuk.blockchain.android.coincore.xlm.XlmAddress
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -24,7 +30,8 @@ internal class CryptoInterestAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    private val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase(), InterestAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
@@ -32,11 +39,45 @@ internal class CryptoInterestAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = custodialWalletManager.getInterestAccountAddress(asset).map {
-            InterestAddress(
-                address = it,
-                label = label,
-                asset = asset
-            )
+            when (asset) {
+                CryptoCurrency.PAX,
+                CryptoCurrency.USDT -> {
+                    Erc20Address(
+                        asset = asset,
+                        address = it,
+                        label = label
+                    )
+                }
+                CryptoCurrency.ETHER -> {
+                    EthAddress(
+                        address = it,
+                        label = label
+                    )
+                }
+                CryptoCurrency.BTC -> {
+                    BtcAddress(
+                        address = it,
+                        label = label,
+                        networkParams = environmentConfig.bitcoinNetworkParameters
+                    )
+                }
+                CryptoCurrency.BCH -> {
+                    BchAddress(
+                        address_ = it,
+                        label = label,
+                        scanUri = null
+                    )
+                }
+                CryptoCurrency.XLM -> {
+                    XlmAddress(
+                        address = it,
+                        label = label
+                    )
+                }
+                CryptoCurrency.ALGO,
+                CryptoCurrency.STX -> throw IllegalStateException(
+                    "Interest receive address not supported for asset: $asset")
+            }.exhaustive
         }
 
     override fun requireSecondPassword(): Single<Boolean> =
@@ -124,12 +165,4 @@ internal class CryptoInterestAccount(
             InterestState.MANUAL_REVIEW
         )
     }
-}
-
-internal class InterestAddress(
-    override val address: String,
-    override val label: String = address,
-    override val asset: CryptoCurrency
-) : CryptoAddress {
-    override val scanUri: String? = null
 }

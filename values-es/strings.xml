@@ -1816,7 +1816,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="send_confirmation_deposit_cta_button">Confirmar transferencia</string>
   <string name="send_confirmation_interest_tos_pp">He leído y acepto las <annotation link="interest_tos">Condiciones de servicio</annotation> y <annotation link="interest_pp"> la Política de privacidad</annotation>.</string>
   <string name="send_confirmation_interest_holding_period_1">Al aceptar esto, usted acepta transferir </string>
-  <string name="send_confirmation_interest_holding_period_2">(%1$s) desde su Wallet Bitcoin a su Cuenta de Intereses. Se aplicará un período de retención inicial de 7 días a sus fondos.</string>
+  <string name="send_confirmation_interest_holding_period_2">(%1$s) desde su monedero de %2$s a su Cuenta de Intereses. Se aplicará un período de retención inicial de 7 días a sus fondos.</string>
   <string name="send_confirmation_progress_title">Transfiriendo %1$s</string>
   <string name="send_confirmation_progress_message">Estamos transfiriendo su %1$s ahora mismo.</string>
   <string name="send_confirmation_success_title">%1$s Transferido</string>

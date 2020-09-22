@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">転送を確認</string>
   <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos">利用規約</annotation>および<annotation link="interest_pp">プライバシーポリシー</annotation>を読んだうえで内容に同意します。</string>
   <string name="send_confirmation_interest_holding_period_1">これを受け入れると、移管に同意したことになります</string>
-  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）ビットコインウォレットからインタレストアカウントへ。最初の7日間の保留期間が資金に適用されます。</string>
+  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）%2$s ウォレットからインタレストアカウントへ。最初の7日間の保留期間が資金に適用されます。</string>
   <string name="send_confirmation_progress_title">%1$s転送しています</string>
   <string name="send_confirmation_progress_message">現在%1$s転送しています。</string>
   <string name="send_confirmation_success_title">%1$s転送しました</string>

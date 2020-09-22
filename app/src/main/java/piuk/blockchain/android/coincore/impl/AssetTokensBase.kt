@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -39,7 +40,8 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    private val tiersService: TierService
+    private val tiersService: TierService,
+    private val environmentConfig: EnvironmentConfig
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -85,7 +87,8 @@ internal abstract class CryptoAssetBase(
                 asset,
                 labels.getDefaultInterestWalletLabel(asset),
                 custodialManager,
-                exchangeRates
+                exchangeRates,
+                environmentConfig
             )
         ).flatMap { account ->
             account.isInterestEnabled().map {

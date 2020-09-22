@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">Sahkan Pemindahan</string>
   <string name="send_confirmation_interest_tos_pp">Saya telah membaca dan bersetuju dengan <annotation link="interest_tos"> Syarat Perkhidmatan </annotation> &amp; <annotation link="interest_pp"> Dasar Privasi </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Dengan menerima ini, anda bersetuju untuk memindahkan</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dari Bitcoin Wallet anda ke Akaun Minat anda. Tempoh penangguhan awal 7 hari akan digunakan untuk dana anda.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dari %2$s Wallet anda ke Akaun Minat anda. Tempoh penangguhan awal 7 hari akan digunakan untuk dana anda.</string>
   <string name="send_confirmation_progress_title">Memindahkan %1$s</string>
   <string name="send_confirmation_progress_message">Kami memindahkan %1$s sekarang.</string>
   <string name="send_confirmation_success_title">%1$s Dipindahkan</string>

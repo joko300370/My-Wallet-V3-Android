@@ -1820,7 +1820,7 @@
   <string name="send_confirmation_deposit_cta_button">Conferma trasferimento</string>
   <string name="send_confirmation_interest_tos_pp">Ho letto e accetto i <annotation link="interest_tos"> Termini di servizio </annotation> e <annotation link="interest_pp"> Norme sulla privacy </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Accettando questo, acconsenti al trasferimento</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dal tuo portafoglio Bitcoin al tuo conto interessi. Ai tuoi fondi verrà applicato un periodo di sospensione iniziale di 7 giorni.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) dal tuo portafoglio %2$s al tuo conto interessi. Ai tuoi fondi verrà applicato un periodo di sospensione iniziale di 7 giorni.</string>
   <string name="send_confirmation_progress_title">Trasferimento di %1$s</string>
   <string name="send_confirmation_progress_message">Stiamo trasferendo il tuo %1$s ora.</string>
   <string name="send_confirmation_success_title">%1$s trasferito</string>

@@ -10,6 +10,8 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -41,7 +43,9 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = it,
-                    engine = onChainEngine
+                    engine = InterestDepositTxEngine(
+                        onChainTxEngine = onChainEngine as OnChainTxEngineBase
+                    )
                 )
             }
             is CryptoAddress -> Single.just(

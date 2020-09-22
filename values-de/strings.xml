@@ -1818,7 +1818,7 @@
   <string name="send_confirmation_deposit_cta_button">Übertragung bestätigen</string>
   <string name="send_confirmation_interest_tos_pp">Ich habe die <annotation link="interest_tos"> Nutzungsbedingungen </annotation> und <annotation link="interest_pp"> Datenschutzrichtlinie </annotation> gelesen und bin damit einverstanden.</string>
   <string name="send_confirmation_interest_holding_period_1">Indem Sie dies akzeptieren, stimmen Sie der Übertragung zu</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) von Ihrer Bitcoin-Brieftasche auf Ihr Zinskonto. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) von Ihrer %2$s-Brieftasche auf Ihr Zinskonto. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
   <string name="send_confirmation_progress_title">%1$s</string>
   <string name="send_confirmation_progress_message">Wir übertragen jetzt Ihre %1$s .</string>
   <string name="send_confirmation_success_title">%1$s übertragen</string>

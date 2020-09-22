@@ -75,7 +75,6 @@ private class AgreementItemViewHolder(val parent: View) :
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
             model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
-            view.isEnabled = false
         }
     }
 }

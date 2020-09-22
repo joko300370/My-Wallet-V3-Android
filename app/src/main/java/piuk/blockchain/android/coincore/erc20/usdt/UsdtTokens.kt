@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -37,7 +38,8 @@ internal class UsdtAsset(
     labels: DefaultLabels,
     crashLogger: CrashLogger,
     pitLinking: PitLinking,
-    tierService: TierService
+    tierService: TierService,
+    environmentConfig: EnvironmentConfig
 ) : Erc20TokensBase(
     payloadManager,
     usdtAccount,
@@ -49,7 +51,8 @@ internal class UsdtAsset(
     labels,
     pitLinking,
     crashLogger,
-    tierService
+    tierService,
+    environmentConfig
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.USDT
 

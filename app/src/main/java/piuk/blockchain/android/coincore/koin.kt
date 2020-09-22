@@ -17,7 +17,6 @@ import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 val coincoreModule = module {
 
@@ -33,14 +32,15 @@ val coincoreModule = module {
                 crashLogger = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
         scoped {
             BtcAsset(
                 exchangeRates = get(),
-                networkParameters = get<EnvironmentConfig>().bitcoinNetworkParameters,
+                environmentConfig = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadManager = get(),
@@ -82,7 +82,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -98,7 +99,8 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -114,7 +116,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -128,7 +131,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -155,7 +159,8 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 pitLinking = get(),
-                tierService = get()
+                tierService = get(),
+                environmentConfig = get()
             )
         }
 

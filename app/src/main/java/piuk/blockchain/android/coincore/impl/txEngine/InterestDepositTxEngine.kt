@@ -46,23 +46,27 @@ class InterestDepositTxEngine(
         get() = onChainTxEngine.feeOptions
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            pendingTx.copy(
-                options = listOf(
-                    TxOptionValue.From(from = sourceAccount.label),
-                    TxOptionValue.To(to = txTarget.label),
-                    TxOptionValue.Fee(fee = pendingTx.fees),
-                    TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees),
-                    TxOptionValue.TxBooleanOption<Unit>(
-                        _option = TxOption.AGREEMENT_INTEREST_T_AND_C
-                    ),
-                    TxOptionValue.TxBooleanOption(
-                        _option = TxOption.AGREEMENT_INTEREST_TRANSFER,
-                        data = pendingTx.amount
+        onChainTxEngine.doBuildConfirmations(pendingTx).map { pTx ->
+            pTx.copy(
+                options = pTx.options.toMutableList().apply {
+                    pTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let {
+                        remove(it)
+                    }
+
+                    add(
+                        TxOptionValue.TxBooleanOption<Unit>(
+                            _option = TxOption.AGREEMENT_INTEREST_T_AND_C
+                        )
                     )
-                )
+                    add(
+                        TxOptionValue.TxBooleanOption(
+                            _option = TxOption.AGREEMENT_INTEREST_TRANSFER,
+                            data = pendingTx.amount
+                        )
+                    )
+                }.toList()
             )
-        )
+        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doValidateAmount(pendingTx)

@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">Confirmați Transferul</string>
   <string name="send_confirmation_interest_tos_pp">Am citit și sunt de acord cu <annotation link="interest_tos"> Termenii condițiile </annotation> &amp; <annotation link="interest_pp"> Politica de confidențialitate </annotation>.</string>
   <string name="send_confirmation_interest_holding_period_1">Acceptând acest lucru, sunteți de acord să transferați</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) din portofelul Bitcoin în contul dvs. de interese. O perioadă inițială de reținere de 7 zile se va aplica fondurilor dvs.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) din portofelul %2$s în contul dvs. de interese. O perioadă inițială de reținere de 7 zile se va aplica fondurilor dvs.</string>
   <string name="send_confirmation_progress_title">Transferul %1$s</string>
   <string name="send_confirmation_progress_message">Transferăm %1$s acum.</string>
   <string name="send_confirmation_success_title">%1$s Transferat</string>

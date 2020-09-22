@@ -1820,7 +1820,7 @@
   <string name="send_confirmation_deposit_cta_button">Bekräfta överföring</string>
   <string name="send_confirmation_interest_tos_pp">Jag har läst och godkänner <annotation link="interest_tos"> Användarvillkor </annotation> &amp; <annotation link="interest_pp"> Integritetspolicy </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Genom att acceptera detta samtycker du till överföring</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) från din Bitcoin Wallet till ditt Intressekonto. En initial hållperiod på sju dagar kommer att tillämpas på dina medel.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) från din %2$s Wallet till ditt Intressekonto. En initial hållperiod på sju dagar kommer att tillämpas på dina medel.</string>
   <string name="send_confirmation_progress_title">Överför %1$s</string>
   <string name="send_confirmation_progress_message">Vi överför dina %1$s nu.</string>
   <string name="send_confirmation_success_title">%1$s överfört</string>

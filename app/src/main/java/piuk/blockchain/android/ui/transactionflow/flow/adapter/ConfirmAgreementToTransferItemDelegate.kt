@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
 import kotlinx.android.extensions.LayoutContainer
@@ -18,6 +19,7 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmAgreementToTransferItemDelegate<in T>(
@@ -73,7 +75,6 @@ private class AgreementTextItemViewHolder(
 
         itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
             model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
-            view.isEnabled = false
         }
     }
 
@@ -87,7 +88,7 @@ private class AgreementTextItemViewHolder(
         val amountInBold =
             amount.toFiat(exchangeRates, selectedCurrency).toStringWithSymbol()
         val outroToHolding = resources.getString(R.string.send_confirmation_interest_holding_period_2,
-            amount.toStringWithSymbol())
+            amount.toStringWithSymbol(), resources.getString((amount as CryptoValue).currency.assetName()))
         val sb = SpannableStringBuilder()
         sb.append(introToHolding)
         sb.append(amountInBold)

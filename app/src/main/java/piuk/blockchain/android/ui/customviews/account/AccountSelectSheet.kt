@@ -88,7 +88,7 @@ class AccountSelectSheet(
         fun newInstance(host: Host): AccountSelectSheet = AccountSelectSheet(host)
 
         fun newInstance(
-            host: Host,
+            host: SelectionHost,
             accountList: Single<List<BlockchainAccount>>,
             @StringRes sheetTitle: Int
         ): AccountSelectSheet =

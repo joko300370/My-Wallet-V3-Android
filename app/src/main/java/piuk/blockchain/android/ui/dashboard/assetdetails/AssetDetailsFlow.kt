@@ -16,8 +16,8 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
@@ -108,7 +108,8 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_DETAILS -> AssetDetailSheet.newInstance(cryptoCurrency)
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
-                    this, fundedNonCustodialAccounts(),
+                    this,
+                    filterNonCustodialAccounts(localState.hostAction == AssetAction.Receive),
                     when (localState.hostAction) {
                         AssetAction.Deposit -> R.string.select_deposit_source_title
                         AssetAction.Send,
@@ -119,10 +120,12 @@ class AssetDetailsFlow(
         )
     }
 
-    private fun fundedNonCustodialAccounts(): Single<List<BlockchainAccount>> =
+    private fun filterNonCustodialAccounts(showUnFunded: Boolean): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
-            .map { it.filter { a -> a.isFunded } }
+            .map {
+                it.filter { a -> showUnFunded || a.isFunded }
+            }
 
     private fun handleHostAction(
         newState: AssetDetailsState,

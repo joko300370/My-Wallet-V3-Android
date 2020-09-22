@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -29,7 +30,6 @@ private const val BTC_URL_PREFIX = "bitcoin:"
 
 internal class BtcAsset(
     payloadManager: PayloadDataManager,
-    private val networkParameters: NetworkParameters,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -37,7 +37,8 @@ internal class BtcAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService
+    tiersService: TierService,
+    private val environmentConfig: EnvironmentConfig
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -47,7 +48,8 @@ internal class BtcAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService
+    tiersService,
+    environmentConfig
 ) {
 
     override val asset: CryptoCurrency
@@ -68,7 +70,7 @@ internal class BtcAsset(
                             payloadManager,
                             i == defaultIndex,
                             exchangeRates,
-                            networkParameters
+                            environmentConfig.bitcoinNetworkParameters
                         )
                     )
                 }
@@ -79,7 +81,7 @@ internal class BtcAsset(
                             a,
                             payloadManager,
                             exchangeRates,
-                            networkParameters
+                            environmentConfig.bitcoinNetworkParameters
                         )
                     )
                 }
@@ -92,7 +94,7 @@ internal class BtcAsset(
             if (isValidAddress(address.removePrefix(BTC_URL_PREFIX))) {
                 BtcAddress(
                     address = address,
-                    networkParams = networkParameters,
+                    networkParams = environmentConfig.bitcoinNetworkParameters,
                     scanUri = address
                 )
             } else {
@@ -102,7 +104,7 @@ internal class BtcAsset(
 
         private fun isValidAddress(address: String): Boolean =
             FormatsUtil.isValidBitcoinAddress(
-                networkParameters,
+                environmentConfig.bitcoinNetworkParameters,
                 address
             )
 }

@@ -1814,7 +1814,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="send_confirmation_cta_button">%1$s gönder</string>
   <string name="send_confirmation_deposit_cta_button">Aktarımı Onayla</string>
   <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos">Hizmet Şartları</annotation> ve <annotation link="interest_pp">Gizlilik Politikasını</annotation> okudum ve kabul ediyorum.</string>
-  <string name="send_confirmation_interest_holding_period_1">Bunu kabul ederek, Bitcoin Cüzdanınızdan Faiz Hesabınıza</string>
+  <string name="send_confirmation_interest_holding_period_1">Bunu kabul ederek, %2$s Cüzdanınızdan Faiz Hesabınıza</string>
   <string name="send_confirmation_interest_holding_period_2"> (%1$s) aktarmayı kabul etmiş olursunuz. Paranıza başlangıç olarak 7 günlük bir vade uygulanacaktır.</string>
   <string name="send_confirmation_progress_title">%1$s Aktarılıyor</string>
   <string name="send_confirmation_progress_message">Size ait %1$s şu anda aktarılıyor.</string>

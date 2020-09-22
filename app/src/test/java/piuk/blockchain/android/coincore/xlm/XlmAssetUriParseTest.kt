@@ -12,6 +12,7 @@ import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -38,6 +39,7 @@ class XlmAssetUriParseTest {
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
     private val tiersService: TierService = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
 
     private val subject = XlmAsset(
         payloadManager,
@@ -51,7 +53,8 @@ class XlmAssetUriParseTest {
         labels,
         pitLinking,
         crashLogger,
-        tiersService
+        tiersService,
+        environmentConfig
     )
 
     @Test

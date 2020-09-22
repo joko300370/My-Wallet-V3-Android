@@ -1821,7 +1821,7 @@
   <string name="send_confirmation_deposit_cta_button">ยืนยันการโอน</string>
   <string name="send_confirmation_interest_tos_pp">ฉันได้อ่านและยอมรับ <annotation link="interest_tos"> ข้อกำหนดในการให้บริการ </annotation> &amp; <annotation link="interest_pp"> นโยบายความเป็นส่วนตัว </annotation></string>
   <string name="send_confirmation_interest_holding_period_1">การยอมรับสิ่งนี้แสดงว่าคุณยินยอมที่จะโอน</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) จาก Bitcoin Wallet ไปยังบัญชีดอกเบี้ยของคุณ ระยะเวลาการระงับเริ่มต้น 7 วันจะถูกนำไปใช้กับเงินของคุณ</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) จาก %2$s Wallet ไปยังบัญชีดอกเบี้ยของคุณ ระยะเวลาการระงับเริ่มต้น 7 วันจะถูกนำไปใช้กับเงินของคุณ</string>
   <string name="send_confirmation_progress_title">กำลังโอน %1$s</string>
   <string name="send_confirmation_progress_message">เรากำลังโอน %1$s ตอนนี้</string>
   <string name="send_confirmation_success_title">%1$s</string>
