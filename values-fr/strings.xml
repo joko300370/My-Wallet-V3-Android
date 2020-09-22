@@ -1947,4 +1947,24 @@ Veuillez réessayer plus tard.</string>
   <string name="blocked_by_local_laws">Bloqué par les lois locales</string>
   <string name="blocked_by_local_laws_description">Chez Blockchain.com, nous nous efforçons de respecter toutes les lois locales. En fonction de votre emplacement, nous ne pouvons pas autoriser l\'achat ou la vente de devises numériques pour le moment.</string>
   <string name="error_contact_support">Si vous pensez qu\'il s\'agit d\'une erreur ou si vous souhaitez un examen manuel de votre compte, veuillez contacter l\'assistance.</string>
+  <string name="common_empty_title">Impossible de charger vos portefeuilles</string>
+  <string name="common_empty_details">Il semble y avoir un problème avec votre connexion Internet. S\'il vous plaît, vérifiez et essayez à nouveau</string>
+  <string name="common_empty_cta">Appuyez pour actualiser</string>
+  <string name="email_request_subject_usdt_1">Demande de paiement Tether</string>
+  <string name="email_request_body_usdt_1">Veuillez envoyer USDT à l\'adresse Tether %1$s .</string>
+  <string name="send_error_tx_in_flight">Une transaction est déjà en cours</string>
+  <string name="send_error_tx_option_invalid">Une erreur est survenue</string>
+  <string name="send_to_exchange_xlm_title">Envoi à un échange?</string>
+  <string name="send_to_exchange_xlm_blurb">Ajoutez un mémo pour éviter de perdre des fonds.</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> En savoir plus sur les exigences de solde. </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">Ajouter un mémo (max 28 caractères)</string>
+  <string name="send_confirm_memo_id_hint">Ajouter un identifiant</string>
+  <string name="send_invalid_option_dsc_memo">Description / mémo invalide</string>
+  <string name="interest_error_title">Impossible de charger les détails des centres d\'intérêt</string>
+  <string name="interest_error_desc">Une erreur s\'est produite lors du chargement des détails du compte d\'intérêt. 
+ Veuillez vérifier votre connexion Internet et réessayer ou contacter l\'assistance si le problème persiste.</string>
+  <string name="sell_is_coming_soon">Acheter et vendre à venir</string>
+  <string name="sell_is_coming_soon_description">Actuellement, nous ne prenons pas en charge l\'achat ou la vente de crypto-monnaies dans votre région. Nous vous enverrons une mise à jour lorsque nous le ferons.</string>
 </resources>

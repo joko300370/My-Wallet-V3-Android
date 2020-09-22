@@ -1466,7 +1466,7 @@
   <string name="simple_buy_amount_to_send">Zu sendender Betrag</string>
   <string name="simple_buy_pending_buy_sheet_title">Ausstehender %1s-Kauf</string>
   <string name="recipient_name_must_match_eur">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.</string>
-  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt. Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
+  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
   <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
   <string name="simple_buy_no_currencies_available_title">Keine Währungen verfügbar</string>
   <string name="simple_buy_no_currencies_available">Leider gibt es derzeit keine Währungen, mit denen Sie handeln können :(</string>
@@ -1668,7 +1668,7 @@
   <string name="bank_transfer">Banküberweisung</string>
   <string name="instantly_buy_crypto_with_card">Kaufen Sie Krypto sofort mit einem Visum oder einer Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Senden Sie Geld direkt von Ihrer Bank an Ihre Blockchain Wallet. Sobald wir die manuelle Überweisung erhalten haben, verwenden Sie dieses Geld, um Krypto zu kaufen.</string>
-  <string name="by_depositing_funds_terms_and_conds">Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr</annotation>, unserem Bankpartner, zu.</string>
+  <string name="by_depositing_funds_terms_and_conds">Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
   <string name="add_bank_with_currency">Fügen Sie eine %1s Bank hinzu</string>
   <string name="deposit_currency">Einzahlung %1s</string>
   <string name="currency_bank_transfer">Banküberweisung</string>
@@ -1783,10 +1783,10 @@
   <string name="cloud_backup_card_body">Sie können Ihre Brieftasche jetzt sicher in der Cloud sichern. Sie können Backups in Ihren Brieftascheneinstellungen deaktivieren.</string>
   <string name="cloud_backup_card_cta">Mehr erfahren</string>
   <string name="basic_transfer_lock_warn" formatted="false">Ihr verfügbares Guthaben zum Abheben beträgt %1s . Der verbleibende Restbetrag in %2s kann innerhalb von 7 Tagen abgehoben werden.</string>
-  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Weitere </annotation>.</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">Weitere</annotation>.</string>
   <string name="basic_transfer_error_insufficient_funds_title">Unzureichende Mittel</string>
   <string name="basic_transfer_error_insufficient_funds">Sie haben nicht genügend Guthaben auf Ihrem Konto, um diese Transaktion abzuschließen.</string>
-  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden. <annotation link="balance_lock"> Weitere </annotation>.</string>
+  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden. <annotation link="balance_lock">Weitere</annotation>.</string>
   <string name="erc20_need_more_eth_error_body_1">Sie benötigen die ETH, um Ihre %1$s zu senden</string>
   <string name="purchase_card_note_1">Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
   <string name="select_deposit_source_title">Übertragen von</string>
@@ -1842,7 +1842,7 @@
   <string name="send_select_a_wallet_title">oder Wählen Sie eine Brieftasche</string>
   <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %1$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
   <string name="purchase_funds_note">Ihr endgültiger Betrag kann sich aufgrund von Marktaktivitäten ändern.</string>
-  <string name="common_linked_learn_more"><annotation link="learn_more_link"> Weitere </annotation>.</string>
+  <string name="common_linked_learn_more"><annotation link="learn_more_link"> Weitere.</annotation></string>
   <string name="interest_announcement_title">Verdienen Sie noch heute Interesse an Ihrer Krypto!</string>
   <string name="interest_announcement_description">Übertragen Sie Crypto und verdienen Sie Zinsen für BTC, ETH und viele mehr.</string>
   <string name="interest_announcement_action">Mehr erfahren</string>
@@ -1943,4 +1943,22 @@
   <string name="blocked_by_local_laws">Durch lokale Gesetze blockiert</string>
   <string name="blocked_by_local_laws_description">Bei Blockchain.com bemühen wir uns, alle lokalen Gesetze einzuhalten. Aufgrund Ihres Standorts können wir derzeit den Kauf oder Verkauf digitaler Währungen nicht zulassen.</string>
   <string name="error_contact_support">Wenn Sie der Meinung sind, dass dies ein Fehler war oder eine manuelle Überprüfung Ihres Kontos wünschen, wenden Sie sich an den Support.</string>
+  <string name="common_empty_title">Ihre Brieftaschen können nicht geladen werden</string>
+  <string name="common_empty_details">Anscheinend liegt ein Problem mit Ihrer Internetverbindung vor. Bitte überprüfen Sie es und versuchen Sie es erneut</string>
+  <string name="common_empty_cta">Tippen Sie zum Aktualisieren auf</string>
+  <string name="email_request_subject_usdt_1">Zahlungsanforderung</string>
+  <string name="email_request_body_usdt_1">Bitte senden Sie USDT an die Tether-Adresse %1$s .</string>
+  <string name="send_error_tx_in_flight">Eine Transaktion ist bereits in Bearbeitung</string>
+  <string name="send_error_tx_option_invalid">Ein Fehler ist aufgetreten</string>
+  <string name="send_to_exchange_xlm_title">An eine Börse senden?</string>
+  <string name="send_to_exchange_xlm_blurb">Fügen Sie ein Memo hinzu, um Geldverluste zu vermeiden.</string>
+  <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link"> Weitere zu den Kontostandanforderungen.</annotation></string>
+  <string name="send_confirm_memo_text_hint">Fügen Sie ein Memo hinzu (max. 28 Zeichen)</string>
+  <string name="send_confirm_memo_id_hint">Fügen Sie eine ID hinzu</string>
+  <string name="send_invalid_option_dsc_memo">Ungültige Beschreibung / Memo</string>
+  <string name="interest_error_title">Zinsdetails können nicht geladen werden</string>
+  <string name="interest_error_desc">Beim Laden der Zinskontodaten ist ein Fehler aufgetreten. 
+ Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut oder wenden Sie sich an den Support, wenn das Problem weiterhin besteht.</string>
+  <string name="sell_is_coming_soon">Kaufen &amp; Verkaufen in Kürze</string>
+  <string name="sell_is_coming_soon_description">Derzeit unterstützen wir den Kauf oder Verkauf von Krypto in Ihrer Region nicht. Wir senden Ihnen dann ein Update.</string>
 </resources>

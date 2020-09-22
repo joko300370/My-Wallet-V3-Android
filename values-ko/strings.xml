@@ -1946,4 +1946,24 @@
   <string name="blocked_by_local_laws">현지 법률에 의해 차단됨</string>
   <string name="blocked_by_local_laws_description">Blockchain.com에서는 모든 현지 법률을 준수하기 위해 노력합니다. 귀하의 위치에 따라 현재 디지털 통화의 매매를 허용 할 수 없습니다.</string>
   <string name="error_contact_support">실수라고 생각하거나 계정을 직접 검토하려면 지원팀에 문의하세요.</string>
+  <string name="common_empty_title">지갑을로드 할 수 없습니다.</string>
+  <string name="common_empty_details">인터넷 연결에 문제가있는 것 같습니다. 확인하고 다시 시도하십시오</string>
+  <string name="common_empty_cta">새로 고침하려면 탭하세요.</string>
+  <string name="email_request_subject_usdt_1">테더 결제 요청</string>
+  <string name="email_request_body_usdt_1">테더 주소 %1$s 로 USDT를 보내주세요.</string>
+  <string name="send_error_tx_in_flight">거래가 이미 진행 중입니다.</string>
+  <string name="send_error_tx_option_invalid">오류가 발생했습니다</string>
+  <string name="send_to_exchange_xlm_title">거래소로 보내시겠습니까?</string>
+  <string name="send_to_exchange_xlm_blurb">자금 손실을 방지하려면 메모를 추가하십시오.</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> 잔액 요건에 대해 자세히 알아보세요. </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">메모 추가 (최대 28 자)</string>
+  <string name="send_confirm_memo_id_hint">ID 추가</string>
+  <string name="send_invalid_option_dsc_memo">잘못된 설명 / 메모</string>
+  <string name="interest_error_title">관심 분야 세부 정보를로드 할 수 없습니다.</string>
+  <string name="interest_error_desc">관심 계정 세부 정보를로드하는 중에 오류가 발생했습니다. 
+ 인터넷 연결을 확인하고 다시 시도하거나 문제가 지속되면 지원팀에 문의하십시오.</string>
+  <string name="sell_is_coming_soon">구매 및 판매 예정</string>
+  <string name="sell_is_coming_soon_description">현재 우리는 귀하의 지역에서 암호 화폐 구매 또는 판매를 지원하지 않습니다. 업데이트되면 업데이트를 보내 드리겠습니다.</string>
 </resources>

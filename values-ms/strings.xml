@@ -1946,4 +1946,24 @@
   <string name="blocked_by_local_laws">Disekat oleh Undang-undang Tempatan</string>
   <string name="blocked_by_local_laws_description">Di Blockchain.com, kami berusaha untuk mematuhi mana-mana dan semua undang-undang tempatan. Berdasarkan lokasi anda, kami tidak membenarkan pembelian atau penjualan mata wang digital buat masa ini.</string>
   <string name="error_contact_support">Sekiranya anda rasa ini adalah kesilapan atau ingin semakan manual akaun anda, sila hubungi sokongan.</string>
+  <string name="common_empty_title">Tidak dapat memuatkan Dompet anda</string>
+  <string name="common_empty_details">Nampaknya ada masalah dengan sambungan internet anda. Sila periksa dan cuba lagi</string>
+  <string name="common_empty_cta">Ketik untuk memuat semula</string>
+  <string name="email_request_subject_usdt_1">Permintaan pembayaran tether</string>
+  <string name="email_request_body_usdt_1">Sila hantarkan USDT ke alamat Tether %1$s .</string>
+  <string name="send_error_tx_in_flight">Urus niaga sedang dijalankan</string>
+  <string name="send_error_tx_option_invalid">Ralat telah berlaku</string>
+  <string name="send_to_exchange_xlm_title">Menghantar ke pertukaran?</string>
+  <string name="send_to_exchange_xlm_blurb">Tambahkan Memo untuk mengelakkan kehilangan dana.</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> Ketahui lebih lanjut mengenai keperluan baki. </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">Tambahkan memo (maksimum 28 watak)</string>
+  <string name="send_confirm_memo_id_hint">Tambahkan ID</string>
+  <string name="send_invalid_option_dsc_memo">Huraian / memo tidak sah</string>
+  <string name="interest_error_title">Tidak dapat memuatkan Butiran Minat</string>
+  <string name="interest_error_desc">Ralat berlaku semasa memuatkan butiran Akaun Minat. 
+ Sila periksa sambungan internet anda dan cuba lagi atau Hubungi Sokongan jika masalahnya berlanjutan.</string>
+  <string name="sell_is_coming_soon">Beli &amp; Jual Akan Segera</string>
+  <string name="sell_is_coming_soon_description">Pada masa ini, kami tidak menyokong membeli atau menjual crypto di wilayah anda. Kami akan menghantar kemas kini kepada anda apabila kami melakukannya.</string>
 </resources>

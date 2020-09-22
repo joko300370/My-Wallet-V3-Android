@@ -1946,4 +1946,24 @@
   <string name="blocked_by_local_laws">Blocat de legile locale</string>
   <string name="blocked_by_local_laws_description">La Blockchain.com, ne străduim să respectăm toate legile locale. Pe baza locației dvs., nu putem permite cumpărarea sau vânzarea de monede digitale în acest moment.</string>
   <string name="error_contact_support">Dacă credeți că aceasta a fost o greșeală sau doriți o revizuire manuală a contului dvs., vă rugăm să contactați asistența.</string>
+  <string name="common_empty_title">Nu vă pot încărca portofelele</string>
+  <string name="common_empty_details">Se pare că există o problemă cu conexiunea la internet. Vă rugăm să verificați și să încercați din nou</string>
+  <string name="common_empty_cta">Atingeți pentru a actualiza</string>
+  <string name="email_request_subject_usdt_1">Cerere de plată Tether</string>
+  <string name="email_request_body_usdt_1">Vă rugăm să trimiteți USDT la adresa Tether %1$s .</string>
+  <string name="send_error_tx_in_flight">O tranzacție este deja în desfășurare</string>
+  <string name="send_error_tx_option_invalid">a avut loc o eroare</string>
+  <string name="send_to_exchange_xlm_title">Trimiți la un schimb?</string>
+  <string name="send_to_exchange_xlm_blurb">Adăugați o notă pentru a evita pierderea de fonduri.</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> Aflați mai multe despre cerințele de sold. </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">Adăugați o notă (maximum 28 de caractere)</string>
+  <string name="send_confirm_memo_id_hint">Adăugați un ID</string>
+  <string name="send_invalid_option_dsc_memo">Descriere / notă nevalidă</string>
+  <string name="interest_error_title">Nu se pot încărca detalii despre dobândă</string>
+  <string name="interest_error_desc">A apărut o eroare la încărcarea detaliilor contului de dobândă. 
+ Vă rugăm să verificați conexiunea la internet și să încercați din nou sau să contactați asistența dacă problema persistă.</string>
+  <string name="sell_is_coming_soon">Cumpărați și vindeți în curând</string>
+  <string name="sell_is_coming_soon_description">În prezent, nu acceptăm cumpărarea sau vânzarea cripto-urilor în regiunea dvs. Vă vom trimite o actualizare când o vom face.</string>
 </resources>

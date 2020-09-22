@@ -1124,6 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Ga akkoord met de <a href="ignored"> algemene voorwaarden </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>
@@ -1945,4 +1947,24 @@
   <string name="blocked_by_local_laws">Geblokkeerd door lokale wetten</string>
   <string name="blocked_by_local_laws_description">Bij Blockchain.com streven we ernaar om ons te houden aan alle lokale wetten. Op basis van uw locatie kunnen we op dit moment het kopen of verkopen van digitale valuta niet toestaan.</string>
   <string name="error_contact_support">Als u denkt dat dit een vergissing was of als u een handmatige beoordeling van uw account wilt, neem dan contact op met de ondersteuning.</string>
+  <string name="common_empty_title">Kan uw portemonnee niet laden</string>
+  <string name="common_empty_details">Het lijkt erop dat er een probleem is met uw internetverbinding. Controleer het en probeer het opnieuw</string>
+  <string name="common_empty_cta">Tik om te vernieuwen</string>
+  <string name="email_request_subject_usdt_1">Betalingsverzoek voor tethering</string>
+  <string name="email_request_body_usdt_1">Stuur USDT naar het Tether-adres %1$s .</string>
+  <string name="send_error_tx_in_flight">Er wordt al een transactie uitgevoerd</string>
+  <string name="send_error_tx_option_invalid">er is een fout opgetreden</string>
+  <string name="send_to_exchange_xlm_title">Verzenden naar een beurs?</string>
+  <string name="send_to_exchange_xlm_blurb">Voeg een memo toe om te voorkomen dat u geld verliest.</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> Meer informatie over balansvereisten. </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">Voeg een memo toe (max. 28 tekens)</string>
+  <string name="send_confirm_memo_id_hint">Voeg een ID toe</string>
+  <string name="send_invalid_option_dsc_memo">Ongeldige beschrijving / memo</string>
+  <string name="interest_error_title">Kan interessegegevens niet laden</string>
+  <string name="interest_error_desc">Er is een fout opgetreden bij het laden van de renteaccountgegevens. 
+ Controleer uw internetverbinding en probeer het opnieuw of neem contact op met de ondersteuning als het probleem zich blijft voordoen.</string>
+  <string name="sell_is_coming_soon">Koop en verkoop binnenkort</string>
+  <string name="sell_is_coming_soon_description">Momenteel ondersteunen we het kopen of verkopen van cryptovaluta in uw regio niet. We sturen je een update als we dat doen.</string>
 </resources>
