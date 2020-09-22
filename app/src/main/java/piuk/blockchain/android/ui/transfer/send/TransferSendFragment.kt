@@ -33,6 +33,10 @@ class TransferSendFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        renderList()
+    }
+
+    private fun renderList() {
         setEmptyStateDetails(R.string.transfer_wallets_empty_title,
             R.string.transfer_wallets_empty_details, R.string.transfer_wallet_buy_crypto) {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))
@@ -106,6 +110,7 @@ class TransferSendFragment :
 
     override fun onFlowFinished() {
         flow = null
+        refreshItems()
     }
 
     companion object {

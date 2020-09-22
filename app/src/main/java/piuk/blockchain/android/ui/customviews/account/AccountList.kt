@@ -89,16 +89,12 @@ class AccountList @JvmOverloads constructor(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {
-                    if (it.size == 1) {
-                        onAccountSelected(it.first())
-                    } else {
-                        itemList.clear()
-                        itemList.addAll(it)
-                        adapter?.notifyDataSetChanged()
+                    itemList.clear()
+                    itemList.addAll(it)
+                    adapter?.notifyDataSetChanged()
 
-                        if (it.isEmpty()) {
-                            onEmptyList()
-                        }
+                    if (it.isEmpty()) {
+                        onEmptyList()
                     }
                 },
                 onError = {
