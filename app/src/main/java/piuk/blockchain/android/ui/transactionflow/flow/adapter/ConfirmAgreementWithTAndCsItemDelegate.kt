@@ -17,6 +17,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.setThrottledCheckedChange
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmAgreementWithTAndCsItemDelegate<in T>(
@@ -44,10 +45,7 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
     )
 }
 
-private class AgreementItemViewHolder(val parent: View) :
-    RecyclerView.ViewHolder(parent),
-    LayoutContainer {
-
+private class AgreementItemViewHolder(val parent: View) : RecyclerView.ViewHolder(parent), LayoutContainer {
     override val containerView: View?
         get() = itemView
 
@@ -63,18 +61,20 @@ private class AgreementItemViewHolder(val parent: View) :
             "interest_pp" to Uri.parse(INTEREST_PRIVACY_POLICY)
         )
 
-        itemView.confirm_details_checkbox_text.text = stringUtils.getStringWithMappedLinks(
-            R.string.send_confirmation_interest_tos_pp,
-            linksMap,
-            activityContext
-        )
+        itemView.apply {
+            confirm_details_checkbox_text.text = stringUtils.getStringWithMappedLinks(
+                R.string.send_confirmation_interest_tos_pp,
+                linksMap,
+                activityContext
+            )
 
-        itemView.confirm_details_checkbox_text.movementMethod = LinkMovementMethod.getInstance()
+            confirm_details_checkbox_text.movementMethod = LinkMovementMethod.getInstance()
 
-        itemView.confirm_details_checkbox.isChecked = item.value
+            confirm_details_checkbox.isChecked = item.value
 
-        itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
-            model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
+            confirm_details_checkbox.setThrottledCheckedChange { isChecked ->
+                model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
+            }
         }
     }
 }

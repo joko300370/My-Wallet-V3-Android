@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.setThrottledCheckedChange
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmAgreementToTransferItemDelegate<in T>(
@@ -53,9 +54,7 @@ private class AgreementTextItemViewHolder(
     val parent: View,
     private val exchangeRates: ExchangeRates,
     private val selectedCurrency: String
-) :
-    RecyclerView.ViewHolder(parent),
-    LayoutContainer {
+) : RecyclerView.ViewHolder(parent), LayoutContainer {
 
     override val containerView: View?
         get() = itemView
@@ -64,17 +63,19 @@ private class AgreementTextItemViewHolder(
         item: TxOptionValue.TxBooleanOption<Money>,
         model: TransactionModel
     ) {
-        itemView.confirm_details_checkbox.setText(agreementText(
-            item.data ?: return,
-            exchangeRates,
-            selectedCurrency, parent.resources),
-            TextView.BufferType.SPANNABLE
-        )
+        itemView.apply {
+            confirm_details_checkbox.setText(agreementText(
+                item.data ?: return,
+                exchangeRates,
+                selectedCurrency, resources),
+                TextView.BufferType.SPANNABLE
+            )
 
-        itemView.confirm_details_checkbox.isChecked = item.value
+            confirm_details_checkbox.isChecked = item.value
 
-        itemView.confirm_details_checkbox.setOnCheckedChangeListener { view, isChecked ->
-            model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
+            confirm_details_checkbox.setThrottledCheckedChange { isChecked ->
+                model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
+            }
         }
     }
 
@@ -90,12 +91,12 @@ private class AgreementTextItemViewHolder(
         val outroToHolding = resources.getString(R.string.send_confirmation_interest_holding_period_2,
             amount.toStringWithSymbol(), resources.getString((amount as CryptoValue).currency.assetName()))
         val sb = SpannableStringBuilder()
-        sb.append(introToHolding)
-        sb.append(amountInBold)
+            .append(introToHolding)
+            .append(amountInBold)
+            .append(outroToHolding)
         sb.setSpan(StyleSpan(BOLD), introToHolding.length,
             introToHolding.length + amountInBold.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.append(outroToHolding)
         return sb
     }
 }
