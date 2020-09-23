@@ -66,10 +66,10 @@ internal class BchCryptoWalletAccount(
                 .indexOfFirst {
                     it.xpub == bchManager.getDefaultGenericMetadataAccount()!!.xpub
                 }
-            ).map {
-                val address = Address.fromBase58(networkParams, it)
-                address.toCashAddress()
-            }
+        ).map {
+            val address = Address.fromBase58(networkParams, it)
+            address.toCashAddress()
+        }
             .singleOrError()
             .map {
                 BchAddress(address_ = it, scanUri = null, label = label)

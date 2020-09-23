@@ -36,7 +36,7 @@ class AssetDetailsModelTest {
     @Test
     fun `load details success`() {
         val assetDisplayMap = mapOf(
-            AssetFilter.Custodial to AssetDisplayInfo(mock(), mock(), mock(), emptySet()))
+            AssetFilter.Custodial to AssetDisplayInfo(mock(), mock(), mock(), mock(), emptySet()))
 
         whenever(interactor.loadAssetDetails(any())).thenReturn(Single.just(assetDisplayMap))
 

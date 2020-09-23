@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
@@ -66,10 +68,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         disposables += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    asset_name.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
+                    asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
                 },
                 onError = {
-                    asset_name.text = resources.getString(
+                    asset_subtitle.text = resources.getString(
                         R.string.dashboard_asset_actions_interest_dsc_failed)
 
                     Timber.e("AssetActions error loading Interest rate: $it")
@@ -83,24 +85,31 @@ class AccountInfoCrypto @JvmOverloads constructor(
         icon.setCoinIcon(crypto)
         icon.visible()
 
-        asset_name.setText(crypto.assetName())
+        asset_subtitle.setText(crypto.assetName())
 
         wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
 
-        disposables += account.accountBalance
+        disposables += account.accountBalance.zipWith(account.pendingBalance.toSingle(CryptoValue.zero(crypto)))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {
-                    wallet_balance_crypto.text = it.toStringWithSymbol()
+                onSuccess = { (accountBalance, pendingBalance) ->
+                    wallet_balance_crypto.text = accountBalance.toStringWithSymbol()
                     wallet_balance_fiat.text =
-                        it.toFiat(
+                        accountBalance.toFiat(
                             exchangeRates,
                             currencyPrefs.selectedFiatCurrency
                         ).toStringWithSymbol()
 
                     wallet_balance_crypto.visible()
                     wallet_balance_fiat.visible()
+
+                    pendingBalance.takeIf { !it.isZero }?.let {
+                        pending_balance.text = pendingBalance.toStringWithSymbol()
+                    } ?: kotlin.run {
+                        pending_balance_title.gone()
+                        pending_balance.gone()
+                    }
                 },
                 onError = {
                     Timber.e("Cannot get balance for ${account.label}")

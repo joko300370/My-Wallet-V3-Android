@@ -144,12 +144,13 @@ class AssetDetailSheet :
         assetDetails[AssetFilter.NonCustodial]?.let {
             itemList.add(
                 AssetDetailItem(
-                    AssetFilter.NonCustodial,
-                    it.account,
-                    it.amount,
-                    it.fiatValue,
-                    it.actions,
-                    it.interestRate
+                    assetFilter = AssetFilter.NonCustodial,
+                    account = it.account,
+                    balance = it.amount,
+                    fiatBalance = it.fiatValue,
+                    actions = it.actions,
+                    pendingBalance = it.pendingAmount,
+                    interestRate = it.interestRate
                 )
             )
         }
@@ -157,12 +158,13 @@ class AssetDetailSheet :
         assetDetails[AssetFilter.Custodial]?.let {
             itemList.add(
                 AssetDetailItem(
-                    AssetFilter.Custodial,
-                    it.account,
-                    it.amount,
-                    it.fiatValue,
-                    it.actions,
-                    it.interestRate
+                    assetFilter = AssetFilter.Custodial,
+                    account = it.account,
+                    balance = it.amount,
+                    pendingBalance = it.pendingAmount,
+                    fiatBalance = it.fiatValue,
+                    actions = it.actions,
+                    interestRate = it.interestRate
                 )
             )
         }
@@ -170,12 +172,13 @@ class AssetDetailSheet :
         assetDetails[AssetFilter.Interest]?.let {
             itemList.add(
                 AssetDetailItem(
-                    AssetFilter.Interest,
-                    it.account,
-                    it.amount,
-                    it.fiatValue,
-                    it.actions,
-                    it.interestRate
+                    assetFilter = AssetFilter.Interest,
+                    account = it.account,
+                    balance = it.amount,
+                    fiatBalance = it.fiatValue,
+                    pendingBalance = it.pendingAmount,
+                    actions = it.actions,
+                    interestRate = it.interestRate
                 )
             )
         }

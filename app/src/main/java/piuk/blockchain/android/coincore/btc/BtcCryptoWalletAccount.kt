@@ -63,17 +63,17 @@ internal class BtcCryptoWalletAccount(
             transactionFetchCount,
             transactionFetchOffset
         )
-        .onErrorReturn { emptyList() }
-        .mapList {
-            BtcActivitySummaryItem(
-                it,
-                payloadManager,
-                exchangeRates,
-                this
-            ) as ActivitySummaryItem
-        }.doOnSuccess {
-            setHasTransactions(it.isNotEmpty())
-        }
+            .onErrorReturn { emptyList() }
+            .mapList {
+                BtcActivitySummaryItem(
+                    it,
+                    payloadManager,
+                    exchangeRates,
+                    this
+                ) as ActivitySummaryItem
+            }.doOnSuccess {
+                setHasTransactions(it.isNotEmpty())
+            }
 
     override fun createTxEngine(): TxEngine {
         TODO("Not yet implemented")

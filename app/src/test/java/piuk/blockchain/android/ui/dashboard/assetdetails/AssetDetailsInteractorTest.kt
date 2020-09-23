@@ -62,6 +62,7 @@ class AssetDetailsInteractorTest {
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
         val custodialCrypto = CryptoValue.ZeroBtc
         val interestCrypto = CryptoValue.ZeroBtc
+        val pendingCrypto = CryptoValue.ZeroBtc
         val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
 
         val walletFiat = FiatValue.fromMinor("USD", 30985)
@@ -70,20 +71,33 @@ class AssetDetailsInteractorTest {
         val totalFiat = walletFiat + custodialFiat + interestFiat
 
         val expectedResult = mapOf(
-            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, totalFiat, emptySet()),
-            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup, walletCrypto, walletFiat, emptySet()),
-            AssetFilter.Custodial to AssetDisplayInfo(custodialGroup, custodialCrypto, custodialFiat, emptySet()),
+            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, pendingCrypto, totalFiat, emptySet()),
+            AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup,
+                walletCrypto,
+                pendingCrypto,
+                walletFiat,
+                emptySet()),
+            AssetFilter.Custodial to AssetDisplayInfo(
+                custodialGroup,
+                custodialCrypto,
+                pendingCrypto,
+                custodialFiat,
+                emptySet()),
             AssetFilter.Interest to AssetDisplayInfo(
-                interestGroup, interestCrypto, interestFiat, emptySet(), interestRate
+                interestGroup, interestCrypto, pendingCrypto, interestFiat, emptySet(), interestRate
             )
         )
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
+        whenever(totalGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
+        whenever(nonCustodialGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
+        whenever(custodialGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
         whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
+        whenever(interestGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))

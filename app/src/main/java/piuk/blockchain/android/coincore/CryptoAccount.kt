@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 
@@ -13,6 +14,9 @@ interface BlockchainAccount {
     val label: String
 
     val accountBalance: Single<Money> // Total balance, including uncleared and locked
+
+    val pendingBalance: Maybe<Money>
+        get() = Maybe.empty()
 
     val activity: Single<ActivitySummaryList>
 
@@ -102,6 +106,7 @@ class NullCryptoAccount(
         get() = Single.just(emptyList())
 
     override val actions: AvailableActions = emptySet()
+
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
 

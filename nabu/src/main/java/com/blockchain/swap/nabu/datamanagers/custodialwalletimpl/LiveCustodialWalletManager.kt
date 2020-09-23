@@ -326,6 +326,9 @@ class LiveCustodialWalletManager(
                 }
             }
 
+    override fun getPendingBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
+        assetBalancesRepository.getPendingBalanceForAsset(crypto)
+
     override fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String> =
         authenticator.authenticate {
             nabuService.transferFunds(

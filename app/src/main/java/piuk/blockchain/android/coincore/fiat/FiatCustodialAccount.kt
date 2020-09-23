@@ -6,6 +6,7 @@ import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -45,6 +46,12 @@ internal class FiatCustodialAccount(
                 it as Money
             }.doOnSuccess {
                 hasFunds.set(it.isPositive)
+            }
+
+    override val pendingBalance: Maybe<Money>
+        get() = assetBalancesRepository.getPendingBalanceForAsset(fiatCurrency)
+            .map {
+                it as Money
             }
 
     override var hasTransactions: Boolean = false
@@ -97,6 +104,9 @@ class FiatAccountGroup(
     // Produce the sum of all balances of all accounts
     override val accountBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
+
+    override val pendingBalance: Maybe<Money>
+        get() = Maybe.error(NotImplementedError("No unified pending balance for All Fiat accounts"))
 
     // All the activities for all the accounts
     override val activity: Single<ActivitySummaryList>

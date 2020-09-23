@@ -9,6 +9,7 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -19,9 +20,11 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
+
 data class AssetDisplayInfo(
     val account: BlockchainAccount,
     val amount: Money,
+    val pendingAmount: Money,
     val fiatValue: Money,
     val actions: Set<AssetAction>,
     val interestRate: Double = Double.NaN
@@ -58,17 +61,19 @@ class AssetDetailsInteractor(
         class DetailsItem(
             val account: BlockchainAccount,
             val balance: Money,
+            val pendingBalance: Money,
             val actions: AvailableActions
         ) : Details()
     }
 
     private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.accountBalance.toMaybe().map { balance ->
+            grp.accountBalance.toMaybe().zipWith(grp.pendingBalance).map { (accBalance, pendingBalance) ->
                 Details.DetailsItem(
-                    grp,
-                    balance,
-                    grp.actions
+                    account = grp,
+                    balance = accBalance,
+                    pendingBalance = pendingBalance,
+                    actions = grp.actions
                 ) as Details
             }
         }.toSingle(Details.NoDetails)
@@ -88,6 +93,7 @@ class AssetDetailsInteractor(
             )
         }
     }
+
     private fun makeAssetDisplayMap(
         fiatRate: ExchangeRate,
         total: Details,
@@ -97,12 +103,12 @@ class AssetDetailsInteractor(
         interestRate: Double,
         interestEnabled: Boolean
     ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
-            addToDisplayMap(this, AssetFilter.All, total, fiatRate)
-            addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
-            addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
-            if (interestEnabled) {
-                addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
-            }
+        addToDisplayMap(this, AssetFilter.All, total, fiatRate)
+        addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
+        addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+        if (interestEnabled) {
+            addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
+        }
     }
 
     private fun addToDisplayMap(
@@ -117,11 +123,12 @@ class AssetDetailsInteractor(
             map.put(
                 filter,
                 AssetDisplayInfo(
-                    it.account,
-                    it.balance,
-                    fiat,
-                    it.actions,
-                    interestRate
+                    account = it.account,
+                    amount = it.balance,
+                    fiatValue = fiat,
+                    pendingAmount = it.pendingBalance,
+                    actions = it.actions,
+                    interestRate = interestRate
                 )
             )
         }

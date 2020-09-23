@@ -2023,5 +2023,6 @@
     <string name="error_contact_support">If you think this was a mistake or would like a manual review of your account, please contact support.</string>
     <string name="sell_is_coming_soon">Buy &amp; Sell Coming Soon</string>
     <string name="sell_is_coming_soon_description">Currently, we don’t support buying or selling crypto in your region. We’ll send you an update when we do.</string>
+    <string name="common_pending">Pending</string>
 
 </resources>

@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
-import kotlinx.android.synthetic.main.dialog_dashboard_asset_detail_item.view.*
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_label_item.view.*
+import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
@@ -26,6 +26,7 @@ data class AssetDetailItem(
     val assetFilter: AssetFilter,
     val account: BlockchainAccount,
     val balance: Money,
+    val pendingBalance: Money,
     val fiatBalance: Money,
     val actions: Set<AssetAction>,
     val interestRate: Double
@@ -41,9 +42,9 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             val asset = getAsset(item.account)
 
             icon.setCoinIcon(asset)
-            asset_name.text = resources.getString(asset.assetName())
+            wallet_name.text = resources.getString(asset.assetName())
 
-            status_date.text = when (item.assetFilter) {
+            asset_subtitle.text = when (item.assetFilter) {
                 AssetFilter.All -> resources.getString(R.string.dashboard_asset_balance_total)
                 AssetFilter.NonCustodial -> resources.getString(
                     R.string.dashboard_asset_balance_wallet
@@ -75,8 +76,19 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 AssetFilter.All -> asset_account_icon.gone()
             }
 
-            asset_balance_crypto.text = item.balance.toStringWithSymbol()
-            asset_balance_fiat.text = item.fiatBalance.toStringWithSymbol()
+            wallet_balance_fiat.text = item.balance.toStringWithSymbol()
+            wallet_balance_crypto.text = item.fiatBalance.toStringWithSymbol()
+
+            item.pendingBalance.takeIf { !it.isZero }?.let {
+                pending_balance_title.visible()
+                pending_balance.apply {
+                    visible()
+                    text = it.toStringWithSymbol()
+                }
+            } ?: kotlin.run {
+                pending_balance_title.gone()
+                pending_balance.gone()
+            }
         }
     }
 
@@ -112,7 +124,7 @@ internal class AssetDetailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_CRYPTO) {
-            AssetDetailViewHolder(parent.inflate(R.layout.dialog_dashboard_asset_detail_item))
+            AssetDetailViewHolder(parent.inflate(R.layout.view_account_crypto_overview))
         } else {
             LabelViewHolder(parent.inflate(R.layout.dialog_dashboard_asset_label_item))
         }
@@ -138,6 +150,8 @@ internal class AssetDetailAdapter(
         }
     }
 
-    private val TYPE_CRYPTO = 0
-    private val TYPE_LABEL = 1
+    companion object {
+        private const val TYPE_CRYPTO = 0
+        private const val TYPE_LABEL = 1
+    }
 }

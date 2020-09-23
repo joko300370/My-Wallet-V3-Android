@@ -47,7 +47,7 @@ class AccountInfoFiat @JvmOverloads constructor(
 
         wallet_name.text = account.label
         icon.setIcon(account.fiatCurrency)
-        asset_name.text = account.fiatCurrency
+        asset_subtitle.text = account.fiatCurrency
 
         disposables += account.accountBalance
             .flatMap { balanceInAccountCurrency ->

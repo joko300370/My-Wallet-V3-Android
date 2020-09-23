@@ -50,6 +50,10 @@ interface CustodialWalletManager {
         crypto: CryptoCurrency
     ): Maybe<CryptoValue>
 
+    fun getPendingBalanceForAsset(
+        crypto: CryptoCurrency
+    ): Maybe<CryptoValue>
+
     fun getSupportedBuySellCryptoCurrencies(
         fiatCurrency: String? = null
     ): Single<BuySellPairs>
