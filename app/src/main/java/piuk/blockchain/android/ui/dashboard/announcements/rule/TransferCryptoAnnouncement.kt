@@ -10,7 +10,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class TransferBitcoinAnnouncement(
+class TransferCryptoAnnouncement(
     dismissRecorder: DismissRecorder,
     private val walletStatus: WalletStatus
 ) : AnnouncementRule(dismissRecorder) {

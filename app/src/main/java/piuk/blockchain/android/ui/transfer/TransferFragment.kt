@@ -16,6 +16,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
+    private lateinit var showView: TransferViewType
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,12 +33,24 @@ class TransferFragment : Fragment() {
             listOf(getString(R.string.send), getString(R.string.common_receive)),
             childFragmentManager
         )
+
+        when (showView) {
+            TransferViewType.TYPE_SEND -> transfer_pager.setCurrentItem(TransferViewType.TYPE_SEND.ordinal, true)
+            TransferViewType.TYPE_RECEIVE -> transfer_pager.setCurrentItem(TransferViewType.TYPE_RECEIVE.ordinal, true)
+        }
     }
 
     companion object {
-        fun newInstance(): TransferFragment {
-            return TransferFragment()
+        fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment {
+            return TransferFragment().apply {
+                showView = transferViewType
+            }
         }
+    }
+
+    enum class TransferViewType {
+        TYPE_SEND,
+        TYPE_RECEIVE
     }
 }
 

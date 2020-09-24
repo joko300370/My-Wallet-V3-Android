@@ -405,7 +405,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun launchTransfer() {
-        bottom_navigation.getViewAtPosition(ITEM_TRANSFER).performClick()
+        startTransferFragment(TransferFragment.TransferViewType.TYPE_RECEIVE)
     }
 
     private fun showLogoutDialog() {
@@ -566,19 +566,19 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         menu.findItem(R.id.nav_debug_swap).isVisible = true
     }
 
-    private fun startTransferFragment() {
+    private fun startTransferFragment(
+        viewToShow: TransferFragment.TransferViewType = TransferFragment.TransferViewType.TYPE_SEND
+    ) {
         setCurrentTabItem(ITEM_TRANSFER)
         toolbar_general.title = getString(R.string.transfer)
 
-        ViewUtils.setElevation(appbar_layout, 0f)
-        val transferFragment = TransferFragment.newInstance()
+        val transferFragment = TransferFragment.newInstance(viewToShow)
         replaceContentFragment(transferFragment)
     }
 
     private fun startBuySellFragment() {
         setCurrentTabItem(ITEM_BUY_SELL)
 
-        ViewUtils.setElevation(appbar_layout, 0f)
         val buySellFragment = BuySellFragment.newInstance()
         replaceContentFragment(buySellFragment)
     }
@@ -649,8 +649,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun launchSwapIntro() {
         setCurrentTabItem(ITEM_SWAP)
-
-        ViewUtils.setElevation(appbar_layout, 0f)
 
         val swapIntroFragment = SwapIntroFragment.newInstance()
         replaceContentFragment(swapIntroFragment)

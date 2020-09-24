@@ -30,7 +30,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingB
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TetherAvailableAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferBitcoinAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
 
@@ -166,7 +166,7 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            TransferBitcoinAnnouncement(
+            TransferCryptoAnnouncement(
                 dismissRecorder = get(),
                 walletStatus = get()
             )

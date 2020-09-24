@@ -7,21 +7,21 @@ import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 
-class TransferBitcoinAnnouncementTest {
+class TransferCryptoAnnouncementTest {
 
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val walletStatus: WalletStatus = mock()
 
-    private lateinit var subject: TransferBitcoinAnnouncement
+    private lateinit var subject: TransferCryptoAnnouncement
 
     @Before
     fun setUp() {
-        whenever(dismissRecorder[TransferBitcoinAnnouncement.DISMISS_KEY]).thenReturn(dismissEntry)
-        whenever(dismissEntry.prefsKey).thenReturn(TransferBitcoinAnnouncement.DISMISS_KEY)
+        whenever(dismissRecorder[TransferCryptoAnnouncement.DISMISS_KEY]).thenReturn(dismissEntry)
+        whenever(dismissEntry.prefsKey).thenReturn(TransferCryptoAnnouncement.DISMISS_KEY)
 
         subject =
-            TransferBitcoinAnnouncement(
+            TransferCryptoAnnouncement(
                 dismissRecorder = dismissRecorder,
                 walletStatus = walletStatus
             )
