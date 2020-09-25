@@ -91,13 +91,13 @@ class AssetDetailsInteractorTest {
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
         whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
-        whenever(totalGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
+        whenever(totalGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
-        whenever(nonCustodialGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
+        whenever(nonCustodialGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
-        whenever(custodialGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
+        whenever(custodialGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
         whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
-        whenever(interestGroup.pendingBalance).thenReturn(Maybe.just(pendingCrypto))
+        whenever(interestGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))

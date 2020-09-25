@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -90,7 +89,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
 
-        disposables += account.accountBalance.zipWith(account.pendingBalance.toSingle(CryptoValue.zero(crypto)))
+        disposables += account.accountBalance.zipWith(account.pendingBalance)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { (accountBalance, pendingBalance) ->

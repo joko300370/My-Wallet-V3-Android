@@ -68,7 +68,7 @@ class AssetDetailsInteractor(
 
     private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.accountBalance.toMaybe().zipWith(grp.pendingBalance).map { (accBalance, pendingBalance) ->
+            grp.accountBalance.zipWith(grp.pendingBalance).toMaybe().map { (accBalance, pendingBalance) ->
                 Details.DetailsItem(
                     account = grp,
                     balance = accBalance,

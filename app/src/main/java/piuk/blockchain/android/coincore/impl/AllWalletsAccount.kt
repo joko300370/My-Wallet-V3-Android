@@ -4,7 +4,6 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
-import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -24,8 +23,8 @@ class AllWalletsAccount(
     override val accountBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Wallets meta account"))
 
-    override val pendingBalance: Maybe<Money>
-        get() = Maybe.error(NotImplementedError("No unified pending balance for All Wallets meta account"))
+    override val pendingBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified pending balance for All Wallets meta account"))
 
     override val activity: Single<ActivitySummaryList>
         get() = allActivities()

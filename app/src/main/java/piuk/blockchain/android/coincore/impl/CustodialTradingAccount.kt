@@ -7,7 +7,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
-import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -71,8 +70,9 @@ open class CustodialTradingAccount(
             .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
 
-    override val pendingBalance: Maybe<Money>
+    override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingBalanceForAsset(asset)
+            .toSingle(CryptoValue.zero(asset))
             .map { it as Money }
 
     override val activity: Single<ActivitySummaryList>

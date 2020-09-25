@@ -6,7 +6,6 @@ import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
-import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -139,7 +138,7 @@ class CryptoAccountCustodialGroup(
     override val accountBalance: Single<Money>
         get() = account.accountBalance
 
-    override val pendingBalance: Maybe<Money>
+    override val pendingBalance: Single<Money>
         get() = account.pendingBalance
 
     override val activity: Single<ActivitySummaryList>
@@ -181,6 +180,8 @@ class CryptoAccountNonCustodialGroup(
                     .total()
             }
         }
+    override val pendingBalance: Single<Money>
+        get() = Single.just(CryptoValue.zero(asset))
 
     // All the activities for all the accounts
     override val activity: Single<ActivitySummaryList>
