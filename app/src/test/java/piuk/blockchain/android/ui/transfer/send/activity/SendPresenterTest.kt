@@ -44,7 +44,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -93,7 +92,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -152,7 +150,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -216,7 +213,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -261,7 +257,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = bchStrategy,
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -288,7 +283,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),
@@ -315,7 +309,6 @@ class SendPresenterTest {
 
         SendPresenter(
             btcStrategy = btcStrategy,
-            bchStrategy = mock(),
             prefs = mock(),
             exchangeRates = mock(),
             stringUtils = mock(),

@@ -74,7 +74,7 @@ public class PayloadManager {
 
     // Bitcoin
     private final MultiAddressFactory multiAddressFactory;
-    private final BalanceManager balanceManager;
+    private final BalanceManagerBtc balanceManagerBtc;
     // Bitcoin Cash
     private final BalanceManagerBch balanceManagerBch;
 
@@ -86,7 +86,7 @@ public class PayloadManager {
         this.walletApi = walletApi;
         // Bitcoin
         this.multiAddressFactory = multiAddressFactory;
-        this.balanceManager = balanceManagerBtc;
+        this.balanceManagerBtc = balanceManagerBtc;
         // Bitcoin Cash
         this.balanceManagerBch = balanceManagerBch;
     }
@@ -584,7 +584,7 @@ public class PayloadManager {
             ApiException {
         LinkedHashMap<String, Balance> map = new LinkedHashMap<>();
 
-        final Response<HashMap<String, Balance>> response = balanceManager.getBalanceOfAddresses(addresses).execute();
+        final Response<HashMap<String, Balance>> response = balanceManagerBtc.getBalanceOfAddresses(addresses).execute();
         if (response.isSuccessful()) {
             final HashMap<String, Balance> balanceHashMap = response.body();
             // Place into map to maintain order, as API may return them in a random order
@@ -881,28 +881,28 @@ public class PayloadManager {
      * Balance API - Final balance for address.
      */
     public BigInteger getAddressBalance(String address) {
-        return balanceManager.getAddressBalance(address);
+        return balanceManagerBtc.getAddressBalance(address);
     }
 
     /**
      * Balance API - Final balance for all accounts + addresses.
      */
     public BigInteger getWalletBalance() {
-        return balanceManager.getWalletBalance();
+        return balanceManagerBtc.getWalletBalance();
     }
 
     /**
      * Balance API - Watch only balances
      */
     public BigInteger getWalletWatchOnlyBalance() {
-        return balanceManager.getWatchOnlyBalance();
+        return balanceManagerBtc.getWatchOnlyBalance();
     }
 
     /**
      * Balance API - Final balance imported addresses.
      */
     public BigInteger getImportedAddressesBalance() {
-        return balanceManager.getImportedAddressesBalance();
+        return balanceManagerBtc.getImportedAddressesBalance();
     }
 
     /**
@@ -918,7 +918,7 @@ public class PayloadManager {
         Set<String> allLegacy = WalletExtensionsKt.nonArchivedLegacyAddressStrings(wallet);
         Set<String> watchOnlyLegacy = WalletExtensionsKt.nonArchivedWatchOnlyLegacyAddressStrings(wallet);
 
-        balanceManager.updateAllBalances(xpubs, allLegacy, watchOnlyLegacy);
+        balanceManagerBtc.updateAllBalances(xpubs, allLegacy, watchOnlyLegacy);
     }
 
     /**
@@ -928,7 +928,7 @@ public class PayloadManager {
      */
     public void subtractAmountFromAddressBalance(String address, BigInteger amount) throws
             Exception {
-        balanceManager.subtractAmountFromAddressBalance(address, amount);
+        balanceManagerBtc.subtractAmountFromAddressBalance(address, amount);
     }
 
 }

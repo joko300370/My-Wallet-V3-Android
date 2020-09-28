@@ -42,7 +42,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
@@ -71,7 +71,6 @@ import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
@@ -519,7 +518,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     @SuppressLint("CheckResult")
-    override fun startTransactionFlowWithTarget(targets: Collection<CryptoAddress>) {
+    override fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>) {
         if (targets.size > 1) {
             disambiguateSendScan(targets)
         } else {
@@ -528,19 +527,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { sourceAccount ->
-                        if (AssetAction.NewSend in sourceAccount.actions) {
-                            TransactionFlow(
-                                sourceAccount = sourceAccount,
-                                target = targetAddress,
-                                action = AssetAction.NewSend
-                            ).apply {
-                                startFlow(
-                                    fragmentManager = currentFragment.childFragmentManager,
-                                    host = this@MainActivity
-                                )
-                            }
-                        } else {
-                            SendActivity.start(this, sourceAccount, targetAddress)
+                        TransactionFlow(
+                            sourceAccount = sourceAccount,
+                            target = targetAddress,
+                            action = AssetAction.NewSend
+                        ).apply {
+                            startFlow(
+                                fragmentManager = currentFragment.childFragmentManager,
+                                host = this@MainActivity
+                            )
                         }
                     },
                     onError = { Timber.e("Unable to select source account for scan") }
@@ -549,7 +544,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     @SuppressLint("CheckResult")
-    private fun disambiguateSendScan(targets: Collection<CryptoAddress>) {
+    private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
         QrScanHandler.disambiguateScan(this, targets)
             .subscribeBy(
                 onSuccess = {

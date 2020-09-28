@@ -7,8 +7,6 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
@@ -88,18 +86,6 @@ abstract class Erc20NonCustodialAccount(
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 
-    override val actions: AvailableActions
-        get() = super.actions.let {
-            if (it.contains(AssetAction.Send)) {
-                it.toMutableSet().apply {
-                    remove(AssetAction.Send)
-                    add(AssetAction.NewSend)
-                }
-            } else {
-                it
-            }
-        }
-
     override val sourceState: Single<TxSourceState>
         get() = super.sourceState.flatMap { state ->
             ethDataManager.isLastTxPending().map { hasUnconfirmed ->
@@ -127,6 +113,4 @@ internal open class Erc20Address(
     init {
         require(asset.hasFeature(CryptoCurrency.IS_ERC20))
     }
-
-    override val scanUri: String? = null
 }

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.notifications.analytics.CustodialBalanceSendClicked
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,7 +29,6 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
@@ -51,7 +49,6 @@ import piuk.blockchain.android.ui.interest.InterestSummarySheet
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
-import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -441,17 +438,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =
         model.process(LaunchSendFlow(account, action))
 
-    override fun gotoSendFor(account: SingleAccount) {
-        when (account) {
-            is CryptoNonCustodialAccount -> startOldSendFor(account)
-            is CustodialTradingAccount -> {
-                analytics.logEvent(CustodialBalanceSendClicked(account.asset))
-                model.process(StartCustodialTransfer(account.asset))
-            }
-            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
-        }.exhaustive
-    }
-
     override fun goToReceiveFor(account: SingleAccount) =
         when (account) {
             is CryptoNonCustodialAccount -> {
@@ -519,11 +505,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun abortTransferFunds() {
         model.process(ClearBottomSheet)
-    }
-
-    private fun startOldSendFor(account: SingleAccount) {
-        clearBottomSheet()
-        SendActivity.start(requireContext(), account as CryptoAccount)
     }
 
     private fun startOldReceiveFor(account: SingleAccount) {

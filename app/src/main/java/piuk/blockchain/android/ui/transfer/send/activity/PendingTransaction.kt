@@ -12,6 +12,7 @@ import java.math.BigInteger
 import piuk.blockchain.android.ui.account.ItemAccount
 import info.blockchain.balance.CryptoCurrency
 
+@Deprecated("Obsolete with new send")
 class PendingTransaction {
     var unspentOutputBundle: SpendableUnspentOutputs? = null
     var sendingObject: ItemAccount? = null
@@ -87,6 +88,7 @@ class PendingTransaction {
     }
 
     companion object {
+        @Deprecated("Watch only, and hence import private keys, and hence this tag is no longer supported")
         const val WATCH_ONLY_SPEND_TAG = -5
     }
 }

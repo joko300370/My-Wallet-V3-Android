@@ -112,7 +112,7 @@ class TransactionModel(
             is TransactionIntent.InitialiseWithSourceAndTargetAccount -> {
                 process(
                     TransactionIntent.TargetSelectionConfirmed(
-                        intent.toAccount
+                        intent.target
                     )
                 )
                 null
@@ -254,11 +254,7 @@ class TransactionModel(
             .subscribeBy(
                 onError = {
                     Timber.e("!TRANSACTION!> Unable to get update available balance")
-                    process(
-                        TransactionIntent.FatalTransactionError(
-                            it
-                        )
-                    )
+                    process(TransactionIntent.FatalTransactionError(it))
                 }
             )
 

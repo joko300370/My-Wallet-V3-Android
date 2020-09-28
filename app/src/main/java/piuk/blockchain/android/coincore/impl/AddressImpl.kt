@@ -1,31 +1,56 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.extensions.exhaustive
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.bch.BchAddress
+import piuk.blockchain.android.coincore.btc.BtcAddress
+import piuk.blockchain.android.coincore.erc20.Erc20Address
+import piuk.blockchain.android.coincore.eth.EthAddress
+import piuk.blockchain.android.coincore.xlm.XlmAddress
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import java.lang.IllegalArgumentException
 
-internal class ExchangeAddress(
-    override val asset: CryptoCurrency,
-    override val address: String,
-    override val label: String // labels.getDefaultExchangeWalletLabel(asset)
-) : CryptoAddress {
-    override val scanUri: String? = null
-}
-
-// internal class CustodialAddress(
-//    asset: CryptoCurrency,
-//    address: String,
-//    labels: DefaultLabels
-// ) : CryptoAddress(asset, address) {
-//    override val label = labels.getDefaultCustodialWalletLabel(asset)
-// }
-
-// internal class EnteredAddress(
-//    asset: CryptoCurrency,
-//    address: String
-// ) : CryptoAddress(asset, address) {
-//    override val label = address
-// }
-
-internal class BitpayAddress
-internal class WalletAddress
-internal class ExternalAddress
+internal fun makeExternalAssetAddress(
+    asset: CryptoCurrency,
+    address: String,
+    label: String,
+    environmentConfig: EnvironmentConfig
+): CryptoAddress =
+    when (asset) {
+        CryptoCurrency.PAX,
+        CryptoCurrency.USDT -> {
+            Erc20Address(
+                asset = asset,
+                address = address,
+                label = label
+            )
+        }
+        CryptoCurrency.ETHER -> {
+            EthAddress(
+                address = address,
+                label = label
+            )
+        }
+        CryptoCurrency.BTC -> {
+            BtcAddress(
+                address = address,
+                label = label,
+                networkParams = environmentConfig.bitcoinNetworkParameters
+            )
+        }
+        CryptoCurrency.BCH -> {
+            BchAddress(
+                address_ = address,
+                label = label
+            )
+        }
+        CryptoCurrency.XLM -> {
+            XlmAddress(
+                address = address,
+                label = label
+            )
+        }
+        CryptoCurrency.ALGO,
+        CryptoCurrency.STX -> throw IllegalArgumentException("External Address not not supported for asset: $asset")
+    }.exhaustive

@@ -153,6 +153,4 @@ internal class TradingAddress(
     override val address: String,
     override val label: String = address,
     override val asset: CryptoCurrency
-) : CryptoAddress {
-    override val scanUri: String? = null
-}
+) : CryptoAddress

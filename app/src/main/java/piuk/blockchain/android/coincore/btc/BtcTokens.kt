@@ -24,12 +24,16 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 
 private const val BTC_URL_PREFIX = "bitcoin:"
 
 internal class BtcAsset(
     payloadManager: PayloadDataManager,
+    private val sendDataManager: SendDataManager,
+    private val feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
@@ -38,7 +42,7 @@ internal class BtcAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    private val environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -65,23 +69,27 @@ internal class BtcAsset(
                 val defaultIndex = defaultAccountIndex
                 accounts.forEachIndexed { i, a ->
                     result.add(
-                        BtcCryptoWalletAccount(
-                            a,
-                            payloadManager,
-                            i == defaultIndex,
-                            exchangeRates,
-                            environmentConfig.bitcoinNetworkParameters
+                        BtcCryptoWalletAccount.createHdAccount(
+                            jsonAccount = a,
+                            payloadManager = payloadManager,
+                            sendDataManager = sendDataManager,
+                            feeDataManager = feeDataManager,
+                            isDefault = i == defaultIndex,
+                            exchangeRates = exchangeRates,
+                            networkParameters = environmentConfig.bitcoinNetworkParameters
                         )
                     )
                 }
 
                 legacyAddresses.forEach { a ->
                     result.add(
-                        BtcCryptoWalletAccount(
-                            a,
-                            payloadManager,
-                            exchangeRates,
-                            environmentConfig.bitcoinNetworkParameters
+                        BtcCryptoWalletAccount.createLegacyAccount(
+                            legacyAccount = a,
+                            payloadManager = payloadManager,
+                            sendDataManager = sendDataManager,
+                            feeDataManager = feeDataManager,
+                            exchangeRates = exchangeRates,
+                            networkParameters = environmentConfig.bitcoinNetworkParameters
                         )
                     )
                 }
@@ -94,8 +102,7 @@ internal class BtcAsset(
             if (isValidAddress(address.removePrefix(BTC_URL_PREFIX))) {
                 BtcAddress(
                     address = address,
-                    networkParams = environmentConfig.bitcoinNetworkParameters,
-                    scanUri = address
+                    networkParams = environmentConfig.bitcoinNetworkParameters
                 )
             } else {
                 null
@@ -111,7 +118,6 @@ internal class BtcAsset(
 
 internal class BtcAddress(
     override val address: String,
-    override val scanUri: String? = null,
     override val label: String = address,
     private val networkParams: NetworkParameters
 ) : CryptoAddress {
@@ -127,6 +133,6 @@ internal class BtcAddress(
             )
         } else {
             return "$BTC_URL_PREFIX$address"
-            }
         }
+    }
 }

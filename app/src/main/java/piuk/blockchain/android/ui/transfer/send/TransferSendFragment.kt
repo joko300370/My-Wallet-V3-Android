@@ -13,7 +13,6 @@ import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
-import piuk.blockchain.android.ui.transfer.send.activity.SendActivity
 
 class TransferSendFragment :
     AccountSelectorFragment(),
@@ -23,10 +22,8 @@ class TransferSendFragment :
 
     override val filterFn: AccountListFilterFn = { account ->
         (account is CryptoAccount) &&
-                account.isFunded &&
-                account.actions.intersect(
-                    listOf(AssetAction.NewSend, AssetAction.Send)
-                ).isNotEmpty()
+            account.isFunded &&
+            account.actions.contains(AssetAction.NewSend)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,15 +56,11 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         require(account is CryptoAccount)
-
-        if (account.actions.contains(AssetAction.NewSend)) {
-            startNewSend(account)
-        } else {
-            startOldSend(account)
-        }
+        require(account.actions.contains(AssetAction.NewSend))
+            startTransactionFlow(account)
     }
 
-    private fun startNewSend(fromAccount: CryptoAccount) {
+    private fun startTransactionFlow(fromAccount: CryptoAccount) {
         flow = TransactionFlow(
             sourceAccount = fromAccount,
             action = AssetAction.NewSend
@@ -77,10 +70,6 @@ class TransferSendFragment :
                 host = this@TransferSendFragment
             )
         }
-    }
-
-    private fun startOldSend(account: CryptoAccount) {
-        SendActivity.start(requireContext(), account)
     }
 
     override fun onFlowFinished() {

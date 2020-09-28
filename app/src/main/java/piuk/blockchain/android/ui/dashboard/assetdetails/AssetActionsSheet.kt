@@ -139,11 +139,6 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
                     getString(R.string.fiat_funds_detail_activity_details), asset) {
                     processAction(AssetAction.ViewActivity)
                 }
-            AssetAction.Send ->
-                AssetActionItem(account, getString(R.string.common_send), R.drawable.ic_tx_sent,
-                    getString(R.string.dashboard_asset_actions_send_dsc, asset.displayTicker), asset) {
-                    processAction(AssetAction.Send)
-                }
             AssetAction.NewSend ->
                 AssetActionItem(account, getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,

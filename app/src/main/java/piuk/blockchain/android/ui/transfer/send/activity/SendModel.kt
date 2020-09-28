@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transfer.send.activity
 
+@Deprecated("Old send. Do not use")
 object SendModel {
 
     /** Large TX Size limit in KB  */

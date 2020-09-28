@@ -8,6 +8,7 @@ import info.blockchain.wallet.exceptions.TransactionHashApiException
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Transaction
@@ -45,7 +46,7 @@ class PaymentService(
         bigIntAmount: BigInteger
     ): Observable<String> = Observable.fromCallable {
 
-        val tx = signAngGetTx(unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount)
+        val tx = signAngGetBtcTx(unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount)
         val response = payment.publishSimpleTransaction(tx).execute()
 
         when {
@@ -54,7 +55,18 @@ class PaymentService(
         }
     }
 
-    internal fun signAngGetTx(
+    @WebRequest
+    internal fun submitBtcPayment(
+        signedTx: Transaction
+    ): Single<String> = Single.fromCallable {
+        val response = payment.publishSimpleTransaction(signedTx).execute()
+        when {
+            response.isSuccessful -> signedTx.hashAsString
+            else -> throw TransactionHashApiException.fromResponse(signedTx.hashAsString, response)
+        }
+    }
+
+    internal fun signAngGetBtcTx(
         unspentOutputBundle: SpendableUnspentOutputs,
         keys: List<ECKey>,
         toAddress: String,

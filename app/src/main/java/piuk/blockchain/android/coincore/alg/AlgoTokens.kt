@@ -82,5 +82,4 @@ internal class AlgoAddress(
     override val label: String = address
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.ALGO
-    override val scanUri: String? = null
 }

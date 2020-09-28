@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.extensions.exhaustive
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
@@ -16,11 +15,6 @@ import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.bch.BchAddress
-import piuk.blockchain.android.coincore.btc.BtcAddress
-import piuk.blockchain.android.coincore.erc20.Erc20Address
-import piuk.blockchain.android.coincore.eth.EthAddress
-import piuk.blockchain.android.coincore.xlm.XlmAddress
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -39,45 +33,12 @@ internal class CryptoInterestAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = custodialWalletManager.getInterestAccountAddress(asset).map {
-            when (asset) {
-                CryptoCurrency.PAX,
-                CryptoCurrency.USDT -> {
-                    Erc20Address(
-                        asset = asset,
-                        address = it,
-                        label = label
-                    )
-                }
-                CryptoCurrency.ETHER -> {
-                    EthAddress(
-                        address = it,
-                        label = label
-                    )
-                }
-                CryptoCurrency.BTC -> {
-                    BtcAddress(
-                        address = it,
-                        label = label,
-                        networkParams = environmentConfig.bitcoinNetworkParameters
-                    )
-                }
-                CryptoCurrency.BCH -> {
-                    BchAddress(
-                        address_ = it,
-                        label = label,
-                        scanUri = null
-                    )
-                }
-                CryptoCurrency.XLM -> {
-                    XlmAddress(
-                        address = it,
-                        label = label
-                    )
-                }
-                CryptoCurrency.ALGO,
-                CryptoCurrency.STX -> throw IllegalStateException(
-                    "Interest receive address not supported for asset: $asset")
-            }.exhaustive
+            makeExternalAssetAddress(
+                asset = asset,
+                address = it,
+                label = label,
+                environmentConfig = environmentConfig
+            )
         }
 
     override fun requireSecondPassword(): Single<Boolean> =

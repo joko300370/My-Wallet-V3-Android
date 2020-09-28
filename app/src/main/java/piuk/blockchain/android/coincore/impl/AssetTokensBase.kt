@@ -41,7 +41,7 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     private val tiersService: TierService,
-    private val environmentConfig: EnvironmentConfig
+    protected val environmentConfig: EnvironmentConfig
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -166,7 +166,8 @@ internal abstract class CryptoAssetBase(
                     asset = asset,
                     label = labels.getDefaultExchangeWalletLabel(asset),
                     address = address,
-                    exchangeRates = exchangeRates
+                    exchangeRates = exchangeRates,
+                    environmentConfig = environmentConfig
                 )
             }
 

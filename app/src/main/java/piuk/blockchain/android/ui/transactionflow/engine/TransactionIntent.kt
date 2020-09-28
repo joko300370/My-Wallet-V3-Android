@@ -5,6 +5,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
@@ -43,25 +44,28 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     class InitialiseWithSourceAndTargetAccount(
         private val action: AssetAction,
         val fromAccount: CryptoAccount,
-        val toAccount: TransactionTarget,
+        val target: TransactionTarget,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             TransactionState(
                 action = action,
                 sendingAccount = fromAccount,
-                selectedTarget = toAccount,
+                selectedTarget = target,
                 errorState = TransactionErrorState.NONE,
                 passwordRequired = passwordRequired,
-                currentStep = selectStep(passwordRequired),
+                currentStep = selectStep(passwordRequired, target),
                 nextEnabled = passwordRequired
             ).updateBackstack(oldState)
 
-        private fun selectStep(passwordRequired: Boolean): TransactionStep =
-            if (passwordRequired) {
-                TransactionStep.ENTER_PASSWORD
-            } else {
-                TransactionStep.ENTER_AMOUNT
+        private fun selectStep(
+            passwordRequired: Boolean,
+            target: TransactionTarget
+        ): TransactionStep =
+            when {
+                passwordRequired -> TransactionStep.ENTER_PASSWORD
+                target is InvoiceTarget -> TransactionStep.CONFIRM_DETAIL
+                else -> TransactionStep.ENTER_AMOUNT
             }
     }
 
@@ -86,10 +90,10 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
 
         private fun selectStep(oldState: TransactionState): TransactionStep =
-            if (oldState.selectedTarget == NullAddress) {
-                TransactionStep.ENTER_ADDRESS
-            } else {
-                TransactionStep.ENTER_AMOUNT
+            when (oldState.selectedTarget) {
+                is NullAddress -> TransactionStep.ENTER_ADDRESS
+                is InvoiceTarget -> TransactionStep.CONFIRM_DETAIL
+                else -> TransactionStep.ENTER_AMOUNT
             }
     }
 
@@ -175,7 +179,6 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 errorState = TransactionErrorState.NONE,
-                currentStep = TransactionStep.ENTER_AMOUNT,
                 allowFiatInput = canTransactFiat,
                 nextEnabled = false
             ).updateBackstack(oldState)

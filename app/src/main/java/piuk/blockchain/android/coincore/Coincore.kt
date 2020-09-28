@@ -81,8 +81,7 @@ class Coincore internal constructor(
                     it is FiatAccount
                 }
             }
-            AssetAction.NewSend,
-            AssetAction.Send -> {
+            AssetAction.NewSend -> {
                 {
                     it !is FiatAccount
                 }

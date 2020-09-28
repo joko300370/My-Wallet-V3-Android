@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
@@ -9,15 +10,19 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
+import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
+import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class TxProcessorFactory(
+    private val bitPayManager: BitPayDataManager,
     private val exchangeRates: ExchangeRateDataManager,
-    private val walletManager: CustodialWalletManager
+    private val walletManager: CustodialWalletManager,
+    private val walletPrefs: WalletStatus
 ) {
     fun createProcessor(
         source: CryptoAccount,
@@ -38,6 +43,18 @@ class TxProcessorFactory(
         val onChainEngine = source.createTxEngine()
 
         return when (target) {
+            is BitPayInvoiceTarget -> Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = BtcBitpayTxEngine(
+                        bitPayDataManager = bitPayManager,
+                        walletPrefs = walletPrefs,
+                        assetEngine = onChainEngine as OnChainTxEngineBase
+                    )
+                )
+            )
             is CryptoInterestAccount -> target.receiveAddress.map {
                 TransactionProcessor(
                     exchangeRates = exchangeRates,

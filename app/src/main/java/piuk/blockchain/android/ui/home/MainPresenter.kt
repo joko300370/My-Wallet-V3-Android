@@ -28,7 +28,7 @@ import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
-import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
@@ -68,7 +68,7 @@ interface MainView : MvpView, HomeNavigator {
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
 
-    fun startTransactionFlowWithTarget(targets: Collection<CryptoAddress>)
+    fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
 }
 
 class MainPresenter internal constructor(
@@ -371,8 +371,8 @@ class MainPresenter internal constructor(
                 onSuccess = {
                     when (it) {
                         is ScanResult.HttpUri -> handlePossibleDeepLink(scanData)
-                        is ScanResult.TransactionTarget -> {
-                            view?.startTransactionFlowWithTarget(it.targets.filterIsInstance<CryptoAddress>())
+                        is ScanResult.TxTarget -> {
+                            view?.startTransactionFlowWithTarget(it.targets)
                         }
                     }
                 }

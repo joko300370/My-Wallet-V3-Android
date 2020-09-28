@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.payloadScope
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.karumi.dexter.Dexter
@@ -21,17 +22,19 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.MaybeSubject
 import io.reactivex.subjects.SingleSubject
+import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.BitpayInvoiceTarget
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
 import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
+import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
@@ -49,13 +52,13 @@ sealed class ScanResult(
         isDeeplinked: Boolean
     ) : ScanResult(isDeeplinked)
 
-    class TransactionTarget(
-        val targets: Set<ReceiveAddress>,
+    class TxTarget(
+        val targets: Set<CryptoTarget>,
         isDeeplinked: Boolean
     ) : ScanResult(isDeeplinked)
 }
 
-object QrScanHandler {
+object QrScanHandler : KoinComponent {
 
     const val SCAN_URI_RESULT = 12007
 
@@ -126,36 +129,35 @@ object QrScanHandler {
     fun processScan(scanResult: String, isDeeplinked: Boolean = false): Single<ScanResult> =
         when {
             scanResult.isHttpUri() -> Single.just(ScanResult.HttpUri(scanResult, isDeeplinked))
-            scanResult.isBitpayUri() -> Single.just(
-                ScanResult.TransactionTarget(parseBitpayInvoice(scanResult), isDeeplinked)
-            )
+            scanResult.isBitpayUri() -> parseBitpayInvoice(scanResult)
+                .map {
+                    ScanResult.TxTarget(setOf(it), isDeeplinked)
+                }
             else -> {
                 val addressParser: AddressFactory = payloadScope.get()
                 addressParser.parse(scanResult)
                     .map {
-                        ScanResult.TransactionTarget(it, isDeeplinked)
+                        ScanResult.TxTarget(
+                            it.filterIsInstance<CryptoAddress>().toSet(),
+                            isDeeplinked
+                        )
                     }
             }
         }
 
-    // Temp hack. This should be processed and checked for validity by the Address Parser
-    // Do this as part of BTC new send impl TODO
-    private fun parseBitpayInvoice(bitpayUri: String) =
-        setOf(
-            BitpayInvoiceTarget(
-                asset = CryptoCurrency.BTC,
-                invoiceUrl = bitpayUri
-            )
-        )
+    private val bitPayDataManager: BitPayDataManager by scopedInject()
 
-    fun disambiguateScan(activity: Activity, targets: Collection<CryptoAddress>): Single<CryptoAddress> {
+    private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> =
+        BitPayInvoiceTarget.fromLink(CryptoCurrency.BTC, bitpayUri, bitPayDataManager)
+
+    fun disambiguateScan(activity: Activity, targets: Collection<CryptoTarget>): Single<CryptoTarget> {
         // TEMP while refactoring - replace with bottom sheet.
         val optionsList = ArrayList(targets)
         val selectList = optionsList.map {
             activity.resources.getString(it.asset.assetName())
         }.toTypedArray()
 
-        val subject = SingleSubject.create<CryptoAddress>()
+        val subject = SingleSubject.create<CryptoTarget>()
 
         AlertDialog.Builder(activity, R.style.AlertDialogStyle)
             .setTitle(R.string.confirm_currency)
@@ -178,9 +180,9 @@ object QrScanHandler {
         scanResult: ScanResult
     ): Maybe<CryptoAddress> =
         Maybe.just(scanResult)
-            .filter { r -> r is ScanResult.TransactionTarget }
+            .filter { r -> r is ScanResult.TxTarget }
             .map { r ->
-                (r as ScanResult.TransactionTarget).targets
+                (r as ScanResult.TxTarget).targets
                 .filterIsInstance<CryptoAddress>()
                 .first { a -> a.asset == asset }
             }.onErrorComplete()
@@ -188,7 +190,7 @@ object QrScanHandler {
     @SuppressLint("CheckResult")
     fun selectSourceAccount(
         activity: BlockchainActivity,
-        target: CryptoAddress
+        target: CryptoTarget
     ): Maybe<CryptoAccount> {
         // TODO: We currently only support sending to external addresses from a non-custodial
         // account. At some point, this will - maybe - change and we'll have to implement

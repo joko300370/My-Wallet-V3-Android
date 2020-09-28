@@ -22,11 +22,9 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(ConfirmInfoItemDelegate(mapper))
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))
-            addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(
-                model,
-                stringUtils,
-                activityContext))
+            addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(model, exchangeRates, selectedCurrency))
+            addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
         }
     }
 }

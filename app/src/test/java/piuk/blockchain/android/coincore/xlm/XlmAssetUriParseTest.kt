@@ -62,8 +62,7 @@ class XlmAssetUriParseTest {
 
         val expectedResult = XlmAddress(
             address = VALID_SCAN_URI,
-            label = VALID_SCAN_URI,
-            scanUri = VALID_SCAN_URI
+            label = VALID_SCAN_URI
         )
 
         subject.parseAddress(VALID_SCAN_URI)

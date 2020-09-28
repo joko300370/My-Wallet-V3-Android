@@ -179,6 +179,10 @@ class BitcoinSendStrategy(
         isBitpayPaymentRequest = isBitPay
     }
 
+    override fun setInvoiceId(invoiceId: String) {
+        this.invoiceId = invoiceId
+    }
+
     override fun onViewReady() {
         resetAccountList()
         setupTextChangeSubject()
@@ -226,8 +230,12 @@ class BitcoinSendStrategy(
         val txHex = transaction.toHexHash()
 
         return bitPayDataManager.paymentVerificationRequest(invoiceId,
-            BitPaymentRequest(CryptoCurrency.BTC.networkTicker,
-                listOf(BitPayTransaction(txHex, transaction.messageSize)))).flatMap {
+            BitPaymentRequest(
+                CryptoCurrency.BTC.networkTicker,
+                listOf(BitPayTransaction(txHex, transaction.messageSize)
+                )
+            )
+        ).flatMap {
             Single.timer(3, TimeUnit.SECONDS)
         }.flatMap {
             bitPayDataManager.paymentSubmitRequest(invoiceId,
@@ -261,7 +269,7 @@ class BitcoinSendStrategy(
                         pendingTransaction.bigIntAmount
                     )
                 } else {
-                    val transaction = sendDataManager.getTransaction(
+                    val transaction = sendDataManager.createAndSignBtcTransaction(
                         pendingTransaction.unspentOutputBundle!!,
                         it,
                         pendingTransaction.receivingAddress,
@@ -881,10 +889,6 @@ class BitcoinSendStrategy(
         }
 
         return Pair.of(validated, errorMessage)
-    }
-
-    override fun setInvoiceId(invoiceId: String) {
-        this.invoiceId = invoiceId
     }
 
     private fun Transaction.toHexHash() =

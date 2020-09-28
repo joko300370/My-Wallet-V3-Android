@@ -5,7 +5,6 @@ import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AsyncAllAccountList
 import com.blockchain.activities.StartSwap
 import com.blockchain.koin.bch
-import com.blockchain.koin.bchStrategy
 import com.blockchain.koin.btc
 import com.blockchain.koin.btcStrategy
 import com.blockchain.koin.cardPaymentsFeatureFlag
@@ -123,7 +122,6 @@ import piuk.blockchain.android.ui.transfer.send.activity.SendView
 import piuk.blockchain.android.ui.account.chooser.AccountChooserPresenter
 import piuk.blockchain.android.ui.account.chooser.AccountListing
 import piuk.blockchain.android.ui.transfer.send.activity.ConfirmPaymentPresenter
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinCashSendStrategy
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinSendStrategy
 import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendStrategy
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
@@ -446,7 +444,6 @@ val applicationModule = module {
         factory<SendPresenter<SendView>> {
             SendPresenter(
                 btcStrategy = get(btcStrategy),
-                bchStrategy = get(bchStrategy),
                 prefs = get(),
                 exchangeRates = get(),
                 stringUtils = get(),
@@ -477,29 +474,6 @@ val applicationModule = module {
                 pitLinking = get(),
                 analytics = get(),
                 envSettings = get()
-            )
-        }
-
-        factory<SendStrategy<SendView>>(bchStrategy) {
-            BitcoinCashSendStrategy(
-                walletAccountHelper = get(),
-                payloadDataManager = get(),
-                prefs = get(),
-                stringUtils = get(),
-                sendDataManager = get(),
-                dynamicFeeCache = get(),
-                feeDataManager = get(),
-                privateKeyFactory = get(),
-                environmentSettings = get(),
-                bchDataManager = get(),
-                exchangeRates = get(),
-                environmentConfig = get(),
-                coinSelectionRemoteConfig = get(),
-                nabuToken = get(),
-                nabuDataManager = get(),
-                pitLinking = get(),
-                envSettings = get(),
-                analytics = get()
             )
         }
 

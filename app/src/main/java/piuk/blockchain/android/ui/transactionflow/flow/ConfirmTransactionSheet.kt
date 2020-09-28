@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
 class ConfirmTransactionSheet(
@@ -44,15 +45,18 @@ class ConfirmTransactionSheet(
         require(newState.currentStep == TransactionStep.CONFIRM_DETAIL)
 
         // We _should_ always have a pending Tx when we get here
-        require(newState.pendingTx != null)
+        newState.pendingTx?.let {
+            listAdapter.items = newState.pendingTx.options.toList()
+            listAdapter.notifyDataSetChanged()
+            dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
+        }
 
-        listAdapter.items = newState.pendingTx.options.toList()
-        listAdapter.notifyDataSetChanged()
-        dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
-
-        dialogView.confirm_cta_button.text = customiser.confirmCtaText(newState)
-        dialogView.confirm_sheet_title.text = customiser.confirmTitle(newState)
-        dialogView.confirm_cta_button.isEnabled = newState.nextEnabled
+        with(dialogView) {
+            confirm_cta_button.text = customiser.confirmCtaText(newState)
+            confirm_sheet_title.text = customiser.confirmTitle(newState)
+            confirm_cta_button.isEnabled = newState.nextEnabled
+            confirm_sheet_back.visibleIf { newState.canGoBack }
+        }
     }
 
     override fun initControls(view: View) {

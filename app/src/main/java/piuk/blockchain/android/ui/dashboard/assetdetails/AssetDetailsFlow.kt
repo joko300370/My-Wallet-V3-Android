@@ -39,7 +39,6 @@ class AssetDetailsFlow(
 
     interface AssetDetailsHost : FlowHost {
         fun launchNewSendFor(account: SingleAccount, action: AssetAction)
-        fun gotoSendFor(account: SingleAccount)
         fun goToReceiveFor(account: SingleAccount)
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
@@ -112,7 +111,6 @@ class AssetDetailsFlow(
                     filterNonCustodialAccounts(localState.hostAction == AssetAction.Receive),
                     when (localState.hostAction) {
                         AssetAction.Deposit -> R.string.select_deposit_source_title
-                        AssetAction.Send,
                         AssetAction.NewSend -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
                     })
@@ -137,14 +135,6 @@ class AssetDetailsFlow(
                     state = newState,
                     singleAccountAction = {
                         launchActivity(it)
-                    }
-                )
-            }
-            AssetAction.Send -> {
-                selectAccountOrPerformAction(
-                    state = newState,
-                    singleAccountAction = {
-                        launchSend(it)
                     }
                 )
             }
@@ -248,7 +238,6 @@ class AssetDetailsFlow(
         when (localState.hostAction) {
             AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
             AssetAction.NewSend -> launchNewSend(singleAccount)
-            AssetAction.Send -> launchSend(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
@@ -283,11 +272,6 @@ class AssetDetailsFlow(
 
     private fun launchNewSend(account: SingleAccount) {
         assetFlowHost.launchNewSendFor(account, AssetAction.NewSend)
-        finishFlow()
-    }
-
-    private fun launchSend(account: SingleAccount) {
-        assetFlowHost.gotoSendFor(account)
         finishFlow()
     }
 

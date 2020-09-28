@@ -17,34 +17,24 @@ interface TransactionTarget {
     val label: String
 }
 
-interface ReceiveAddress : TransactionTarget
+// An invoice has a fixed amount
+interface InvoiceTarget
+
+interface ReceiveAddress : TransactionTarget {
+    val address: String
+}
 
 object NullAddress : ReceiveAddress {
     override val label: String = ""
-}
-
-interface CryptoAddress : ReceiveAddress {
-    val asset: CryptoCurrency
-    val address: String
-
-    fun toUrl(amount: CryptoValue = CryptoValue.zero(asset)) = address
-
-    // Temp for passing the results of a scan through to old send. Not needed for new
-    // send, so only BTC, BCH and XLM will use this and it'll be taken out once the last
-    // 3 assets are moved to the sendflow framework. TODO
-    @Deprecated(message = "Old send scan support")
-    val scanUri: String?
-}
-
-// Stub address type - the address parser should check and populate this properly, once BTC is
-// new send enabled. TODO
-class BitpayInvoiceTarget(
-    override val asset: CryptoCurrency,
-    val invoiceUrl: String
-) : CryptoAddress {
-    override val label: String = ""
     override val address: String = ""
-    override val scanUri = invoiceUrl
+}
+
+interface CryptoTarget : TransactionTarget {
+    val asset: CryptoCurrency
+}
+
+interface CryptoAddress : CryptoTarget, ReceiveAddress {
+    fun toUrl(amount: CryptoValue = CryptoValue.zero(asset)) = address
 }
 
 interface AddressFactory {

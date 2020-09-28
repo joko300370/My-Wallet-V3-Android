@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore
 
+import androidx.annotation.CallSuper
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.preferences.CurrencyPrefs
@@ -51,7 +52,8 @@ data class PendingTx(
     val options: List<TxOptionValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
-    val validationState: ValidationState = ValidationState.UNINITIALISED
+    val validationState: ValidationState = ValidationState.UNINITIALISED,
+    val engineState: Map<String, Any> = emptyMap()
 ) {
     fun hasOption(option: TxOption): Boolean =
         options.find { it.option == option } != null
@@ -66,10 +68,11 @@ enum class TxOption {
     AGREEMENT_INTEREST_TRANSFER,
     READ_ONLY,
     MEMO,
-    AMOUNT
+    AMOUNT,
+    LARGE_TRANSACTION_WARNING
 }
 
-sealed class TxOptionValue(val option: TxOption) {
+sealed class TxOptionValue(open val option: TxOption) {
 
     data class ExchangePriceOption(val money: Money, val asset: CryptoCurrency) :
         TxOptionValue(TxOption.READ_ONLY)
@@ -94,10 +97,10 @@ sealed class TxOptionValue(val option: TxOption) {
     data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) : TxOptionValue(TxOption.MEMO)
 
     data class TxBooleanOption<T>(
-        private val _option: TxOption,
+        override val option: TxOption,
         val data: T? = null,
         val value: Boolean = false
-    ) : TxOptionValue(_option)
+    ) : TxOptionValue(option)
 }
 
 abstract class TxEngine : KoinComponent {
@@ -115,6 +118,7 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
+    @CallSuper
     open fun start(
         sourceAccount: CryptoAccount,
         txTarget: TransactionTarget,

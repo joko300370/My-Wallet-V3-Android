@@ -7,8 +7,6 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
@@ -113,16 +111,4 @@ internal class EthCryptoWalletAccount(
             feeManager = fees,
             requireSecondPassword = ethDataManager.requireSecondPassword
         )
-
-    override val actions: AvailableActions
-        get() = super.actions.let {
-            if (it.contains(AssetAction.Send)) {
-                it.toMutableSet().apply {
-                    remove(AssetAction.Send)
-                    add(AssetAction.NewSend)
-                }
-            } else {
-                it
-            }
-        }
 }

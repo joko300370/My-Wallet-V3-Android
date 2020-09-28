@@ -79,8 +79,7 @@ internal class XlmAsset(
                 val payment = address.fromStellarUri()
                 XlmAddress(
                     address = payment.public.accountId,
-                    stellarPayment = payment,
-                    scanUri = address
+                    stellarPayment = payment
                 )
             } else {
                 if (isValidAddress(address)) {
@@ -98,7 +97,6 @@ internal class XlmAsset(
 internal data class XlmAddress(
     override val address: String,
     override val label: String = address,
-    override val scanUri: String? = null,
     val stellarPayment: StellarPayment? = null
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.XLM
@@ -110,7 +108,6 @@ internal data class XlmAddress(
 
     override fun hashCode(): Int {
         var result = address.hashCode()
-        result = 31 * result + (scanUri?.hashCode() ?: 0)
         result = 31 * result + label.hashCode()
         result = 31 * result + (stellarPayment?.hashCode() ?: 0)
         result = 31 * result + asset.hashCode()

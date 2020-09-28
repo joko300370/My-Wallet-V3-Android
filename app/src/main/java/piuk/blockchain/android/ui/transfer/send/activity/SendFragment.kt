@@ -54,7 +54,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.data.api.bitpay.models.events.BitPayEvent
@@ -1120,7 +1119,6 @@ class SendFragment : MvpFragment<SendView, SendPresenter<SendView>>(), SendView 
         ): SendFragment {
             val fragment = SendFragment()
             fragment.arguments = Bundle().apply {
-                urlInput = (target as? CryptoAddress)?.scanUri
                 inputDeeplinked = isDeeplink
                 putAccount(ARGUMENT_SEND_SOURCE, sourceAccount)
             }

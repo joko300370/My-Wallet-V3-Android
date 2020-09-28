@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -51,7 +52,8 @@ internal class CryptoExchangeAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase() {
 
     override fun requireSecondPassword(): Single<Boolean> =
@@ -65,10 +67,11 @@ internal class CryptoExchangeAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
-            ExchangeAddress(
+            makeExternalAssetAddress(
                 asset = asset,
                 label = label,
-                address = address
+                address = address,
+                environmentConfig = environmentConfig
             )
         )
 
@@ -83,7 +86,7 @@ internal class CryptoExchangeAccount(
 
 abstract class CryptoNonCustodialAccount(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
-    protected val payloadManager: PayloadDataManager,
+    protected val payloadDataManager: PayloadDataManager,
     override val asset: CryptoCurrency
 ) : CryptoAccountBase(), NonCustodialAccount {
 
@@ -93,13 +96,13 @@ abstract class CryptoNonCustodialAccount(
         get() =
             mutableSetOf(
                 AssetAction.ViewActivity,
-                AssetAction.Send,
+                AssetAction.NewSend,
                 AssetAction.Receive,
                 AssetAction.Swap
             ).apply {
                 if (!isFunded) {
                     remove(AssetAction.Swap)
-                    remove(AssetAction.Send)
+                    remove(AssetAction.NewSend)
                 }
             }
 
@@ -113,7 +116,7 @@ abstract class CryptoNonCustodialAccount(
         }
 
     override fun requireSecondPassword(): Single<Boolean> =
-        Single.fromCallable { payloadManager.isDoubleEncrypted }
+        Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
     abstract fun createTxEngine(): TxEngine
 }

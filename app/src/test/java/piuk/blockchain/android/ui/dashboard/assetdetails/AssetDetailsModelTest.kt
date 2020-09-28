@@ -17,7 +17,20 @@ import piuk.blockchain.androidcore.data.charts.TimeSpan
 class AssetDetailsModelTest {
     private lateinit var model: AssetDetailsModel
     private val defaultState = AssetDetailsState(
-        asset = BtcAsset(mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock(), mock())
+        asset = BtcAsset(
+            payloadManager = mock(),
+            sendDataManager = mock(),
+            feeDataManager = mock(),
+            custodialManager = mock(),
+            exchangeRates = mock(),
+            historicRates = mock(),
+            currencyPrefs = mock(),
+            labels = mock(),
+            pitLinking = mock(),
+            crashLogger = mock(),
+            tiersService = mock(),
+            environmentConfig = mock()
+        )
     )
     private val interactor: AssetDetailsInteractor = mock()
 

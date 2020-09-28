@@ -13,12 +13,16 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import java.math.BigInteger
 
 class BtcAccountActivityTest {
 
     private val payloadDataManager: PayloadDataManager = mock()
+    private val sendDataManager: SendDataManager = mock()
+    private val feeDataManager: FeeDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val networkParameters: NetworkParameters = mock()
@@ -28,10 +32,13 @@ class BtcAccountActivityTest {
             label = "TestBtcAccount",
             address = "",
             payloadManager = payloadDataManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
             isDefault = true,
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
-            internalAccount = mock()
+            internalAccount = mock(),
+            isHDAccount = true
         )
 
     @get:Rule

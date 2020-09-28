@@ -17,7 +17,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
@@ -45,7 +45,6 @@ class DisplayFeeOptions(val title: String, val description: String)
  */
 class SendPresenter<View : SendView>(
     private val btcStrategy: SendStrategy<View>,
-    private val bchStrategy: SendStrategy<View>,
     private val exchangeRates: ExchangeRateDataManager,
     private val envSettings: EnvironmentConfig,
     private val stringUtils: StringUtils,
@@ -131,7 +130,6 @@ class SendPresenter<View : SendView>(
     private fun onCurrencySelected(asset: CryptoCurrency) {
         delegate = when (asset) {
             CryptoCurrency.BTC -> btcStrategy
-            CryptoCurrency.BCH -> bchStrategy
             else -> throw IllegalArgumentException("Old send no longer supports: ${asset.networkTicker}")
         }
 
@@ -148,9 +146,9 @@ class SendPresenter<View : SendView>(
         compositeDisposable += QrScanHandler.processScan(scanData)
             .subscribeBy(
                 onSuccess = {
-                    if (it is ScanResult.TransactionTarget) {
+                    if (it is ScanResult.TxTarget) {
                         // Make sure this is a viable send target for the selected asset
-                        val target = it.targets.filterIsInstance<CryptoAddress>()
+                        val target = it.targets.filterIsInstance<CryptoTarget>()
                             .firstOrNull { target -> target.asset == asset }
 
                         if (target != null) {

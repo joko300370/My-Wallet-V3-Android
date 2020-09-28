@@ -40,6 +40,8 @@ val coincoreModule = module {
         scoped {
             BtcAsset(
                 exchangeRates = get(),
+                sendDataManager = get(),
+                feeDataManager = get(),
                 environmentConfig = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
@@ -63,6 +65,8 @@ val coincoreModule = module {
                 stringUtils = get(),
                 custodialManager = get(),
                 environmentSettings = get(),
+                feeDataManager = get(),
+                sendDataManager = get(),
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get()
@@ -186,8 +190,10 @@ val coincoreModule = module {
 
         scoped {
             TxProcessorFactory(
+                bitPayManager = get(),
                 exchangeRates = get(),
-                walletManager = get()
+                walletManager = get(),
+                walletPrefs = get()
             )
         }
 

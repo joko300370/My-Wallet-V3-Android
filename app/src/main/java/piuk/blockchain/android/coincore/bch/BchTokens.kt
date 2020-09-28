@@ -22,7 +22,9 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import timber.log.Timber
 
 private const val BCH_URL_PREFIX = "bitcoincash:"
@@ -33,6 +35,8 @@ internal class BchAsset(
     private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
     private val environmentSettings: EnvironmentConfig,
+    private val feeDataManager: FeeDataManager,
+    private val sendDataManager: SendDataManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
@@ -71,7 +75,9 @@ internal class BchAsset(
                             bchManager = bchDataManager,
                             isDefault = i == getDefaultAccountPosition(),
                             exchangeRates = exchangeRates,
-                            networkParams = environmentSettings.bitcoinCashNetworkParameters
+                            networkParams = environmentSettings.bitcoinCashNetworkParameters,
+                            feeDataManager = feeDataManager,
+                            sendDataManager = sendDataManager
                         )
                 }
             }
@@ -95,7 +101,6 @@ internal class BchAsset(
 
 internal class BchAddress(
     address_: String,
-    override val scanUri: String?,
     override val label: String = address_
 ) : CryptoAddress {
     override val address: String = address_.removeBchUri()

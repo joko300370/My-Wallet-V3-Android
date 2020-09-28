@@ -55,12 +55,12 @@ class InterestDepositTxEngine(
 
                     add(
                         TxOptionValue.TxBooleanOption<Unit>(
-                            _option = TxOption.AGREEMENT_INTEREST_T_AND_C
+                            option = TxOption.AGREEMENT_INTEREST_T_AND_C
                         )
                     )
                     add(
                         TxOptionValue.TxBooleanOption(
-                            _option = TxOption.AGREEMENT_INTEREST_TRANSFER,
+                            option = TxOption.AGREEMENT_INTEREST_TRANSFER,
                             data = pendingTx.amount
                         )
                     )

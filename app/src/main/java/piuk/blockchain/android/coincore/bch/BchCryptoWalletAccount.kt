@@ -16,7 +16,9 @@ import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -28,6 +30,8 @@ internal class BchCryptoWalletAccount(
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters,
+    private val feeDataManager: FeeDataManager,
+    private val sendDataManager: SendDataManager,
     // TEMP keep a copy of the metadata account, for interop with the old send flow
     // this can and will be removed when BCH is moved over and has a on-chain
     // TransactionProcessor defined;
@@ -72,7 +76,7 @@ internal class BchCryptoWalletAccount(
         }
             .singleOrError()
             .map {
-                BchAddress(address_ = it, scanUri = null, label = label)
+                BchAddress(address_ = it, label = label)
             }
 
     override val activity: Single<ActivitySummaryList>
@@ -86,9 +90,15 @@ internal class BchCryptoWalletAccount(
                 ) as ActivitySummaryItem
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
-    override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
-    }
+    override fun createTxEngine(): TxEngine =
+        BchOnChainTxEngine(
+            feeDataManager = feeDataManager,
+            networkParams = networkParams,
+            sendDataManager = sendDataManager,
+            bchDataManager = bchManager,
+            payloadDataManager = payloadDataManager,
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+        )
 
     constructor(
         payloadManager: PayloadDataManager,
@@ -96,7 +106,9 @@ internal class BchCryptoWalletAccount(
         bchManager: BchDataManager,
         isDefault: Boolean,
         exchangeRates: ExchangeRateDataManager,
-        networkParams: NetworkParameters
+        networkParams: NetworkParameters,
+        feeDataManager: FeeDataManager,
+        sendDataManager: SendDataManager
     ) : this(
         payloadManager,
         jsonAccount.label,
@@ -105,6 +117,8 @@ internal class BchCryptoWalletAccount(
         isDefault,
         exchangeRates,
         networkParams,
+        feeDataManager,
+        sendDataManager,
         jsonAccount
     )
 }

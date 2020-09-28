@@ -16,12 +16,16 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BtcCryptoWalletAccount(
     payloadManager: PayloadDataManager,
+    private val sendDataManager: SendDataManager,
+    private val feeDataManager: FeeDataManager,
     override val label: String,
     private val address: String,
     override val isDefault: Boolean = false,
@@ -30,7 +34,9 @@ internal class BtcCryptoWalletAccount(
     // TEMP keep a copy of the metadata account, for interop with the old send flow
     // this can and will be removed when BTC is moved over and has a on-chain
     // TransactionProcessor defined;
-    val internalAccount: JsonSerializableAccount
+    @Deprecated("Old send style address format")
+    val internalAccount: JsonSerializableAccount,
+    val isHDAccount: Boolean
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -39,7 +45,7 @@ internal class BtcCryptoWalletAccount(
         get() = hasFunds.get()
 
     override val accountBalance: Single<Money>
-        get() = payloadManager.getAddressBalanceRefresh(address)
+        get() = payloadDataManager.getAddressBalanceRefresh(address)
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
@@ -49,16 +55,16 @@ internal class BtcCryptoWalletAccount(
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = payloadManager.getNextReceiveAddress(
+        get() = payloadDataManager.getNextReceiveAddress(
             // TODO: Probably want the index of this address'
-            payloadManager.getAccount(payloadManager.defaultAccountIndex)
+            payloadDataManager.getAccount(payloadDataManager.defaultAccountIndex)
         ).singleOrError()
             .map {
                 BtcAddress(address = it, label = label, networkParams = networkParameters)
             }
 
     override val activity: Single<ActivitySummaryList>
-        get() = payloadManager.getAccountTransactions(
+        get() = payloadDataManager.getAccountTransactions(
             address,
             transactionFetchCount,
             transactionFetchOffset
@@ -67,7 +73,7 @@ internal class BtcCryptoWalletAccount(
             .mapList {
                 BtcActivitySummaryItem(
                     it,
-                    payloadManager,
+                    payloadDataManager,
                     exchangeRates,
                     this
                 ) as ActivitySummaryItem
@@ -75,38 +81,55 @@ internal class BtcCryptoWalletAccount(
                 setHasTransactions(it.isNotEmpty())
             }
 
-    override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
+    override fun createTxEngine(): TxEngine =
+        BtcOnChainTxEngine(
+            btcDataManager = payloadDataManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            btcNetworkParams = networkParameters,
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+        )
+
+    companion object {
+        fun createHdAccount(
+            jsonAccount: Account,
+            payloadManager: PayloadDataManager,
+            sendDataManager: SendDataManager,
+            feeDataManager: FeeDataManager,
+            isDefault: Boolean = false,
+            exchangeRates: ExchangeRateDataManager,
+            networkParameters: NetworkParameters
+        ) = BtcCryptoWalletAccount(
+            payloadManager = payloadManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            label = jsonAccount.label,
+            address = jsonAccount.xpub,
+            isDefault = isDefault,
+            exchangeRates = exchangeRates,
+            networkParameters = networkParameters,
+            internalAccount = jsonAccount,
+            isHDAccount = true
+        )
+
+        fun createLegacyAccount(
+            legacyAccount: LegacyAddress,
+            payloadManager: PayloadDataManager,
+            sendDataManager: SendDataManager,
+            feeDataManager: FeeDataManager,
+            exchangeRates: ExchangeRateDataManager,
+            networkParameters: NetworkParameters
+        ) = BtcCryptoWalletAccount(
+            payloadManager = payloadManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            label = legacyAccount.label ?: legacyAccount.address,
+            address = legacyAccount.address,
+            isDefault = false,
+            exchangeRates = exchangeRates,
+            networkParameters = networkParameters,
+            internalAccount = legacyAccount,
+            isHDAccount = false
+        )
     }
-
-    constructor(
-        jsonAccount: Account,
-        payloadManager: PayloadDataManager,
-        isDefault: Boolean = false,
-        exchangeRates: ExchangeRateDataManager,
-        networkParameters: NetworkParameters
-    ) : this(
-        payloadManager,
-        jsonAccount.label,
-        jsonAccount.xpub,
-        isDefault,
-        exchangeRates,
-        networkParameters,
-        jsonAccount
-    )
-
-    constructor(
-        legacyAccount: LegacyAddress,
-        payloadManager: PayloadDataManager,
-        exchangeRates: ExchangeRateDataManager,
-        networkParameters: NetworkParameters
-    ) : this(
-        payloadManager,
-        legacyAccount.label ?: legacyAccount.address,
-        legacyAccount.address,
-        false,
-        exchangeRates,
-        networkParameters,
-        legacyAccount
-    )
 }
