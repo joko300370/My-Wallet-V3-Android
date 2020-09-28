@@ -5,9 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_label_item.view.*
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -26,7 +30,6 @@ data class AssetDetailItem(
     val assetFilter: AssetFilter,
     val account: BlockchainAccount,
     val balance: Money,
-    val pendingBalance: Money,
     val fiatBalance: Money,
     val actions: Set<AssetAction>,
     val interestRate: Double
@@ -36,7 +39,9 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
     fun bind(
         item: AssetDetailItem,
-        onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit
+        onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
+        disposable: CompositeDisposable,
+        block: AssetDetailsDecorator
     ) {
         with(itemView) {
             val asset = getAsset(item.account)
@@ -78,16 +83,13 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
             wallet_balance_fiat.text = item.balance.toStringWithSymbol()
             wallet_balance_crypto.text = item.fiatBalance.toStringWithSymbol()
-
-            item.pendingBalance.takeIf { !it.isZero }?.let {
-                pending_balance_title.visible()
-                pending_balance.apply {
-                    visible()
-                    text = it.toStringWithSymbol()
-                }
-            } ?: kotlin.run {
-                pending_balance_title.gone()
-                pending_balance.gone()
+            disposable += block(item).view(rootView.context).subscribe {
+                container.addViewToBottomWithConstraints(
+                    view = it,
+                    bottomOfView = asset_subtitle,
+                    startOfView = asset_subtitle,
+                    endOfView = wallet_balance_crypto
+                )
             }
         }
     }
@@ -113,13 +115,20 @@ class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 internal class AssetDetailAdapter(
     private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,
-    private val token: CryptoAsset
+    private val token: CryptoAsset,
+    private val assetDetailsDecorator: AssetDetailsDecorator
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val compositeDisposable = CompositeDisposable()
 
     var itemList: List<AssetDetailItem> by Delegates.observable(emptyList()) { _, oldValue, newValue ->
         if (oldValue != newValue) {
             notifyDataSetChanged()
         }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        compositeDisposable.clear()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -144,7 +153,7 @@ internal class AssetDetailAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is AssetDetailViewHolder) {
-            holder.bind(itemList[position], onAccountSelected)
+            holder.bind(itemList[position], onAccountSelected, compositeDisposable, assetDetailsDecorator)
         } else {
             (holder as LabelViewHolder).bind(token)
         }
@@ -155,3 +164,5 @@ internal class AssetDetailAdapter(
         private const val TYPE_LABEL = 1
     }
 }
+
+typealias AssetDetailsDecorator = (AssetDetailItem) -> CellDecorator

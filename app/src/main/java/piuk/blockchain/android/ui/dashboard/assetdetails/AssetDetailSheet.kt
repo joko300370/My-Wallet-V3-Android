@@ -24,6 +24,7 @@ import info.blockchain.wallet.prices.data.PriceDatum
 import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -67,7 +68,9 @@ class AssetDetailSheet :
 
     private val detailsAdapter by lazy {
         AssetDetailAdapter(::onAccountSelected,
-            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token)
+            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token) {
+            PendingBalanceAccountDecorator(it.account)
+        }
     }
 
     private var state = AssetDetailsState()
@@ -149,7 +152,6 @@ class AssetDetailSheet :
                     balance = it.amount,
                     fiatBalance = it.fiatValue,
                     actions = it.actions,
-                    pendingBalance = it.pendingAmount,
                     interestRate = it.interestRate
                 )
             )
@@ -161,7 +163,6 @@ class AssetDetailSheet :
                     assetFilter = AssetFilter.Custodial,
                     account = it.account,
                     balance = it.amount,
-                    pendingBalance = it.pendingAmount,
                     fiatBalance = it.fiatValue,
                     actions = it.actions,
                     interestRate = it.interestRate
@@ -176,7 +177,6 @@ class AssetDetailSheet :
                     account = it.account,
                     balance = it.amount,
                     fiatBalance = it.fiatValue,
-                    pendingBalance = it.pendingAmount,
                     actions = it.actions,
                     interestRate = it.interestRate
                 )

@@ -11,10 +11,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
+import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
@@ -89,10 +90,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
 
-        disposables += account.accountBalance.zipWith(account.pendingBalance)
+        disposables += account.accountBalance
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { (accountBalance, pendingBalance) ->
+                onSuccess = { accountBalance ->
                     wallet_balance_crypto.text = accountBalance.toStringWithSymbol()
                     wallet_balance_fiat.text =
                         accountBalance.toFiat(
@@ -102,17 +103,18 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
                     wallet_balance_crypto.visible()
                     wallet_balance_fiat.visible()
-
-                    pendingBalance.takeIf { !it.isZero }?.let {
-                        pending_balance.text = pendingBalance.toStringWithSymbol()
-                    } ?: kotlin.run {
-                        pending_balance_title.gone()
-                        pending_balance.gone()
-                    }
                 },
                 onError = {
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
+        disposables += PendingBalanceAccountDecorator(account).view(container.context).subscribe {
+            container.addViewToBottomWithConstraints(
+                view = it,
+                bottomOfView = asset_subtitle,
+                startOfView = asset_subtitle,
+                endOfView = wallet_balance_crypto
+            )
+        }
     }
 }
