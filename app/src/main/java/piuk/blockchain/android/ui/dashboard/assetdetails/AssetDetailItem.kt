@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_label_item.view.*
@@ -83,14 +84,16 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
             wallet_balance_fiat.text = item.balance.toStringWithSymbol()
             wallet_balance_crypto.text = item.fiatBalance.toStringWithSymbol()
-            disposable += block(item).view(rootView.context).subscribe {
-                container.addViewToBottomWithConstraints(
-                    view = it,
-                    bottomOfView = asset_subtitle,
-                    startOfView = asset_subtitle,
-                    endOfView = wallet_balance_crypto
-                )
-            }
+            disposable += block(item).view(rootView.context)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    container.addViewToBottomWithConstraints(
+                        view = it,
+                        bottomOfView = asset_subtitle,
+                        startOfView = asset_subtitle,
+                        endOfView = wallet_balance_crypto
+                    )
+                }
         }
     }
 

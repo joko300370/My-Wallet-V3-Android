@@ -12,10 +12,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
+import kotlinx.android.synthetic.main.view_account_crypto_overview.view.container
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
+import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
+import piuk.blockchain.android.accounts.removePossibleBottomView
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
@@ -46,13 +48,23 @@ class AccountInfoCrypto @JvmOverloads constructor(
     var account: CryptoAccount? = null
         private set
 
-    fun updateAccount(account: CryptoAccount, disposables: CompositeDisposable) {
+    fun updateAccount(
+        account: CryptoAccount,
+        onAccountClicked: (CryptoAccount) -> Unit,
+        disposables: CompositeDisposable,
+        cellDecorator: CellDecorator
+    ) {
         this.account = account
-        updateView(account, disposables)
+        updateView(account, onAccountClicked, disposables, cellDecorator)
     }
 
-    private fun updateView(account: CryptoAccount, disposables: CompositeDisposable) {
-        updateAccountDetails(account, disposables)
+    private fun updateView(
+        account: CryptoAccount,
+        onAccountClicked: (CryptoAccount) -> Unit,
+        disposables: CompositeDisposable,
+        cellDecorator: CellDecorator
+    ) {
+        updateAccountDetails(account, onAccountClicked, disposables, cellDecorator)
 
         when (account) {
             is InterestAccount -> setInterestAccountDetails(account, disposables)
@@ -62,7 +74,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         }
     }
 
-    private fun setInterestAccountDetails(account: CryptoAccount, disposables: CompositeDisposable) {
+    private fun setInterestAccountDetails(
+        account: CryptoAccount,
+        disposables: CompositeDisposable
+    ) {
         asset_account_icon.setImageResource(R.drawable.ic_account_badge_interest)
 
         disposables += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
@@ -79,7 +94,12 @@ class AccountInfoCrypto @JvmOverloads constructor(
             )
     }
 
-    private fun updateAccountDetails(account: CryptoAccount, disposables: CompositeDisposable) {
+    private fun updateAccountDetails(
+        account: CryptoAccount,
+        onAccountClicked: (CryptoAccount) -> Unit,
+        disposables: CompositeDisposable,
+        cellDecorator: CellDecorator
+    ) {
         val crypto = account.asset
         wallet_name.text = account.label
         icon.setCoinIcon(crypto)
@@ -108,13 +128,32 @@ class AccountInfoCrypto @JvmOverloads constructor(
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
-        disposables += PendingBalanceAccountDecorator(account).view(container.context).subscribe {
-            container.addViewToBottomWithConstraints(
-                view = it,
-                bottomOfView = asset_subtitle,
-                startOfView = asset_subtitle,
-                endOfView = wallet_balance_crypto
+        disposables += cellDecorator.view(container.context)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                container.addViewToBottomWithConstraints(
+                    view = it,
+                    bottomOfView = asset_subtitle,
+                    startOfView = asset_subtitle,
+                    endOfView = wallet_balance_crypto
+                )
+            }
+
+        container.alpha = 1f
+
+        disposables += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { isEnabled ->
+                    if (isEnabled) {
+                        setOnClickListener { onAccountClicked(account) }
+                        container.alpha = 1f
+                    } else {
+                        container.alpha = .6f
+                        setOnClickListener { }
+                    }
+                }
             )
-        }
+
+        container.removePossibleBottomView()
     }
 }

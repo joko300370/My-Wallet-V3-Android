@@ -13,7 +13,6 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -21,18 +20,20 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_asset_actions_sheet.view.*
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.accounts.DefaultCellDecorator
+import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
+import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
+import piuk.blockchain.android.accounts.removePossibleBottomView
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
@@ -90,28 +91,11 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         dispose()
     }
 
-    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
+    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
         if (account is CryptoAccount) {
-            account.sourceState
-                .map { sendState ->
-                    object : AccountDecorator {
-                        override val enabled: Boolean
-                            get() = sendState == TxSourceState.CAN_TRANSACT
-                        override val status: String
-                            get() = when (sendState) {
-                                TxSourceState.FUNDS_LOCKED -> getString(R.string.send_state_locked_funds)
-                                TxSourceState.TRANSACTION_IN_FLIGHT -> getString(R.string.send_state_send_in_flight)
-                                else -> ""
-                            }
-                    }
-                }
+            CryptoAssetActionCellDecorator(account)
         } else {
-            Single.just(object : AccountDecorator {
-                override val enabled: Boolean
-                    get() = true
-                override val status: String
-                    get() = ""
-            })
+            DefaultCellDecorator()
         }
 
     private fun showError(error: AssetDetailsError) =
@@ -127,7 +111,9 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
     private fun showAssetBalances(state: AssetDetailsState) {
         dialogView.asset_actions_account_details.updateAccount(
             state.selectedAccount.selectFirstAccount(),
-            disposables
+            {},
+            disposables,
+            PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
         )
     }
 
@@ -246,22 +232,28 @@ private class AssetActionAdapter(
             notifyDataSetChanged()
         }
 
+    private val compositeDisposable = CompositeDisposable()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActionItemViewHolder =
-        ActionItemViewHolder(parent.inflate(R.layout.item_asset_action))
+        ActionItemViewHolder(compositeDisposable, parent.inflate(R.layout.item_asset_action))
 
     override fun getItemCount(): Int = itemList.size
 
     override fun onBindViewHolder(holder: ActionItemViewHolder, position: Int) =
-        holder.bind(itemList[position], disposable, statusDecorator)
+        holder.bind(itemList[position], statusDecorator)
 
-    private class ActionItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        compositeDisposable.clear()
+    }
+
+    private class ActionItemViewHolder(private val compositeDisposable: CompositeDisposable, private val view: View) :
+        RecyclerView.ViewHolder(view) {
         fun bind(
             item: AssetActionItem,
-            disposable: CompositeDisposable,
             statusDecorator: StatusDecorator
         ) {
-
-            addDecorator(item, disposable, view.context, statusDecorator)
+            addDecorator(item, statusDecorator)
 
             view.apply {
                 item_action_icon.setImageResource(item.icon)
@@ -273,33 +265,39 @@ private class AssetActionAdapter(
 
         private fun addDecorator(
             item: AssetActionItem,
-            disposable: CompositeDisposable,
-            context: Context,
             statusDecorator: StatusDecorator
         ) {
             item.account?.let { account ->
-                disposable += statusDecorator(account)
+                compositeDisposable += statusDecorator(account).isEnabled()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
-                        onSuccess = { decorator ->
-                            view.apply {
-                                item_action_status.status = decorator.status
-                                item_action_status.goneIf { decorator.status.isBlank() }
-
-                                if (decorator.enabled) {
-                                    item_action_holder.alpha = 1f
-                                    item_action_holder.setOnClickListener {
-                                        item.actionCta()
-                                    }
-                                } else {
-                                    item_action_holder.alpha = .6f
+                        onSuccess = { enabled ->
+                            if (enabled) {
+                                view.item_action_holder.alpha = 1f
+                                view.item_action_holder.setOnClickListener {
+                                    item.actionCta()
                                 }
+                            } else {
+                                view.item_action_holder.alpha = .6f
+                                view.item_action_holder.setOnClickListener {}
                             }
                         },
                         onError = {
                             Timber.e("Error getting decorator info $it")
                         }
                     )
+
+                view.item_action_holder.removePossibleBottomView()
+                compositeDisposable += statusDecorator(account).view(view.context)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        view.item_action_holder.addViewToBottomWithConstraints(
+                            it,
+                            bottomOfView = view.item_action_label,
+                            startOfView = view.item_action_icon,
+                            endOfView = null
+                        )
+                    }
             } ?: view.item_action_holder.setOnClickListener {
                 item.actionCta()
             }

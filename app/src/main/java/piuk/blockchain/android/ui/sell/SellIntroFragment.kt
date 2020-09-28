@@ -24,6 +24,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.sell_intro_fragment.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -32,7 +33,6 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
-import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -111,9 +111,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     getString(R.string.invalid_id),
                     getString(R.string.invalid_id_description)
                 ), VerifyIdentityBenefit(
-                getString(R.string.information_missmatch),
-                getString(R.string.information_missmatch_description)
-            ),
+                    getString(R.string.information_missmatch),
+                    getString(R.string.information_missmatch_description)
+                ),
                 VerifyIdentityBenefit(
                     getString(R.string.blocked_by_local_laws),
                     getString(R.string.sell_intro_kyc_subtitle_3)
@@ -140,9 +140,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     getString(R.string.sell_intro_kyc_title_1),
                     getString(R.string.sell_intro_kyc_subtitle_1)
                 ), VerifyIdentityBenefit(
-                getString(R.string.sell_intro_kyc_title_2),
-                getString(R.string.sell_intro_kyc_subtitle_2)
-            ),
+                    getString(R.string.sell_intro_kyc_title_2),
+                    getString(R.string.sell_intro_kyc_subtitle_2)
+                ),
                 VerifyIdentityBenefit(
                     getString(R.string.sell_intro_kyc_title_3),
                     getString(R.string.sell_intro_kyc_subtitle_3)
@@ -176,7 +176,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     coincore.allWallets().map {
                         it.accounts.filter { account ->
                             account is CustodialTradingAccount &&
-                                supportedCryptos.contains(account.asset)
+                                    supportedCryptos.contains(account.asset)
                         }
                     },
                     status = ::statusDecorator,
@@ -192,15 +192,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             })
     }
 
-    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
-        Single.just(
-            object : AccountDecorator {
-                override val enabled: Boolean
-                    get() = account.isFunded
-                override val status: String
-                    get() = ""
-            }
-        )
+    private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)
 
     private fun startSellFlow(it: CryptoAccount) {
         TransactionFlow(

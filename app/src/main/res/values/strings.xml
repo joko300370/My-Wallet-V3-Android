@@ -1923,7 +1923,7 @@
     <string name="send_state_no_funds">No funds</string>
     <string name="send_state_not_supported">Send not supported on this account</string>
     <string name="send_state_not_enough_gas">ETH balance low, unable to pay network fee</string>
-    <string name="send_state_locked_funds">Your funds will be available within 7 days</string>
+    <string name="send_state_locked_funds_1">You have pending transactions.</string>
     <string name="send_state_send_in_flight">Unavailable due to pending transaction.</string>
     <string name="send_progress_sending_title">Sending %1$s</string>
     <string name="send_progress_sending_subtitle">We\'re sending your transaction now.</string>

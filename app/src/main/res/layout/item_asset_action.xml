@@ -9,7 +9,7 @@
     android:paddingStart="@dimen/standard_margin"
     android:paddingTop="@dimen/small_margin"
     android:paddingEnd="@dimen/standard_margin"
-    android:paddingBottom="@dimen/small_margin">
+    >
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/item_action_icon"
@@ -37,19 +37,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="@string/fiat_funds_detail_deposit_details"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="@+id/item_action_title"
         app:layout_constraintTop_toBottomOf="@+id/item_action_title" />
-
-    <piuk.blockchain.android.ui.customviews.account.StatusInfoLine
-        android:id="@+id/item_action_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/miniscule_margin"
-        android:visibility="gone"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_action_label"
-        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

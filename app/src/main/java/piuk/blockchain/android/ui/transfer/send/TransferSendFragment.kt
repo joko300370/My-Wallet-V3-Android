@@ -2,14 +2,13 @@ package piuk.blockchain.android.ui.transfer.send
 
 import android.os.Bundle
 import android.view.View
-import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.customviews.account.AccountDecorator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
@@ -24,10 +23,10 @@ class TransferSendFragment :
 
     override val filterFn: AccountListFilterFn = { account ->
         (account is CryptoAccount) &&
-            account.isFunded &&
-            account.actions.intersect(
-                listOf(AssetAction.NewSend, AssetAction.Send)
-            ).isNotEmpty()
+                account.isFunded &&
+                account.actions.intersect(
+                    listOf(AssetAction.NewSend, AssetAction.Send)
+                ).isNotEmpty()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,35 +50,11 @@ class TransferSendFragment :
         )
     }
 
-    private fun statusDecorator(account: BlockchainAccount): Single<AccountDecorator> =
+    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
         if (account is CryptoAccount) {
-            account.sourceState
-                .map { sendState ->
-                    object : AccountDecorator {
-                        override val enabled: Boolean
-                            get() = sendState == TxSourceState.CAN_TRANSACT
-                        override val status: String
-                            get() = when (sendState) {
-                                TxSourceState.NO_FUNDS -> getString(R.string.send_state_no_funds)
-                                TxSourceState.NOT_SUPPORTED -> getString(
-                                    R.string.send_state_not_supported)
-                                TxSourceState.FUNDS_LOCKED -> getString(
-                                    R.string.send_state_locked_funds)
-                                TxSourceState.NOT_ENOUGH_GAS -> getString(
-                                    R.string.send_state_not_enough_gas)
-                                TxSourceState.TRANSACTION_IN_FLIGHT -> getString(
-                                    R.string.send_state_send_in_flight)
-                                else -> ""
-                            }
-                    }
-                }
+            SendCellDecorator(account)
         } else {
-            Single.just(object : AccountDecorator {
-                override val enabled: Boolean
-                    get() = true
-                override val status: String
-                    get() = ""
-            })
+            DefaultCellDecorator()
         }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {

@@ -50,19 +50,28 @@ fun ConstraintLayout.addViewToBottomWithConstraints(
     startOfView: View? = null,
     endOfView: View? = null
 ) {
-    val tag = "BOTTOM_VIEW"
     // we need to remove the view first in favour of recycling
-    removeView(this.findViewWithTag(tag))
+    removeView(this.findViewWithTag(BOTTOM_VIEW_TAG))
     view.id = View.generateViewId()
-    view.tag = tag
+    view.tag = BOTTOM_VIEW_TAG
     addView(view, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT, ViewGroup.LayoutParams.WRAP_CONTENT)
     val constraintSet = ConstraintSet()
     constraintSet.clone(this)
-    constraintSet.connect(view.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
+    constraintSet.connect(
+        view.id,
+        ConstraintSet.BOTTOM,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.BOTTOM,
+        resources.getDimensionPixelSize(R.dimen.very_small_margin)
+    )
 
     bottomOfView?.let {
         constraintSet.clear(it.id, ConstraintSet.BOTTOM)
-        constraintSet.connect(view.id, ConstraintSet.TOP, it.id, ConstraintSet.BOTTOM)
+        constraintSet.connect(view.id,
+            ConstraintSet.TOP,
+            it.id,
+            ConstraintSet.BOTTOM,
+            resources.getDimensionPixelSize(R.dimen.smallest_margin))
     }
 
     startOfView?.let {
@@ -75,3 +84,9 @@ fun ConstraintLayout.addViewToBottomWithConstraints(
 
     constraintSet.applyTo(this)
 }
+
+fun ConstraintLayout.removePossibleBottomView() {
+    removeView(this.findViewWithTag(BOTTOM_VIEW_TAG))
+}
+
+private const val BOTTOM_VIEW_TAG = "BOTTOM_VIEW"

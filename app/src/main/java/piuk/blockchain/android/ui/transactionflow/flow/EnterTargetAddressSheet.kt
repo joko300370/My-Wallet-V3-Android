@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.dialog_tx_flow_enter_address.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -51,7 +52,12 @@ class EnterTargetAddressSheet(
 
         with(dialogView) {
             if (state.sendingAccount != newState.sendingAccount) {
-                from_details.updateAccount(newState.sendingAccount, disposables)
+                from_details.updateAccount(
+                    newState.sendingAccount,
+                    {},
+                    disposables,
+                    DefaultCellDecorator()
+                )
                 setupTransferList(newState.sendingAccount, newState)
             }
             cta_button.isEnabled = newState.nextEnabled
