@@ -1,11 +1,11 @@
 package piuk.blockchain.android.ui.account
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.graphics.Bitmap
-import androidx.annotation.VisibleForTesting
 import android.view.View
+import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AppCompatActivity
 import com.blockchain.notifications.analytics.AddressAnalytics
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.WalletAnalytics
@@ -155,13 +155,8 @@ class AccountEditPresenter constructor(
                     ::isArchivableBtc
                 )
 
-                if (legacyAddress!!.isWatchOnly) {
-                    scanPrivateKeyVisibility = View.VISIBLE
-                    archiveVisibility = View.GONE
-                } else {
-                    scanPrivateKeyVisibility = View.GONE
-                    archiveVisibility = View.VISIBLE
-                }
+                scanPrivateKeyVisibility = View.GONE
+                archiveVisibility = View.VISIBLE
             }
 
             // Subtract fee
@@ -172,7 +167,7 @@ class AccountEditPresenter constructor(
                 BigInteger.valueOf(dynamicFeeCache.btcFeeOptions!!.regularFee * 1000)
             ).toLong()
 
-            if (balanceAfterFee > Payment.DUST.toLong() && !legacyAddress!!.isWatchOnly) {
+            if (balanceAfterFee > Payment.DUST.toLong()) {
                 accountModel.transferFundsVisibility = View.VISIBLE
             } else {
                 // No need to show 'transfer' if funds are less than dust amount

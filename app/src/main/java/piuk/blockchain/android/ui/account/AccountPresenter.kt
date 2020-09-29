@@ -352,7 +352,6 @@ class AccountPresenter internal constructor(
                     label, null,
                     balance,
                     account.isArchived,
-                    false,
                     defaultAccount.xpub == account.xpub,
                     AccountItem.TYPE_ACCOUNT_BTC
                 )
@@ -364,10 +363,6 @@ class AccountPresenter internal constructor(
         accountsAndImportedList.add(AccountItem(AccountItem.TYPE_IMPORT_ADDRESS_BUTTON))
 
         for (legacyAddress in getLegacyAddresses()) {
-            if (legacyAddress.isWatchOnly) {
-                continue
-            }
-
             var label: String? = legacyAddress.label
             val address: String = legacyAddress.address ?: ""
             val balance = getBtcAddressBalance(address)
@@ -384,7 +379,6 @@ class AccountPresenter internal constructor(
                     address,
                     balance,
                     legacyAddress.isArchived,
-                    legacyAddress.isWatchOnly,
                     false,
                     AccountItem.TYPE_ACCOUNT_BTC
                 )
@@ -419,7 +413,6 @@ class AccountPresenter internal constructor(
                     label, null,
                     balance,
                     account.isArchived,
-                    false,
                     defaultAccount?.xpub == account.xpub,
                     AccountItem.TYPE_ACCOUNT_BCH
                 )

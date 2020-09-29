@@ -1,5 +1,15 @@
 package info.blockchain.wallet.multiaddress;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.api.blockexplorer.FilterType;
 import info.blockchain.api.data.AddressSummary;
@@ -12,17 +22,6 @@ import info.blockchain.wallet.bip44.HDChain;
 import info.blockchain.wallet.exceptions.ApiException;
 import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType;
 import info.blockchain.wallet.payload.data.AddressLabel;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -64,8 +63,8 @@ public class MultiAddressFactory {
     protected Call<MultiAddress> getMultiAddress(List<String> allActive, int limit, int offset,
                                                  String context) {
         return getBlockExplorer()
-                .getMultiAddress("btc", allActive, context, FilterType.RemoveUnspendable, limit,
-                        offset);
+            .getMultiAddress("btc", allActive, context, FilterType.RemoveUnspendable, limit,
+                offset);
     }
 
     BlockExplorer getBlockExplorer() {
@@ -75,7 +74,6 @@ public class MultiAddressFactory {
     /**
      * @param all          A list of all xpubs and legacy addresses whose transactions are to
      *                     be retrieved from API.
-     * @param watchOnly    A list of watch-only legacy addresses. Used to flag transactions as 'watch-only'
      * @param activeLegacy (Hacky! Needs a rethink) Only set this when fetching a transaction list
      *                     for imported addresses, otherwise set as Null.
      *                     A list of all active legacy addresses. Used for 'Imported address' transaction list.
@@ -84,21 +82,20 @@ public class MultiAddressFactory {
      * @param limit        Maximum amount of transactions fetched
      * @param offset       Page offset
      */
-    public List<TransactionSummary> getAccountTransactions(List<String> all,
-                                                           List<String> watchOnly,
-                                                           List<String> activeLegacy,
-                                                           String onlyShow,
-                                                           int limit,
-                                                           int offset,
-                                                           int startingBlockHeight)
-            throws IOException, ApiException {
+    public List<TransactionSummary> getAccountTransactions(
+        List<String> all,
+        List<String> activeLegacy,
+        String onlyShow,
+        int limit,
+        int offset,
+        int startingBlockHeight) throws IOException, ApiException {
 
         MultiAddress multiAddress = getMultiAddress(all, onlyShow, limit, offset);
         if (multiAddress == null || multiAddress.getTxs() == null) {
             return new ArrayList<>();
         }
 
-        return summarize(all, watchOnly, multiAddress, activeLegacy, startingBlockHeight);
+        return summarize(all, multiAddress, activeLegacy, startingBlockHeight);
     }
 
     public int getNextChangeAddressIndex(String xpub) {
@@ -176,7 +173,6 @@ public class MultiAddressFactory {
     }
 
     public List<TransactionSummary> summarize(List<String> ownAddressesAndXpubs,
-                                              List<String> watchOnlyAddresses,
                                               MultiAddress multiAddress,
                                               List<String> legacy,
                                               int startingBlockHeight) {
@@ -242,11 +238,6 @@ public class MultiAddressFactory {
                             txSummary.inputsXpubMap.put(inputAddr, xpubBody.getM());
                         }
 
-                        //Flag as watch only
-                        if (watchOnlyAddresses.contains(inputAddr)) {
-                            txSummary.setWatchOnly(true);
-                        }
-
                         //Flag as imported legacy address
                         if (legacy != null && legacy.contains(inputAddr)) {
                             isLegacy = true;
@@ -254,7 +245,7 @@ public class MultiAddressFactory {
 
                         //Keep track of inputs
                         BigInteger existingBalance = txSummary.inputsMap.containsKey(inputAddr)
-                                ? txSummary.inputsMap.get(inputAddr) : BigInteger.ZERO;
+                            ? txSummary.inputsMap.get(inputAddr) : BigInteger.ZERO;
                         txSummary.inputsMap.put(inputAddr, existingBalance.add(inputValue));
 
                     } else {
@@ -283,7 +274,7 @@ public class MultiAddressFactory {
                         ownAddressesAndXpubs.add(outputAddr);
                         if (xpubBody.getPath().startsWith("M/" + HDChain.RECEIVE_CHAIN + "/")) {
                             BigInteger existingBalance = txSummary.outputsMap.containsKey(outputAddr)
-                                    ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
+                                ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
                             txSummary.outputsMap.put(outputAddr, existingBalance.add(outputValue));
                             txSummary.outputsXpubMap.put(outputAddr, xpubBody.getM());
                         } else {
@@ -294,7 +285,7 @@ public class MultiAddressFactory {
                     } else {
                         //If we own this address and it's not change coming back, it's a transfer
                         if (ownAddressesAndXpubs.contains(outputAddr)
-                                && !txSummary.inputsMap.keySet().contains(outputAddr)) {
+                            && !txSummary.inputsMap.keySet().contains(outputAddr)) {
 
                             if (txSummary.getTransactionType() == TransactionType.SENT) {
                                 txSummary.setTransactionType(TransactionType.TRANSFERRED);
@@ -303,7 +294,7 @@ public class MultiAddressFactory {
                             //Don't add change coming back
                             if (!txSummary.inputsMap.containsKey(outputAddr)) {
                                 BigInteger existingBalance = txSummary.outputsMap.containsKey(outputAddr)
-                                        ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
+                                    ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
                                 txSummary.outputsMap.put(outputAddr, existingBalance.add(outputValue));
                             } else {
                                 changeMap.put(outputAddr, outputValue);
@@ -315,14 +306,9 @@ public class MultiAddressFactory {
                         } else {
                             //Address does not belong to us
                             BigInteger existingBalance = txSummary.outputsMap.containsKey(outputAddr)
-                                    ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
+                                ? txSummary.outputsMap.get(outputAddr) : BigInteger.ZERO;
                             txSummary.outputsMap.put(outputAddr, existingBalance.add(outputValue));
                         }
-                    }
-
-                    //Flag as watch only
-                    if (watchOnlyAddresses.contains(outputAddr)) {
-                        txSummary.setWatchOnly(true);
                     }
 
                     //Flag as imported legacy address
@@ -342,10 +328,10 @@ public class MultiAddressFactory {
 
             //Remove input addresses not ours
             filterOwnedAddresses(
-                    ownAddressesAndXpubs,
-                    txSummary.inputsMap,
-                    txSummary.outputsMap,
-                    txSummary.getTransactionType());
+                ownAddressesAndXpubs,
+                txSummary.inputsMap,
+                txSummary.outputsMap,
+                txSummary.getTransactionType());
 
             txSummary.setHash(tx.getHash());
             txSummary.setTime(tx.getTime());
@@ -357,10 +343,10 @@ public class MultiAddressFactory {
                 txSummary.setTotal(total);
             } else {
                 BigInteger total = calculateTotalSent(
-                        txSummary.inputsMap,
-                        changeMap,
-                        tx.getFee(),
-                        txSummary.getTransactionType());
+                    txSummary.inputsMap,
+                    changeMap,
+                    tx.getFee(),
+                    txSummary.getTransactionType());
                 txSummary.setTotal(total);
             }
 

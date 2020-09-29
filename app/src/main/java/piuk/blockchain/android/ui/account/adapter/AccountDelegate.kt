@@ -1,15 +1,15 @@
 package piuk.blockchain.android.ui.account.adapter
 
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_accounts_row.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.AccountItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -106,13 +106,6 @@ class AccountDelegate<in T>(
                     }
                 }
 
-                if (accountItem.isWatchOnly) {
-                    tag.apply {
-                        setText(R.string.watch_only)
-                        setTextColor(ContextCompat.getColor(itemView.context, R.color.product_red_medium))
-                    }
-                }
-
                 if (accountItem.isDefault) {
                     tag.apply {
                         setText(R.string.default_label)
@@ -120,7 +113,7 @@ class AccountDelegate<in T>(
                     }
                 }
 
-                if (!accountItem.isWatchOnly && !accountItem.isDefault) {
+                if (!accountItem.isDefault) {
                     tag.gone()
                 } else {
                     tag.visible()

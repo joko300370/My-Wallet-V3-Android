@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.account
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
-import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.account.chooser.AccountChooserItem
 import piuk.blockchain.android.ui.account.chooser.AccountListing
+import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 
 class WalletAccountHelperAccountListingAdapter(
     private val walletAccountHelper: WalletAccountHelper
@@ -53,7 +53,6 @@ class WalletAccountHelperAccountListingAdapter(
             label = itemAccount.label,
             address = if (legacyAddress == null) null else itemAccount.address,
             displayBalance = itemAccount.formatDisplayBalance(),
-            isWatchOnly = legacyAddress?.isWatchOnly ?: true,
             accountObject = itemAccount.accountObject
         )
     }

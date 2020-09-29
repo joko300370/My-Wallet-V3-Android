@@ -22,8 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -642,15 +642,7 @@ public class PayloadManager {
             IOException,
             ApiException {
 
-        List<TransactionSummary> txs = getAccountTransactions(null, limit, offset);
-
-        ListIterator<TransactionSummary> iter = txs.listIterator();
-        while(iter.hasNext()){
-            if(iter.next().isWatchOnly()){
-                iter.remove();
-            }
-        }
-        return txs;
+        return getAccountTransactions(null, limit, offset);
     }
 
     /**
@@ -663,13 +655,12 @@ public class PayloadManager {
     public List<TransactionSummary> getImportedAddressesTransactions(int limit, int offset)
             throws IOException, ApiException {
         List<String> activeXpubs = getPayload().getHdWallets().get(0).getActiveXpubs();
-        List<String> watchOnly = getPayload().getWatchOnlyAddressStringList();
         List<String> activeLegacy = getPayload().getLegacyAddressStringList(LegacyAddress.NORMAL_ADDRESS);
 
         ArrayList<String> all = new ArrayList<>(activeXpubs);
         all.addAll(activeLegacy);
 
-        return multiAddressFactory.getAccountTransactions(all, watchOnly, activeLegacy, null, limit, offset, 0);
+        return multiAddressFactory.getAccountTransactions(all, activeLegacy, null, limit, offset, 0);
     }
 
     public DeterministicKey masterKey() throws HDWalletException {
@@ -696,13 +687,12 @@ public class PayloadManager {
             throws IOException, ApiException {
 
         List<String> activeXpubs = getPayload().getHdWallets().get(0).getActiveXpubs();
-        List<String> watchOnly = getPayload().getWatchOnlyAddressStringList();
         List<String> activeLegacy = getPayload().getLegacyAddressStringList(LegacyAddress.NORMAL_ADDRESS);
 
         ArrayList<String> all = new ArrayList<>(activeXpubs);
         all.addAll(activeLegacy);
 
-        return multiAddressFactory.getAccountTransactions(all, watchOnly, null, xpub, limit, offset, 0);
+        return multiAddressFactory.getAccountTransactions(all, null, xpub, limit, offset, 0);
     }
 
     /**
@@ -892,13 +882,6 @@ public class PayloadManager {
     }
 
     /**
-     * Balance API - Watch only balances
-     */
-    public BigInteger getWalletWatchOnlyBalance() {
-        return balanceManagerBtc.getWatchOnlyBalance();
-    }
-
-    /**
      * Balance API - Final balance imported addresses.
      */
     public BigInteger getImportedAddressesBalance() {
@@ -916,9 +899,8 @@ public class PayloadManager {
         Wallet wallet = getPayload();
         Set<String> xpubs = WalletExtensionsKt.activeXpubs(wallet);
         Set<String> allLegacy = WalletExtensionsKt.nonArchivedLegacyAddressStrings(wallet);
-        Set<String> watchOnlyLegacy = WalletExtensionsKt.nonArchivedWatchOnlyLegacyAddressStrings(wallet);
 
-        balanceManagerBtc.updateAllBalances(xpubs, allLegacy, watchOnlyLegacy);
+        balanceManagerBtc.updateAllBalances(xpubs, allLegacy);
     }
 
     /**

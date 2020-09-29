@@ -70,8 +70,7 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                payloadDataManager.wallet!!.legacyAddressStringList.contains(outputAddress) ||
-                payloadDataManager.wallet!!.watchOnlyAddressStringList.contains(outputAddress)
+                payloadDataManager.wallet!!.legacyAddressStringList.contains(outputAddress)
             ) { // If output address belongs to a legacy address we own - we have to check if it's change
                 // If it goes back to same address AND if it's not the total amount sent
                 // (inputs x and y could send to output y in which case y is not receiving change,
@@ -149,8 +148,7 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                bchDataManager.getLegacyAddressStringList().contains(outputAddress) ||
-                bchDataManager.getWatchOnlyAddressStringList().contains(outputAddress)
+                bchDataManager.getLegacyAddressStringList().contains(outputAddress)
             ) { // If output address belongs to a legacy address we own - we have to check if it's
                 // change
                 // If it goes back to same address AND if it's not the total amount sent

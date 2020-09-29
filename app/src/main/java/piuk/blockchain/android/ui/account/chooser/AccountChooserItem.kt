@@ -17,7 +17,6 @@ sealed class AccountChooserItem(val label: String) {
         label: String,
         val address: String?,
         val displayBalance: String,
-        val isWatchOnly: Boolean,
         val accountObject: JsonSerializableAccount?
     ) : AccountChooserItem(label)
 }

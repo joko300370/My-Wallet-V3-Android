@@ -159,43 +159,6 @@ class WalletAccountHelperAccountListingAdapterTest {
     }
 
     @Test
-    fun `BTC imported (legacy) addresses - watch only`() {
-        val account = mock<LegacyAddress> {
-            on { isWatchOnly } `it returns` true
-        }
-        val walletAccountHelper = mock<WalletAccountHelper> {
-            on { getLegacyBtcAddresses() } `it returns` listOf(
-                ItemAccount(
-                    accountObject = account
-                )
-            )
-        }
-        givenAccountListing(walletAccountHelper)
-            .importedList(CryptoCurrency.BTC)
-            .assertSingleLegacyAddress {
-                isWatchOnly `should be` true
-            }
-    }
-
-    @Test
-    fun `BTC imported (legacy) addresses - non watch only`() {
-        val account = mock<LegacyAddress> {
-            on { isWatchOnly } `it returns` false
-        }
-        val walletAccountHelper = mock<WalletAccountHelper> {
-            on { getLegacyBtcAddresses() } `it returns` listOf(
-                ItemAccount().apply {
-                    accountObject = account
-                })
-        }
-        givenAccountListing(walletAccountHelper)
-            .importedList(CryptoCurrency.BTC)
-            .assertSingleLegacyAddress {
-                isWatchOnly `should be` false
-            }
-    }
-
-    @Test
     fun `BTC imported (legacy) addresses - null address when not a legacy`() {
         val account = mock<JsonSerializableAccount>()
         val walletAccountHelper = mock<WalletAccountHelper> {

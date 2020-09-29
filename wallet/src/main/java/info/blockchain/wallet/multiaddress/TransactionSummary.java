@@ -16,7 +16,6 @@ public class TransactionSummary {
     private TransactionType transactionType;
     private long time;
     private int confirmations;
-    private boolean isWatchOnly;
     private boolean isDoubleSpend;
     private boolean isPending;//Sent to server but not confirmed
 
@@ -74,14 +73,6 @@ public class TransactionSummary {
 
     public void setFee(BigInteger fee) {
         this.fee = fee;
-    }
-
-    public boolean isWatchOnly() {
-        return isWatchOnly;
-    }
-
-    public void setWatchOnly(boolean watchOnly) {
-        isWatchOnly = watchOnly;
     }
 
     public HashMap<String, BigInteger> getInputsMap() {

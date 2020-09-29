@@ -38,9 +38,6 @@ internal class BchActivitySummaryItem(
     override val confirmations: Int
         get() = transactionSummary.confirmations
 
-    override val watchOnly: Boolean
-        get() = transactionSummary.isWatchOnly
-
     override val doubleSpend: Boolean
         get() = transactionSummary.isDoubleSpend
 

@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.account.chooser
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.serialization.JsonSerializableAccount
 import kotlinx.android.synthetic.main.item_accounts_row.view.*
 import piuk.blockchain.android.R
@@ -59,7 +59,7 @@ class AccountChooserAdapter(
                     address.text = item.address
                     tag.setText(R.string.watch_only)
                     address.goneIf(item.address == null)
-                    tag.goneIf(item.address == null || !item.isWatchOnly)
+                    tag.goneIf(item.address == null)
                 }
                 holder.itemView.setOnClickListener(clickListener(item.accountObject))
             }

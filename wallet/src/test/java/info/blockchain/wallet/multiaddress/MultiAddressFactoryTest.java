@@ -1,11 +1,5 @@
 package info.blockchain.wallet.multiaddress;
 
-import info.blockchain.api.blockexplorer.BlockExplorer;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.MockedResponseTest;
-import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType;
-import info.blockchain.wallet.payload.data.AddressLabel;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import info.blockchain.api.blockexplorer.BlockExplorer;
+import info.blockchain.wallet.BlockchainFramework;
+import info.blockchain.wallet.MockedResponseTest;
+import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType;
+import info.blockchain.wallet.payload.data.AddressLabel;
 
 public class MultiAddressFactoryTest extends MockedResponseTest {
 
@@ -43,7 +43,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Collections.singletonList(dormantAddress)), new ArrayList<String>(), null, dormantAddress, 100, 0, 0);
+            new ArrayList<>(Collections.singletonList(dormantAddress)), null, dormantAddress, 100, 0, 0);
 
         Assert.assertEquals(2, summary.size());
         Assert.assertEquals(1, summary.get(0).getInputsMap().size());
@@ -64,7 +64,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Collections.singletonList(dormantXpub)), new ArrayList<String>(), null, dormantXpub, 100, 0, 0);
+            new ArrayList<>(Collections.singletonList(dormantXpub)), null, dormantXpub, 100, 0, 0);
 
         Assert.assertEquals(34, summary.size());
         Assert.assertEquals(1, summary.get(0).getInputsMap().size());
@@ -92,7 +92,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Arrays.asList(dormantAddress, dormantXpub)), new ArrayList<String>(), null, null, 100, 0, 0);
+            new ArrayList<>(Arrays.asList(dormantAddress, dormantXpub)), null, null, 100, 0, 0);
 
         Assert.assertEquals(36, summary.size());
         Assert.assertEquals(1, summary.get(0).getInputsMap().size());
@@ -125,7 +125,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> summary = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Arrays.asList(xpub1, xpub2, address)), new ArrayList<String>(),
+            new ArrayList<>(Arrays.asList(xpub1, xpub2, address)),
             null, null, 100, 0, 0);
 
         Assert.assertEquals(7, summary.size());
@@ -208,7 +208,7 @@ public class MultiAddressFactoryTest extends MockedResponseTest {
         mockInterceptor.setResponseString(response);
 
         List<TransactionSummary> transactionSummaries = multiAddressFactory.getAccountTransactions(
-            new ArrayList<>(Arrays.asList(xpub1, xpub2, address)), new ArrayList<String>(),
+            new ArrayList<>(Arrays.asList(xpub1, xpub2, address)),
             null, null, 100, 0, 0);
 
         Assert.assertEquals(8, transactionSummaries.size());

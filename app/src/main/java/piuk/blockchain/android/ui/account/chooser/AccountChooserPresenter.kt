@@ -88,7 +88,7 @@ class AccountChooserPresenter(
                 {
                     view.updateUi(
                         it.filter { item ->
-                            item !is AccountChooserItem.LegacyAddress || !item.isWatchOnly
+                            item !is AccountChooserItem.LegacyAddress
                         })
                 },
                 { Timber.e(it) }

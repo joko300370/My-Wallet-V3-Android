@@ -140,8 +140,6 @@ class TransactionHelperTest {
 
         whenever(payload.legacyAddressStringList)
             .thenReturn(legacyStrings)
-        whenever(payload.watchOnlyAddressStringList)
-            .thenReturn(watchOnlyStrings)
 
         whenever(payloadDataManager.wallet)
             .thenReturn(payload)
@@ -151,7 +149,7 @@ class TransactionHelperTest {
 
         // Assert
         assertEquals(1, value.left.size)
-        assertEquals(1, value.right.size)
+        assertEquals(2, value.right.size)
     }
 
     @Test
@@ -169,12 +167,10 @@ class TransactionHelperTest {
         )
 
         val legacyStrings = listOf("key0", "key1")
-        val watchOnlyStrings = listOf("key2")
 
         whenever(payload.legacyAddressStringList)
             .thenReturn(legacyStrings)
-        whenever(payload.watchOnlyAddressStringList)
-            .thenReturn(watchOnlyStrings)
+
         whenever(payloadDataManager.wallet)
             .thenReturn(payload)
         whenever(payloadDataManager.isOwnHDAddress(any()))
@@ -256,19 +252,16 @@ class TransactionHelperTest {
         )
 
         val legacyStrings = listOf("key0", "key1")
-        val watchOnlyStrings = listOf("key2")
 
         whenever(bchDataManager.getLegacyAddressStringList())
             .thenReturn(legacyStrings)
-        whenever(bchDataManager.getWatchOnlyAddressStringList())
-            .thenReturn(watchOnlyStrings)
 
         // Act
         val value = subject.filterNonChangeBchAddresses(item)
 
         // Assert
         assertEquals(1, value.left.size)
-        assertEquals(1, value.right.size)
+        assertEquals(2, value.right.size)
     }
 
     @Test
@@ -286,12 +279,10 @@ class TransactionHelperTest {
         )
 
         val legacyStrings = listOf("key0", "key1")
-        val watchOnlyStrings = listOf("key2")
 
         whenever(bchDataManager.getLegacyAddressStringList())
             .thenReturn(legacyStrings)
-        whenever(bchDataManager.getWatchOnlyAddressStringList())
-            .thenReturn(watchOnlyStrings)
+
         whenever(bchDataManager.isOwnAddress(any()))
             .thenReturn(true)
 

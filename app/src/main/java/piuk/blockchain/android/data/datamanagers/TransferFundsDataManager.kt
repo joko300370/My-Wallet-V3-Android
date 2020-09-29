@@ -53,9 +53,7 @@ class TransferFundsDataManager(
             var totalFee = 0.toBigInteger()
 
             for (legacyAddress in legacyAddresses) {
-                if (!legacyAddress.isWatchOnly &&
-                    payloadDataManager.getAddressBalance(legacyAddress.address) > CryptoValue.Companion.ZeroBtc
-                ) {
+                if (payloadDataManager.getAddressBalance(legacyAddress.address) > CryptoValue.Companion.ZeroBtc) {
                     val unspentOutputs =
                         sendDataManager.getUnspentBtcOutputs(legacyAddress.address)
                             .blockingFirst()

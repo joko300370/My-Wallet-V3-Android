@@ -11,7 +11,6 @@ import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import org.bitcoinj.core.Address
-import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -114,7 +113,7 @@ class WalletAccountHelper(
                 ItemAccount(
                     label = makeLabel(it),
                     balance = CryptoValue.fromMinor(CryptoCurrency.BTC, getAddressAbsoluteBalance(it)),
-                    tag = checkTag(it),
+                    tag = "",
                     accountObject = it,
                     address = it.address
                 )
@@ -143,7 +142,7 @@ class WalletAccountHelper(
                 ItemAccount(
                     label = makeLabel(it),
                     balance = CryptoValue.fromMinor(CryptoCurrency.BCH, getBchAddressAbsoluteBalance(it)),
-                    tag = checkTag(it),
+                    tag = "",
                     accountObject = it,
                     address = cashAddress
                 )
@@ -158,14 +157,6 @@ class WalletAccountHelper(
         }
         return labelOrAddress ?: ""
     }
-
-    // Watch-only tag - we'll ask for xpriv scan when spending from
-    private fun checkTag(address: LegacyAddress): String =
-        if (address.isWatchOnly) {
-            stringUtils.getString(R.string.watch_only)
-        } else {
-            ""
-        }
 
     fun getDefaultOrFirstFundedAccount(cryptoCurrency: CryptoCurrency): ItemAccount? =
         when (cryptoCurrency) {

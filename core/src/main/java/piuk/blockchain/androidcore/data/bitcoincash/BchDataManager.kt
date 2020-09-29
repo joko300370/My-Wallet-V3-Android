@@ -275,12 +275,9 @@ class BchDataManager(
 
     fun getLegacyAddressStringList(): List<String> = payloadDataManager.legacyAddressStringList
 
-    fun getWatchOnlyAddressStringList(): List<String> =
-        payloadDataManager.watchOnlyAddressStringList
-
     fun updateAllBalances(): Completable {
         val legacyAddresses = payloadDataManager.legacyAddresses
-            .filterNot { it.isWatchOnly || it.isArchived }
+            .filterNot { it.isArchived }
             .map { it.address }
             .toSet()
 
@@ -477,7 +474,6 @@ class BchDataManager(
     ): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
             null, // legacy list
-            mutableListOf(), // watch-only list
             getActiveXpubsAndImportedAddresses(),
             address,
             limit,
@@ -488,7 +484,6 @@ class BchDataManager(
     private fun fetchWalletTransactions(limit: Int, offset: Int): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
             null, // legacy list
-            mutableListOf(), // watch-only list
             getActiveXpubsAndImportedAddresses(),
             null,
             limit,
@@ -502,7 +497,6 @@ class BchDataManager(
     ): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
             payloadDataManager.legacyAddressStringList, // legacy list
-            mutableListOf(), // watch-only list
             getActiveXpubsAndImportedAddresses(),
             null,
             limit,

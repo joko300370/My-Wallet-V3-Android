@@ -67,9 +67,6 @@ class PayloadDataManager(
     val legacyAddressStringList: List<String>
         get() = wallet?.legacyAddressStringList ?: emptyList()
 
-    val watchOnlyAddressStringList: List<String>
-        get() = wallet?.watchOnlyAddressStringList ?: emptyList()
-
     val wallet: Wallet?
         get() = payloadManager.payload
 
@@ -596,7 +593,6 @@ class PayloadDataManager(
         Single<List<TransactionSummary>> =
             Single.fromCallable {
                 payloadManager.getAccountTransactions(xpub, limit, offset)
-                    .filter { !it.isWatchOnly }
             }
 
     /**

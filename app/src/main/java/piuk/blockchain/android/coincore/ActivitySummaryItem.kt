@@ -111,7 +111,6 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
     abstract val description: String?
 
     open val confirmations = 0
-    open val watchOnly: Boolean = false
     open val doubleSpend: Boolean = false
     open val isFeeTransaction = false
     open val isPending: Boolean = false
@@ -125,7 +124,6 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
             "inputsMap  = $inputsMap " +
             "outputsMap  = $outputsMap " +
             "confirmations  = $confirmations " +
-            "watchOnly  = $watchOnly " +
             "doubleSpend  = $doubleSpend " +
             "isPending  = $isPending " +
             "note = $note"
@@ -143,7 +141,6 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
                 this.inputsMap == that.inputsMap &&
                 this.outputsMap == that.outputsMap &&
                 this.confirmations == that.confirmations &&
-                this.watchOnly == that.watchOnly &&
                 this.doubleSpend == that.doubleSpend &&
                 this.isFeeTransaction == that.isFeeTransaction &&
                 this.isPending == that.isPending &&
@@ -161,7 +158,6 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
         result = 31 * result + outputsMap.hashCode()
         result = 31 * result + JavaHashCode.hashCode(confirmations)
         result = 31 * result + JavaHashCode.hashCode(isFeeTransaction)
-        result = 31 * result + JavaHashCode.hashCode(watchOnly)
         result = 31 * result + JavaHashCode.hashCode(doubleSpend)
         result = 31 * result + (note?.hashCode() ?: 0)
         return result
