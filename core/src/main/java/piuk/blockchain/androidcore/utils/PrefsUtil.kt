@@ -67,6 +67,10 @@ class PrefsUtil(
         get() = getValue(KEY_CUSTODIAL_INTRO_SEEN, false)
         set(seen) = setValue(KEY_CUSTODIAL_INTRO_SEEN, seen)
 
+    override var remainingSendsWithoutBackup: Int
+        get() = getValue(KEY_REMAINING_SENDS_WITHOUT_BACKUP, MAX_ALLOWED_SENDS)
+        set(remaining) = setValue(KEY_REMAINING_SENDS_WITHOUT_BACKUP, remaining)
+
     override val isLoggedOut: Boolean
         get() = getValue(KEY_LOGGED_OUT, true)
 
@@ -393,6 +397,8 @@ class PrefsUtil(
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"
         private const val KEY_INTRO_TOUR_CURRENT_STAGE = "key_intro_tour_current_stage"
         private const val KEY_CUSTODIAL_INTRO_SEEN = "key_custodial_balance_intro_seen"
+        private const val KEY_REMAINING_SENDS_WITHOUT_BACKUP = "key_remaining_sends_without_backup"
+        private const val MAX_ALLOWED_SENDS = 5
 
         private const val BACKUP_DATE_KEY = "BACKUP_DATE_KEY"
         private const val SWAP_DATE_KEY = "SWAP_DATE_KEY"

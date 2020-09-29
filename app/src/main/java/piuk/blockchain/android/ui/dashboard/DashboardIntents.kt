@@ -9,6 +9,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
+import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import java.math.BigInteger
@@ -201,41 +202,22 @@ object ClearBottomSheet : DashboardIntent() {
         )
 }
 
-@Deprecated("Moving to new send")
-class StartCustodialTransfer(
-    private val cryptoCurrency: CryptoCurrency
+class CheckBackupStatus(
+    val account: SingleAccount,
+    val action: AssetAction
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState = oldState
+}
+
+class ShowBackupSheet(
+    private val account: SingleAccount,
+    private val action: AssetAction
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
-            activeFlow = null,
-            transferFundsCurrency = cryptoCurrency
+            showDashboardSheet = DashboardSheet.BACKUP_BEFORE_SEND,
+            backupSheetDetails = BackupDetails(account, action)
         )
-}
-
-object CheckBackupStatus : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState
-}
-
-class BackupStatusUpdate(
-    private val isBackedUp: Boolean
-) : DashboardIntent() {
-    override fun reduce(oldState: DashboardState): DashboardState =
-        if (isBackedUp) {
-            oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
-        } else {
-            oldState.copy(showDashboardSheet = DashboardSheet.BACKUP_BEFORE_SEND)
-        }
-}
-
-@Deprecated("Moving to new send")
-object TransferFunds : DashboardIntent() {
-    override fun isValidFor(oldState: DashboardState): Boolean =
-        oldState.transferFundsCurrency != null
-
-    override fun reduce(oldState: DashboardState): DashboardState =
-        oldState.copy(showDashboardSheet = DashboardSheet.BASIC_WALLET_TRANSFER)
 }
 
 class UpdateSelectedCryptoAccount(
@@ -257,7 +239,7 @@ class LaunchSendFlow(
         oldState.copy(
             showDashboardSheet = null,
             activeFlow = null,
-            transferFundsCurrency = null
+            backupSheetDetails = null
         )
 }
 
@@ -270,7 +252,7 @@ class LaunchDepositFlow(
         oldState.copy(
             showDashboardSheet = null,
             activeFlow = null,
-            transferFundsCurrency = null
+            backupSheetDetails = null
         )
 }
 
@@ -281,7 +263,7 @@ class LaunchAssetDetailsFlow(
         oldState.copy(
             showDashboardSheet = null,
             activeFlow = null,
-            transferFundsCurrency = null
+            backupSheetDetails = null
         )
 }
 
@@ -292,6 +274,6 @@ class UpdateLaunchDialogFlow(
         oldState.copy(
             showDashboardSheet = null,
             activeFlow = flow,
-            transferFundsCurrency = null
+            backupSheetDetails = null
         )
 }

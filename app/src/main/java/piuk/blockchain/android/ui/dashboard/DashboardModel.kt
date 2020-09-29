@@ -10,13 +10,16 @@ import info.blockchain.balance.percentageDelta
 import info.blockchain.balance.total
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
+import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
@@ -94,8 +97,6 @@ enum class DashboardSheet {
     STX_AIRDROP_COMPLETE,
     SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
-    @Deprecated("Moving to send v2")
-    BASIC_WALLET_TRANSFER,
     SIMPLE_BUY_CANCEL_ORDER,
     FIAT_FUNDS_DETAILS,
     LINK_OR_DEPOSIT,
@@ -113,12 +114,11 @@ data class DashboardState(
     val showDashboardSheet: DashboardSheet? = null,
     val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
-    @Deprecated("Moving to new send")
-    val transferFundsCurrency: CryptoCurrency? = null,
     val fiatAssets: FiatAssetState? = null,
     val selectedFiatAccount: FiatAccount? = null,
     val selectedCryptoAccount: SingleAccount? = null,
-    val selectedAsset: CryptoCurrency? = null
+    val selectedAsset: CryptoCurrency? = null,
+    val backupSheetDetails: BackupDetails? = null
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -229,17 +229,12 @@ class DashboardModel(
             }
             is RefreshPrices -> interactor.refreshPrices(this, intent.cryptoCurrency)
             is PriceUpdate -> interactor.refreshPriceHistory(this, intent.cryptoCurrency)
-            is StartCustodialTransfer -> {
-                process(CheckBackupStatus)
-                null
-            }
-            is CheckBackupStatus -> interactor.hasUserBackedUp(this)
+            is CheckBackupStatus -> checkBackupStatus(intent.account, intent.action)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is LaunchDepositFlow -> interactor.getDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,
-            is BackupStatusUpdate,
             is BalanceUpdateError,
             is PriceHistoryUpdate,
             is ClearAnnouncement,
@@ -247,12 +242,24 @@ class DashboardModel(
             is ShowFiatAssetDetails,
             is ShowBankLinkingSheet,
             is ShowDashboardSheet,
-            is TransferFunds,
             is UpdateLaunchDialogFlow,
             is ClearBottomSheet,
-            is UpdateSelectedCryptoAccount -> null
+            is UpdateSelectedCryptoAccount,
+            is ShowBackupSheet -> null
         }
     }
+
+    private fun checkBackupStatus(account: SingleAccount, action: AssetAction): Disposable =
+        interactor.hasUserBackedUp()
+            .subscribeBy(
+                onSuccess = { isBackedUp ->
+                    if (isBackedUp) {
+                        process(LaunchSendFlow(account, action))
+                    } else {
+                        process(ShowBackupSheet(account, action))
+                    }
+                }, onError = { Timber.e(it) }
+            )
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("***> Scan loop failed: $t")

@@ -1210,6 +1210,12 @@
     <string name="backup_before_send_title">Backup Your Wallet</string>
     <string name="backup_before_send_body">Your backup phrase will allow you to recover your crypto if you lose access to your wallet. \n\nPlease write down these 12 words in order and keep them somewhere safe. Never share it with anyone. Your backup phrase is the key to recovering your crypto if you ever get locked out.</string>
     <string name="backup_before_send_cta">Backup Now</string>
+    <string name="backup_before_send_later_cta">Continue without Backup</string>
+    <plurals name="backup_before_send_later_label">
+        <item quantity="one">You have %1$d send without backing up remaining</item>
+        <item quantity="other">You have %1$d sends without backing up remaining</item>
+    </plurals>
+    <string name="backup_before_send_now_label">You must backup before sending</string>
 
     <!-- basic transfer to wallet -->
     <string name="basic_transfer_title">Send to %1s</string>

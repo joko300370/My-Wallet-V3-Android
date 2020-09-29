@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
@@ -59,7 +60,6 @@ import timber.log.Timber
 class EmptyDashboardItem : DashboardItem
 
 private typealias RefreshFn = () -> Unit
-
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
     ForceBackupForSendSheet.Host,
     BasicTransferToWallet.Host,
@@ -201,9 +201,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
-                DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
-                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
-                    state.transferFundsCurrency!!)
+                DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance(state.backupSheetDetails!!)
                 DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
@@ -326,7 +324,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         when (requestCode) {
             MainActivity.SETTINGS_EDIT,
             MainActivity.ACCOUNT_EDIT -> model.process(RefreshAllIntent)
-            BACKUP_FUNDS_REQUEST_CODE -> startTransferFunds()
+            BACKUP_FUNDS_REQUEST_CODE -> {
+                state?.backupSheetDetails?.let {
+                    model.process(CheckBackupStatus(it.account, it.action))
+                }
+            }
         }
     }
 
@@ -435,8 +437,13 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) =
-        model.process(LaunchSendFlow(account, action))
+    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
+        if (account is CustodialTradingAccount) {
+            model.process(CheckBackupStatus(account, action))
+        } else {
+            model.process(LaunchSendFlow(account, action))
+        }
+    }
 
     override fun goToReceiveFor(account: SingleAccount) =
         when (account) {
@@ -499,8 +506,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         navigator().launchBackupFunds(this, BACKUP_FUNDS_REQUEST_CODE)
     }
 
-    override fun startTransferFunds() {
-        model.process(TransferFunds)
+    override fun startTransferFunds(account: SingleAccount, action: AssetAction) {
+        model.process(LaunchSendFlow(account, action))
     }
 
     override fun abortTransferFunds() {

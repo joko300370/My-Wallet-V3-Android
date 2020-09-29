@@ -32,7 +32,6 @@ import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 private class DashboardGroupLoadFailure(msg: String, e: Throwable) : Exception(msg, e)
@@ -196,13 +195,7 @@ class DashboardInteractor(
             )
     }
 
-    fun hasUserBackedUp(model: DashboardModel): Disposable? {
-        return Single.just(payloadManager.isWalletBackedUp)
-            .subscribeBy(
-                onSuccess = { model.process(BackupStatusUpdate(it)) },
-                onError = { Timber.e(it) }
-            )
-    }
+    fun hasUserBackedUp(): Single<Boolean> = Single.just(payloadManager.isWalletBackedUp)
 
     fun cancelSimpleBuyOrder(orderId: String): Disposable? {
         return custodialWalletManager.deleteBuyOrder(orderId)
