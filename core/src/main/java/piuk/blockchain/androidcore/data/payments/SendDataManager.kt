@@ -139,8 +139,9 @@ class SendDataManager(
      * @return An [Observable] wrapping an [UnspentOutputs] object
      */
     fun getUnspentBtcOutputs(address: String): Observable<UnspentOutputs> =
-        rxPinning.call<UnspentOutputs> { paymentService.getUnspentBtcOutputs(address) }
-            .applySchedulers()
+        rxPinning.call<UnspentOutputs> {
+            paymentService.getUnspentBtcOutputs(address)
+        }.applySchedulers()
 
     /**
      * Returns an [UnspentOutputs] object containing all the unspent outputs for a given

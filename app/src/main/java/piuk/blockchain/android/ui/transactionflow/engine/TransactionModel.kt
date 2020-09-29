@@ -110,10 +110,11 @@ class TransactionModel(
             is TransactionIntent.TargetAddressValidated -> null
             is TransactionIntent.TargetAddressInvalid -> null
             is TransactionIntent.InitialiseWithSourceAndTargetAccount -> {
-                process(
-                    TransactionIntent.TargetSelectionConfirmed(
-                        intent.target
-                    )
+                processTargetSelectionConfirmed(
+                    sourceAccount = intent.fromAccount,
+                    amount = CryptoValue.zero(intent.fromAccount.asset),
+                    transactionTarget = intent.target,
+                    action = previousState.action
                 )
                 null
             }

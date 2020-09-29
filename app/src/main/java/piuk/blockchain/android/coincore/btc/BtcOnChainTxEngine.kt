@@ -34,6 +34,7 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
+import java.lang.IllegalStateException
 import java.math.BigInteger
 
 private const val STATE_UTXO = "btc_utxo"
@@ -112,6 +113,16 @@ class BtcOnChainTxEngine(
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
         if (btcDataManager.getAddressBalance(address) > CryptoValue.ZeroBtc) {
             sendDataManager.getUnspentBtcOutputs(address)
+                // If we get here, we should have balance... but if we have no UTXOs then we have
+                // a problem:
+                .map { utxo ->
+                    if (utxo.unspentOutputs.isEmpty()) {
+                        Timber.e("No BTC UTXOs found for non-zero balance!")
+                        throw IllegalStateException("No BTC UTXOs found for non-zero balance")
+                    } else {
+                        utxo
+                    }
+                }
                 .singleOrError()
         } else {
             Single.error(Throwable("No funds"))

@@ -88,7 +88,16 @@ class BchOnChainTxEngine(
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
         if (bchDataManager.getAddressBalance(address) > CryptoValue.ZeroBch.toBigInteger()) {
-            sendDataManager.getUnspentBchOutputs(address).singleOrError()
+            sendDataManager.getUnspentBchOutputs(address)
+                // If we get here, we should have balance and valid UTXOs. IF we don't, then, um... we'd best fail hard
+                .map { utxo ->
+                    if (utxo.unspentOutputs.isEmpty()) {
+                        Timber.e("No BTC UTXOs found for non-zero balance!")
+                        throw IllegalStateException("No BTC UTXOs found for non-zero balance")
+                    } else {
+                        utxo
+                    }
+                }.singleOrError()
         } else {
             Single.error(Throwable("No BCH funds"))
         }

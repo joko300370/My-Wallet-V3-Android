@@ -106,6 +106,9 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    // Check a manually entered address is correct. If it is, the interactor will send a
+    // TargetAddressValidated intent which, in turn, will enable the next cta on the enter
+    // address sheet
     class ValidateInputTargetAddress(
         val targetAddress: String,
         val expectedCrypto: CryptoCurrency
@@ -133,7 +136,9 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
-    // When a target is selected and valid, send by the UI to prep the BE for amount input
+    // Fired from the enter address sheet when a target address is confirmed - by selecting from the list
+    // (in this build, this will change for swap) or when the CTA is clicked. Move to the enter amount sheet
+    // once this has been processed. Do not send this from anywhere _but_ the enter address sheet.
     class TargetSelectionConfirmed(
         val transactionTarget: TransactionTarget
     ) : TransactionIntent() {
@@ -141,6 +146,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 errorState = TransactionErrorState.NONE,
                 selectedTarget = transactionTarget,
+                currentStep = TransactionStep.ENTER_AMOUNT,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }
@@ -210,10 +216,12 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    // Fired when the cta of the enter amount sheet is clicked. This just moved to the
+    // confirm sheet, with CTA disabled pending a validation check.
     object PrepareTransaction : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                nextEnabled = oldState.action != AssetAction.Deposit, // What's this?
+                nextEnabled = false, // Don't enable until we get a validated pendingTx from the interactor
                 currentStep = TransactionStep.CONFIRM_DETAIL
             ).updateBackstack(oldState)
     }
@@ -272,9 +280,8 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         }
     }
 
-    // When we start the enter amount sheet, we need to kick off a validation pass, so we
-    // know to enable the CTA button or not - transactions might require further option
-    // setting - t&cs etc - before the Tx can proceed.
+    // Fired from when the confirm transaction sheet is created.
+    // Forces a validation pass; we will get a
     object ValidateTransaction : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState = oldState
     }
