@@ -156,6 +156,10 @@ class PrefsUtil(
         removeValue(KEY_SIMPLE_BUY_STATE)
     }
 
+    override var addCardInfoDismissed: Boolean
+        get() = getValue(KEY_ADD_CARD_INFO, false)
+        set(dismissed) = setValue(KEY_ADD_CARD_INFO, dismissed)
+
     // From Onboarding
     override var swapIntroCompleted: Boolean
         get() = getValue(KEY_SWAP_INTRO_COMPLETED, false)
@@ -390,6 +394,7 @@ class PrefsUtil(
         private const val KEY_PIT_LINKING_LINK_ID = "pit_wallet_link_id"
         private const val KEY_SIMPLE_BUY_STATE = "key_simple_buy_state"
         private const val KEY_CARD_STATE = "key_card_state"
+        private const val KEY_ADD_CARD_INFO = "key_add_card_info"
 
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
 

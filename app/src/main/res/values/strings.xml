@@ -1742,6 +1742,8 @@
     <string name="completing_card_buy">We’re completing your purchase now.</string>
     <string name="card_purchased">%1s Purchased</string>
     <string name="card_purchased_available_now">Your %1s is now available in your Wallet.</string>
+    <string name="card_info_title">Virtual Cards Not Accepted</string>
+    <string name="card_info_description">At this time, we don’t support buying crypto with virtual credit and debit cards. You must use a physical card’s number, date and security code.</string>
 
     <string name="invalid_cvv">Invalid CVV</string>
     <string name="invalid_date">Invalid Date</string>
