@@ -43,7 +43,7 @@ class FcmCallbackService : FirebaseMessagingService() {
                 remoteMessage.notification?.title ?: "",
                 remoteMessage.notification?.title ?: "",
                 remoteMessage.notification?.body ?: "",
-                R.drawable.ic_notification_white,
+                R.mipmap.ic_launcher,
                 // Don't want to launch an activity
                 PendingIntent.getActivity(applicationContext, 0, Intent(), PendingIntent.FLAG_UPDATE_CURRENT),
                 ID_BACKGROUND_NOTIFICATION_2FA,
@@ -137,7 +137,7 @@ class FcmCallbackService : FirebaseMessagingService() {
             payload.title ?: "",
             payload.title ?: "",
             payload.body ?: "",
-            R.drawable.ic_notification_white,
+            R.mipmap.ic_launcher,
             pendingIntent,
             notificationId
         )

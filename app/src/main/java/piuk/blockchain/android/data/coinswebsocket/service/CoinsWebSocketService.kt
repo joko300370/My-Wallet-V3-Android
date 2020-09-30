@@ -65,7 +65,7 @@ class CoinsWebSocketService(private val applicationContext: Context) : MessagesS
             title,
             marquee,
             text,
-            R.drawable.ic_launcher_round,
+            R.mipmap.ic_launcher,
             pendingIntent,
             1000)
     }
