@@ -383,10 +383,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-    override fun updateBanks(banks: List<LinkedBank>) {
+    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
         val existingBanks = prefsExistingBanks()
 
-        val newBanks = banks.filterNot { existingBanks.contains(it.id) }
+        val newBanks = linkedAndSupportedCurrencies.linkedBanks.filterNot { existingBanks.contains(it.id) }
 
         newBanks.forEach { bank ->
             banksPref?.addPreference(
@@ -399,24 +399,35 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             )
         }
 
-        addOrUpdateLinkBankForCurrencies(banks.size + 1, listOf("GBP", "EUR"))
+        addOrUpdateLinkBankForCurrencies(
+            linkedAndSupportedCurrencies.linkedBanks.size + 1,
+            linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
+        )
     }
 
     private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
-
-        currencies.forEach { currency ->
-            banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
-                it.order = it.order + firstIndex + currencies.indexOf(currency)
-            } ?: banksPref?.addPreference(
-                BankPreference(context = requireContext(), fiatCurrency = currency).apply {
-                    onClick {
-                        linkBankWithCurrency(currency)
+        if (currencies.isEmpty()) {
+            banksPref?.isVisible = false
+        } else {
+            currencies.forEach { currency ->
+                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
+                    it.order = it.order + firstIndex + currencies.indexOf(currency)
+                } ?: banksPref?.addPreference(
+                    BankPreference(context = requireContext(), fiatCurrency = currency).apply {
+                        onClick {
+                            linkBankWithCurrency(currency)
+                        }
+                        key = LINK_BANK_KEY.plus(currency)
                     }
-                    key = LINK_BANK_KEY.plus(currency)
-                }
-            )
+                )
+            }
         }
     }
+
+    data class LinkedBanksAndSupportedCurrencies(
+        val linkedBanks: List<LinkedBank>,
+        val supportedCurrencies: List<String>
+    )
 
     private fun removeBank(bank: LinkedBank) {
         RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
