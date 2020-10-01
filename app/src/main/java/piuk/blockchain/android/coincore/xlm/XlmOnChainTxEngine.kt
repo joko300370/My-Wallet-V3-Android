@@ -32,8 +32,8 @@ class XlmOnChainTxEngine(
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(requireSecondPassword) {
 
-    private val targetXlmAddress: String by lazy {
-        (txTarget as CryptoAddress).address
+    private val targetXlmAddress: XlmAddress by lazy {
+        txTarget as XlmAddress
     }
 
     override fun assertInputsValid() {
@@ -114,7 +114,7 @@ class XlmOnChainTxEngine(
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
                     TxOptionValue.Memo(
-                        text = null,
+                        text = targetXlmAddress.memo,
                         isRequired = isMemoRequired(),
                         id = null
                     )
@@ -122,15 +122,17 @@ class XlmOnChainTxEngine(
             )
         )
 
+    private fun String.containsMemo() = contains(":")
+
     private fun isMemoRequired(): Boolean =
-        walletOptionsDataManager.isXlmAddressExchange(targetXlmAddress)
+        walletOptionsDataManager.isXlmAddressExchange(targetXlmAddress.address)
 
     private fun isMemoValid(memoOption: TxOptionValue.Memo): Boolean {
         return if (!isMemoRequired()) {
             true
         } else {
             !memoOption.text.isNullOrEmpty() && memoOption.text.length in 1..28 ||
-                memoOption.id != null
+                    memoOption.id != null
         }
     }
 
@@ -151,7 +153,7 @@ class XlmOnChainTxEngine(
 
     private fun validateAddress() =
         Completable.fromCallable {
-            if (!xlmDataManager.isAddressValid(targetXlmAddress)) {
+            if (!xlmDataManager.isAddressValid(targetXlmAddress.address)) {
                 throw TxValidationFailure(ValidationState.INVALID_ADDRESS)
             }
         }
@@ -205,7 +207,7 @@ class XlmOnChainTxEngine(
                     (receiveAddress as XlmAddress).address
                 ),
                 value = pendingTx.amount as CryptoValue,
-                toAddress = targetXlmAddress,
+                toAddress = targetXlmAddress.address,
                 toLabel = "",
                 fee = pendingTx.fees as CryptoValue,
                 memo = getMemoOption(pendingTx).toXlmMemo()

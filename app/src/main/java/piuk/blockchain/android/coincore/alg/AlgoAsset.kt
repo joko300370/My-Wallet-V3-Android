@@ -55,8 +55,8 @@ internal class AlgoAsset(
         Single.fromCallable {
             listOf(getAlgoAccount())
         }
-        .doOnError { Timber.e(it) }
-        .onErrorReturn { emptyList() }
+            .doOnError { Timber.e(it) }
+            .onErrorReturn { emptyList() }
 
     private fun getAlgoAccount(): SingleAccount =
         AlgoCryptoWalletAccount(
@@ -70,7 +70,8 @@ internal class AlgoAsset(
                 asset,
                 labels.getDefaultCustodialWalletLabel(asset),
                 exchangeRates,
-                custodialManager
+                custodialManager,
+                environmentConfig
             ))
         )
 

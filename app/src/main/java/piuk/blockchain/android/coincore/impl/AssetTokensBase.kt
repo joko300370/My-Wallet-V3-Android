@@ -105,10 +105,11 @@ internal abstract class CryptoAssetBase(
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
             CustodialTradingAccount(
-                asset,
-                labels.getDefaultCustodialWalletLabel(asset),
-                exchangeRates,
-                custodialManager
+                asset = asset,
+                label = labels.getDefaultCustodialWalletLabel(asset),
+                exchangeRates = exchangeRates,
+                custodialWalletManager = custodialManager,
+                environmentConfig = environmentConfig
             )
         ).flatMap { account ->
             account.accountBalance.map {

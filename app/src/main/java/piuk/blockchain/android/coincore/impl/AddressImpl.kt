@@ -47,8 +47,8 @@ internal fun makeExternalAssetAddress(
         }
         CryptoCurrency.XLM -> {
             XlmAddress(
-                address = address,
-                label = label
+                _address = address,
+                _label = label
             )
         }
         CryptoCurrency.ALGO,

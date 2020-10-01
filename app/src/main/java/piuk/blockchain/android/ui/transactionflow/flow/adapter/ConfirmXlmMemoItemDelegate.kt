@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSpinner
@@ -63,7 +64,6 @@ private class XlmMemoItemViewHolder(
     val activity: Activity
 ) : RecyclerView.ViewHolder(parent), LayoutContainer {
     private val maxCharacters = 28
-    private var isAutomaticInput = false
 
     override val containerView: View?
         get() = itemView
@@ -71,6 +71,8 @@ private class XlmMemoItemViewHolder(
     init {
         itemView.apply {
             confirm_details_memo_spinner.setupSpinner()
+            confirm_details_memo_spinner.setSelection(TEXT_INDEX)
+            confirm_details_memo_input.configureForSelection(TEXT_INDEX)
         }
     }
 
@@ -83,18 +85,17 @@ private class XlmMemoItemViewHolder(
                 showExchangeInfo()
             }
 
-            confirm_details_memo_spinner.addSpinnerListener(model, item)
+            confirm_details_memo_spinner.onItemSelectedListener = null
 
-            isAutomaticInput = true
             if (!item.text.isNullOrBlank()) {
-                confirm_details_memo_spinner.setSelection(0)
+                confirm_details_memo_spinner.setSelection(TEXT_INDEX)
                 confirm_details_memo_input.setText(item.text, TextView.BufferType.EDITABLE)
             } else if (item.id != null) {
-                confirm_details_memo_spinner.setSelection(1)
+                confirm_details_memo_spinner.setSelection(ID_INDEX)
                 confirm_details_memo_input.setText(item.id.toString(), TextView.BufferType.EDITABLE)
             }
-            isAutomaticInput = false
 
+            confirm_details_memo_spinner.addSpinnerListener(model, item, confirm_details_memo_input)
             confirm_details_memo_input.setupOnDoneListener(model, item)
         }
     }
@@ -108,7 +109,7 @@ private class XlmMemoItemViewHolder(
 
         setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
-                if (itemView.confirm_details_memo_spinner.selectedItemPosition == 0) {
+                if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
                     model.process(
                         TransactionIntent.ModifyTxOption(item.copy(text = v.text.toString())))
                 } else {
@@ -126,12 +127,14 @@ private class XlmMemoItemViewHolder(
         val spinnerArrayAdapter: ArrayAdapter<String> =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item,
                 resources.getStringArray(R.array.xlm_memo_types_manual))
-
         adapter = spinnerArrayAdapter
-        setSelection(0)
     }
 
-    private fun AppCompatSpinner.addSpinnerListener(model: TransactionModel, item: TxOptionValue.Memo) {
+    private fun AppCompatSpinner.addSpinnerListener(
+        model: TransactionModel,
+        item: TxOptionValue.Memo,
+        editText: EditText
+    ) {
         onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -140,22 +143,10 @@ private class XlmMemoItemViewHolder(
                     position: Int,
                     id: Long
                 ) {
+                    editText.configureForSelection(position)
                     itemView.apply {
-                        if (position == 0) {
-                            confirm_details_memo_input.hint =
-                                context.getString(R.string.send_confirm_memo_text_hint)
-                            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_TEXT
-                        } else {
-                            confirm_details_memo_input.hint =
-                                context.getString(R.string.send_confirm_memo_id_hint)
-                            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_NUMBER
-                        }
-
-                        if (!isAutomaticInput) {
-                            model.process(
-                                TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
-                            confirm_details_memo_input.setText("", TextView.BufferType.EDITABLE)
-                        }
+                        model.process(
+                            TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
                     }
                 }
 
@@ -163,6 +154,19 @@ private class XlmMemoItemViewHolder(
                     // do nothing
                 }
             }
+    }
+
+    private fun EditText.configureForSelection(selection: Int) {
+        if (selection == TEXT_INDEX) {
+            confirm_details_memo_input.hint =
+                context.getString(R.string.send_confirm_memo_text_hint)
+            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_TEXT
+        } else {
+            confirm_details_memo_input.hint =
+                context.getString(R.string.send_confirm_memo_id_hint)
+            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_NUMBER
+        }
+        setText("", TextView.BufferType.EDITABLE)
     }
 
     private fun View.showExchangeInfo() {
@@ -188,5 +192,10 @@ private class XlmMemoItemViewHolder(
             movementMethod = LinkMovementMethod.getInstance()
             visible()
         }
+    }
+
+    companion object {
+        private const val TEXT_INDEX = 0
+        private const val ID_INDEX = 1
     }
 }

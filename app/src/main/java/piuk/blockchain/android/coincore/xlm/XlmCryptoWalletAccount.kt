@@ -49,7 +49,7 @@ internal class XlmCryptoWalletAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.just(
-            XlmAddress(address = address, label = label)
+            XlmAddress(_address = address, _label = label)
         )
 
     override val activity: Single<ActivitySummaryList>

@@ -13,11 +13,11 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -28,7 +28,8 @@ open class CustodialTradingAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
-    val isNoteSupported: Boolean = false
+    val isNoteSupported: Boolean = false,
+    private val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
@@ -36,10 +37,11 @@ open class CustodialTradingAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = custodialWalletManager.getCustodialAccountAddress(asset).map {
-            TradingAddress(
+            makeExternalAssetAddress(
+                asset = asset,
                 address = it,
                 label = label,
-                asset = asset
+                environmentConfig = environmentConfig
             )
         }
 
@@ -148,9 +150,3 @@ open class CustodialTradingAccount(
         )
     }
 }
-
-internal class TradingAddress(
-    override val address: String,
-    override val label: String = address,
-    override val asset: CryptoCurrency
-) : CryptoAddress
