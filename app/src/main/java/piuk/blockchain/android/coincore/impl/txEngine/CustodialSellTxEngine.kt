@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
@@ -58,7 +59,7 @@ class CustodialSellTxEngine(
                     .map {
                         it.pairs.first { pair ->
                             pair.cryptoCurrency == sourceAccount.asset &&
-                                pair.fiatCurrency == fiatTarget.fiatCurrency
+                                    pair.fiatCurrency == fiatTarget.fiatCurrency
                         }
                     }.flatMap { pair ->
                         Single.just(
@@ -158,21 +159,27 @@ class CustodialSellTxEngine(
             )
         )
 
+        val exchangeRate = ExchangeRate.FiatToCrypto(
+            from = fiatTarget.fiatCurrency,
+            to = sourceAccount.asset,
+            rate = 1.toBigDecimal().divide(quote.rate.toBigDecimal(),
+                sourceAccount.asset.dp, RoundingMode.HALF_UP
+            )
+        )
+
         return pendingTx.copy(
             options = options,
             amount = if (pendingTx.amount is CryptoValue) pendingTx.amount else
-                CryptoValue.fromMajor(
-                    sourceAccount.asset,
-                    (pendingTx.amount.toBigDecimal().divide(quote.rate.toBigDecimal(),
-                        sourceAccount.asset.userDp, RoundingMode.HALF_UP
-                    ))
-                )
+                exchangeRate.convert(pendingTx.amount),
+            minLimit = if (pendingTx.minLimit is CryptoValue) pendingTx.minLimit else
+                exchangeRate.convert(pendingTx.minLimit ?: FiatValue.zero(fiatTarget.fiatCurrency)),
+            maxLimit = if (pendingTx.maxLimit is CryptoValue) pendingTx.maxLimit else
+                exchangeRate.convert(pendingTx.maxLimit ?: FiatValue.zero(fiatTarget.fiatCurrency))
         )
     }
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         sourceAccount.accountBalance.map { it as CryptoValue }
-            .map { it as CryptoValue }
             .flatMapCompletable { balance ->
                 val cryptoAmount = (pendingTx.amount as? FiatValue)?.toCrypto(exchangeRates, cryptoCurrency)
                     ?: pendingTx.amount as CryptoValue
