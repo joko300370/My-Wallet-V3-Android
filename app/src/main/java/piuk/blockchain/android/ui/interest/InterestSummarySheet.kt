@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.InterestAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
@@ -84,6 +85,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
                     // TODO how do we select accounts from here? For now choose default non-custodial
                     coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
                         val defaultAccount = it.accounts.first { acc -> acc.isDefault }
+                        analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
                         host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
                     }
                 }

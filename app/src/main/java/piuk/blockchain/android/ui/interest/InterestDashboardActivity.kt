@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.interest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.notifications.analytics.InterestAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -64,6 +65,7 @@ class InterestDashboardActivity : BlockchainActivity(),
     }
 
     override fun startKyc() {
+        analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_KYC)
         KycNavHostActivity.start(this, CampaignType.Interest)
     }
 
@@ -72,6 +74,7 @@ class InterestDashboardActivity : BlockchainActivity(),
     }
 
     override fun startDepositFlow(fromAccount: SingleAccount, toAccount: SingleAccount) {
+        analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_ACTION)
         startDeposit(fromAccount, toAccount, AssetAction.Deposit)
     }
 

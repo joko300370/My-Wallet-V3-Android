@@ -1,7 +1,11 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.InterestAnalytics
 import io.reactivex.Single
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
@@ -11,8 +15,9 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 class InterestAvailableAnnouncement(
     dismissRecorder: DismissRecorder
-) : AnnouncementRule(dismissRecorder) {
+) : AnnouncementRule(dismissRecorder), KoinComponent {
 
+    private val analytics: Analytics by inject()
     override val dismissKey = DISMISS_KEY
 
     override fun shouldShow(): Single<Boolean> {
@@ -34,6 +39,7 @@ class InterestAvailableAnnouncement(
                 iconImage = R.drawable.ic_interest_blue_circle,
                 ctaText = R.string.interest_announcement_action,
                 ctaFunction = {
+                    analytics.logEvent(InterestAnalytics.INTEREST_ANNOUNCEMENT_CTA)
                     host.dismissAnnouncementCard()
                     host.startInterestDashboard()
                 },
