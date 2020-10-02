@@ -1,24 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="match_parent">
 
     <piuk.blockchain.android.ui.customviews.VerifyIdentityBenefitsView
         android:id="@+id/kyc_benefits"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:visibility="visible"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="gone" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/accounts_list"
+        android:layout_width="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sell_info_separator"/>
+
+    <View
+        android:id="@+id/sell_info_separator"
+        style="@style/SeparatorWithoutMargins"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toTopOf="@id/sell_info_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sell_info_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:paddingTop="@dimen/small_margin"
+        android:text="@string/sell_info_title"
+        app:layout_constraintBottom_toTopOf="@id/sell_info_blurb" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sell_info_blurb"
+        style="@style/Text.Standard.14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/smallest_margin"
+        app:layout_constraintBottom_toTopOf="@id/sell_info_action"
+        tools:text="@string/sell_info_blurb_1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sell_info_action"
+        style="@style/Text.Blue.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="@dimen/tiny_margin"
+        android:text="@string/sell_info_action"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/sell_info_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="sell_info_separator,sell_info_title,sell_info_blurb,sell_info_action"
+        tools:visibility="visible" />
 
     <piuk.blockchain.android.ui.customviews.EmptyStateView
         android:id="@+id/sell_empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

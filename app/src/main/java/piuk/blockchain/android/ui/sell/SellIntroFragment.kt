@@ -1,13 +1,20 @@
 package piuk.blockchain.android.ui.sell
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
@@ -42,6 +49,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     interface SellIntroHost {
         fun onSellFinished()
+        fun onSellInfoClicked()
     }
 
     private val host: SellIntroHost by lazy {
@@ -53,6 +61,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private val coincore: Coincore by scopedInject()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val analytics: Analytics by inject()
     private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
@@ -96,6 +105,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderSellError() {
         accounts_list.gone()
+        sell_info_group.gone()
         sell_empty.setDetails {
             loadSellDetails()
         }
@@ -105,6 +115,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderRejectedKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
+        sell_info_group.gone()
+
         kyc_benefits.initWithBenefits(
             benefits = listOf(
                 VerifyIdentityBenefit(
@@ -134,6 +146,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderNonKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
+        sell_info_group.gone()
+
         kyc_benefits.initWithBenefits(
             benefits = listOf(
                 VerifyIdentityBenefit(
@@ -182,6 +196,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     status = ::statusDecorator,
                     introView = introHeaderView
                 )
+
+                renderSellInfo()
+
                 accounts_list.onAccountSelected = { account ->
                     (account as? CryptoAccount)?.let {
                         startSellFlow(it)
@@ -190,6 +207,27 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             }, onError = {
                 renderSellError()
             })
+    }
+
+    private fun renderSellInfo() {
+        sell_info_group.visible()
+
+        val sellInfoIntro = getString(R.string.sell_info_blurb_1)
+        val sellInfoBold = getString(R.string.sell_info_blurb_2)
+        val sellInfoEnd = getString(R.string.sell_info_blurb_3)
+
+        val sb = SpannableStringBuilder()
+            .append(sellInfoIntro)
+            .append(sellInfoBold)
+            .append(sellInfoEnd)
+        sb.setSpan(StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+        sell_info_blurb.setText(sb, TextView.BufferType.SPANNABLE)
+        sell_info_action.setOnClickListener {
+            analytics.logEvent(AnalyticsEvents.SellTabInfo)
+            host.onSellInfoClicked()
+        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)
@@ -210,8 +248,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
         val availableFiats =
             custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
         return custodialWalletManager.getSupportedBuySellCryptoCurrencies()
-            .zipWith(availableFiats) { supportedPairs, availableFiats ->
-                supportedPairs.pairs.filter { availableFiats.contains(it.fiatCurrency) }
+            .zipWith(availableFiats) { supportedPairs, fiats ->
+                supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
                     .map { it.cryptoCurrency }
             }
     }

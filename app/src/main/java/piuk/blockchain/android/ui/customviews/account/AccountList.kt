@@ -40,6 +40,17 @@ class AccountList @JvmOverloads constructor(
     private val uiScheduler = AndroidSchedulers.mainThread()
     private val itemList = mutableListOf<BlockchainAccount>()
 
+    init {
+        isVerticalFadingEdgeEnabled = true
+        setFadingEdgeLength(resources.getDimension(R.dimen.very_small_margin).toInt())
+
+        layoutManager = LinearLayoutManager(
+            context,
+            VERTICAL,
+            false
+        )
+    }
+
     fun initialise(
         source: Single<List<BlockchainAccount>>,
         status: StatusDecorator = {
@@ -60,12 +71,6 @@ class AccountList @JvmOverloads constructor(
                     .build()
             )
         }
-
-        layoutManager = LinearLayoutManager(
-            context,
-            VERTICAL,
-            false
-        )
 
         val theAdapter = AccountsDelegateAdapter(
             statusDecorator = status,

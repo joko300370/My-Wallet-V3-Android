@@ -561,6 +561,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         menu.findItem(R.id.nav_debug_swap).isVisible = true
     }
 
+    override fun goToTransfer() {
+        startTransferFragment()
+    }
+
     private fun startTransferFragment(
         viewToShow: TransferFragment.TransferViewType = TransferFragment.TransferViewType.TYPE_SEND
     ) {

@@ -70,7 +70,8 @@ enum class AnalyticsEvents(
     WalletSignupCreated("wallet_signup_wallet_created"),
     WalletSignupPINFirst("wallet_signup_pin_first"),
     WalletSignupPINSecond("wallet_signup_pin_second"),
-    WalletSignupFirstLogIn("wallet_signup_login")
+    WalletSignupFirstLogIn("wallet_signup_login"),
+    SellTabInfo("sell_send_now_clicked")
 }
 
 fun kycTierStart(tier: Int): AnalyticsEvent = object : AnalyticsEvent {

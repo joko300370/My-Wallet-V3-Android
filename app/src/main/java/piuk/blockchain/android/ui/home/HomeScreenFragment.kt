@@ -40,6 +40,7 @@ interface HomeNavigator {
 
     fun gotoActivityFor(account: BlockchainAccount?)
     fun goToWithdraw(currency: String)
+    fun goToTransfer()
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)

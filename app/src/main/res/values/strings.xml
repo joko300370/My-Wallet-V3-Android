@@ -1990,6 +1990,7 @@
     <string name="interest_error_title">Can\'t load Interest Details</string>
     <string name="interest_error_desc">An error occurred while loading Interest Account details.\nPlease check your internet connection and try again or Contact Support if the issue persists.</string>
 
+    <!-- Buy & Sell -->
     <string name="buy">Buy</string>
     <string name="sell">Sell</string>
     <string name="buy_and_sell">Buy &amp; Sell</string>
@@ -2011,6 +2012,11 @@
     <string name="sell_quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
     <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>
+    <string name="sell_info_title">Want to sell from your other Wallets?</string>
+    <string name="sell_info_blurb_1">Send crypto from your Wallets to your</string>
+    <string name="sell_info_blurb_2">&#160;Trading Wallets.&#160;</string>
+    <string name="sell_info_blurb_3">Once that send completes, sell that crypto for cash.</string>
+    <string name="sell_info_action">Send Now →</string>
 
     <string name="scan_mismatch_transaction_target">The scanned code is not a %1$s QR code.</string>
     <string name="scan_failed">QR code not recognised, please try again.</string>

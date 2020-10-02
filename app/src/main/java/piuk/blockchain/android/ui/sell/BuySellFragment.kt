@@ -147,6 +147,10 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         subscribeForNavigation()
     }
 
+    override fun onSellInfoClicked() {
+        navigator().goToTransfer()
+    }
+
     override fun onResume() {
         super.onResume()
         subscribeForNavigation()
