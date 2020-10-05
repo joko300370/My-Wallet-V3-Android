@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.transfer.send.activity
+package piuk.blockchain.android.ui.account
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +14,6 @@ import kotlinx.android.synthetic.main.dialog_confirm_transaction.*
 import org.apache.commons.lang3.NotImplementedException
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.androidcoreui.ui.base.BaseDialogFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import piuk.blockchain.androidcoreui.utils.extensions.gone

@@ -227,9 +227,6 @@ class CustodialSellTxEngine(
         return TxValidationFailure(ValidationState.INVALID_AMOUNT)
     }
 
-    override val feeOptions: Set<FeeLevel>
-        get() = setOf(FeeLevel.None)
-
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
         walletManager.cancelAllPendingOrders().then {
             walletManager.createOrder(

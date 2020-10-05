@@ -6,7 +6,6 @@ import com.blockchain.accounts.AsyncAllAccountList
 import com.blockchain.activities.StartSwap
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
-import com.blockchain.koin.btcStrategy
 import com.blockchain.koin.cardPaymentsFeatureFlag
 import com.blockchain.koin.eth
 import com.blockchain.koin.eur
@@ -54,7 +53,7 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
+import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
@@ -84,7 +83,6 @@ import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferPresenter
 import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
-import piuk.blockchain.android.ui.account.WalletAccountHelperAccountListingAdapter
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
@@ -117,13 +115,6 @@ import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
 import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
-import piuk.blockchain.android.ui.transfer.send.activity.SendPresenter
-import piuk.blockchain.android.ui.transfer.send.activity.SendView
-import piuk.blockchain.android.ui.account.chooser.AccountChooserPresenter
-import piuk.blockchain.android.ui.account.chooser.AccountListing
-import piuk.blockchain.android.ui.transfer.send.activity.ConfirmPaymentPresenter
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.BitcoinSendStrategy
-import piuk.blockchain.android.ui.transfer.send.activity.strategy.SendStrategy
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
@@ -236,27 +227,9 @@ val applicationModule = module {
 
         factory {
             WalletAccountHelper(
-                payloadManager = get(),
-                stringUtils = get(),
-                ethDataManager = get(),
-                bchDataManager = get(),
-                xlmDataManager = get(),
-                environmentSettings = get(),
-                paxAccount = get(paxAccount),
-                usdtAccount = get(usdtAccount),
-                crashLogger = get()
+                payloadManager = get()
             )
         }
-
-        factory {
-            AccountChooserPresenter(get(), get())
-        }
-
-        factory {
-            WalletAccountHelperAccountListingAdapter(
-                walletAccountHelper = get()
-            )
-        }.bind(AccountListing::class)
 
         factory {
             SecondPasswordHandlerDialog(get(), get())
@@ -441,42 +414,6 @@ val applicationModule = module {
             )
         }
 
-        factory<SendPresenter<SendView>> {
-            SendPresenter(
-                btcStrategy = get(btcStrategy),
-                prefs = get(),
-                exchangeRates = get(),
-                stringUtils = get(),
-                envSettings = get(),
-                exchangeRateFactory = get(),
-                pitLinkingFeatureFlag = get(pitFeatureFlag),
-                bitpayDataManager = get(),
-                analytics = get()
-            )
-        }
-
-        factory<SendStrategy<SendView>>(btcStrategy) {
-            BitcoinSendStrategy(
-                walletAccountHelper = get(),
-                payloadDataManager = get(),
-                prefs = get(),
-                exchangeRates = get(),
-                stringUtils = get(),
-                sendDataManager = get(),
-                dynamicFeeCache = get(),
-                feeDataManager = get(),
-                privateKeyFactory = get(),
-                environmentSettings = get(),
-                coinSelectionRemoteConfig = get(),
-                nabuDataManager = get(),
-                nabuToken = get(),
-                bitPayDataManager = get(),
-                pitLinking = get(),
-                analytics = get(),
-                envSettings = get()
-            )
-        }
-
         factory {
             SunriverDeepLinkHelper(
                 linkHandler = get()
@@ -541,8 +478,6 @@ val applicationModule = module {
         }
 
         factory { DeepLinkPersistence(get()) }
-
-        factory { ConfirmPaymentPresenter() }
 
         factory {
             DashboardModel(

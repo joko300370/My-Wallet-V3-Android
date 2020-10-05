@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.transfer.send.activity
+package piuk.blockchain.android.ui.account
 
 @Deprecated("Old send. Do not use")
 object SendModel {

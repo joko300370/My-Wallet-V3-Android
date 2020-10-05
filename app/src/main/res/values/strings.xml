@@ -809,9 +809,9 @@
 
     <!-- CONFIRM PAYMENT -->
     <string name="confirm_payment_fee_sync_error">Error getting fee options</string>
-    <string name="fee_options_regular">Regular</string>
 
     <!-- FEE OPTIONS -->
+    <string name="fee_options_regular">Regular</string>
     <string name="fee_options_priority">Priority</string>
     <string name="fee_options_custom">Custom</string>
     <string name="fee_options_regular_time">1+ hour</string>
@@ -1909,8 +1909,10 @@
     <string name="send_error_tx_in_flight">A transaction is already in progress</string>
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="send_confirmation_title">Send %1$s</string>
-    <string name="send_confirmation_fee">Fee - Regular</string>
-    <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
+    <string name="send_confirmation_fee">Fee</string>
+    <string name="send_confirmation_tx_fee">Transaction Fee</string>
+    <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
+    <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees">Learn more</annotation> about network fees.</string>
     <string name="send_confirmation_fee_loading">Loading…</string>
     <string name="send_confirmation_fee_error">Error loading fee</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
@@ -2038,5 +2040,14 @@
     <string name="sell_is_coming_soon">Buy &amp; Sell Coming Soon</string>
     <string name="sell_is_coming_soon_description">Currently, we don’t support buying or selling crypto in your region. We’ll send you an update when we do.</string>
     <string name="common_pending">Pending</string>
+
+    <!-- Transaction Flow confirmation screen -->
+    <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
+    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_option_invalid">Please ensure you`ve agreed to our Terms.</string>
+    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+
+    <!-- Fee options -->
 
 </resources>

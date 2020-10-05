@@ -35,8 +35,6 @@ open class Erc20OnChainTxEngine(
     private val ethDataManager: EthDataManager =
         erc20Account.ethDataManager
 
-    override val feeOptions = setOf(FeeLevel.Regular)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(

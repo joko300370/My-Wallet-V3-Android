@@ -8,12 +8,12 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
+import piuk.blockchain.android.ui.account.PendingTransaction
+import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
-import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.events.PaymentFailedEvent
 import piuk.blockchain.androidcore.data.events.PaymentSentEvent

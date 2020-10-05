@@ -42,9 +42,6 @@ class XlmOnChainTxEngine(
         require(asset == CryptoCurrency.XLM)
     }
 
-    override val feeOptions: Set<FeeLevel>
-        get() = setOf(FeeLevel.Regular)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(

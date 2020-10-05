@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.transfer.send.activity
+package piuk.blockchain.android.ui.account
 
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState

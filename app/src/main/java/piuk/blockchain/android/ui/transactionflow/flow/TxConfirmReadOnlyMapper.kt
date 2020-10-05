@@ -53,11 +53,7 @@ class FeePropertyFormatter(private val resources: Resources) : TxOptionsFormatte
 
     override fun format(property: TxOptionValue): Pair<String, String>? =
         if (property is TxOptionValue.Fee) {
-            val feeTitle = resources.getString(
-                R.string.common_spaced_strings,
-                resources.getString(R.string.send_confirmation_fee),
-                resources.getString(R.string.send_confirmation_regular_estimation)
-            )
+            val feeTitle = resources.getString(R.string.send_confirmation_tx_fee)
             feeTitle to property.fee.formatWithExchange(property.exchange)
         } else null
 }
@@ -89,7 +85,7 @@ class ToPropertyFormatter(private val resources: Resources) : TxOptionsFormatter
         else null
 }
 
-private fun Money.formatWithExchange(exchange: Money?) =
+fun Money.formatWithExchange(exchange: Money?) =
     exchange?.let {
         "${this.toStringWithSymbol()} (${it.toStringWithSymbol()})"
     } ?: this.toStringWithSymbol()

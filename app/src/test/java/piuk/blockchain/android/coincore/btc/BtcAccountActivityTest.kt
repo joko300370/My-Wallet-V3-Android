@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -26,6 +27,7 @@ class BtcAccountActivityTest {
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val networkParameters: NetworkParameters = mock()
+    private val walletPrefs: WalletStatus = mock()
 
     private val subject =
         BtcCryptoWalletAccount(
@@ -38,7 +40,8 @@ class BtcAccountActivityTest {
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
             internalAccount = mock(),
-            isHDAccount = true
+            isHDAccount = true,
+            walletPreferences = walletPrefs
         )
 
     @get:Rule

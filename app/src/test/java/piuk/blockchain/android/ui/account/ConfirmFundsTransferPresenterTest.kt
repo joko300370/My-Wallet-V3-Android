@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.backup.transfer
+package piuk.blockchain.android.ui.account
 
 import android.annotation.SuppressLint
 import com.blockchain.preferences.CurrencyPrefs
@@ -24,12 +24,10 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
-import piuk.blockchain.android.ui.account.ItemAccount
+import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferPresenter
+import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferView
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
-import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.events.PaymentFailedEvent
 import piuk.blockchain.androidcore.data.events.PaymentSentEvent
@@ -51,13 +49,13 @@ class ConfirmFundsTransferPresenterTest {
     }
 
     private val subject = ConfirmFundsTransferPresenter(
-            walletAccountHelper,
-            transferFundsDataManager,
-            payloadDataManager,
-            stringUtils,
-            exchangeRates,
-            currencyPrefs
-        )
+        walletAccountHelper,
+        transferFundsDataManager,
+        payloadDataManager,
+        stringUtils,
+        exchangeRates,
+        currencyPrefs
+    )
 
     @Before
     fun setUp() {

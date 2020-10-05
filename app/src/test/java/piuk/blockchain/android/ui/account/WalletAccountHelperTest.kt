@@ -1,7 +1,5 @@
 package piuk.blockchain.android.ui.account
 
-import com.blockchain.logging.CrashLogger
-import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.bitcoin
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
@@ -21,9 +19,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import java.math.BigInteger
 import java.util.Locale
 
@@ -32,28 +27,14 @@ class WalletAccountHelperTest {
     private lateinit var subject: WalletAccountHelper
     private val payloadManager: PayloadManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val stringUtils: StringUtils = mock()
-    private val ethDataManager: EthDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private val bchDataManager: BchDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private val xlmDataManager: XlmDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val environmentSettings: EnvironmentConfig = mock()
-    private val paxAccount: Erc20Account = mock()
-    private val usdtAccount: Erc20Account = mock()
-    private val crashLogger: CrashLogger = mock()
 
     @Before
     fun setUp() {
         Locale.setDefault(Locale.US)
 
         subject = WalletAccountHelper(
-            payloadManager,
-            stringUtils,
-            ethDataManager,
-            paxAccount,
-            usdtAccount,
-            bchDataManager,
-            xlmDataManager,
-            environmentSettings,
-            crashLogger
+            payloadManager
         )
 
         whenever(environmentSettings.bitcoinCashNetworkParameters)

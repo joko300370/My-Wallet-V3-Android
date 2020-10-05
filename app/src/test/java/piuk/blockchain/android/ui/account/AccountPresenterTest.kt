@@ -37,10 +37,7 @@ import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
-import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -112,11 +109,12 @@ class AccountPresenterTest {
     @Test
     fun checkTransferableLegacyFundsWarnTransferAllTrue() {
         // Arrange
-        val result = TransferableFundTransactionList(
-            pendingTransactions = listOf(PendingTransaction()),
-            totalToSend = 1.toBigInteger(),
-            totalFee = 2.toBigInteger()
-        )
+        val result =
+            TransferableFundTransactionList(
+                pendingTransactions = listOf(PendingTransaction()),
+                totalToSend = 1.toBigInteger(),
+                totalFee = 2.toBigInteger()
+            )
 
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
             .thenReturn(Observable.just(result))
@@ -139,11 +137,12 @@ class AccountPresenterTest {
     @Test
     fun checkTransferableLegacyFundsWarnTransferAllTrueDontShowDialog() {
         // Arrange
-        val result = TransferableFundTransactionList(
-            pendingTransactions = listOf(PendingTransaction()),
-            totalToSend = 1.toBigInteger(),
-            totalFee = 2.toBigInteger()
-        )
+        val result =
+            TransferableFundTransactionList(
+                pendingTransactions = listOf(PendingTransaction()),
+                totalToSend = 1.toBigInteger(),
+                totalFee = 2.toBigInteger()
+            )
 
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
             .thenReturn(Observable.just(result))
@@ -163,11 +162,12 @@ class AccountPresenterTest {
     @Test
     fun checkTransferableLegacyFundsNoFundsAvailable() {
         // Arrange
-        val result = TransferableFundTransactionList(
-            pendingTransactions = emptyList(),
-            totalToSend = 1.toBigInteger(),
-            totalFee = 2.toBigInteger()
-        )
+        val result =
+            TransferableFundTransactionList(
+                pendingTransactions = emptyList(),
+                totalToSend = 1.toBigInteger(),
+                totalFee = 2.toBigInteger()
+            )
 
         whenever(fundsDataManager.transferableFundTransactionListForDefaultAccount)
             .thenReturn(Observable.just(result))

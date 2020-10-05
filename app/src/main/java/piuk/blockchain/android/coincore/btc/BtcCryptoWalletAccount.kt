@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -36,7 +37,8 @@ internal class BtcCryptoWalletAccount(
     // TransactionProcessor defined;
     @Deprecated("Old send style address format")
     val internalAccount: JsonSerializableAccount,
-    val isHDAccount: Boolean
+    val isHDAccount: Boolean,
+    private val walletPreferences: WalletStatus
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -87,7 +89,8 @@ internal class BtcCryptoWalletAccount(
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             btcNetworkParams = networkParameters,
-            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted,
+            walletPreferences = walletPreferences
         )
 
     companion object {
@@ -98,7 +101,8 @@ internal class BtcCryptoWalletAccount(
             feeDataManager: FeeDataManager,
             isDefault: Boolean = false,
             exchangeRates: ExchangeRateDataManager,
-            networkParameters: NetworkParameters
+            networkParameters: NetworkParameters,
+            walletPreferences: WalletStatus
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             sendDataManager = sendDataManager,
@@ -109,7 +113,8 @@ internal class BtcCryptoWalletAccount(
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
             internalAccount = jsonAccount,
-            isHDAccount = true
+            isHDAccount = true,
+            walletPreferences = walletPreferences
         )
 
         fun createLegacyAccount(
@@ -118,7 +123,8 @@ internal class BtcCryptoWalletAccount(
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
             exchangeRates: ExchangeRateDataManager,
-            networkParameters: NetworkParameters
+            networkParameters: NetworkParameters,
+            walletPreferences: WalletStatus
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             sendDataManager = sendDataManager,
@@ -129,7 +135,9 @@ internal class BtcCryptoWalletAccount(
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
             internalAccount = legacyAccount,
-            isHDAccount = false
+            isHDAccount = false,
+            walletPreferences = walletPreferences
+
         )
     }
 }

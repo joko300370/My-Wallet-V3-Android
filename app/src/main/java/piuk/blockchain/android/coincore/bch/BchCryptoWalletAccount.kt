@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.bch
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -35,7 +36,8 @@ internal class BchCryptoWalletAccount(
     // TEMP keep a copy of the metadata account, for interop with the old send flow
     // this can and will be removed when BCH is moved over and has a on-chain
     // TransactionProcessor defined;
-    val internalAccount: GenericMetadataAccount
+    val internalAccount: GenericMetadataAccount,
+    private val walletPreferences: WalletStatus
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -97,7 +99,8 @@ internal class BchCryptoWalletAccount(
             sendDataManager = sendDataManager,
             bchDataManager = bchManager,
             payloadDataManager = payloadDataManager,
-            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted,
+            walletPreferences = walletPreferences
         )
 
     constructor(
@@ -108,7 +111,8 @@ internal class BchCryptoWalletAccount(
         exchangeRates: ExchangeRateDataManager,
         networkParams: NetworkParameters,
         feeDataManager: FeeDataManager,
-        sendDataManager: SendDataManager
+        sendDataManager: SendDataManager,
+        walletPreferences: WalletStatus
     ) : this(
         payloadManager,
         jsonAccount.label,
@@ -119,6 +123,7 @@ internal class BchCryptoWalletAccount(
         networkParams,
         feeDataManager,
         sendDataManager,
-        jsonAccount
+        jsonAccount,
+        walletPreferences
     )
 }

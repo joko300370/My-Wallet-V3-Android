@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -34,7 +35,6 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.math.BigInteger
 
 private const val STATE_UTXO = "btc_utxo"
@@ -56,6 +56,7 @@ class BtcOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val feeDataManager: FeeDataManager,
     private val btcNetworkParams: NetworkParameters,
+    private val walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword
@@ -83,16 +84,14 @@ class BtcOnChainTxEngine(
         }
     }
 
-    override val feeOptions: Set<FeeLevel>
-        get() = setOf(FeeLevel.Regular)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
                 amount = CryptoValue.ZeroBtc,
                 available = CryptoValue.ZeroBtc,
                 fees = CryptoValue.ZeroBtc,
-                feeLevel = FeeLevel.Regular,
+                feeLevel = mapSavedFeeToFeeLevel(
+                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BTC)),
                 selectedFiat = userFiat
             )
         )
@@ -174,6 +173,24 @@ class BtcOnChainTxEngine(
         )
     }
 
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
+        if (newOption is TxOptionValue.FeeSelection) {
+            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
+            // will need updating as well as the fees:
+            if (newOption.selectedLevel != pendingTx.feeLevel) {
+                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BTC,
+                    newOption.selectedLevel.mapFeeLevelToSavedValue())
+                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
+                    .flatMap { pTx -> doValidateAmount(pTx) }
+                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+            } else {
+                // The option hasn't changed, revert to our known settings
+                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
+            }
+        } else {
+            super.doOptionUpdateRequest(pendingTx, newOption)
+        }
+
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
@@ -185,10 +202,7 @@ class BtcOnChainTxEngine(
                 options = mutableListOf(
                     TxOptionValue.From(from = sourceAccount.label),
                     TxOptionValue.To(to = txTarget.label),
-                    TxOptionValue.Fee(
-                        fee = pendingTx.fees,
-                        exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)
-                    ),
+                    makeFeeSelectionOption(pendingTx),
                     TxOptionValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
@@ -204,10 +218,20 @@ class BtcOnChainTxEngine(
             )
         )
 
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
+        TxOptionValue.FeeSelection(
+            absoluteFee = pendingTx.fees,
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(
+                FeeLevel.Regular, FeeLevel.Priority
+            )
+        )
+
     // Returns true if bitcoin transaction is large by checking against 3 criteria:
-    //  * If the fee > $0.50
-    //  * If the Tx size is over 1kB
-    //  * If the ratio of fee/amount is over 1%
+    //  * If the fee > $0.50 AND
+    //  * the Tx size is over 1kB AND
+    //  * the ratio of fee/amount is over 1%
     private fun isLargeTransaction(pendingTx: PendingTx): Boolean {
         val fiatValue = pendingTx.fees.toFiat(exchangeRates, LARGE_TX_FIAT)
 
@@ -271,8 +295,8 @@ class BtcOnChainTxEngine(
             if (pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
                     TxOption.LARGE_TRANSACTION_WARNING
                 )?.value == false) {
-                    throw TxValidationFailure(ValidationState.OPTION_INVALID)
-                }
+                throw TxValidationFailure(ValidationState.OPTION_INVALID)
+            }
         }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =

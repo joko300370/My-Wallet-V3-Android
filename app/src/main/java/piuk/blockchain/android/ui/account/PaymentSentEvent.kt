@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.transfer.send.activity.strategy
+package piuk.blockchain.android.ui.account
 
 import info.blockchain.balance.CryptoValue
 import piuk.blockchain.androidcoreui.utils.extensions.getBoundary

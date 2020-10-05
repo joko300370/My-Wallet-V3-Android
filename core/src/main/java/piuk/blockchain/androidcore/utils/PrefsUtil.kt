@@ -47,7 +47,6 @@ class PrefsUtil(
 
     override var pinId: String
         get() = getValue(KEY_PIN_IDENTIFIER) ?: backupStore.getString(KEY_PIN_IDENTIFIER, null) ?: ""
-
         @SuppressLint("ApplySharedPref")
         set(value) {
             setValue(KEY_PIN_IDENTIFIER, value)
@@ -208,6 +207,12 @@ class PrefsUtil(
         get() = getValue(BITPAY_TRANSACTION_SUCCEEDED, false)
 
     override fun setBitPaySuccess() = setValue(BITPAY_TRANSACTION_SUCCEEDED, true)
+
+    override fun setFeeTypeForAsset(cryptoCurrency: CryptoCurrency, type: Int) =
+        setValue(NETWORK_FEE_PRIORITY_KEY + cryptoCurrency.networkTicker, type)
+
+    override fun getFeeTypeForAsset(cryptoCurrency: CryptoCurrency): Int =
+        getValue(NETWORK_FEE_PRIORITY_KEY + cryptoCurrency.networkTicker, -1)
 
     // Notification prefs
     override var arePushNotificationsEnabled: Boolean
@@ -409,6 +414,7 @@ class PrefsUtil(
         private const val SWAP_DATE_KEY = "SWAP_DATE_KEY"
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
+        private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
 
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

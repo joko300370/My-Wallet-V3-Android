@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.bch
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -41,6 +42,7 @@ class BchOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val bchDataManager: BchDataManager,
     private val payloadDataManager: PayloadDataManager,
+    private val walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword
@@ -60,16 +62,14 @@ class BchOnChainTxEngine(
         require(asset == CryptoCurrency.BCH)
     }
 
-    override val feeOptions: Set<FeeLevel>
-        get() = setOf(FeeLevel.Regular)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
                 amount = CryptoValue.ZeroBch,
                 available = CryptoValue.ZeroBch,
                 fees = CryptoValue.ZeroBch,
-                feeLevel = FeeLevel.Regular,
+                feeLevel = mapSavedFeeToFeeLevel(
+                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BCH)),
                 selectedFiat = userFiat
             )
         )
@@ -141,7 +141,7 @@ class BchOnChainTxEngine(
                     FeeLevel.Regular -> feeToCrypto(feeOptions.regularFee)
                     FeeLevel.None -> CryptoValue.ZeroBch
                     FeeLevel.Priority -> feeToCrypto(feeOptions.priorityFee)
-                    FeeLevel.Custom -> TODO() // feeToCrypto(view!!.getCustomFeeValue())
+                    FeeLevel.Custom -> TODO()
                 }
             }.singleOrError()
 
@@ -152,6 +152,24 @@ class BchOnChainTxEngine(
         validateAmounts(pendingTx)
             .then { validateSufficientFunds(pendingTx) }
             .updateTxValidity(pendingTx)
+
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
+        if (newOption is TxOptionValue.FeeSelection) {
+            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
+            // will need updating as well as the fees:
+            if (newOption.selectedLevel != pendingTx.feeLevel) {
+                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BCH,
+                    newOption.selectedLevel.mapFeeLevelToSavedValue())
+                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
+                    .flatMap { pTx -> doValidateAmount(pTx) }
+                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+            } else {
+                // The option hasn't changed, revert to our known settings
+                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
+            }
+        } else {
+            super.doOptionUpdateRequest(pendingTx, newOption)
+        }
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
@@ -174,8 +192,7 @@ class BchOnChainTxEngine(
                 options = listOf(
                     TxOptionValue.From(from = sourceAccount.label),
                     TxOptionValue.To(to = txTarget.label),
-                    TxOptionValue.Fee(fee = pendingTx.fees,
-                        exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
+                    makeFeeSelectionOption(pendingTx),
                     TxOptionValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
@@ -183,6 +200,16 @@ class BchOnChainTxEngine(
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     )
                 )
+            )
+        )
+
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
+        TxOptionValue.FeeSelection(
+            absoluteFee = pendingTx.fees,
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(
+                FeeLevel.Regular, FeeLevel.Priority
             )
         )
 

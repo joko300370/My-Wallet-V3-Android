@@ -50,7 +50,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                walletPreferences = get()
             )
         }
 
@@ -69,7 +70,8 @@ val coincoreModule = module {
                 sendDataManager = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get()
+                tiersService = get(),
+                walletPreferences = get()
             )
         }
 

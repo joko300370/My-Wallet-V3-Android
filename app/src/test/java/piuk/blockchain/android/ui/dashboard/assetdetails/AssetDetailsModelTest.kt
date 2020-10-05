@@ -29,7 +29,8 @@ class AssetDetailsModelTest {
             pitLinking = mock(),
             crashLogger = mock(),
             tiersService = mock(),
-            environmentConfig = mock()
+            environmentConfig = mock(),
+            walletPreferences = mock()
         )
     )
     private val interactor: AssetDetailsInteractor = mock()

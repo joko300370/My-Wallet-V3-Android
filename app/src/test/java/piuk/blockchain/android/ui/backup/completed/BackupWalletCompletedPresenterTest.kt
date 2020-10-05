@@ -9,9 +9,9 @@ import io.reactivex.Observable
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
-import piuk.blockchain.android.data.datamanagers.TransferableFundTransactionList
-import piuk.blockchain.android.ui.transfer.send.activity.PendingTransaction
+import piuk.blockchain.android.ui.account.PendingTransaction
+import piuk.blockchain.android.ui.account.TransferFundsDataManager
+import piuk.blockchain.android.ui.account.TransferableFundTransactionList
 
 class BackupWalletCompletedPresenterTest {
 

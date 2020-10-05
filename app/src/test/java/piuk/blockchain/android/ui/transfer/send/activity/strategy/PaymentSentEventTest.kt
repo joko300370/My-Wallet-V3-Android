@@ -7,6 +7,7 @@ import com.blockchain.testutils.lumens
 import info.blockchain.balance.CryptoValue
 import org.amshove.kluent.`should equal`
 import org.junit.Test
+import piuk.blockchain.android.ui.account.paymentSentEvent
 
 class PaymentSentEventTest {
 

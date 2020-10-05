@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.transfer.send.activity
+package piuk.blockchain.android.ui.account
 
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
@@ -7,7 +7,6 @@ import info.blockchain.balance.CryptoCurrency
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.ui.account.PaymentConfirmationDetails
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import java.util.Locale
 

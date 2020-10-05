@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
@@ -42,7 +43,8 @@ internal class BtcAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    private val walletPreferences: WalletStatus
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -76,7 +78,8 @@ internal class BtcAsset(
                             feeDataManager = feeDataManager,
                             isDefault = i == defaultIndex,
                             exchangeRates = exchangeRates,
-                            networkParameters = environmentConfig.bitcoinNetworkParameters
+                            networkParameters = environmentConfig.bitcoinNetworkParameters,
+                            walletPreferences = walletPreferences
                         )
                     )
                 }
@@ -89,7 +92,8 @@ internal class BtcAsset(
                             sendDataManager = sendDataManager,
                             feeDataManager = feeDataManager,
                             exchangeRates = exchangeRates,
-                            networkParameters = environmentConfig.bitcoinNetworkParameters
+                            networkParameters = environmentConfig.bitcoinNetworkParameters,
+                            walletPreferences = walletPreferences
                         )
                     )
                 }

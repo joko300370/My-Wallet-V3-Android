@@ -31,6 +31,7 @@ enum class ValidationState {
     OPTION_INVALID,
     UNDER_MIN_LIMIT,
     OVER_MAX_LIMIT,
+    INVOICE_EXPIRED,
     UNKNOWN_ERROR
 }
 
@@ -60,6 +61,29 @@ data class PendingTx(
 
     inline fun <reified T : TxOptionValue> getOption(option: TxOption): T? =
         options.find { it.option == option } as? T
+
+    // Internal, coincore only helper methods for managing option lists. If you're using these in
+    // UI are client code, you're doing something wrong!
+    internal fun removeOption(option: TxOption): PendingTx =
+        this.copy(
+            options = options.filter { it.option != option }
+        )
+
+    internal fun addOrReplaceOption(newOption: TxOptionValue, prepend: Boolean = false): PendingTx =
+        copy(
+            options = if (hasOption(newOption.option)) {
+                val old = options.find { it.option == newOption.option }
+                options.replace(old, newOption).filterNotNull()
+            } else {
+                val opts = options.toMutableList()
+                if (prepend) {
+                    opts.add(0, newOption)
+                } else {
+                    opts.add(newOption)
+                }
+                opts.toList()
+            }
+        )
 }
 
 enum class TxOption {
@@ -68,8 +92,10 @@ enum class TxOption {
     AGREEMENT_INTEREST_TRANSFER,
     READ_ONLY,
     MEMO,
-    AMOUNT,
-    LARGE_TRANSACTION_WARNING
+    LARGE_TRANSACTION_WARNING,
+    FEE_SELECTION,
+    ERROR_NOTICE,
+    INVOICE_COUNTDOWN
 }
 
 sealed class TxOptionValue(open val option: TxOption) {
@@ -90,7 +116,22 @@ sealed class TxOptionValue(open val option: TxOption) {
 
     data class Total(val total: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
 
+    @Deprecated("Replace with FeeSelection")
     data class Fee(val fee: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class FeeSelection(
+        val absoluteFee: Money? = null,
+        val exchange: Money? = null,
+        val selectedLevel: FeeLevel,
+        val availableLevels: Set<FeeLevel> = emptySet()
+    ) : TxOptionValue(TxOption.FEE_SELECTION)
+
+    data class BitPayCountdown(
+        val expireTime: Long = 0,
+        val isExpired: Boolean = false
+    ) : TxOptionValue(TxOption.INVOICE_COUNTDOWN)
+
+    data class ErrorNotice(val status: ValidationState) : TxOptionValue(TxOption.ERROR_NOTICE)
 
     data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
 
@@ -132,8 +173,6 @@ abstract class TxEngine : KoinComponent {
     // Optionally assert, via require() etc, that sourceAccounts and txTarget
     // are valid for this engine.
     open fun assertInputsValid() {}
-
-    abstract val feeOptions: Set<FeeLevel>
 
     open val userFiat: String by unsafeLazy {
         payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
@@ -178,6 +217,11 @@ abstract class TxEngine : KoinComponent {
     // be passed to validate after this call.
     abstract fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx>
 
+    // Process any TxOption updates, if required. The default just replaces the option and returns
+    // the updated pendingTx. Subclasses may want to, eg, update amounts on fee changes etc
+    open fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
+        Single.just(pendingTx.addOrReplaceOption(newOption))
+
     // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
     // Else set it to the appropriate error, and then return the updated PendingTx
     abstract fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx>
@@ -205,10 +249,6 @@ class TransactionProcessor(
         )
         engine.assertInputsValid()
     }
-
-    // This may be moved into options at some point in the near future.
-    val feeOptions: Set<FeeLevel>
-        get() = engine.feeOptions
 
     val requireSecondPassword: Boolean
         get() = engine.requireSecondPassword
@@ -243,12 +283,13 @@ class TransactionProcessor(
         if (!pendingTx.hasOption(newOption.option)) {
             throw IllegalArgumentException("Unsupported TxOption: ${newOption.option}")
         }
-        val old = pendingTx.options.find { it.option == newOption.option }
-        val opts = pendingTx.options.replace(old, newOption).filterNotNull()
 
-        return engine.doValidateAll(pendingTx.copy(options = opts))
-            .doOnSuccess { updatePendingTx(it) }
-            .ignoreElement()
+        return engine.doOptionUpdateRequest(pendingTx, newOption)
+            .flatMap { pTx ->
+                engine.doValidateAll(pTx)
+            }.doOnSuccess { pTx ->
+                updatePendingTx(pTx)
+            }.ignoreElement()
     }
 
     fun updateAmount(amount: Money): Completable {
@@ -323,4 +364,16 @@ fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
         } else {
             throw it
         }
+    }.map { pTx ->
+        if (pTx.options.isNotEmpty())
+            updateOptionsWithValidityWarning(pTx)
+        else
+            pTx
+    }
+
+private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
+    if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
+        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(status = pendingTx.validationState), true)
+    } else {
+        pendingTx.removeOption(TxOption.ERROR_NOTICE)
     }

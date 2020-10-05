@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.Completable
@@ -10,12 +11,18 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxOption
+import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxValidationFailure
+import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.models.BitPayTransaction
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.lang.IllegalStateException
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 interface EngineTransaction {
@@ -25,7 +32,7 @@ interface EngineTransaction {
 }
 
 interface BitPayClientEngine {
-    fun doPrepareTransaction(PendingTx: PendingTx, secondPassword: String): Single<EngineTransaction>
+    fun doPrepareTransaction(pendingTx: PendingTx, secondPassword: String): Single<EngineTransaction>
     fun doOnTransactionSuccess(pendingTx: PendingTx)
     fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable)
 }
@@ -66,18 +73,30 @@ class BtcBitpayTxEngine(
                 tx.copy(
                     amount = bitpayInvoice.amount,
                     feeLevel = FeeLevel.Priority
-//                    engineState = BitPayEngineState(
                 )
             }
-//                view.showBitPayTimerAndMerchantInfo(expires, merchant)
-//                view.updateReceivingAddress("bitcoin:?r=" + it.paymentUrl)
-//            }
-
-    override val feeOptions: Set<FeeLevel>
-        get() = setOf(FeeLevel.Priority)
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(pendingTx)
+        assetEngine.doBuildConfirmations(pendingTx)
+            .map { pTx ->
+                pTx.addOrReplaceOption(TxOptionValue.BitPayCountdown(getCountdownTimeout()), true).run {
+                    if (hasOption(TxOption.FEE_SELECTION)) {
+                        addOrReplaceOption(makeFeeSelectionOption(pendingTx))
+                    } else {
+                        this
+                    }
+                }
+            }
+
+    // BitPay invoices _always_ require priority fees, so replace the option as defined by the
+    // underlying asset engine.
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
+        TxOptionValue.FeeSelection(
+            absoluteFee = pendingTx.fees,
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(FeeLevel.Priority)
+        )
 
     // Bitpay invoices have a fixed amount, so attempting to update the amount is an error
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
@@ -89,7 +108,25 @@ class BtcBitpayTxEngine(
         assetEngine.doValidateAmount(pendingTx)
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
+        doValidateTimeout(pendingTx)
+            .flatMap { assetEngine.doValidateAll(pendingTx) }
+
+    private fun doValidateTimeout(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
+            .map { pTx ->
+                val remaining = (getCountdownTimeout() - System.currentTimeMillis())
+                if (remaining <= 0) {
+                    throw TxValidationFailure(ValidationState.INVOICE_EXPIRED)
+                }
+                pTx
+            }
+
+    private fun getCountdownTimeout(): Long =
+        bitpayInvoice.expires.fromIso8601ToUtc()?.let {
+            val calendar = Calendar.getInstance()
+            val timeZone = calendar.timeZone
+            return timeZone.getOffset(it.time).toLong()
+        } ?: throw IllegalStateException("Unknown countdown time")
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
         executionClient.doPrepareTransaction(pendingTx, secondPassword)
@@ -141,41 +178,11 @@ class BtcBitpayTxEngine(
         }
 }
 
-// if (address.isEmpty() && scanData.isBitpayAddress()) {
-//    // get payment protocol request data from bitpay
-//    val invoiceId = paymentRequestUrl.replace(bitpayInvoiceUrl, "")
-//    if (isDeepLinked) {
-//        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayUrlDeeplink.event, CryptoCurrency.BTC))
-//    } else {
-//        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayAdrressScanned.event,CryptoCurrency.BTC))
+//    val bitPayProtocol = delegate as? BitPayProtocol ?: return
+//    if (!bitPayProtocol.isBitpayPaymentRequest && address.isBitpayAddress()) {
+//        val invoiceId = address
+//            .replace(bitpayInvoiceUrl, "")
+//            .replace("bitcoin:?r=", "")
+//        handleBitPayInvoice(invoiceId)
+//        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayUrlPasted.event, CryptoCurrency.BTC))
 //    }
-//    handleBitPayInvoice(invoiceId)
-//
-// private fun handleBitPayInvoice(invoiceId: String) {
-//    compositeDisposable += bitpayDataManager.getRawPaymentRequest(invoiceId = invoiceId)
-//        .doOnSuccess {
-//            val cryptoValue = CryptoValue(selectedCrypto, it.instructions[0].outputs[0].amount)
-//            val merchant = it.memo.split(merchantPattern)[1]
-//            val bitpayProtocol: BitPayProtocol? = delegate as? BitPayProtocol ?: return@doOnSuccess
-//
-//            bitpayProtocol?.setBitpayReceivingAddress(it.instructions[0].outputs[0].address)
-//            bitpayProtocol?.setBitpayMerchant(merchant)
-//            bitpayProtocol?.setInvoiceId(invoiceId)
-//            bitpayProtocol?.setIsBitpayPaymentRequest(true)
-//            view?.let { view ->
-//                view.disableInput()
-//                view.showBitPayTimerAndMerchantInfo(it.expires, merchant)
-//                view.updateCryptoAmount(cryptoValue)
-//                view.updateReceivingAddress("bitcoin:?r=" + it.paymentUrl)
-//                view.setFeePrioritySelection(1)
-//                view.disableFeeDropdown()
-//                view.onBitPayAddressScanned()
-//            }
-//        }.doOnError {
-//            Timber.e(it)
-//        }.subscribeBy(
-//            onError = {
-//                view?.finishPage()
-//            }
-//        )
-// }

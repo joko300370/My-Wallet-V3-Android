@@ -23,7 +23,6 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig

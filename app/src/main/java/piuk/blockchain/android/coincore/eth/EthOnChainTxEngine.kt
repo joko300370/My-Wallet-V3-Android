@@ -38,8 +38,6 @@ open class EthOnChainTxEngine(
         require(asset == CryptoCurrency.ETHER)
     }
 
-    override val feeOptions = setOf(FeeLevel.Regular)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(

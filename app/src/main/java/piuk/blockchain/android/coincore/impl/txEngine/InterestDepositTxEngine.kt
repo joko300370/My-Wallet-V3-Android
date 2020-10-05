@@ -7,7 +7,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
@@ -42,30 +41,43 @@ class InterestDepositTxEngine(
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doUpdateAmount(amount, pendingTx)
 
-    override val feeOptions: Set<FeeLevel>
-        get() = onChainTxEngine.feeOptions
-
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doBuildConfirmations(pendingTx).map { pTx ->
-            pTx.copy(
-                options = pTx.options.toMutableList().apply {
-                    pTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let {
-                        remove(it)
-                    }
+            modifyEngineConfirmations(pTx)
+        }
 
-                    add(
-                        TxOptionValue.TxBooleanOption<Unit>(
-                            option = TxOption.AGREEMENT_INTEREST_T_AND_C
-                        )
-                    )
-                    add(
-                        TxOptionValue.TxBooleanOption(
-                            option = TxOption.AGREEMENT_INTEREST_TRANSFER,
-                            data = pendingTx.amount
-                        )
-                    )
-                }.toList()
+    private fun modifyEngineConfirmations(
+        pendingTx: PendingTx,
+        termsChecked: Boolean = false,
+        agreementChecked: Boolean = false
+    ): PendingTx =
+        pendingTx.removeOption(TxOption.DESCRIPTION)
+            .addOrReplaceOption(
+                TxOptionValue.TxBooleanOption<Unit>(
+                    option = TxOption.AGREEMENT_INTEREST_T_AND_C,
+                    value = termsChecked
+                )
             )
+            .addOrReplaceOption(
+                TxOptionValue.TxBooleanOption(
+                    option = TxOption.AGREEMENT_INTEREST_TRANSFER,
+                    data = pendingTx.amount,
+                    value = agreementChecked
+                )
+            )
+
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
+        if (newOption.option in setOf(TxOption.AGREEMENT_INTEREST_T_AND_C, TxOption.AGREEMENT_INTEREST_TRANSFER)) {
+            Single.just(pendingTx.addOrReplaceOption(newOption))
+        } else {
+            onChainTxEngine.doOptionUpdateRequest(pendingTx, newOption)
+                .map { pTx ->
+                    modifyEngineConfirmations(
+                        pendingTx = pTx,
+                        termsChecked = getTermsOptionValue(pendingTx),
+                        agreementChecked = getAgreementOptionValue(pendingTx)
+                    )
+                }
         }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
@@ -89,14 +101,20 @@ class InterestDepositTxEngine(
             }
 
     private fun areOptionsValid(pendingTx: PendingTx): Boolean {
-        val terms = pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
+        val terms = getTermsOptionValue(pendingTx)
+        val agreement = getAgreementOptionValue(pendingTx)
+        return (terms && agreement)
+    }
+
+    private fun getTermsOptionValue(pendingTx: PendingTx): Boolean =
+        pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
             TxOption.AGREEMENT_INTEREST_T_AND_C
         )?.value ?: false
-        val transfer = pendingTx.getOption<TxOptionValue.TxBooleanOption<Money>>(
+
+    private fun getAgreementOptionValue(pendingTx: PendingTx): Boolean =
+        pendingTx.getOption<TxOptionValue.TxBooleanOption<Money>>(
             TxOption.AGREEMENT_INTEREST_TRANSFER
         )?.value ?: false
-        return (terms && transfer)
-    }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
         onChainTxEngine.doExecute(pendingTx, secondPassword)

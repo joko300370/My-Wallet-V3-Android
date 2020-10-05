@@ -25,6 +25,9 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(model, exchangeRates, selectedCurrency))
             addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
+            addAdapterDelegate(InvoiceCountdownTimerDelegate(model, compositeDisposable))
+            addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
+            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, activityContext, stringUtils))
         }
     }
 }

@@ -25,8 +25,6 @@ open class TradingToOnChainTxEngine(
         require(sourceAccount.asset == (txTarget as CryptoAddress).asset)
     }
 
-    override val feeOptions = setOf(FeeLevel.None)
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(

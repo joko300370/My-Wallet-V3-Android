@@ -43,7 +43,6 @@ import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
-import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
@@ -62,7 +61,6 @@ class EmptyDashboardItem : DashboardItem
 private typealias RefreshFn = () -> Unit
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
     ForceBackupForSendSheet.Host,
-    BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
@@ -508,10 +506,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun startTransferFunds(account: SingleAccount, action: AssetAction) {
         model.process(LaunchSendFlow(account, action))
-    }
-
-    override fun abortTransferFunds() {
-        model.process(ClearBottomSheet)
     }
 
     private fun startOldReceiveFor(account: SingleAccount) {
