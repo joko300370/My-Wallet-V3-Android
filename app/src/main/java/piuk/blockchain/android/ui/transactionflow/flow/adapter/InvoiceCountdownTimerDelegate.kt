@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.extensions.LayoutContainer
@@ -64,25 +65,25 @@ class InvoiceCountdownTimerDelegate<in T>(
                 disposable += Observable.interval(1, TimeUnit.SECONDS)
                     .doOnEach { remaining-- }
                     .map { remaining }
-                    .doOnNext {
-                        updateCountdownElements(remaining)
-                    }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext { updateCountdownElements(remaining) }
                     .takeUntil { it <= TIMEOUT_STOP }
                     .doOnComplete { handleCountdownComplete() }
-                    .doOnDispose {
-                        Timber.d("Disposed")
-                    }
                     .subscribe()
             }
         }
 
         private fun updateCountdownElements(remaining: Long) {
-            val readableTime = String.format(
-                "%2d:%02d",
-                TimeUnit.SECONDS.toMinutes(remaining),
-                TimeUnit.SECONDS.toSeconds(remaining) -
-                    TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(remaining))
-            )
+            val readableTime = if (remaining >= 0) {
+                String.format(
+                    "%2d:%02d",
+                    TimeUnit.SECONDS.toMinutes(remaining),
+                    TimeUnit.SECONDS.toSeconds(remaining) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(remaining))
+                )
+            } else {
+                "--:--"
+            }
             itemView.confirmation_item_value.text = readableTime
 
             when {

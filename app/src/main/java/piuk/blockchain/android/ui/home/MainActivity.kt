@@ -43,6 +43,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoTarget
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
@@ -541,6 +542,20 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     onError = { Timber.e("Unable to select source account for scan") }
                 )
         }
+    }
+
+    override fun showScanTargetError(error: QrScanError) {
+        ToastCustom.makeText(
+            this,
+            getString(
+                when (error.errorCode) {
+                    QrScanError.ErrorCode.ScanFailed -> R.string.error_scan_failed_general
+                    QrScanError.ErrorCode.BitPayScanFailed -> R.string.error_scan_failed_bitpay
+                }
+            ),
+            ToastCustom.LENGTH_LONG,
+            ToastCustom.TYPE_ERROR
+        )
     }
 
     @SuppressLint("CheckResult")

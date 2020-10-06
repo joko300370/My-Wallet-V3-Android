@@ -10,7 +10,6 @@ import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
-import piuk.blockchain.android.data.api.bitpay.models.exceptions.BitPayApiException
 import timber.log.Timber
 import java.util.regex.Pattern
 
@@ -50,15 +49,7 @@ class BitPayInvoiceTarget(
                     ) as CryptoTarget
                 }.doOnError { e ->
                     Timber.e("Error loading invoice: $e")
-                    when (e) {
-                        is BitPayApiException -> handleBitPayInvoiceError(e)
-                        else -> throw e
-                    }
                 }
-        }
-
-        fun handleBitPayInvoiceError(e: BitPayApiException) {
-//            e._httpErrorCode = 404
         }
     }
 }

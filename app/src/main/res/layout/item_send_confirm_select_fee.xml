@@ -13,6 +13,7 @@
         android:id="@+id/fee_switcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:measureAllChildren="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

@@ -33,6 +33,7 @@ import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
@@ -69,6 +70,7 @@ interface MainView : MvpView, HomeNavigator {
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
 
     fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
+    fun showScanTargetError(error: QrScanError)
 }
 
 class MainPresenter internal constructor(
@@ -112,13 +114,9 @@ class MainPresenter internal constructor(
             view?.kickToLauncherPage()
         } else {
             logEvents()
-
             checkLockboxAvailability()
-
             lightSimpleBuySync()
-
             doPushNotifications()
-
             checkPitAvailability()
         }
     }
@@ -374,6 +372,12 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
+                    }
+                },
+                onError = {
+                    when (it) {
+                        is QrScanError -> view?.showScanTargetError(it)
+                        else -> { Timber.d("Scan failed") }
                     }
                 }
             )

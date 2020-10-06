@@ -207,6 +207,9 @@
 
     <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
 
+    <string name="error_scan_failed_general">Scan failed. Please try again.</string>
+    <string name="error_scan_failed_bitpay">Unable to retrieve BitPay invoice. Has it expired?</string>
+
     <string name="invalid_amount">Invalid amount</string>
     <string name="enter_double_encryption_pw">Please enter double encryption password</string>
     <string name="support">Support</string>

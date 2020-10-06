@@ -364,7 +364,10 @@ class TransactionProcessor(
 fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
     this.toSingle {
         pendingTx.copy(validationState = ValidationState.CAN_EXECUTE)
-    }.onErrorReturn {
+    }.updateTxValidity(pendingTx)
+
+fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
+    this.onErrorReturn {
         if (it is TxValidationFailure) {
             pendingTx.copy(validationState = it.state)
         } else {

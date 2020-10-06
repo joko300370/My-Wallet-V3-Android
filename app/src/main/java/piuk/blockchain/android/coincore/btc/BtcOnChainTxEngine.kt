@@ -41,7 +41,7 @@ import java.math.BigInteger
 private const val STATE_UTXO = "btc_utxo"
 
 private val PendingTx.utxoBundle: SpendableUnspentOutputs
-    get() = (this.engineState[STATE_UTXO] as SpendableUnspentOutputs)
+    get() = (this.engineState[STATE_UTXO] as? SpendableUnspentOutputs) ?: SpendableUnspentOutputs()
 
 private class BtcPreparedTx(
     val btcTx: Transaction

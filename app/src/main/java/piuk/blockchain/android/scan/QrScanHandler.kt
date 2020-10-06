@@ -58,6 +58,13 @@ sealed class ScanResult(
     ) : ScanResult(isDeeplinked)
 }
 
+class QrScanError(val errorCode: ErrorCode, msg: String) : Exception(msg) {
+    enum class ErrorCode {
+        ScanFailed, // General Purpose Error. The most common case for now until scan gets overhauled
+        BitPayScanFailed
+    }
+}
+
 object QrScanHandler : KoinComponent {
 
     const val SCAN_URI_RESULT = 12007
@@ -136,7 +143,9 @@ object QrScanHandler : KoinComponent {
             else -> {
                 val addressParser: AddressFactory = payloadScope.get()
                 addressParser.parse(scanResult)
-                    .map {
+                    .onErrorResumeNext {
+                        Single.error(QrScanError(QrScanError.ErrorCode.ScanFailed, it.message ?: "Unknown reason"))
+                    }.map {
                         ScanResult.TxTarget(
                             it.filterIsInstance<CryptoAddress>().toSet(),
                             isDeeplinked
@@ -149,6 +158,9 @@ object QrScanHandler : KoinComponent {
 
     private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> =
         BitPayInvoiceTarget.fromLink(CryptoCurrency.BTC, bitpayUri, bitPayDataManager)
+            .onErrorResumeNext {
+                Single.error(QrScanError(QrScanError.ErrorCode.BitPayScanFailed, it.message ?: "Unknown reason"))
+            }
 
     fun disambiguateScan(activity: Activity, targets: Collection<CryptoTarget>): Single<CryptoTarget> {
         // TEMP while refactoring - replace with bottom sheet.

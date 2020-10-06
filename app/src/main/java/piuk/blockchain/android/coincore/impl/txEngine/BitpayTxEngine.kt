@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
+import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.models.BitPayTransaction
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
@@ -77,11 +78,12 @@ class BtcBitpayTxEngine(
             }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        assetEngine.doBuildConfirmations(pendingTx)
+        assetEngine.doUpdateAmount(bitpayInvoice.amount, pendingTx)
+            .flatMap { assetEngine.doBuildConfirmations(it) }
             .map { pTx ->
-                pTx.addOrReplaceOption(TxOptionValue.BitPayCountdown(getCountdownTimeout()), true).run {
+                pTx.addOrReplaceOption(TxOptionValue.BitPayCountdown(getCountdownTimeoutMs()), true).run {
                     if (hasOption(TxOption.FEE_SELECTION)) {
-                        addOrReplaceOption(makeFeeSelectionOption(pendingTx))
+                        addOrReplaceOption(makeFeeSelectionOption(pTx))
                     } else {
                         this
                     }
@@ -98,11 +100,9 @@ class BtcBitpayTxEngine(
             availableLevels = setOf(FeeLevel.Priority)
         )
 
-    // Bitpay invoices have a fixed amount, so attempting to update the amount is an error
-    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        require(amount.isZero)
-        return assetEngine.doUpdateAmount(bitpayInvoice.amount, pendingTx)
-    }
+    // Don't set the amount here, it is fixed so we can do it in the confirmation building step
+    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(pendingTx)
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         assetEngine.doValidateAmount(pendingTx)
@@ -110,22 +110,24 @@ class BtcBitpayTxEngine(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         doValidateTimeout(pendingTx)
             .flatMap { assetEngine.doValidateAll(pendingTx) }
+            .updateTxValidity(pendingTx)
 
     private fun doValidateTimeout(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
             .map { pTx ->
-                val remaining = (getCountdownTimeout() - System.currentTimeMillis())
+                val remaining = (getCountdownTimeoutMs() - System.currentTimeMillis())
                 if (remaining <= 0) {
                     throw TxValidationFailure(ValidationState.INVOICE_EXPIRED)
                 }
                 pTx
             }
 
-    private fun getCountdownTimeout(): Long =
+    private fun getCountdownTimeoutMs(): Long =
         bitpayInvoice.expires.fromIso8601ToUtc()?.let {
             val calendar = Calendar.getInstance()
             val timeZone = calendar.timeZone
-            return timeZone.getOffset(it.time).toLong()
+            val offset = timeZone.getOffset(it.time).toLong()
+            return it.time + offset
         } ?: throw IllegalStateException("Unknown countdown time")
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
@@ -179,12 +181,3 @@ class BtcBitpayTxEngine(
             tx.txHash
         }
 }
-
-//    val bitPayProtocol = delegate as? BitPayProtocol ?: return
-//    if (!bitPayProtocol.isBitpayPaymentRequest && address.isBitpayAddress()) {
-//        val invoiceId = address
-//            .replace(bitpayInvoiceUrl, "")
-//            .replace("bitcoin:?r=", "")
-//        handleBitPayInvoice(invoiceId)
-//        analytics.logEvent(BitPayEvent.InputEvent(AnalyticsEvents.BitpayUrlPasted.event, CryptoCurrency.BTC))
-//    }
