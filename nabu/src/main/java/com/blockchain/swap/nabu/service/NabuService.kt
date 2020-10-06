@@ -26,6 +26,7 @@ import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
@@ -315,6 +316,20 @@ class NabuService(retrofit: Retrofit) {
         WithdrawRequestBody(beneficiary = beneficiaryId, amount = amount, currency = currency)
     ).wrapErrorMessage()
 
+    internal fun createDepositTransaction(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String,
+        address: String,
+        hash: String,
+        amount: String,
+        product: String
+    ) = service.createDepositOrder(
+        sessionToken.authHeader,
+        DepositRequestBody(
+            currency = currency, depositAddress = address, txHash = hash, amount = amount, product = product
+        )
+    )
+
     internal fun getOutstandingOrders(
         sessionToken: NabuSessionTokenResponse,
         pendingOnly: Boolean
@@ -473,7 +488,7 @@ class NabuService(retrofit: Retrofit) {
         when (it.code()) {
             200 -> Single.just(it.body())
             204 -> Single.just(
-                InterestAccountDetailsResponse("0", "0", "0")
+                InterestAccountDetailsResponse("0", "0", "0", "0")
             )
             else -> Single.error(HttpException(it))
         }

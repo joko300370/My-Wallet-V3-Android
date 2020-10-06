@@ -3,9 +3,11 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
+import com.blockchain.swap.nabu.datamanagers.Product
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -14,6 +16,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -37,8 +40,24 @@ internal class CryptoInterestAccount(
                 asset = asset,
                 address = it,
                 label = label,
-                environmentConfig = environmentConfig
+                environmentConfig = environmentConfig,
+                postTransactions = onTxCompleted
             )
+        }
+
+    override val onTxCompleted: (TxResult) -> Completable
+        get() = { txResult ->
+            require(txResult.amount is CryptoValue)
+            require(txResult is TxResult.HashedTxResult)
+            receiveAddress.flatMapCompletable { receiveAddress ->
+                custodialWalletManager.createPendingDeposit(
+                    crypto = txResult.amount.currency,
+                    address = receiveAddress.address,
+                    hash = txResult.txHash,
+                    amount = txResult.amount,
+                    product = Product.SAVINGS
+                )
+            }
         }
 
     override fun requireSecondPassword(): Single<Boolean> =
@@ -50,6 +69,13 @@ internal class CryptoInterestAccount(
                 Single.just(CryptoValue.zero(asset))
             )
             .doOnSuccess { hasFunds.set(it.isPositive) }
+            .map { it as Money }
+
+    override val pendingBalance: Single<Money>
+        get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
+            .switchIfEmpty(
+                Single.just(CryptoValue.zero(asset))
+            )
             .map { it as Money }
 
     override val actionableBalance: Single<Money>

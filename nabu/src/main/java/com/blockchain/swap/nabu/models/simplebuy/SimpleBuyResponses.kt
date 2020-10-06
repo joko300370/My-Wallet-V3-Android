@@ -206,6 +206,14 @@ data class WithdrawRequestBody(
     private val amount: String
 )
 
+data class DepositRequestBody(
+    private val currency: String,
+    private val depositAddress: String,
+    private val txHash: String,
+    private val amount: String,
+    private val product: String
+)
+
 data class WithdrawLocksCheckRequestBody(
     private val paymentMethod: String
 )

@@ -22,6 +22,7 @@ import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.Product
 import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
@@ -55,6 +56,7 @@ import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -538,6 +540,19 @@ class LiveCustodialWalletManager(
                 }
         }
 
+    override fun getPendingInterestAccountBalance(
+        crypto: CryptoCurrency
+    ): Maybe<CryptoValue> =
+        authenticator.authenticateMaybe { sessionToken ->
+            nabuService.getInterestAccountBalance(sessionToken, crypto.networkTicker)
+                .map { accountDetailsResponse ->
+                    CryptoValue.fromMinor(
+                        currency = crypto,
+                        minor = accountDetailsResponse.pendingDeposit.toBigInteger()
+                    )
+                }
+        }
+
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency
     ): Single<InterestAccountDetails?> =
@@ -620,6 +635,24 @@ class LiveCustodialWalletManager(
                     }
                 }
                 .onErrorComplete()
+        }
+
+    override fun createPendingDeposit(
+        crypto: CryptoCurrency,
+        address: String,
+        hash: String,
+        amount: Money,
+        product: Product
+    ): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.createDepositTransaction(
+                sessionToken = sessionToken,
+                currency = crypto.networkTicker,
+                address = address,
+                hash = hash,
+                amount = amount.toBigInteger().toString(),
+                product = product.toString()
+            )
         }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =

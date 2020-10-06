@@ -17,11 +17,11 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
-import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import java.lang.IllegalStateException
 import java.math.RoundingMode
@@ -227,13 +227,15 @@ class CustodialSellTxEngine(
         return TxValidationFailure(ValidationState.INVALID_AMOUNT)
     }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
-        walletManager.cancelAllPendingOrders().then {
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
+        walletManager.cancelAllPendingOrders().thenSingle {
             walletManager.createOrder(
                 custodialWalletOrder = order,
                 stateAction = "pending"
             ).flatMap {
                 walletManager.confirmOrder(it.id, null)
-            }.ignoreElement()
+            }.map {
+                TxResult.UnHashedTxResult(pendingTx.amount) as TxResult
+            }
         }
 }

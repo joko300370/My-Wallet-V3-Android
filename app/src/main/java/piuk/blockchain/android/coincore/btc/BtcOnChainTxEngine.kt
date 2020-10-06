@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
@@ -243,8 +244,8 @@ class BtcOnChainTxEngine(
         val relativeFee = 100.toBigDecimal() * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
 
         return fiatValue.toBigDecimal() > LARGE_TX_FEE.toBigDecimal() &&
-            txSize > LARGE_TX_SIZE &&
-            relativeFee > LARGE_TX_PERCENTAGE
+                txSize > LARGE_TX_SIZE &&
+                relativeFee > LARGE_TX_PERCENTAGE
     }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
@@ -293,13 +294,13 @@ class BtcOnChainTxEngine(
             // If the large_fee warning is present, make sure it's ack'd.
             // If it's not, then there's nothing to do
             if (pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
-                    TxOption.LARGE_TRANSACTION_WARNING
-                )?.value == false) {
+                    TxOption.LARGE_TRANSACTION_WARNING)?.value == false
+            ) {
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
             }
         }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         doPrepareTransaction(pendingTx, secondPassword)
             .flatMap { engineTx ->
                 val btcTx = engineTx as BtcPreparedTx
@@ -308,7 +309,9 @@ class BtcOnChainTxEngine(
                 doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
                 doOnTransactionFailed(pendingTx, e)
-            }.ignoreElement()
+            }.map {
+                TxResult.HashedTxResult(it, pendingTx.amount)
+            }
 
     override fun doPrepareTransaction(
         pendingTx: PendingTx,

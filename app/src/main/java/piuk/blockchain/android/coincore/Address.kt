@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import timber.log.Timber
@@ -15,6 +16,10 @@ class AddressParseError(val error: Error) : Exception("Error Parsing address") {
 
 interface TransactionTarget {
     val label: String
+    val onTxCompleted: (TxResult) -> Completable
+        get() = { _ ->
+            Completable.complete()
+        }
 }
 
 // An invoice has a fixed amount

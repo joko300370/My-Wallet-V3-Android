@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
@@ -222,12 +223,13 @@ class BchOnChainTxEngine(
     private fun validateAddress() =
         Completable.fromCallable {
             if (!FormatsUtil.isValidBCHAddress(networkParams, bchTarget.address) &&
-                !FormatsUtil.isValidBitcoinAddress(networkParams, bchTarget.address)) {
+                !FormatsUtil.isValidBitcoinAddress(networkParams, bchTarget.address)
+            ) {
                 throw TxValidationFailure(ValidationState.INVALID_ADDRESS)
             }
         }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         Singles.zip(
             getBchChangeAddress(),
             getBchKeys(pendingTx, secondPassword)
@@ -246,7 +248,9 @@ class BchOnChainTxEngine(
         }.doOnError { e ->
             Timber.e("BCH Send failed: $e")
             // logPaymentSentEvent(false, BCH.BTC, pendingTransaction.bigIntAmount)
-        }.ignoreElement()
+        }.map {
+            TxResult.HashedTxResult(it, pendingTx.amount)
+        }
 
     private fun getFullBitcoinCashAddressFormat(cashAddress: String): String {
         return if (!cashAddress.startsWith(networkParams.bech32AddressPrefix) &&

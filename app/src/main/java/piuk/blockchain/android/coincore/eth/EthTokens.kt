@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.AddressParseError.Error.ETH_UNEXPECTED_C
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -96,7 +97,8 @@ internal class EthAsset(
 
 internal class EthAddress(
     override val address: String,
-    override val label: String = address
+    override val label: String = address,
+    override val onTxCompleted: (TxResult) -> Completable = { Completable.complete() }
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.ETHER
 }

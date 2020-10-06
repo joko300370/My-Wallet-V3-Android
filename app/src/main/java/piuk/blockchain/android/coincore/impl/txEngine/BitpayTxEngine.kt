@@ -4,13 +4,13 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
-import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
@@ -128,9 +128,9 @@ class BtcBitpayTxEngine(
             return timeZone.getOffset(it.time).toLong()
         } ?: throw IllegalStateException("Unknown countdown time")
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         executionClient.doPrepareTransaction(pendingTx, secondPassword)
-            .map { preparedTx ->
+            .flatMap { preparedTx ->
                 doExecuteTransaction(bitpayInvoice.invoiceId, preparedTx)
             }.doOnSuccess {
                 walletPrefs.setBitPaySuccess()
@@ -141,7 +141,9 @@ class BtcBitpayTxEngine(
 //                (it as? BitPayApiException)?.let { bitpayException ->
 //                    analytics.logEvent(BitPayEvent.FailureEvent(bitpayException.message ?: ""))
 //                }
-            }.ignoreElement()
+            }.map {
+                TxResult.HashedTxResult(it, pendingTx.amount)
+            }
 
     private fun doExecuteTransaction(
         invoiceId: String,

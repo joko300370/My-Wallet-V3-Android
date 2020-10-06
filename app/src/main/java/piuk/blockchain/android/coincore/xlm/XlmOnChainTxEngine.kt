@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.fees.FeeType
 import com.blockchain.sunriver.Memo
 import com.blockchain.sunriver.SendDetails
-import com.blockchain.sunriver.SendException
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import info.blockchain.balance.AccountReference
@@ -18,6 +17,7 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
@@ -187,14 +187,12 @@ class XlmOnChainTxEngine(
             Memo("")
         }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createTransaction(pendingTx).flatMap { sendDetails ->
             xlmDataManager.sendFunds(sendDetails)
-        }.doOnSuccess {
-            if (!it.success) {
-                throw SendException(it)
-            }
-        }.ignoreElement()
+        }.map {
+            TxResult.HashedTxResult(it.txHash, pendingTx.amount)
+        }
 
     private fun createTransaction(pendingTx: PendingTx): Single<SendDetails> =
         sourceAccount.receiveAddress.map { receiveAddress ->

@@ -16,6 +16,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
@@ -82,7 +83,7 @@ internal class BchAsset(
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences
                         )
-                }
+                    }
             }
         }
 
@@ -104,7 +105,8 @@ internal class BchAsset(
 
 internal class BchAddress(
     address_: String,
-    override val label: String = address_
+    override val label: String = address_,
+    override val onTxCompleted: (TxResult) -> Completable = { Completable.complete() }
 ) : CryptoAddress {
     override val address: String = address_.removeBchUri()
     override val asset: CryptoCurrency = CryptoCurrency.BCH

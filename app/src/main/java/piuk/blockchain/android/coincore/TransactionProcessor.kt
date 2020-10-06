@@ -232,7 +232,11 @@ abstract class TxEngine : KoinComponent {
 
     // Execute the transaction, it will have been validated before this is called, so the expectation
     // is that it will succeed.
-    abstract fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable
+    abstract fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult>
+
+    // Action to be executed once the transaction has been executed, it will have been validated before this is called, so the expectation
+    // is that it will succeed.
+    open fun doPostExecute(txResult: TxResult): Completable = Completable.complete()
 }
 
 class TransactionProcessor(
@@ -344,7 +348,9 @@ class TransactionProcessor(
                 if (it.validationState != ValidationState.CAN_EXECUTE)
                     throw IllegalStateException("PendingTx is not executable")
             }.flatMapCompletable {
-                engine.doExecute(it, secondPassword)
+                engine.doExecute(it, secondPassword).flatMapCompletable { result ->
+                    engine.doPostExecute(result)
+                }
             }
     }
 
@@ -377,3 +383,8 @@ private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     } else {
         pendingTx.removeOption(TxOption.ERROR_NOTICE)
     }
+
+sealed class TxResult(val amount: Money) {
+    class HashedTxResult(val txHash: String, amount: Money) : TxResult(amount)
+    class UnHashedTxResult(amount: Money) : TxResult(amount)
+}

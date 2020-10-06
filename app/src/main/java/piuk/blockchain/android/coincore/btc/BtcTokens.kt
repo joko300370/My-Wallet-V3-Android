@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -113,17 +114,18 @@ internal class BtcAsset(
             }
         }
 
-        private fun isValidAddress(address: String): Boolean =
-            FormatsUtil.isValidBitcoinAddress(
-                environmentConfig.bitcoinNetworkParameters,
-                address
-            )
+    private fun isValidAddress(address: String): Boolean =
+        FormatsUtil.isValidBitcoinAddress(
+            environmentConfig.bitcoinNetworkParameters,
+            address
+        )
 }
 
 internal class BtcAddress(
     override val address: String,
     override val label: String = address,
-    private val networkParams: NetworkParameters
+    private val networkParams: NetworkParameters,
+    override val onTxCompleted: (TxResult) -> Completable = { Completable.complete() }
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.BTC
 

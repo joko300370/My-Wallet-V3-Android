@@ -3,10 +3,12 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.Product
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -17,6 +19,7 @@ import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -41,8 +44,24 @@ open class CustodialTradingAccount(
                 asset = asset,
                 address = it,
                 label = label,
-                environmentConfig = environmentConfig
+                environmentConfig = environmentConfig,
+                postTransactions = onTxCompleted
             )
+        }
+
+    override val onTxCompleted: (TxResult) -> Completable
+        get() = { txResult ->
+            receiveAddress.flatMapCompletable {
+                require(txResult.amount is CryptoValue)
+                require(txResult is TxResult.HashedTxResult)
+                custodialWalletManager.createPendingDeposit(
+                    crypto = txResult.amount.currency,
+                    address = it.address,
+                    hash = txResult.txHash,
+                    amount = txResult.amount,
+                    product = Product.SIMPLEBUY
+                )
+            }
         }
 
     override fun requireSecondPassword(): Single<Boolean> =

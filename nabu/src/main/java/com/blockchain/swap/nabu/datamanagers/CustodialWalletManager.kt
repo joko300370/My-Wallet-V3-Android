@@ -145,6 +145,8 @@ interface CustodialWalletManager {
 
     fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
 
+    fun getPendingInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+
     fun getInterestAccountDetails(crypto: CryptoCurrency): Single<InterestAccountDetails?>
 
     fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double>
@@ -161,6 +163,14 @@ interface CustodialWalletManager {
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
+
+    fun createPendingDeposit(
+        crypto: CryptoCurrency,
+        address: String,
+        hash: String,
+        amount: Money,
+        product: Product
+    ): Completable
 }
 
 data class InterestActivityItem(
@@ -373,6 +383,10 @@ data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable 
         FiatValue.fromMinor(currency, min),
         FiatValue.fromMinor(currency, max)
     )
+}
+
+enum class Product {
+    SIMPLEBUY, SAVINGS
 }
 
 data class BillingAddress(

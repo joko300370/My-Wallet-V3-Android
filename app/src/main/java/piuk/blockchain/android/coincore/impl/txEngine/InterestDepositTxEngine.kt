@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -116,6 +117,8 @@ class InterestDepositTxEngine(
             TxOption.AGREEMENT_INTEREST_TRANSFER
         )?.value ?: false
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         onChainTxEngine.doExecute(pendingTx, secondPassword)
+
+    override fun doPostExecute(txResult: TxResult): Completable = txTarget.onTxCompleted(txResult)
 }

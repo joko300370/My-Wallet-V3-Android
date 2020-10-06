@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.erc20
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -10,6 +11,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -108,7 +110,8 @@ abstract class Erc20NonCustodialAccount(
 internal open class Erc20Address(
     final override val asset: CryptoCurrency,
     override val address: String,
-    override val label: String = address
+    override val label: String = address,
+    override val onTxCompleted: (TxResult) -> Completable = { Completable.complete() }
 ) : CryptoAddress {
     init {
         require(asset.hasFeature(CryptoCurrency.IS_ERC20))

@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
@@ -80,9 +81,11 @@ open class TradingToOnChainTxEngine(
 
     // The custodial balance now returns an id, so it is possible to add a note via this
     // processor at some point. TODO
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable {
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
         val targetAddress = txTarget as CryptoAddress
         return walletManager.transferFundsToWallet(pendingTx.amount as CryptoValue, targetAddress.address)
-            .ignoreElement()
+            .map {
+                TxResult.UnHashedTxResult(pendingTx.amount)
+            }
     }
 }

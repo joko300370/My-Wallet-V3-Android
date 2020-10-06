@@ -32,7 +32,8 @@ class TransactionProgressSheet(
             )
             TxExecutionStatus.COMPLETED -> dialogView.tx_progress_view.showTxSuccess(
                 customiser.transactionCompleteTitle(newState),
-                customiser.transactionCompleteMessage(newState)
+                customiser.transactionCompleteMessage(newState),
+                activityContext = requireActivity()
             )
             TxExecutionStatus.ERROR -> dialogView.tx_progress_view.showTxError(
                 getString(R.string.send_progress_error_title),

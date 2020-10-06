@@ -36,6 +36,7 @@ import com.blockchain.swap.nabu.models.simplebuy.BuySellOrderResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.FeesResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
@@ -258,6 +259,12 @@ internal interface Nabu {
     fun withdrawOrder(
         @Header("authorization") authorization: String,
         @Body withdrawRequestBody: WithdrawRequestBody
+    ): Completable
+
+    @POST(NABU_DEPOSIT_ORDER)
+    fun createDepositOrder(
+        @Header("authorization") authorization: String,
+        @Body depositRequestBody: DepositRequestBody
     ): Completable
 
     @GET(NABU_SIMPLE_BUY_ORDERS)

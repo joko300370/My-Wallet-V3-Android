@@ -55,19 +55,19 @@ class XlmDataManager internal constructor(
                     sendDetails.fee
                 )
             }.map { it.mapToSendFundsResult(sendDetails) }
-            .flatMap {
-                if (it.success) {
-                    val event = sendDetails.memo?.let { memo ->
-                        memoToEvent(memo)
-                    } ?: noMemoEvent
+                .flatMap {
+                    if (it.success) {
+                        val event = sendDetails.memo?.let { memo ->
+                            memoToEvent(memo)
+                        } ?: noMemoEvent
 
-                    eventLogger.logEvent(event)
+                        eventLogger.logEvent(event)
 
-                    lastTxUpdater.updateLastTxTime().onErrorComplete().toSingleDefault(it)
-                } else {
-                    Single.just(it)
+                        lastTxUpdater.updateLastTxTime().onErrorComplete().toSingleDefault(it)
+                    } else {
+                        Single.just(it)
+                    }
                 }
-            }
         }
 
     fun dryRunSendFunds(
@@ -299,6 +299,8 @@ data class SendFundsResult(
     val errorValue: CryptoValue? = null,
     val errorExtra: String? = null
 ) {
+    val txHash: String
+        get() = hash ?: throw SendException(this)
     val success = errorCode == 0 && hash != null
 }
 

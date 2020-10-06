@@ -7,6 +7,7 @@ data class InterestResponse(
 data class InterestAccountDetailsResponse(
     val balance: String,
     val pendingInterest: String,
+    val pendingDeposit: String,
     val totalInterest: String
 )
 

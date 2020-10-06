@@ -71,7 +71,8 @@ internal class CryptoExchangeAccount(
                 asset = asset,
                 label = label,
                 address = address,
-                environmentConfig = environmentConfig
+                environmentConfig = environmentConfig,
+                postTransactions = onTxCompleted
             )
         )
 

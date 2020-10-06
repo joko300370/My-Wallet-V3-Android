@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
@@ -168,17 +169,21 @@ open class Erc20OnChainTxEngine(
                 }
             }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createTransaction(pendingTx)
             .flatMap {
                 ethDataManager.signEthTransaction(it, secondPassword)
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
-            .flatMapCompletable { hash ->
+            .flatMap { hash ->
                 pendingTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let { notes ->
                     ethDataManager.updateErc20TransactionNotes(hash, notes.text)
-                } ?: Completable.complete()
+                }?.toSingle {
+                    hash
+                } ?: Single.just(hash)
+            }.map {
+                TxResult.HashedTxResult(it, pendingTx.amount)
             }
 
     private fun createTransaction(pendingTx: PendingTx): Single<RawTransaction> {
