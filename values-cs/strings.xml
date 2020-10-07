@@ -1937,6 +1937,7 @@
   <string name="could_not_activate_card">Vaši kartu jsme nemohli aktivovat. Kontaktujte podporu.</string>
   <string name="card_still_pending">Čekali jsme dvě minuty a neobdrželi jsme aktualizaci od našeho poskytovatele karet. Vaše karta může být i nadále schválena později. V případě dotazů kontaktujte podporu.</string>
   <string name="card_link_failed">Propojení karty se nezdařilo. Zkuste to znovu nebo se obraťte na podporu, pokud se domníváte, že k tomu došlo omylem.</string>
+  <string name="tx_view_locked_funds">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete je moci posílat ani vybírat z Blockchain.com až 7 dní.</string>
   <string name="unable_to_verify_id">Nelze ověřit vaše ID</string>
   <string name="unable_to_verify_id_description">Nepodařilo se nám ověřit vaši identitu. To se může stát z několika důvodů.</string>
   <string name="invalid_id">Neplatné ID</string>
@@ -1966,4 +1967,35 @@
  Zkontrolujte své připojení k internetu a zkuste to znovu, nebo pokud problém přetrvává, kontaktujte podporu.</string>
   <string name="sell_is_coming_soon">Nákup a prodej již brzy</string>
   <string name="sell_is_coming_soon_description">V současné době ve vaší oblasti nepodporujeme nákup ani prodej kryptoměny. Až tak učiníme, zašleme vám aktualizaci.</string>
+  <string name="error_scan_failed_general">Skenování se nezdařilo. Prosím zkuste to znovu.</string>
+  <string name="error_scan_failed_bitpay">Fakturu BitPay nelze načíst. Vypršelo?</string>
+  <string name="backup_before_send_later_cta">Pokračujte bez zálohování</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Máte %1$d odeslání bez zbývající zálohy</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">Máte %1$d odeslání bez zbývající zálohy</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Před odesláním musíte provést zálohu</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d den.</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">%d dny.</item>
+  </plurals>
+  <string name="card_info_title">Virtuální karty nejsou přijímány</string>
+  <string name="card_info_description">V tuto chvíli nepodporujeme nákup kryptoměny pomocí virtuálních kreditních a debetních karet. Musíte použít číslo, datum a bezpečnostní kód fyzické karty.</string>
+  <string name="send_confirmation_tx_fee">Transakční poplatek</string>
+  <string name="send_confirmation_insufficient_fee">Nedostatek prostředků na prioritní poplatek, upravte prosím částku pro odeslání.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Další informace </annotation> o síťových poplatcích.</string>
+  <string name="send_state_locked_funds_1">Máte nevyřízené transakce.</string>
+  <string name="sell_info_title">Chcete prodávat ze svých ostatních peněženek?</string>
+  <string name="sell_info_blurb_1">Pošlete krypto ze svých peněženek do svého</string>
+  <string name="sell_info_blurb_2">Obchodní peněženky.</string>
+  <string name="sell_info_blurb_3">Jakmile se odeslání dokončí, prodejte kryptoměnu za hotovost.</string>
+  <string name="sell_info_action">Odeslat →</string>
+  <string name="tx_view_locked_funds_1">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete moci tyto prostředky odesílat ani vybírat z Blockchain.com až do %2$s</string>
+  <string name="common_pending">čekající</string>
+  <string name="confirm_status_msg_insufficient_funds">Na tomto účtu nemáte dostatek prostředků ke zpracování této transakce</string>
+  <string name="confirm_status_msg_option_invalid">Ujistěte se, že jste souhlasili s našimi podmínkami.</string>
 </resources>

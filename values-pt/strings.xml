@@ -1936,6 +1936,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="could_not_activate_card">Não foi possível ativar seu cartão. Entre em contato com o suporte.</string>
   <string name="card_still_pending">Esperamos dois minutos e não recebemos nenhuma atualização do fornecedor do cartão. Seu cartão ainda pode ser aprovado mais tarde. Entre em contato com o suporte se tiver alguma dúvida.</string>
   <string name="card_link_failed">Falha ao vincular o cartão. Tente novamente ou entre em contato com o suporte se achar que isso ocorreu por engano.</string>
+  <string name="tx_view_locked_funds">Esses fundos estarão disponíveis para venda em uma carteira Fiat %1$s imediatamente, mas você não poderá enviar ou sacar esses fundos do Blockchain.com por até 7 dias.</string>
   <string name="unable_to_verify_id">Incapaz de verificar sua identidade</string>
   <string name="unable_to_verify_id_description">Não foi possível verificar sua identidade. Isso pode acontecer por alguns motivos.</string>
   <string name="invalid_id">ID Inválido</string>
@@ -1965,4 +1966,31 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
  Verifique sua conexão com a Internet e tente novamente ou entre em contato com o suporte se o problema persistir.</string>
   <string name="sell_is_coming_soon">Compre e venda em breve</string>
   <string name="sell_is_coming_soon_description">Atualmente, não oferecemos suporte à compra ou venda de criptografia em sua região. Enviaremos uma atualização quando o fizermos.</string>
+  <string name="error_scan_failed_general">A digitalização falhou. Por favor, tente novamente.</string>
+  <string name="error_scan_failed_bitpay">Não foi possível recuperar a fatura do BitPay. Ele expirou?</string>
+  <string name="backup_before_send_later_cta">Continue sem backup</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Você tem %1$d enviar sem backup restante</item>
+    <item quantity="other">Você tem %1$d envios sem backup restante</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Você deve fazer backup antes de enviar</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d dia.</item>
+    <item quantity="other">%d dias.</item>
+  </plurals>
+  <string name="card_info_title">Cartões virtuais não aceitos</string>
+  <string name="card_info_description">No momento, não oferecemos suporte à compra de criptografia com cartões virtuais de crédito e débito. Você deve usar um número de cartão físico, data e código de segurança.</string>
+  <string name="send_confirmation_tx_fee">Taxa de transação</string>
+  <string name="send_confirmation_insufficient_fee">Não há fundos suficientes para a taxa de prioridade, ajuste o valor de envio.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Saiba mais </annotation> sobre taxas de rede.</string>
+  <string name="send_state_locked_funds_1">Você tem transações pendentes.</string>
+  <string name="sell_info_title">Quer vender de suas outras carteiras?</string>
+  <string name="sell_info_blurb_1">Envie criptografia de suas carteiras para o seu</string>
+  <string name="sell_info_blurb_2">Carteiras de negociação.</string>
+  <string name="sell_info_blurb_3">Assim que o envio for concluído, venda essa criptografia por dinheiro.</string>
+  <string name="sell_info_action">Envie agora →</string>
+  <string name="tx_view_locked_funds_1">Esses fundos estarão disponíveis para venda em uma carteira Fiat %1$s imediatamente, mas você não poderá enviar ou retirar esses fundos do Blockchain.com por até %2$s</string>
+  <string name="common_pending">Pendente</string>
+  <string name="confirm_status_msg_insufficient_funds">Você não tem fundos suficientes nesta conta para processar esta transação</string>
+  <string name="confirm_status_msg_option_invalid">Certifique-se de concordar com nossos Termos.</string>
 </resources>

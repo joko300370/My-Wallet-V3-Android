@@ -1938,6 +1938,7 @@
   <string name="could_not_activate_card">เราไม่สามารถเปิดใช้งานบัตรของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
   <string name="card_still_pending">เรารอสองนาทีและไม่ได้รับการอัปเดตจากผู้ให้บริการบัตรของเรา บัตรของคุณอาจยังคงได้รับการอนุมัติในภายหลัง โปรดติดต่อฝ่ายสนับสนุนหากคุณมีคำถามใด ๆ</string>
   <string name="card_link_failed">ลิงก์การ์ดไม่สำเร็จ โปรดลองอีกครั้งหรือติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่าเกิดจากข้อผิดพลาด</string>
+  <string name="tx_view_locked_funds">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้นานถึง 7 วัน</string>
   <string name="unable_to_verify_id">ไม่สามารถยืนยัน ID ของคุณ</string>
   <string name="unable_to_verify_id_description">เราไม่สามารถยืนยันตัวตนของคุณได้ สิ่งนี้อาจเกิดขึ้นได้จากสาเหตุบางประการ</string>
   <string name="invalid_id">ID ไม่ถูกต้อง</string>
@@ -1967,4 +1968,29 @@
  โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณแล้วลองอีกครั้งหรือติดต่อฝ่ายสนับสนุนหากปัญหายังคงมีอยู่</string>
   <string name="sell_is_coming_soon">ซื้อและขายเร็ว ๆ นี้</string>
   <string name="sell_is_coming_soon_description">ปัจจุบันเราไม่สนับสนุนการซื้อหรือขาย crypto ในภูมิภาคของคุณ เราจะส่งข้อมูลอัปเดตให้คุณเมื่อเสร็จสิ้น</string>
+  <string name="error_scan_failed_general">การสแกนล้มเหลว กรุณาลองอีกครั้ง.</string>
+  <string name="error_scan_failed_bitpay">ไม่สามารถเรียกดูใบแจ้งหนี้ BitPay หมดอายุแล้วหรือยัง?</string>
+  <string name="backup_before_send_later_cta">ดำเนินการต่อโดยไม่ต้องสำรองข้อมูล</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">คุณมี %1$d ส่งโดยไม่ต้องสำรองข้อมูลที่เหลือ</item>
+  </plurals>
+  <string name="backup_before_send_now_label">คุณต้องสำรองข้อมูลก่อนส่ง</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d วัน</item>
+  </plurals>
+  <string name="card_info_title">ไม่ยอมรับการ์ดเสมือน</string>
+  <string name="card_info_description">ในขณะนี้เราไม่สนับสนุนการซื้อ crypto ด้วยบัตรเครดิตเสมือนและบัตรเดบิต คุณต้องใช้หมายเลขวันที่และรหัสความปลอดภัยของบัตรจริง</string>
+  <string name="send_confirmation_tx_fee">ค่าธรรมเนียมการทำธุรกรรม</string>
+  <string name="send_confirmation_insufficient_fee">เงินทุนไม่เพียงพอสำหรับค่าธรรมเนียมพิเศษโปรดปรับจำนวนเงินที่ส่งของคุณ</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> เรียนรู้เพิ่มเติม </annotation> เกี่ยวกับค่าธรรมเนียมเครือข่าย</string>
+  <string name="send_state_locked_funds_1">คุณมีธุรกรรมที่รอดำเนินการ</string>
+  <string name="sell_info_title">ต้องการขายจากกระเป๋าเงินอื่น ๆ ของคุณหรือไม่?</string>
+  <string name="sell_info_blurb_1">ส่ง crypto จากกระเป๋าเงินของคุณไปยังของคุณ</string>
+  <string name="sell_info_blurb_2">ซื้อขายกระเป๋าสตางค์</string>
+  <string name="sell_info_blurb_3">เมื่อส่งเสร็จสิ้นให้ขาย crypto นั้นเป็นเงินสด</string>
+  <string name="sell_info_action">ส่งตอนนี้→</string>
+  <string name="tx_view_locked_funds_1">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้ถึง %2$s</string>
+  <string name="common_pending">รอดำเนินการ</string>
+  <string name="confirm_status_msg_insufficient_funds">คุณมีเงินไม่เพียงพอในบัญชีนี้ที่จะดำเนินธุรกรรมนี้</string>
+  <string name="confirm_status_msg_option_invalid">โปรดตรวจสอบว่าคุณได้ยอมรับข้อกำหนดของเราแล้ว</string>
 </resources>

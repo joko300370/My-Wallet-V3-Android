@@ -1939,6 +1939,7 @@
   <string name="could_not_activate_card">Нам не удалось активировать вашу карту. Обратитесь в службу поддержки.</string>
   <string name="card_still_pending">Мы подождали две минуты и не получили обновления от нашего поставщика карты. Ваша карта может быть одобрена позже. Если у вас есть вопросы, обратитесь в службу поддержки.</string>
   <string name="card_link_failed">Карту не удалось связать. Повторите попытку или обратитесь в службу поддержки, если вы считаете, что это произошло по ошибке.</string>
+  <string name="tx_view_locked_funds">Эти средства будут доступны для продажи на фиатный кошелек %1$s немедленно, но вы не сможете отправлять или снимать эти средства с Blockchain.com в течение 7 дней.</string>
   <string name="unable_to_verify_id">Невозможно подтвердить ваш идентификатор</string>
   <string name="unable_to_verify_id_description">Нам не удалось подтвердить вашу личность. Это может произойти по нескольким причинам.</string>
   <string name="invalid_id">Неверный ID</string>
@@ -1968,4 +1969,35 @@
  Проверьте подключение к Интернету и повторите попытку или обратитесь в службу поддержки, если проблема не исчезнет.</string>
   <string name="sell_is_coming_soon">Купить и продать скоро</string>
   <string name="sell_is_coming_soon_description">В настоящее время мы не поддерживаем покупку или продажу криптовалюты в вашем регионе. Когда это произойдет, мы пришлем вам обновленную информацию.</string>
+  <string name="error_scan_failed_general">Ошибка сканирования. Пожалуйста, попробуйте еще раз.</string>
+  <string name="error_scan_failed_bitpay">Невозможно получить счет BitPay. Срок его действия истек?</string>
+  <string name="backup_before_send_later_cta">Продолжить без резервного копирования</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">У вас %1$d отправлено без резервного копирования</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">У вас есть %1$d отправленных без резервного копирования</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Вы должны сделать резервную копию перед отправкой</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d день.</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">%d дней.</item>
+  </plurals>
+  <string name="card_info_title">Виртуальные карты не принимаются</string>
+  <string name="card_info_description">В настоящее время мы не поддерживаем покупку криптовалюты с помощью виртуальных кредитных и дебетовых карт. Вы должны использовать номер физической карты, дату и код безопасности.</string>
+  <string name="send_confirmation_tx_fee">Комиссия на перевод</string>
+  <string name="send_confirmation_insufficient_fee">Недостаточно средств для оплаты приоритетной комиссии. Измените сумму отправки.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Подробнее </annotation> о сетевых сборах.</string>
+  <string name="send_state_locked_funds_1">У вас есть незавершенные транзакции.</string>
+  <string name="sell_info_title">Хотите продавать из других кошельков?</string>
+  <string name="sell_info_blurb_1">Отправляйте криптовалюту со своих кошельков на свой</string>
+  <string name="sell_info_blurb_2">Торговые кошельки.</string>
+  <string name="sell_info_blurb_3">После завершения отправки продайте криптовалюту за наличные.</string>
+  <string name="sell_info_action">Отправить сейчас →</string>
+  <string name="tx_view_locked_funds_1">Эти средства будут доступны для продажи на фиатный кошелек %1$s немедленно, но вы не сможете отправлять или снимать эти средства с Blockchain.com на сумму до %2$s</string>
+  <string name="common_pending">В ожидании</string>
+  <string name="confirm_status_msg_insufficient_funds">У вас недостаточно средств на этом счете для обработки этой транзакции</string>
+  <string name="confirm_status_msg_option_invalid">Убедитесь, что вы согласны с нашими Условиями.</string>
 </resources>

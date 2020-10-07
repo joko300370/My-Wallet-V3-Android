@@ -1937,6 +1937,7 @@
   <string name="could_not_activate_card">We konden uw kaart niet activeren. Neem contact op met ondersteuning.</string>
   <string name="card_still_pending">We hebben twee minuten gewacht en hebben geen update ontvangen van onze kaartaanbieder. Mogelijk wordt uw kaart later nog goedgekeurd. Neem bij vragen contact op met de klantenservice.</string>
   <string name="card_link_failed">Kaart kan niet worden gekoppeld. Probeer het opnieuw of neem contact op met de ondersteuning als u denkt dat dit ten onrechte is gebeurd.</string>
+  <string name="tx_view_locked_funds">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot 7 dagen niet verzenden naar of opnemen van Blockchain.com.</string>
   <string name="unable_to_verify_id">Kan uw ID niet verifiëren</string>
   <string name="unable_to_verify_id_description">We konden uw identiteit niet verifiëren. Dit kan verschillende redenen hebben.</string>
   <string name="invalid_id">ongeldig identiteitsbewijs</string>
@@ -1966,4 +1967,31 @@
  Controleer uw internetverbinding en probeer het opnieuw of neem contact op met de ondersteuning als het probleem zich blijft voordoen.</string>
   <string name="sell_is_coming_soon">Koop en verkoop binnenkort</string>
   <string name="sell_is_coming_soon_description">Momenteel ondersteunen we het kopen of verkopen van cryptovaluta in uw regio niet. We sturen je een update als we dat doen.</string>
+  <string name="error_scan_failed_general">Scan mislukt. Probeer het a.u.b. opnieuw.</string>
+  <string name="error_scan_failed_bitpay">Kan BitPay-factuur niet ophalen. Is het verlopen?</string>
+  <string name="backup_before_send_later_cta">Ga door zonder back-up</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Je hebt %1$d verzonden zonder dat er nog een back-up over is</item>
+    <item quantity="other">Je hebt %1$d verzendingen zonder dat er een back-up over is</item>
+  </plurals>
+  <string name="backup_before_send_now_label">U moet een back-up maken voordat u verzendt</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d dag.</item>
+    <item quantity="other">%d dagen.</item>
+  </plurals>
+  <string name="card_info_title">Virtuele kaarten worden niet geaccepteerd</string>
+  <string name="card_info_description">Op dit moment ondersteunen we het kopen van cryptovaluta met virtuele creditcards en betaalpassen niet. U moet het nummer, de datum en de beveiligingscode van een fysieke kaart gebruiken.</string>
+  <string name="send_confirmation_tx_fee">Transactiekosten</string>
+  <string name="send_confirmation_insufficient_fee">Onvoldoende saldo voor prioriteitsvergoeding, pas uw verzendingsbedrag aan.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Meer informatie </annotation> over netwerkkosten.</string>
+  <string name="send_state_locked_funds_1">U heeft lopende transacties.</string>
+  <string name="sell_info_title">Wilt u verkopen vanuit uw andere wallets?</string>
+  <string name="sell_info_blurb_1">Stuur crypto van uw portemonnee naar uw</string>
+  <string name="sell_info_blurb_2">Handel in portefeuilles.</string>
+  <string name="sell_info_blurb_3">Zodra die verzending is voltooid, verkoopt u die crypto voor contant geld.</string>
+  <string name="sell_info_action">Nu verzenden →</string>
+  <string name="tx_view_locked_funds_1">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot %2$s niet verzenden naar of opnemen van Blockchain.com.</string>
+  <string name="common_pending">In afwachting</string>
+  <string name="confirm_status_msg_insufficient_funds">U heeft onvoldoende saldo op deze rekening om deze transactie te verwerken</string>
+  <string name="confirm_status_msg_option_invalid">Zorg ervoor dat u akkoord gaat met onze voorwaarden.</string>
 </resources>

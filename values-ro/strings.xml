@@ -1936,6 +1936,7 @@
   <string name="could_not_activate_card">Nu v-am putut activa cardul. Vă rugăm să contactați asistența.</string>
   <string name="card_still_pending">Am așteptat două minute și nu am primit nicio actualizare de la furnizorul nostru de carduri. Cardul dvs. poate fi aprobat în continuare ulterior. Vă rugăm să contactați asistența dacă aveți întrebări.</string>
   <string name="card_link_failed">Cardul nu a putut fi conectat. Încercați din nou sau contactați asistența dacă credeți că acest lucru a apărut din greșeală.</string>
+  <string name="tx_view_locked_funds">Aceste fonduri vor fi disponibile pentru a fi vândute imediat într-un portofel Fiat %1$s , dar nu veți putea trimite sau retrage aceste fonduri de pe Blockchain.com timp de până la 7 zile.</string>
   <string name="unable_to_verify_id">Imposibil de verificat ID-ul dvs.</string>
   <string name="unable_to_verify_id_description">Nu am putut verifica identitatea dvs. Acest lucru se poate întâmpla din câteva motive.</string>
   <string name="invalid_id">ID invalid</string>
@@ -1965,4 +1966,33 @@
  Vă rugăm să verificați conexiunea la internet și să încercați din nou sau să contactați asistența dacă problema persistă.</string>
   <string name="sell_is_coming_soon">Cumpărați și vindeți în curând</string>
   <string name="sell_is_coming_soon_description">În prezent, nu acceptăm cumpărarea sau vânzarea cripto-urilor în regiunea dvs. Vă vom trimite o actualizare când o vom face.</string>
+  <string name="error_scan_failed_general">Scanarea nu a reușit. Vă rugăm să încercați din nou.</string>
+  <string name="error_scan_failed_bitpay">Imposibil de preluat factura BitPay. A expirat?</string>
+  <string name="backup_before_send_later_cta">Continuați fără Backup</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Aveți %1$d trimitere fără a rămâne o copie de rezervă</item>
+    <item quantity="few"></item>
+    <item quantity="other">Aveți %1$d trimiteri fără a mai rămâne o copie de rezervă</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Trebuie să faceți o copie de rezervă înainte de a trimite</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d zi.</item>
+    <item quantity="few"></item>
+    <item quantity="other">%d zile.</item>
+  </plurals>
+  <string name="card_info_title">Cardurile virtuale nu sunt acceptate</string>
+  <string name="card_info_description">În acest moment, nu acceptăm cumpărarea criptelor cu carduri de credit și debit virtuale. Trebuie să utilizați numărul cardului fizic, data și codul de securitate.</string>
+  <string name="send_confirmation_tx_fee">Taxa de tranzacție</string>
+  <string name="send_confirmation_insufficient_fee">Nu există fonduri suficiente pentru taxa prioritară, vă rugăm să ajustați suma de trimitere.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Aflați mai multe </annotation> despre taxele de rețea.</string>
+  <string name="send_state_locked_funds_1">Aveți tranzacții în așteptare.</string>
+  <string name="sell_info_title">Doriți să vindeți din celelalte portofele?</string>
+  <string name="sell_info_blurb_1">Trimite cripto din portofelele tale către</string>
+  <string name="sell_info_blurb_2">Portofele de tranzacționare.</string>
+  <string name="sell_info_blurb_3">Odată ce trimiterea a fost finalizată, vindeți cripto-ul în numerar.</string>
+  <string name="sell_info_action">Trimite acum →</string>
+  <string name="tx_view_locked_funds_1">Aceste fonduri vor fi disponibile pentru a fi vândute imediat într-un portofel Fiat %1$s , dar nu veți putea trimite sau retrage aceste fonduri de pe Blockchain.com pentru până la %2$s</string>
+  <string name="common_pending">In asteptarea</string>
+  <string name="confirm_status_msg_insufficient_funds">Nu aveți fonduri suficiente în acest cont pentru a procesa această tranzacție</string>
+  <string name="confirm_status_msg_option_invalid">Vă rugăm să vă asigurați că ați fost de acord cu Termenii noștri.</string>
 </resources>
