@@ -106,7 +106,7 @@ class TxProcessorFactory(
             TransactionProcessor(
                 exchangeRates = exchangeRates,
                 sourceAccount = source,
-                txTarget = target,
+                txTarget = it,
                 engine = TradingToOnChainTxEngine(
                     walletManager = walletManager,
                     isNoteSupported = source.isNoteSupported
