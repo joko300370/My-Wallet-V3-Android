@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">确认转账</string>
   <string name="send_confirmation_interest_tos_pp">我已阅读并同意<annotation link="interest_tos">服务条款</annotation>和<annotation link="interest_pp">隐私政策</annotation> 。</string>
   <string name="send_confirmation_interest_holding_period_1">接受此即表示您同意转让</string>
-  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）从您的比特币钱包到您的兴趣帐户。最初的保留期为7天，将适用于您的资金。</string>
+  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）%2$s从您的比特币钱包到您的兴趣帐户。最初的保留期为7天，将适用于您的资金。</string>
   <string name="send_confirmation_progress_title">转移%1$s</string>
   <string name="send_confirmation_progress_message">我们正在转移您的%1$s 。</string>
   <string name="send_confirmation_success_title">%1$s转移%1$s</string>
@@ -1936,6 +1936,7 @@
   <string name="could_not_activate_card">我们无法激活您的卡。请联系支持。</string>
   <string name="card_still_pending">我们等待了两分钟，没有收到银行卡提供商的更新。您的卡可能仍会在以后获得批准。如有任何疑问，请联系支持。</string>
   <string name="card_link_failed">卡无法链接。如果您认为这是错误的，请重试或联系支持人员。</string>
+  <string name="tx_view_locked_funds">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在7天内从Blockchain.com上发送或提取这些资金。</string>
   <string name="unable_to_verify_id">无法验证您的ID</string>
   <string name="unable_to_verify_id_description">我们无法验证您的身份。发生这种情况可能有几个原因。</string>
   <string name="invalid_id">无效的ID</string>
@@ -1965,4 +1966,29 @@
 请检查您的互联网连接，然后重试；如果问题仍然存在，请与支持人员联系。</string>
   <string name="sell_is_coming_soon">买卖即将到来</string>
   <string name="sell_is_coming_soon_description">目前，我们不支持在您所在地区购买或出售加密货币。完成后，我们会向您发送更新。</string>
+  <string name="error_scan_failed_general">扫描失败。请再试一次。</string>
+  <string name="error_scan_failed_bitpay">无法检索BitPay发票。它过期了吗？</string>
+  <string name="backup_before_send_later_cta">继续而不备份</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">您有%1$d发送但没有备份剩余</item>
+  </plurals>
+  <string name="backup_before_send_now_label">您必须先备份，然后再发送</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d天。</item>
+  </plurals>
+  <string name="card_info_title">不接受虚拟卡</string>
+  <string name="card_info_description">目前，我们不支持使用虚拟信用卡和借记卡购买加密货币。您必须使用实体卡的编号，日期和安全码。</string>
+  <string name="send_confirmation_tx_fee">手续费</string>
+  <string name="send_confirmation_insufficient_fee">没有足够的资金支付优先费，请调整您的发送金额。</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees">了解更多</annotation>有关网络费用的信息。</string>
+  <string name="send_state_locked_funds_1">您有待处理的交易。</string>
+  <string name="sell_info_title">想要从您的其他电子钱包中出售？</string>
+  <string name="sell_info_blurb_1">将电子钱包中的加密货币发送到您的</string>
+  <string name="sell_info_blurb_2">交易钱包。</string>
+  <string name="sell_info_blurb_3">发送完成后，以现金出售该加密货币。</string>
+  <string name="sell_info_action">立即发送→</string>
+  <string name="tx_view_locked_funds_1">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在%2$s从Blockchain.com上发送或提取这些资金%2$s</string>
+  <string name="common_pending">待定</string>
+  <string name="confirm_status_msg_insufficient_funds">您的帐户资金不足，无法处理此交易</string>
+  <string name="confirm_status_msg_option_invalid">请确保您已同意我们的条款。</string>
 </resources>

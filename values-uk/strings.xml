@@ -1822,7 +1822,7 @@
   <string name="send_confirmation_deposit_cta_button">Підтвердити передачу</string>
   <string name="send_confirmation_interest_tos_pp">Я прочитав і погоджуюся на <annotation link="interest_tos"> Умови надання послуг </annotation> &amp; <annotation link="interest_pp"> Політика конфіденційності </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Приймаючи це, ви погоджуєтесь передати</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) з вашого Bitcoin Wallet на ваш рахунок інтересів. Початковий термін утримування у 7 днів буде застосовано до ваших коштів.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) з вашого  %2$s Wallet на ваш рахунок інтересів. Початковий термін утримування у 7 днів буде застосовано до ваших коштів.</string>
   <string name="send_confirmation_progress_title">Передача %1$s</string>
   <string name="send_confirmation_progress_message">Зараз ми передаємо ваш %1$s .</string>
   <string name="send_confirmation_success_title">Перенесено %1$s</string>
@@ -1939,6 +1939,7 @@
   <string name="could_not_activate_card">Ми не змогли активувати вашу картку. Зверніться до служби підтримки.</string>
   <string name="card_still_pending">Ми почекали дві хвилини і не отримали оновлення від нашого постачальника карток. Ваша картка може бути затверджена пізніше. Зверніться до служби підтримки, якщо у вас виникли запитання.</string>
   <string name="card_link_failed">Не вдалося зв’язати картку. Повторіть спробу або зв’яжіться зі службою підтримки, якщо ви вважаєте, що це сталося помилково.</string>
+  <string name="tx_view_locked_funds">Ці кошти можна буде негайно продати у %1$s гаманця Fiat, але ви не зможете надіслати або вивести ці кошти з Blockchain.com протягом 7 днів.</string>
   <string name="unable_to_verify_id">Неможливо підтвердити свій ідентифікатор</string>
   <string name="unable_to_verify_id_description">Нам не вдалося підтвердити вашу особу. Це може статися з кількох причин.</string>
   <string name="invalid_id">Недійсний ідентифікатор</string>
@@ -1968,4 +1969,35 @@
  Перевірте підключення до Інтернету та спробуйте ще раз або зв’яжіться зі службою підтримки, якщо проблема не зникне.</string>
   <string name="sell_is_coming_soon">Купуйте та продавайте найближчим часом</string>
   <string name="sell_is_coming_soon_description">В даний час ми не підтримуємо купівлю або продаж криптовалют у вашому регіоні. Коли ми це надішлемо, ми надішлемо вам оновлення.</string>
+  <string name="error_scan_failed_general">Помилка сканування. Будь ласка спробуйте ще раз.</string>
+  <string name="error_scan_failed_bitpay">Не вдається отримати рахунок-фактуру BitPay. Термін дії закінчився?</string>
+  <string name="backup_before_send_later_cta">Продовжуйте без резервного копіювання</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">У вас є %1$d відправлення без резервного копіювання</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">У вас є %1$d надсилання без резервного копіювання</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Перед надсиланням потрібно зробити резервну копію</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d день.</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">%d днів.</item>
+  </plurals>
+  <string name="card_info_title">Віртуальні картки не приймаються</string>
+  <string name="card_info_description">На даний момент ми не підтримуємо купівлю криптовалюти за допомогою віртуальних кредитних та дебетових карток. Ви повинні використовувати номер фізичної картки, дату та код безпеки.</string>
+  <string name="send_confirmation_tx_fee">Комісія за транзакцію</string>
+  <string name="send_confirmation_insufficient_fee">Не вистачає коштів для пріоритетного внеску, будь ласка, скоригуйте суму відправлення.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Докладніше </annotation> про плату за мережу.</string>
+  <string name="send_state_locked_funds_1">У вас є очікувані операції.</string>
+  <string name="sell_info_title">Хочете продати з інших своїх гаманців?</string>
+  <string name="sell_info_blurb_1">Надішліть крипто з ваших гаманців на ваш</string>
+  <string name="sell_info_blurb_2">Торгові гаманці.</string>
+  <string name="sell_info_blurb_3">Після того, як відправка буде завершена, продайте цю криптографію за готівку.</string>
+  <string name="sell_info_action">Надіслати →</string>
+  <string name="tx_view_locked_funds_1">Ці кошти можна буде негайно продати у %1$s гаманця Fiat, але ви не зможете надіслати або вивести ці кошти з Blockchain.com до %2$s</string>
+  <string name="common_pending">В очікуванні</string>
+  <string name="confirm_status_msg_insufficient_funds">У вас недостатньо коштів на цьому рахунку для обробки цієї транзакції</string>
+  <string name="confirm_status_msg_option_invalid">Будь ласка, переконайтеся, що ви погодились з нашими Умовами.</string>
 </resources>

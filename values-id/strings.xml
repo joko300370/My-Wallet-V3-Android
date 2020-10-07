@@ -1936,6 +1936,7 @@
   <string name="could_not_activate_card">Kami tidak dapat mengaktifkan kartu Anda. Silakan hubungi dukungan.</string>
   <string name="card_still_pending">Kami menunggu dua menit dan tidak menerima pembaruan dari penyedia kartu kami. Kartu Anda mungkin masih disetujui nanti. Silakan hubungi dukungan jika Anda memiliki pertanyaan.</string>
   <string name="card_link_failed">Kartu gagal ditautkan. Harap coba lagi atau hubungi dukungan jika Anda yakin ini terjadi karena kesalahan.</string>
+  <string name="tx_view_locked_funds">Dana ini akan segera tersedia untuk dijual ke dompet Fiat %1$s , tetapi Anda tidak akan dapat mengirim atau menarik dana ini dari Blockchain.com hingga 7 hari.</string>
   <string name="unable_to_verify_id">Tidak dapat memverifikasi ID Anda</string>
   <string name="unable_to_verify_id_description">Kami tidak dapat memverifikasi identitas Anda. Ini bisa terjadi karena beberapa alasan.</string>
   <string name="invalid_id">ID tidak valid</string>
@@ -1965,4 +1966,29 @@
  Periksa koneksi internet Anda dan coba lagi atau Hubungi Dukungan jika masalah terus berlanjut.</string>
   <string name="sell_is_coming_soon">Beli &amp; Jual Segera Hadir</string>
   <string name="sell_is_coming_soon_description">Saat ini, kami tidak mendukung pembelian atau penjualan crypto di wilayah Anda. Kami akan mengirimkan pembaruan kepada Anda saat kami melakukannya.</string>
+  <string name="error_scan_failed_general">Pemindaian gagal. Silakan coba lagi.</string>
+  <string name="error_scan_failed_bitpay">Tidak dapat mengambil faktur BitPay. Apakah sudah kedaluwarsa?</string>
+  <string name="backup_before_send_later_cta">Lanjutkan tanpa Cadangan</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">Anda memiliki %1$d pengiriman tanpa cadangan yang tersisa</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Anda harus membuat cadangan sebelum mengirim</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d hari.</item>
+  </plurals>
+  <string name="card_info_title">Kartu Virtual Tidak Diterima</string>
+  <string name="card_info_description">Saat ini, kami tidak mendukung pembelian crypto dengan kartu kredit dan debit virtual. Anda harus menggunakan nomor kartu fisik, tanggal dan kode keamanan.</string>
+  <string name="send_confirmation_tx_fee">Biaya transaksi</string>
+  <string name="send_confirmation_insufficient_fee">Dana tidak cukup untuk biaya prioritas, harap sesuaikan jumlah pengiriman Anda.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Pelajari selengkapnya </annotation> tentang biaya jaringan.</string>
+  <string name="send_state_locked_funds_1">Anda memiliki transaksi yang menunggu keputusan.</string>
+  <string name="sell_info_title">Ingin menjual dari Dompet Anda yang lain?</string>
+  <string name="sell_info_blurb_1">Kirim crypto dari Dompet Anda ke</string>
+  <string name="sell_info_blurb_2">Dompet Perdagangan.</string>
+  <string name="sell_info_blurb_3">Setelah pengiriman selesai, jual crypto itu dengan uang tunai.</string>
+  <string name="sell_info_action">Kirim Sekarang →</string>
+  <string name="tx_view_locked_funds_1">Dana ini akan segera tersedia untuk dijual ke dompet Fiat %1$s , tetapi Anda tidak akan dapat mengirim atau menarik dana ini dari Blockchain.com hingga %2$s</string>
+  <string name="common_pending">Menunggu keputusan</string>
+  <string name="confirm_status_msg_insufficient_funds">Anda tidak memiliki cukup dana di akun ini untuk memproses transaksi ini</string>
+  <string name="confirm_status_msg_option_invalid">Harap pastikan Anda telah menyetujui Persyaratan kami.</string>
 </resources>

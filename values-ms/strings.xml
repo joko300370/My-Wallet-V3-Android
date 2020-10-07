@@ -1936,6 +1936,7 @@
   <string name="could_not_activate_card">Kami tidak dapat mengaktifkan kad anda. Sila hubungi sokongan.</string>
   <string name="card_still_pending">Kami menunggu dua minit dan tidak menerima kemas kini daripada pembekal kad kami. Kad anda masih boleh diluluskan kemudian. Sila hubungi sokongan jika anda mempunyai sebarang pertanyaan.</string>
   <string name="card_link_failed">Kad gagal dipaut. Sila cuba lagi atau hubungi sokongan jika anda percaya ini berlaku secara tidak sengaja.</string>
+  <string name="tx_view_locked_funds">Dana ini akan tersedia untuk dijual ke dalam dompet Fiat %1$s , tetapi anda tidak akan dapat mengirim atau mengeluarkan dana ini dari Blockchain.com sehingga 7 hari.</string>
   <string name="unable_to_verify_id">Tidak dapat Mengesahkan ID Anda</string>
   <string name="unable_to_verify_id_description">Kami tidak dapat mengesahkan identiti anda. Ini boleh berlaku kerana beberapa sebab.</string>
   <string name="invalid_id">ID tidak sah</string>
@@ -1965,4 +1966,29 @@
  Sila periksa sambungan internet anda dan cuba lagi atau Hubungi Sokongan jika masalahnya berlanjutan.</string>
   <string name="sell_is_coming_soon">Beli &amp; Jual Akan Segera</string>
   <string name="sell_is_coming_soon_description">Pada masa ini, kami tidak menyokong membeli atau menjual crypto di wilayah anda. Kami akan menghantar kemas kini kepada anda apabila kami melakukannya.</string>
+  <string name="error_scan_failed_general">Imbasan gagal. Sila cuba lagi.</string>
+  <string name="error_scan_failed_bitpay">Tidak dapat mengambil invois BitPay. Adakah ia telah tamat tempoh?</string>
+  <string name="backup_before_send_later_cta">Teruskan tanpa Sandaran</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">Anda mempunyai %1$d kiriman tanpa membuat baki sandaran</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Anda mesti membuat sandaran sebelum menghantar</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d hari.</item>
+  </plurals>
+  <string name="card_info_title">Kad Maya Tidak Diterima</string>
+  <string name="card_info_description">Pada masa ini, kami tidak menyokong pembelian crypto dengan kad kredit dan debit maya. Anda mesti menggunakan nombor, tarikh dan kod keselamatan kad fizikal.</string>
+  <string name="send_confirmation_tx_fee">Bayaran transaksi</string>
+  <string name="send_confirmation_insufficient_fee">Tidak cukup dana untuk bayaran keutamaan, sila sesuaikan jumlah penghantaran anda.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Ketahui lebih lanjut </annotation> mengenai bayaran rangkaian.</string>
+  <string name="send_state_locked_funds_1">Anda mempunyai urus niaga yang belum selesai.</string>
+  <string name="sell_info_title">Ingin menjual dari Dompet anda yang lain?</string>
+  <string name="sell_info_blurb_1">Hantar crypto dari Wallet anda ke</string>
+  <string name="sell_info_blurb_2">Dompet Dagangan.</string>
+  <string name="sell_info_blurb_3">Setelah penghantaran selesai, jual crypto itu dengan wang tunai.</string>
+  <string name="sell_info_action">Hantar Sekarang →</string>
+  <string name="tx_view_locked_funds_1">Dana ini akan tersedia untuk dijual ke dompet Fiat %1$s dengan segera, tetapi anda tidak akan dapat mengirim atau mengeluarkan dana ini dari Blockchain.com hingga %2$s</string>
+  <string name="common_pending">Yang belum selesai</string>
+  <string name="confirm_status_msg_insufficient_funds">Anda tidak mempunyai dana dalam akaun ini untuk memproses transaksi ini</string>
+  <string name="confirm_status_msg_option_invalid">Pastikan anda telah bersetuju dengan Syarat kami.</string>
 </resources>

@@ -1817,7 +1817,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="send_confirmation_deposit_cta_button">Aktarımı Onayla</string>
   <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos">Hizmet Şartları</annotation> ve <annotation link="interest_pp">Gizlilik Politikasını</annotation> okudum ve kabul ediyorum.</string>
   <string name="send_confirmation_interest_holding_period_1">Bunu kabul ederek, %2$s Cüzdanınızdan Faiz Hesabınıza</string>
-  <string name="send_confirmation_interest_holding_period_2"> (%1$s) aktarmayı kabul etmiş olursunuz. Paranıza başlangıç olarak 7 günlük bir vade uygulanacaktır.</string>
+  <string name="send_confirmation_interest_holding_period_2"> (%1$s) aktarmayı %2$s kabul etmiş olursunuz. Paranıza başlangıç olarak 7 günlük bir vade uygulanacaktır.</string>
   <string name="send_confirmation_progress_title">%1$s Aktarılıyor</string>
   <string name="send_confirmation_progress_message">Size ait %1$s şu anda aktarılıyor.</string>
   <string name="send_confirmation_success_title">%1$s Aktarıldı</string>
@@ -1934,6 +1934,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="could_not_activate_card">Kartınızı etkinleştiremedik. Lütfen desteğe başvurun.</string>
   <string name="card_still_pending">İki dakika bekledik ve kart sağlayıcımızdan bir güncelleme almadık. Kartınız daha sonra hala onaylanabilir. Herhangi bir sorunuz varsa lütfen destek ile iletişime geçin.</string>
   <string name="card_link_failed">Kart bağlanamadı. Lütfen tekrar deneyin veya bunun bir hata olduğunu düşünüyorsanız destek ile iletişime geçin.</string>
+  <string name="tx_view_locked_funds">Bu fonlar hemen %1$s Fiat cüzdanına satılabilecek, ancak bu fonları Blockchain.com\'dan 7 güne kadar gönderemez veya çekemezsiniz.</string>
   <string name="unable_to_verify_id">Kimliğiniz Doğrulanamıyor</string>
   <string name="unable_to_verify_id_description">Kimliğinizi doğrulayamadık. Bu birkaç nedenden dolayı olabilir.</string>
   <string name="invalid_id">geçersiz kimlik</string>
@@ -1963,4 +1964,31 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
  Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin veya sorun devam ederse Desteğe Başvurun.</string>
   <string name="sell_is_coming_soon">Al ve Sat Çok Yakında</string>
   <string name="sell_is_coming_soon_description">Şu anda, bölgenizde kripto alıp satmayı desteklemiyoruz. Bunu yaptığımızda size bir güncelleme göndereceğiz.</string>
+  <string name="error_scan_failed_general">Tarama başarısız oldu. Lütfen tekrar deneyin.</string>
+  <string name="error_scan_failed_bitpay">BitPay faturası alınamıyor. Süresi doldu mu?</string>
+  <string name="backup_before_send_later_cta">Yedeklemeden Devam Et</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Kalan yedeklemeden %1$d gönderme hakkınız var</item>
+    <item quantity="other">Kalan yedeklemesiz %1$d gönderiminiz var</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Göndermeden önce yedeklemelisiniz</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d gün.</item>
+    <item quantity="other">%d gün.</item>
+  </plurals>
+  <string name="card_info_title">Kabul Edilmeyen Sanal Kartlar</string>
+  <string name="card_info_description">Şu anda sanal kredi ve banka kartlarıyla kripto satın almayı desteklemiyoruz. Fiziksel bir kartın numarasını, tarihini ve güvenlik kodunu kullanmalısınız.</string>
+  <string name="send_confirmation_tx_fee">İşlem ücreti</string>
+  <string name="send_confirmation_insufficient_fee">Öncelik ücreti için yeterli para yok, lütfen gönderim miktarınızı ayarlayın.</string>
+  <string name="send_confirmation_fee_learn_more">Ağ ücretleri hakkında <annotation link="send_tx_fees"> daha fazla bilgi edinin </annotation> .</string>
+  <string name="send_state_locked_funds_1">Bekleyen işlemleriniz var.</string>
+  <string name="sell_info_title">Diğer Cüzdanlarınızdan mı satmak istiyorsunuz?</string>
+  <string name="sell_info_blurb_1">Cüzdanlarınızdan hesabınıza kripto gönderin</string>
+  <string name="sell_info_blurb_2">İşlem Cüzdanları.</string>
+  <string name="sell_info_blurb_3">Gönderim tamamlandığında, o kriptoyu nakit olarak sat.</string>
+  <string name="sell_info_action">Şimdi Gönder →</string>
+  <string name="tx_view_locked_funds_1">Bu fonlar hemen %1$s Fiat cüzdanına satılabilecek, ancak bu fonları Blockchain.com\'dan %2$s kadar gönderemeyecek veya çekemeyeceksiniz.</string>
+  <string name="common_pending">Bekliyor</string>
+  <string name="confirm_status_msg_insufficient_funds">Bu hesapta bu işlemi gerçekleştirmek için yeterli paranız yok</string>
+  <string name="confirm_status_msg_option_invalid">Lütfen Şartlarımızı kabul ettiğinizden emin olun.</string>
 </resources>

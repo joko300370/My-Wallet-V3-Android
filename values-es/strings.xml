@@ -1933,6 +1933,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="could_not_activate_card">No pudimos activar su tarjeta. Póngase en contacto con el servicio de asistencia.</string>
   <string name="card_still_pending">Esperamos dos minutos y no recibimos una actualización de nuestro proveedor de tarjetas. Su tarjeta aún puede ser aprobada más tarde. Póngase en contacto con el servicio de asistencia si tiene alguna pregunta.</string>
   <string name="card_link_failed">La tarjeta no se pudo vincular. Vuelva a intentarlo o póngase en contacto con el servicio de asistencia si cree que se produjo un error.</string>
+  <string name="tx_view_locked_funds">Estos fondos estarán disponibles para vender en una billetera Fiat %1$s inmediato, pero no podrá enviar ni retirar estos fondos de Blockchain.com hasta por 7 días.</string>
   <string name="unable_to_verify_id">No se puede verificar su identificación</string>
   <string name="unable_to_verify_id_description">No pudimos verificar su identidad. Esto puede suceder por varias razones.</string>
   <string name="invalid_id">identificación invalida</string>
@@ -1962,4 +1963,31 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
  Verifique su conexión a Internet y vuelva a intentarlo o comuníquese con el soporte técnico si el problema persiste.</string>
   <string name="sell_is_coming_soon">Compra y venta próximamente</string>
   <string name="sell_is_coming_soon_description">Actualmente, no admitimos la compra o venta de criptomonedas en su región. Le enviaremos una actualización cuando lo hagamos.</string>
+  <string name="error_scan_failed_general">Error de escaneo. Inténtalo de nuevo.</string>
+  <string name="error_scan_failed_bitpay">No se puede recuperar la factura de BitPay. ¿Ha caducado?</string>
+  <string name="backup_before_send_later_cta">Continuar sin respaldo</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Tienes %1$d enviado sin copia de seguridad restante</item>
+    <item quantity="other">Tienes %1$d envíos sin copia de seguridad restante</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Debes hacer una copia de seguridad antes de enviar</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d día.</item>
+    <item quantity="other">%d días.</item>
+  </plurals>
+  <string name="card_info_title">Tarjetas virtuales no aceptadas</string>
+  <string name="card_info_description">En este momento, no admitimos la compra de criptomonedas con tarjetas de crédito y débito virtuales. Debe utilizar el número, la fecha y el código de seguridad de una tarjeta física.</string>
+  <string name="send_confirmation_tx_fee">Tarifa de transacción</string>
+  <string name="send_confirmation_insufficient_fee">No hay fondos suficientes para la tarifa de prioridad, ajuste la cantidad de envío.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Obtenga más información </annotation> sobre las tarifas de la red.</string>
+  <string name="send_state_locked_funds_1">Tiene transacciones pendientes.</string>
+  <string name="sell_info_title">¿Quiere vender desde sus otras carteras?</string>
+  <string name="sell_info_blurb_1">Envíe criptomonedas desde sus billeteras a su</string>
+  <string name="sell_info_blurb_2">Monederos comerciales.</string>
+  <string name="sell_info_blurb_3">Una vez que se complete el envío, vende esa criptografía por dinero en efectivo.</string>
+  <string name="sell_info_action">Enviar ahora →</string>
+  <string name="tx_view_locked_funds_1">Estos fondos estarán disponibles para venderse en una billetera Fiat %1$s inmediatamente, pero no podrá enviar ni retirar estos fondos de Blockchain.com por hasta %2$s</string>
+  <string name="common_pending">Pendiente</string>
+  <string name="confirm_status_msg_insufficient_funds">No tiene fondos suficientes en esta cuenta para procesar esta transacción</string>
+  <string name="confirm_status_msg_option_invalid">Asegúrese de haber aceptado nuestros Términos.</string>
 </resources>

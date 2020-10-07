@@ -1937,6 +1937,7 @@
   <string name="could_not_activate_card">Vi kunde inte aktivera ditt kort. Kontakta support.</string>
   <string name="card_still_pending">Vi väntade två minuter och fick ingen uppdatering från vår kortleverantör. Ditt kort kan fortfarande godkännas senare. Kontakta support om du har några frågor.</string>
   <string name="card_link_failed">Det gick inte att länka kortet. Försök igen eller kontakta support om du tror att detta inträffade av misstag.</string>
+  <string name="tx_view_locked_funds">Dessa medel kommer att kunna säljas till en %1$s Fiat-plånbok omedelbart, men du kommer inte att kunna skicka eller ta ut dessa medel från Blockchain.com på upp till 7 dagar.</string>
   <string name="unable_to_verify_id">Det går inte att verifiera ditt ID</string>
   <string name="unable_to_verify_id_description">Vi kunde inte verifiera din identitet. Detta kan hända av några anledningar.</string>
   <string name="invalid_id">ogiltigt ID</string>
@@ -1966,4 +1967,31 @@
  Kontrollera din internetanslutning och försök igen eller kontakta support om problemet kvarstår.</string>
   <string name="sell_is_coming_soon">Köp &amp; Sälj Kommer snart</string>
   <string name="sell_is_coming_soon_description">För närvarande stöder vi inte att köpa eller sälja krypto i din region. Vi skickar en uppdatering till dig när vi gör det.</string>
+  <string name="error_scan_failed_general">Skanningen misslyckades. Var god försök igen.</string>
+  <string name="error_scan_failed_bitpay">Det gick inte att hämta BitPay-fakturan. Har den gått ut?</string>
+  <string name="backup_before_send_later_cta">Fortsätt utan säkerhetskopiering</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Du har %1$d skicka utan att säkerhetskopiera kvar</item>
+    <item quantity="other">Du har %1$d skickat utan att säkerhetskopiera kvar</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Du måste säkerhetskopiera innan du skickar</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d dag.</item>
+    <item quantity="other">%d dagar.</item>
+  </plurals>
+  <string name="card_info_title">Virtuella kort accepteras inte</string>
+  <string name="card_info_description">För närvarande stöder vi inte att köpa krypto med virtuella kredit- och betalkort. Du måste använda ett fysiskt kortnummer, datum och säkerhetskod.</string>
+  <string name="send_confirmation_tx_fee">Transaktionsavgift</string>
+  <string name="send_confirmation_insufficient_fee">Inte tillräckligt med medel för prioritetsavgift, justera ditt sändningsbelopp.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Läs mer </annotation> om nätverksavgifter.</string>
+  <string name="send_state_locked_funds_1">Du har väntande transaktioner.</string>
+  <string name="sell_info_title">Vill du sälja från dina andra plånböcker?</string>
+  <string name="sell_info_blurb_1">Skicka krypto från dina plånböcker till din</string>
+  <string name="sell_info_blurb_2">Handelsplånböcker.</string>
+  <string name="sell_info_blurb_3">När sändningen är klar, sälj den krypto mot kontanter.</string>
+  <string name="sell_info_action">Skicka nu →</string>
+  <string name="tx_view_locked_funds_1">Dessa medel kommer att kunna säljas till en %1$s Fiat-plånbok omedelbart, men du kommer inte att kunna skicka eller ta ut dessa medel från Blockchain.com för upp till %2$s</string>
+  <string name="common_pending">I väntan på</string>
+  <string name="confirm_status_msg_insufficient_funds">Du har inte tillräckligt med pengar på det här kontot för att behandla transaktionen</string>
+  <string name="confirm_status_msg_option_invalid">Se till att du har godkänt våra villkor.</string>
 </resources>

@@ -1937,6 +1937,7 @@
   <string name="could_not_activate_card">Nie mogliśmy aktywować Twojej karty. Skontaktuj się z pomocą techniczną.</string>
   <string name="card_still_pending">Czekaliśmy dwie minuty i nie otrzymaliśmy aktualizacji od naszego dostawcy karty. Twoja karta może zostać zatwierdzona później. Jeśli masz jakieś pytania, skontaktuj się z pomocą techniczną.</string>
   <string name="card_link_failed">Karta nie powiodła się. Spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.</string>
+  <string name="tx_view_locked_funds">Środki te będą dostępne do natychmiastowej sprzedaży do portfela Fiata %1$s , ale nie będzie można ich wysyłać ani wypłacać z Blockchain.com przez okres do 7 dni.</string>
   <string name="unable_to_verify_id">Nie można zweryfikować Twojej tożsamości</string>
   <string name="unable_to_verify_id_description">Nie mogliśmy zweryfikować Twojej tożsamości. Może się tak zdarzyć z kilku powodów.</string>
   <string name="invalid_id">nieważny numer identyfikacyjny</string>
@@ -1966,4 +1967,35 @@
  Sprawdź połączenie internetowe i spróbuj ponownie lub skontaktuj się z pomocą techniczną, jeśli problem nie ustąpi.</string>
   <string name="sell_is_coming_soon">Kupuj i sprzedawaj już wkrótce</string>
   <string name="sell_is_coming_soon_description">Obecnie nie obsługujemy kupowania ani sprzedawania kryptowalut w Twoim regionie. Wyślemy Ci aktualizację, gdy to zrobimy.</string>
+  <string name="error_scan_failed_general">Skanowanie nie powiodło się. Proszę spróbuj ponownie.</string>
+  <string name="error_scan_failed_bitpay">Nie można pobrać faktury BitPay. Czy to wygasło?</string>
+  <string name="backup_before_send_later_cta">Kontynuuj bez kopii zapasowej</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Masz %1$d wysłanych bez kopii zapasowej</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">Masz %1$d wysłanych bez kopii zapasowej</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Musisz wykonać kopię zapasową przed wysłaniem</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d dzień.</item>
+    <item quantity="few"></item>
+    <item quantity="many"></item>
+    <item quantity="other">%d dni.</item>
+  </plurals>
+  <string name="card_info_title">Karty wirtualne nie są akceptowane</string>
+  <string name="card_info_description">W tej chwili nie obsługujemy kupowania kryptowalut za pomocą wirtualnych kart kredytowych i debetowych. Musisz użyć numeru karty fizycznej, daty i kodu zabezpieczającego.</string>
+  <string name="send_confirmation_tx_fee">Opłata transakcyjna</string>
+  <string name="send_confirmation_insufficient_fee">Za mało środków na opłatę priorytetową. Dostosuj kwotę wysyłania.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Dowiedz się więcej </annotation> o opłatach sieciowych.</string>
+  <string name="send_state_locked_funds_1">Masz oczekujące transakcje.</string>
+  <string name="sell_info_title">Chcesz sprzedawać z innych portfeli?</string>
+  <string name="sell_info_blurb_1">Wyślij krypto ze swoich portfeli na swój</string>
+  <string name="sell_info_blurb_2">Portfele handlowe.</string>
+  <string name="sell_info_blurb_3">Po zakończeniu wysyłania sprzedaj krypto za gotówkę.</string>
+  <string name="sell_info_action">Wyślij teraz →</string>
+  <string name="tx_view_locked_funds_1">Środki te będą dostępne do natychmiastowej sprzedaży do portfela Fiata %1$s , ale nie będziesz w stanie wysyłać ani wypłacać tych środków z Blockchain.com do kwoty %2$s</string>
+  <string name="common_pending">W oczekiwaniu</string>
+  <string name="confirm_status_msg_insufficient_funds">Nie masz wystarczających środków na tym koncie, aby przetworzyć tę transakcję</string>
+  <string name="confirm_status_msg_option_invalid">Upewnij się, że wyraziłeś zgodę na nasze Warunki.</string>
 </resources>

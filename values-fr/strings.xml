@@ -1937,6 +1937,7 @@ Veuillez réessayer plus tard.</string>
   <string name="could_not_activate_card">Nous n\'avons pas pu activer votre carte. Veuillez contacter le support.</string>
   <string name="card_still_pending">Nous avons attendu deux minutes et n\'avons pas reçu de mise à jour de notre fournisseur de cartes. Votre carte peut encore être approuvée plus tard. Veuillez contacter le support si vous avez des questions.</string>
   <string name="card_link_failed">La carte n\'a pas pu être liée. Veuillez réessayer ou contacter l\'assistance si vous pensez que cela s\'est produit par erreur.</string>
+  <string name="tx_view_locked_funds">Ces fonds pourront être vendus immédiatement dans un portefeuille Fiat %1$s , mais vous ne pourrez pas envoyer ou retirer ces fonds de Blockchain.com pendant un maximum de 7 jours.</string>
   <string name="unable_to_verify_id">Impossible de vérifier votre identifiant</string>
   <string name="unable_to_verify_id_description">Nous n\'avons pas pu vérifier votre identité. Cela peut arriver pour plusieurs raisons.</string>
   <string name="invalid_id">ID invalide</string>
@@ -1966,4 +1967,31 @@ Veuillez réessayer plus tard.</string>
  Veuillez vérifier votre connexion Internet et réessayer ou contacter l\'assistance si le problème persiste.</string>
   <string name="sell_is_coming_soon">Acheter et vendre à venir</string>
   <string name="sell_is_coming_soon_description">Actuellement, nous ne prenons pas en charge l\'achat ou la vente de crypto-monnaies dans votre région. Nous vous enverrons une mise à jour lorsque nous le ferons.</string>
+  <string name="error_scan_failed_general">Le scan a échoué. Veuillez réessayer.</string>
+  <string name="error_scan_failed_bitpay">Impossible de récupérer la facture BitPay. A-t-il expiré?</string>
+  <string name="backup_before_send_later_cta">Continuer sans sauvegarde</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Vous avez %1$d envoi sans sauvegarde restante</item>
+    <item quantity="other">Vous avez %1$d envois sans sauvegarde restante</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Vous devez sauvegarder avant d\'envoyer</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d jour.</item>
+    <item quantity="other">%d jours.</item>
+  </plurals>
+  <string name="card_info_title">Cartes virtuelles non acceptées</string>
+  <string name="card_info_description">Pour le moment, nous ne prenons pas en charge l\'achat de crypto avec des cartes de crédit et de débit virtuelles. Vous devez utiliser le numéro, la date et le code de sécurité d\'une carte physique.</string>
+  <string name="send_confirmation_tx_fee">Frais de transaction</string>
+  <string name="send_confirmation_insufficient_fee">Pas assez de fonds pour les frais de priorité, veuillez ajuster votre montant d\'envoi.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> En savoir plus </annotation> sur les frais de réseau.</string>
+  <string name="send_state_locked_funds_1">Vous avez des transactions en attente.</string>
+  <string name="sell_info_title">Vous souhaitez vendre à partir de vos autres portefeuilles?</string>
+  <string name="sell_info_blurb_1">Envoyez des crypto-monnaies de vos portefeuilles à votre</string>
+  <string name="sell_info_blurb_2">Portefeuilles de trading.</string>
+  <string name="sell_info_blurb_3">Une fois cet envoi terminé, vendez cette crypto contre de l\'argent.</string>
+  <string name="sell_info_action">Envoyer maintenant →</string>
+  <string name="tx_view_locked_funds_1">Ces fonds pourront être vendus immédiatement dans un portefeuille Fiat %1$s , mais vous ne pourrez pas envoyer ou retirer ces fonds de Blockchain.com jusqu\'à %2$s</string>
+  <string name="common_pending">En attente</string>
+  <string name="confirm_status_msg_insufficient_funds">Vous n\'avez pas suffisamment de fonds sur ce compte pour traiter cette transaction</string>
+  <string name="confirm_status_msg_option_invalid">Veuillez vous assurer que vous avez accepté nos conditions.</string>
 </resources>

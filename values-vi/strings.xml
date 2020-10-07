@@ -1819,7 +1819,7 @@
   <string name="send_confirmation_deposit_cta_button">Xác nhận chuyển khoản</string>
   <string name="send_confirmation_interest_tos_pp">Tôi đã đọc và đồng ý với <annotation link="interest_tos"> Điều khoản Dịch vụ </annotation> &amp; <annotation link="interest_pp"> Chính sách Bảo mật </annotation> .</string>
   <string name="send_confirmation_interest_holding_period_1">Bằng cách chấp nhận điều này, bạn đồng ý chuyển</string>
-  <string name="send_confirmation_interest_holding_period_2">( %1$s ) từ Ví Bitcoin vào Tài khoản sở thích của bạn. Khoảng thời gian giữ ban đầu là 7 ngày sẽ được áp dụng cho tiền của bạn.</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) từ Ví %2$s vào Tài khoản sở thích của bạn. Khoảng thời gian giữ ban đầu là 7 ngày sẽ được áp dụng cho tiền của bạn.</string>
   <string name="send_confirmation_progress_title">Đang chuyển %1$s</string>
   <string name="send_confirmation_progress_message">Chúng tôi đang chuyển %1$s ngay bây giờ.</string>
   <string name="send_confirmation_success_title">%1$s</string>
@@ -1936,6 +1936,7 @@
   <string name="could_not_activate_card">Chúng tôi không thể kích hoạt thẻ của bạn. Vui lòng liên hệ với bộ phận hỗ trợ.</string>
   <string name="card_still_pending">Chúng tôi đã đợi hai phút và không nhận được thông tin cập nhật từ nhà cung cấp thẻ của chúng tôi. Thẻ của bạn vẫn có thể được phê duyệt sau đó. Vui lòng liên hệ với bộ phận hỗ trợ nếu bạn có bất kỳ câu hỏi nào.</string>
   <string name="card_link_failed">Không liên kết được thẻ. Vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ nếu bạn cho rằng điều này xảy ra do lỗi.</string>
+  <string name="tx_view_locked_funds">Các khoản tiền này sẽ có sẵn để bán vào ví Fiat %1$s ngay lập tức, nhưng bạn sẽ không thể gửi hoặc rút các khoản tiền này từ Blockchain.com trong tối đa 7 ngày.</string>
   <string name="unable_to_verify_id">Không thể xác minh ID của bạn</string>
   <string name="unable_to_verify_id_description">Chúng tôi không thể xác minh danh tính của bạn. Điều này có thể xảy ra vì một vài lý do.</string>
   <string name="invalid_id">ID không hợp lệ</string>
@@ -1965,4 +1966,29 @@
  Vui lòng kiểm tra kết nối internet của bạn và thử lại hoặc Liên hệ với bộ phận hỗ trợ nếu sự cố vẫn tiếp diễn.</string>
   <string name="sell_is_coming_soon">Mua &amp; Bán sắp ra mắt</string>
   <string name="sell_is_coming_soon_description">Hiện tại, chúng tôi không hỗ trợ mua hoặc bán tiền điện tử trong khu vực của bạn. Chúng tôi sẽ gửi cho bạn bản cập nhật khi chúng tôi thực hiện.</string>
+  <string name="error_scan_failed_general">Quét không thành công. Vui lòng thử lại.</string>
+  <string name="error_scan_failed_bitpay">Không thể truy xuất hóa đơn BitPay. Nó đã hết hạn?</string>
+  <string name="backup_before_send_later_cta">Tiếp tục mà không cần sao lưu</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">Bạn có %1$d gửi mà không cần sao lưu</item>
+  </plurals>
+  <string name="backup_before_send_now_label">Bạn phải sao lưu trước khi gửi</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d ngày.</item>
+  </plurals>
+  <string name="card_info_title">Thẻ ảo không được chấp nhận</string>
+  <string name="card_info_description">Tại thời điểm này, chúng tôi không hỗ trợ mua tiền điện tử bằng thẻ tín dụng và thẻ ghi nợ ảo. Bạn phải sử dụng số, ngày tháng và mã bảo mật của thẻ vật lý.</string>
+  <string name="send_confirmation_tx_fee">Phí giao dịch</string>
+  <string name="send_confirmation_insufficient_fee">Không đủ tiền cho phí ưu tiên, vui lòng điều chỉnh số tiền gửi của bạn.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Tìm hiểu thêm </annotation> về phí mạng.</string>
+  <string name="send_state_locked_funds_1">Bạn có giao dịch đang chờ xử lý.</string>
+  <string name="sell_info_title">Bạn muốn bán hàng từ các Ví khác của mình?</string>
+  <string name="sell_info_blurb_1">Gửi tiền điện tử từ Ví của bạn đến</string>
+  <string name="sell_info_blurb_2">Ví giao dịch.</string>
+  <string name="sell_info_blurb_3">Khi quá trình gửi hoàn tất, hãy bán tiền điện tử đó để lấy tiền mặt.</string>
+  <string name="sell_info_action">Gửi ngay →</string>
+  <string name="tx_view_locked_funds_1">Các khoản tiền này sẽ có sẵn để bán vào ví Fiat %1$s ngay lập tức, nhưng bạn sẽ không thể gửi hoặc rút các khoản tiền này từ Blockchain.com với số tiền lên đến %2$s</string>
+  <string name="common_pending">Đang chờ xử lý</string>
+  <string name="confirm_status_msg_insufficient_funds">Bạn không có đủ tiền trong tài khoản này để xử lý giao dịch này</string>
+  <string name="confirm_status_msg_option_invalid">Hãy đảm bảo rằng bạn đã đồng ý với các Điều khoản của chúng tôi.</string>
 </resources>

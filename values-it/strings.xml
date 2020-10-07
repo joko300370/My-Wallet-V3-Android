@@ -1937,6 +1937,7 @@
   <string name="could_not_activate_card">Non è stato possibile attivare la tua carta. Contatta l\'assistenza.</string>
   <string name="card_still_pending">Abbiamo aspettato due minuti e non abbiamo ricevuto alcun aggiornamento dal nostro fornitore della carta. La tua carta potrebbe essere ancora approvata in seguito. In caso di domande, contatta l\'assistenza.</string>
   <string name="card_link_failed">Collegamento della carta non riuscito. Riprova o contatta l\'assistenza se ritieni che si sia verificato un errore.</string>
+  <string name="tx_view_locked_funds">Questi fondi saranno disponibili per essere venduti immediatamente in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com per un massimo di 7 giorni.</string>
   <string name="unable_to_verify_id">Impossibile verificare il tuo ID</string>
   <string name="unable_to_verify_id_description">Non siamo riusciti a verificare la tua identità. Ciò può accadere per diversi motivi.</string>
   <string name="invalid_id">ID non valido</string>
@@ -1966,4 +1967,31 @@
  Controlla la tua connessione Internet e riprova o contatta l\'assistenza se il problema persiste.</string>
   <string name="sell_is_coming_soon">Acquista e vendi presto</string>
   <string name="sell_is_coming_soon_description">Al momento, non supportiamo l\'acquisto o la vendita di criptovalute nella tua regione. Ti invieremo un aggiornamento quando lo faremo.</string>
+  <string name="error_scan_failed_general">Scansione fallita. Per favore riprova.</string>
+  <string name="error_scan_failed_bitpay">Impossibile recuperare la fattura BitPay. È scaduto?</string>
+  <string name="backup_before_send_later_cta">Continua senza backup</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="one">Hai %1$d invio senza backup rimanenti</item>
+    <item quantity="other">Hai %1$d invii senza backup rimanenti</item>
+  </plurals>
+  <string name="backup_before_send_now_label">È necessario eseguire il backup prima di inviare</string>
+  <plurals name="lock_days">
+    <item quantity="one">%d giorno.</item>
+    <item quantity="other">%d giorni.</item>
+  </plurals>
+  <string name="card_info_title">Carte virtuali non accettate</string>
+  <string name="card_info_description">Al momento, non supportiamo l\'acquisto di criptovalute con carte di credito e debito virtuali. È necessario utilizzare il numero, la data e il codice di sicurezza della carta fisica.</string>
+  <string name="send_confirmation_tx_fee">Costo della transazione</string>
+  <string name="send_confirmation_insufficient_fee">Fondi insufficienti per la tariffa prioritaria, modifica l\'importo di invio.</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> Ulteriori informazioni </annotation> sulle tariffe di rete.</string>
+  <string name="send_state_locked_funds_1">Hai transazioni in sospeso.</string>
+  <string name="sell_info_title">Vuoi vendere dagli altri tuoi portafogli?</string>
+  <string name="sell_info_blurb_1">Invia criptovalute dai tuoi portafogli al tuo</string>
+  <string name="sell_info_blurb_2">Portafogli di trading.</string>
+  <string name="sell_info_blurb_3">Una volta completato l\'invio, vendi quella criptovaluta in contanti.</string>
+  <string name="sell_info_action">Invia ora →</string>
+  <string name="tx_view_locked_funds_1">Questi fondi saranno immediatamente disponibili per la vendita in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com fino a %2$s</string>
+  <string name="common_pending">in sospeso</string>
+  <string name="confirm_status_msg_insufficient_funds">Non hai fondi sufficienti in questo account per elaborare questa transazione</string>
+  <string name="confirm_status_msg_option_invalid">Assicurati di aver accettato i nostri Termini.</string>
 </resources>
