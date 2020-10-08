@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.account
 
 import androidx.annotation.StringRes
 import info.blockchain.wallet.payload.data.LegacyAddress
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.util.Locale
@@ -9,10 +11,6 @@ import java.util.Locale
 interface AccountView : View {
 
     val locale: Locale
-
-    fun onShowTransferableLegacyFundsWarning(isAutoPopup: Boolean)
-
-    fun onSetTransferLegacyFundsMenuItemVisible(visible: Boolean)
 
     fun showProgressDialog(@StringRes message: Int)
 
@@ -31,4 +29,6 @@ interface AccountView : View {
     fun updateAccountList(displayAccounts: List<AccountItem>)
 
     fun hideCurrencyHeader()
+
+    fun showTransferFunds(sendingAccount: CryptoAccount, defaultAccount: SingleAccount)
 }

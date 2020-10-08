@@ -23,8 +23,6 @@ interface ConfirmFundsTransferView : View {
 
     fun sendBroadcast(event: ActionEvent)
 
-    fun setPaymentButtonEnabled(enabled: Boolean)
-
     fun getIfArchiveChecked(): Boolean
 
     fun showProgressDialog()

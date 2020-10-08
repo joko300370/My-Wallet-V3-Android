@@ -53,7 +53,6 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
@@ -341,7 +340,6 @@ val applicationModule = module {
         factory {
             ConfirmFundsTransferPresenter(
                 walletAccountHelper = get(),
-                fundsDataManager = get(),
                 payloadDataManager = get(),
                 stringUtils = get(),
                 exchangeRates = get(),
@@ -451,22 +449,17 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 metadataManager = get(),
-                fundsDataManager = get(),
-                prefs = get(),
                 appUtil = get(),
                 privateKeyFactory = get(),
                 environmentSettings = get(),
                 analytics = get(),
-                coinsWebSocketStrategy = get()
-            )
-        }
-
-        factory {
-            TransferFundsDataManager(
-                payloadDataManager = get(),
+                coinsWebSocketStrategy = get(),
+                coincore = get(),
                 sendDataManager = get(),
-                dynamicFeeCache = get(),
-                coinSelectionRemoteConfig = get()
+                feeDataManager = get(),
+                exchangeRates = get(),
+                environmentConfig = get(),
+                walletPreferences = get()
             )
         }
 
@@ -727,7 +720,6 @@ val applicationModule = module {
 
         factory {
             BackupWalletCompletedPresenter(
-                transferFundsDataManager = get(),
                 walletStatus = get()
             )
         }

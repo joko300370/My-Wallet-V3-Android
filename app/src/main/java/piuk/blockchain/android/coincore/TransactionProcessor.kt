@@ -297,7 +297,7 @@ class TransactionProcessor(
     }
 
     fun updateAmount(amount: Money): Completable {
-        Timber.d("!SEND!> in UpdateAmount")
+        Timber.d("!TRANSACTION!> in UpdateAmount")
         val pendingTx = getPendingTx()
         if (!canTransactFiat && amount is FiatValue)
             throw IllegalArgumentException("The processor does not support fiat values")

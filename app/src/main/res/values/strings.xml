@@ -447,10 +447,9 @@
 
     <!-- FUNDS TRANSFER -->
     <string name="transfer">Transfer</string>
-    <string name="transfer_funds">Transfer Imported Addresses?</string>
-    <string name="transfer_recommend">Looks like you have some bitcoins in imported addresses.
-        Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
-        recommend transferring these balances to include in your backup.
+    <string name="transfer_funds_title">Transfer From Imported Address?</string>
+    <string name="transfer_funds_description">Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
+        recommend transferring these balances to your Blockchain.com non-custodial Wallet.
     </string>
 
     <string name="transfer_confirmed">Transfer Confirmed</string>

@@ -143,11 +143,11 @@ class TransactionModel(
     }
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.e("!TRANSACTION!> Send Model: loop error -> $t")
+        Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")
     }
 
     override fun onStateUpdate(s: TransactionState) {
-        Timber.v("!TRANSACTION!> Send Model: state update -> $s")
+        Timber.v("!TRANSACTION!> Transaction Model: state update -> $s")
     }
 
     private fun processInvalidateTransaction(): Disposable? =
