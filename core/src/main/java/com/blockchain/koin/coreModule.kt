@@ -217,7 +217,12 @@ val coreModule = module {
         )
     }
 
-    factory { ExchangeRateService(get()) }
+    factory {
+        ExchangeRateService(
+            priceApi = get(),
+            rxBus = get()
+        )
+    }
 
     factory {
         DeviceIdGeneratorImpl(

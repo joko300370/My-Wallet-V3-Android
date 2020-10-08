@@ -19,7 +19,7 @@ import org.junit.Test
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import java.util.Locale
 
 class AssetDetailsInteractorTest {

@@ -127,7 +127,6 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.erc20.UsdtAccount
@@ -328,13 +327,6 @@ val applicationModule = module {
             OkHttpClient()
                 .newBlockchainWebSocket(options = Options(url = BuildConfig.COINS_WEBSOCKET_URL))
                 .autoRetry().debugLog("COIN_SOCKET")
-        }
-
-        factory {
-            ChartsDataManager(
-                historicPriceApi = get(),
-                rxBus = get()
-            )
         }
 
         factory {

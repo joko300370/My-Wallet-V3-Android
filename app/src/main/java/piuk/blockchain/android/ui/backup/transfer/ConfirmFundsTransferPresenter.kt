@@ -6,8 +6,8 @@ import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.LegacyAddress
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.account.PendingTransaction
 import piuk.blockchain.android.ui.account.ItemAccount
+import piuk.blockchain.android.ui.account.PendingTransaction
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable

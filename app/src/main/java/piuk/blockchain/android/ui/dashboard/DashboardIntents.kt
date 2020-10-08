@@ -11,7 +11,7 @@ import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.androidcore.data.charts.PriceSeries
+import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import java.math.BigInteger
 
 sealed class DashboardIntent : MviIntent<DashboardState>
