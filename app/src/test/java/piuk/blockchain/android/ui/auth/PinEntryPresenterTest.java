@@ -48,7 +48,6 @@ import piuk.blockchain.androidcore.utils.PrngFixer;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
 import piuk.blockchain.android.util.AppUtil;
-import piuk.blockchain.android.util.DialogButtonCallback;
 import piuk.blockchain.android.util.StringUtils;
 
 import static io.reactivex.Observable.just;

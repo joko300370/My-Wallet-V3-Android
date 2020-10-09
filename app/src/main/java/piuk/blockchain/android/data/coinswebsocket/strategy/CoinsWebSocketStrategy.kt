@@ -7,7 +7,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.exceptions.DecryptionException
-import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -46,7 +45,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.websockets.WebSocketReceiveEvent
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Locale
@@ -224,8 +223,7 @@ class CoinsWebSocketStrategy(
             .andThen(payloadDataManager.updateAllTransactions())
             .doOnComplete {
                 rxBus.emitEvent(ActionEvent::class.java, WalletAndTransactionsUpdatedEvent())
-            }
-            .subscribe(IgnorableDefaultObserver<Any>())
+            }.emptySubscribe()
     }
 
     private fun updateBchBalancesAndTransactions() {
@@ -234,7 +232,7 @@ class CoinsWebSocketStrategy(
             .doOnComplete {
                 rxBus.emitEvent(ActionEvent::class.java, WalletAndTransactionsUpdatedEvent())
             }
-            .subscribe(IgnorableDefaultObserver<List<TransactionSummary>>())
+            .emptySubscribe()
     }
 
     private fun handleEthTransaction(response: String) {

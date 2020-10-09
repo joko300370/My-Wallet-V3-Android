@@ -28,8 +28,6 @@ class EnterAmountSheet(
 ) : TransactionFlowSheet(host) {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_amount
 
-    private var state: TransactionState =
-        TransactionState()
     private val customiser: TransactionFlowCustomiser by inject()
     private val compositeDisposable = CompositeDisposable()
 
@@ -45,7 +43,7 @@ class EnterAmountSheet(
     @SuppressLint("SetTextI18n")
     override fun render(newState: TransactionState) {
         Timber.d("!SEND!> Rendering! EnterAmountSheet")
-        state = newState
+        cacheState(newState)
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
@@ -93,9 +91,16 @@ class EnterAmountSheet(
 
     override fun initControls(view: View) {
         view.apply {
-            amount_sheet_use_max.setOnClickListener { onUseMaxClick() }
-            amount_sheet_cta_button.setOnClickListener { onCtaClick() }
+            amount_sheet_use_max.setOnClickListener {
+                analyticsHooks.onMaxClicked(state)
+                onUseMaxClick()
+            }
+            amount_sheet_cta_button.setOnClickListener {
+                analyticsHooks.onEnterAmountCtaClick(state)
+                onCtaClick()
+            }
             amount_sheet_back.setOnClickListener {
+                analyticsHooks.onStepBackClicked(state)
                 model.process(TransactionIntent.InvalidateTransaction)
             }
         }
@@ -129,6 +134,10 @@ class EnterAmountSheet(
                     // do nothing
                 }
             }
+        }
+
+        compositeDisposable += view.amount_sheet_input.onInputToggle.subscribe {
+            analyticsHooks.onCryptoToggle(it, state)
         }
     }
 

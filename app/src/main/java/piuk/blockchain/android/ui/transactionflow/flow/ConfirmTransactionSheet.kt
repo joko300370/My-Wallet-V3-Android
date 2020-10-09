@@ -57,6 +57,7 @@ class ConfirmTransactionSheet(
             confirm_cta_button.isEnabled = newState.nextEnabled
             confirm_sheet_back.visibleIf { newState.canGoBack }
         }
+        cacheState(newState)
     }
 
     override fun initControls(view: View) {
@@ -74,6 +75,7 @@ class ConfirmTransactionSheet(
         }
 
         view.confirm_sheet_back.setOnClickListener {
+            analyticsHooks.onStepBackClicked(state)
             model.process(TransactionIntent.ReturnToPreviousStep)
         }
 
@@ -81,6 +83,7 @@ class ConfirmTransactionSheet(
     }
 
     private fun onCtaClick() {
+        analyticsHooks.onConfirmationCtaClick(state)
         model.process(TransactionIntent.ExecuteTransaction)
     }
 }

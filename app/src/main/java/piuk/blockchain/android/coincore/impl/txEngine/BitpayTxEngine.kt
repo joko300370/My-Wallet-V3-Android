@@ -1,8 +1,10 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -18,6 +20,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
+import piuk.blockchain.android.data.api.bitpay.analytics.BitPayEvent
 import piuk.blockchain.android.data.api.bitpay.models.BitPayTransaction
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -41,7 +44,8 @@ interface BitPayClientEngine {
 class BtcBitpayTxEngine(
     private val bitPayDataManager: BitPayDataManager,
     private val assetEngine: OnChainTxEngineBase,
-    private val walletPrefs: WalletStatus
+    private val walletPrefs: WalletStatus,
+    private val analytics: Analytics
 ) : TxEngine() {
 
     override fun assertInputsValid() {
@@ -117,6 +121,7 @@ class BtcBitpayTxEngine(
             .map { pTx ->
                 val remaining = (getCountdownTimeoutMs() - System.currentTimeMillis())
                 if (remaining <= 0) {
+                    analytics.logEvent(BitPayEvent.InvoiceExpired)
                     throw TxValidationFailure(ValidationState.INVOICE_EXPIRED)
                 }
                 pTx
@@ -136,13 +141,11 @@ class BtcBitpayTxEngine(
                 doExecuteTransaction(bitpayInvoice.invoiceId, preparedTx)
             }.doOnSuccess {
                 walletPrefs.setBitPaySuccess()
-//                analytics.logEvent(BitPayEvent.SuccessEvent(pendingTx.amount, CryptoCurrency.BTC))
+                analytics.logEvent(BitPayEvent.TxSuccess(pendingTx.amount as CryptoValue))
                 executionClient.doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
+                analytics.logEvent(BitPayEvent.TxFailed(e.message ?: e.toString()))
                 executionClient.doOnTransactionFailed(pendingTx, e)
-//                (it as? BitPayApiException)?.let { bitpayException ->
-//                    analytics.logEvent(BitPayEvent.FailureEvent(bitpayException.message ?: ""))
-//                }
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }

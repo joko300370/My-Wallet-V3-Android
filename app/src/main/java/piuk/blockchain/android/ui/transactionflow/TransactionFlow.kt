@@ -9,6 +9,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -24,6 +26,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterSecondPasswordSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterTargetAddressSheet
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionProgressSheet
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import timber.log.Timber
 
 abstract class DialogFlow : SlidingModalBottomDialog.Host {
@@ -72,10 +75,12 @@ class TransactionFlow(
     private val target: TransactionTarget = NullCryptoAccount(),
     private val action: AssetAction,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
-) : DialogFlow() {
+) : DialogFlow(), KoinComponent {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var currentStep: TransactionStep = TransactionStep.ZERO
+
+    private val analyticsHooks: TxFlowAnalytics by inject()
 
     override fun startFlow(
         fragmentManager: FragmentManager,
@@ -134,6 +139,7 @@ class TransactionFlow(
             } else {
                 currentStep = newState.currentStep
                 showFlowStep(currentStep)
+                analyticsHooks.onStepChanged(newState)
             }
         }
     }

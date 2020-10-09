@@ -23,7 +23,8 @@ class EnterSecondPasswordSheet(
         if (!newState.nextEnabled && newState.secondPassword.isEmpty()) {
             Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
         }
-        Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
+        Timber.d("!TRANSACTION!> Rendering! EnterSecondPasswordSheet")
+        cacheState(newState)
     }
 
     override fun initControls(view: View) {

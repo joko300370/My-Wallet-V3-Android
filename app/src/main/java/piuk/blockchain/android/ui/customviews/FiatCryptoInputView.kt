@@ -37,6 +37,11 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
 
+    private val inputToggleSubject: PublishSubject<CurrencyType> = PublishSubject.create()
+
+    val onInputToggle: Observable<CurrencyType>
+        get() = inputToggleSubject
+
     val amount: Observable<Money>
         get() = amountSubject
 
@@ -88,6 +93,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                     output = configuration.output.swap(),
                     predefinedAmount = getLastEnteredAmount(configuration)
                 )
+            inputToggleSubject.onNext(configuration.input)
         }
     }
 

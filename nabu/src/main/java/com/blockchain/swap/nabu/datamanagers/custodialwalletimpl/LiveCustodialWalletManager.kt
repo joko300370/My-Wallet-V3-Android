@@ -125,7 +125,7 @@ class LiveCustodialWalletManager(
         authenticator.authenticateCompletable {
             nabuService.createWithdrawOrder(
                 sessionToken = it,
-                amount = amount.valueMinor.toString(),
+                amount = amount.toBigInteger().toString(),
                 currency = amount.currencyCode,
                 beneficiaryId = bankId
             )

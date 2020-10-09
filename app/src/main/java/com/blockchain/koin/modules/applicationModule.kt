@@ -119,6 +119,7 @@ import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.ResourceDefaultLabels
+import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.android.withdraw.mvi.WithdrawInteractor
@@ -148,6 +149,8 @@ val applicationModule = module {
             prefs = get()
         )
     }
+
+    factory { RootUtil() }
 
     single {
         CoinsWebSocketService(

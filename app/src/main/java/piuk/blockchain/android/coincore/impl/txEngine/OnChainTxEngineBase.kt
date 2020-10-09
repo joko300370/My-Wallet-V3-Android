@@ -17,8 +17,8 @@ abstract class OnChainTxEngineBase(
         require(sourceAccount.asset == tgt.asset)
     }
 
-    override fun doPostExecute(result: TxResult): Completable =
-        txTarget.onTxCompleted(result)
+    override fun doPostExecute(txResult: TxResult): Completable =
+        txTarget.onTxCompleted(txResult)
 
     protected fun mapSavedFeeToFeeLevel(feeType: Int?): FeeLevel =
         when (feeType) {

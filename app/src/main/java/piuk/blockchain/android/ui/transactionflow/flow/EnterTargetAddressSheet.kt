@@ -44,11 +44,9 @@ class EnterTargetAddressSheet(
     private val customiser: TransactionFlowCustomiser by inject()
 
     private val disposables = CompositeDisposable()
-    private var state: TransactionState =
-        TransactionState()
 
     override fun render(newState: TransactionState) {
-        Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
+        Timber.d("!TRANSACTION!> Rendering! EnterTargetAddressSheet")
 
         with(dialogView) {
             if (state.sendingAccount != newState.sendingAccount) {
@@ -62,7 +60,7 @@ class EnterTargetAddressSheet(
             }
             cta_button.isEnabled = newState.nextEnabled
 
-            state = newState
+            cacheState(newState)
             if (customiser.selectTargetShowManualEnterAddress(newState)) {
                 showManualAddressEntry(newState)
             } else {
@@ -147,7 +145,6 @@ class EnterTargetAddressSheet(
 
             wallet_select.apply {
                 onLoadError = {
-                    showErrorToast("Failed getting transfer wallets")
                     hideTransferList()
                 }
                 onAccountSelected = { accountSelected(it) }
@@ -170,10 +167,12 @@ class EnterTargetAddressSheet(
 
     private fun accountSelected(account: BlockchainAccount) {
         require(account is SingleAccount)
+        analyticsHooks.onAccountSelected(account, state)
         model.process(TransactionIntent.TargetSelectionConfirmed(account))
     }
 
     private fun onLaunchAddressScan() {
+        analyticsHooks.onScanQrClicked(state)
         QrScanHandler.requestScanPermissions(
             activity = requireActivity(),
             rootView = dialogView
@@ -187,6 +186,7 @@ class EnterTargetAddressSheet(
     }
 
     private fun addressEntered(address: String, asset: CryptoCurrency) {
+        analyticsHooks.onManualAddressEntered(state)
         model.process(TransactionIntent.ValidateInputTargetAddress(address, asset))
     }
 

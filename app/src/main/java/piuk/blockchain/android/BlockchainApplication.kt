@@ -34,7 +34,6 @@ import piuk.blockchain.android.ui.auth.LogoutActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.lifecycle.AppLifecycleListener
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -59,7 +58,6 @@ open class BlockchainApplication : Application(), FrameworkInterface {
     private val rxBus: RxBus by inject()
     private val currentContextAccess: CurrentContextAccess by inject()
     private val appUtils: AppUtil by inject()
-    private val osUtil: OSUtil by inject()
     private val crashLogger: CrashLogger by inject()
     private val coinsWebSocketService: CoinsWebSocketService by inject()
 

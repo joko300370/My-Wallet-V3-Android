@@ -36,7 +36,6 @@ import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.access.AccessStateImpl
@@ -89,8 +88,6 @@ val coreModule = module {
     factory { AuthService(get(), get()) }
 
     factory { PrivateKeyFactory() }
-
-    factory { RootUtil() }
 
     scope(payloadScopeQualifier) {
 

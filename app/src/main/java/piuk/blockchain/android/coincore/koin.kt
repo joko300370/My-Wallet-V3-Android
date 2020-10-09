@@ -195,7 +195,8 @@ val coincoreModule = module {
                 bitPayManager = get(),
                 exchangeRates = get(),
                 walletManager = get(),
-                walletPrefs = get()
+                walletPrefs = get(),
+                analytics = get()
             )
         }
 

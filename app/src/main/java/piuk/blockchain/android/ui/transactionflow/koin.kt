@@ -18,6 +18,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
 
 val transactionFlowScope = named("TransactionScope")
@@ -69,6 +70,12 @@ val transactionModule = module {
     factory {
         TxConfirmReadOnlyMapper(
             formatters = getAll()
+        )
+    }
+
+    factory {
+        TxFlowAnalytics(
+            analytics = get()
         )
     }
 

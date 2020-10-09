@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.Single
@@ -22,7 +23,8 @@ class TxProcessorFactory(
     private val bitPayManager: BitPayDataManager,
     private val exchangeRates: ExchangeRateDataManager,
     private val walletManager: CustodialWalletManager,
-    private val walletPrefs: WalletStatus
+    private val walletPrefs: WalletStatus,
+    private val analytics: Analytics
 ) {
     fun createProcessor(
         source: CryptoAccount,
@@ -51,7 +53,8 @@ class TxProcessorFactory(
                     engine = BtcBitpayTxEngine(
                         bitPayDataManager = bitPayManager,
                         walletPrefs = walletPrefs,
-                        assetEngine = onChainEngine as OnChainTxEngineBase
+                        assetEngine = onChainEngine as OnChainTxEngineBase,
+                        analytics = analytics
                     )
                 )
             )

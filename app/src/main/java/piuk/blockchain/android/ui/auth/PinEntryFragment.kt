@@ -51,7 +51,6 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.DialogButtonCallback
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk

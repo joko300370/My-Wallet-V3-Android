@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 
+@Deprecated("Only used for SecondPasswordHandler")
 class CurrentContextAccess {
 
     var context: Context? = null

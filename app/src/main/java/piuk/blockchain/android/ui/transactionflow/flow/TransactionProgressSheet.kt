@@ -20,7 +20,7 @@ class TransactionProgressSheet(
     private val customiser: TransactionFlowCustomiser by inject()
 
     override fun render(newState: TransactionState) {
-        Timber.d("!SEND!> Rendering! TransactionProgressSheet")
+        Timber.d("!TRANSACTION!> Rendering! TransactionProgressSheet")
         require(newState.currentStep == TransactionStep.IN_PROGRESS)
 
         dialogView.tx_progress_view.setAssetIcon(newState.sendingAccount.asset.maskedAsset())
@@ -30,18 +30,25 @@ class TransactionProgressSheet(
                 customiser.transactionProgressTitle(newState),
                 customiser.transactionProgressMessage(newState)
             )
-            TxExecutionStatus.COMPLETED -> dialogView.tx_progress_view.showTxSuccess(
-                customiser.transactionCompleteTitle(newState),
-                customiser.transactionCompleteMessage(newState),
-                activityContext = requireActivity()
-            )
-            TxExecutionStatus.ERROR -> dialogView.tx_progress_view.showTxError(
-                getString(R.string.send_progress_error_title),
-                getString(R.string.send_progress_error_subtitle)
-            )
+            TxExecutionStatus.COMPLETED -> {
+                analyticsHooks.onTransactionSuccess(newState)
+                dialogView.tx_progress_view.showTxSuccess(
+                    customiser.transactionCompleteTitle(newState),
+                    customiser.transactionCompleteMessage(newState),
+                    activityContext = requireActivity()
+                )
+            }
+            TxExecutionStatus.ERROR -> {
+                analyticsHooks.onTransactionFailure(newState)
+                dialogView.tx_progress_view.showTxError(
+                    getString(R.string.send_progress_error_title),
+                    getString(R.string.send_progress_error_subtitle)
+                )
+            }
             else -> {
             } // do nothing
         }
+        cacheState(newState)
     }
 
     override fun initControls(view: View) {

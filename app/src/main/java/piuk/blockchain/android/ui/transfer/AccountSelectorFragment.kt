@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
@@ -87,7 +88,8 @@ abstract class AccountSelectorFragment : Fragment() {
         }
     }
 
-    private fun doOnEmptyList() {
+    @CallSuper
+    protected open fun doOnEmptyList() {
         account_selector_account_list.gone()
         account_selector_empty_view.visible()
     }

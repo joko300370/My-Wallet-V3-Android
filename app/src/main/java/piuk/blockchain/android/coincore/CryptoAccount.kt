@@ -34,6 +34,7 @@ interface SingleAccount : BlockchainAccount, TransactionTarget {
     // Available balance, not including uncleared and locked, that may be used for transactions
     val actionableBalance: Single<Money>
 
+    // Is this account currently able to operate as a transaction source
     val sourceState: Single<TxSourceState>
 }
 

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util
+package piuk.blockchain.android.ui.customviews
 
 import android.content.ClipboardManager
 import android.content.Context

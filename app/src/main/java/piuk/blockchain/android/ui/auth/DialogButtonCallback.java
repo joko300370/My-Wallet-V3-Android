@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util;
+package piuk.blockchain.android.ui.auth;
 
 @Deprecated
 public interface DialogButtonCallback {

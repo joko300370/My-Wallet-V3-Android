@@ -79,7 +79,7 @@ interface CustodialWalletManager {
 
     fun createWithdrawOrder(
         amount: FiatValue,
-        currency: String
+        bankId: String
     ): Completable
 
     fun getPredefinedAmounts(
