@@ -533,12 +533,9 @@ class AccountEditPresenter constructor(
     @Suppress("UNUSED_PARAMETER")
     fun onClickScanXpriv(view: View) {
         if (payloadDataManager.wallet!!.isDoubleEncryption) {
-            getView().promptPrivateKey(
-                stringUtils.getFormattedString(
-                    R.string.watch_only_spend_instructions,
-                    legacyAddress!!.address
-                )
-            )
+            legacyAddress?.let {
+                getView().promptPrivateKey(it.address)
+            }
         } else {
             getView().startScanActivity()
         }
