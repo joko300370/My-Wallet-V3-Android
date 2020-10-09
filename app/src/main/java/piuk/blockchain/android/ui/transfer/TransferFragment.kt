@@ -16,7 +16,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
-
     private val startingView: TransferViewType by unsafeLazy {
         arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType
             ?: TransferViewType.TYPE_SEND
@@ -56,6 +55,7 @@ class TransferFragment : Fragment() {
                     putSerializable(PARAM_START_VIEW, transferViewType)
                 }
             }
+        }
     }
 
     enum class TransferViewType {
