@@ -137,12 +137,8 @@ internal class CryptoInterestAccount(
                 TxSourceState.NOT_SUPPORTED
             }
         )
-    override val actions: AvailableActions =
-        if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
-            setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
-        } else {
-            setOf(AssetAction.Summary, AssetAction.ViewActivity)
-        }
+
+    override val actions: AvailableActions = setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
 
     companion object {
         private val displayedStates = setOf(

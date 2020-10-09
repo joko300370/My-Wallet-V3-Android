@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
@@ -225,7 +224,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
         sell_info_blurb.setText(sb, TextView.BufferType.SPANNABLE)
         sell_info_action.setOnClickListener {
-            analytics.logEvent(AnalyticsEvents.SellTabInfo)
+            analytics.logEvent(SellAnalytics.SellTabInfo)
             host.onSellInfoClicked()
         }
     }

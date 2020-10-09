@@ -1170,15 +1170,10 @@
     <string name="kyc_airdrop_card_body">Verify your identity to participate in our Airdrop program and receive free crypto from future Airdrops.</string>
     <string name="kyc_airdrop_card_cta">Start Verification</string>
 
-    <!-- Algorand announcement -->
-    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
-    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
-    <string name="algorand_announcement_action">Buy Algorand</string>
-
-    <!-- Tether announcement -->
-    <string name="tether_announcement_title">Say Hello to Tether!</string>
-    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
-    <string name="tether_announcement_action">Buy Tether Now</string>
+    <!-- Sell announcement -->
+    <string name="sell_announcement_title">Sell Your Crypto for Cash</string>
+    <string name="sell_announcement_description">Sell directly from your Trading Wallets to your Cash Wallet.</string>
+    <string name="sell_announcement_action">Sell now</string>
 
     <!-- Interest announcement -->
     <string name="interest_announcement_title">Earn interest on your crypto today!</string>

@@ -37,6 +37,7 @@ interface AnnouncementHost {
     fun finishSimpleBuySignup()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency = CryptoCurrency.BTC)
     fun startInterestDashboard()
+    fun startSell()
 
     fun showFiatFundsKyc()
     fun showBankLinking()

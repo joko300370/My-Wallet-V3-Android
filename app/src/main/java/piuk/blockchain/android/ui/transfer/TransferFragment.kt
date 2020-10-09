@@ -12,11 +12,15 @@ import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
-    private lateinit var showView: TransferViewType
+    private val showView: TransferViewType by unsafeLazy {
+        arguments?.getSerializable(VIEW_TYPE) as? TransferViewType
+            ?: TransferViewType.TYPE_SEND
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,9 +45,13 @@ class TransferFragment : Fragment() {
     }
 
     companion object {
+        private const val VIEW_TYPE = "VIEW_TYPE"
+
         fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment {
             return TransferFragment().apply {
-                showView = transferViewType
+                arguments = Bundle().apply {
+                    putSerializable(VIEW_TYPE, transferViewType)
+                }
             }
         }
     }
