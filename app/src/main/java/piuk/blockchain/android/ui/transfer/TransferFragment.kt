@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transfer
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +11,20 @@ import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
-    private lateinit var showView: TransferViewType
+    private val startingView: TransferViewType by unsafeLazy {
+        arguments?.getInt(PARAM_START_VIEW)?.let {
+            when (it) {
+                TransferViewType.TYPE_SEND.ordinal -> TransferViewType.TYPE_SEND
+                TransferViewType.TYPE_RECEIVE.ordinal -> TransferViewType.TYPE_RECEIVE
+                else -> TransferViewType.TYPE_SEND
+            }
+        } ?: TransferViewType.TYPE_SEND
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,18 +42,26 @@ class TransferFragment : Fragment() {
             childFragmentManager
         )
 
-        when (showView) {
-            TransferViewType.TYPE_SEND -> transfer_pager.setCurrentItem(TransferViewType.TYPE_SEND.ordinal, true)
-            TransferViewType.TYPE_RECEIVE -> transfer_pager.setCurrentItem(TransferViewType.TYPE_RECEIVE.ordinal, true)
-        }
+        transfer_pager.setCurrentItem(
+            when (startingView) {
+                TransferViewType.TYPE_SEND -> TransferViewType.TYPE_SEND.ordinal
+                TransferViewType.TYPE_RECEIVE -> TransferViewType.TYPE_RECEIVE.ordinal
+            }, true
+        )
     }
 
     companion object {
-        fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment {
-            return TransferFragment().apply {
-                showView = transferViewType
+        private const val PARAM_START_VIEW = "show_view"
+
+        fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment =
+            TransferFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(
+                        PARAM_START_VIEW,
+                        transferViewType.ordinal
+                    )
+                }
             }
-        }
     }
 
     enum class TransferViewType {
@@ -54,7 +70,6 @@ class TransferFragment : Fragment() {
     }
 }
 
-@SuppressLint("WrongConstant")
 class TransferPagerAdapter(
     private val titlesList: List<String>,
     fragmentManager: FragmentManager
@@ -64,8 +79,9 @@ class TransferPagerAdapter(
     override fun getPageTitle(position: Int): CharSequence =
         titlesList[position]
 
-    override fun getItem(position: Int): Fragment = when (position) {
-        0 -> TransferSendFragment.newInstance()
-        else -> TransferReceiveFragment.newInstance()
-    }
+    override fun getItem(position: Int): Fragment =
+        when (position) {
+            0 -> TransferSendFragment.newInstance()
+            else -> TransferReceiveFragment.newInstance()
+        }
 }
