@@ -11,7 +11,6 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import java.lang.IllegalArgumentException
 
 class ReceiveActivity : BlockchainActivity(),
     ReceiveFragment.ReceiveFragmentHost {
@@ -31,7 +30,8 @@ class ReceiveActivity : BlockchainActivity(),
         intent.getAccount(PARAM_ACCOUNT)?.let {
             val f = ReceiveFragment.newInstance(it as CryptoAccount)
             supportFragmentManager.beginTransaction().replace(R.id.content, f).commit()
-        } ?: throw IllegalArgumentException("Failed to find account for receive")
+        } ?: finish()
+        // TODO: Find a better solution than finish() for this case.
     }
 
     override fun onSupportNavigateUp(): Boolean = consume {

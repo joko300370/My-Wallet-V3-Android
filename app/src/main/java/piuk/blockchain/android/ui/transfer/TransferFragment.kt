@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transfer
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +16,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class TransferFragment : Fragment() {
 
-    private val showView: TransferViewType by unsafeLazy {
-        arguments?.getSerializable(VIEW_TYPE) as? TransferViewType
+    private val startingView: TransferViewType by unsafeLazy {
+        arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType
             ?: TransferViewType.TYPE_SEND
     }
 
@@ -38,19 +37,22 @@ class TransferFragment : Fragment() {
             childFragmentManager
         )
 
-        when (showView) {
-            TransferViewType.TYPE_SEND -> transfer_pager.setCurrentItem(TransferViewType.TYPE_SEND.ordinal, true)
-            TransferViewType.TYPE_RECEIVE -> transfer_pager.setCurrentItem(TransferViewType.TYPE_RECEIVE.ordinal, true)
-        }
+        transfer_pager.setCurrentItem(
+            when (startingView) {
+                TransferViewType.TYPE_SEND -> TransferViewType.TYPE_SEND.ordinal
+                TransferViewType.TYPE_RECEIVE -> TransferViewType.TYPE_RECEIVE.ordinal
+            }, true
+        )
     }
 
     companion object {
-        private const val VIEW_TYPE = "VIEW_TYPE"
+
+        private const val PARAM_START_VIEW = "show_view"
 
         fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment {
             return TransferFragment().apply {
                 arguments = Bundle().apply {
-                    putSerializable(VIEW_TYPE, transferViewType)
+                    putSerializable(PARAM_START_VIEW, transferViewType)
                 }
             }
         }
@@ -62,7 +64,6 @@ class TransferFragment : Fragment() {
     }
 }
 
-@SuppressLint("WrongConstant")
 class TransferPagerAdapter(
     private val titlesList: List<String>,
     fragmentManager: FragmentManager
@@ -72,8 +73,9 @@ class TransferPagerAdapter(
     override fun getPageTitle(position: Int): CharSequence =
         titlesList[position]
 
-    override fun getItem(position: Int): Fragment = when (position) {
-        0 -> TransferSendFragment.newInstance()
-        else -> TransferReceiveFragment.newInstance()
-    }
+    override fun getItem(position: Int): Fragment =
+        when (position) {
+            0 -> TransferSendFragment.newInstance()
+            else -> TransferReceiveFragment.newInstance()
+        }
 }
