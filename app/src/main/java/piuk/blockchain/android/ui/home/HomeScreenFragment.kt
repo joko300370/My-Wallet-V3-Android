@@ -44,6 +44,7 @@ interface HomeNavigator {
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
+    fun startSell()
     fun startInterestDashboard()
 }
 

@@ -17,8 +17,8 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
@@ -26,7 +26,7 @@ internal class StxAsset(
     payloadManager: PayloadDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,

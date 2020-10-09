@@ -97,6 +97,7 @@ object Versions {
     const val veriff = "3.2.0"
     const val probity = "1.0.0"
     const val cardForm = "4.2.0"
+    const val xlmSunriver = "0.19.0"
 
     // Logging
     const val timber = "4.7.1"
@@ -236,6 +237,7 @@ object Libraries {
     const val veriff = "com.veriff:veriff-library:${Versions.veriff}"
     const val probity = "io.probity.sdk:collector:${Versions.probity}"
     const val cardForm = "com.braintreepayments:card-form:${Versions.cardForm}"
+    const val sunriver = "com.github.stellar:java-stellar-sdk:${Versions.xlmSunriver}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

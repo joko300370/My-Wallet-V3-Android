@@ -125,7 +125,7 @@ class BtcOnChainTxEngine(
                 }
                 .singleOrError()
         } else {
-            Single.error(Throwable("No funds"))
+            Single.error(Throwable("No BTC funds"))
         }
 
     private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<CryptoValue> =

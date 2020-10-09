@@ -447,10 +447,9 @@
 
     <!-- FUNDS TRANSFER -->
     <string name="transfer">Transfer</string>
-    <string name="transfer_funds">Transfer Imported Addresses?</string>
-    <string name="transfer_recommend">Looks like you have some bitcoins in imported addresses.
-        Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
-        recommend transferring these balances to include in your backup.
+    <string name="transfer_funds_title">Transfer From Imported Address?</string>
+    <string name="transfer_funds_description">Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
+        recommend transferring these balances to your Blockchain.com non-custodial Wallet.
     </string>
 
     <string name="transfer_confirmed">Transfer Confirmed</string>
@@ -1171,15 +1170,10 @@
     <string name="kyc_airdrop_card_body">Verify your identity to participate in our Airdrop program and receive free crypto from future Airdrops.</string>
     <string name="kyc_airdrop_card_cta">Start Verification</string>
 
-    <!-- Algorand announcement -->
-    <string name="algorand_announcement_title">Say Hello to Algorand!</string>
-    <string name="algorand_announcement_description">Buy and hold ALGO in your wallet. Sell and withdraw are coming soon.</string>
-    <string name="algorand_announcement_action">Buy Algorand</string>
-
-    <!-- Tether announcement -->
-    <string name="tether_announcement_title">Say Hello to Tether!</string>
-    <string name="tether_announcement_description">USDT is the world\'s largest Stablecoin. Buy and swap from your app. Full Send and Receive functionality are available on the Web wallet.</string>
-    <string name="tether_announcement_action">Buy Tether Now</string>
+    <!-- Sell announcement -->
+    <string name="sell_announcement_title">Sell Your Crypto for Cash</string>
+    <string name="sell_announcement_description">Sell directly from your Trading Wallets to your Cash Wallet.</string>
+    <string name="sell_announcement_action">Sell now</string>
 
     <!-- Interest announcement -->
     <string name="interest_announcement_title">Earn interest on your crypto today!</string>

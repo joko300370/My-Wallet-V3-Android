@@ -53,7 +53,6 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
@@ -79,7 +78,6 @@ import piuk.blockchain.android.ui.auth.MobileNoticeRemoteConfig
 import piuk.blockchain.android.ui.auth.PinEntryPresenter
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedPresenter
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingPresenter
-import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferPresenter
 import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
@@ -128,7 +126,6 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.erc20.UsdtAccount
@@ -332,24 +329,6 @@ val applicationModule = module {
         }
 
         factory {
-            ChartsDataManager(
-                historicPriceApi = get(),
-                rxBus = get()
-            )
-        }
-
-        factory {
-            ConfirmFundsTransferPresenter(
-                walletAccountHelper = get(),
-                fundsDataManager = get(),
-                payloadDataManager = get(),
-                stringUtils = get(),
-                exchangeRates = get(),
-                currencyPrefs = get()
-            )
-        }
-
-        factory {
             UpgradeWalletPresenter(
                 prefs = get(),
                 appUtil = get(),
@@ -451,22 +430,17 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 metadataManager = get(),
-                fundsDataManager = get(),
-                prefs = get(),
                 appUtil = get(),
                 privateKeyFactory = get(),
                 environmentSettings = get(),
                 analytics = get(),
-                coinsWebSocketStrategy = get()
-            )
-        }
-
-        factory {
-            TransferFundsDataManager(
-                payloadDataManager = get(),
+                coinsWebSocketStrategy = get(),
+                coincore = get(),
                 sendDataManager = get(),
-                dynamicFeeCache = get(),
-                coinSelectionRemoteConfig = get()
+                feeDataManager = get(),
+                exchangeRates = get(),
+                environmentConfig = get(),
+                walletPreferences = get()
             )
         }
 
@@ -727,7 +701,6 @@ val applicationModule = module {
 
         factory {
             BackupWalletCompletedPresenter(
-                transferFundsDataManager = get(),
                 walletStatus = get()
             )
         }

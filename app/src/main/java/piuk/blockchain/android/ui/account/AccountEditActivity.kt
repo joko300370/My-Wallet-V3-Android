@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.account
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,6 +12,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
@@ -23,6 +23,7 @@ import info.blockchain.balance.CryptoCurrency
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.AppUtil
@@ -31,7 +32,6 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
@@ -141,10 +141,10 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
         }
     }
 
-    override fun promptPrivateKey(message: String) {
+    override fun promptPrivateKey(address: String) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.privx_required)
-            .setMessage(message)
+            .setMessage(getString(R.string.watch_only_spend_instructions, address))
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 secondPasswordHandler.validate(object :

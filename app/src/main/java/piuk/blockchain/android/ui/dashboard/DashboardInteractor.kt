@@ -29,7 +29,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

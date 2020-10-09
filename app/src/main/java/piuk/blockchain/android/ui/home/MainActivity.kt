@@ -590,10 +590,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(transferFragment)
     }
 
-    private fun startBuySellFragment() {
+    private fun startBuySellFragment(
+        viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY
+    ) {
         setCurrentTabItem(ITEM_BUY_SELL)
 
-        val buySellFragment = BuySellFragment.newInstance()
+        val buySellFragment = BuySellFragment.newInstance(viewType)
         replaceContentFragment(buySellFragment)
     }
 
@@ -633,6 +635,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 cryptoCurrency = cryptoCurrency
             )
         )
+    }
+
+    override fun startSell() {
+        startBuySellFragment(BuySellFragment.BuySellViewType.TYPE_SELL)
     }
 
     override fun startInterestDashboard() {

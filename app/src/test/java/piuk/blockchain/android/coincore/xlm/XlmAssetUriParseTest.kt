@@ -13,8 +13,8 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
@@ -33,7 +33,7 @@ class XlmAssetUriParseTest {
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val custodialManager: CustodialWalletManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
-    private val historicRates: ChartsDataManager = mock()
+    private val historicRates: ExchangeRateService = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()

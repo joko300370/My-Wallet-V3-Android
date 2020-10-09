@@ -21,8 +21,8 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
@@ -33,7 +33,7 @@ internal class XlmAsset(
     private val walletOptionsDataManager: WalletOptionsDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
