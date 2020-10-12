@@ -34,6 +34,7 @@ class BtcAccountActivityTest {
             label = "TestBtcAccount",
             address = "",
             payloadManager = payloadDataManager,
+            hdAccountIndex = -1,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             isDefault = true,

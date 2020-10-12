@@ -23,11 +23,13 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class BchCryptoWalletAccount(
+internal class BchCryptoWalletAccount private constructor(
     payloadManager: PayloadDataManager,
     override val label: String,
     private val address: String,
     private val bchManager: BchDataManager,
+    // Used to lookup the account in payloadDataManager to fetch receive address
+    private val addressIndex: Int,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParams: NetworkParameters,
@@ -45,16 +47,6 @@ internal class BchCryptoWalletAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    // From receive presenter:
-//    compositeDisposable += bchDataManager.updateAllBalances()
-//    .doOnSubscribe { view?.showQrLoading() }
-//    .andThen(
-//    bchDataManager.getWalletTransactions(50, 0)
-//    .onErrorReturn { emptyList() }
-//    )
-//    .flatMap { bchDataManager.getNextReceiveAddress(position) }
-// it may be that we need to update tx's etc to get a legitimat receive address
-
     override val accountBalance: Single<Money>
         get() = bchManager.getBalance(address)
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
@@ -68,15 +60,11 @@ internal class BchCryptoWalletAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = bchManager.getNextReceiveAddress(
-            bchManager.getAccountMetadataList()
-                .indexOfFirst {
-                    it.xpub == bchManager.getDefaultGenericMetadataAccount()!!.xpub
-                }
+            addressIndex
         ).map {
             val address = Address.fromBase58(networkParams, it)
             address.toCashAddress()
-        }
-            .singleOrError()
+        }.singleOrError()
             .map {
                 BchAddress(address_ = it, label = label)
             }
@@ -103,27 +91,60 @@ internal class BchCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    constructor(
-        payloadManager: PayloadDataManager,
-        jsonAccount: GenericMetadataAccount,
-        bchManager: BchDataManager,
-        isDefault: Boolean,
-        exchangeRates: ExchangeRateDataManager,
-        networkParams: NetworkParameters,
-        feeDataManager: FeeDataManager,
-        sendDataManager: SendDataManager,
-        walletPreferences: WalletStatus
-    ) : this(
-        payloadManager,
-        jsonAccount.label,
-        jsonAccount.xpub,
-        bchManager,
-        isDefault,
-        exchangeRates,
-        networkParams,
-        feeDataManager,
-        sendDataManager,
-        jsonAccount,
-        walletPreferences
-    )
+    companion object {
+        fun createBchAccount(
+            payloadManager: PayloadDataManager,
+            jsonAccount: GenericMetadataAccount,
+            bchManager: BchDataManager,
+            addressIndex: Int,
+            isDefault: Boolean,
+            exchangeRates: ExchangeRateDataManager,
+            networkParams: NetworkParameters,
+            feeDataManager: FeeDataManager,
+            sendDataManager: SendDataManager,
+            walletPreferences: WalletStatus
+        ) = BchCryptoWalletAccount(
+            payloadManager = payloadManager,
+            label = jsonAccount.label,
+            address = jsonAccount.xpub,
+            bchManager = bchManager,
+            addressIndex = addressIndex,
+            isDefault = isDefault,
+            exchangeRates = exchangeRates,
+            networkParams = networkParams,
+            feeDataManager = feeDataManager,
+            sendDataManager = sendDataManager,
+            internalAccount = jsonAccount,
+            walletPreferences = walletPreferences
+        )
+
+        @Deprecated("Used in legacy Account List to generate a transfer source when importing addresses")
+        fun createImportBchAccount(
+            payloadManager: PayloadDataManager,
+            label: String,
+            address: String,
+            jsonAccount: GenericMetadataAccount,
+            bchManager: BchDataManager,
+            exchangeRates: ExchangeRateDataManager,
+            networkParams: NetworkParameters,
+            feeDataManager: FeeDataManager,
+            sendDataManager: SendDataManager,
+            walletPreferences: WalletStatus
+        ) = BchCryptoWalletAccount(
+            payloadManager = payloadManager,
+            label = label,
+            address = address,
+            bchManager = bchManager,
+            addressIndex = IMPORT_ADDRESS_NO_INDEX,
+            isDefault = false,
+            exchangeRates = exchangeRates,
+            networkParams = networkParams,
+            feeDataManager = feeDataManager,
+            sendDataManager = sendDataManager,
+            internalAccount = jsonAccount,
+            walletPreferences = walletPreferences
+        )
+
+        private const val IMPORT_ADDRESS_NO_INDEX = -1
+    }
 }

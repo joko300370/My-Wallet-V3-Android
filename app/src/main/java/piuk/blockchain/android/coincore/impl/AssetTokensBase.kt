@@ -159,52 +159,61 @@ internal abstract class CryptoAssetBase(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
 
-    private fun getPitLinkingAccount(): Maybe<SingleAccount> =
+    private fun getPitLinkingTargets(): Maybe<SingleAccountList> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
             .map { address ->
-                CryptoExchangeAccount(
-                    asset = asset,
-                    label = labels.getDefaultExchangeWalletLabel(asset),
-                    address = address,
-                    exchangeRates = exchangeRates,
-                    environmentConfig = environmentConfig
+                listOf(
+                    CryptoExchangeAccount(
+                        asset = asset,
+                        label = labels.getDefaultExchangeWalletLabel(asset),
+                        address = address,
+                        exchangeRates = exchangeRates,
+                        environmentConfig = environmentConfig
+                    )
                 )
             }
 
-    private fun getInterestAccount(): Maybe<SingleAccount> =
+    private fun getInterestTargets(): Maybe<SingleAccountList> =
         tiersService.tiers().flatMapMaybe { tier ->
-            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
-                val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
-                if (interestAccounts.isNotEmpty()) {
-                    Maybe.just(interestAccounts.first())
-                } else {
-                    Maybe.empty()
-                }
+        if (tier.isApprovedFor(KycTierLevel.GOLD)) {
+            val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
+            if (interestAccounts.isNotEmpty()) {
+                Maybe.just(interestAccounts)
             } else {
                 Maybe.empty()
             }
+        } else {
+            Maybe.empty()
         }
+    }
 
-    private fun getCustodialAccount(): Maybe<SingleAccount> =
+    private fun getCustodialTargets(): Maybe<SingleAccountList> =
         accountGroup(AssetFilter.Custodial)
-            .map { it.accounts.first() }
+            .map { it.accounts }
             .onErrorComplete()
+
+    private fun getNonCustodialTargets(exclude: SingleAccount? = null): Maybe<SingleAccountList> =
+        getNonCustodialAccountList()
+            .map { it.filter { a -> a !== exclude } }
+            .toMaybe()
 
     final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)
 
         return when (account) {
-            is TradingAccount -> getNonCustodialAccountList()
+            is TradingAccount -> getNonCustodialTargets().toSingle(emptyList())
             is NonCustodialAccount ->
                 Maybe.concat(
                     listOf(
-                        getPitLinkingAccount(),
-                        getInterestAccount(),
-                        getCustodialAccount()
+                        getPitLinkingTargets(),
+                        getInterestTargets(),
+                        getCustodialTargets(),
+                        getNonCustodialTargets(exclude = account)
                     )
                 ).toList()
+                    .map { ll -> ll.flatten() }
                     .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())
         }

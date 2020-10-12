@@ -75,6 +75,7 @@ internal class BtcAsset(
                         BtcCryptoWalletAccount.createHdAccount(
                             jsonAccount = a,
                             payloadManager = payloadManager,
+                            hdAccountIndex = i,
                             sendDataManager = sendDataManager,
                             feeDataManager = feeDataManager,
                             isDefault = i == defaultIndex,

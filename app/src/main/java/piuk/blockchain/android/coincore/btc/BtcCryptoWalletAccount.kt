@@ -11,6 +11,8 @@ import io.reactivex.Single
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -21,6 +23,7 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import java.lang.IllegalStateException
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class BtcCryptoWalletAccount(
@@ -29,6 +32,8 @@ internal class BtcCryptoWalletAccount(
     private val feeDataManager: FeeDataManager,
     override val label: String,
     private val address: String,
+    // Used to lookup the account in payloadDataManager to fetch receive address
+    private val hdAccountIndex: Int,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParameters: NetworkParameters,
@@ -57,12 +62,15 @@ internal class BtcCryptoWalletAccount(
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = payloadDataManager.getNextReceiveAddress(
-            // TODO: Probably want the index of this address'
-            payloadDataManager.getAccount(payloadDataManager.defaultAccountIndex)
-        ).singleOrError()
-            .map {
-                BtcAddress(address = it, label = label, networkParams = networkParameters)
+        get() = if (!isHDAccount) {
+                Single.error(IllegalStateException("Cannot receive to Legacy Account"))
+            } else {
+                payloadDataManager.getNextReceiveAddress(
+                    payloadDataManager.getAccount(hdAccountIndex)
+                ).singleOrError()
+                    .map {
+                        BtcAddress(address = it, label = label, networkParams = networkParameters)
+                    }
             }
 
     override val activity: Single<ActivitySummaryList>
@@ -70,18 +78,17 @@ internal class BtcCryptoWalletAccount(
             address,
             transactionFetchCount,
             transactionFetchOffset
-        )
-            .onErrorReturn { emptyList() }
-            .mapList {
-                BtcActivitySummaryItem(
-                    it,
-                    payloadDataManager,
-                    exchangeRates,
-                    this
-                ) as ActivitySummaryItem
-            }.doOnSuccess {
-                setHasTransactions(it.isNotEmpty())
-            }
+        ).onErrorReturn { emptyList() }
+        .mapList {
+            BtcActivitySummaryItem(
+                it,
+                payloadDataManager,
+                exchangeRates,
+                this
+            ) as ActivitySummaryItem
+        }.doOnSuccess {
+            setHasTransactions(it.isNotEmpty())
+        }
 
     override fun createTxEngine(): TxEngine =
         BtcOnChainTxEngine(
@@ -93,10 +100,18 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
+    override val actions: AvailableActions
+        get() = super.actions.apply {
+            if (!isHDAccount) {
+                toMutableSet().remove(AssetAction.Receive)
+            }
+        }
+
     companion object {
         fun createHdAccount(
             jsonAccount: Account,
             payloadManager: PayloadDataManager,
+            hdAccountIndex: Int,
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
             isDefault: Boolean = false,
@@ -105,6 +120,7 @@ internal class BtcCryptoWalletAccount(
             walletPreferences: WalletStatus
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
+            hdAccountIndex = hdAccountIndex,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             label = jsonAccount.label,
@@ -127,6 +143,7 @@ internal class BtcCryptoWalletAccount(
             walletPreferences: WalletStatus
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
+            hdAccountIndex = LEGACY_ACCOUNT_NO_INDEX,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             label = legacyAccount.label ?: legacyAccount.address,
@@ -137,7 +154,8 @@ internal class BtcCryptoWalletAccount(
             internalAccount = legacyAccount,
             isHDAccount = false,
             walletPreferences = walletPreferences
-
         )
+
+        private const val LEGACY_ACCOUNT_NO_INDEX = -1
     }
 }

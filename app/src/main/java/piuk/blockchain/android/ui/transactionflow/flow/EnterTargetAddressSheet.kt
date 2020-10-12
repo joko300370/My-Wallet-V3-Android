@@ -156,7 +156,7 @@ class EnterTargetAddressSheet(
     private fun setupTransferList(account: CryptoAccount, state: TransactionState) {
         dialogView.wallet_select.initialise(
             coincore.getTransactionTargets(account, state.action)
-                .map { it.map { it as BlockchainAccount } }
+                .map { it.map { a -> a as BlockchainAccount } }
         )
     }
 

@@ -72,10 +72,11 @@ internal class BchAsset(
             with(bchDataManager) {
                 getAccountMetadataList()
                     .mapIndexed { i, a ->
-                        BchCryptoWalletAccount(
+                        BchCryptoWalletAccount.createBchAccount(
                             payloadManager = payloadManager,
                             jsonAccount = a,
                             bchManager = bchDataManager,
+                            addressIndex = i,
                             isDefault = i == getDefaultAccountPosition(),
                             exchangeRates = exchangeRates,
                             networkParams = environmentSettings.bitcoinCashNetworkParameters,

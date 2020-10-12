@@ -189,7 +189,7 @@ class AccountPresenter internal constructor(
     }
 
     private fun loadBchAccount(legacyAddress: LegacyAddress, defaultAccount: SingleAccount) {
-        val sendingAccount = BchCryptoWalletAccount(
+        val sendingAccount = BchCryptoWalletAccount.createImportBchAccount(
             payloadManager = payloadDataManager,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
@@ -197,9 +197,8 @@ class AccountPresenter internal constructor(
             label = legacyAddress.label,
             address = legacyAddress.address,
             bchManager = bchDataManager,
-            isDefault = false,
             networkParams = environmentConfig.bitcoinCashNetworkParameters,
-            internalAccount = GenericMetadataAccount(legacyAddress.label, false),
+            jsonAccount = GenericMetadataAccount(legacyAddress.label, false),
             walletPreferences = walletPreferences
         )
 
