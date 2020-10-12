@@ -95,7 +95,8 @@ class KycNavHostPresenter(
     private fun redirectUserFlow(user: NabuUser) {
         if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
             view.navigateToResubmissionSplash()
-        } else if (view.campaignType == CampaignType.Blockstack || view.campaignType == CampaignType.SimpleBuy) {
+        } else if (view.campaignType == CampaignType.Blockstack ||
+            view.campaignType == CampaignType.SimpleBuy || view.campaignType == CampaignType.Interest) {
             compositeDisposable += kycNavigator.findNextStep()
                 .subscribeBy(
                     onError = { Timber.e(it) },

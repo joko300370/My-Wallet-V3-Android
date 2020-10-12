@@ -26,18 +26,18 @@ internal class Erc20ActivitySummaryItem(
 
     private val transfer: Erc20Transfer = feedTransfer.transfer
 
-    override val direction: TransactionSummary.Direction by unsafeLazy {
+    override val transactionType: TransactionSummary.TransactionType by unsafeLazy {
         when {
             transfer.isToAccount(accountHash)
-                && transfer.isFromAccount(accountHash) -> TransactionSummary.Direction.TRANSFERRED
-            transfer.isFromAccount(accountHash) -> TransactionSummary.Direction.SENT
-            else -> TransactionSummary.Direction.RECEIVED
+                && transfer.isFromAccount(accountHash) -> TransactionSummary.TransactionType.TRANSFERRED
+            transfer.isFromAccount(accountHash) -> TransactionSummary.TransactionType.SENT
+            else -> TransactionSummary.TransactionType.RECEIVED
         }
     }
 
     override val timeStampMs: Long = transfer.timestamp * 1000
 
-    override val cryptoValue: CryptoValue by unsafeLazy {
+    override val value: CryptoValue by unsafeLazy {
         CryptoValue.fromMinor(cryptoCurrency, transfer.value)
     }
 

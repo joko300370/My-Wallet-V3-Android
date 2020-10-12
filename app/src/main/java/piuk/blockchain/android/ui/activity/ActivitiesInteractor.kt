@@ -28,7 +28,7 @@ class ActivitiesInteractor(
         activityRepository.fetch(account, isRefreshRequested)
 
     fun getDefaultAccount(): Single<BlockchainAccount> =
-        Single.just(coincore.allWallets)
+        coincore.allWallets().map { it as BlockchainAccount }
 
     fun cancelSimpleBuyOrder(orderId: String): Disposable? {
         return custodialWalletManager.deleteBuyOrder(orderId)

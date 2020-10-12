@@ -19,7 +19,6 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManagerImpl
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.swap.nabu.datamanagers.NabuUserReporter
-import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.swap.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsWalletReporter
@@ -28,6 +27,15 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWa
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestLimitsMapAdapter
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -88,11 +96,30 @@ val nabuModule = module {
                 paymentAccountMapperMappers = mapOf(
                     "EUR" to get(eur), "GBP" to get(gbp)
                 ),
-                featureFlag = get(cardPaymentsFeatureFlag),
+                cardsPaymentFeatureFlag = get(cardPaymentsFeatureFlag),
+                fundsFeatureFlag = get(simpleBuyFundsFeatureFlag),
                 kycFeatureEligibility = get(),
-                assetBalancesRepository = get()
+                assetBalancesRepository = get(),
+                interestLimitsRepository = get(),
+                interestEnabledRepository = get()
             )
         }.bind(CustodialWalletManager::class)
+
+        factory {
+            InterestLimitsProviderImpl(
+                nabuService = get(),
+                authenticator = get(),
+                currencyPrefs = get(),
+                exchangeRates = get()
+            )
+        }.bind(InterestLimitsProvider::class)
+
+        factory {
+            InterestEnabledProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(InterestEnabledProvider::class)
 
         factory {
             BalanceProviderImpl(
@@ -151,10 +178,25 @@ val nabuModule = module {
         scoped {
             AssetBalancesRepository(balancesProvider = get())
         }
+
+        scoped {
+            InterestLimitsRepository(interestLimitsProvider = get())
+        }
+
+        scoped {
+            InterestEnabledRepository(interestEnabledProvider = get())
+        }
+        scoped {
+            WithdrawLocksRepository(custodialWalletManager = get())
+        }
     }
 
     moshiInterceptor(nabu) { builder ->
         builder.add(TransactionStateAdapter())
+    }
+
+    moshiInterceptor(interestLimits) { builder ->
+        builder.add(InterestLimitsMapAdapter())
     }
 
     single { NabuSessionTokenStore() }

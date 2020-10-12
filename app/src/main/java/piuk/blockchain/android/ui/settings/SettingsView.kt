@@ -50,7 +50,11 @@ internal interface SettingsView : View {
 
     fun updateCards(cards: List<PaymentMethod.Card>)
 
+    fun updateBanks(linkedAndSupportedCurrencies: SettingsFragment.LinkedBanksAndSupportedCurrencies)
+
     fun cardsEnabled(enabled: Boolean)
+
+    fun banksEnabled(enabled: Boolean)
 
     fun setScreenshotsEnabled(enabled: Boolean)
 

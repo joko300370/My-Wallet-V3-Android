@@ -19,17 +19,17 @@ class XlmActivitySummaryItem(
 ) : NonCustodialActivitySummaryItem() {
     override val cryptoCurrency = CryptoCurrency.XLM
 
-    override val direction: TransactionSummary.Direction
+    override val transactionType: TransactionSummary.TransactionType
         get() = if (xlmTransaction.value > CryptoValue.ZeroXlm) {
-            TransactionSummary.Direction.RECEIVED
+            TransactionSummary.TransactionType.RECEIVED
         } else {
-            TransactionSummary.Direction.SENT
+            TransactionSummary.TransactionType.SENT
         }
 
     override val timeStampMs: Long
         get() = xlmTransaction.timeStamp.fromIso8601ToUtc()!!.toLocalTime().time
 
-    override val cryptoValue: CryptoValue by unsafeLazy {
+    override val value: CryptoValue by unsafeLazy {
         xlmTransaction.accountDelta.abs()
     }
 
@@ -46,7 +46,7 @@ class XlmActivitySummaryItem(
 
     override val outputsMap: Map<String, CryptoValue>
         get() = hashMapOf(
-            xlmTransaction.to.accountId to cryptoValue
+            xlmTransaction.to.accountId to value
         )
 
     override val confirmations: Int

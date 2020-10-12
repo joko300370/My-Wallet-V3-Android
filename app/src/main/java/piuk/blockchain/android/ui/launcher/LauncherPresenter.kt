@@ -82,23 +82,31 @@ class LauncherPresenter(
             }
         }
 
+        val hasBackup = prefs.hasBackup()
+        val pin = prefs.pinId
+
         when {
-            // No GUID? Treat as new installation
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() -> view.onNoGuid()
+            // No GUID and no backup? Treat as new installation
+            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && !hasBackup -> view.onNoGuid()
+            // No GUID but a backup. Show PIN entry page to populate other values
+            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && hasBackup -> view.onRequestPin()
             // User has logged out recently. Show password reentry page
             hasLoggedOut -> view.onReEnterPassword()
             // No PIN ID? Treat as installed app without confirmed PIN
-            prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "").isEmpty() -> view.onRequestPin()
+            pin.isEmpty() -> view.onRequestPin()
             // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
             // Legacy app has not been prompted for upgrade
-            isPinValidated && !payloadDataManager.wallet!!.isUpgraded -> promptUpgrade()
+            isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
             isPinValidated || accessState.isLoggedIn -> initSettings()
             // Something odd has happened, re-request PIN
             else -> view.onRequestPin()
         }
     }
+
+    private fun upgradeNeeded(): Boolean =
+        payloadDataManager.wallet?.isUpgraded == false
 
     fun clearCredentialsAndRestart() =
         appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
@@ -127,15 +135,16 @@ class LauncherPresenter(
             // or select the default from device Locale
             if (!isNewAccount())
                 setCurrencyUnits(it)
-        }
-            .singleOrError()
+        }.singleOrError()
 
         val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
             .ignoreElements()
 
         compositeDisposable +=
-            settings.zipWith(metadata.toSingleDefault(true)).flatMap { (_, _) ->
+            settings.zipWith(
+                metadata.toSingleDefault(true)
+            ).flatMap { (_, _) ->
                 if (!shouldCheckForSimpleBuyLaunching())
                     Single.just(false)
                 else {
@@ -158,7 +167,7 @@ class LauncherPresenter(
                     onSuccess = { simpleBuyShouldLaunched ->
                         view.updateProgressVisibility(false)
                         if (simpleBuyShouldLaunched) {
-                            startSimpleBuy()
+                            launchBuySellIntro()
                         } else {
                             startMainActivity()
                         }
@@ -223,8 +232,8 @@ class LauncherPresenter(
         view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
     }
 
-    private fun startSimpleBuy() {
-        view.startSimpleBuy()
+    private fun launchBuySellIntro() {
+        view.launchBuySellIntro()
     }
 
     private fun setCurrencyUnits(settings: Settings) {

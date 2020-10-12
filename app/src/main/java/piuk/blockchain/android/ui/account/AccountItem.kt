@@ -6,7 +6,6 @@ class AccountItem {
     var address: String? = null
     var amount: String = ""
     var isArchived: Boolean = false
-    var isWatchOnly: Boolean = false
     var isDefault: Boolean = false
     var correctedPosition: Int = -1
     var type: Int = 0
@@ -17,7 +16,6 @@ class AccountItem {
         address: String?,
         amount: String,
         isArchived: Boolean,
-        isWatchOnly: Boolean,
         isDefault: Boolean,
         type: Int
     ) {
@@ -26,7 +24,6 @@ class AccountItem {
         this.address = address
         this.amount = amount
         this.isArchived = isArchived
-        this.isWatchOnly = isWatchOnly
         this.isDefault = isDefault
         this.type = type
     }

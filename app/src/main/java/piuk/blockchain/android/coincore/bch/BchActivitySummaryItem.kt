@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.bch
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Observable
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -15,10 +16,10 @@ internal class BchActivitySummaryItem(
 ) : NonCustodialActivitySummaryItem() {
 
     override val cryptoCurrency = CryptoCurrency.BCH
-    override val direction: TransactionSummary.Direction = transactionSummary.direction
+    override val transactionType: TransactionSummary.TransactionType = transactionSummary.transactionType
     override val timeStampMs: Long = transactionSummary.time * 1000
 
-    override val cryptoValue: CryptoValue = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
+    override val value: Money = CryptoValue.fromMinor(CryptoCurrency.BCH, transactionSummary.total)
 
     override val description: String? = null
 
@@ -36,9 +37,6 @@ internal class BchActivitySummaryItem(
 
     override val confirmations: Int
         get() = transactionSummary.confirmations
-
-    override val watchOnly: Boolean
-        get() = transactionSummary.isWatchOnly
 
     override val doubleSpend: Boolean
         get() = transactionSummary.isDoubleSpend

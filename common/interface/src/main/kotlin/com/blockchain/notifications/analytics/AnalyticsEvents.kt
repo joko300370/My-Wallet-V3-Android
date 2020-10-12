@@ -30,6 +30,8 @@ enum class AnalyticsEvents(
     KycSunriverStart("kyc_sunriver_start"),
     KycBlockstackStart("kyc_blockstack_start"),
     KycSimpleBuyStart("kyc_simple_buy_start"),
+    KycFiatFundsStart("kyc_fiat_funds_start"),
+    KycInterestStart("kyc_interest_start"),
     KycMoreInfo("kyc_more_info"),
     KycTiers("kyc_tiers"),
     Lockbox("lockbox"),

@@ -5,17 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/details_sheet_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vector_sheet_indicator" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/current_price_title"
         style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        tools:text="Current BTC Price"
+        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/small_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/details_sheet_indicator"
+        tools:text="Current BTC Price" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/current_price"
@@ -36,11 +46,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
-        tools:text="+$158.45 (1.56%)"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/price_change_period"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/current_price"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        tools:text="+$158.45 (1.56%)" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/price_change_period"
@@ -48,10 +58,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        tools:text="last 24hrs"
-        app:layout_constraintTop_toBottomOf="@+id/current_price"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/price_change"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/current_price"
+        tools:text="last 24hrs" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
@@ -64,19 +74,19 @@
         tools:ignore="RtlHardcoded,RtlSymmetry" />
 
     <ProgressBar
-            android:id="@+id/prices_loading"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginEnd="35dp"
-            android:indeterminate="true"
-            android:indeterminateTint="@color/blue_600"
-            android:indeterminateTintMode="src_in"
-            app:layout_constraintBottom_toBottomOf="@+id/chart"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/chart" />
+        android:id="@+id/prices_loading"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/blue_600"
+        android:indeterminateTintMode="src_in"
+        app:layout_constraintBottom_toBottomOf="@+id/chart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/chart" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/chart_price_periods"
@@ -125,10 +135,10 @@
         android:id="@+id/asset_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constrainedHeight="true"
-        app:layout_constraintTop_toBottomOf="@id/chart_price_periods"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="@dimen/very_small_margin"
-        tools:listitem="@layout/dialog_dashboard_asset_detail_item"/>
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chart_price_periods"
+        tools:listitem="@layout/dialog_dashboard_asset_detail_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

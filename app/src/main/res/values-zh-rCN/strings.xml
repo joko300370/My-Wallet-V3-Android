@@ -15,14 +15,14 @@
     <item>第十二字</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d导入的地址</item>
@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">接收</string>
   <string name="toolbar_cmd_activity">活动</string>
   <string name="toolbar_cmd_view_activity">查看活动</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">取消</string>
   <string name="btn_ok">好</string>
-  <string name="yes">是</string>
-  <string name="no">没有</string>
+  <string name="common_yes">是</string>
+  <string name="common_no">没有</string>
   <string name="polite_no">不用了，谢谢</string>
   <string name="done">完成</string>
   <string name="btn_close">关</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">继续</string>
   <string name="btn_forgot_password">忘记密码？”</string>
   <string name="SEND">发送</string>
-  <string name="total">总</string>
+  <string name="common_total">总</string>
   <string name="max_available">使用总支出余额：</string>
   <string name="bitpay_remaining_time">剩余时间</string>
   <string name="bitpay_invoice_expired">BitPay发票已过期</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">所选密码太弱，无法保护您的资金。我们强烈
 建议您选择其他。您想定义一个新密码吗？ 
 </string>
-  <string name="from">从</string>
-  <string name="to">至</string>
+  <string name="common_from">从</string>
+  <string name="common_to">至</string>
   <string name="confirm_details">确认付款</string>
   <string name="fee">费用</string>
   <string name="exit_confirm">再次按返回按钮退出</string>
@@ -349,17 +349,6 @@
 比特币地址%1$s 。请扫描二维码。 
 </string>
   <string name="invalid_private_key">私钥无效</string>
-  <string name="watch_only_import_warning">您将要导入一个非消费性地址， 
-地址（或公共密钥脚本） 
-没有对应私钥的情况下存储在钱包中。这个
-意味着仅当您将私钥存储在其他位置时，才能使用这些资金。如果你
-做
-没有存储私钥，请勿指示任何人将您的比特币发送给
-不可消费
-地址。 
-
-仅建议高级用户使用这些选项。继续？ 
-</string>
   <string name="scan_private_key">扫描私钥</string>
   <string name="private_key_successfully_imported">私钥已成功导入。</string>
   <string name="private_key_not_matching_address">注意：扫描的私钥不
@@ -638,7 +627,7 @@
 启动器中的图标，可以更快地接收比特币。 
 </string>
   <string name="shortcut_settings_enable">启动器快捷方式</string>
-  <string name="confirm">确认</string>
+  <string name="common_confirm">确认</string>
   <string name="swipe_receive_hint">滑动即可接收</string>
   <string name="swipe_receive_preference_summary">向左滑动时显示一个接收地址
  PIN屏幕，使收款速度更快。 
@@ -826,7 +815,7 @@
 由于市场活动。订单开始后，我们将无法停止
 </string>
   <string name="send_to">发给</string>
-  <string name="receive">接收</string>
+  <string name="common_receive">接收</string>
   <string name="fees">费用</string>
   <string name="value">值</string>
   <string name="status">状态</string>
@@ -1123,8 +1112,6 @@
   <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
   <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
   <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意Coinify <a href="ignored">条款</a></string>
-  <string name="coinify">协整</string>
   <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
   <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>
   <string name="buy_sell_identification_verification">识别验证</string>
@@ -1231,7 +1218,7 @@
   <string name="kyc_email_title">验证您的电子邮件</string>
   <string name="kyc_email_message">我们需要验证您的电子邮件地址，以增加安全性。</string>
   <string name="kyc_email_hint_focused">你的邮件</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">保存电子邮件时出错，请重试</string>
   <string name="kyc_email_send_verification">发送电子邮件</string>
   <string name="kyc_email_validation_header">检查你的收件箱。</string>
@@ -1256,7 +1243,7 @@
   <string name="kyc_onfido_splash_verification_error">验证ID出错，请重试</string>
   <string name="kyc_veriff_splash_country_supported_header">支持我的国家吗？</string>
   <string name="kyc_veriff_splash_country_supported_subheader">目前，并非所有国家都支持。在继续之前，请检查我们最新的<annotation link="country_list">国家</annotation>列表&lt;/annotation&gt; 。</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">银色验证</string>
   <string name="kyc_veriff_splash_header">让我们确认是你</string>
   <string name="kyc_veriff_splash_subtitle">您需要以下ID类型之一才能继续。</string>
@@ -1278,11 +1265,11 @@
   <string name="kyc_complete_device_verified">设备验证</string>
   <string name="kyc_complete_id_uploaded">ID已上传</string>
   <string name="kyc_complete_video_uploaded">视频已上传</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">我们的区块链支持团队已编写了帮助指南，解释了为什么我们需要验证您的身份。</string>
   <string name="kyc_help_dialog_read_now">现在读</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/zh-CN/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/zh-CN/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">身份验证</string>
   <string name="kyc_settings_status_none">未验证</string>
@@ -1294,7 +1281,7 @@
   <string name="kyc_settings_gold_level_in_review">黄金级-审核中</string>
   <string name="kyc_settings_gold_level_approved">金级-已批准</string>
   <string name="kyc_settings_silver_level_approved">银级-已批准</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">提取KYC状态时出错</string>
   <string name="kyc_status_title_in_progress">正在进行验证</string>
   <string name="kyc_status_title_approved">帐户已批准</string>
@@ -1318,10 +1305,10 @@
   <string name="kyc_drop_off_card_description">从您上次停下来的地方取走并完成身份验证。</string>
   <string name="kyc_drop_off_card_button">继续验证</string>
   <string name="kyc_documents_needed">所需文件</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">您提供的文档有一些问题。请尝试再次上传文档，以继续进行验证。</string>
   <string name="kyc_resubmission_card_button">上传文件</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">我们无法验证您的身份，需要您重新上传所需的文档。</string>
   <string name="kyc_resubmission_splash_description_2">发生这种情况的主要原因：</string>
   <string name="kyc_resubmission_splash_description_3">所需的照片丢失。</string>
@@ -1543,7 +1530,6 @@
   <string name="estimated_amount">美东时间。量</string>
   <string name="buying_fee">购买费用</string>
   <string name="purchase_bank_note">收到您的资金后，我们将开始您的%1$s购买订单。请注意，您的最终金额可能会因应市场活动而改变。可能需要付费。</string>
-  <string name="purchase_card_note">我们将在2个工作日内从您的付款方式中扣款。您的最终金额可能会因市场活动而变化。</string>
   <string name="complete_payment">完成支付</string>
   <string name="card_payment">信用卡支付</string>
   <string name="buy_now">立即购买</string>

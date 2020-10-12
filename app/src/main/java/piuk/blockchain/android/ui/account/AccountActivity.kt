@@ -1,22 +1,16 @@
 package piuk.blockchain.android.ui.account
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
-import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.widget.CheckBox
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
@@ -24,23 +18,23 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.zxing.BarcodeFormat
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.activity_accounts.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
-import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.account.adapter.AccountAdapter
 import piuk.blockchain.android.ui.account.adapter.AccountHeadersListener
-import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferDialogFragment
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Intents
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -49,26 +43,22 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import timber.log.Timber
 import java.util.EnumSet
 import java.util.Locale
 
 class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     AccountView,
-    AccountHeadersListener {
+    AccountHeadersListener, DialogFlow.FlowHost {
 
     override val locale: Locale = Locale.getDefault()
 
-    private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
     private val accountPresenter: AccountPresenter by scopedInject()
 
-    private var transferFundsMenuItem: MenuItem? = null
     private val accountsAdapter: AccountAdapter by unsafeLazy {
         AccountAdapter(this)
     }
@@ -100,23 +90,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         onViewReady()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_account, menu)
-        transferFundsMenuItem = menu.findItem(R.id.action_transfer_funds)
-        // Auto popup
-        presenter.checkTransferableLegacyFunds(isAutoPopup = true, showWarningDialog = true)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         android.R.id.home -> consume { onBackPressed() }
-        R.id.action_transfer_funds -> consume {
-            showProgressDialog(R.string.please_wait)
-            // Not auto popup
-            presenter.checkTransferableLegacyFunds(isAutoPopup = false, showWarningDialog = true)
-        }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -157,31 +132,14 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onImportAddressClicked() {
-        importAddress()
+        QrScanHandler.requestScanPermissions(
+            activity = this,
+            rootView = linear_layout_root
+        ) { onScanButtonClicked() }
     }
 
     override fun onAccountClicked(cryptoCurrency: CryptoCurrency, correctedPosition: Int) {
         onRowClick(cryptoCurrency, correctedPosition)
-    }
-
-    private fun importAddress() {
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(linear_layout_root, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { importAddress() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            onScanButtonClicked()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
     }
 
     private fun onRowClick(cryptoCurrency: CryptoCurrency, position: Int) {
@@ -266,15 +224,6 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
 
     override fun onResume() {
         super.onResume()
-
-        compositeDisposable += event.subscribe {
-            onViewReady()
-            // Check if we need to hide/show the transfer funds icon in the Toolbar
-            presenter.checkTransferableLegacyFunds(
-                isAutoPopup = false,
-                showWarningDialog = false
-            )
-        }
         onViewReady()
     }
 
@@ -322,11 +271,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.warning)
             .setCancelable(false)
-            .setMessage(getString(R.string.watch_only_import_warning))
-            .setPositiveButton(R.string.dialog_continue) { _, _ ->
-                presenter.confirmImportWatchOnly(address)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setMessage(getString(R.string.watch_only_not_supported))
+            .setPositiveButton(R.string.ok_cap, null)
             .show()
     }
 
@@ -362,48 +308,32 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         presenter.updateLegacyAddress(legacy)
     }
 
-    override fun onShowTransferableLegacyFundsWarning(isAutoPopup: Boolean) {
-        val checkBox = CheckBox(this)
-        checkBox.isChecked = false
-        checkBox.setText(R.string.dont_ask_again)
-
-        val builder = AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.transfer_funds)
-            .setMessage(getString(R.string.transfer_recommend) + "\n")
-            .setPositiveButton(R.string.transfer) { _, _ ->
-                transferSpendableFunds()
-                if (checkBox.isChecked) {
-                    prefs.setValue(KEY_WARN_TRANSFER_ALL, false)
-                }
+    override fun showTransferFunds(sendingAccount: CryptoAccount, defaultAccount: SingleAccount) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+            .setTitle(R.string.transfer_funds_title)
+            .setMessage(getString(R.string.transfer_funds_description) + "\n")
+            .setPositiveButton(R.string.transfer_all) { _, _ ->
+                launchFlow(sendingAccount, defaultAccount)
             }
             .setNegativeButton(R.string.not_now) { _, _ ->
-                if (checkBox.isChecked) {
-                    prefs.setValue(KEY_WARN_TRANSFER_ALL, false)
-                }
-            }
+            }.show()
+    }
 
-        if (isAutoPopup) {
-            builder.setView(ViewUtils.getAlertDialogPaddedView(this, checkBox))
-        }
-
-        val alertDialog = builder.create()
-        if (!isFinishing) {
-            alertDialog.show()
-        }
-
-        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).apply {
-            setTextColor(ContextCompat.getColor(this@AccountActivity, R.color.primary_grey_dark))
+    private fun launchFlow(sourceAccount: CryptoAccount, targetAccount: SingleAccount) {
+        TransactionFlow(
+            sourceAccount = sourceAccount,
+            action = AssetAction.NewSend,
+            target = targetAccount
+        ).apply {
+            startFlow(
+                fragmentManager = supportFragmentManager,
+                host = this@AccountActivity
+            )
         }
     }
 
-    @SuppressLint("CommitTransaction")
-    private fun transferSpendableFunds() {
-        ConfirmFundsTransferDialogFragment.newInstance()
-            .show(supportFragmentManager, ConfirmFundsTransferDialogFragment.TAG)
-    }
-
-    override fun onSetTransferLegacyFundsMenuItemVisible(visible: Boolean) {
-        transferFundsMenuItem?.isVisible = visible
+    override fun onFlowFinished() {
+        // do nothing
     }
 
     override fun showProgressDialog(@StringRes message: Int) {

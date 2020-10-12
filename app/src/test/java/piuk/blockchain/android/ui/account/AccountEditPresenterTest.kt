@@ -40,11 +40,9 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
-import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
-import piuk.blockchain.android.ui.send.PendingTransaction
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.StringUtils
@@ -498,22 +496,18 @@ class AccountEditPresenterTest {
     @Test
     fun onClickScanXprivDoubleEncrypted() {
         // Arrange
+        val addr = "1Address"
         subject.legacyAddress = LegacyAddress().apply {
-            address = "1Address"
+            address = addr
         }
         val mockPayload: Wallet = mock()
         whenever(mockPayload.isDoubleEncryption).thenReturn(true)
         whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        whenever(
-            stringUtils.getFormattedString(
-                eq(R.string.watch_only_spend_instructions),
-                eq("1Address")
-            )
-        ).thenReturn("Watch only 1Address")
+
         // Act
         subject.onClickScanXpriv(mock())
         // Assert
-        verify(view).promptPrivateKey(anyString())
+        verify(view).promptPrivateKey(addr)
     }
 
     @Test

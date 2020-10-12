@@ -15,14 +15,14 @@
     <item>zwölftes Wort</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importierte Adresse</item>
@@ -46,11 +46,11 @@
   <string name="toolbar_cmd_receive_crypto">Erhalten</string>
   <string name="toolbar_cmd_activity">Aktivität</string>
   <string name="toolbar_cmd_view_activity">Aktivität anzeigen</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">Stornieren</string>
   <string name="btn_ok">in Ordnung</string>
-  <string name="yes">Ja</string>
-  <string name="no">Nein</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nein</string>
   <string name="polite_no">Nein Danke</string>
   <string name="done">Erledigt</string>
   <string name="btn_close">Schließen</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Fortsetzen</string>
   <string name="btn_forgot_password">Passwort vergessen?\"</string>
   <string name="SEND">Senden</string>
-  <string name="total">Gesamt</string>
+  <string name="common_total">Gesamt</string>
   <string name="max_available">Verwenden Sie das gesamte Guthaben:</string>
   <string name="bitpay_remaining_time">Verbleibende Zeit</string>
   <string name="bitpay_invoice_expired">BitPay-Rechnung abgelaufen</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Das ausgewählte Passwort ist zu schwach, um Ihr Geld zu sichern. Wir stark 
  schlagen vor, dass Sie eine andere auswählen. Möchten Sie ein neues Passwort definieren? 
 </string>
-  <string name="from">Von</string>
-  <string name="to">Zu</string>
+  <string name="common_from">Von</string>
+  <string name="common_to">Zu</string>
   <string name="confirm_details">Bestätige Zahlung</string>
   <string name="fee">Gebühr</string>
   <string name="exit_confirm">Drücken Sie die Zurück-Taste erneut, um den Vorgang zu beenden</string>
@@ -350,17 +350,6 @@
  Bitcoin-Adresse %1$s . Bitte scannen Sie den QR-Code. 
 </string>
   <string name="invalid_private_key">Ungültiger privater Schlüssel</string>
-  <string name="watch_only_import_warning">Sie sind dabei, eine nicht ausgabefähige Adresse zu importieren 
- Adresse (oder öffentliches Schlüsselskript) 
- ohne den entsprechenden privaten Schlüssel in der Brieftasche gespeichert. Dies 
- bedeutet, dass das Geld NUR ausgegeben werden kann, wenn Sie den privaten Schlüssel an einer anderen Stelle gespeichert haben. Wenn du 
- tun 
- Wenn der private Schlüssel nicht gespeichert ist, weisen Sie niemanden an, Ihnen Bitcoin an den zu senden 
- nicht ausgabefähig 
- Adresse. 
-
- Diese Optionen werden nur fortgeschrittenen Benutzern empfohlen. Fortsetzen? 
-</string>
   <string name="scan_private_key">Privaten Schlüssel scannen</string>
   <string name="private_key_successfully_imported">Privater Schlüssel erfolgreich importiert.</string>
   <string name="private_key_not_matching_address">HINWEIS: Der gescannte private Schlüssel funktioniert nicht 
@@ -639,7 +628,7 @@
  Symbol im Launcher, wodurch der Empfang von Bitcoin noch schneller wird. 
 </string>
   <string name="shortcut_settings_enable">Launcher-Verknüpfungen</string>
-  <string name="confirm">Bestätigen</string>
+  <string name="common_confirm">Bestätigen</string>
   <string name="swipe_receive_hint">Wischen Sie zum Empfangen</string>
   <string name="swipe_receive_preference_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie nach links wischen 
  der PIN-Bildschirm, wodurch der Geldempfang noch schneller wird. 
@@ -827,7 +816,7 @@
  aufgrund der Marktaktivität. Sobald eine Bestellung beginnt, können wir sie nicht mehr stoppen 
 </string>
   <string name="send_to">Senden an</string>
-  <string name="receive">Erhalten</string>
+  <string name="common_receive">Erhalten</string>
   <string name="fees">Gebühren</string>
   <string name="value">Wert</string>
   <string name="status">Status</string>
@@ -1124,8 +1113,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Wir haben einen Bestätigungslink an gesendet</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicken Sie darauf und kehren Sie hierher zurück, um mit Ihrer Transaktion fortzufahren.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öffnen Sie die E-Mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Stimmen Sie zu, <a href="ignored"> Geschäftsbedingungen </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email überprüft!</string>
   <string name="buy_sell_verified_email_message">Unser Partner %1$s wird Ihre Bitcoin-Transaktion abwickeln. Wenn Sie auf Zustimmen und dann auf Weiter klicken, erstellen Sie ein Konto mit %1$s .</string>
   <string name="buy_sell_identification_verification">Identifizieren Sie die Überprüfung</string>
@@ -1232,7 +1220,7 @@
   <string name="kyc_email_title">Bestätigen Sie Ihre E-Mail</string>
   <string name="kyc_email_message">Wir müssen Ihre E-Mail-Adresse als zusätzliche Sicherheitsebene überprüfen.</string>
   <string name="kyc_email_hint_focused">Deine E-Mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fehler beim Speichern der E-Mail, versuchen Sie es erneut</string>
   <string name="kyc_email_send_verification">E-Mail senden</string>
   <string name="kyc_email_validation_header">Überprüfe deinen Posteingang.</string>
@@ -1257,7 +1245,7 @@
   <string name="kyc_onfido_splash_verification_error">Fehler beim Überprüfen der ID, versuchen Sie es erneut</string>
   <string name="kyc_veriff_splash_country_supported_header">Wird mein Land unterstützt?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link="country_list"> Liste der Länder </annotation> bevor Sie</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILBER ÜBERPRÜFT</string>
   <string name="kyc_veriff_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
   <string name="kyc_veriff_splash_subtitle">Sie benötigen einen der folgenden ID-Typen, um fortzufahren.</string>
@@ -1279,11 +1267,11 @@
   <string name="kyc_complete_device_verified">Gerät verifiziert</string>
   <string name="kyc_complete_id_uploaded">ID hochgeladen</string>
   <string name="kyc_complete_video_uploaded">Video hochgeladen</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Unser Blockchain-Support-Team hat Hilfehandbücher verfasst, in denen erläutert wird, warum wir Ihre Identität überprüfen müssen.</string>
   <string name="kyc_help_dialog_read_now">Lies jetzt</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitätsprüfung</string>
   <string name="kyc_settings_status_none">Nicht überprüft</string>
@@ -1295,7 +1283,7 @@
   <string name="kyc_settings_gold_level_in_review">Gold Level - Im Rückblick</string>
   <string name="kyc_settings_gold_level_approved">Gold Level - Genehmigt</string>
   <string name="kyc_settings_silver_level_approved">Silberstufe - Genehmigt</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fehler beim Abrufen des KYC-Status</string>
   <string name="kyc_status_title_in_progress">Überprüfung läuft</string>
   <string name="kyc_status_title_approved">Konto genehmigt</string>
@@ -1319,10 +1307,10 @@
   <string name="kyc_drop_off_card_description">Fahren Sie dort fort, wo Sie aufgehört haben, und führen Sie Ihre Identitätsprüfung durch.</string>
   <string name="kyc_drop_off_card_button">Setzen Sie die Überprüfung fort</string>
   <string name="kyc_documents_needed">Erforderliche Dokumente</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Wir hatten einige Probleme mit den von Ihnen gelieferten Dokumenten. Bitte versuchen Sie erneut, die Dokumente hochzuladen, um mit Ihrer Überprüfung fortzufahren.</string>
   <string name="kyc_resubmission_card_button">Dokumente hochladen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Wir können Ihre Identität nicht überprüfen und müssen die erforderlichen Dokumente erneut hochladen.</string>
   <string name="kyc_resubmission_splash_description_2">Hauptgründe dafür:</string>
   <string name="kyc_resubmission_splash_description_3">Die erforderlichen Fotos fehlen.</string>
@@ -1542,7 +1530,6 @@
   <string name="estimated_amount">Europäische Sommerzeit. Menge</string>
   <string name="buying_fee">Kaufgebühr</string>
   <string name="purchase_bank_note">Sobald wir Ihr Geld erhalten haben, beginnen wir mit Ihrer %1$s . Beachten Sie, dass sich Ihr endgültiger Betrag möglicherweise aufgrund der Marktaktivität ändert. Es können Gebühren anfallen.</string>
-  <string name="purchase_card_note">Wir werden Ihre Zahlungsmethode innerhalb von 2 Werktagen belasten. Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern.</string>
   <string name="complete_payment">Zur vollständigen Bezahlung</string>
   <string name="card_payment">Kartenzahlung</string>
   <string name="buy_now">Kaufe jetzt</string>

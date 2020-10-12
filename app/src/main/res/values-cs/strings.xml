@@ -15,14 +15,14 @@
     <item>dvanácté slovo</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importovaná adresa</item>
@@ -48,11 +48,11 @@
   <string name="toolbar_cmd_receive_crypto">Dostávat</string>
   <string name="toolbar_cmd_activity">Aktivita</string>
   <string name="toolbar_cmd_view_activity">Zobrazit aktivitu</string>
-  <string name="toolbar_cmd_swap">Zaměnit</string>
+  <string name="common_swap">Zaměnit</string>
   <string name="cancel">zrušení</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ano</string>
-  <string name="no">Ne</string>
+  <string name="common_yes">Ano</string>
+  <string name="common_no">Ne</string>
   <string name="polite_no">Ne, díky</string>
   <string name="done">Hotovo</string>
   <string name="btn_close">Zavřít</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Pokračovat</string>
   <string name="btn_forgot_password">Zapomenuté heslo?\"</string>
   <string name="SEND">Poslat</string>
-  <string name="total">Celkový</string>
+  <string name="common_total">Celkový</string>
   <string name="max_available">Použít celkový zůstatek:</string>
   <string name="bitpay_remaining_time">Zbývající čas</string>
   <string name="bitpay_invoice_expired">Platnost faktury BitPay vypršela</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Vybrané heslo je příliš slabé na to, abyste zajistili své prostředky. Jsme silně 
  doporučujeme vybrat jinou. Chcete definovat nové heslo? 
 </string>
-  <string name="from">Z</string>
-  <string name="to">Na</string>
+  <string name="common_from">Z</string>
+  <string name="common_to">Na</string>
   <string name="confirm_details">Potvrďte platbu</string>
   <string name="fee">Poplatek</string>
   <string name="exit_confirm">Opětovným stisknutím tlačítka zpět akci ukončíte</string>
@@ -352,17 +352,6 @@
  Bitcoinová adresa %1$s . Naskenujte prosím QR kód. 
 </string>
   <string name="invalid_private_key">Neplatný soukromý klíč</string>
-  <string name="watch_only_import_warning">Chystáte se importovat nevyměnitelnou adresu 
- adresa (nebo skript veřejného klíče) 
- uložené v peněžence bez odpovídajícího soukromého klíče. Tento 
- znamená, že prostředky lze utratit POUZE, pokud máte soukromý klíč uložen jinde. jestli ty 
- dělat 
- Nemáte-li uložen soukromý klíč, NELÁTE nikomu pokyn, aby vám poslal bitcoiny na server 
- nevratný 
- adresa. 
-
- Tyto možnosti jsou doporučeny pouze pro pokročilé uživatele. Pokračovat? 
-</string>
   <string name="scan_private_key">Skenovat soukromý klíč</string>
   <string name="private_key_successfully_imported">Soukromý klíč byl úspěšně importován.</string>
   <string name="private_key_not_matching_address">POZNÁMKA: Naskenovaný soukromý klíč ne 
@@ -641,7 +630,7 @@
  ikona ve spouštěči, čímž je příjem bitcoinů ještě rychlejší. 
 </string>
   <string name="shortcut_settings_enable">Klávesové zkratky spouštěče</string>
-  <string name="confirm">Potvrdit</string>
+  <string name="common_confirm">Potvrdit</string>
   <string name="swipe_receive_hint">Přejetím přejděte prstem</string>
   <string name="swipe_receive_preference_summary">Když přejedete prstem doleva, odhalte adresu pro příjem 
  na obrazovce PIN, což zrychluje příjem prostředků. 
@@ -829,7 +818,7 @@
  kvůli tržní aktivitě. Jakmile objednávka začne, nemůžeme ji zastavit 
 </string>
   <string name="send_to">Poslat komu</string>
-  <string name="receive">Dostávat</string>
+  <string name="common_receive">Dostávat</string>
   <string name="fees">Poplatky</string>
   <string name="value">Hodnota</string>
   <string name="status">Postavení</string>
@@ -1126,8 +1115,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Souhlasíte s Coinify <a href="ignored"> smluvními podmínkami </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>
@@ -1234,7 +1222,7 @@
   <string name="kyc_email_title">Ověřte svůj email</string>
   <string name="kyc_email_message">Jako dodatečnou vrstvu zabezpečení musíme ověřit vaši e-mailovou adresu.</string>
   <string name="kyc_email_hint_focused">Tvůj e-mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Při ukládání e-mailu došlo k chybě, zkuste to znovu</string>
   <string name="kyc_email_send_verification">Poslat e-mailem</string>
   <string name="kyc_email_validation_header">Zkontrolujte doručenou poštu.</string>
@@ -1259,7 +1247,7 @@
   <string name="kyc_onfido_splash_verification_error">Při ověřování ID došlo k chybě, zkuste to znovu</string>
   <string name="kyc_veriff_splash_country_supported_header">Je moje země podporována?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">V současné době nejsou podporovány všechny země. Než budete pokračovat, zkontrolujte náš aktuální seznam <annotation link="country_list"> zemí </annotation> .</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">STŘÍBRO OVĚŘENO</string>
   <string name="kyc_veriff_splash_header">Potvrďte, že jste to vy</string>
   <string name="kyc_veriff_splash_subtitle">Pro pokračování budete potřebovat 1 z níže uvedených typů ID.</string>
@@ -1281,11 +1269,11 @@
   <string name="kyc_complete_device_verified">Zařízení bylo ověřeno</string>
   <string name="kyc_complete_id_uploaded">ID nahráno</string>
   <string name="kyc_complete_video_uploaded">Video bylo nahráno</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Náš tým podpory blockchainu napsal písemné příručky s vysvětlením, proč potřebujeme ověřit vaši totožnost.</string>
   <string name="kyc_help_dialog_read_now">Přečtěte si nyní</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Ověření identity</string>
   <string name="kyc_settings_status_none">Neověřeno</string>
@@ -1297,7 +1285,7 @@
   <string name="kyc_settings_gold_level_in_review">Zlatá úroveň - probíhá kontrola</string>
   <string name="kyc_settings_gold_level_approved">Zlatá úroveň - schváleno</string>
   <string name="kyc_settings_silver_level_approved">Silver Level - Schváleno</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Při načítání stavu KYC došlo k chybě</string>
   <string name="kyc_status_title_in_progress">Probíhá ověřování</string>
   <string name="kyc_status_title_approved">Účet schválen</string>
@@ -1321,10 +1309,10 @@
   <string name="kyc_drop_off_card_description">Zjistěte, kde jste skončili, a dokončete ověření identity.</string>
   <string name="kyc_drop_off_card_button">Pokračujte v ověřování</string>
   <string name="kyc_documents_needed">Potřebné dokumenty</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Měli jsme nějaké problémy s dodanými dokumenty. Zkuste prosím znovu nahrát dokumenty a pokračovat v ověřování.</string>
   <string name="kyc_resubmission_card_button">Nahrajte dokumenty</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nemůžeme ověřit vaši totožnost a potřebujeme znovu nahrát požadované dokumenty.</string>
   <string name="kyc_resubmission_splash_description_2">Hlavní důvody, proč k tomu došlo:</string>
   <string name="kyc_resubmission_splash_description_3">Chybí požadované fotografie.</string>
@@ -1544,7 +1532,6 @@
   <string name="estimated_amount">Est. Množství</string>
   <string name="buying_fee">Poplatek za nákup</string>
   <string name="purchase_bank_note">Jakmile dostaneme vaše prostředky, zahájíme vaši objednávku nákupu %1$s . Vaše konečná částka se může změnit na řádnou tržní aktivitu. Mohou být účtovány poplatky.</string>
-  <string name="purchase_card_note">Za 2 pracovní dny odečteme platbu z vaší platební metody. Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
   <string name="complete_payment">Dokončete platbu</string>
   <string name="card_payment">Platba kartou</string>
   <string name="buy_now">Kup nyní</string>

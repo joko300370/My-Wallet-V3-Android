@@ -6,31 +6,36 @@ import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.MultiAddressFactory
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class TransactionInOutMapper(
     private val transactionHelper: TransactionHelper,
     private val payloadDataManager: PayloadDataManager,
     private val stringUtils: StringUtils,
-    private val ethDataManager: EthDataManager,
     private val bchDataManager: BchDataManager,
     private val xlmDataManager: XlmDataManager,
-    private val environmentSettings: EnvironmentConfig
+    private val environmentSettings: EnvironmentConfig,
+    private val coincore: Coincore
 ) {
 
-    fun transformInputAndOutputs(item: NonCustodialActivitySummaryItem): Single<TransactionInOutDetails> =
+    fun transformInputAndOutputs(
+        item: NonCustodialActivitySummaryItem
+    ): Single<TransactionInOutDetails> =
         when (item.cryptoCurrency) {
             CryptoCurrency.BTC -> handleBtcToAndFrom(item)
-            CryptoCurrency.ETHER -> handleEthToAndFrom(item)
             CryptoCurrency.BCH -> handleBchToAndFrom(item)
             CryptoCurrency.XLM -> handleXlmToAndFrom(item)
-            CryptoCurrency.PAX -> handlePaxToAndFrom(item)
+            CryptoCurrency.ETHER,
+            CryptoCurrency.PAX,
+            CryptoCurrency.USDT -> handleErc20ToAndFrom(item)
             else -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
         }
 
@@ -60,69 +65,45 @@ class TransactionInOutMapper(
                 )
             }
 
-    private fun handleEthToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
-        Single.fromCallable {
-            var fromAddress = activitySummaryItem.inputsMap.keys.first()
-            var toAddress = activitySummaryItem.outputsMap.keys.first()
+    private fun handleErc20ToAndFrom(
+        activitySummaryItem: NonCustodialActivitySummaryItem
+    ): Single<TransactionInOutDetails> {
 
-            val ethAddress = ethDataManager.getEthResponseModel()!!.getAddressResponse()!!.account
-            if (fromAddress == ethAddress) {
-                fromAddress = stringUtils.getString(R.string.eth_default_account_label)
-            }
-            if (toAddress == ethAddress) {
-                toAddress = stringUtils.getString(R.string.eth_default_account_label)
-            }
+        val fromAddress = activitySummaryItem.inputsMap.keys.first()
+        val toAddress = activitySummaryItem.outputsMap.keys.first()
 
+        return Singles.zip(
+            coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, fromAddress)
+                .toSingle(NullCryptoAccount(fromAddress)),
+            coincore.findAccountByAddress(activitySummaryItem.cryptoCurrency, toAddress)
+                .toSingle(NullCryptoAccount(toAddress))
+        ) { fromAccount, toAccount ->
             TransactionInOutDetails(
                 inputs = listOf(
                     TransactionDetailModel(
-                        fromAddress
+                        fromAccount.label.takeIf { it.isNotEmpty() } ?: fromAddress
                     )
                 ),
                 outputs = listOf(
                     TransactionDetailModel(
-                        toAddress
+                        toAccount.label.takeIf { it.isNotEmpty() } ?: toAddress
                     )
                 )
             )
         }
-
-    private fun handlePaxToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
-        Single.fromCallable {
-            var fromAddress = activitySummaryItem.inputsMap.keys.first()
-            var toAddress = activitySummaryItem.outputsMap.keys.first()
-
-            val ethAddress = ethDataManager.getEthResponseModel()!!.getAddressResponse()!!.account
-            if (fromAddress == ethAddress) {
-                fromAddress = stringUtils.getString(R.string.pax_default_account_label_1)
-            }
-            if (toAddress == ethAddress) {
-                toAddress = stringUtils.getString(R.string.pax_default_account_label_1)
-            }
-
-            TransactionInOutDetails(
-                inputs = listOf(
-                    TransactionDetailModel(
-                        fromAddress
-                    )
-                ),
-                outputs = listOf(
-                    TransactionDetailModel(
-                        toAddress
-                    )
-                )
-            )
-        }
+    }
 
     private fun handleBtcToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
         Single.fromCallable {
-            val (inputs, outputs) = transactionHelper.filterNonChangeBtcAddresses(activitySummaryItem)
+            val (inputs, outputs) = transactionHelper.filterNonChangeBtcAddresses(
+                activitySummaryItem)
             setToAndFrom(CryptoCurrency.BTC, inputs, outputs)
         }
 
     private fun handleBchToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
         Single.fromCallable {
-            val (inputs, outputs) = transactionHelper.filterNonChangeBchAddresses(activitySummaryItem)
+            val (inputs, outputs) = transactionHelper.filterNonChangeBchAddresses(
+                activitySummaryItem)
             setToAndFrom(CryptoCurrency.BCH, inputs, outputs)
         }
 
@@ -167,7 +148,8 @@ class TransactionInOutMapper(
                 payloadDataManager.addressToLabel(key)
             } else {
                 bchDataManager.getLabelFromBchAddress(key)
-                    ?: FormatsUtil.toShortCashAddress(environmentSettings.bitcoinCashNetworkParameters, key)
+                    ?: FormatsUtil.toShortCashAddress(
+                        environmentSettings.bitcoinCashNetworkParameters, key)
             }
 
             val transactionDetailModel = buildTransactionDetailModel(label, value, currency)

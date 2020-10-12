@@ -3,22 +3,22 @@ package piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
 import com.blockchain.logging.SwapDiagnostics
+import com.blockchain.morph.to
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.payload.PayloadDecrypt
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.SendException
+import com.blockchain.sunriver.SendFundsResult
 import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
 import com.blockchain.swap.nabu.service.Fix
 import com.blockchain.swap.nabu.service.Quote
 import com.blockchain.swap.nabu.service.TradeExecutionService
 import com.blockchain.swap.nabu.service.TradeTransaction
-import com.blockchain.morph.to
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
-import com.blockchain.transactions.Memo
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.SendException
-import com.blockchain.transactions.SendFundsResult
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -67,7 +67,6 @@ class ExchangeConfirmationPresenterTest {
             payloadDecrypt,
             mock {
                 on { getString(any()) } `it returns` ""
-                on { getFormattedString(any(), any()) } `it returns` ""
             },
             analytics,
             diagnostics
@@ -103,7 +102,7 @@ class ExchangeConfirmationPresenterTest {
         // Arrange
         val accountReference = AccountReference.BitcoinLike(CryptoCurrency.BTC, "Label", "xPub")
         whenever(payloadDecrypt.isDoubleEncrypted).thenReturn(false)
-        val fee = CryptoValue.bitcoinFromMajor(0.00005.toBigDecimal())
+        val fee = 0.00005.bitcoin()
         whenever(
             transactionExecutor.getFeeForTransaction(
                 1.0.bitcoin(),

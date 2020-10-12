@@ -7,6 +7,7 @@
     <!-- in future -->
 
     <color name="white">#FFFFFF</color>
+    <color name="faded_white">#99FFFFFF</color>
     <color name="black">#000000</color>
 
     <color name="red_000">#FFECEB</color>
@@ -25,12 +26,15 @@
     <color name="orange_400">#FFB266</color>
     <color name="orange_800">#B34400</color>
 
+    <color name="green_000">#E6FAEC</color>
     <color name="green_100">#D1F0DB</color>
     <color name="green_200">#59CD93</color>
     <color name="green_400">#3EDC89</color>
     <color name="green_500">#00B26B</color>
     <color name="green_600">#00875A</color>
     <color name="green_800">#04593D</color>
+
+    <color name="green_500_fade_15">#2604593D</color>
 
     <color name="grey_000">#F0F2F7</color>
     <color name="grey_100">#DFE3EB</color>

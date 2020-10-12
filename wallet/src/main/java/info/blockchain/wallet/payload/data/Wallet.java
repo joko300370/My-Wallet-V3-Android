@@ -9,13 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import info.blockchain.wallet.api.PersistentUrls;
-import info.blockchain.wallet.exceptions.DecryptionException;
-import info.blockchain.wallet.exceptions.EncryptionException;
-import info.blockchain.wallet.exceptions.HDWalletException;
-import info.blockchain.wallet.exceptions.NoSuchAddressException;
-import info.blockchain.wallet.util.DoubleEncryptionFactory;
-import info.blockchain.wallet.util.FormatsUtil;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.StringUtils;
 import org.bitcoinj.core.Base58;
@@ -26,7 +20,6 @@ import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
 import org.spongycastle.crypto.InvalidCipherTextException;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -35,6 +28,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import info.blockchain.wallet.api.PersistentUrls;
+import info.blockchain.wallet.exceptions.DecryptionException;
+import info.blockchain.wallet.exceptions.EncryptionException;
+import info.blockchain.wallet.exceptions.HDWalletException;
+import info.blockchain.wallet.exceptions.NoSuchAddressException;
+import info.blockchain.wallet.util.DoubleEncryptionFactory;
+import info.blockchain.wallet.util.FormatsUtil;
 
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -264,9 +267,7 @@ public class Wallet {
         if (getLegacyAddressList() != null) {
             List<LegacyAddress> legacyAddresses = getLegacyAddressList();
             for (LegacyAddress legacyAddress : legacyAddresses) {
-                if (!legacyAddress.isWatchOnly()) {
-                    keyList.add(legacyAddress.getPrivateKey());
-                }
+                keyList.add(legacyAddress.getPrivateKey());
             }
         }
 
@@ -472,18 +473,6 @@ public class Wallet {
         List<String> addrs = new ArrayList<>(keys.size());
         for (LegacyAddress legacyAddress : keys) {
             if (!LegacyAddressExtensionsKt.isArchived(legacyAddress)) {
-                addrs.add(legacyAddress.getAddress());
-            }
-        }
-
-        return addrs;
-    }
-
-    public List<String> getWatchOnlyAddressStringList() {
-
-        List<String> addrs = new ArrayList<>(keys.size());
-        for (LegacyAddress legacyAddress : keys) {
-            if (legacyAddress.isWatchOnly()) {
                 addrs.add(legacyAddress.getAddress());
             }
         }

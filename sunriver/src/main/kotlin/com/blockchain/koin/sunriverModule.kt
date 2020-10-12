@@ -8,8 +8,6 @@ import com.blockchain.sunriver.MemoMapper
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmSecretAccess
 import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
-import com.blockchain.transactions.logMemoType
-import com.blockchain.transactions.updateLastTxOnSend
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -19,10 +17,18 @@ val sunriverModule = module {
 
         factory { XlmSecretAccess(get()) }
 
-        factory { XlmDataManager(get(), get(), get(), get(), get(), get(), get(), getProperty("HorizonURL")) }
-            .bind(DefaultAccountDataManager::class)
-
-        factory { get<XlmDataManager>().updateLastTxOnSend(get()).logMemoType(get()) }
+        scoped { XlmDataManager(
+            horizonProxy = get(),
+            metaDataInitializer = get(),
+            xlmSecretAccess = get(),
+            memoMapper = get(),
+            xlmFeesFetcher = get(),
+            xlmTimeoutFetcher = get(),
+            lastTxUpdater = get(),
+            eventLogger = get(),
+            xlmHorizonUrlFetcher = get(),
+            xlmHorizonDefUrl = getProperty("HorizonURL"))
+        }.bind(DefaultAccountDataManager::class)
 
         factory { HorizonProxy() }
 

@@ -2,20 +2,19 @@ package piuk.blockchain.android.simplebuy
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.google.gson.Gson
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.utils.extensions.flatMapBy
 import timber.log.Timber
-import java.text.DecimalFormatSymbols
-import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 
 // Ensure that the local and remote SimpleBuy state is the same.
@@ -208,7 +207,7 @@ class SimpleBuySyncFactory(
         }
     }
 
-    private fun BuyOrder.isCardPayment() =
+    private fun BuySellOrder.isCardPayment() =
         paymentMethodType == PaymentMethodType.PAYMENT_CARD
 
     private fun updateWithRemote(localState: SimpleBuyState): Maybe<SimpleBuyState> =
@@ -253,16 +252,15 @@ class SimpleBuySyncFactory(
 }
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-fun BuyOrder.toSimpleBuyState(): SimpleBuyState =
+fun BuySellOrder.toSimpleBuyState(): SimpleBuyState =
     SimpleBuyState(
         id = id,
-        enteredAmount = fiat.toStringWithoutSymbol()
-            .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), ""),
+        amount = fiat,
         fiatCurrency = fiat.currencyCode,
         selectedCryptoCurrency = crypto.currency,
         orderState = state,
         fee = fee,
-        orderValue = orderValue,
+        orderValue = orderValue as? CryptoValue,
         orderExchangePrice = price,
         selectedPaymentMethod = SelectedPaymentMethod(
             id = paymentMethodId,

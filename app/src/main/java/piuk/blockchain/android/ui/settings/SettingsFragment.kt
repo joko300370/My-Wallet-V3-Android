@@ -33,6 +33,9 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.notifications.analytics.linkBankEventWithCurrency
+import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.ui.dialog.MaterialProgressDialog
@@ -51,12 +54,17 @@ import piuk.blockchain.android.R.string.success
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.RemoveCardBottomSheet
+import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
+import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
 import piuk.blockchain.android.ui.settings.preferences.ThePitStatusPreference
@@ -73,7 +81,7 @@ import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBottomSheet.Host {
+class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -91,7 +99,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
     private val thePit by lazy {
         findPreference<ThePitStatusPreference>("the_pit")
     }
-
+    private val banksPref by lazy {
+        findPreference<PreferenceCategory>("banks")
+    }
     private val cardsPref by lazy {
         findPreference<PreferenceCategory>("cards")
     }
@@ -125,6 +135,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
     }
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
+    }
+    private val cloudBackupPref by lazy {
+        findPreference<SwitchPreferenceCompat>("cloud_backup")
     }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
@@ -232,6 +245,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
             true
         }
 
+        cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
+            settingsPresenter.updateCloudData(newValue as Boolean)
+            analytics.logEvent(SettingsAnalyticsEvents.CloudBackupSwitch)
+            true
+        }
+
         // App
         findPreference<Preference>("about")?.apply {
             summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
@@ -250,8 +269,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {
-            }
+            intent == null -> {}
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
@@ -365,6 +383,61 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         thePit?.setValue(isLinked)
     }
 
+    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
+        val existingBanks = prefsExistingBanks()
+
+        val newBanks = linkedAndSupportedCurrencies.linkedBanks.filterNot { existingBanks.contains(it.id) }
+
+        newBanks.forEach { bank ->
+            banksPref?.addPreference(
+                BankPreference(context = requireContext(), bank = bank, fiatCurrency = bank.currency).apply {
+                    onClick {
+                        removeBank(bank)
+                    }
+                    key = bank.id
+                }
+            )
+        }
+
+        addOrUpdateLinkBankForCurrencies(
+            linkedAndSupportedCurrencies.linkedBanks.size + 1,
+            linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
+        )
+    }
+
+    private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
+        if (currencies.isEmpty()) {
+            banksPref?.isVisible = false
+        } else {
+            currencies.forEach { currency ->
+                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
+                    it.order = it.order + firstIndex + currencies.indexOf(currency)
+                } ?: banksPref?.addPreference(
+                    BankPreference(context = requireContext(), fiatCurrency = currency).apply {
+                        onClick {
+                            linkBankWithCurrency(currency)
+                        }
+                        key = LINK_BANK_KEY.plus(currency)
+                    }
+                )
+            }
+        }
+    }
+
+    data class LinkedBanksAndSupportedCurrencies(
+        val linkedBanks: List<LinkedBank>,
+        val supportedCurrencies: List<String>
+    )
+
+    private fun removeBank(bank: LinkedBank) {
+        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
+    }
+
+    private fun linkBankWithCurrency(currency: String) {
+        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+    }
+
     override fun updateCards(cards: List<PaymentMethod.Card>) {
 
         val existingCards = prefsExistingCards()
@@ -375,7 +448,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
             cardsPref?.addPreference(
                 CardPreference(context = requireContext(), card = card).apply {
                     onClick {
-                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, "BOTTOM_SHEET")
+                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, BOTTOM_SHEET)
                     }
                     key = card.cardId
                 }
@@ -406,10 +479,21 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
     private fun addNewCard() {
         val intent = Intent(activity, CardDetailsActivity::class.java)
         startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
+        analytics.logEvent(SimpleBuyAnalytics.SETTINGS_ADD_CARD)
     }
 
     override fun setScreenshotsEnabled(enabled: Boolean) {
         screenshotPref?.isChecked = enabled
+    }
+
+    private fun prefsExistingBanks(): List<String> {
+        val existingBanks = mutableListOf<String>()
+
+        for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
+            existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
+                ?: continue)
+        }
+        return existingBanks
     }
 
     override fun setLauncherShortcutVisibility(visible: Boolean) {
@@ -425,7 +509,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_disable_message)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 settingsPresenter.setFingerprintUnlockEnabled(
                     false
                 )
@@ -442,7 +526,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_no_fingerprints_added)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
                     Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
                     0
@@ -604,7 +688,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
             .setTitle(R.string.app_name)
             .setMessage(R.string.guid_to_clipboard)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
                     activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
@@ -612,7 +696,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
                 showCustomToast(R.string.copied_to_clipboard)
                 analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 
@@ -795,7 +879,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
                                     .setTitle(R.string.app_name)
                                     .setMessage(R.string.weak_password)
                                     .setCancelable(false)
-                                    .setPositiveButton(R.string.yes) { _, _ ->
+                                    .setPositiveButton(R.string.common_yes) { _, _ ->
                                         newPasswordConfirmation.setText("")
                                         newPasswordConfirmation.requestFocus()
                                         newPassword.setText("")
@@ -957,6 +1041,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         internal const val EXTRA_SHOW_ADD_EMAIL_DIALOG = "show_add_email_dialog"
         internal const val EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog"
         private const val ADD_CARD_KEY = "ADD_CARD_KEY"
+        private const val LINK_BANK_KEY = "ADD_BANK_KEY"
     }
 
     override fun onCardRemoved(cardId: String) {
@@ -965,10 +1050,20 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemoveCardBot
         }
     }
 
+    override fun onLinkedBankRemoved(bankId: String) {
+        banksPref?.findPreference<BankPreference>(bankId)?.let {
+            banksPref?.removePreference(it)
+        }
+    }
+
     override fun onSheetClosed() {}
 
     override fun cardsEnabled(enabled: Boolean) {
         cardsPref?.isVisible = enabled
+    }
+
+    override fun banksEnabled(enabled: Boolean) {
+        banksPref?.isVisible = enabled
     }
 }
 

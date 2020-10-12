@@ -1,8 +1,8 @@
 package piuk.blockchain.androidcore.utils
 
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -15,12 +15,15 @@ interface PersistentPrefs :
     SecurityPrefs,
     ThePitLinkingPrefs,
     SimpleBuyPrefs,
-    WalletStatus {
+    WalletStatus,
+    EncryptedPrefs {
 
     val isLoggedOut: Boolean
 
     val deviceId: String // Pre-IDV device identifier
     var devicePreIDVCheckFailed: Boolean // Pre-IDV check has failed! Don't show 'gold' announce cards etc
+
+    var pinId: String
 
     fun getValue(name: String): String?
     fun getValue(name: String, defaultValue: String): String
@@ -46,8 +49,6 @@ interface PersistentPrefs :
     var qaRandomiseDeviceId: Boolean
 
     companion object {
-
-        const val KEY_PIN_IDENTIFIER = "pin_kookup_key"
         const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
         const val KEY_WALLET_GUID = "guid"
         const val KEY_SHARED_KEY = "sharedKey"
@@ -71,6 +72,5 @@ interface PersistentPrefs :
 
         // Send screen
         const val KEY_WARN_ADVANCED_FEE = "pref_warn_advanced_fee"
-        const val KEY_WARN_WATCH_ONLY_SPEND = "pref_warn_watch_only_spend"
     }
 }

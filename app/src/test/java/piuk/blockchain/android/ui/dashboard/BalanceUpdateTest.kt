@@ -1,8 +1,9 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -19,13 +20,12 @@ class BalanceUpdateTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showAssetSheetFor = CryptoCurrency.ETHER,
             announcement = testAnnouncementCard_1
         )
 
         val subject = BalanceUpdate(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinCashFromMajor(1)
+            1.bitcoinCash()
         )
 
         subject.reduce(initialState)
@@ -39,13 +39,12 @@ class BalanceUpdateTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showAssetSheetFor = CryptoCurrency.ETHER,
             announcement = testAnnouncementCard_1
         )
 
         val subject = BalanceUpdate(
             CryptoCurrency.BTC,
-            CryptoValue.bitcoinFromMajor(1)
+            1.bitcoin()
         )
 
         val result = subject.reduce(initialState)
@@ -55,7 +54,6 @@ class BalanceUpdateTest {
         assertEquals(result[CryptoCurrency.ETHER], initialState[CryptoCurrency.ETHER])
         assertEquals(result[CryptoCurrency.XLM], initialState[CryptoCurrency.XLM])
 
-        assertEquals(result.showAssetSheetFor, initialState.showAssetSheetFor)
         assertEquals(result.announcement, initialState.announcement)
     }
 
@@ -67,7 +65,6 @@ class BalanceUpdateTest {
                 CryptoCurrency.ETHER to initialEthState.copy(hasBalanceError = true),
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showAssetSheetFor = CryptoCurrency.ETHER,
             announcement = testAnnouncementCard_1
         )
 
@@ -84,7 +81,6 @@ class BalanceUpdateTest {
         assertEquals(result[CryptoCurrency.BTC], initialState[CryptoCurrency.BTC])
         assertEquals(result[CryptoCurrency.XLM], initialState[CryptoCurrency.XLM])
 
-        assertEquals(result.showAssetSheetFor, initialState.showAssetSheetFor)
         assertEquals(result.announcement, initialState.announcement)
     }
 }

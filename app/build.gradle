@@ -46,6 +46,11 @@ android {
         buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
+
+        manifestPlaceholders = [
+                FABRIC_API_KEY: buildProperties.secrets['fabricApiKey'].string
+        ]
+
         resConfigs 'en',
                 'cs',
                 'de',
@@ -108,6 +113,7 @@ android {
         envProd {
             dimension "environment"
             manifestPlaceholders = [
+                    BACKUP_API_KEY: buildProperties.secrets['prodGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['prodDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['prodDynamicLink2'].string
             ]
@@ -130,6 +136,7 @@ android {
         envDev {
             dimension "environment"
             manifestPlaceholders = [
+                    BACKUP_API_KEY: buildProperties.secrets['devGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['devDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['devDynamicLink2'].string
             ]
@@ -149,10 +156,13 @@ android {
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-dev'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            applicationId "piuk.blockchain.android.dev"
+            resValue "string", "app_name", "BlockDev"
         }
         envStaging {
             dimension "environment"
             manifestPlaceholders = [
+                    BACKUP_API_KEY: buildProperties.secrets['stagingGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['stagingDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['stagingDynamicLink2'].string
             ]
@@ -173,6 +183,7 @@ android {
             versionNameSuffix '-staging'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             applicationId "piuk.blockchain.android.staging"
+            resValue "string", "app_name", "BlockStaging"
         }
         envTestnet {
             dimension "environment"

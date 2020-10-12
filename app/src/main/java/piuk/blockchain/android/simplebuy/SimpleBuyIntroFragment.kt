@@ -21,13 +21,15 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.ErrorDialogData
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.launcher.LauncherView
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
-class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
+class SimpleBuyIntroFragment : Fragment(), SlidingModalBottomDialog.Host {
 
     private val nabuToken: NabuToken by scopedInject()
     private val simpleBuyPrefs: SimpleBuyPrefs by inject()
@@ -57,7 +59,7 @@ class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
                 }
 
             compositeDisposable += updateCurrencyCompletable.observeOn(AndroidSchedulers.mainThread()).subscribeBy({}, {
-                navigator().exitSimpleBuyFlow()
+                navigator().onStartMainActivity(null)
             })
         }
         analytics.logEvent(SimpleBuyAnalytics.INTRO_SCREEN_SHOW)
@@ -71,7 +73,7 @@ class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
                 .subscribeBy(
                     onSuccess = {
                         simpleBuyPrefs.clearState()
-                        navigator().goToCurrencySelection()
+                        navigator().onStartMainActivity(null, true)
                     },
                     onError = {
                         showError()
@@ -101,8 +103,10 @@ class SimpleBuyIntroFragment : Fragment(), SimpleBuyScreen {
         compositeDisposable.clear()
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator) ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+    fun navigator(): LauncherView =
+        (activity as? LauncherView) ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
-    override fun onBackPressed(): Boolean = true
+    override fun onSheetClosed() {
+        navigator().onStartMainActivity(null, false)
+    }
 }

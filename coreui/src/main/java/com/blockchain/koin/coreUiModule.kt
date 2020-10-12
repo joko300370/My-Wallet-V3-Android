@@ -10,7 +10,6 @@ import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.remoteconfig.ABTestExperiment
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.RemoteConfiguration
-import com.blockchain.ui.chooser.AccountChooserPresenter
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import org.koin.dsl.bind
@@ -20,13 +19,6 @@ import piuk.blockchain.androidcoreui.utils.OverlayDetection
 import piuk.blockchain.androidcoreui.utils.logging.InjectableLogging
 
 val coreUiModule = module {
-
-    scope(payloadScopeQualifier) {
-
-        factory {
-            AccountChooserPresenter(get(), get())
-        }
-    }
 
     single {
         val config = FirebaseRemoteConfigSettings.Builder()

@@ -15,14 +15,14 @@
     <item>tolfte ordet</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ Sträng / xlm_memo_text</item>
-    <item>\@ Sträng / xlm_memo_id</item>
-    <item>\@ Sträng / xlm_memo_hash</item>
-    <item>\@ Sträng / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ Sträng / xlm_memo_text</item>
-    <item>\@ Sträng / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importerad adress</item>
@@ -46,11 +46,11 @@
   <string name="toolbar_cmd_receive_crypto">Motta</string>
   <string name="toolbar_cmd_activity">Aktivitet</string>
   <string name="toolbar_cmd_view_activity">Visa aktivitet</string>
-  <string name="toolbar_cmd_swap">Byta</string>
+  <string name="common_swap">Byta</string>
   <string name="cancel">Annullera</string>
   <string name="btn_ok">OK</string>
-  <string name="yes">Ja</string>
-  <string name="no">Nej</string>
+  <string name="common_yes">Ja</string>
+  <string name="common_no">Nej</string>
   <string name="polite_no">Nej tack</string>
   <string name="done">Gjort</string>
   <string name="btn_close">Stänga</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Fortsätta</string>
   <string name="btn_forgot_password">Glömt ditt lösenord?\"</string>
   <string name="SEND">Skicka</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Använd den totala betalningsbara balansen:</string>
   <string name="bitpay_remaining_time">Återstående tid</string>
   <string name="bitpay_invoice_expired">BitPay-faktura har gått ut</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Det valda lösenordet är för svagt för att säkra dina pengar. Vi starkt 
  föreslår att du väljer en annan. Vill du definiera ett nytt lösenord? 
 </string>
-  <string name="from">Från</string>
-  <string name="to">Till</string>
+  <string name="common_from">Från</string>
+  <string name="common_to">Till</string>
   <string name="confirm_details">Bekräfta betalning</string>
   <string name="fee">Avgift</string>
   <string name="exit_confirm">Tryck på bakåtknappen igen för att avsluta</string>
@@ -350,17 +350,6 @@
  Bitcoin-adress %1$s . Skanna QR-koden. 
 </string>
   <string name="invalid_private_key">Ogiltig privat nyckel</string>
-  <string name="watch_only_import_warning">Du håller på att importera en adress som inte kan spendera, en 
- adress (eller public key script) 
- lagras i plånboken utan motsvarande privat nyckel. Detta 
- innebär att medlen endast kan användas om du har den privata nyckeln lagrad någon annanstans. Om du 
- do 
- inte ha den privata nyckeln lagrad, instruera INTE någon att skicka dig bitcoin till 
- icke-spendable 
- adress. 
-
- Dessa alternativ rekommenderas endast för avancerade användare. Fortsätta? 
-</string>
   <string name="scan_private_key">Skanna privat nyckel</string>
   <string name="private_key_successfully_imported">Privat nyckel importeras.</string>
   <string name="private_key_not_matching_address">OBS! Den skannade privata nyckeln gör det inte 
@@ -639,7 +628,7 @@
  ikonen i startern, vilket gör att ta emot bitcoin ännu snabbare. 
 </string>
   <string name="shortcut_settings_enable">Starta genvägar</string>
-  <string name="confirm">Bekräfta</string>
+  <string name="common_confirm">Bekräfta</string>
   <string name="swipe_receive_hint">Svep för att ta emot</string>
   <string name="swipe_receive_preference_summary">Visa en mottagaradress när du sveper till vänster 
  PIN-skärmen, vilket gör mottagningen av pengar ännu snabbare. 
@@ -827,7 +816,7 @@
  på grund av marknadsaktivitet. När en beställning startar kan vi inte stoppa den 
 </string>
   <string name="send_to">Skicka till</string>
-  <string name="receive">Motta</string>
+  <string name="common_receive">Motta</string>
   <string name="fees">avgifter</string>
   <string name="value">Värde</string>
   <string name="status">Status</string>
@@ -1124,8 +1113,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Vi skickade en verifieringslänk till</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicka på den och gå tillbaka hit för att fortsätta med din transaktion.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öppna e-post</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Håller med att Coinify <a href="ignored"> villkor </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">E-post bekräftad!</string>
   <string name="buy_sell_verified_email_message">Vår partner %1$s kommer att behandla din bitcoin-transaktion. Genom att klicka på Agree och \'Fortsätt\' skapar du ett konto med %1$s .</string>
   <string name="buy_sell_identification_verification">Identifiera verifiering</string>
@@ -1232,7 +1220,7 @@
   <string name="kyc_email_title">Verifiera din epost</string>
   <string name="kyc_email_message">Vi måste verifiera din e-postadress som ett extra lager av säkerhet.</string>
   <string name="kyc_email_hint_focused">Din email</string>
-  <string name="kyc_email_hint_unfocused">\@ Sträng / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fel vid sparande av e-post, försök igen</string>
   <string name="kyc_email_send_verification">Skicka epost</string>
   <string name="kyc_email_validation_header">Kolla din inkorg.</string>
@@ -1257,7 +1245,7 @@
   <string name="kyc_onfido_splash_verification_error">Fel vid verifiering av ID, försök igen</string>
   <string name="kyc_veriff_splash_country_supported_header">Stöds mitt land?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Inte alla länder stöds just nu. Kontrollera vår uppdaterade <annotation link="country_list"> lista över länder </annotation> innan du fortsätter.</string>
-  <string name="kyc_veriff_splash_title">\@ Sträng / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
   <string name="kyc_veriff_splash_header">Låt oss bekräfta att det är du</string>
   <string name="kyc_veriff_splash_subtitle">Du behöver 1 av ID-typerna nedan för att fortsätta.</string>
@@ -1279,11 +1267,11 @@
   <string name="kyc_complete_device_verified">Enheten har verifierats</string>
   <string name="kyc_complete_id_uploaded">ID laddat upp</string>
   <string name="kyc_complete_video_uploaded">Video laddad upp</string>
-  <string name="kyc_help_dialog_need_some_help">\@ Sträng / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Vårt supportteam för Blockchain har skrivit hjälpguider som förklarar varför vi måste verifiera din identitet.</string>
   <string name="kyc_help_dialog_read_now">Läs nu</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ Sträng / CONTACT_SUPPORT</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitetsverifiering</string>
   <string name="kyc_settings_status_none">Unverified</string>
@@ -1295,7 +1283,7 @@
   <string name="kyc_settings_gold_level_in_review">Guldnivå - Granskning</string>
   <string name="kyc_settings_gold_level_approved">Guldnivå - Godkänd</string>
   <string name="kyc_settings_silver_level_approved">Silvernivå - Godkänd</string>
-  <string name="kyc_settings_tier_status_failed">\@ Sträng / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fel vid hämtning av KYC-status</string>
   <string name="kyc_status_title_in_progress">Verifiering pågår</string>
   <string name="kyc_status_title_approved">Kontot godkänd</string>
@@ -1319,10 +1307,10 @@
   <string name="kyc_drop_off_card_description">Plocka upp var du slutade och slutför din identitetsverifiering.</string>
   <string name="kyc_drop_off_card_button">Fortsätt verifieringen</string>
   <string name="kyc_documents_needed">Dokument behövs</string>
-  <string name="kyc_resubmission_card_title">\@ Sträng / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Vi hade några problem med dokumenten du har levererat. Försök att ladda upp dokumenten igen för att fortsätta med verifieringen.</string>
   <string name="kyc_resubmission_card_button">Ladda upp dokument</string>
-  <string name="kyc_resubmission_splash_title">\@ Sträng / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Vi kan inte verifiera din identitet och behöver att du laddar upp de nödvändiga dokumenten.</string>
   <string name="kyc_resubmission_splash_description_2">De viktigaste orsakerna till att detta händer:</string>
   <string name="kyc_resubmission_splash_description_3">De nödvändiga fotona saknas.</string>
@@ -1542,7 +1530,6 @@
   <string name="estimated_amount">Est. Belopp</string>
   <string name="buying_fee">Köpsavgift</string>
   <string name="purchase_bank_note">När vi har fått dina medel börjar du din beställning av %1$s . Observera att ditt slutliga belopp kan ändras till marknadsaktivitet. Avgifter kan tillkomma.</string>
-  <string name="purchase_card_note">Vi debiterar din betalningsmetod inom två arbetsdagar. Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
   <string name="complete_payment">Komplett betalning</string>
   <string name="card_payment">Kortbetalning</string>
   <string name="buy_now">Köp nu</string>

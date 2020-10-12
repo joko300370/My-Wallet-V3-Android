@@ -5,21 +5,21 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.fragment.app.Fragment
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.DecelerateInterpolator
+import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.koin.scopedInject
-import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import com.blockchain.swap.nabu.StartKyc
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -62,7 +62,9 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
             CampaignType.Sunriver,
             CampaignType.SimpleBuy,
             CampaignType.Blockstack,
-            CampaignType.Resubmission -> R.string.sunriver_splash_title
+            CampaignType.Resubmission,
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 

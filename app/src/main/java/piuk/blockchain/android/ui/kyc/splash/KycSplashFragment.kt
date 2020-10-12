@@ -8,14 +8,10 @@ import androidx.navigation.NavDirections
 import com.blockchain.activities.StartOnboarding
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_COINIFY_POLICY
 import io.reactivex.disposables.CompositeDisposable
@@ -23,9 +19,13 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -67,6 +67,8 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
                 CampaignType.Resubmission -> AnalyticsEvents.KycResubmission
                 CampaignType.Blockstack -> AnalyticsEvents.KycBlockstackStart
                 CampaignType.SimpleBuy -> AnalyticsEvents.KycSimpleBuyStart
+                CampaignType.FiatFunds -> AnalyticsEvents.KycFiatFundsStart
+                CampaignType.Interest -> AnalyticsEvents.KycFiatFundsStart
             }
         )
 
@@ -74,8 +76,10 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
             CampaignType.Sunriver,
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
-            CampaignType.Resubmission -> R.string.buy_sell_splash_title
+            CampaignType.Resubmission,
+            CampaignType.FiatFunds -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
+            CampaignType.Interest -> R.string.earn_interest
         }
 
         progressListener.setHostTitle(title)

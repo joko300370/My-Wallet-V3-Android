@@ -9,34 +9,34 @@ class ExchangeRateTest {
     @Test
     fun `crypto to crypto`() {
         ExchangeRate.CryptoToCrypto(CryptoCurrency.BTC, CryptoCurrency.BCH, 20.toBigDecimal())
-            .applyRate(CryptoValue.bitcoinFromMajor(10)) `should equal` CryptoValue.bitcoinCashFromMajor(200)
+            .applyRate(10.bitcoin()) `should equal` 200.bitcoinCash()
     }
 
     @Test
     fun `crypto to fiat`() {
         ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal())
-            .applyRate(CryptoValue.bitcoinFromMajor(10)) `should equal` 200.usd()
+            .applyRate(10.bitcoin()) `should equal` 200.usd()
     }
 
     @Test
     fun `fiat to crypto`() {
         ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 20.toBigDecimal())
-            .applyRate(10.usd()) `should equal` CryptoValue.bitcoinFromMajor(200)
+            .applyRate(10.usd()) `should equal` 200.bitcoin()
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = ValueTypeMismatchException::class)
     fun `crypto to crypto - from miss match`() {
         ExchangeRate.CryptoToCrypto(CryptoCurrency.BCH, CryptoCurrency.BCH, 20.toBigDecimal())
-            .applyRate(CryptoValue.bitcoinFromMajor(10))
+            .applyRate(10.bitcoin())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = ValueTypeMismatchException::class)
     fun `crypto to fiat - from miss match`() {
         ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal())
             .applyRate(10.ether())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = ValueTypeMismatchException::class)
     fun `fiat to crypto - from miss match`() {
         ExchangeRate.FiatToCrypto("GBP", CryptoCurrency.BTC, 20.toBigDecimal())
             .applyRate(10.usd())
@@ -45,14 +45,14 @@ class ExchangeRateTest {
     @Test
     fun `crypto to crypto - multiply`() {
         val rate = ExchangeRate.CryptoToCrypto(CryptoCurrency.BTC, CryptoCurrency.BCH, 20.toBigDecimal())
-        val cryptoValue = CryptoValue.bitcoinFromMajor(10)
-        cryptoValue * rate `should equal` CryptoValue.bitcoinCashFromMajor(200)
+        val cryptoValue = 10.bitcoin()
+        cryptoValue * rate `should equal` 200.bitcoinCash()
     }
 
     @Test
     fun `crypto to fiat - multiply`() {
         val rate: ExchangeRate.CryptoToFiat = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal())
-        val cryptoValue = CryptoValue.bitcoinFromMajor(10)
+        val cryptoValue = 10.bitcoin()
 
         cryptoValue * rate `should equal` 200.usd()
     }
@@ -61,13 +61,13 @@ class ExchangeRateTest {
     fun `fiat to crypto - multiply`() {
         val rate = ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 20.toBigDecimal())
 
-        10.usd() * rate `should equal` CryptoValue.bitcoinFromMajor(200)
+        10.usd() * rate `should equal` 200.bitcoin()
     }
 
     @Test
     fun `crypto to fiat - inverse`() {
         ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 20.toBigDecimal()).inverse()
-            .applyRate(200.usd()) `should equal` CryptoValue.bitcoinFromMajor(10)
+            .applyRate(200.usd()) `should equal` 10.bitcoin()
     }
 
     @Test
@@ -76,18 +76,18 @@ class ExchangeRateTest {
             CryptoCurrency.BTC,
             "USD",
             20.toBigDecimal()
-        ) `should equal` CryptoValue.bitcoinFromMajor(10)
+        ) `should equal` 10.bitcoin()
     }
 
     @Test
     fun `fiat to crypto - inverse`() {
         ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 20.toBigDecimal()).inverse()
-            .applyRate(CryptoValue.bitcoinFromMajor(200)) `should equal` 10.usd()
+            .applyRate(200.bitcoin()) `should equal` 10.usd()
     }
 
     @Test
     fun `fiat to crypto - divide`() {
-        CryptoValue.bitcoinFromMajor(200) / ExchangeRate.FiatToCrypto(
+        200.bitcoin() / ExchangeRate.FiatToCrypto(
             "USD",
             CryptoCurrency.BTC,
             20.toBigDecimal()
@@ -107,7 +107,7 @@ class ExchangeRateTest {
     @Test
     fun `crypto to crypto - divide`() {
         val rate = ExchangeRate.CryptoToCrypto(CryptoCurrency.BCH, CryptoCurrency.BTC, 20.toBigDecimal())
-        val cryptoValue = CryptoValue.bitcoinFromMajor(20)
-        cryptoValue / rate `should equal` CryptoValue.bitcoinCashFromMajor(1)
+        val cryptoValue = 20.bitcoin()
+        cryptoValue / rate `should equal` 1.bitcoinCash()
     }
 }

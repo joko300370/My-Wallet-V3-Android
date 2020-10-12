@@ -11,3 +11,5 @@ inline fun <T> Iterable<T>.nextAfterOrNull(predicate: (T) -> Boolean): T? {
 
 val <T> T.exhaustive: T
     get() = this
+
+fun <E> Iterable<E>.replace(old: E, new: E) = map { if (it == old) new else it }

@@ -2,11 +2,12 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuyLimits
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellLimits
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
+import com.blockchain.swap.nabu.datamanagers.BuySellPair
+import com.blockchain.swap.nabu.datamanagers.BuySellPairs
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
@@ -34,13 +35,12 @@ class SimpleBuyModelTest {
     private lateinit var model: SimpleBuyModel
     private val defaultState = SimpleBuyState(
         selectedCryptoCurrency = CryptoCurrency.BTC,
-        enteredAmount = "12.22",
+        amount = FiatValue.fromMinor("USD", 1000),
         fiatCurrency = "USD",
         selectedPaymentMethod = SelectedPaymentMethod(
             id = "123-321",
             paymentMethodType = PaymentMethodType.PAYMENT_CARD
-        )
-    )
+        ))
     private val gson = Gson()
     private val interactor: SimpleBuyInteractor = mock()
     private val prefs: SimpleBuyPrefs = mock {
@@ -72,18 +72,24 @@ class SimpleBuyModelTest {
     fun `interactor fetched limits and pairs should be applied to state`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
             .thenReturn(Single.just(
-                SimpleBuyPairs(listOf(
-                    SimpleBuyPair(pair = "BTC-USD", buyLimits = BuyLimits(100, 5024558)),
-                    SimpleBuyPair(pair = "BTC-EUR", buyLimits = BuyLimits(1006, 10000)),
-                    SimpleBuyPair(pair = "ETH-EUR", buyLimits = BuyLimits(1005, 10000)),
-                    SimpleBuyPair(pair = "BCH-EUR", buyLimits = BuyLimits(1001, 10000))
+                BuySellPairs(listOf(
+                    BuySellPair(pair = "BTC-USD",
+                        buyLimits = BuySellLimits(100, 5024558),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "BTC-EUR", buyLimits = BuySellLimits(1006, 10000),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "ETH-EUR", buyLimits = BuySellLimits(1005, 10000),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
+                        sellLimits = BuySellLimits(100, 5024558))
                 ))))
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.FetchBuyLimits("USD"))
+        model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(supportedPairsAndLimits = listOf(
-            SimpleBuyPair("BTC-USD", BuyLimits(min = 100, max = 5024558))),
+            BuySellPair("BTC-USD", BuySellLimits(min = 100, max = 5024558),
+                sellLimits = BuySellLimits(100, 5024558))),
             fiatCurrency = "USD",
             selectedCryptoCurrency = CryptoCurrency.BTC
         ))
@@ -110,16 +116,18 @@ class SimpleBuyModelTest {
             paymentMethod = any(),
             isPending = any()
         )).thenReturn(Single.just(SimpleBuyIntent.OrderCreated(
-            BuyOrder(
+            BuySellOrder(
                 id = "testId",
                 expires = date,
                 state = OrderState.AWAITING_FUNDS,
                 crypto = CryptoValue.ZeroBtc,
+                orderValue = CryptoValue.ZeroBtc,
                 paymentMethodId = "213",
                 updated = Date(),
                 paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
                 fiat = FiatValue.zero("USD"),
-                pair = "USD-BTC"
+                pair = "USD-BTC",
+                type = OrderType.BUY
             ))))
 
         val testObserver = model.state.test()
@@ -131,6 +139,7 @@ class SimpleBuyModelTest {
             defaultState.copy(
                 orderState = OrderState.AWAITING_FUNDS,
                 id = "testId",
+                orderValue = CryptoValue.ZeroBtc,
                 expirationDate = date))
     }
 
@@ -157,7 +166,7 @@ class SimpleBuyModelTest {
         val id = "testId"
         whenever(interactor.fetchOrder(id))
             .thenReturn(Single.just(
-                BuyOrder(
+                BuySellOrder(
                     id = id,
                     pair = "EUR-BTC",
                     fiat = FiatValue.fromMinor("EUR", 10000),
@@ -170,12 +179,13 @@ class SimpleBuyModelTest {
                     attributes = CardPaymentAttributes(
                         EverypayPaymentAttrs(paymentLink = paymentLink,
                             paymentState = EverypayPaymentAttrs.WAITING_3DS)
-                    )
+                    ),
+                    type = OrderType.BUY
                 )
             ))
 
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.MakeCardPayment("testId"))
+        model.process(SimpleBuyIntent.MakePayment("testId"))
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(isLoading = true))
@@ -188,14 +198,18 @@ class SimpleBuyModelTest {
     }
 
     @Test
-    fun `predefined shoulb be filtered properly based on the buy limits`() {
+    fun `predefined should be filtered properly based on the buy limits`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
             .thenReturn(Single.just(
-                SimpleBuyPairs(listOf(
-                    SimpleBuyPair(pair = "BTC-USD", buyLimits = BuyLimits(100, 3000)),
-                    SimpleBuyPair(pair = "BTC-EUR", buyLimits = BuyLimits(1006, 10000)),
-                    SimpleBuyPair(pair = "ETH-EUR", buyLimits = BuyLimits(1005, 10000)),
-                    SimpleBuyPair(pair = "BCH-EUR", buyLimits = BuyLimits(1001, 10000))
+                BuySellPairs(listOf(
+                    BuySellPair(pair = "BTC-USD", buyLimits = BuySellLimits(100, 3000),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "BTC-EUR", buyLimits = BuySellLimits(1006, 10000),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "ETH-EUR", buyLimits = BuySellLimits(1005, 10000),
+                        sellLimits = BuySellLimits(100, 5024558)),
+                    BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
+                        sellLimits = BuySellLimits(100, 5024558))
                 ))))
 
         whenever(interactor.fetchPredefinedAmounts("USD"))
@@ -207,7 +221,7 @@ class SimpleBuyModelTest {
 
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchPredefinedAmounts("USD"))
-        model.process(SimpleBuyIntent.FetchBuyLimits("USD"))
+        model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(predefinedAmounts = listOf(
@@ -218,7 +232,8 @@ class SimpleBuyModelTest {
 
         testObserver.assertValueAt(2, defaultState.copy(
             supportedPairsAndLimits = listOf(
-                SimpleBuyPair(pair = "BTC-USD", buyLimits = BuyLimits(100, 3000))
+                BuySellPair(pair = "BTC-USD", buyLimits = BuySellLimits(100, 3000),
+                    sellLimits = BuySellLimits(100, 5024558))
             ),
             selectedCryptoCurrency = CryptoCurrency.BTC,
             predefinedAmounts = listOf(

@@ -3,9 +3,10 @@ package com.blockchain.datamanagers
 import com.blockchain.datamanagers.fees.getFeeOptions
 import com.blockchain.fees.FeeType
 import com.blockchain.logging.SwapDiagnostics
-import com.blockchain.transactions.Memo
+import com.blockchain.sunriver.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
@@ -23,7 +24,7 @@ internal class SelfFeeCalculatingTransactionExecutor(
         amount: CryptoValue,
         sendingAccount: AccountReference
     ): Single<Boolean> {
-        return if (amount.currency != CryptoCurrency.PAX) {
+        return if (!amount.currency.hasFeature(IS_ERC20)) {
             return Single.just(true)
         } else {
             balanceCalculator.balance(CryptoCurrency.ETHER).singleOrError()

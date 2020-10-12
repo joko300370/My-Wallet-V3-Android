@@ -22,16 +22,18 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.BuildConfig
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
+import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
-import piuk.blockchain.android.data.currency.CurrencyState
+import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
-import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
@@ -43,7 +45,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.secondPasswordEvent
 import timber.log.Timber
@@ -53,15 +54,12 @@ interface MainView : MvpView, HomeNavigator {
     @Deprecated("Used for processing deep links. Find a way to get rid of this")
     fun getStartIntent(): Intent
 
-    fun onHandleInput(strUri: String)
     fun refreshAnnouncements()
     fun kickToLauncherPage()
     fun showProgressDialog(@StringRes message: Int)
     fun hideProgressDialog()
     fun clearAllDynamicShortcuts()
     fun setPitEnabled(enabled: Boolean)
-    fun setSimpleBuyEnabled(enabled: Boolean)
-    fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
     fun displayLockboxMenu(lockboxAvailable: Boolean)
@@ -70,6 +68,9 @@ interface MainView : MvpView, HomeNavigator {
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
+
+    fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
+    fun showScanTargetError(error: QrScanError)
 }
 
 class MainPresenter internal constructor(
@@ -78,7 +79,6 @@ class MainPresenter internal constructor(
     private val credentialsWiper: CredentialsWiper,
     private val payloadDataManager: PayloadDataManager,
     private val exchangeRateFactory: ExchangeRateDataManager,
-    private val currencyState: CurrencyState,
     private val environmentSettings: EnvironmentConfig,
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
@@ -91,7 +91,6 @@ class MainPresenter internal constructor(
     private val simpleBuySync: SimpleBuySyncFactory,
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
-    private val simpleBuyAvailability: SimpleBuyAvailability,
     private val cacheCredentialsWiper: CacheCredentialsWiper,
     nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
@@ -108,12 +107,6 @@ class MainPresenter internal constructor(
             nabuDataManager.getUser(it)
         }
 
-    internal var cryptoCurrency: CryptoCurrency
-        get() = currencyState.cryptoCurrency
-        set(v) {
-            currencyState.cryptoCurrency = v
-        }
-
     override fun onViewAttached() {
         if (!accessState.isLoggedIn) {
             // This should never happen, but handle the scenario anyway by starting the launcher
@@ -121,27 +114,11 @@ class MainPresenter internal constructor(
             view?.kickToLauncherPage()
         } else {
             logEvents()
-
             checkLockboxAvailability()
-
             lightSimpleBuySync()
-
             doPushNotifications()
-
             checkPitAvailability()
         }
-    }
-
-    private fun initSimpleBuyState() {
-        compositeDisposable +=
-            simpleBuyAvailability.isAvailable()
-                .doOnSubscribe { view?.setSimpleBuyEnabled(false) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        view?.setSimpleBuyEnabled(it)
-                    }
-                )
     }
 
     override fun onViewDetached() {}
@@ -170,7 +147,6 @@ class MainPresenter internal constructor(
 
     internal fun doTestnetCheck() {
         if (environmentSettings.environment == Environment.TESTNET) {
-            cryptoCurrency = CryptoCurrency.BTC
             view?.showTestnetWarning()
         }
     }
@@ -202,7 +178,7 @@ class MainPresenter internal constructor(
                 val strUri = prefs.getValue(PersistentPrefs.KEY_SCHEME_URL, "")
                 if (strUri.isNotEmpty()) {
                     prefs.removeValue(PersistentPrefs.KEY_SCHEME_URL)
-                    view?.onHandleInput(strUri)
+                    processScanResult(strUri)
                 }
                 view?.refreshAnnouncements()
             }
@@ -210,7 +186,6 @@ class MainPresenter internal constructor(
                 onComplete = {
                     checkKycStatus()
                     setDebugExchangeVisibility()
-                    initSimpleBuyState()
                     checkForPendingLinks()
                 },
                 onError = { throwable ->
@@ -377,17 +352,6 @@ class MainPresenter internal constructor(
         showThePitOrPitLinkingView("")
     }
 
-    fun onSimpleBuyClicked() {
-        compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.showProgress()
-            }.doOnComplete {
-                view?.hideProgress()
-            }.subscribe {
-                view?.launchSimpleBuy()
-            }
-    }
-
     private fun showThePitOrPitLinkingView(linkId: String) {
         compositeDisposable += pitLinking.isPitLinked().observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { Timber.e(it) }, onSuccess = { isLinked ->
@@ -397,5 +361,25 @@ class MainPresenter internal constructor(
                     view?.launchThePitLinking(linkId)
                 }
             })
+    }
+
+    fun processScanResult(scanData: String) {
+        compositeDisposable += QrScanHandler.processScan(scanData)
+            .subscribeBy(
+                onSuccess = {
+                    when (it) {
+                        is ScanResult.HttpUri -> handlePossibleDeepLink(scanData)
+                        is ScanResult.TxTarget -> {
+                            view?.startTransactionFlowWithTarget(it.targets)
+                        }
+                    }
+                },
+                onError = {
+                    when (it) {
+                        is QrScanError -> view?.showScanTargetError(it)
+                        else -> { Timber.d("Scan failed") }
+                    }
+                }
+            )
     }
 }

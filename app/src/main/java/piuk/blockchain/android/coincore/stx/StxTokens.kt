@@ -3,38 +3,47 @@ package piuk.blockchain.android.coincore.stx
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
 internal class StxAsset(
-    private val payloadManager: PayloadManager,
+    payloadManager: PayloadDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService,
+    environmentConfig: EnvironmentConfig
 ) : CryptoAssetBase(
+    payloadManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     custodialManager,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService,
+    environmentConfig
 ) {
 
     override val asset: CryptoCurrency
@@ -51,21 +60,24 @@ internal class StxAsset(
         .onErrorReturn { emptyList() }
 
     private fun getStxAccount(): CryptoAccount {
-        val hdWallets = payloadManager.payload?.hdWallets
-            ?: throw IllegalStateException("Wallet not available")
-
-        val stxAccount = hdWallets[0].stxAccount
-            ?: throw IllegalStateException("Wallet not available")
+        val stxAccount = payloadManager.stxAccount
 
         return StxCryptoWalletAccount(
+            payloadManager,
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
             exchangeRates = exchangeRates
         )
     }
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        null
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Maybe.fromCallable {
+            if (isValidAddress(address)) {
+                StxAddress(address)
+            } else {
+                null
+            }
+        }
 
     private fun isValidAddress(address: String): Boolean =
         false

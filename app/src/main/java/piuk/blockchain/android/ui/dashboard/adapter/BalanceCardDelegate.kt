@@ -1,31 +1,31 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.annotation.SuppressLint
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
+import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_dashboard_balance_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.BalanceState
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import com.github.mikephil.charting.data.PieData
-import android.graphics.Color
-import piuk.blockchain.android.util.colorRes
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
+import piuk.blockchain.android.util.colorRes
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
-class BalanceCardDelegate<in T> : AdapterDelegate<T> {
+class BalanceCardDelegate<in T>(private val selectedFiat: String) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is BalanceState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        BalanceCardViewHolder(parent.inflate(R.layout.item_dashboard_balance_card))
+        BalanceCardViewHolder(parent.inflate(R.layout.item_dashboard_balance_card), selectedFiat)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -35,7 +35,8 @@ class BalanceCardDelegate<in T> : AdapterDelegate<T> {
 }
 
 private class BalanceCardViewHolder internal constructor(
-    itemView: View
+    itemView: View,
+    private val selectedFiat: String
 ) : RecyclerView.ViewHolder(itemView) {
 
     internal fun bind(state: BalanceState) {
@@ -52,7 +53,6 @@ private class BalanceCardViewHolder internal constructor(
         itemView.total_balance.resetLoader()
         itemView.balance_delta_value.resetLoader()
         itemView.balance_delta_percent.resetLoader()
-        itemView.delta_interval.resetLoader()
 
         populateEmptyPieChart()
     }
@@ -72,8 +72,6 @@ private class BalanceCardViewHolder internal constructor(
                 balance_delta_value.text = deltaVal.toStringWithSymbol()
                 balance_delta_value.setDeltaColour(deltaPercent)
                 balance_delta_percent.asDeltaPercent(deltaPercent, "(", ")")
-
-                delta_interval.text = "Today"
             }
 
             populatePieChart(state)
@@ -102,9 +100,12 @@ private class BalanceCardViewHolder internal constructor(
             val entries = ArrayList<PieEntry>().apply {
                 CryptoCurrency.activeCurrencies().forEach {
                     val asset = state[it]
-                    val point = asset.fiatBalance?.toFloat() ?: 0.0f
+                    val point = asset.fiatBalance?.toFloat() ?: 0f
                     add(PieEntry(point))
                 }
+
+                // Add all fiat from Funds
+                add(PieEntry(state.getFundsFiat(selectedFiat).toFloat()))
             }
 
             if (entries.all { it.value == 0.0f }) {
@@ -112,7 +113,10 @@ private class BalanceCardViewHolder internal constructor(
             } else {
                 val sliceColours = CryptoCurrency.activeCurrencies().map {
                     ContextCompat.getColor(itemView.context, it.colorRes())
-                }
+                }.toMutableList()
+
+                // Add colour for Funds
+                sliceColours.add(ContextCompat.getColor(itemView.context, R.color.green_500))
 
                 pie_chart.data = PieData(
                     PieDataSet(entries, null).apply {

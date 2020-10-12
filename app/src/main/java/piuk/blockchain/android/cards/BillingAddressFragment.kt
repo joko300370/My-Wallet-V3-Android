@@ -67,17 +67,17 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        header.setOnClickListener {
+        billing_header.setOnClickListener {
             SearchPickerItemBottomSheet.newInstance(Locale.getISOCountries().toList().map {
                 CountryPickerItem(it)
-            }).show(childFragmentManager, "BOTTOM_SHEET")
+            }).show(childFragmentManager, BOTTOM_SHEET)
         }
         state.setOnClickListener {
             SearchPickerItemBottomSheet.newInstance(
                 US.values().map {
                     StatePickerItem(it.ANSIAbbreviation, it.unabbreviated)
                 }
-            ).show(childFragmentManager, "BOTTOM_SHEET")
+            ).show(childFragmentManager, BOTTOM_SHEET)
         }
 
         full_name.addTextChangedListener(textWatcher)

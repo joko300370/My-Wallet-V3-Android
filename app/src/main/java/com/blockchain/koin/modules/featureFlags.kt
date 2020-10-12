@@ -3,10 +3,12 @@ package com.blockchain.koin.modules
 import com.blockchain.koin.cardPaymentsFeatureFlag
 import com.blockchain.koin.coinifyFeatureFlag
 import com.blockchain.koin.coinifyUsersToKyc
-import com.blockchain.koin.interestAccount
+import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.pitAnnouncementFeatureFlag
 import com.blockchain.koin.pitFeatureFlag
+import com.blockchain.koin.sellFeatureFlag
 import com.blockchain.koin.simpleBuyFeatureFlag
+import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.smsVerifFeatureFlag
 import com.blockchain.koin.sunriver
 import com.blockchain.remoteconfig.RemoteConfig
@@ -30,6 +32,14 @@ val featureFlagsModule = module {
         get<RemoteConfig>().featureFlag("simple_buy_method_card_enabled")
     }
 
+    factory(simpleBuyFundsFeatureFlag) {
+        get<RemoteConfig>().featureFlag("simple_buy_method_funds_enabled")
+    }
+
+    factory(sellFeatureFlag) {
+        get<RemoteConfig>().featureFlag("brokerage_sell_enabled")
+    }
+
     factory(simpleBuyFeatureFlag) {
         get<RemoteConfig>().featureFlag("simple_buy_enabled")
     }
@@ -46,7 +56,7 @@ val featureFlagsModule = module {
         get<RemoteConfig>().featureFlag("android_sunriver_airdrop_enabled")
     }
 
-    factory(interestAccount) {
+    factory(interestAccountFeatureFlag) {
         get<RemoteConfig>().featureFlag("interest_account_enabled")
     }
 }

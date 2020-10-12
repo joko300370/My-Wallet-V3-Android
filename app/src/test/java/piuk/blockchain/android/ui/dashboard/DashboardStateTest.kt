@@ -16,7 +16,6 @@ class DashboardStateTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showAssetSheetFor = null,
             announcement = null
         )
 
@@ -28,10 +27,9 @@ class DashboardStateTest {
         val subject = DashboardState(
             assets = mapOfAssets(
                 CryptoCurrency.BTC to initialBtcState,
-                CryptoCurrency.ETHER to AssetState(CryptoCurrency.ETHER),
-                CryptoCurrency.XLM to AssetState(CryptoCurrency.XLM)
+                CryptoCurrency.ETHER to CryptoAssetState(CryptoCurrency.ETHER),
+                CryptoCurrency.XLM to CryptoAssetState(CryptoCurrency.XLM)
             ),
-            showAssetSheetFor = null,
             announcement = null
         )
 
@@ -42,11 +40,10 @@ class DashboardStateTest {
     fun `if no assets are loaded, total balance is null`() {
         val subject = DashboardState(
             assets = mapOfAssets(
-                CryptoCurrency.BTC to AssetState(CryptoCurrency.BTC),
-                CryptoCurrency.ETHER to AssetState(CryptoCurrency.ETHER),
-                CryptoCurrency.XLM to AssetState(CryptoCurrency.XLM)
+                CryptoCurrency.BTC to CryptoAssetState(CryptoCurrency.BTC),
+                CryptoCurrency.ETHER to CryptoAssetState(CryptoCurrency.ETHER),
+                CryptoCurrency.XLM to CryptoAssetState(CryptoCurrency.XLM)
             ),
-            showAssetSheetFor = null,
             announcement = null
         )
 

@@ -1,144 +1,83 @@
 package piuk.blockchain.android.ui.transfer.send
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.blockchain.koin.scopedInject
-import info.blockchain.balance.CryptoCurrency
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_transfer.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.accounts.DefaultCellDecorator
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.ui.transfer.send.adapter.AccountsAdapter
-import piuk.blockchain.android.ui.transfer.send.flow.SendFlow
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
-
-typealias AccountListFilterFn = (BlockchainAccount) -> Boolean
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transfer.AccountListFilterFn
+import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 
 class TransferSendFragment :
-    Fragment(),
-    SlidingModalBottomDialog.Host,
-    SendFlow.Listener {
+    AccountSelectorFragment(),
+    DialogFlow.FlowHost {
 
-    private val disposables = CompositeDisposable()
-    private val coincore: Coincore by scopedInject()
-    private val uiScheduler = AndroidSchedulers.mainThread()
+    private var flow: TransactionFlow? = null
 
-    private lateinit var flow: SendFlow
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_transfer)
-
-    private val filterFn: AccountListFilterFn =
-        { account -> (account is CryptoAccount) && account.isFunded }
+    override val filterFn: AccountListFilterFn = { account ->
+        (account is CryptoAccount) &&
+            account.isFunded &&
+            account.actions.contains(AssetAction.NewSend)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        flow = SendFlow(
-            fragmentManager = childFragmentManager,
-            listener = this,
-            disposables = disposables
-        )
-
-        with(account_list) {
-            val itemList = mutableListOf<CryptoAccount>()
-            val accountAdapter = AccountsAdapter(itemList, ::onAccountSelected)
-
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    DividerItemDecoration.VERTICAL
-                )
-            )
-
-            layoutManager = LinearLayoutManager(
-                requireContext(),
-                LinearLayoutManager.VERTICAL,
-                false
-            )
-
-            adapter = accountAdapter
-
-            disposables += Single.merge(
-                CryptoCurrency.activeCurrencies().map { ac ->
-                    coincore[ac].accountGroup()
-                }.toList()
-            )
-            .observeOn(uiScheduler)
-            .subscribeBy(
-                onNext = {
-                    itemList.addAll(
-                        it.accounts.filter(filterFn).map { it as CryptoAccount }
-                    )
-                    accountAdapter.notifyDataSetChanged()
-                },
-                onError = {
-                    ToastCustom.makeText(
-                        requireContext(),
-                        getString(R.string.transfer_wallets_load_error),
-                        ToastCustom.LENGTH_SHORT,
-                        ToastCustom.TYPE_ERROR
-                    )
-                },
-                onComplete = {
-                    if (itemList.isEmpty()) {
-                        showEmptyState()
-                    }
-                }
-            )
-        }
+        renderList()
     }
 
-    private fun showEmptyState() {
-        account_list.gone()
-        send_blurb.gone()
-        empty_view.visible()
-        button_buy_crypto.setOnClickListener {
+    private fun renderList() {
+        setEmptyStateDetails(R.string.transfer_wallets_empty_title,
+            R.string.transfer_wallets_empty_details, R.string.transfer_wallet_buy_crypto) {
             startActivity(SimpleBuyActivity.newInstance(requireContext()))
         }
+
+        initialiseAccountSelectorWithHeader(
+            statusDecorator = ::statusDecorator,
+            onAccountSelected = ::doOnAccountSelected,
+            title = R.string.transfer_send_crypto_title,
+            label = R.string.transfer_send_crypto_label,
+            icon = R.drawable.ic_send_blue_circle
+        )
     }
 
-    private fun onAccountSelected(cryptoAccount: CryptoAccount) {
-        if (cryptoAccount is CryptoAccount) {
-            disposables += coincore.requireSecondPassword().observeOn(uiScheduler)
-                .subscribeBy(onSuccess = { secondPassword ->
-                    flow.startFlow(cryptoAccount, secondPassword)
-                }, onError = {
-                    Timber.e("Unable to configure send flow, aborting. e == $it")
-                    activity?.finish()
-                })
+    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
+        if (account is CryptoAccount) {
+            SendCellDecorator(account)
+        } else {
+            DefaultCellDecorator()
+        }
+
+    private fun doOnAccountSelected(account: BlockchainAccount) {
+        require(account is CryptoAccount)
+        require(account.actions.contains(AssetAction.NewSend))
+            startTransactionFlow(account)
+    }
+
+    private fun startTransactionFlow(fromAccount: CryptoAccount) {
+        flow = TransactionFlow(
+            sourceAccount = fromAccount,
+            action = AssetAction.NewSend
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@TransferSendFragment
+            )
         }
     }
 
-    override fun onSendFlowFinished() {
-        disposables.clear()
+    override fun onFlowFinished() {
+        flow = null
+        refreshItems()
     }
 
     companion object {
         fun newInstance() = TransferSendFragment()
-    }
-
-    override fun onSheetClosed() {
-        flow.finishFlow()
     }
 }

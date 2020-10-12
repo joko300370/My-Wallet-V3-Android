@@ -4,11 +4,10 @@ object Versions {
 
     // Release info
     const val minSdk = 21
-    const val targetSdk = 28
+    const val targetSdk = 29
     const val compileSdk = 28
-
-    const val versionCode = 555
-    const val versionName = "6.35.1"
+    const val versionCode = 577
+    const val versionName = "7.2.1"
 
     const val buildTools = "28.0.3"
 
@@ -95,9 +94,10 @@ object Versions {
     const val sparkline = "1.2.0"
 
     // Third Party SDKs
-    const val veriff = "3.1.0"
+    const val veriff = "3.2.0"
     const val probity = "1.0.0"
     const val cardForm = "4.2.0"
+    const val xlmSunriver = "0.19.0"
 
     // Logging
     const val timber = "4.7.1"
@@ -237,6 +237,7 @@ object Libraries {
     const val veriff = "com.veriff:veriff-library:${Versions.veriff}"
     const val probity = "io.probity.sdk:collector:${Versions.probity}"
     const val cardForm = "com.braintreepayments:card-form:${Versions.cardForm}"
+    const val sunriver = "com.github.stellar:java-stellar-sdk:${Versions.xlmSunriver}"
 
     // Logging
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

@@ -11,17 +11,13 @@ import kotlinx.android.synthetic.main.spinner_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.account.ItemAccount
 import piuk.blockchain.android.ui.account.formatDisplayBalance
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 
 class AddressAdapter(
     context: Context,
     textViewResourceId: Int,
     accountList: List<ItemAccount>,
-    private val showText: Boolean,
-    private val currencyState: CurrencyState,
-    private val exchangeRates: ExchangeRateDataManager
+    private val showText: Boolean
 ) : ArrayAdapter<ItemAccount>(context, textViewResourceId, accountList) {
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -43,7 +39,7 @@ class AddressAdapter(
                 view.tvTag.text = it.tag
             }
             view.tvLabel.text = it.label
-            view.tvBalance.text = it.formatDisplayBalance(currencyState, exchangeRates)
+            view.tvBalance.text = it.formatDisplayBalance()
         }
 
         return view

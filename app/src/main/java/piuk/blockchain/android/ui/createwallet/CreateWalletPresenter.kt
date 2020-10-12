@@ -92,7 +92,7 @@ class CreateWalletPresenter(
     fun createOrRecoverWallet(email: String, password: String) {
         analytics.logEventOnce(AnalyticsEvents.WalletSignupCreated)
         when {
-            !recoveryPhrase.isEmpty() -> recoverWallet(email, password)
+            recoveryPhrase.isNotEmpty() -> recoverWallet(email, password)
             else -> createWallet(email, password)
         }
     }

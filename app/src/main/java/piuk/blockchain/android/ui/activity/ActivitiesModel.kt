@@ -12,9 +12,17 @@ import timber.log.Timber
 
 enum class ActivitiesSheet {
     ACCOUNT_SELECTOR,
-    ACTIVITY_DETAILS,
+    CRYPTO_ACTIVITY_DETAILS,
+    FIAT_ACTIVITY_DETAILS,
     BANK_TRANSFER_DETAILS,
     BANK_ORDER_CANCEL
+}
+
+enum class CryptoAccountType {
+    NON_CUSTODIAL,
+    CUSTODIAL_TRADING,
+    CUSTODIAL_INTEREST,
+    UNKNOWN
 }
 
 data class ActivitiesState(
@@ -25,7 +33,8 @@ data class ActivitiesState(
     val isError: Boolean = false,
     val selectedTxId: String = "",
     val selectedCryptoCurrency: CryptoCurrency? = null,
-    val isCustodial: Boolean = false
+    val selectedFiatCurrency: String? = null,
+    val accountType: CryptoAccountType = CryptoAccountType.UNKNOWN
 ) : MviState
 
 class ActivitiesModel(
@@ -61,13 +70,7 @@ class ActivitiesModel(
                         onError = { process(ActivityListUpdatedErrorIntent) }
                     )
             is CancelSimpleBuyOrderIntent -> interactor.cancelSimpleBuyOrder(intent.orderId)
-            is ShowActivityDetailsIntent,
-            is ShowBankTransferDetailsIntent,
-            is ShowCancelOrderIntent,
-            is ClearBottomSheetIntent,
-            is ActivityListUpdatedIntent,
-            is ActivityListUpdatedErrorIntent,
-            is ShowAccountSelectionIntent -> null
+            else -> null
         }
     }
 

@@ -20,7 +20,7 @@ interface AccountEditView : View {
 
     fun startScanActivity()
 
-    fun promptPrivateKey(message: String)
+    fun promptPrivateKey(address: String)
 
     fun promptArchive(title: String, message: String)
 

@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
@@ -17,26 +18,32 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import java.math.BigInteger
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class XlmAccountActivityTest {
 
-    private val currencyState: CurrencyState = mock()
+    private val payloadManager: PayloadDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
 
     private val xlmDataManager: XlmDataManager = mock()
+    private val xlmFeesFetcher: XlmFeesFetcher = mock()
+    private val walletOptionsDataManager: WalletOptionsDataManager = mock()
 
     private val subject =
         XlmCryptoWalletAccount(
-            label = "TEst Xlm Account",
+            payloadManager = payloadManager,
+            label = "Test Xlm Account",
             address = "Test XLM Address",
             xlmManager = xlmDataManager,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            xlmFeesFetcher = xlmFeesFetcher,
+            walletOptionsDataManager = walletOptionsDataManager
         )
 
     @get:Rule
@@ -49,7 +56,6 @@ class XlmAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.XLM)
     }
 
     @Test
@@ -79,10 +85,11 @@ class XlmAccountActivityTest {
         val activityItem = result[0] as NonCustodialActivitySummaryItem
         assertEquals(CryptoCurrency.XLM, activityItem.cryptoCurrency)
         assertEquals("hash", activityItem.txId)
-        assertEquals(TransactionSummary.Direction.RECEIVED, activityItem.direction)
+        assertEquals(
+            TransactionSummary.TransactionType.RECEIVED, activityItem.transactionType)
         assertEquals(1, activityItem.confirmations.toLong())
         assertFalse(activityItem.isFeeTransaction)
-        assertEquals(output, activityItem.cryptoValue.toBigInteger())
+        assertEquals(output, activityItem.value.toBigInteger())
         assertEquals(
             mapOf(HORIZON_ACCOUNT_ID_2 to CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)),
             activityItem.inputsMap

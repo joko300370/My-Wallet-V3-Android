@@ -1,8 +1,13 @@
 package com.blockchain.swap.nabu.api.nabu
 
+import com.blockchain.swap.nabu.models.cards.BeneficiariesResponse
 import com.blockchain.swap.nabu.models.cards.CardResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
-import com.blockchain.swap.nabu.models.interest.InterestAccountBalanceResponse
+import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
+import com.blockchain.swap.nabu.models.interest.InterestActivityResponse
+import com.blockchain.swap.nabu.models.interest.InterestAddressResponse
+import com.blockchain.swap.nabu.models.interest.InterestEnabledResponse
+import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
 import com.blockchain.swap.nabu.models.interest.InterestResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
@@ -20,7 +25,6 @@ import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
 import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.swap.nabu.models.nabu.SupportedDocumentsResponse
 import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.UpdateCoinifyTraderIdRequest
 import com.blockchain.swap.nabu.models.nabu.VeriffToken
 import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
 import com.blockchain.swap.nabu.models.simplebuy.ActivateCardResponse
@@ -28,17 +32,24 @@ import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardResponse
 import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
-import com.blockchain.swap.nabu.models.simplebuy.BuyOrderResponse
+import com.blockchain.swap.nabu.models.simplebuy.BuySellOrderResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
+import com.blockchain.swap.nabu.models.simplebuy.FeesResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckResponse
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -167,12 +178,6 @@ internal interface Nabu {
         @Header("authorization") authorization: String
     ): Completable
 
-    @PUT(NABU_UPDATE_COINIFY_ID)
-    fun setCoinifyTraderId(
-        @Body coinifyTraderId: UpdateCoinifyTraderIdRequest,
-        @Header("authorization") authorization: String
-    ): Completable
-
     @PUT(NABU_CONNECT_WALLET_TO_PIT)
     fun connectWalletWithMercury(
         @Header("authorization") authorization: String
@@ -207,12 +212,20 @@ internal interface Nabu {
         @Query("currency") currency: String
     ): Single<List<Map<String, List<Long>>>>
 
+    @GET(NABU_SIMPLE_BUY_TRANSACTIONS)
+    fun getTransactions(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("product") product: String = "SIMPLEBUY"
+    ): Single<TransactionsResponse>
+
     @GET(NABU_SIMPLE_QUOTE)
     fun getSimpleBuyQuote(
         @Header("authorization") authorization: String,
         @Query("currencyPair") currencyPair: String,
         @Query("action") action: String,
-        @Query("amount") amount: String
+        @Query("amount") amount: String,
+        @Query("currency") currency: String
     ): Single<SimpleBuyQuoteResponse>
 
     @PUT(NABU_SIMPLE_BUY_ACCOUNT_DETAILS)
@@ -233,13 +246,38 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("action") action: String?,
         @Body order: CustodialWalletOrder
-    ): Single<BuyOrderResponse>
+    ): Single<BuySellOrderResponse>
+
+    @GET(NABU_SIMPLE_BUY_WITHDRAW_ORDER_FEE)
+    fun withdrawFee(
+        @Header("authorization") authorization: String,
+        @Query("product") product: String = "SIMPLEBUY"
+    ): Single<FeesResponse>
+
+    @Headers("blockchain-origin: simplebuy")
+    @POST(NABU_SIMPLE_BUY_WITHDRAW_ORDER)
+    fun withdrawOrder(
+        @Header("authorization") authorization: String,
+        @Body withdrawRequestBody: WithdrawRequestBody
+    ): Completable
+
+    @POST(NABU_DEPOSIT_ORDER)
+    fun createDepositOrder(
+        @Header("authorization") authorization: String,
+        @Body depositRequestBody: DepositRequestBody
+    ): Completable
 
     @GET(NABU_SIMPLE_BUY_ORDERS)
-    fun getBuyOrders(
+    fun getOrders(
         @Header("authorization") authorization: String,
         @Query("pendingOnly") pendingOnly: Boolean
     ): Single<BuyOrderListResponse>
+
+    @POST(NABU_WITHDRAW_LOCKS_CHECK)
+    fun getWithdrawalLocksCheck(
+        @Header("authorization") authorization: String,
+        @Body withdrawLocksCheckRequestBody: WithdrawLocksCheckRequestBody
+    ): Single<WithdrawLocksCheckResponse>
 
     @DELETE("$NABU_SIMPLE_BUY_ORDERS/{orderId}")
     fun deleteBuyOrder(
@@ -251,14 +289,14 @@ internal interface Nabu {
     fun getBuyOrder(
         @Header("authorization") authHeader: String,
         @Path("orderId") orderId: String
-    ): Single<BuyOrderResponse>
+    ): Single<BuySellOrderResponse>
 
     @POST("$NABU_SIMPLE_BUY_ORDERS/{orderId}")
     fun confirmOrder(
         @Header("authorization") authHeader: String,
         @Path("orderId") orderId: String,
         @Body confirmBody: ConfirmOrderRequestBody
-    ): Single<BuyOrderResponse>
+    ): Single<BuySellOrderResponse>
 
     @POST(NABU_CARDS)
     fun addNewCard(
@@ -270,6 +308,12 @@ internal interface Nabu {
     fun deleteCard(
         @Header("authorization") authHeader: String,
         @Path("cardId") cardId: String
+    ): Completable
+
+    @DELETE("$NABU_BANKS/{id}")
+    fun deleteBank(
+        @Header("authorization") authHeader: String,
+        @Path("id") id: String
     ): Completable
 
     @POST("$NABU_CARDS/{cardId}/activate")
@@ -292,6 +336,11 @@ internal interface Nabu {
         @Query("checkEligibility") checkEligibility: Boolean?
     ): Single<PaymentMethodsResponse>
 
+    @GET(NABU_BENEFICIARIES)
+    fun getLinkedBanks(
+        @Header("authorization") authorization: String
+    ): Single<List<BeneficiariesResponse>>
+
     @GET(NABU_CARDS)
     fun getCards(
         @Header("authorization") authorization: String
@@ -313,7 +362,7 @@ internal interface Nabu {
     fun transferFunds(
         @Header("authorization") authorization: String,
         @Body request: TransferRequest
-    ): Completable
+    ): Single<Response<TransferFundsResponse>>
 
     @GET(NABU_INTEREST_RATES)
     fun getInterestRates(
@@ -322,8 +371,32 @@ internal interface Nabu {
     ): Single<Response<InterestResponse>>
 
     @GET(NABU_INTEREST_ACCOUNT_BALANCE)
-    fun getInterestAccountBalance(
+    fun getInterestAccountDetails(
         @Header("authorization") authorization: String,
         @Query("ccy") cryptoSymbol: String
-    ): Single<Response<InterestAccountBalanceResponse>>
+    ): Single<Response<InterestAccountDetailsResponse>>
+
+    @GET(NABU_INTEREST_ADDRESS)
+    fun getInterestAddress(
+        @Header("authorization") authorization: String,
+        @Query("ccy") currency: String
+    ): Single<Response<InterestAddressResponse>>
+
+    @GET(NABU_INTEREST_ACTIVITY)
+    fun getInterestActivity(
+        @Header("authorization") authorization: String,
+        @Query("product") product: String,
+        @Query("currency") currency: String
+    ): Single<Response<InterestActivityResponse>>
+
+    @GET(NABU_INTEREST_LIMITS)
+    fun getInterestLimits(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String
+    ): Single<Response<InterestLimitsFullResponse>>
+
+    @GET(NABU_INTEREST_ENABLED)
+    fun getInterestEnabled(
+        @Header("authorization") authorization: String
+    ): Single<Response<InterestEnabledResponse>>
 }

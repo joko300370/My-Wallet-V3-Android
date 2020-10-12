@@ -3,31 +3,25 @@ package piuk.blockchain.android.ui.kyc.tiersplash
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavDirections
 import com.blockchain.activities.StartSwap
 import com.blockchain.koin.scopedInject
-import piuk.blockchain.android.util.setImageDrawable
-import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.models.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
@@ -38,7 +32,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.kyc.navigate
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
@@ -73,7 +73,9 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             CampaignType.Sunriver,
             CampaignType.SimpleBuy,
             CampaignType.Blockstack,
-            CampaignType.Resubmission -> R.string.sunriver_splash_title
+            CampaignType.Resubmission,
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         container.visibility = if (showContent) View.VISIBLE else View.GONE
         progressListener.setHostTitle(title)

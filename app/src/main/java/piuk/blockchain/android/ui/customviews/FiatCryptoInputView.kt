@@ -24,13 +24,16 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
-import java.lang.IllegalStateException
 import java.text.DecimalFormatSymbols
-import java.util.Locale
 import java.util.Currency
+import java.util.Locale
 import kotlin.properties.Delegates
 
 class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
+
+    val onImeAction: Observable<PrefixedOrSuffixedEditText.ImeOptions> by lazy {
+        enter_amount.onImeAction
+    }
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
 
@@ -48,6 +51,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
         enter_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(s: Editable?) {
+                if (configuration.isInitialised.not())
+                    return
                 if (configuration.input == CurrencyType.Fiat) {
 
                     val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
@@ -80,6 +85,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             configuration =
                 configuration.copy(
                     input = configuration.input.swap(),
+                    output = configuration.output.swap(),
                     predefinedAmount = getLastEnteredAmount(configuration)
                 )
         }
@@ -100,8 +106,12 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             updateFilters(enter_amount.configuration.prefixOrSuffix)
     }
 
-    var configuration: FiatCryptoViewConfiguration by Delegates.observable(FiatCryptoViewConfiguration(
-        CurrencyType.Fiat, CurrencyType.Crypto, currencyPrefs.selectedFiatCurrency, null)
+    var configuration: FiatCryptoViewConfiguration by Delegates.observable(
+        FiatCryptoViewConfiguration(
+            input = CurrencyType.Fiat,
+            output = CurrencyType.Crypto,
+            fiatCurrency = currencyPrefs.selectedFiatCurrency,
+            cryptoCurrency = null)
     ) { _, oldValue, newValue ->
         if (oldValue != newValue) {
 
@@ -131,6 +141,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 if (newValue.output == CurrencyType.Crypto) newValue.predefinedAmount.inCrypto()
                 else newValue.predefinedAmount.inFiat()
             )
+            enter_amount.resetForTyping()
         }
     }
 
@@ -151,6 +162,12 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             it.isEnabled = true
             it.alpha = 1f
         }
+    }
+
+    fun showValue(money: Money) {
+        configuration = configuration.copy(
+            predefinedAmount = money
+        )
     }
 
     private fun updateFilters(prefixOrSuffix: String) {
@@ -190,7 +207,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private fun Money.inCrypto(): CryptoValue =
         when (this) {
             is FiatValue -> toCrypto(exchangeRateDataManager,
-                configuration?.cryptoCurrency ?: throw IllegalStateException("Currency not specified"))
+                configuration.cryptoCurrency ?: throw IllegalStateException("Currency not specified"))
             is CryptoValue -> this
             else -> throw IllegalStateException("Illegal money type")
         }
@@ -200,11 +217,11 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 }
 
 data class FiatCryptoViewConfiguration(
-    val input: CurrencyType = CurrencyType.Fiat,
-    val output: CurrencyType = CurrencyType.Crypto,
     val fiatCurrency: String,
     val cryptoCurrency: CryptoCurrency?,
     val predefinedAmount: Money = FiatValue.zero(fiatCurrency),
+    val input: CurrencyType = (predefinedAmount as? FiatValue)?.let { CurrencyType.Fiat } ?: CurrencyType.Crypto,
+    val output: CurrencyType = (predefinedAmount as? FiatValue)?.let { CurrencyType.Fiat } ?: CurrencyType.Crypto,
     val canSwap: Boolean = true
 ) {
     val isInitialised: Boolean by unsafeLazy {

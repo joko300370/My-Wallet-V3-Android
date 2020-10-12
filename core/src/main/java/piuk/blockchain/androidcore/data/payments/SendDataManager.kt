@@ -6,6 +6,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.apache.commons.lang3.tuple.Pair
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
@@ -45,7 +46,6 @@ class SendDataManager(
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
     ): Observable<String> {
-
         return rxPinning.call<String> {
             paymentService.submitBtcPayment(
                 unspentOutputBundle,
@@ -55,11 +55,20 @@ class SendDataManager(
                 bigIntFee,
                 bigIntAmount
             )
-        }.logLastTx()
-            .applySchedulers()
+        }.logLastTx().applySchedulers()
     }
 
-    fun getTransaction(
+    fun submitBtcPayment(
+        signedTx: Transaction
+    ): Single<String> =
+        rxPinning.callSingle<String> {
+            paymentService.submitBtcPayment(
+                signedTx
+            )
+        }.logLastTx()
+            .applySchedulers()
+
+    fun createAndSignBtcTransaction(
         unspentOutputBundle: SpendableUnspentOutputs,
         keys: List<ECKey>,
         toAddress: String,
@@ -67,7 +76,7 @@ class SendDataManager(
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
     ): Transaction {
-        return paymentService.signAngGetTx(
+        return paymentService.signAngGetBtcTx(
             unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount
         )
     }
@@ -130,8 +139,9 @@ class SendDataManager(
      * @return An [Observable] wrapping an [UnspentOutputs] object
      */
     fun getUnspentBtcOutputs(address: String): Observable<UnspentOutputs> =
-        rxPinning.call<UnspentOutputs> { paymentService.getUnspentBtcOutputs(address) }
-            .applySchedulers()
+        rxPinning.call<UnspentOutputs> {
+            paymentService.getUnspentBtcOutputs(address)
+        }.applySchedulers()
 
     /**
      * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
@@ -233,5 +243,12 @@ class SendDataManager(
             lastTxUpdater.updateLastTxTime()
                 .onErrorComplete()
                 .andThen(Observable.just(it))
+        }
+
+    private fun Single<String>.logLastTx(): Single<String> =
+        this.flatMap {
+            lastTxUpdater.updateLastTxTime()
+                .onErrorComplete()
+                .andThen(Single.just(it))
         }
 }

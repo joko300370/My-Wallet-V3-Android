@@ -8,16 +8,16 @@ import androidx.constraintlayout.widget.ConstraintSet
 import com.blockchain.activities.StartSwap
 import com.blockchain.extensions.px
 import com.blockchain.koin.scopedInject
-import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.ui.dialog.MaterialProgressDialog
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
@@ -50,7 +50,9 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Sunriver,
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
-            CampaignType.Resubmission -> R.string.sunriver_splash_title
+            CampaignType.Resubmission,
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 
@@ -93,7 +95,9 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
-            CampaignType.Sunriver -> R.string.sunriver_status_message
+            CampaignType.Sunriver,
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_status_message
         }
         textViewMessage.setText(message)
     }

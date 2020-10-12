@@ -11,8 +11,8 @@
     <string name="please_wait">Por favor, aguarde</string>
 
     <string name="cancel">Cancelar</string>
-    <string name="yes">Sim</string>
-    <string name="no">Não</string>
+    <string name="common_yes">Sim</string>
+    <string name="common_no">Não</string>
     <string name="polite_no">Não, obrigado</string>
 
     <string name="SENT">Enviado</string>
@@ -73,7 +73,7 @@
 
     <string name="SEND">ENVIAR</string>
 
-    <string name="total">Total</string>
+    <string name="common_total">Total</string>
 
     <string name="max_available">Usar total disponível menos a taxa:</string>
 
@@ -92,8 +92,8 @@
 
     <string name="weak_password">A senha selecionada é muito fraca para proteger seus fundos. É altamente recomendável que você escolha outra. Gostaria de definir uma nova senha?</string>
 
-    <string name="from">De</string>
-    <string name="to">Para</string>
+    <string name="common_from">De</string>
+    <string name="common_to">Para</string>
 
     <string name="confirm_details">Confirmar Pagamento</string>
     <string name="fee">Taxa</string>
@@ -219,7 +219,6 @@
     <string name="privx_required">Chave Privada Requerida</string>
     <string name="watch_only_spend_instructions">Esta ação requer a chave privada do endereço Bitcoin %1$s. Por favor, escaneie o código QR.</string>
     <string name="invalid_private_key">Chave privada inválida</string>
-    <string name="watch_only_import_warning">Você está prestes a importar um endereço watch only, um endereço (ou script de chave pública) armazenado na carteira sem a chave privada correspondente. Isto significa que os fundos podem ser utilizados SOMENTE se você tiver a chave privada armazenada em algum lugar. Se você não tiver a chave privada armazenada, NÃO instrua ninguém a enviar bitcoins para o endereço watch only.\n\nEstas opções são recomendadas apenas para usuários avançados. Deseja continuar? </string>
     <string name="scan_private_key">Escanear chave privada</string>
     <string name="private_key_successfully_imported">Chave privada importada com êxito.</string>
     <string name="watch_only">Watch Only</string>
@@ -471,7 +470,7 @@
     <string name="backup_complete_message">Você pode usar a sua Frase de Backup para restaurar seus fundos caso perca a sua senha. Qualquer pessoa com acesso à sua Frase de Backup pode acessar seus fundos. Portanto, lembre-se de mantê-la off-line em algum lugar seguro e protegido.</string>
     <string name="shortcut_settings_summary">Revele um endereço de recebimento ao manter pressionado o ícone do app no inicializador, tornando o recebimento de bitcoins ainda mais rápido.</string>
 
-    <string name="confirm">Confirmar</string>
+    <string name="common_confirm">Confirmar</string>
     <string name="transactions">Transações</string>
 
     <string name="swipe_receive_preference_summary">Revele um endereço de recebimento ao deslizar para a esquerda na tela de PIN, tornando o recebimento de fundos ainda mais rápido.</string>

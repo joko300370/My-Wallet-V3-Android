@@ -30,6 +30,7 @@ import com.blockchain.sunriver.XlmTransactionTimeoutFetcher
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
 import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.params.BitcoinMainNetParams
@@ -72,8 +73,10 @@ import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.AESUtilWrapper
+import piuk.blockchain.androidcore.utils.CloudBackupAgent
 import piuk.blockchain.androidcore.utils.DeviceIdGenerator
 import piuk.blockchain.androidcore.utils.DeviceIdGeneratorImpl
+import piuk.blockchain.androidcore.utils.EncryptedPrefs
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrefsUtil
 import piuk.blockchain.androidcore.utils.UUIDGenerator
@@ -178,7 +181,7 @@ val coreModule = module {
         factory { WalletOptionsDataManager(get(), get(), get(), get(explorerUrl)) }
             .bind(XlmTransactionTimeoutFetcher::class).bind(XlmHorizonUrlFetcher::class)
 
-        factory { ExchangeRateDataManager(get(), get()) }
+        factory { ExchangeRateDataManager(get(), get()) }.bind(ExchangeRates::class)
 
         scoped { ExchangeRateDataStore(get(), get()) }
 
@@ -214,7 +217,12 @@ val coreModule = module {
         )
     }
 
-    factory { ExchangeRateService(get()) }
+    factory {
+        ExchangeRateService(
+            priceApi = get(),
+            rxBus = get()
+        )
+    }
 
     factory {
         DeviceIdGeneratorImpl(
@@ -232,6 +240,7 @@ val coreModule = module {
     single {
         PrefsUtil(
             store = get(),
+            backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),
             uuidGenerator = get()
         )
@@ -243,6 +252,7 @@ val coreModule = module {
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
         .bind(WalletStatus::class)
+        .bind(EncryptedPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 

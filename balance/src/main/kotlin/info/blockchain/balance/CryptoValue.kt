@@ -23,7 +23,7 @@ data class CryptoValue(
 
     override fun toNetworkString(): String = format(Locale.US).removeComma()
 
-    override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String) =
+    override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String): FiatValue =
         FiatValue.fromMajor(
             fiatCurrency,
             exchangeRates.getLastPrice(currency, fiatCurrency).toBigDecimal() * toBigDecimal()
@@ -71,27 +71,10 @@ data class CryptoValue(
         fun bitcoinFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
 
-        @Deprecated("Historical method", ReplaceWith("bitcoin.bitcoin()"))
-        fun bitcoinFromMajor(bitcoin: Int) = bitcoinFromMajor(bitcoin.toBigDecimal())
-        @Deprecated("Historical method", ReplaceWith("bitcoin.bitcoin()"))
-        fun bitcoinFromMajor(bitcoin: BigDecimal) = fromMajor(CryptoCurrency.BTC, bitcoin)
-
         @Deprecated("Historical method", ReplaceWith("satoshi.satoshiCash()"))
         fun bitcoinCashFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
-        @Deprecated("Historical method", ReplaceWith("bitcoinCash.bitcoinCash()"))
-        fun bitcoinCashFromMajor(bitcoinCash: Int) =
-            fromMajor(CryptoCurrency.BCH, bitcoinCash.toBigDecimal())
 
-        @Deprecated("Historical method", ReplaceWith("bitcoinCash.bitcoinCash()"))
-        fun bitcoinCashFromMajor(bitcoinCash: BigDecimal) =
-            fromMajor(CryptoCurrency.BCH, bitcoinCash)
-
-        @Deprecated("Historical method", ReplaceWith("ether.ether()"))
-        fun etherFromMajor(ether: BigDecimal) = fromMajor(CryptoCurrency.ETHER, ether)
-
-        @Deprecated("Historical method", ReplaceWith("lumens.lumens()"))
-        fun lumensFromMajor(lumens: BigDecimal) = fromMajor(CryptoCurrency.XLM, lumens)
         @Deprecated("Historical method", ReplaceWith("stroop.stroops()"))
         fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
 

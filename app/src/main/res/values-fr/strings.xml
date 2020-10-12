@@ -15,14 +15,14 @@
     <item>douzième mot</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">%d adresse importée</item>
@@ -46,11 +46,11 @@
   <string name="toolbar_cmd_receive_crypto">Recevoir</string>
   <string name="toolbar_cmd_activity">Activité</string>
   <string name="toolbar_cmd_view_activity">Afficher l\'activité</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">Annuler</string>
   <string name="btn_ok">D\'accord</string>
-  <string name="yes">Oui</string>
-  <string name="no">Non</string>
+  <string name="common_yes">Oui</string>
+  <string name="common_no">Non</string>
   <string name="polite_no">Non merci</string>
   <string name="done">Terminé</string>
   <string name="btn_close">Fermer</string>
@@ -162,7 +162,7 @@
   <string name="btn_continue">Continuer</string>
   <string name="btn_forgot_password">Mot de passe oublié?\"</string>
   <string name="SEND">Envoyer</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Utilisez le solde total dépensable:</string>
   <string name="bitpay_remaining_time">Temps restant</string>
   <string name="bitpay_invoice_expired">La facture BitPay a expiré</string>
@@ -188,8 +188,8 @@
   <string name="weak_password">Le mot de passe sélectionné est trop faible pour sécuriser vos fonds. Nous fortement 
  vous suggérons d\'en sélectionner un autre. Souhaitez-vous définir un nouveau mot de passe? 
 </string>
-  <string name="from">De</string>
-  <string name="to">À</string>
+  <string name="common_from">De</string>
+  <string name="common_to">À</string>
   <string name="confirm_details">Confirmer le paiement</string>
   <string name="fee">Frais</string>
   <string name="exit_confirm">Appuyez à nouveau sur le bouton de retour pour quitter</string>
@@ -350,17 +350,6 @@
  Adresse Bitcoin %1$s . Veuillez scanner le code QR. 
 </string>
   <string name="invalid_private_key">Clé privée non valide</string>
-  <string name="watch_only_import_warning">Vous êtes sur le point d\'importer une adresse non utilisable, un 
- adresse (ou script de clé publique) 
- stocké dans le portefeuille sans la clé privée correspondante. Cette 
- signifie que les fonds peuvent être dépensés UNIQUEMENT si vous avez la clé privée stockée ailleurs. Si vous 
- faire 
- ne conservez pas la clé privée, n’informez personne de vous envoyer des bitcoins sur le 
- non dépensable 
- adresse. 
-
- Ces options sont recommandées uniquement pour les utilisateurs avancés. Continuer? 
-</string>
   <string name="scan_private_key">Analyser la clé privée</string>
   <string name="private_key_successfully_imported">Clé privée importée avec succès.</string>
   <string name="private_key_not_matching_address">REMARQUE: la clé privée analysée ne 
@@ -639,7 +628,7 @@
  icône dans le lanceur, ce qui rend la réception de bitcoin encore plus rapide. 
 </string>
   <string name="shortcut_settings_enable">Raccourcis du lanceur</string>
-  <string name="confirm">Confirmer</string>
+  <string name="common_confirm">Confirmer</string>
   <string name="swipe_receive_hint">Glissez pour recevoir</string>
   <string name="swipe_receive_preference_summary">Révéler une adresse de réception lorsque vous balayez vers la gauche 
  l\'écran PIN, ce qui rend la réception des fonds encore plus rapide. 
@@ -827,7 +816,7 @@
  en raison de l\'activité du marché. Une fois qu\'une commande démarre, nous ne pouvons pas l\'arrêter 
 </string>
   <string name="send_to">Envoyer à</string>
-  <string name="receive">Recevoir</string>
+  <string name="common_receive">Recevoir</string>
   <string name="fees">Honoraires</string>
   <string name="value">Valeur</string>
   <string name="status">Statut</string>
@@ -1124,8 +1113,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Nous avons envoyé un lien de vérification à</string>
   <string name="buy_sell_unverified_email_verify_message2">Cliquez dessus et revenez ici pour poursuivre votre transaction.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail ouvert</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Acceptez de Coinify <a href="ignored"> Termes et conditions </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email verifié!</string>
   <string name="buy_sell_verified_email_message">Notre partenaire %1$s traitera votre transaction bitcoin. En cliquant sur Accepter et sur «Continuer», vous créerez un compte avec %1$s .</string>
   <string name="buy_sell_identification_verification">Identifier la vérification</string>
@@ -1232,7 +1220,7 @@
   <string name="kyc_email_title">Vérifiez votre e-mail</string>
   <string name="kyc_email_message">Nous devons vérifier votre adresse e-mail en tant que couche de sécurité supplémentaire.</string>
   <string name="kyc_email_hint_focused">Votre email</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Erreur lors de l\'enregistrement de l\'e-mail, veuillez réessayer</string>
   <string name="kyc_email_send_verification">Envoyer un e-mail</string>
   <string name="kyc_email_validation_header">Vérifiez votre boîte de réception.</string>
@@ -1257,7 +1245,7 @@
   <string name="kyc_onfido_splash_verification_error">Erreur lors de la vérification de l\'ID, veuillez réessayer</string>
   <string name="kyc_veriff_splash_country_supported_header">Mon pays est-il pris en charge?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Tous les pays ne sont pas pris en charge pour le moment. Consultez notre <annotation link="country_list"> liste de pays </annotation> avant de continuer.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ARGENT VÉRIFIÉ</string>
   <string name="kyc_veriff_splash_header">Confirmez que c\'est vous</string>
   <string name="kyc_veriff_splash_subtitle">Vous aurez besoin de l\'un des types d\'ID ci-dessous pour continuer.</string>
@@ -1279,11 +1267,11 @@
   <string name="kyc_complete_device_verified">Appareil vérifié</string>
   <string name="kyc_complete_id_uploaded">ID téléchargé</string>
   <string name="kyc_complete_video_uploaded">Vidéo téléchargée</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Notre équipe d\'assistance Blockchain a rédigé des guides d\'aide expliquant pourquoi nous devons vérifier votre identité.</string>
   <string name="kyc_help_dialog_read_now">Lisez maintenant</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">vérification d\'identité</string>
   <string name="kyc_settings_status_none">Non vérifié</string>
@@ -1295,7 +1283,7 @@
   <string name="kyc_settings_gold_level_in_review">Gold Level - En revue</string>
   <string name="kyc_settings_gold_level_approved">Niveau Or - Approuvé</string>
   <string name="kyc_settings_silver_level_approved">Niveau Argent - Approuvé</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Erreur lors de la récupération de l\'état KYC</string>
   <string name="kyc_status_title_in_progress">Vérification en cours</string>
   <string name="kyc_status_title_approved">Compte approuvé</string>
@@ -1319,10 +1307,10 @@
   <string name="kyc_drop_off_card_description">Reprenez là où vous vous étiez arrêté et terminez votre vérification d\'identité.</string>
   <string name="kyc_drop_off_card_button">Poursuivre la vérification</string>
   <string name="kyc_documents_needed">Documents nécessaires</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Nous avons eu quelques problèmes avec les documents que vous avez fournis. Veuillez réessayer de télécharger les documents pour poursuivre votre vérification.</string>
   <string name="kyc_resubmission_card_button">Télécharger des documents</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nous ne sommes pas en mesure de vérifier votre identité et avons besoin que vous téléchargiez à nouveau les documents requis.</string>
   <string name="kyc_resubmission_splash_description_2">Principales raisons pour cela:</string>
   <string name="kyc_resubmission_splash_description_3">Les photos requises sont manquantes.</string>
@@ -1542,7 +1530,6 @@
   <string name="estimated_amount">Est. Montant</string>
   <string name="buying_fee">Frais d\'achat</string>
   <string name="purchase_bank_note">Une fois que nous aurons reçu vos fonds, nous commencerons votre commande d\'achat %1$s . Notez que votre montant final peut changer en fonction de l\'activité du marché. Des frais peuvent s\'appliquer.</string>
-  <string name="purchase_card_note">Nous débiterons votre mode de paiement dans les 2 jours ouvrables. Votre montant final peut changer en raison de l\'activité du marché.</string>
   <string name="complete_payment">Paiement complet</string>
   <string name="card_payment">Paiement par carte</string>
   <string name="buy_now">Acheter maintenant</string>

@@ -4,18 +4,18 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
 import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.morph.CoinPair
-import com.blockchain.swap.nabu.service.Quote
-import com.blockchain.swap.nabu.service.TradeExecutionService
-import com.blockchain.swap.nabu.service.TradeTransaction
-import com.blockchain.swap.common.trade.MorphTrade
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.serialization.fromMoshiJson
-import com.blockchain.transactions.Memo
-import com.blockchain.transactions.SendException
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendException
+import com.blockchain.swap.common.trade.MorphTrade
+import com.blockchain.swap.nabu.service.Quote
+import com.blockchain.swap.nabu.service.TradeExecutionService
+import com.blockchain.swap.nabu.service.TradeTransaction
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_ORDER_ABOVE_MAX
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_ORDER_EXPIRED
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_ORDER_FAILED_BELOW_MIN
@@ -33,6 +33,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.SwapErrorDialogContent
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.SwapErrorResponse
 import piuk.blockchain.android.ui.swap.homebrew.exchange.model.SwapErrorType
@@ -41,7 +42,6 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.ethereum.exceptions.TransactionInProgressException
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import retrofit2.HttpException
 import timber.log.Timber
 
@@ -182,14 +182,14 @@ class ExchangeConfirmationPresenter internal constructor(
         transaction: TradeTransaction,
         sendingAccount: AccountReference
     ): Single<TradeTransaction> = transactionExecutor.executeTransaction(
-            transaction.deposit,
-            transaction.depositAddress,
-            sendingAccount,
-            memo = transaction.memo(),
-            diagnostics = diagnostics
-        ).flatMap { Single.just(transaction) }
-            .onErrorResumeNext { onSendFundsFailed(transaction, it) }
-            .doOnSuccess { onSendFundsSucceeded(it) }
+        transaction.deposit,
+        transaction.depositAddress,
+        sendingAccount,
+        memo = transaction.memo(),
+        diagnostics = diagnostics
+    ).flatMap { Single.just(transaction) }
+        .onErrorResumeNext { onSendFundsFailed(transaction, it) }
+        .doOnSuccess { onSendFundsSucceeded(it) }
 
     private fun onSendFundsSucceeded(transaction: TradeTransaction) {
         triggerPaxTradeEvent(transaction)
@@ -258,67 +258,76 @@ class ExchangeConfirmationPresenter internal constructor(
         when (this) {
             SwapErrorType.ORDER_BELOW_MIN_LIMIT -> SwapErrorDialogContent(
                 ErrorBottomDialog.Content(
-                    stringUtils.getString(R.string.markets_are_moving),
-                    stringUtils.getFormattedString(R.string.markets_movement_markets_below_required,
-                        minAmountFiat?.formatOrSymbolForZero() ?: ""), R.string.update_order,
-                    R.string.more_info, 0),
+                    title = stringUtils.getString(R.string.markets_are_moving),
+                    descriptionToFormat = Pair(R.string.markets_movement_markets_below_required,
+                        minAmountFiat?.formatOrSymbolForZero() ?: ""),
+                    ctaButtonText = R.string.update_order,
+                    dismissText = R.string.more_info,
+                    icon = 0),
                 { view?.goBack() },
                 { view?.openMoreInfoLink(URL_BLOCKCHAIN_ORDER_FAILED_BELOW_MIN) })
             SwapErrorType.ORDER_ABOVE_MAX_LIMIT ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.markets_are_moving),
-                        stringUtils.getFormattedString(R.string.markets_movement_markets_above_required,
-                            maxAmountFiat?.formatOrSymbolForZero() ?: ""), R.string.update_order,
-                        R.string.more_info, 0),
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(R.string.markets_are_moving),
+                        descriptionToFormat = Pair(R.string.markets_movement_markets_above_required,
+                            maxAmountFiat?.formatOrSymbolForZero() ?: ""),
+                        ctaButtonText = R.string.update_order,
+                        dismissText = R.string.more_info,
+                        icon = 0),
                     { view?.goBack() },
                     { view?.openMoreInfoLink(URL_BLOCKCHAIN_ORDER_ABOVE_MAX) })
             SwapErrorType.DAILY_LIMIT_EXCEEDED,
             SwapErrorType.WEEKLY_LIMIT_EXCEEDED ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.hold_your_horses),
-                        stringUtils.getFormattedString(R.string.above_limit_description,
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(
+                            R.string.hold_your_horses),
+                        descriptionToFormat = Pair(R.string.above_limit_description,
                             maxAmountFiat?.formatOrSymbolForZero() ?: ""),
-                        R.string.update_order,
-                        R.string.more_info,
-                        0), { view.goBack() },
+                        ctaButtonText = R.string.update_order,
+                        dismissText = R.string.more_info,
+                        icon = 0), { view.goBack() },
                     { view?.openMoreInfoLink(URL_BLOCKCHAIN_ORDER_LIMIT_EXCEED) })
             SwapErrorType.ANNUAL_LIMIT_EXCEEDED ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.hold_your_horses),
-                        stringUtils.getFormattedString(R.string.above_limit_description,
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(R.string.hold_your_horses),
+                        descriptionToFormat = Pair(R.string.above_limit_description,
                             maxAmountFiat?.formatOrSymbolForZero() ?: ""),
-                        R.string.update_order,
-                        R.string.increase_limits,
-                        0),
+                        ctaButtonText = R.string.update_order,
+                        dismissText = R.string.increase_limits,
+                        icon = 0),
                     { view.goBack() },
                     { view.openTiersCard() })
             SwapErrorType.CONFIRMATION_ETH_PENDING ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.card_error_title),
-                        stringUtils.getString(R.string.morph_confirmation_eth_pending),
-                        R.string.try_again, 0, 0),
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(R.string.card_error_title),
+                        description = stringUtils.getString(R.string.morph_confirmation_eth_pending),
+                        ctaButtonText = R.string.try_again,
+                        dismissText = 0,
+                        icon = 0),
                     { view.goBack() },
                     { })
             SwapErrorType.ALBERT_EXECUTION_ERROR ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.card_error_title),
-                        stringUtils.getString(R.string.something_went_wrong_description),
-                        R.string.try_again,
-                        R.string.more_info,
-                        0),
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(R.string.card_error_title),
+                        description = stringUtils.getString(R.string.something_went_wrong_description),
+                        ctaButtonText = R.string.try_again,
+                        dismissText = R.string.more_info,
+                        icon = 0),
                     { view.goBack() },
                     { view?.openMoreInfoLink(URL_BLOCKCHAIN_ORDER_EXPIRED) })
             else ->
                 SwapErrorDialogContent(
-                    ErrorBottomDialog.Content(stringUtils.getString(
-                        R.string.card_error_title),
-                        stringUtils.getString(R.string.something_went_wrong_description),
-                        R.string.try_again, 0, 0),
+                    ErrorBottomDialog.Content(
+                        title = stringUtils.getString(R.string.card_error_title),
+                        description = stringUtils.getString(R.string.something_went_wrong_description),
+                        ctaButtonText = R.string.try_again,
+                        dismissText = 0,
+                        icon = 0),
                     { view?.goBack() },
                     { })
         }

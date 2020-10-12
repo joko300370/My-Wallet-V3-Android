@@ -2,9 +2,7 @@ package piuk.blockchain.android.simplebuy
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencySelected
@@ -16,43 +14,44 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.fragment_simple_buy_currency_selection.*
+import kotlinx.android.synthetic.main.fragment_simple_buy_currency_selection.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.mvi.MviFragment
-import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Locale
 import java.util.Currency
 
-class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
+class SimpleBuySelectCurrencyFragment : MviBottomSheet<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     ChangeCurrencyOptionHost {
 
     private val currencyPrefs: CurrencyPrefs by inject()
     private val settingsDataManager: SettingsDataManager by scopedInject()
     private val appUtil: AppUtil by inject()
     private val compositeDisposable = CompositeDisposable()
-    private var filter: (CurrencyItem) -> Boolean = { true }
+
+    private val currencies: List<String> by unsafeLazy {
+        arguments?.getStringArrayList(CURRENCIES_KEY) ?: emptyList<String>()
+    }
+
+    // show all currencies if passed list is empty
+    private var filter: (CurrencyItem) -> Boolean =
+        { if (currencies.isEmpty()) true else currencies.contains(it.symbol) }
 
     private val adapter = CurrenciesAdapter(true) {
         updateFiat(it)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_simple_buy_currency_selection)
+    override val layoutResource: Int = R.layout.fragment_simple_buy_currency_selection
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        activity.setupToolbar(R.string.simple_buy_select_currency)
+    override fun initControls(view: View) {
         analytics.logEvent(SimpleBuyAnalytics.SELECT_YOUR_CURRENCY_SHOWN)
-        recycler.layoutManager = LinearLayoutManager(activity)
-        recycler.adapter = adapter
-        model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
+        with(view) {
+            recycler.layoutManager = LinearLayoutManager(activity)
+            recycler.adapter = adapter
+        }
         model.process(SimpleBuyIntent.FetchSupportedFiatCurrencies)
     }
 
@@ -67,7 +66,7 @@ class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyInt
             }
             .subscribeBy(onNext = {
                 if (item.isAvailable) {
-                    navigator().goToBuyCryptoScreen()
+                    dismiss()
                 } else {
                     showCurrencyNotAvailableBottomSheet(item)
                 }
@@ -81,7 +80,7 @@ class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyInt
     }
 
     private fun showCurrencyNotAvailableBottomSheet(item: CurrencyItem) {
-        showBottomSheet(CurrencyNotSupportedBottomSheet.newInstance(item))
+        CurrencyNotSupportedBottomSheet.newInstance(item).show(childFragmentManager, "BOTTOM_SHEET")
     }
 
     override val model: SimpleBuyModel by scopedInject()
@@ -115,6 +114,17 @@ class SimpleBuySelectCurrencyFragment : MviFragment<SimpleBuyModel, SimpleBuyInt
     override fun skip() {
         analytics.logEvent(SimpleBuyAnalytics.CURRENCY_NOT_SUPPORTED_SKIP)
         navigator().exitSimpleBuyFlow()
+    }
+
+    companion object {
+        private const val CURRENCIES_KEY = "CURRENCIES_KEY"
+        fun newInstance(currencies: List<String> = emptyList()): SimpleBuySelectCurrencyFragment {
+            return SimpleBuySelectCurrencyFragment().apply {
+                arguments = Bundle().apply {
+                    putStringArrayList(CURRENCIES_KEY, ArrayList(currencies))
+                }
+            }
+        }
     }
 }
 

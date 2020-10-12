@@ -11,6 +11,10 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.FiatActivitySummaryItem
+import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
@@ -41,18 +45,29 @@ class AssetActivityRepository(
             .toObservable()
             .map { list ->
                 list.filter { item ->
-                    if (account is AccountGroup) {
-                        account.includes(item.account)
-                    } else {
-                        account == item.account
+                    when (account) {
+                        is AccountGroup -> {
+                            account.includes(item.account)
+                        }
+                        is CryptoInterestAccount -> {
+                            account.asset == (item as? CustodialInterestActivitySummaryItem)?.cryptoCurrency
+                        }
+                        else -> {
+                            account == item.account
+                        }
                     }
                 }.sorted()
             }
     }
 
     fun findCachedItem(cryptoCurrency: CryptoCurrency, txHash: String): ActivitySummaryItem? =
-        transactionCache.find {
+        transactionCache.filterIsInstance<CryptoActivitySummaryItem>().find {
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
+        }
+
+    fun findCachedItem(currency: String, txHash: String): FiatActivitySummaryItem? =
+        transactionCache.filterIsInstance<FiatActivitySummaryItem>().find {
+            it.currency == currency && it.txId == txHash
         }
 
     fun findCachedItemById(txHash: String): ActivitySummaryItem? =
@@ -69,21 +84,24 @@ class AssetActivityRepository(
     }
 
     override fun getFromNetwork(): Maybe<ActivitySummaryList> =
-        coincore.allWallets.activity.toMaybe().doOnSuccess { activityList ->
-            // on error of activity returns onSuccess with empty list
-            if (activityList.isNotEmpty()) {
-                transactionCache.clear()
-                transactionCache.addAll(activityList)
+        coincore.allWallets()
+            .flatMap { it.activity }
+            .toMaybe()
+            .doOnSuccess { activityList ->
+                // on error of activity returns onSuccess with empty list
+                if (activityList.isNotEmpty()) {
+                    transactionCache.clear()
+                    transactionCache.addAll(activityList)
+                }
+                lastUpdatedTimestamp = System.currentTimeMillis()
+            }.map { list ->
+                // if network comes empty, but we have cache, return cache instead
+                if (list.isEmpty() && transactionCache.isNotEmpty()) {
+                    transactionCache
+                } else {
+                    list
+                }
             }
-            lastUpdatedTimestamp = System.currentTimeMillis()
-        }.map { list ->
-            // if network comes empty, but we have cache, return cache instead
-            if (list.isEmpty() && transactionCache.isNotEmpty()) {
-                transactionCache
-            } else {
-                list
-            }
-        }
 
     override fun getFromCache(): Maybe<ActivitySummaryList> {
         return if (transactionCache.isNotEmpty()) {
