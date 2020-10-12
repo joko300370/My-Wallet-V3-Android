@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.notifications.analytics.CustodialBalanceSendClicked
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,27 +23,33 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
-import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailSheet
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
-import piuk.blockchain.android.ui.dashboard.sheets.CustodyWalletIntroSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
-import piuk.blockchain.android.ui.dashboard.transfer.BasicTransferToWallet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.interest.InterestSummarySheet
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
+import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -54,15 +59,15 @@ import timber.log.Timber
 class EmptyDashboardItem : DashboardItem
 
 private typealias RefreshFn = () -> Unit
-
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
-    AssetDetailSheet.Host,
     ForceBackupForSendSheet.Host,
-    BasicTransferToWallet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
-    FiatFundsNoKycDetailsSheet.Host {
+    FiatFundsNoKycDetailsSheet.Host,
+    DialogFlow.FlowHost,
+    AssetDetailsFlow.AssetDetailsHost,
+    InterestSummarySheet.Host {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
@@ -110,13 +115,18 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             updateDisplayList(newState)
         }
 
-        // Update/show bottom sheet
-        if (this.state?.showAssetSheetFor != newState.showAssetSheetFor) {
-            showAssetSheet(newState.showAssetSheetFor)
-        } else {
-            if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
-                showPromoSheet(newState)
+        if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
+            showPromoSheet(newState)
+        }
+
+        // Update/show dialog flow
+        if (state?.activeFlow != newState.activeFlow) {
+            state?.activeFlow?.let {
+                clearBottomSheet()
+                it.finishFlow()
             }
+
+            newState.activeFlow?.startFlow(childFragmentManager, this)
         }
 
         // Update/show announcement
@@ -183,35 +193,31 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun showAssetSheet(sheetFor: CryptoCurrency?) {
-        if (sheetFor != null) {
-            showBottomSheet(AssetDetailSheet.newInstance(sheetFor))
-        } else {
-            // Nothing, unless we need to remove the sheet? TODO
-        }
-    }
-
     private fun showPromoSheet(state: DashboardState) {
         showBottomSheet(
             when (state.showDashboardSheet) {
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
-                DashboardSheet.CUSTODY_INTRO -> CustodyWalletIntroSheet.newInstance()
                 DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
-                DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance()
-                DashboardSheet.BASIC_WALLET_TRANSFER -> BasicTransferToWallet.newInstance(
-                    state.transferFundsCurrency!!)
+                DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance(state.backupSheetDetails!!)
                 DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
-                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(state.selectedFiatAccount!!)
+                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
+                    state.selectedFiatAccount
+                    ?: return
+                )
                 DashboardSheet.LINK_OR_DEPOSIT -> {
                     state.selectedFiatAccount?.let {
                         LinkBankAccountDetailsBottomSheet.newInstance(it)
                     } ?: LinkBankAccountDetailsBottomSheet.newInstance()
                 }
                 DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
+                DashboardSheet.INTEREST_SUMMARY -> InterestSummarySheet.newInstance(
+                    state.selectedCryptoAccount!!,
+                    state.selectedAsset!!
+                )
                 null -> null
             }
         )
@@ -229,7 +235,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
             val newBalance = s.balance
             if (newBalance != null && newBalance != oldState?.assets?.get(cc)?.balance) {
-                // IF we have the full set, this will fire
+                // If we have the full set, this will fire
                 analyticsReporter.gotAssetBalance(cc, newBalance)
             }
         }
@@ -258,6 +264,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         recycler_view.apply {
             layoutManager = theLayoutManager
             adapter = theAdapter
+
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
         theAdapter.items = displayList
     }
@@ -314,12 +322,16 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         when (requestCode) {
             MainActivity.SETTINGS_EDIT,
             MainActivity.ACCOUNT_EDIT -> model.process(RefreshAllIntent)
-            BACKUP_FUNDS_REQUEST_CODE -> startTransferFunds()
+            BACKUP_FUNDS_REQUEST_CODE -> {
+                state?.backupSheetDetails?.let {
+                    model.process(CheckBackupStatus(it.account, it.action))
+                }
+            }
         }
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
-        model.process(ShowCryptoAssetDetails(cryptoCurrency))
+        model.process(LaunchAssetDetailsFlow(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {
@@ -368,17 +380,23 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             navigator().resumeSimpleBuyKyc()
         }
 
-        override fun startSimpleBuy() {
-            navigator().startSimpleBuy()
+        override fun startSimpleBuy(cryptoCurrency: CryptoCurrency) {
+            navigator().startSimpleBuy(cryptoCurrency)
+        }
+
+        override fun startInterestDashboard() {
+            navigator().startInterestDashboard()
         }
 
         override fun showFiatFundsKyc() {
             model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
         }
 
-        override fun showBankLinking() {
+        override fun showBankLinking() =
             model.process(ShowBankLinkingSheet())
-        }
+
+        override fun openBrowserLink(url: String) =
+            requireContext().launchUrlInBrowser(url)
     }
 
     override fun startWarnCancelSimpleBuyOrder() {
@@ -400,54 +418,99 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowBankLinkingSheet(account))
     }
 
+    override fun showFundsKyc() {
+        model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+    }
+
     override fun fiatFundsVerifyIdentityCta() {
         navigator().launchKyc(CampaignType.FiatFunds)
     }
 
-    // AssetDetailSheet.Host
+    // DialogBottomSheet.Host
     override fun onSheetClosed() {
         model.process(ClearBottomSheet)
     }
 
-    override fun gotoSendFor(account: SingleAccount) {
-        when (account) {
-            is CryptoNonCustodialAccount -> navigator().gotoSendFor(account)
-            is CustodialTradingAccount -> {
-                analytics.logEvent(CustodialBalanceSendClicked(account.asset))
-                model.process(StartCustodialTransfer(account.asset))
-            }
-            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
-        }.exhaustive
+    override fun onFlowFinished() {
+        model.process(ClearBottomSheet)
+    }
+
+    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
+        if (account is CustodialTradingAccount) {
+            model.process(CheckBackupStatus(account, action))
+        } else {
+            model.process(LaunchSendFlow(account, action))
+        }
     }
 
     override fun goToReceiveFor(account: SingleAccount) =
         when (account) {
-            is CryptoNonCustodialAccount -> navigator().gotoReceiveFor(account)
+            is CryptoNonCustodialAccount -> {
+                clearBottomSheet()
+                startOldReceiveFor(account)
+            }
             else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
         }.exhaustive
 
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
 
+    override fun withdrawFiat(currency: String) {
+        navigator().goToWithdraw(currency)
+    }
+
+    override fun goToDeposit(
+        fromAccount: SingleAccount,
+        toAccount: SingleAccount,
+        action: AssetAction
+    ) {
+        model.process(LaunchDepositFlow(toAccount, fromAccount, action))
+    }
+
+    override fun goToSummary(account: SingleAccount, asset: CryptoCurrency) {
+        model.process(UpdateSelectedCryptoAccount(account, asset))
+        model.process(ShowDashboardSheet(DashboardSheet.INTEREST_SUMMARY))
+    }
+
+    override fun goToSellFrom(account: CryptoAccount) {
+        TransactionFlow(
+            sourceAccount = account,
+            action = AssetAction.Sell
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@DashboardFragment
+            )
+        }
+    }
+
     override fun gotoSwap(account: SingleAccount) =
         when (account) {
-            is CryptoNonCustodialAccount -> navigator().launchSwapOrKyc(
-                fromCryptoCurrency = account.asset,
-                targetCurrency = account.asset.defaultSwapTo
-            )
+            is CryptoNonCustodialAccount -> {
+                clearBottomSheet()
+                navigator().launchSwapOrKyc(
+                    fromCryptoCurrency = account.asset,
+                    targetCurrency = account.asset.defaultSwapTo
+                )
+            }
             else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")
         }.exhaustive
+
+    override fun goToInterestDashboard() {
+        navigator().startInterestDashboard()
+    }
 
     override fun startBackupForTransfer() {
         navigator().launchBackupFunds(this, BACKUP_FUNDS_REQUEST_CODE)
     }
 
-    override fun startTransferFunds() {
-        model.process(TransferFunds)
+    override fun startTransferFunds(account: SingleAccount, action: AssetAction) {
+        model.process(LaunchSendFlow(account, action))
     }
 
-    override fun abortTransferFunds() {
-        model.process(AbortFundsTransfer)
+    private fun startOldReceiveFor(account: SingleAccount) {
+        require(account is CryptoAccount)
+        ReceiveActivity.start(requireContext(), account)
     }
 
     companion object {

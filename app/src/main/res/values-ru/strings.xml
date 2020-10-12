@@ -15,14 +15,14 @@
     <item>двенадцатое слово</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ Строка / xlm_memo_text</item>
-    <item>\@ Строка / xlm_memo_id</item>
-    <item>\@ Строка / xlm_memo_hash</item>
-    <item>\@ Строка / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ Строка / xlm_memo_text</item>
-    <item>\@ Строка / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">%d импортированный адрес</item>
@@ -48,11 +48,11 @@
   <string name="toolbar_cmd_receive_crypto">Получать</string>
   <string name="toolbar_cmd_activity">Мероприятия</string>
   <string name="toolbar_cmd_view_activity">Просмотр активности</string>
-  <string name="toolbar_cmd_swap">Swap</string>
+  <string name="common_swap">Swap</string>
   <string name="cancel">Отмена</string>
   <string name="btn_ok">Ok</string>
-  <string name="yes">да</string>
-  <string name="no">нет</string>
+  <string name="common_yes">да</string>
+  <string name="common_no">нет</string>
   <string name="polite_no">Спасибо, не надо</string>
   <string name="done">Выполнено</string>
   <string name="btn_close">близко</string>
@@ -164,7 +164,7 @@
   <string name="btn_continue">Продолжить</string>
   <string name="btn_forgot_password">Забыл пароль?\"</string>
   <string name="SEND">послать</string>
-  <string name="total">Общее количество</string>
+  <string name="common_total">Общее количество</string>
   <string name="max_available">Используйте общий расходный баланс:</string>
   <string name="bitpay_remaining_time">Оставшееся время</string>
   <string name="bitpay_invoice_expired">Срок действия счета BitPay истек</string>
@@ -190,8 +190,8 @@
   <string name="weak_password">Выбранный пароль слишком слаб для защиты ваших средств. Мы сильно 
  предлагаю вам выбрать другой. Хотите ли вы определить новый пароль? 
 </string>
-  <string name="from">Из</string>
-  <string name="to">к</string>
+  <string name="common_from">Из</string>
+  <string name="common_to">к</string>
   <string name="confirm_details">Подтвердите оплату</string>
   <string name="fee">плата</string>
   <string name="exit_confirm">Нажмите кнопку назад еще раз, чтобы выйти</string>
@@ -352,17 +352,6 @@
  Биткойн-адрес %1$s . Пожалуйста, отсканируйте QR-код. 
 </string>
   <string name="invalid_private_key">Неверный закрытый ключ</string>
-  <string name="watch_only_import_warning">Вы собираетесь импортировать не расходуемый адрес, 
- адрес (или скрипт с открытым ключом) 
- хранится в кошельке без соответствующего закрытого ключа. Эта 
- означает, что средства могут быть потрачены ТОЛЬКО, если у вас есть закрытый ключ, хранящийся в другом месте. если ты 
- делать 
- не храните закрытый ключ, НЕ поручайте кому-либо отправлять вам биткойны на 
- без расходуемого 
- адрес. 
-
- Эти параметры рекомендуются только для опытных пользователей. Продолжить? 
-</string>
   <string name="scan_private_key">Сканирование закрытого ключа</string>
   <string name="private_key_successfully_imported">Закрытый ключ успешно импортирован.</string>
   <string name="private_key_not_matching_address">ПРИМЕЧАНИЕ. Отсканированный закрытый ключ не 
@@ -641,7 +630,7 @@
  Иконка в лаунчере, делающая получение биткойнов еще быстрее. 
 </string>
   <string name="shortcut_settings_enable">Ярлыки запуска</string>
-  <string name="confirm">Подтверждение</string>
+  <string name="common_confirm">Подтверждение</string>
   <string name="swipe_receive_hint">Проведите, чтобы получить</string>
   <string name="swipe_receive_preference_summary">Раскройте получающий адрес, когда вы проводите влево на 
  экран PIN, что делает получение средств еще быстрее. 
@@ -829,7 +818,7 @@
  из-за рыночной активности. После запуска заказа мы не можем его остановить 
 </string>
   <string name="send_to">Отправить</string>
-  <string name="receive">Получать</string>
+  <string name="common_receive">Получать</string>
   <string name="fees">сборы</string>
   <string name="value">Значение</string>
   <string name="status">Положение дел</string>
@@ -1126,8 +1115,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Мы отправили ссылку для подтверждения</string>
   <string name="buy_sell_unverified_email_verify_message2">Нажмите на нее и вернитесь сюда, чтобы продолжить транзакцию.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Открыть электронную почту</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Согласитесь с Coinify <a href="ignored"> правилами и условиями </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email подтвержден!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обработает вашу биткойн-транзакцию. Нажав «Согласен» и «Продолжить», вы создадите учетную запись с %1$s .</string>
   <string name="buy_sell_identification_verification">Определить подтверждение</string>
@@ -1234,7 +1222,7 @@
   <string name="kyc_email_title">Подтвердите Ваш электронный адрес</string>
   <string name="kyc_email_message">Нам нужно подтвердить ваш адрес электронной почты как дополнительный уровень безопасности.</string>
   <string name="kyc_email_hint_focused">Ваш адрес электронной почты</string>
-  <string name="kyc_email_hint_unfocused">\@ Строка / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Ошибка при сохранении электронной почты, пожалуйста, попробуйте еще раз</string>
   <string name="kyc_email_send_verification">Отправить письмо</string>
   <string name="kyc_email_validation_header">Проверь свои входящие.</string>
@@ -1259,7 +1247,7 @@
   <string name="kyc_onfido_splash_verification_error">Ошибка при подтверждении ID, пожалуйста, попробуйте еще раз</string>
   <string name="kyc_veriff_splash_country_supported_header">Поддерживается ли моя страна?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">В настоящее время поддерживаются не все страны. Проверьте наш обновленный <annotation link="country_list"> список стран </annotation> прежде чем продолжить.</string>
-  <string name="kyc_veriff_splash_title">\@ Строка / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">СЕРЕБРО ПРОВЕРЕНО</string>
   <string name="kyc_veriff_splash_header">Давайте подтвердим, что это ты</string>
   <string name="kyc_veriff_splash_subtitle">Для продолжения вам понадобится один из следующих типов идентификаторов.</string>
@@ -1281,11 +1269,11 @@
   <string name="kyc_complete_device_verified">Устройство проверено</string>
   <string name="kyc_complete_id_uploaded">ID загружен</string>
   <string name="kyc_complete_video_uploaded">Видео загружено</string>
-  <string name="kyc_help_dialog_need_some_help">\@ Строка / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Наша группа поддержки Blockchain написала справочные руководства, объясняющие, почему мы должны подтвердить вашу личность.</string>
   <string name="kyc_help_dialog_read_now">Прочитай сейчас</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ Строка / CONTACT_SUPPORT</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Подтверждение личности</string>
   <string name="kyc_settings_status_none">непроверенный</string>
@@ -1297,7 +1285,7 @@
   <string name="kyc_settings_gold_level_in_review">Золотой уровень - в обзоре</string>
   <string name="kyc_settings_gold_level_approved">Золотой уровень - утвержден</string>
   <string name="kyc_settings_silver_level_approved">Уровень серебра - Утверждено</string>
-  <string name="kyc_settings_tier_status_failed">\@ Строка / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Ошибка при получении статуса KYC</string>
   <string name="kyc_status_title_in_progress">Проверка в процессе</string>
   <string name="kyc_status_title_approved">Аккаунт утвержден</string>
@@ -1321,10 +1309,10 @@
   <string name="kyc_drop_off_card_description">Возьмите, где вы остановились, и завершите проверку вашей личности.</string>
   <string name="kyc_drop_off_card_button">Продолжить проверку</string>
   <string name="kyc_documents_needed">Необходимые документы</string>
-  <string name="kyc_resubmission_card_title">\@ Строка / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">У нас были некоторые проблемы с документами, которые вы предоставили. Пожалуйста, попробуйте загрузить документы еще раз, чтобы продолжить проверку.</string>
   <string name="kyc_resubmission_card_button">Загрузить документы</string>
-  <string name="kyc_resubmission_splash_title">\@ Строка / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Мы не можем подтвердить вашу личность, и вам необходимо повторно загрузить необходимые документы.</string>
   <string name="kyc_resubmission_splash_description_2">Основные причины этого:</string>
   <string name="kyc_resubmission_splash_description_3">Требуемые фотографии отсутствуют.</string>
@@ -1546,7 +1534,6 @@
   <string name="estimated_amount">Стандартное восточное время. Количество</string>
   <string name="buying_fee">Плата за покупку</string>
   <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>
-  <string name="purchase_card_note">Мы выберем способ оплаты в течение 2 рабочих дней. Ваша итоговая сумма может измениться из-за активности на рынке.</string>
   <string name="complete_payment">Полная оплата</string>
   <string name="card_payment">Оплата картой</string>
   <string name="buy_now">купить сейчас</string>

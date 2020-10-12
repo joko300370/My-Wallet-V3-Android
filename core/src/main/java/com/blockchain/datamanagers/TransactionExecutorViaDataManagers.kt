@@ -10,10 +10,10 @@ import com.blockchain.fees.FeeType
 import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
-import com.blockchain.transactions.Memo
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.TransactionSender
-import com.blockchain.transactions.sendFundsOrThrow
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.XlmDataManager
+import com.blockchain.sunriver.sendFundsOrThrow
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
@@ -49,7 +49,7 @@ internal class TransactionExecutorViaDataManagers(
     private val accountLookup: AccountLookup,
     private val defaultAccountDataManager: DefaultAccountDataManager,
     private val ethereumAccountWrapper: EthereumAccountWrapper,
-    private val xlmSender: TransactionSender,
+    private val xlmSender: XlmDataManager,
     private val coinSelectionRemoteConfig: CoinSelectionRemoteConfig,
     private val analytics: Analytics
 ) : TransactionExecutor {

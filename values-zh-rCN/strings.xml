@@ -1,1026 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-  <string-array name="balance_type">
-    <item>\@字符串/总</item>
-    <item>\@字符串/钱包</item>
-    <item>\@字符串/ lockbox_title</item>
-  </string-array>
+<resources>
   <string-array name="mnemonic_word_requests">
-    <item>第一个词</item>
-    <item>第二个词</item>
-    <item>第三个词</item>
-    <item>第四个词</item>
-    <item>第五个词</item>
-    <item>第六个词</item>
-    <item>第七个词</item>
-    <item>第八个词</item>
-    <item>第九个词</item>
-    <item>第十个词</item>
-    <item>第十一个词</item>
-    <item>第十二个词</item>
+    <item>第一个字</item>
+    <item>第二个字</item>
+    <item>第三个字</item>
+    <item>第四个字</item>
+    <item>第五个字</item>
+    <item>第六个字</item>
+    <item>第七个字</item>
+    <item>第八个字</item>
+    <item>第九个字</item>
+    <item>第十个字</item>
+    <item>第十一字</item>
+    <item>第十二字</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@字符串/ xlm_memo_text</item>
-    <item>\@字符串/ xlm_memo_id</item>
-    <item>\@字符串/ xlm_memo_hash</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
     <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@字符串/ xlm_memo_text</item>
-    <item>\@字符串/ xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
-  <string name="backup_wallet">备份资金</string>
-  <string name="upgrade_wallet">更新</string>
+  <plurals name="transfer_label_plural">
+    <item quantity="other">%d导入的地址</item>
+  </plurals>
+  <string name="upgrade_wallet">升级</string>
+  <string name="backup_wallet">备用资金</string>
   <string name="current_price_btc">1 BTC = %1$s</string>
-  <string name="action_settings">设置</string>
+  <string name="action_settings">设定值</string>
   <string name="all_accounts">所有钱包</string>
-  <string name="please_wait">请稍后</string>
+  <string name="please_wait">请耐心等待</string>
+  <string name="item_buy_sell">买卖</string>
+  <string name="item_buy">购买加密</string>
+  <string name="item_backup">备用资金</string>
+  <string name="item_lockbox">密码箱</string>
+  <string name="item_the_exchange">交换</string>
+  <string name="item_simple_buy">简单购买</string>
+  <string name="item_airdrops">空投</string>
+  <string name="toolbar_cmd_home">家</string>
+  <string name="toolbar_cmd_send">发送</string>
+  <string name="toolbar_cmd_receive_crypto">接收</string>
+  <string name="toolbar_cmd_activity">活动</string>
+  <string name="toolbar_cmd_view_activity">查看活动</string>
+  <string name="toolbar_cmd_swap">Swap</string>
   <string name="cancel">取消</string>
+  <string name="btn_ok">好</string>
   <string name="yes">是</string>
-  <string name="no">否</string>
-  <string name="polite_no">不，谢谢</string>
+  <string name="no">没有</string>
+  <string name="polite_no">不用了，谢谢</string>
   <string name="done">完成</string>
+  <string name="btn_close">关</string>
   <string name="SENT">已发送</string>
+  <string name="pax_fee_1">美元兑美元费用</string>
   <string name="sending">正在发送</string>
-  <string name="RECEIVED">已接收</string>
-  <string name="receiving">正在接收</string>
-  <string name="MOVED">已转账</string>
-  <string name="paid">已支付</string>
-  <string name="payment_request">支付请求</string>
-  <string name="copied_to_clipboard">已复制到剪贴板</string>
+  <string name="RECEIVED">已收到</string>
+  <string name="receiving">接收</string>
+  <string name="MOVED">转入</string>
+  <string name="edit_transaction_hint">编辑交易说明</string>
+  <string name="pie_chart_content">饼形图</string>
+  <string name="paid">已付费</string>
+  <string name="copied_to_clipboard">复制到剪贴板</string>
   <string name="options_id">钱包ID</string>
   <string name="preferences_about_title">关于我们</string>
-  <string name="ask_you_sure_unpair">你确定想要解除设备配对？</string>
-  <string name="select_currency">选择货币种类</string>
-  <string name="options_currency">本地货币</string>
+  <string name="logout_wallet">登出</string>
+  <string name="ask_you_sure_logout">您确定要退出此钱包吗？</string>
+  <string name="btn_logout">登出</string>
+  <string name="select_currency">选择货币</string>
+  <string name="options_currency">当地货币</string>
   <string name="options_units">比特币单位</string>
   <string name="options_tos">服务条款</string>
   <string name="options_privacy">隐私政策</string>
-  <string name="invalid_email">无效邮件地址</string>
-  <string name="invalid_mobile">无效手机号码</string>
-  <string name="invalid_password">无效密码</string>
-  <string name="invalid_password_too_short">请输入超过3个字符</string>
-  <string name="invalid_guid">无效钱包ID</string>
+  <string name="invalid_email">无效的邮件地址</string>
+  <string name="invalid_mobile">手机号码无效</string>
+  <string name="invalid_password">无效的密码</string>
+  <string name="invalid_password_too_short">请输入3个以上的字符</string>
+  <string name="invalid_guid">无效的电子钱包ID</string>
   <string name="password_mismatch_error">密码不匹配</string>
-  <string name="change_password_new_matches_current">您不能用你当前的密码为您的新密码</string>
-  <string name="no_private_key">无法生成私钥</string>
-  <string name="pin_4_strikes">PIN输入已失败4次，请输入密码</string>
-  <string name="pin_4_strikes_password_accepted">密码已被接受，请重新定义PIN</string>
-  <string name="bip38_password_entry">请输入您的私钥密码</string>
-  <string name="pin_entry">输入PIN</string>
-  <string name="password_entry">请输入密码</string>
-  <string name="zero_pin">0000是无效的PIN密码，请重试</string>
-  <string name="invalid_pin">无效PIN，请重试</string>
-  <string name="pin_mismatch_error">PIN无法匹配</string>
-  <string name="create_pin">创建PIN</string>
-  <string name="confirm_pin">确认PIN</string>
-  <string name="create_pin_failed">PIN创建失败，请尝试重新配对设备</string>
-  <string name="change_pin_new_matches_current">您不能使用当前PIN作为新的PIN</string>
-  <string name="pairing_failed">配对失败，请重试</string>
-  <string name="account_locked_title">账户被锁定</string>
-  <string name="account_locked_message">您的账户已经被暂时锁定。请查看您的邮件以获得更多信息并稍后重试</string>
-  <string name="check_connectivity_exit">Blockchain钱包无法获取网络连接。请检查设备连接并重试</string>
-  <string name="double_encryption_password_error">双重加密密码错误。请重试。</string>
-  <string name="create_a_wallet">创建钱包</string>
-  <string name="log_in">登录</string>
-  <string name="manual_pairing">手动配对</string>
-  <string name="pair_wallet_step_1">以%1$s形式通过您的PC或Mac登录您的Blockchain钱包</string>
-  <string name="pair_wallet_step_2">进入设置/钱包信息</string>
-  <string name="pair_wallet_step_3">单击显示配对码以显示二维码，一个黑白正方形条码；使用您的摄像头扫描该代码。</string>
-  <string name="wallet_id">钱包ID</string>
-  <string name="recover_funds">找回资金</string>
-  <string name="recover_funds_warning_message">只要你能访问你的钱包ID和密码，你应该能够时刻保持配对或登录状态。找回资金将会创建新的钱包ID，你想要继续？</string>
-  <string name="recover_funds_instructions">输入您的12位备份词以找回您的资金和交易</string>
-  <string name="recovery_passphrase">备份短语</string>
-  <string name="invalid_recovery_phrase">无效的备份短语。请重试。</string>
-  <string name="creating_wallet">正在创建钱包</string>
-  <string name="restore_failed">恢复钱包失败。请重试</string>
-  <string name="restoring_wallet">正在恢复钱包</string>
-  <string name="password">密码</string>
-  <string name="email">邮件</string>
-  <string name="agree_terms_of_service">同意创建新钱包</string>
-  <string name="blockchain_tos">Blockchain服务条款</string>
-  <string name="create_wallet">创建钱包</string>
-  <string name="new_wallet">新钱包</string>
-  <string name="strength_weak">弱</string>
-  <string name="strength_medium">一般</string>
-  <string name="strength_strong">强</string>
-  <string name="strength_normal">普通</string>
-  <string name="SEND">[%key:send_bitcoin%]</string>
-  <string name="total">总计</string>
-  <string name="max_available">使用总额减去手续费：</string>
-  <string name="invalid_bitcoin_address">比特币地址无效</string>
-  <string name="invalid_amount">无效的金额</string>
-  <string name="enter_double_encryption_pw">请输入双重加密密码</string>
-  <string name="support">支持</string>
-  <string name="rate_us">请给我们打分</string>
-  <string name="licenses">许可</string>
-  <string name="email_chooser">发送邮件…</string>
-  <string name="about">Blockchain钱包 %1$s
-©%2$s Blockchain卢森堡股份公司 
- 版权所有</string>
-  <string name="merchant_download">免费商家App</string>
-  <string name="password_or_wipe">使用密码进入或忘记此钱包</string>
-  <string name="use_password">使用密码</string>
-  <string name="wipe_wallet">忘记钱包</string>
-  <string name="support_leaving_app_warning">这将离开这个App并前往你的浏览器，继续？</string>
-  <string name="weak_password">选择的密码太弱，无法确保您的资金安全。我们强烈建议您选择另一个不同的密码。是否定义新的密码？</string>
-  <string name="from">从</string>
-  <string name="to">到</string>
-  <string name="confirm_details">确认付款</string>
-  <string name="fee">手续费</string>
-  <string name="exit_confirm">再次点击返回按钮退出</string>
-  <string name="label_address">您的地址已经被成功导入。请任意为该地址指定一个友好的显示名称。</string>
-  <string name="label_address2">您的地址已经被成功创建。请任意为该地址指定一个友好的显示名称。</string>
-  <string name="bip38_error">私钥密码无效</string>
-  <string name="privkey_error">无法识别私钥格式</string>
-  <string name="hd_error">分层确定性（HD）钱包错误</string>
-  <string name="scan_not_recognized">无法解码扫描的内容</string>
-  <string name="imported_addresses">导入的地址</string>
-  <string name="remote_save_ok">保存成功</string>
-  <string name="remote_save_ko">保存失败</string>
-  <string name="unpair_wallet">解除钱包配对</string>
-  <string name="unpair">解除配对</string>
-  <string name="change_pin_code">更改PIN</string>
-  <string name="enter_current_pin">请输入当前PIN.</string>
-  <string name="addresses_bitcoin">地址</string>
-  <string name="addresses_bitcoin_cash">Bitcoin Cash 地址</string>
-  <string name="drawer_addresses">地址</string>
-  <string name="create_new">新建地址</string>
-  <string name="import_address">导入地址</string>
-  <string name="wallets">钱包</string>
-  <string name="save_name">保存名称</string>
-  <string name="receive_address_to_clipboard">确定复制这个接收地址到剪切板？ 如果是，请注意其他应用也许能够查看到这些信息。</string>
-  <string name="receive_address_to_share">确定共享这个接收地址用于发送？ 如果是，请注意其他应用也许能够查看到这些信息。</string>
-  <string name="guid_to_clipboard">确定复制这个钱包ID到剪切板？  如果是，请注意其他应用也许能够查看到这些信息。</string>
-  <string name="ssl_pinning_invalid">与主机安全连接失败。这可能表示恶意活动。请在继续前检查您的网络连接和设备。</string>
-  <string name="description">描述</string>
-  <string name="name">名称</string>
-  <string name="save">保存</string>
-  <string name="next">下一步</string>
-  <string name="received_bitcoin">接收到的比特币</string>
-  <string name="received_ethereum">接收到的 Ether</string>
-  <string name="received_bitcoin_cash">接收到的 Bitcoin Cash</string>
-  <string name="verification_failed">验证失败</string>
-  <string name="send_payment">发送付款</string>
-  <string name="share">分享接收地址</string>
-  <string name="confirm_password">确认密码</string>
-  <string name="check_email_to_auth_login">请检查您的电子邮件以批准这次登录尝试.</string>
-  <string name="transaction_fee">交易手续费</string>
-  <string name="your_transactions">没有交易</string>
-  <string name="transaction_occur_when_bitcoin">接收和发送比特币时会产生交易。</string>
-  <string name="transaction_occur_when_eth">接收和发送以太币时会产生交易。</string>
-  <string name="transaction_occur_when_bitcoin_cash">接收和发送比特币现金会产生交易。</string>
-  <string name="transaction_occur_when_lumens">接收和发送 Stellar 时会产生交易。</string>
-  <string name="click">点击</string>
-  <string name="to_start_sending_and_receiving_btc">开始发送和接收比特币</string>
-  <string name="address_book_label">(地址薄)</string>
-  <string name="archived_label">已存档</string>
-  <string name="UPGRADE_YOUR_WALLET">好的，让我们继续</string>
-  <string name="upgrade_page_1">简化备份和恢复</string>
-  <string name="upgrade_page_2">通过分层确定性（HD）地址增强隐私性</string>
-  <string name="upgrade_page_3">自定义你在Blockchain钱包管理比特币的方式</string>
-  <string name="confirm_upgrade_header">我们已经为您的Blockchain钱包添加了这些新的功能:</string>
-  <string name="upgrading">正在升级…</string>
-  <string name="upgrading_started_info">您的钱包正在升级，请耐心等待，所需时间将取决于你的钱包大小和现有版本的新旧</string>
-  <string name="upgrade_success_heading">您的钱包已经升级完成！</string>
-  <string name="upgrade_success_info">您现在正在运行最安全的Blockchain钱包。您现在可以继续使用了。</string>
-  <string name="CLOSE">关闭</string>
-  <string name="total_funds">全部</string>
-  <string name="upgrade_fail_heading">钱包升级失败</string>
-  <string name="upgrade_fail_info">钱包升级出现错误。请稍后重试</string>
-  <string name="not_sane_error">您的Blockchain钱包安装未完成。请重新配对您的钱包或创建一个新钱包。</string>
-  <string name="watchonly_address_receive_warning">您将会通过一个仅查看地址接收比特币。您只有在访问私钥时才能支付这些资金。是否继续？</string>
-  <string name="camera_unavailable">摄像头当前正被另一个应用程序占用。请关闭其他程序并重试。</string>
-  <string name="validating_password">正在验证密码…</string>
-  <string name="validating_pin">正在验证PIN…</string>
-  <string name="creating_pin">正在创建PIN…</string>
-  <string name="decrypting_wallet">正在解密钱包…</string>
-  <string name="password_unchanged">密码未更改</string>
-  <string name="password_changed">密码已更改</string>
-  <string name="password_changed_explanation">您的密码已经被更改，请重新配对您的钱包</string>
-  <string name="verify_email2">您的验证邮箱将被用于当可疑或异常的活动时发送登录码，提醒您的钱包ID，以及当收到资金时发送比特币支付提醒。</string>
-  <string name="disable_root_warning">禁用根设备警告</string>
-  <string name="show_balance">显示余额</string>
-  <string name="create_new_address">创建新地址</string>
-  <string name="auth_failed">授权失败，请重试</string>
-  <string name="send_failed">发送失败，请重试</string>
-  <string name="wallet_updated">钱包更新已收到</string>
-  <string name="device_rooted">您的设备似乎已经被root。提醒：在已root设备上存储资金是不安全的，并且还会导致稳定性问题。如果您继续在此设备上使用我们的比特币钱包，建议您对您的 Blockchain 账户使用双重加密</string>
-  <string name="address_already_in_wallet">您的钱包已经包含了这个地址。</string>
-  <string name="cannot_create_address">此时无法创建新地址。请重试。</string>
-  <string name="saving_address">正在保存地址…</string>
-  <string name="edit">编辑</string>
-  <string name="label_cant_be_empty">标签不能是空白</string>
-  <string name="label_name_match">名称已被使用</string>
-  <string name="warning">警告</string>
-  <string name="ssl_no_connection">我们无法连接到主机以建立安全连接。请在继续之前检查您的网络连接和设备。</string>
-  <string name="retry">重试</string>
-  <string name="archived_description">此项目已存档， 在移动App中不可访问。您将无法从该项目发送资金，但所有资金是安全的。若取消存档该项目便可再次继续使用。</string>
-  <string name="not_archived_description">该项目未存档。若您不想再使用该项目，请对其进行存档。您的资金将是安全的，并且您可随时取消存档。</string>
-  <string name="transfer_success_archive_prompt_title">是否存档扫描到的地址？</string>
-  <plurals name="transfer_success_archive_prompt_plurals">
-    <item quantity="other">%d 个地址已经被成功传输至我的比特币钱包。您要立即存档这些地址吗？</item>
-  </plurals>
-  <string name="default_account_description">此项目已设置为您的默认项目，无法存档。</string>
-  <string name="extended_public_key">扩展的公钥</string>
-  <string name="address">地址</string>
-  <string name="copy_xpub">复制xpub</string>
-  <string name="scan_this_code">您的 xPub是一项高级功能，包含您所有的公开地址。</string>
-  <string name="xpub_sharing_warning">分享您的 xPub 将会授权他人跟踪您的交易历史记录。获得授权的人可能会破坏您访问自己的钱包，因此，请仅与您信任的人分享 xPub。</string>
-  <string name="copy_address">复制地址</string>
-  <string name="archive">存档</string>
-  <string name="unarchive">取消存档</string>
-  <string name="archive_are_you_sure">您确定要存档该项目？</string>
-  <string name="unarchive_are_you_sure">您确定想要取消存档该项目？</string>
-  <string name="send_to_same_address_warning">无法发送到同一个地址。</string>
-  <string name="make_default">设为默认</string>
-  <string name="privx_required">需要私钥</string>
-  <string name="watch_only_spend_instructions">此操作需要比特币地址 %1$s的私钥。请扫描二维码。</string>
-  <string name="invalid_private_key">无效私钥</string>
-  <string name="watch_only_import_warning">您将导入一个只看地址,这个地址（或公钥脚本）存储在钱包中当没有对应的私钥。这意味着资金只有你拥有存储在其他地方的私钥时才能被支出，如果您没有私钥，请不要指导任何人向该地址发送资金。 
-
-这些选项仅推荐高级用户使用。继续？
-    </string>
-  <string name="scan_private_key">扫描私钥</string>
-  <string name="private_key_successfully_imported">私钥被成功导入。</string>
-  <string name="private_key_not_matching_address">注意：扫描到的私钥无法与您的只看地址相对应。 请扫描正确的私钥</string>
-  <string name="watch_only">只看</string>
-  <string name="extended_public_key_description">如果您是商家，展示您的xPub并使用Blockchain商家App安全和私密地接收资金。
-
-保持您的xPub私密。能够访问您的xpub的人将能够看到您所有的资金和交易历史记录
-
-    </string>
-  <string name="extended_public_key_description_bch_only">保持 xPub 私密。 能访问您的 xPub 的人也将能够看到您的所有资金和交易。</string>
-  <string name="watch_only_description">这是一个只看地址。要从这个钱包发送您的资金，请扫描您的私钥。
-    </string>
-  <string name="success">成功</string>
-  <string name="default_label">默认</string>
-  <string name="transfer">转账</string>
-  <string name="transfer_funds">转账到导入的地址？</string>
-  <string name="transfer_recommend">您导入的地址下似乎有一些比特币。您的备份短语并没有备份您的导入地址。为了这些资金的安全，我们建议您将导入的地址中的资金转移到您的备份中。</string>
-  <string name="spendable_addresses">可支付的地址</string>
-  <string name="transfer_confirmed">转账已确认</string>
-  <string name="transfer_confirm">确认转账</string>
-  <string name="transfer_all">全部转移</string>
-  <string name="transfer_amount">转账数量</string>
-  <string name="transfer_archive_message">转账后存档导入的地址</string>
-  <plurals name="transfer_label_plural">
-    <item quantity="other">%d个导入的地址</item>
-  </plurals>
-  <string name="transfer_archive">存档已确认</string>
-  <string name="dont_ask_again">不要在问我。</string>
-  <string name="insufficient_fee">交易手续费过低</string>
-  <string name="customize">自定义</string>
-  <string name="amount">数额</string>
-  <string name="recommended_fee">交易手续费会影响到比特币挖矿网络确认你的交易的速度，并且取决于当前网络条件。我们为当前交易推荐以下手续费。</string>
-  <string name="not_now">不是现在</string>
-  <string name="high_fee_not_necessary_info">您指定了一笔异常高的手续费%1$s。
-
-即使您把手续费降低到%2$s，您的交易预计将会在下一个10分钟（1个区块）被确认。</string>
-  <string name="low_fee_suggestion">你指定了一笔特别小的交易手续费%1$s.
-
-您的交易可能会被卡住甚至可能永远不会被确认。 为了将您的交易被确认的可能性增加到大约1小时（6个区块）以内，我们强烈建议手续费不低于%2$s。</string>
-  <string name="raise_fee">提升手续费</string>
-  <string name="lower_fee">降低手续费</string>
-  <string name="keep_high_fee">保持高手续费</string>
-  <string name="keep_low_fee">保持低手续费</string>
-  <string name="no_confirmed_funds">没有确认的资金支出。</string>
-  <string name="estimate_confirm_block_count">估计确认时间: ~%1$d分钟(%2$d个区块)</string>
-  <string name="fee_too_low_no_confirm">您的手续费太低，您的交易可能永远无法确认。</string>
-  <string name="transaction_surge">比特币挖矿网络目前交易活动频繁,这导致推荐的交易手续费比通常更高。</string>
-  <string name="unsupported_encryption_version">不支持钱包版本%1$s</string>
-  <string name="logout">注销</string>
-  <string name="to_field_helper">输入比特币地址或选择</string>
-  <string name="to_field_helper_no_dropdown">输入比特币地址</string>
-  <string name="update">更新</string>
-  <string name="mobile">手机号码</string>
-  <string name="profile">配置文件</string>
-  <string name="app">App</string>
-  <string name="verify">验证</string>
-  <string name="resend">重新发送</string>
-  <string name="verified">已验证</string>
-  <string name="unverified">未验证</string>
-  <string name="allow">允许</string>
-  <string name="block">阻止</string>
-  <string name="security">安全性</string>
-  <string name="enable">启用</string>
-  <string name="disable">禁用</string>
-  <string name="sms">短信</string>
-  <string name="google_authenticator">谷歌认证</string>
-  <string name="yubikey">Yubikey</string>
-  <string name="disable_2fa_first">请首先在安全设置中通过短信禁用双重验证。</string>
-  <string name="disable_online_only">请在网络浏览器中登录您的钱包来禁用双重验证。</string>
-  <string name="settings_field_cant_be_empty">字段不能为空。</string>
-  <string name="settings_error_updating">错误更新设置，请重试</string>
-  <string name="request_camera_permission">需要访问摄像头</string>
-  <string name="request_camera_permission_title">相机访问权限</string>
-  <string name="request_location_permission">需要访问您的位置</string>
-  <string name="request_write_storage_permission">需要编写内部存储。</string>
-  <string name="request_write_and_camera_storage_permission_description">上传 KYC 文档需要写入外部存储和相机权限。</string>
-  <string name="request_write_and_camera_storage_permission_title">写入存储和相机权限</string>
-  <string name="not_specified">未指定</string>
-  <string name="update_failed">更新失败。</string>
-  <string name="verify_mobile">验证手机号码</string>
-  <string name="select_country">选择国家</string>
-  <string name="search_country">搜索国家</string>
-  <string name="verify_sms_summary">我们已经向您的手机发送短信验证码，请输入该验证码来验证您的手机号。</string>
-  <string name="verify_sms_failed">验证码无效，请重试</string>
-  <string name="mobile_description">您的手机能够用于启用双重验证,帮助确保您的钱包免遭未经授权的访问。</string>
-  <string name="enable_fingerprint">指纹解锁</string>
-  <string name="two_fa">双重验证</string>
-  <string name="tor_requests">阻止Tor请求</string>
-  <string name="tor_summary">阻止被认为是来自Tor匿名网络的IP地址。Tor网络经常被黑客用于尝试访问Blockchain用户的钱包。</string>
-  <string name="enable_screenshots">启用截屏</string>
-  <string name="enable_screenshots_summary">应用内的某些界面可能会显示敏感数据，其他应用将能够访问这些截图。</string>
-  <string name="password_hint_summary">您的Blockchain钱包绝不会将密码上传到我们的服务器。这就意味着我们无法知晓您的密码并且如果您忘记密码，我们将无法帮你重置。请创建一个不易忘记的密码提示，我们能够通过您的验证邮箱发送给您，以防您忘记密码。</string>
-  <string name="change_password">更改密码</string>
-  <string name="change_password_summary">您的密码绝不会上传到我们的服务器，这就意味如果您忘记密码，我们将无法帮您重置密码。请确保你从侧边菜单栏进行资金备份，以便在丢失密码的情况下能够恢复访问您的钱包。</string>
-  <string name="verify_email_notice">我们已经向您的邮箱地址发送了一个验证链接。请点击该链接以验证您的邮箱地址。</string>
-  <string name="email_notifications">邮箱通知</string>
-  <string name="email_notifications_summary">当收到比特币时获取通知.</string>
-  <string name="current_password">当前密码</string>
-  <string name="new_password">新密码</string>
-  <string name="sms_verified">手机号码验证</string>
-  <string name="preferences">自选项</string>
-  <string name="two_fa_summary">通过启用双重验证来保护您的钱包不会遭受未授权访问。</string>
-  <string name="two_fa_description">通过启用两步认证来保护您的钱包不会遭受未授权访问。您可以选择使用您的手机号码来保护您的钱包。当你通过Web浏览器访问钱包时将需要您提供该验证码。
-
-为了使用其他身份验证方法，请在%1$s登录我们的Web钱包</string>
-  <string name="rate_title">对Blockchain钱包进行评价</string>
-  <string name="rate_message">Blockchain钱包好用吗？ 请花少许时间在Google Play商店为我们留下评论，让我们知晓您的看法。</string>
-  <string name="rate_yes">是的，对Blockchain钱包进行评价</string>
-  <string name="rate_no">不，谢谢</string>
-  <string name="rate_later">稍后提醒我</string>
-  <string name="why_has_my_address_changed">为什么我的地址改变了？</string>
-  <string name="information">信息</string>
-  <string name="learn_more">了解更多</string>
-  <string name="pairing_code_log_in">登录我的web钱包</string>
-  <string name="pairing_code_instruction_1">在您的电脑上前往%1$s。</string>
-  <string name="pairing_code_instruction_2">选择通过手机登录</string>
-  <string name="pairing_code_instruction_3">使用您的电脑扫描以下二维码。</string>
-  <string name="pairing_code_show_qr">显示二维码</string>
-  <string name="pairing_code_hide_qr">隐藏二维码</string>
-  <string name="pairing_code_warning_1">请保持此码为隐藏状态直到您准备好。</string>
-  <string name="pairing_code_warning_2">请安全保存此码!
-不要向任何人展示。</string>
-  <string name="email_request_subject_eth">Ether 支付请求</string>
-  <string name="email_request_subject_bch">Bitcoin Cash 支付请求</string>
-  <string name="email_request_subject_xlm">Xlm 支付请求</string>
-  <string name="email_request_body_eth">请将 ETH 发送到 Ether 地址%1$s。</string>
-  <string name="email_request_body_bch">请将 BCH 发送到 Bitcoin Cash 地址%1$s。</string>
-  <string name="email_request_body_xlm">请将 xlm 发送到 stellar 地址%1$s。</string>
-  <string name="email_request_body_fallback">附加</string>
-  <string name="share_instructions">点击复制这个地址。通过电子邮件或文本分享给发送者。</string>
-  <string name="common_pin_dialog_title">警告</string>
-  <string name="common_pin_dialog_message">您选择的PIN非常常见，可能会被能够使用您的手机的人在三次内轻易猜到。您仍旧想要使用这个PIN吗？</string>
-  <string name="common_pin_dialog_try_again">请重试</string>
-  <string name="common_pin_dialog_continue">继续</string>
-  <string name="logged_out_enter_password">您已注销或钱包解密出现错误。在下方输入您的密码以登录。</string>
-  <string name="logged_out_forget_wallet">如果你想忘记这个钱包并重新开始,请点击\'忘记钱包\'。</string>
-  <string name="forget_wallet">忘记钱包</string>
-  <string name="forget_wallet_warning">此操作将消除在该设备上的所有钱包数据。请确认您已将您的钱包信息存储在别处，否则该钱包中的所有比特币都将不可用!</string>
-  <string name="api_fail">无法连接到服务器。请稍后再试。</string>
-  <string name="large_tx_warning">这是一笔超大的比特币交易！您的钱包需要合并此前接收的很多小额支付。这将需要相对较高的手续费以便迅速进行交易确认。
-    </string>
-  <string name="go_back">返回</string>
-  <string name="accept_higher_fee">接受更高的手续费</string>
-  <string name="large_tx_high_fee_warning">\"这笔交易需要更高的手续费，因为少量变化所导致的粉尘耗费将被返还。\"</string>
-  <string name="password_reveal_warning">请注意！显示此文本将允许您的密码被复制到剪贴板，这将使这个设备上的所有应用都能够读取。请注意您背后隐藏的人！</string>
-  <string name="push_notifications">推送通知</string>
-  <string name="push_notifications_summary">允许接收比特币时的弹出通知。</string>
-  <string name="transaction_detail_title">交易</string>
-  <string name="transaction_detail_description_hint">这用于什么？</string>
-  <string name="transaction_detail_date">日期</string>
-  <string name="transaction_detail_status">状态</string>
-  <string name="transaction_detail_confirmed">已确认</string>
-  <string name="transaction_detail_pending">等待确认中 (%1$s/%2$s 确认)</string>
-  <string name="transaction_detail_fee">\"交易手续费: %1$s\"</string>
-  <string name="transaction_detail_value_at_time_received">收到时的价值:\u0020</string>
-  <string name="transaction_detail_value_at_time_transferred">转账时的价值:\u0020</string>
-  <string name="transaction_detail_value_at_time_sent">发送时的价值:\u0020</string>
-  <string name="transaction_detail_value">价值:\u0020</string>
-  <string name="transaction_details_unknown">未知</string>
-  <string name="transaction_detail_coinbase">没有输入值 (新生成的币)</string>
-  <string name="transaction_detail_double_spend">可能面临重复支付的风险。</string>
-  <string name="transaction_detail_verify">在Blockchain.com进行验证</string>
-  <string name="transaction_detail_verify_stellar_chain">去 StellarChain.io 验证</string>
-  <string name="transaction_detail_share_chooser">分享交易详细信息</string>
-  <string name="transaction_detail_contact_note">注释</string>
-  <string name="security_centre_email_title">检查您的邮件</string>
-  <string name="security_centre_email_check">检查邮件</string>
-  <string name="security_centre_email_message">我们向%1$s发送了一份邮件。查看来自Blockchain的邮件并点击验证链接以完成您的钱包设置。</string>
-  <string name="security_centre_add_email_title">邮件地址</string>
-  <string name="security_centre_add_email_message">添加并验证您的邮件地址以获得提醒、防止可疑活动以及在忘记钱包ID时进行找回。</string>
-  <string name="security_centre_add_email_positive_button">添加</string>
-  <string name="security_centre_backup_title">备份您的资金</string>
-  <string name="security_centre_backup_message">为了您的资金安全，我们不在文件中保存任何密码。请备份您的钱包以确保您的比特币安全，以防您丢失密码。 </string>
-  <string name="security_centre_backup_positive_button">备份</string>
-  <string name="security_centre_two_fa_message">防止您的钱包遭受未授权的访问。启用两步验证以提高钱包安全性。</string>
-  <string name="backup_header">备份短语</string>
-  <string name="backup_explanation">为了您的资金安全，Blockchain不在文件中保存任何密码。以下由12个单词组成的备份短语将让你在丢失密码时访问您的资金。请确保将其写在纸上并放于安全的地方进行保存。 </string>
-  <string name="backup_button_start">开始备份</string>
-  <string name="backup_write_down_words">请确保按照此处的样子和顺序写下这些单词，这很重要。</string>
-  <string name="backup_header_complete">备份完成</string>
-  <string name="backup_complete_message">如果您丢失了密码，您可以使用您的备份短语来恢复您的资金。任何持有您的备份短语的人都能够获取您的比特币，请将其离线保存在安全的地方。</string>
-  <string name="backup_again">再次备份</string>
-  <string name="backup_confirmed">备份确认</string>
-  <string name="backup_last">最后一次备份: %1$s</string>
-  <string name="backup_verify_heading">输入您的备份短语的单词以完成备份流程。</string>
-  <string name="backup_next_word">下一个单词</string>
-  <string name="backup_previous_word">前一个单词</string>
-  <string name="backup_word">单词</string>
-  <string name="backup_of">的</string>
-  <string name="backup_word_mismatch">单词不匹配</string>
-  <string name="backup_done">完成</string>
-  <string name="backup_lost_mnemonic">丢失了您的12个单词备份短语？</string>
-  <string name="fingerprint_prompt">使用您的指纹以更快更简单地访问您的钱包。
-
-确认指纹并继续</string>
-  <string name="fingerprint_description">确认指纹并继续</string>
-  <string name="fingerprint_hint">按压传感器</string>
-  <string name="fingerprint_login_title">指纹登录</string>
-  <string name="fingerprint_not_recognized">指纹未被识别。请重试。</string>
-  <string name="fingerprint_success">指纹识别完成</string>
-  <string name="fingerprint_use_pin">使用PIN</string>
-  <string name="fingerprint_disable_message">你确认想要禁用指纹登录。</string>
-  <string name="fingerprint_no_fingerprints_added">该设备还未注册任何指纹。您想现在注册指纹？</string>
-  <string name="fingerprint_key_invalidated_description">设备存储的指纹已经更改或者键盘锁已经被禁用。</string>
-  <string name="fingerprint_key_invalidated_brief">密钥无效，需要输入PIN码。</string>
-  <string name="fingerprint_fatal_error_register_description">30秒内尝试失败次数过多。请稍后再尝试设置。</string>
-  <string name="fingerprint_fatal_error_authenticate_description">尝试失败次数过多。请使用PIN登录。</string>
-  <string name="fingerprint_fatal_error_brief">意外错误</string>
-  <string name="shortcut_receive_copy_short">复制地址</string>
-  <string name="shortcut_receive_copy_long">复制接收地址到另一个应用程序。</string>
-  <string name="shortcut_receive_qr_short">扫描接收二维码</string>
-  <string name="shortcut_receive_qr_long">查看接收地址的二维码</string>
-  <string name="shortcut_receive_qr_error">对不起，二维码生成出错！</string>
-  <string name="shortcut_settings_summary">长按启动界面的应用图标以显示接收地址，更快地接收比特币。</string>
-  <string name="shortcut_settings_enable">桌面快捷方式</string>
-  <string name="confirm">确认</string>
-  <string name="swipe_receive_hint">滑动接收</string>
-  <string name="swipe_receive_preference_summary">当您在PIN屏幕上向左滑动时将显示一个接收地址，接收比特币将更加迅速。 </string>
-  <string name="swipe_receive_address_info">将会连续加载5个地址，之后需要登录才能显示新地址。</string>
-  <string name="swipe_receive_no_addresses">当前不能加载更多的地址。登录App以加载更多。</string>
-  <string name="swipe_receive_request">请求%1$s</string>
-  <string name="onboarding_fingerprint_title">指纹登录</string>
-  <string name="onboarding_fingerprint_summary">使用指纹登录代替您的PIN来认证和访问您的钱包。</string>
-  <string name="onboarding_fingerprint_enable">启用指纹</string>
-  <string name="onboarding_check_inbox_title">检查您的收件箱</string>
-  <string name="onboarding_check_inbox_summary">寻找来自Blockchain的邮件并单击验证链接完成您的钱包设置。</string>
-  <string name="onboarding_verify_email">验证邮件</string>
-  <string name="onboarding_receive_bitcoin">接收比特币</string>
-  <string name="onboarding_current_price">当前价格:</string>
-  <string name="onboarding_qr_codes">二维码</string>
-  <string name="onboarding_scan_address">扫描地址</string>
-  <string name="onboarding_buy_bitcoin">购买比特币</string>
-  <string name="onboarding_buy_and_sell_bitcoin">买卖比特币</string>
-  <string name="onboarding_get_bitcoin">获得比特币</string>
-  <string name="onboarding_get_eth">获取以太币</string>
-  <string name="onboarding_get_bitcoin_cash">获取 Bitcoin Cash</string>
-  <string name="onboarding_get_lumens">获取 Stellar</string>
-  <string name="onboarding_complete_title">现在就这样！</string>
-  <string name="onboarding_complete_content">我们将在这里提供最新的建议和新功能。</string>
-  <string name="onboarding_start_over">重新开始</string>
-  <string name="onboarding_skip_all">跳过所有操作</string>
-  <string name="trade_complete">交易完成</string>
-  <string name="trade_complete_details">您的比特币购买交易已经完成！</string>
-  <string name="view_details">查看详细信息</string>
-  <string name="onboarding_available_now">现在可用</string>
-  <string name="onboarding_buy_details">直接从手机钱包就能购买比特币。 简单、便捷、安全。</string>
-  <string name="onboarding_buy_performance_warning">这种购买体验在您的设备上也许有点缓慢。首先感谢您的耐心。</string>
-  <string name="buy_second_password_prompt">要使用此服务，我们要求您输入第二个密码。您只需输入此一次即可使用购买功能。</string>
-  <string name="two_factor_dialog_title">输入双重验证码</string>
-  <string name="two_factor_dialog_message_authenticator">请输入您的验证器App中的有效双重验证码然后继续</string>
-  <string name="two_factor_dialog_message_sms">我们刚刚向您发送了一条包含双重验证码的短信。请在此处输入并继续</string>
-  <string name="two_factor_dialog_hint">双重验证码</string>
-  <string name="two_factor_null_error">双重验证码不能为空</string>
-  <string name="two_factor_incorrect_error">双重验证码不正确</string>
-  <string name="confirm_payment_change_fee">更改手续费</string>
-  <string name="confirm_payment_fee_sync_error">获取手续费选项出错</string>
-  <string name="fee_options_regular">正常</string>
-  <string name="fee_options_priority">优先</string>
-  <string name="fee_options_custom">自定义</string>
-  <string name="fee_options_regular_time">1+小时</string>
-  <string name="fee_options_priority_time">~0–60分钟</string>
-  <string name="fee_options_custom_warning">只针对高级用户</string>
-  <string name="fee_options_sat_byte_formatted">%1$s sat/b</string>
-  <string name="fee_options_fee_too_low">不建议低手续费</string>
-  <string name="fee_options_fee_too_high">不需要高手续费</string>
-  <string name="fee_options_advanced_warning">此功能仅建议高级用户使用。 选择自定义手续费将意味着您将面临支付过多手续费或者您的交易永远不会被确认的风险。</string>
-  <string name="fee_options_sat_byte_hint">sat/b</string>
-  <string name="fee_options_sat_byte_inline_hint">正常: %1$s,优先: %2$s</string>
-  <string name="what_s_this">这是什么？</string>
-  <string name="dismiss">解除</string>
-  <string name="eth_now_supporting">现在支持ETH</string>
-  <string name="eth_second_password_prompt">要使用此服务，我们要求您输入第二个密码。您只需要输入这一次来设置您的ETH钱包</string>
-  <string name="ether">ETH</string>
-  <string name="bitcoin">比特币</string>
-  <string name="eth_to_field_helper">输入ETH地址或选择</string>
-  <string name="eth_to_field_helper_no_dropdown">输入ETH地址</string>
-  <string name="eth_invalid_address">无效ETH地址</string>
-  <string name="eth_support_contract_not_allowed">不支持合约地址。</string>
-  <string name="eth_support_only_eth">目前我们只支持ETH-您不能向该地址发送代币。</string>
-  <string name="eth_unconfirmed_wait">请等待您此前的交易确认</string>
-  <string name="eth_transaction_complete">交易完成！您的交易和余额将很快更新，这可能需要几分钟时间。
+  <string name="change_password_new_matches_current">您不能将当前密码用作您的密码
+新密码
 </string>
-  <string name="dashboard_title">控制板</string>
-  <string name="dashboard_time_span_day">日</string>
-  <string name="dashboard_time_span_week">周</string>
-  <string name="dashboard_time_span_month">月</string>
-  <string name="dashboard_time_span_year">年</string>
-  <string name="dashboard_time_span_all_time">全部时间</string>
-  <string name="dashboard_bitcoin_price">比特币价格</string>
-  <string name="dashboard_ether_price">ETH价格</string>
-  <string name="dashboard_charts_error">加载图表数据时出错</string>
-  <string name="dashboard_charts_price_error">获取价格数据时出错</string>
-  <string name="dashboard_charts_balance_error">获取余额数据时出错</string>
-  <string name="dashboard_balances">余额</string>
-  <string name="dashboard_price_charts">价格图表</string>
-  <string name="dashboard_see_charts">请参阅图表</string>
-  <string name="dashboard_price">%1$s价格</string>
-  <string name="dashboard_non_spendable_value">%1$s不可支付</string>
-  <string name="dashboard_lockbox_disclaimer">此设备上显示的总余额不包括您的链接的%1$s。</string>
-  <string name="metadata_load_failure">加载完整钱包功能时出错。服务可能暂时不可用。</string>
-  <string name="more">更多</string>
-  <string name="force_upgrade_message">该版本的 app 已不再支持。请更新 app 后重试。</string>
-  <string name="tx_decode_error">无法解码地址</string>
-  <string name="bch_all_accounts">所有 Bitcoin Cash Wallets</string>
-  <string name="bch_imported_addresses">导入的比特现金地址</string>
-  <string name="bch_to_field_helper">输入 BCH 地址或选择</string>
-  <string name="bch_to_field_helper_no_dropdown">输入比特币现金地址</string>
-  <string name="xlm_to_field_helper">输入 stellar 地址或选择</string>
-  <string name="xlm_to_field_helper_no_dropdown">输入 Stellar 地址</string>
-  <string name="bch_address_warning">您确定这是 Bitcoin Cash 的地址吗？</string>
-  <string name="bch_address_warning_subtext">意外向比特币地址汇款将导致资金损失。</string>
-  <string name="bch_invalid_address">无效 Bitcoin Cash 地址</string>
-  <string name="confirm_currency">确认货币</string>
-  <string name="confirm_currency_message">请选择您要扫描的货币二维码。</string>
-  <string name="announcement_trading_cta">更好的购买与卖出服务</string>
-  <string name="announcement_trading_description">现在您可以在手机钱包里通过我们改进后的流体验购买与卖出服务了， 简单、便捷且又安全。</string>
-  <string name="announcement_trading_link">开始吧</string>
-  <string name="testnet_warning">警告！这是测试网 3 的区块链。</string>
-  <string name="buy_sell">买卖服务</string>
-  <string name="buy_sell_create_account">创建账户</string>
-  <string name="sunriver_error_registering">注册 Airdrop 时出错，请再试一次。</string>
-  <string name="kyc_splash_title">兑换</string>
-  <string name="kyc_splash_apply_now">立即开始</string>
-  <string name="kyc_splash_message">使用 Blockchain 兑换 crypto，更快、更智能。现在更新享更多优惠，如更优惠的价格、更高的交易限额以及实时交易率。</string>
-  <string name="kyc_splash_terms_and_conditions">现在点击开始继续，则表示本人同意 Blockchain 的条款与条件</string>
-  <string name="kyc_splash_terms_and_conditions_terms">服务条款</string>
-  <string name="kyc_splash_terms_and_conditions_privacy">隐私政策</string>
-  <string name="kyc_country_selection_title">居住国家</string>
-  <string name="kyc_country_selection_state_title">州</string>
-  <string name="kyc_country_selection_header">为什么需要此信息？</string>
-  <string name="kyc_country_selection_message">每个国家对加密货币的交易都有不同的规定。</string>
-  <string name="kyc_country_selection_search_hint">搜索您的国家</string>
-  <string name="kyc_country_selection_connection_error">请检查您的互联网连接。</string>
-  <string name="kyc_country_selection_please_wait">请稍候...</string>
-  <string name="kyc_profile_title">配置文件</string>
-  <string name="kyc_profile_header">为什么需要此信息？</string>
-  <string name="kyc_profile_message">使用此改进功能需进行身份验证。验证只需几分钟。</string>
-  <string name="kyc_profile_first_name_hint">名称</string>
-  <string name="kyc_profile_last_name_hint">姓氏</string>
-  <string name="kyc_profile_dob_hint">出生日期</string>
-  <string name="kyc_profile_next">下一步</string>
-  <string name="kyc_profile_error">创建用户详细信息时出错，请稍后再试</string>
-  <string name="kyc_profile_error_conflict">您的电子邮件地址已被使用</string>
-  <string name="kyc_invalid_country_message_me">可用时请给我留言</string>
-  <string name="kyc_invalid_country_no_thanks">不，谢谢</string>
-  <string name="kyc_invalid_country_header">即将到来%1$s</string>
-  <string name="kyc_invalid_country_message">每个国家对买卖加密货币都有不同的规定，请仔细留意，我们会在发布时%1$s立即通知您！</string>
-  <string name="kyc_address_title">家庭住址</string>
-  <string name="kyc_address_header">为什么需要输入地址？</string>
-  <string name="kyc_address_message">此信息仅用于验证您的身份。</string>
-  <string name="kyc_address_search_hint">搜索您的%1$s</string>
-  <string name="kyc_address_search_hint_postcode">邮政编码</string>
-  <string name="kyc_address_search_hint_zipcode">邮编</string>
-  <string name="kyc_address_address_first_line_hint">地址</string>
-  <string name="kyc_address_address_apt_name_hint">公寓，楼层， #</string>
-  <string name="kyc_address_address_postcode_hint">邮政编码</string>
-  <string name="kyc_address_address_zip_code_hint">邮政编码</string>
-  <string name="kyc_address_address_city_hint">城市</string>
-  <string name="kyc_address_address_state_hint">州</string>
-  <string name="kyc_address_address_county_hint">县</string>
-  <string name="kyc_address_address_country_hint">国家</string>
-  <string name="kyc_address_google_not_available">google play 服务在此设备上不可用。</string>
-  <string name="kyc_address_error_saving">保存地址时出错，请重试</string>
-  <string name="kyc_address_error_loading_places">搜索地址时出错</string>
-  <string name="kyc_phone_number_title">验证您的设备</string>
-  <string name="kyc_phone_number_message">此操作有助于验证您的身份，并在将来确保您的帐户安全。我们将向您的收集发送一个验证码，以助您完成此操作。</string>
-  <string name="kyc_phone_number_hint_focused">您的手机号码</string>
-  <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
-  <string name="kyc_phone_number_error_saving_number">保存手机号码时出错，请重试</string>
-  <string name="kyc_phone_number_error_conflict">该手机号码已被注册，请使用另一个。</string>
-  <string name="kyc_phone_number_validation_header">输入刚发送的验证码</string>
-  <string name="kyc_phone_number_validation_hint">验证码</string>
-  <string name="kyc_phone_number_validation_error">验证电话号码时出错。请检查您的验证码</string>
-  <string name="kyc_phone_number_validation_error_incorrect">验证码错误。请仔细检查验证码并重试。</string>
-  <string name="kyc_onfido_splash_title">验证您的身份</string>
-  <string name="kyc_onfido_splash_header">确认您是本人</string>
-  <string name="kyc_onfido_splash_subtitle">出具您的护照及驾驶执照。</string>
-  <string name="kyc_onfido_splash_message">通过验证之后您即可在 Blockchain app 上兑换加密货币！</string>
-  <string name="kyc_onfido_splash_verification_error">验证身份时出错，请重试</string>
-  <string name="kyc_onfido_splash_passport">我的护照</string>
-  <string name="kyc_onfido_splash_drivers_license">我的驾驶执照</string>
-  <string name="kyc_onfido_splash_id_card">我国政府颁发的身份证</string>
-  <string name="kyc_complete_title">申请完成</string>
-  <string name="kyc_complete_header">完成！</string>
-  <string name="kyc_complete_subtitle">已成功提交信息。您的帐户正在审核中！</string>
-  <string name="kyc_complete_button_done">完成</string>
-  <string name="kyc_complete_country_selected">国家已选择</string>
-  <string name="kyc_complete_profile_created">个人简介已创建</string>
-  <string name="kyc_complete_home_address">家庭地址已添加</string>
-  <string name="kyc_complete_device_verified">设备已验证</string>
-  <string name="kyc_complete_id_uploaded">ID 已上传</string>
-  <string name="kyc_complete_video_uploaded">视频已上传</string>
-  <string name="kyc_settings_identity_verification">身份验证</string>
-  <string name="kyc_settings_status_none">未验证</string>
-  <string name="kyc_settings_status_pending">[%key:contacts_pending_transaction%]</string>
-  <string name="kyc_settings_status_under_review">正在审核中</string>
-  <string name="kyc_settings_status_rejected">失败</string>
-  <string name="kyc_settings_status_verified">已验证</string>
-  <string name="kyc_status_error">获取 KYC 状态时出错</string>
-  <string name="kyc_status_title_in_progress">正在验证</string>
-  <string name="kyc_status_title_approved">帐户已批准</string>
-  <string name="kyc_status_title_failed">验证失败</string>
-  <string name="kyc_status_title_in_review">验证正在审核中</string>
-  <string name="kyc_status_subtitle">下一步？</string>
-  <string name="kyc_status_message_in_progress">正在审核您的信息，审核通过后您即可使用兑换。我们将在 5 分钟内给您发送通知。</string>
-  <string name="kyc_status_message_verified">恭喜！身份验证成功。您现在可以在 Blockchain 兑换加密货币了。</string>
-  <string name="kyc_status_message_failed">我们在使用所提供的文档验证您的账户时遇到了一些问题，目前无法验证您的账户。</string>
-  <string name="kyc_status_message_under_review">我们在使用所提供的文档验证您的账户时遇到了一些问题。我们的支持团队将尽快与您联系，以帮助您完成验证过程。</string>
-  <string name="kyc_status_button_notify_me">通知我</string>
-  <string name="kyc_status_button_get_started">开始吧</string>
-  <string name="kyc_status_button_notifications_enabled_title">通知已启用</string>
-  <string name="kyc_status_button_notifications_enabled_message">您的验证一经通过，我们将立即通知您。</string>
-  <string name="kyc_status_button_notifications_error">启用通知时出错</string>
-  <string name="kyc_status_button_notifications_enabled">通知已启用</string>
-  <string name="kyc_drop_off_card_description">似乎您已经开始了身份验证，但并未完成整个过程。继续完成验证？</string>
-  <string name="kyc_drop_off_card_button">继续验证</string>
-  <string name="sunriver_splash_title">身份验证</string>
-  <string name="sunriver_splash_message">验证身份以认领您的 XLM。仅需几分钟时间。通过验证之后，您将能够使用我们新一代的交易产品 Swap。</string>
-  <string name="sunriver_status_message">正在审核您的信息，5 分钟内完成审核。您的验证通过之后，一周之内将收到我们汇入的 Stellar。</string>
-  <string name="cannot_launch_app">Blockchain钱包无法在该设备运行。</string>
-  <string name="exit">退出</string>
-  <string name="screen_overlay_warning">检测到屏幕覆盖!</string>
-  <string name="screen_overlay_note">使用屏幕覆盖的应用程序会欺骗你点击看不到的对象并可能窃取资金。请注意，屏幕调光应用程序也会触发该警告。若您确定没有威胁，您可继续操作。
-    </string>
-  <string name="dialog_continue">继续</string>
-  <string name="insufficient_funds_with_max">资金不足，最高汇款为%1$s</string>
-  <string name="not_enough_funds_with_currency">不足%1$s</string>
-  <string name="invalid_address">无效地址</string>
-  <string name="transaction_failed_min_send">最低汇款为%1$s</string>
-  <string name="xlm_transaction_failed_min_balance_new_account">新账户最少需要%1$s</string>
-  <string name="lockbox_title">密码箱</string>
-  <string name="lockbox_landing_get_yours_title">获取您的 Lockbox</string>
-  <string name="lockbox_landing_get_yours_message">离线安全储存您的加密货币。</string>
-  <string name="lockbox_landing_get_yours_button">立即购买</string>
-  <string name="lockbox_landing_already_owned_title">已有  lockbox？</string>
-  <string name="lockbox_landing_already_owned_message">在您的电脑上登录 blockchain.com 并连接您的 lockbox。</string>
-  <string name="lockbox_landing_learn_more">想了解更多？点击此处访问
-%1$s</string>
-  <string name="lockbox_landing_coming_soon_title">即将推出余额功能</string>
-  <string name="lockbox_landing_coming_soon_message">现在您无法查看 Lockbox 余额，但无需担心，您的资金十分安全。我们即将开通此功能，在此期间，您可在网络浏览器上查看您的余额。</string>
-  <string name="lockbox_landing_coming_soon_button">查看我的余额</string>
-  <string name="coinify_account_created_success">成功！
-账户已创建</string>
-  <string name="buy_sell_launcher_error">获取购买/卖出数据时出错</string>
-  <string name="buy_sell_buy">买</string>
-  <string name="buy_sell_sell">卖出</string>
-  <string name="buy_sell_overview_error_loading_transactions">获取交易时出错</string>
-  <string name="buy_sell_overview_pending_kyc_not_found">未找到正在等待的 KYC，请稍后再试。</string>
-  <string name="buy_sell_overview_could_not_start_kyc">无法重启 KYC，请稍后再试。</string>
-  <string name="buy_sell_overview_empty_list">您可在此处查看您的历史订单</string>
-  <string name="buy_sell_overview_in_review_title">身份验证
-审核中</string>
-  <string name="buy_sell_overview_denied_title">身份验证
-遭拒</string>
-  <string name="buy_sell_overview_pending_title">完成身份
-验证</string>
-  <string name="buy_sell_overview_in_review_button">立即使用银行卡购买</string>
-  <string name="buy_sell_overview_denied_button">重试</string>
-  <string name="buy_sell_overview_pending_button">完成验证</string>
-  <string name="buy_sell_overview_in_review_message">若尚未完成身份验证，您无法卖出数额超出%1$s的比特币。</string>
-  <string name="buy_sell_overview_denied_message">银行转账失败，请完成您的身份验证。</string>
-  <string name="buy_sell_overview_pending_message">若您尚未完成验证，超出%1$s的银行转账及卖出金额将不可用。</string>
-  <string name="buy_sell_overview_next_recurring_order">您的下一个循环订单</string>
-  <string name="buy_sell_overview_subscription_daily">每天</string>
-  <string name="buy_sell_overview_subscription_weekly">每周，每%1$s</string>
-  <string name="buy_sell_overview_subscription_monthly">每月%1$s</string>
-  <string name="buy_sell_state_awaiting_funds">等待资金</string>
-  <string name="buy_sell_state_pending_buy">等待购买</string>
-  <string name="buy_sell_state_awaiting_reference">等待参考号</string>
-  <string name="buy_sell_state_processing">处理中</string>
-  <string name="buy_sell_state_completed">已完成</string>
-  <string name="buy_sell_state_cancelled">[%key:contacts_receiving_cancelled%]</string>
-  <string name="buy_sell_state_rejected">[%key:contacts_receiving_declined%]</string>
-  <string name="buy_sell_state_expired">已过期</string>
-  <string name="buy_sell_detail_trade_id">交易 ID</string>
-  <string name="buy_sell_detail_transaction_fee">交易手续费</string>
-  <string name="buy_sell_detail_exchange_rate">汇率</string>
-  <string name="buy_sell_detail_amount">数额</string>
-  <string name="buy_sell_detail_payment_fee">付款服务费</string>
-  <string name="buy_sell_detail_total">总计</string>
-  <string name="buy_sell_detail_title_buy">购买%1$s</string>
-  <string name="buy_sell_detail_title_sell">卖出%1$s</string>
-  <string name="buy_sell_detail_currency_received">%1$s已接收</string>
-  <string name="buy_sell_detail_currency_to_be_received">%1$s待接收</string>
-  <string name="buy_sell_detail_currency_sold">%1$s卖出</string>
-  <string name="buy_sell_detail_currency_to_be_sold">%1$s待卖出</string>
-  <string name="buy_sell_detail_bank_disclaimer">将资金存入您的银行账户通常需要 2 至 3 个工作日。</string>
-  <string name="buy_sell_detail_refund_message">Coinify 已取消此次卖出订单并向您发送了电子邮件解释退款资金。</string>
-  <string name="buy_sell_details_whats_next">下一步？</string>
-  <string name="buy_sell_awaiting_funds_description">您需在 48 小时内汇款%1$s给 Coinify。
-
-资金必须来自于您的银行账户，账户名必须与贵国政府签发的证件名称一致。否则您的汇款将遭拒。</string>
-  <string name="buy_sell_awaiting_funds_already_sent">我已经将资金汇给了 Coinify</string>
-  <string name="buy_sell_awaiting_funds_reference_title">参考/消息</string>
-  <string name="buy_sell_awaiting_funds_reference_note">*必须提供！</string>
-  <string name="buy_sell_awaiting_funds_recipient_name_title">收款人名字</string>
-  <string name="buy_sell_awaiting_funds_recipient_address_title">收款人地址</string>
-  <string name="buy_sell_awaiting_funds_iban_title">国际银行账号</string>
-  <string name="buy_sell_awaiting_funds_bic_title">银行识别码</string>
-  <string name="buy_sell_awaiting_funds_bank_title">银行</string>
-  <string name="buy_sell_awaiting_funds_copy_all">复制所有信息到剪贴板</string>
-  <string name="buy_sell_awaiting_funds_already_sent_title">资金已汇出？</string>
-  <string name="buy_sell_awaiting_funds_already_sent_message">Coinify 处理订单并将资金汇入您的银行账户，通常需要 2 至 3 个工作日。</string>
-  <string name="buy_sell_awaiting_funds_finish_payment">完成交易</string>
-  <string name="buy_sell_awaiting_funds_cancel_trade">取消交易</string>
-  <string name="buy_sell_awaiting_funds_cancel_trade_success">成功取消交易</string>
-  <string name="buy_sell_awaiting_funds_cancel_trade_failed">无法取消交易</string>
-  <string name="buy_sell_awaiting_funds_cancel_trade_dialog_title">取消交易？</string>
-  <string name="buy_sell_awaiting_funds_cancel_trade_dialog_disclaimer">注：若您已从银行账户中付款给了 Coinify 且其已收到付款，此交易将继续显示处理状态，您会收到您购买的比特币。</string>
-  <string name="buy_sell_id_verification_in_review">正在审核身份验证</string>
-  <string name="buy_sell_id_verification_in_review_loading">加载中…</string>
-  <string name="buy_sell_review_status_thanks">感谢您完成身份验证</string>
-  <string name="buy_sell_review_in_progress">正在进行身份验证</string>
-  <string name="buy_sell_review_failed">身份验证不成功</string>
-  <string name="buy_sell_review_status_message">我们的购买与卖出合作伙伴 Coinify 将在 48 小时内给您发送状态更新的电子邮件。</string>
-  <string name="buy_sell_review_status_failed">请联系我们的购买与卖出合作伙伴 Coinify</string>
-  <string name="buy_sell_review_status_pending_message">完成验证之后才可进行交易。请完成您的身份验证。</string>
-  <string name="buy_sell_review_finish_verification">完成验证</string>
-  <string name="buy_sell_review_finish_verification_title">完成身份验证</string>
-  <string name="buy_sell_review_status">状态：%1$s</string>
-  <string name="buy_sell_review_status_in_review">审核中</string>
-  <string name="buy_sell_review_status_in_pending">不完整</string>
-  <string name="buy_sell_review_status_in_rejected">[%key:contacts_receiving_declined%]</string>
-  <string name="buy_sell_review_status_in_failed">失败</string>
-  <string name="buy_sell_review_status_in_expired">已过期</string>
-  <string name="buy_sell_review_status_in_completed">已完成</string>
-  <string name="buy_sell_review_status_in_reviewing">审核中</string>
-  <string name="buy_sell_review_status_in_docs_requested">请求文件</string>
-  <string name="buy_sell_review_status_fetching">正在审核您的信息，请稍后片刻…</string>
-  <string name="buy_sell_isignthis_payment_method">支付方式</string>
-  <string name="buy_sell_error_fetching_quote">获取报价时出错</string>
-  <string name="buy_sell_review_transaction">查看订单</string>
-  <string name="buy_sell_remaining_buy_limit">您的剩余购买限额为%1$s</string>
-  <string name="buy_sell_remaining_sell_limit">您剩余的卖出限额为%1$s</string>
-  <string name="buy_sell_remaining_sell_minimum_limit">最低卖出限额为%1$s</string>
-  <string name="buy_sell_minimum_sell_limit">您至少需要%1$s才能卖出，不包括交易服务费</string>
-  <string name="buy_sell_not_enough_bitcoin">%1$s BTC 超出您当前的余额</string>
-  <string name="buy_sell_error_fetching_limit">获取限额时出错</string>
-  <string name="buy_sell_amount_too_low">请输入大于%1$s的金额</string>
-  <string name="buy_sell_sell_bitcoin_max">您最多可卖出您余额的%1$s</string>
-  <string name="buy_sell_error_forced_delay">正在审核您之前的交易，%1$s小时内您将无法进行交易。请稍后再试。</string>
-  <string name="buy_sell_error_limits_exceeded">已超出您的今日限额，请明日再试。</string>
-  <string name="buy_sell_error_trade_in_progress">交易正在进行时您无法创建新的交易，请在交易完成后重试。</string>
-  <string name="buy_sell_confirmation_btc_amount">BTC 金额</string>
-  <string name="buy_sell_confirmation_transaction_fee">交易手续费</string>
-  <string name="buy_sell_confirmation_btc_total">总待收 BTC</string>
-  <string name="buy_sell_confirmation_title_buy">确认购买</string>
-  <string name="buy_sell_confirmation_title_preview_buy">预览购买</string>
-  <string name="buy_sell_confirmation_title_sell">确认卖出</string>
-  <string name="buy_sell_confirmation_amount">数额</string>
-  <string name="buy_sell_confirmation_payment_fee">付款服务费</string>
-  <string name="buy_sell_confirmation_total_cost">总计</string>
-  <string name="buy_sell_confirmation_order_expired">您的报价已过期，请返回订单页面新建一个订单。</string>
-  <string name="buy_sell_confirmation_order_id">Coinify 订单 ID #</string>
-  <string name="buy_sell_confirmation_unexpected_error">出现了意外错误。若问题仍然存在，请稍后重试或与支持小组联系。</string>
-  <string name="buy_sell_confirmation_card">银行卡</string>
-  <string name="buy_sell_confirmation_bank">转账</string>
-  <string name="buy_sell_confirmation_amount_too_high_title">金额过高</string>
-  <string name="buy_sell_confirmation_amount_too_high_message">超过%1$s的订单仅可通过银行转账处理。</string>
-  <string name="buy_sell_confirmation_amount_too_high_use_card">使用银行卡</string>
-  <string name="buy_sell_confirmation_amount_too_high_use_transfer">使用转账</string>
-  <string name="buy_sell_confirmation_bank_rate_disclaimer">本人同意 Coinify 在处理我的订单时，若彼时汇率有所变动，以彼时汇率交易比特币。</string>
-  <string name="buy_sell_confirmation_btc_sell_amount">卖出 BTC</string>
-  <string name="buy_sell_confirmation_you_will_receive">欠款总额</string>
-  <string name="buy_sell_confirmation_btc_to_receive_description">点击提交后，%1$s BTC 将直接从您的 Blockchain wallet 汇入 Coinify。</string>
-  <string name="buy_sell_confirmation_sell_rate_disclaimer">本人同意 Coinify 在比特币的交易完成后处理我的订单时，若彼时汇率有所变动，以彼时汇率交易比特币。</string>
-  <string name="buy_sell_card_payment_success_title">成功！
-订单已创建</string>
-  <string name="buy_sell_card_payment_success_message">资金将在 3 日内到达您的账户。</string>
-  <string name="buy_sell_card_order_created_title">订单已创建</string>
-  <string name="buy_sell_card_order_cancelled_title">订单已取消</string>
-  <string name="buy_sell_card_order_failed_title">订单失败</string>
-  <string name="buy_sell_card_order_expired_title">订单已过期</string>
-  <string name="buy_sell_card_order_declined_title">订单遭拒</string>
-  <string name="buy_sell_card_order_rejected_title">订单被拒绝</string>
-  <string name="buy_sell_card_order_in_review_title">审核订单中</string>
-  <string name="buy_sell_card_order_failed_message">您的支付卡已被拒绝。请重试或联系您的支付卡提供商。</string>
-  <string name="buy_sell_card_order_reviewing_message">正在审核订单信息，请稍后片刻。</string>
-  <string name="buy_sell_card_order_cancelled_message">您的订单已取消。请稍后再试。</string>
-  <string name="buy_sell_card_order_expired_message">由于付款时间过长（15分钟），您的订单已过期。请创建一个新订单。</string>
-  <string name="buy_sell_welcome_message">立即创建一个账户，几分钟后开始购买加密货币。</string>
-  <string name="buy_sell_get_started">开始吧</string>
-  <string name="buy_sell_select_country">请选择您的国家</string>
-  <string name="buy_sell_unverified_email_title">验证您的邮箱</string>
-  <string name="buy_sell_unverified_email_verify_message1">我们发送验证链接到</string>
-  <string name="buy_sell_unverified_email_verify_message2">点击它，并返回这里继续交易。</string>
-  <string name="buy_sell_unverified_email_verify_open_email">打开电子邮件</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意 Coinify 的<a href="ignored">条款与条件</a></string>
-  <string name="coinify">Coinify</string>
-  <string name="buy_sell_verified_email_title">电子邮件已通过验证</string>
-  <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。点击%1$s“同意”和继续创建您的账户。</string>
-  <string name="buy_sell_identification_verification">身份验证</string>
-  <string name="buy_sell_verify_your_identity">验证您的身份</string>
-  <string name="buy_sell_identification_verification_message">政府的反洗钱法规要求进行身份验证。</string>
-  <string name="buy_sell_verification_status_title">验证状态</string>
-  <string name="buy_sell_invalid_country_title">您所在的国家暂不支持 Bitcoin 的购买与卖出服务</string>
-  <string name="buy_sell_invalid_country_message">我们即将推出更多国家版本。</string>
-  <string name="submit">提交</string>
-  <string name="buy_sell_get_to_know_you_title">让我们了解您</string>
-  <string name="buy_sell_get_to_know_you_message">在开通您的购买与卖出账户之前，我们需要先了解您的情况。</string>
-  <string name="buy_sell_cannot_open_file">无法打开文件选择器</string>
-  <string name="buy_sell_choose_file">选择文件</string>
-  <string name="buy_sell_add_account_title">添加账户</string>
-  <string name="buy_sell_add_account_subtitle">添加银行账户</string>
-  <string name="buy_sell_add_account_iban_hint">国际银行账号 (IBAN)</string>
-  <string name="buy_sell_add_account_bic_hint">银行识别码 (SWIFT/BIC)</string>
-  <string name="buy_sell_add_account_iban_empty">SWIFT/BIC 不能为空</string>
-  <string name="buy_sell_add_account_bic_empty">IBAN 不能为空</string>
-  <string name="buy_sell_account_selection_title">选择账户</string>
-  <string name="buy_sell_account_selection_description">请选择您想要从哪里出资？</string>
-  <string name="buy_sell_account_selection_error_message">加载银行账户时出错，请重试。</string>
-  <string name="buy_sell_account_selection_add_button">+ 添加新账户</string>
-  <string name="buy_sell_account_selection_delete_title">删除账户</string>
-  <string name="buy_sell_account_selection_delete_message">您确定您要删除这个银行账户?</string>
-  <string name="buy_sell_account_selection_delete_failure">删除银行账户失败</string>
-  <string name="buy_sell_add_address_subtitle">添加地址</string>
-  <string name="buy_sell_add_address_name_hint">账户持有人的全名</string>
-  <string name="buy_sell_add_address_street_hint">街道和门牌号</string>
-  <string name="buy_sell_add_address_city_hint">城市</string>
-  <string name="buy_sell_add_address_post_code_hint">邮政编码</string>
-  <string name="buy_sell_add_address_post_country_hint">国家</string>
-  <string name="buy_sell_add_address_name_empty">名字不能为空</string>
-  <string name="buy_sell_add_address_street_empty">街道不能为空</string>
-  <string name="buy_sell_add_address_city_empty">城市不能为空</string>
-  <string name="buy_sell_add_address_postcode_empty">邮政编码不能为空</string>
-  <string name="buy_sell_recurring_order_title">循环订单</string>
-  <string name="buy_sell_recurring_order_subtitle">您的下一次循环订单已设置好</string>
-  <string name="buy_sell_recurring_order_description">若要管理循环订单，请在网络浏览器中登录您的钱包。</string>
-  <string name="buy_sell_recurring_order_frequency_title">频率</string>
-  <string name="buy_sell_recurring_order_duration_title">时间</string>
-  <string name="buy_sell_recurring_order_duration_until_cancelled">%1$s或到达您的限额时，以较早者为准。</string>
-  <string name="buy_sell_recurring_order_duration_you_cancelled">直到您取消</string>
-  <string name="buy_sell_recurring_order_duration_until">直到</string>
-  <string name="buy_sell_recurring_order_amount">%1$s%2$s（+%3$s%4$s支付服务费）</string>
-  <string name="buy_sell_recurring_frequency_weekly">每周，每%1$s</string>
-  <string name="buy_sell_recurring_frequency_daily">每一天</string>
-  <string name="buy_sell_recurring_frequency_monthly">在每月的%1$s上</string>
-  <string name="buy_sell_transaction_list_label">Coinify 订单 ID #%1$s</string>
-  <string name="sunriver_set_memo">设置备忘录</string>
-  <string name="xlm_memo_text">备忘录文本</string>
-  <string name="xlm_memo_id">备忘录ID</string>
-  <string name="xlm_memo_hash">备忘录哈希</string>
-  <string name="xlm_memo_return">备忘录返回哈希</string>
-  <string name="xlm_memo_toolbar_title">添加备忘录</string>
-  <string name="xlm_memo_explain">备注用于将可选信息传达给收件人。</string>
-  <string name="xlm_memo_text_hint">备忘录</string>
-  <string name="xlm_memo_id_hint">数字ID</string>
-  <string name="xlm_memo_hash_hint">32 字节十六进制哈希</string>
-  <string name="wallet">钱包</string>
-  <string name="sunriver_invalid_url_message">您的XLM已被声明。</string>
-  <string name="sunriver_invalid_url_title">不好了！</string>
-  <string name="kyc_non_specific_server_error">错误，请再试一次</string>
-  <string name="kyc_email_title">验证您的邮箱</string>
-  <string name="kyc_email_message">作为提升安全保障的措施，我们需要对您的邮箱地址进行验证。</string>
-  <string name="kyc_email_hint_focused">您的电子邮箱</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
-  <string name="kyc_email_error_saving_email">保存邮箱时出错，请再试一次</string>
-  <string name="kyc_email_error_conflict">该邮箱已被注册，请另择重试。</string>
-  <string name="kyc_email_send_verification">发送电子邮件</string>
-  <string name="kyc_email_validation_header">查看您的收件箱。</string>
-  <string name="kyc_email_validation_message">我们刚给您发送了一封电子邮件，其中包含进一步的说明。</string>
-  <string name="kyc_email_validation_hint">验证码</string>
-  <string name="kyc_email_validation_error">验证电话号码时出错。请检查您的验证码</string>
-  <string name="kyc_email_validation_error_incorrect">验证码错误。请仔细检查验证码并重试。</string>
-  <string name="kyc_more_info_splash_title">需更多信息</string>
-  <string name="kyc_more_info_splash_header">我们需要更多信息来完善您的个人资料</string>
-  <string name="kyc_more_info_splash_subtitle">您需核实自己的电话号码。提供政府颁发的身份证和一张自拍照。</string>
-  <string name="a_better_way_to_trade_crypto">更好的 Crypto 交易方式</string>
-  <string name="announcing_swap">通过 Blockchain 宣布 Swap — 更快更智能的 crypto 交易方式。</string>
-  <string name="tier_1">1 级</string>
-  <string name="tier_2">2 级</string>
-  <string name="tier_verification">验证</string>
-  <string name="_1_000">$ 1,000个</string>
-  <string name="_25_000">$ 25,000个</string>
-  <string name="annual_swap_limit">年兑换限额</string>
-  <string name="daily_swap_limit">日兑换限额</string>
-  <string name="takes_3_min">需要 3 分钟</string>
-  <string name="takes_10_min">需要 10 分钟</string>
-  <string name="get_free_crypto">获得免费 crypto</string>
-  <string name="by_completing_tier_2_you_will_be_eligible_to_participate_in_our_airdrop_program">获 2 级资格者可参与我们的 airdrop 计划。</string>
-  <string name="start_arrow">开始箭头</string>
-  <string name="approved">已批准</string>
-  <string name="in_review">审核中</string>
-  <string name="available">可用</string>
-  <string name="swap_limit">您的最高 crypto 交易兑换限额</string>
-  <string name="swap_unavailable">兑换功能目前不可用</string>
-  <string name="swap_unavailable_explained">审批您的身份时出现问题，您的兑换功能目前已被禁用。</string>
-  <string name="tier_in_review" tools:ignore="PluralsCandidate">Blockchain 支持人员正在审核您的 %d 级验证</string>
-  <string name="contact_support">联系支持人员</string>
-  <string name="swap_now">立即兑换</string>
-  <string name="requires_email_name_date_of_birth_and_address">需邮箱、姓名、出生日期和地址</string>
-  <string name="requires_tier_1_phone_number_govt_id_and_a_selfie">需一级、电话号码、政府颁发的身份证以及自拍</string>
-  <string name="kyc_splash_terms_and_conditions_submit">点击确认即表示您同意Blockchain的</string>
-  <string name="kyc_country_selection_message_state">每个州对加密货币的交易都有不同的规定。</string>
-  <string name="kyc_profile_submit">提交</string>
-  <string name="kyc_email_didnt_see_email">没有收到电子邮件？</string>
-  <string name="kyc_email_send_again_hyperlink">重新发送</string>
-  <string name="kyc_email_email_was_resent">邮件已重新发送</string>
-  <string name="kyc_phone_didnt_see_sms">1</string>
-  <string name="kyc_phone_send_again_hyperlink">重新发送代码</string>
-  <string name="kyc_phone_number_code_was_resent">代码已重新发送</string>
-  <string name="kyc_phone_number_error_resending">发送代码时出错，请重试</string>
-  <string name="kyc_settings_swap_limit">兑换限额</string>
-  <string name="kyc_settings_tier_status_locked">已锁定</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
-  <string name="import_try_again">重试</string>
-  <string name="pax_to_field_helper">输入 PAX/ETH 地址或选择</string>
-  <string name="pax_to_field_helper_no_dropdown">输入 PAX/ETH 地址</string>
-  <string name="transaction_detail_verify_bch">在Blockchain.com进行验证</string>
-  <string name="sunriver_invalid_campaign_user">很抱歉，空投计划目前无法使用。</string>
-  <string name="sunriver_user_already_registered">看起来您已经收到了空投！</string>
-  <string name="sunriver_campaign_expired">很抱歉，XLM空投已结束。请完成您的个人资料，以便有资格参加未来的空投和访问交易</string>
-  <string name="sunriver_generic_error">哎呀！我们在处理你的空投时遇到了问题。请再试一次。</string>
-  <string name="complete_your_profile_card_title">完成您的个人资料</string>
-  <string name="complete_your_profile_card_body">今天就完成您的Blockchain资料填写，我们将在您的钱包中空投XLM。</string>
-  <string name="complete_your_profile_card_button">继续索取您的XLM</string>
-  <string name="swap_announcement_title">兑换</string>
-  <string name="swap_announcement_description">无需离开Blockchain Wallet即可将一个加密货币换成另一个加密货币。</string>
-  <string name="swap_announcement_introducing_link">看看这个！</string>
-  <string name="kyc_address_street_line_1">街道地址行1</string>
-  <string name="kyc_address_street_line_2">街道地址行2</string>
-  <string name="kyc_address_address_line_1">地址行1</string>
-  <string name="kyc_address_address_line_2">地址行2</string>
-  <string name="kyc_address_city_town_village">城市/城镇/村庄</string>
-  <string name="kyc_address_state_region_province_county">州/地区/省/国家</string>
-  <string name="kyc_address_postal_code">邮政编码</string>
-  <string name="kyc_onfido_splash_residence_permit">我的居留证</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
-  <string name="kyc_veriff_splash_header">@string/kyc_onfido_splash_header</string>
-  <string name="kyc_veriff_splash_subtitle">您需要以下1种ID类型才能继续。</string>
-  <string name="kyc_veriff_splash_enable_camera_title">另外，启用您的摄像头！</string>
-  <string name="kyc_veriff_splash_enable_camera_body">请允许您的Blockchain应用程序访问您的相机，以上传您的身份证并拍摄自拍照。</string>
-  <string name="kyc_veriff_splash_verification_error">@string/kyc_onfido_splash_verification_error</string>
-  <string name="kyc_veriff_splash_passport">有效护照</string>
-  <string name="kyc_veriff_splash_drivers_license">驾驶执照</string>
-  <string name="kyc_veriff_splash_id_card">国家身份证</string>
-  <string name="kyc_veriff_splash_residence_permit">居留证</string>
-  <string name="kyc_veriff_splash_continue">继续</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
-  <string name="kyc_help_dialog_need_some_help_body">我们的区块链支持团队编写了帮助指南，里面解释了为什么我们需要验证您的身份</string>
-  <string name="kyc_help_dialog_read_now">现在阅读</string>
-  <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
-  <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
-  <string name="kyc_settings_silver_level_in_review">银级——审核中</string>
-  <string name="kyc_settings_gold_level_in_review">金级——审核中</string>
-  <string name="kyc_settings_gold_level_approved">金级——已批准</string>
-  <string name="kyc_settings_silver_level_approved">银级——已批准</string>
-  <string name="kyc_documents_needed">需要文档</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
-  <string name="kyc_resubmission_card_description">您提供的文档存在一些问题。请尝试重新上传文档以继续进行验证。</string>
-  <string name="kyc_resubmission_card_button">上传文件</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
-  <string name="kyc_resubmission_splash_description_1">我们无法验证您的身份，需要您重新上传所需的文件。</string>
-  <string name="kyc_resubmission_splash_description_2">发生这种情况的主要原因</string>
-  <string name="kyc_resubmission_splash_description_3">缺少所需的照片</string>
-  <string name="kyc_resubmission_splash_description_4">您提交的文档不正确。</string>
-  <string name="kyc_resubmission_splash_description_5">由于图像质量原因，我们无法读取您提交的图像</string>
-  <string name="tiers_splash_header_text">交易加密币并不意味着交易控制</string>
-  <string name="gold_level">金级</string>
-  <string name="silver_level">银级</string>
-  <string name="unlock">解锁</string>
-  <string name="by_completing_gold_level_you_will_be_eligible_to_participate_in_our_airdrop_program">完成金级要求后，您将自动获得我们的空投计划资格。</string>
-  <string name="airdrop_learn_more_url">https://support.blockchain.com/hc/en-us/categories/360001126692-Airdrop-Program</string>
-  <string name="tier_x_in_review">Blockchain 支持团队正在审核您的 1 验证</string>
-  <string name="requires_silver_level_govt_id_and_a_selfie">需银级、电话号码、政府颁发的身份证以及人像照片</string>
-  <string name="bch_default_account_label">我的Bitcoin Cash Wallet</string>
-  <string name="xlm_default_account_label">我的 Stellar Wallet</string>
-  <string name="default_wallet_name">我的Bitcoin Wallet</string>
-  <string name="eth_default_account_label">我的ETH Wallet</string>
-  <string name="buy_sell_splash_title">买卖</string>
-  <string name="buy_sell_splash_message">您可以通过我们的合作伙伴Coinify使用您的信用卡或银行账户买卖比特币（BTC）。</string>
-  <string name="buy_sell_splash_terms_and_conditions">通过点击Begin Now，您同意Coinify的</string>
-  <string name="buy_sell_please_wait">请耐心等待…</string>
-  <string name="pin_box_0">Pin Box 0</string>
+  <string name="no_private_key">无法产生私钥。</string>
+  <string name="pin_4_strikes">4次PIN尝试失败。请提供密码。</string>
+  <string name="pin_4_strikes_password_accepted">密码已接受。请定义新的PIN码。 
+</string>
+  <string name="bip38_password_entry">请输入私钥密码</string>
+  <string name="pin_entry">输入密码</string>
+  <string name="password_entry">请输入密码</string>
+  <string name="zero_pin">0000是无效的PIN。请再试一遍。</string>
+  <string name="invalid_pin">PIN码无效。请再试一遍。</string>
+  <string name="pin_mismatch_error">PIN码不匹配</string>
+  <string name="create_pin">创建PIN码</string>
+  <string name="confirm_pin">确认密码</string>
+  <string name="create_pin_failed">PIN创建失败。请再次配对设备。</string>
+  <string name="change_pin_new_matches_current">您不能将当前PIN用作新PIN 
+</string>
+  <string name="pairing_failed">配对失败。请再试一遍。</string>
+  <string name="account_locked_title">帐户被锁定</string>
+  <string name="account_locked_message">为了预防起见，您的帐户已被暂时锁定。 
+请检查您的电子邮件以获取更多信息，然后重试。 
+</string>
+  <string name="pin_box_0">针盒0</string>
   <string name="pin_box_1">针盒1</string>
-  <string name="pin_box_2">Pin Box 2</string>
+  <string name="pin_box_2">针盒2</string>
   <string name="pin_box_3">针盒3</string>
-  <string name="fingerprint_logo">指纹标志</string>
+  <string name="fingerprint_logo">指纹徽标</string>
   <string name="keyboard_input_1">键盘输入1</string>
   <string name="keyboard_input_2">键盘输入2</string>
   <string name="keyboard_input_3">键盘输入3</string>
@@ -1032,289 +118,1877 @@
   <string name="keyboard_input_9">键盘输入9</string>
   <string name="keyboard_input_0">键盘输入0</string>
   <string name="keyboard_input_delete">键盘输入删除</string>
-  <string name="swipe_receive_left_arrow">滑动即可接收左箭头</string>
-  <string name="swipe_receive_right_arrow">滑动即可接收右箭头</string>
-  <string name="btn_ok">好</string>
-  <string name="transaction_occur_when_paxos">收到和发送Paxos时会发生交易。</string>
-  <string name="email_request_subject_btc">比特币支付请求</string>
-  <string name="email_request_subject_pax">PAX付款请求</string>
-  <string name="email_request_body_btc">请将%1$s BTC发送到比特币地址%2$s 。</string>
-  <string name="email_request_body_pax">请将PAX发送到USD PAX地址%1$s 。</string>
-  <string name="pax_invalid_address">无效的美元PAX地址</string>
-  <string name="stablecoin_announcement_new">新</string>
-  <string name="stablecoin_announcement_introducing_title">我们的第一个Stablecoin</string>
-  <string name="stablecoin_announcement_introducing_description">在您的钱包中引入USD PAX，一种安全稳定的数字美元</string>
-  <string name="stablecoin_announcement_introducing_link">立即交换PAX</string>
-  <string name="pax_title">美元PAX</string>
-  <string name="pax_no_transactions_message">完成第一笔交易后，您的美元PAX交易将显示在此处。</string>
-  <string name="pax_learn_more_link">了解有关USD PAX的更多信息</string>
-  <string name="pax_wallet_name">我的美元PAX钱包</string>
-  <string name="pax_default_account_label">我的美元PAX钱包</string>
-  <string name="pax_swap_now">立即获得USD PAX</string>
-  <string name="pax_fee">PAX FEE</string>
-  <string name="morph_exchange">交换</string>
-  <string name="morph_loading_orders">加载订单历史记录</string>
-  <string name="morph_loading_orders_failed">装货订单失败</string>
+  <string name="check_connectivity_exit">区块链钱包无法获得Internet连接。 
+请检查设备上的连接，然后重试。 
+</string>
+  <string name="double_encryption_password_error">双重加密密码错误。请再试一遍。</string>
+  <string name="btn_scan_pairing_code">扫描配对码</string>
+  <string name="btn_manual_pairing">手动配对</string>
+  <string name="create_a_wallet">创建一个帐户</string>
+  <string name="log_in">登录</string>
+  <string name="login_auto_pair_title">自动配对</string>
+  <string name="manual_pairing">手动配对</string>
+  <string name="pair_wallet_step_1">通过PC或Mac以%1$s登录到您的Blockchain Wallet。</string>
+  <string name="pair_wallet_step_2">转到设置/常规。</string>
+  <string name="landing_title">欢迎来到区块链</string>
+  <string name="landing_body"><b>发送</b> ， <b>接收</b> ， <b>存储</b>和<b>交易</b>数字货币的简单方法。</string>
+  <string name="pair_wallet_step_3">单击显示配对代码以显示QR码（正方形黑色） 
+ ＆白色条形码。用相机扫描代码。 
+</string>
+  <string name="wallet_id">钱包ID</string>
+  <string name="recover_funds">追回资金</string>
+  <string name="recover_funds_warning_message">如果有访问权限，则应始终配对或登录
+到您的电子钱包ID和密码。恢复您的资金将创建一个新的电子钱包ID。你会
+想继续吗？ 
+</string>
+  <string name="recover_funds_instructions">输入您的12个备用字词（带空格）以恢复您的
+资金与交易
+</string>
+  <string name="recovery_passphrase">备用词组</string>
+  <string name="invalid_recovery_phrase">无效的备份词组。请再试一遍</string>
+  <string name="creating_wallet">创建钱包</string>
+  <string name="restore_failed">恢复钱包失败。请再试一遍</string>
+  <string name="restoring_wallet">恢复钱包。</string>
+  <string name="password">密码</string>
+  <string name="email">你的邮件</string>
+  <string name="you_agree_terms_of_service">创建帐户即表示您同意Blockchain的<annotation link="terms">服务条款</annotation>和<annotation link="privacy">隐私政策</annotation> 。</string>
+  <string name="new_account_cta_text">继续</string>
+  <string name="new_account_title">创建一个帐户</string>
+  <string name="strength_weak">弱</string>
+  <string name="strength_medium">定期</string>
+  <string name="strength_strong">强大</string>
+  <string name="strength_normal">正常</string>
+  <string name="btn_continue">继续</string>
+  <string name="btn_forgot_password">忘记密码？”</string>
+  <string name="SEND">发送</string>
+  <string name="total">总</string>
+  <string name="max_available">使用总支出余额：</string>
+  <string name="bitpay_remaining_time">剩余时间</string>
+  <string name="bitpay_invoice_expired">BitPay发票已过期</string>
+  <string name="bitpay_invoice_expired_message">发票仅在15分钟内有效。如果您想重新提交付款，请返回商家。</string>
+  <string name="bitpay_announcement_body">借助BitPay，您现在可以将您的Blockchain钱包用于与支持零售商的购买。</string>
+  <string name="transaction_failed">交易失败</string>
+  <string name="invalid_bitcoin_address">无效的比特币地址</string>
+  <string name="invalid_amount">无效金额</string>
+  <string name="enter_double_encryption_pw">请输入双重加密密码</string>
+  <string name="support">支持</string>
+  <string name="rate_us">评价我们</string>
+  <string name="licenses">执照</string>
+  <string name="about">区块链钱包%1$s 
+ © %2$s卢森堡卢森堡区块链
+版权所有。</string>
+  <string name="merchant_download">免费商家应用</string>
+  <string name="password_or_wipe">使用密码输入或忘记此钱包</string>
+  <string name="use_password">使用密码</string>
+  <string name="wipe_wallet">忘记钱包</string>
+  <string name="support_leaving_app_warning">这将离开应用程序，并带您进入浏览器。 
+继续？ 
+</string>
+  <string name="weak_password">所选密码太弱，无法保护您的资金。我们强烈
+建议您选择其他。您想定义一个新密码吗？ 
+</string>
+  <string name="from">从</string>
+  <string name="to">至</string>
+  <string name="confirm_details">确认付款</string>
+  <string name="fee">费用</string>
+  <string name="exit_confirm">再次按返回按钮退出</string>
+  <string name="label_address">您的地址已成功导入。 （可选）分配一个
+此地址的友好显示名称。 
+</string>
+  <string name="bip38_error">私钥密码无效</string>
+  <string name="privkey_error">无法识别的私钥格式</string>
+  <string name="hd_error">HD钱包错误</string>
+  <string name="scan_not_recognized">扫描无法解码</string>
+  <string name="imported_addresses">导入的地址</string>
+  <string name="remote_save_ok">保存成功</string>
+  <string name="remote_save_ko">保存失败</string>
+  <string name="change_pin_code">更改密码</string>
+  <string name="enter_current_pin">请输入当前的PIN码。</string>
+  <string name="addresses_bitcoin">比特币地址</string>
+  <string name="addresses_bitcoin_cash">比特币现金地址</string>
+  <string name="drawer_addresses">地址</string>
+  <string name="create_new">创建新的</string>
+  <string name="import_address">汇入地址</string>
+  <string name="wallet">钱包</string>
+  <string name="wallets">皮夹</string>
+  <string name="save_name">保存名字</string>
+  <string name="receive_address_to_clipboard">将此收信地址复制到剪贴板吗？如果是这样的话， 
+建议其他应用程序也可以查看此信息。 
+</string>
+  <string name="receive_address_to_share">分享此接收地址以发送？如果是这样， 
+建议其他应用程序可以查看此信息。 
+</string>
+  <string name="guid_to_clipboard">将您的电子钱包ID复制到剪贴板？如果是这样，请注意
+其他应用程序可能可以查看此信息。 
+</string>
+  <string name="ssl_pinning_invalid">与主机的安全连接失败。这可能表明
+恶意活动。请先验证您的网络连接和设备，然后再继续。 
+</string>
+  <string name="description">描述</string>
+  <string name="name">名称</string>
+  <string name="content_desc_edit_account_label">编辑帐户标签</string>
+  <string name="save">保存</string>
+  <string name="next">下一个</string>
+  <string name="received_bitcoin">收到比特币</string>
+  <string name="received_ethereum">收到的以太</string>
+  <string name="received_usd_pax_1">收到美元数字</string>
+  <string name="received_bitcoin_cash">收到比特币现金</string>
+  <string name="verification_failed">验证失败</string>
+  <string name="send">发送</string>
+  <string name="send_payment">发送付款</string>
+  <string name="share">共享接收地址</string>
+  <string name="confirm_password">确认密码</string>
+  <string name="check_email_to_auth_login">请检查您的电子邮件以批准此登录尝试。</string>
+  <string name="transaction_fee">手续费</string>
+  <string name="your_transactions">没有交易</string>
+  <string name="transaction_occur_when_bitcoin">交易在您接收和发送比特币时发生。</string>
+  <string name="transaction_occur_when_eth">当您接收和发送以太币时，交易就会发生。</string>
+  <string name="transaction_occur_when_bitcoin_cash">当您接收和发送比特币现金时，交易就会发生。</string>
+  <string name="transaction_occur_when_lumens">交易在您接收和发送恒星币时发生。</string>
+  <string name="address_book_label">（地址簿）</string>
+  <string name="archived_label">已封存</string>
+  <string name="UPGRADE_YOUR_WALLET">好的，我们走吧！</string>
+  <string name="upgrade_page_1">简化的备份和恢复。</string>
+  <string name="upgrade_page_2">通过分层确定性地址增强了隐私。 
+</string>
+  <string name="upgrade_page_3">自定义在区块链中组织比特币的方式
+钱包。 
+</string>
+  <string name="confirm_upgrade_header">嘿，我们已经将这些新功能添加到您的区块链中
+钱包： 
+</string>
+  <string name="upgrading">升级中...</string>
+  <string name="upgrading_started_info">您的钱包正在升级，请耐心等待
+一段时间取决于钱包的大小和年龄。 
+</string>
+  <string name="upgrade_success_heading">您的钱包已升级！</string>
+  <string name="upgrade_success_info">您现在正在运行最安全，最私密的区块链
+钱包。您现在可以继续使用钱包。 
+</string>
+  <string name="CLOSE">关</string>
+  <string name="upgrade_fail_heading">钱包升级失败！</string>
+  <string name="upgrade_fail_info">升级您的钱包时出错。请再试一遍
+后来。 
+</string>
+  <string name="not_sane_error">您的Blockchain Wallet安装不完整。请重新配对
+您的钱包或创建一个新的钱包。 
+</string>
+  <string name="watchonly_address_receive_warning">您即将收到比特币给
+非支出地址。如果您有权使用私钥，则只能花费这些资金。 
+继续？ 
+</string>
+  <string name="camera_unavailable">相机当前正在由另一个应用程序打开。请
+关闭其他应用程序，然后重试。 
+</string>
+  <string name="validating_password">正在验证密码...</string>
+  <string name="validating_pin">正在验证PIN…</string>
+  <string name="creating_pin">正在创建PIN码...</string>
+  <string name="decrypting_wallet">解密钱包…</string>
+  <string name="password_unchanged">密码不变</string>
+  <string name="password_changed">密码已更改</string>
+  <string name="password_changed_explanation">您的密码已更改，请重新配对
+钱包
+</string>
+  <string name="verify_email2">经过验证的电子邮件地址将在以下情况下发送登录代码： 
+检测到可疑或异常活动，以提醒您您的钱包登录ID，并
+收到资金后发送比特币付款提醒。 
+</string>
+  <string name="disable_root_warning">禁用根设备警告</string>
+  <string name="auth_failed">授权失败。请再试一遍。</string>
+  <string name="send_failed">发送失败。请再试一遍。</string>
+  <string name="wallet_updated">收到电子钱包更新</string>
+  <string name="device_rooted">您的设备似乎已植根。请注意，将资金存入
+生根的设备不安全，此外还可能导致稳定性问题。如果继续
+在此设备上使用我们的比特币钱包，我们建议您在自己的设备上使用双重加密
+区块链账户
+</string>
+  <string name="address_already_in_wallet">您的钱包已包含此地址。</string>
+  <string name="saving_address">正在保存地址...</string>
+  <string name="edit">编辑</string>
+  <string name="label_cant_be_empty">标签不能为空。</string>
+  <string name="label_name_match">名称已被使用</string>
+  <string name="warning">警告</string>
+  <string name="ssl_no_connection">我们无法连接到主机以建立安全
+连接。请先验证您的网络连接和设备，然后再继续。 
+</string>
+  <string name="retry">重试</string>
+  <string name="archived_description">此项目已被归档，并且在
+移动应用体验。尽管您无法从该项目中汇款，但所有资金仍会保留
+安全。只需取消存档该项目即可再次使用它。 
+</string>
+  <string name="not_archived_description">此项目未存档。如果您存档，请存档
+不想再使用它。您的资金将保持安全，您可以在以下位置取消存档
+任何时候。 
+</string>
+  <string name="default_account_description">此项目设置为您的默认设置，不能设置为
+已封存。 
+</string>
+  <string name="extended_public_key">扩展公钥</string>
+  <string name="address">地址</string>
+  <string name="copy_xpub">复制xpub</string>
+  <string name="scan_this_code">您的xPub是一项高级功能，其中包含您所有的公共
+地址。 
+</string>
+  <string name="xpub_sharing_warning">共享您的xPub授权其他人跟踪您的
+交易记录。由于授权人员可能会干扰您访问您的
+钱包，仅与您信任的人共享xPub。 
+</string>
+  <string name="edit_wallet_name">编辑名称</string>
+  <string name="edit_wallet_name_helper_text">给这个新钱包起个名字。</string>
+  <string name="create_a_new_wallet">创建一个新钱包</string>
+  <string name="create_a_new_wallet_helper_text">给这个新钱包起个名字。</string>
+  <string name="create_now">立即建立</string>
+  <string name="copy_address">复制地址</string>
+  <string name="archive">封存</string>
+  <string name="unarchive">取消存档</string>
+  <string name="archive_are_you_sure">您确定要存档此项目吗？</string>
+  <string name="unarchive_are_you_sure">您确定要取消存档该项目吗？</string>
+  <string name="make_default">使默认</string>
+  <string name="privx_required">需要私钥</string>
+  <string name="watch_only_spend_instructions">此操作需要使用专用密钥
+比特币地址%1$s 。请扫描二维码。 
+</string>
+  <string name="invalid_private_key">私钥无效</string>
+  <string name="watch_only_import_warning">您将要导入一个非消费性地址， 
+地址（或公共密钥脚本） 
+没有对应私钥的情况下存储在钱包中。这个
+意味着仅当您将私钥存储在其他位置时，才能使用这些资金。如果你
+做
+没有存储私钥，请勿指示任何人将您的比特币发送给
+不可消费
+地址。 
+
+仅建议高级用户使用这些选项。继续？ 
+</string>
+  <string name="scan_private_key">扫描私钥</string>
+  <string name="private_key_successfully_imported">私钥已成功导入。</string>
+  <string name="private_key_not_matching_address">注意：扫描的私钥不
+对应于您的非消费性地址。要从此地址花费您的资金，请扫描
+正确的私钥。 
+</string>
+  <string name="watch_only">不可消费</string>
+  <string name="extended_public_key_description">如果您是商人，请显示xPub并使用
+区块链商家应用程序可安全私密地接收资金。 
+
+保持您的xPub私有。 
+有权访问您的xPub的人将能够看到您的所有资金和交易。 
+</string>
+  <string name="extended_public_key_description_bch_only">保持您的xPub私有。有人
+访问您的xPub将能够看到您所有的资金和交易。 
+</string>
+  <string name="watch_only_description">这是一个不可消费的地址。花费您的资金
+此钱包，请扫描您的私钥。 
+</string>
+  <string name="success">成功</string>
+  <string name="default_label">默认</string>
+  <string name="import_try_again">再试一次</string>
+  <string name="transfer">传递</string>
+  <string name="transfer_funds">转移导入的地址？</string>
+  <string name="transfer_recommend">看起来您的导入地址中有一些比特币。 
+备份短语不备份导入的地址。为了获得这些资金，我们
+建议转移这些余额以包括在备份中。 
+</string>
+  <string name="transfer_confirmed">转移确认</string>
+  <string name="transfer_confirm">确认转账</string>
+  <string name="transfer_all">全部转移</string>
+  <string name="transfer_amount">转账金额</string>
+  <string name="transfer_archive_message">转移后存档导入的地址</string>
+  <string name="transfer_archive">存档已确认</string>
+  <string name="dont_ask_again">不要再问我了。</string>
+  <string name="amount">量</string>
+  <string name="not_now">现在不要</string>
+  <string name="no_confirmed_funds">没有确认的资金可以支出。</string>
+  <string name="transaction_surge">比特币采矿网络目前正处于高位
+活动量，导致建议的费用比平时高。 
+</string>
+  <string name="unsupported_encryption_version">不支持电子钱包版本%1$s 。</string>
+  <string name="logout">登出</string>
+  <string name="to_field_helper">输入BTC地址或选择</string>
+  <string name="to_field_helper_no_dropdown">输入比特币地址</string>
+  <string name="update">更新资料</string>
+  <string name="mobile">移动</string>
+  <string name="profile">轮廓</string>
+  <string name="app">应用程式</string>
+  <string name="verify">校验</string>
+  <string name="resend">重发</string>
+  <string name="verified">已验证</string>
+  <string name="unverified">未验证</string>
+  <string name="allow">允许</string>
+  <string name="block">块</string>
+  <string name="security">安全</string>
+  <string name="enable">启用</string>
+  <string name="disable">禁用</string>
+  <string name="sms">短信</string>
+  <string name="setting_the_exchange">交换</string>
+  <string name="disable_2fa_first">请在安全性中禁用通过SMS进行的两步验证
+设置第一。 
+</string>
+  <string name="disable_online_only">请在网络浏览器中登录您的钱包以禁用
+ 2FA。 
+</string>
+  <string name="settings_field_cant_be_empty">字段不能为空。</string>
+  <string name="settings_error_updating">更新设置时出错，请重试</string>
+  <string name="request_camera_permission">需要访问相机。</string>
+  <string name="request_camera_permission_title">摄像头访问</string>
+  <string name="request_location_permission">需要位置访问权限。</string>
+  <string name="request_write_storage_permission">需要写入外部存储。</string>
+  <string name="request_write_and_camera_storage_permission_description">写外部存储
+和相机需要上传KYC文档。 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">写存储和相机
+权限
+</string>
+  <string name="not_specified">未标明</string>
+  <string name="update_failed">更新失败。</string>
+  <string name="verify_mobile">验证手机</string>
+  <string name="select_country">选择国家</string>
+  <string name="search_country">搜索国家</string>
+  <string name="verify_sms_summary">我们已向您的手机发送了一条短信，其中包含
+验证码。输入代码以验证您的手机号码。 
+</string>
+  <string name="verify_sms_failed">代码无效，请重试</string>
+  <string name="mobile_description">您的手机可用于启用两因素
+身份验证，有助于保护您的钱包免遭未经授权的访问。 
+</string>
+  <string name="enable_fingerprint">指纹解锁</string>
+  <string name="two_fa">两步验证</string>
+  <string name="tor_requests">阻止Tor请求</string>
+  <string name="tor_summary">阻止已知为Tor匿名化一部分的IP地址
+网络。尝试访问区块链的黑客经常使用Tor网络
+用户的钱包。 
+</string>
+  <string name="enable_screenshots">启用屏幕截图</string>
+  <string name="enable_screenshots_summary">应用程序中的某些屏幕可以显示
+敏感数据。其他应用程序将能够访问这些屏幕截图。 
+</string>
+  <string name="password_hint_summary">您的区块链钱包永远不会将您的密码传达给
+我们的服务器。这意味着我们不知道您的密码是什么，如果您输入密码，我们将无法重置
+算了吧。创建一个令人难忘的密码提示，我们可以将其发送到您已验证的电子邮件地址
+以防您忘记密码。 
+</string>
+  <string name="change_password">更改密码</string>
+  <string name="change_password_summary">您的密码永远不会与我们的服务器共享， 
+表示如果您忘记了密码，我们将无法帮助您重置密码。确保您备份了资金
+从侧面菜单中，如果密码丢失，该菜单可以恢复对钱包的访问。 
+</string>
+  <string name="verify_email_notice">我们已向您的电子邮件地址发送了一个验证链接。请点击
+验证您的电子邮件地址的链接。 
+</string>
+  <string name="email_notifications">邮件通知</string>
+  <string name="email_notifications_summary">在收到比特币时得到通知。</string>
+  <string name="current_password">当前密码</string>
+  <string name="new_password">新密码</string>
+  <string name="sms_verified">手机号码已验证</string>
+  <string name="preferences">优先</string>
+  <string name="two_fa_summary">启用两步操作，保护您的钱包免遭未经授权的访问
+验证。 
+</string>
+  <string name="two_fa_description">通过启用来保护您的钱包免遭未经授权的访问
+两步验证。您可以选择使用手机号码来保护您的钱包。 
+当您尝试通过网络浏览器访问钱包时，将要求输入此代码。 
+
+在
+要改用其他身份验证方法，请通过%1$s登录到我们的网络钱包
+</string>
+  <string name="rate_title">评价区块链钱包</string>
+  <string name="rate_message">享受区块链钱包？请花一点时间离开
+在Google Play中进行评论，并告知其他人。 
+</string>
+  <string name="rate_yes">是的，给区块链钱包打分</string>
+  <string name="rate_no">不用了，谢谢</string>
+  <string name="rate_later">稍后提醒我</string>
+  <string name="information">信息</string>
+  <string name="learn_more">学到更多</string>
+  <string name="pairing_code_log_in">登录到网络钱包</string>
+  <string name="pairing_code_instruction_1">在您的计算机上转到%1$s 。</string>
+  <string name="pairing_code_instruction_2">选择通过手机登录。</string>
+  <string name="pairing_code_instruction_3">使用计算机的相机，扫描下面的QR码。</string>
+  <string name="pairing_code_show_qr">显示二维码</string>
+  <string name="pairing_code_hide_qr">隐藏二维码</string>
+  <string name="pairing_code_warning_1">将此代码隐藏起来，直到您准备好。</string>
+  <string name="pairing_code_warning_2">确保此代码安全！ 
+不要与他人分享。</string>
+  <string name="email_request_subject_btc">比特币付款请求</string>
+  <string name="email_request_subject_eth">醚付款请求</string>
+  <string name="email_request_subject_bch">比特币现金付款请求</string>
+  <string name="email_request_subject_pax_1">USD电子付款请求</string>
+  <string name="email_request_subject_xlm">Xlm付款要求</string>
+  <string name="email_request_body_btc">请发送%1$s BTC到比特币地址%2$s 。</string>
+  <string name="email_request_body_eth">请将ETH发送到以太%1$s地址%1$s 。</string>
+  <string name="email_request_body_pax_1">请将USD-D发送到USD数字地址%1$s 。</string>
+  <string name="email_request_body_bch">请将BCH发送到比特币现金地址%1$s 。</string>
+  <string name="email_request_body_xlm">请将XLM发送到恒星地址%1$s 。</string>
+  <string name="email_request_body_fallback">附上</string>
+  <string name="share_instructions">点击以复制此地址。通过电子邮件与发件人共享
+或文字。 
+</string>
+  <string name="common_pin_dialog_title">警告</string>
+  <string name="common_pin_dialog_message">您选择的PIN非常普遍，可能会
+ 3次尝试访问您的手机的人很容易猜到。你想用吗
+反正这个PIN？ 
+</string>
+  <string name="common_pin_dialog_try_again">再试一次</string>
+  <string name="common_pin_dialog_continue">继续</string>
+  <string name="logged_out_enter_password">您已注销或解密时出错
+你的钱包。在下面输入密码登录。 
+</string>
+  <string name="logged_out_forget_wallet">如果您想忘记此钱包并重新开始， 
+按“忘记钱包”。 
+</string>
+  <string name="forget_wallet">忘记钱包</string>
+  <string name="forget_wallet_warning">这将清除此设备上的所有钱包数据。请
+确认您的钱包信息已保存在其他地方，否则其中的任何比特币
+钱包将无法访问！ 
+</string>
+  <string name="api_fail">无法连接到服务器。请稍后再试。</string>
+  <string name="large_tx_warning">这是一个超大的比特币交易。您的钱包需要
+合并您过去收到的许多小额付款。这需要相对
+高费用以便快速确认。 
+</string>
+  <string name="accept_higher_fee">接受更高的费用</string>
+  <string name="password_reveal_warning">小心！显示此文本可让您的密码
+复制到剪贴板，然后可以由设备上的所有应用程序读取。也
+注意站在你身后的人！ 
+</string>
+  <string name="push_notifications">推送通知</string>
+  <string name="push_notifications_summary">启用通知以接收弹出通知
+每当您收到比特币时。 
+</string>
+  <string name="transaction_detail_title">交易</string>
+  <string name="transaction_detail_description_hint">这是用来干嘛的？</string>
+  <string name="transaction_detail_date">日期</string>
+  <string name="transaction_detail_status">状态</string>
+  <string name="transaction_detail_confirmed">已确认</string>
+  <string name="transaction_detail_pending">待处理（ %1$s / %2$s确认）</string>
+  <string name="transaction_detail_fee">“交易费用： %1$s ”</string>
+  <string name="transaction_detail_value_at_time_received">收到的值： \u0020</string>
+  <string name="transaction_detail_value_at_time_transferred">转移时的价值： \u0020 
+</string>
+  <string name="transaction_detail_value_at_time_sent">发送时的值： \u0020</string>
+  <string name="transaction_detail_value">值： \u0020</string>
+  <string name="transaction_detail_coinbase">无输入（新生成的硬币）</string>
+  <string name="transaction_detail_double_spend">可能有双花的风险。</string>
+  <string name="transaction_detail_verify">在Blockchain.com上验证</string>
+  <string name="transaction_detail_verify_stellar_chain">在StellarChain.io上验证</string>
+  <string name="transaction_detail_share_chooser">分享交易明细</string>
+  <string name="transaction_detail_contact_note">注意</string>
+  <string name="security_centre_email_check">查看电子邮件</string>
+  <string name="backup_header">备用词组</string>
+  <string name="backup_explanation">为了您的安全，Blockchain不会保留任何密码
+文件。以下12个字词的备用词组将使您可以使用自己的资金
+忘记密码。确保将其写在纸上，并放在安全的地方
+和安全。 
+</string>
+  <string name="backup_button_start">开始备份</string>
+  <string name="backup_write_down_words">确保写下您的话很重要
+完全按照此处显示的顺序排列。 
+</string>
+  <string name="backup_header_complete">备份完成</string>
+  <string name="backup_complete_message">如果出现以下情况，您可以使用备份短语来恢复资金
+您会丢失密码。有权访问您的备用词组的任何人都可以访问您的资金，因此
+请记住将其离线保存在安全的地方。 
+</string>
+  <string name="backup_again">再次备份</string>
+  <string name="backup_confirmed">备份已确认</string>
+  <string name="backup_last">上次备份： %1$s</string>
+  <string name="backup_verify_heading">在“备份短语”中输入以下字词： 
+完成备份过程。 
+</string>
+  <string name="backup_next_word">下一个词</string>
+  <string name="backup_previous_word">上一个字</string>
+  <string name="backup_word">字</string>
+  <string name="backup_of">的</string>
+  <string name="backup_word_mismatch">单词不匹配</string>
+  <string name="backup_done">完成</string>
+  <string name="backup_lost_mnemonic">丢失了12个单词的备用词组？</string>
+  <string name="fingerprint_prompt">使用指纹可以更快，更轻松地访问您的指纹
+钱包。 
+
+确认指纹以继续
+</string>
+  <string name="fingerprint_description">确认指纹以继续</string>
+  <string name="fingerprint_hint">触控感应器</string>
+  <string name="fingerprint_login_title">指纹登录</string>
+  <string name="fingerprint_not_recognized">无法识别指纹。再试一次</string>
+  <string name="fingerprint_success">指纹识别</string>
+  <string name="fingerprint_use_pin">使用个人识别码</string>
+  <string name="fingerprint_disable_message">您确定要禁用指纹登录吗？ 
+</string>
+  <string name="fingerprint_no_fingerprints_added">没有指纹注册到此
+设备呢。您要现在注册指纹吗？ 
+</string>
+  <string name="fingerprint_key_invalidated_description">储存在此的指纹
+设备已更改或键盘锁已禁用
+</string>
+  <string name="fingerprint_key_invalidated_brief">密钥无效，需要PIN码</string>
+  <string name="fingerprint_fatal_error_register_description">失败太多了
+最近30分钟内的尝试。请稍后再尝试设置。 
+</string>
+  <string name="fingerprint_fatal_error_authenticate_description">失败太多了
+尝试。请改用您的PIN登录。 
+</string>
+  <string name="fingerprint_fatal_error_brief">意外的错误</string>
+  <string name="shortcut_receive_copy_short">复制地址</string>
+  <string name="shortcut_receive_copy_long">将接收地址复制到另一个应用程序</string>
+  <string name="shortcut_receive_qr_short">显示接收QR</string>
+  <string name="shortcut_receive_qr_long">查看QR码以获取地址</string>
+  <string name="shortcut_receive_qr_error">抱歉，生成QR码时出错
+</string>
+  <string name="shortcut_settings_summary">长按应用程序时显示一个接收地址
+启动器中的图标，可以更快地接收比特币。 
+</string>
+  <string name="shortcut_settings_enable">启动器快捷方式</string>
+  <string name="confirm">确认</string>
+  <string name="swipe_receive_hint">滑动即可接收</string>
+  <string name="swipe_receive_preference_summary">向左滑动时显示一个接收地址
+ PIN屏幕，使收款速度更快。 
+</string>
+  <string name="swipe_receive_address_info">五个地址将连续加载，之后
+需要登录才能显示新地址。 
+</string>
+  <string name="swipe_receive_no_addresses">现在无法加载更多地址。登录到
+该应用程序可以加载更多。 
+</string>
+  <string name="swipe_to_receive_request">收到%1$s</string>
+  <string name="swipe_receive_left_arrow">滑动即可接收向左箭头</string>
+  <string name="swipe_receive_right_arrow">滑动即可接收向右箭头</string>
+  <string name="onboarding_fingerprint_title">指纹登录</string>
+  <string name="onboarding_fingerprint_summary">使用指纹登录而不是您的PIN 
+验证并访问您的钱包。 
+</string>
+  <string name="onboarding_fingerprint_enable">启用指纹</string>
+  <string name="onboarding_check_inbox_title">检查你的收件箱</string>
+  <string name="onboarding_check_inbox_summary">查找来自Blockchain的电子邮件，然后单击
+验证链接以完成您的钱包设置。 
+</string>
+  <string name="onboarding_verify_email">验证邮件</string>
+  <string name="onboarding_qr_codes">二维码</string>
+  <string name="onboarding_get_bitcoin">获取比特币</string>
+  <string name="onboarding_get_eth">获取以太</string>
+  <string name="onboarding_get_bitcoin_cash">获取比特币现金</string>
+  <string name="onboarding_get_lumens">获取恒星</string>
+  <string name="trade_complete">交易完成</string>
+  <string name="trade_complete_details">您的购买比特币交易已经完成！</string>
+  <string name="view_details">查看详情</string>
+  <string name="two_factor_dialog_title">输入2FA代码</string>
+  <string name="two_factor_dialog_message_authenticator">请输入您的有效2FA代码
+身份验证器应用继续。 
+</string>
+  <string name="two_factor_dialog_message_sms">我们刚刚给您发送了包含2FA代码的SMS。 
+请在此处输入以继续。 
+</string>
+  <string name="two_factor_dialog_hint">2FA代码</string>
+  <string name="two_factor_null_error">2FA代码不能为空</string>
+  <string name="two_factor_incorrect_error">2FA代码不正确</string>
+  <string name="confirm_payment_change_fee">变更费</string>
+  <string name="confirm_payment_fee_sync_error">获取费用选项时出错</string>
+  <string name="fee_options_regular">定期</string>
+  <string name="fee_options_priority">优先</string>
+  <string name="fee_options_custom">自订</string>
+  <string name="fee_options_regular_time">1小时以上</string>
+  <string name="fee_options_priority_time">〜0–60分钟</string>
+  <string name="fee_options_custom_warning">仅限高级用户</string>
+  <string name="fee_options_fee_too_low">不推荐低费用</string>
+  <string name="fee_options_fee_too_high">不必要的高额费用</string>
+  <string name="fee_options_advanced_warning">仅建议高级用户使用此功能。 
+通过选择自定义费用，您可能会面临多付或您的交易从未被确认的风险。 
+</string>
+  <string name="fee_options_sat_byte_hint">坐/ b</string>
+  <string name="fee_options_sat_byte_inline_hint">常规： %1$s ，优先级： %2$s</string>
+  <string name="dismiss">解雇</string>
+  <string name="second_password_dlg_title">输入密码</string>
+  <string name="eth_second_password_prompt">要使用此服务，我们要求您输入您的
+第二个密码。 
+</string>
+  <string name="ether">醚</string>
+  <string name="bitcoin">比特币</string>
+  <string name="eth_to_field_helper">输入ETH地址或选择</string>
+  <string name="eth_to_field_helper_no_dropdown">输入以太币地址</string>
+  <string name="eth_invalid_address">无效的以太地址</string>
+  <string name="eth_support_contract_not_allowed">不支持合同地址。</string>
+  <string name="eth_support_only_eth">目前，我们仅支持ETH-您无法收到
+此地址的令牌
+</string>
+  <string name="eth_unconfirmed_wait">请等待，直到您之前的交易确认
+</string>
+  <string name="eth_transaction_complete">交易完成！您的交易和余额将
+请尽快更新，这可能需要几分钟。 
+
+</string>
+  <string name="pax_to_field_helper_no_dropdown_1">输入USD-D / ETH地址</string>
+  <string name="pax_to_field_helper_1">输入USD-D / ETH地址或选择</string>
+  <string name="pax_invalid_address_1">USD-D地址无效</string>
+  <string name="dashboard_title">仪表板</string>
+  <string name="dashboard_time_span_last_day">最后一天</string>
+  <string name="dashboard_time_span_last_month">上个月</string>
+  <string name="dashboard_time_span_last_week">上个星期</string>
+  <string name="dashboard_time_span_last_year">去年</string>
+  <string name="dashboard_time_span_all_time">整天</string>
+  <string name="kyc_more_info_title">需要更多信息</string>
+  <string name="kyc_more_info_body">要继续使用买卖服务，您需要更新个人资料。完成后，您还可以在 Swap 中解锁更高额的交易权限。 </string>
+  <string name="kyc_more_info_cta">现在更新</string>
+  <string name="metadata_load_failure">加载完整的钱包功能时出错。服务可能暂时不可用。</string>
+  <string name="dashboard_price_for_asset">当前%1$s价格</string>
+  <string name="dashboard_buy_for_asset">购买%1$s</string>
+  <string name="dashboard_asset_error">目前无法加载%1$s</string>
+  <string name="dashboard_asset_balance_total">总余额</string>
+  <string name="dashboard_asset_balance_wallet">钱包余额</string>
+  <string name="dashboard_asset_balance_custodial">交易钱包</string>
+  <string name="more">更多</string>
+  <string name="force_upgrade_message">您正在使用的应用版本不再
+支持的。请更新该应用，然后重试。 
+</string>
+  <string name="tx_decode_error">无法解码地址</string>
+  <string name="bch_all_accounts">所有比特币现金钱包</string>
+  <string name="bch_imported_addresses">导入的比特币现金地址</string>
+  <string name="transaction_detail_verify_bch">在Blockchain.com上验证</string>
+  <string name="bch_to_field_helper">输入BCH地址或选择</string>
+  <string name="bch_to_field_helper_no_dropdown">输入比特币现金地址</string>
+  <string name="xlm_to_field_helper">输入恒星地址或选择</string>
+  <string name="xlm_to_field_helper_no_dropdown">输入恒星地址</string>
+  <string name="bch_address_warning">您确定这是比特币现金地址吗？</string>
+  <string name="bch_address_warning_subtext">意外将资金发送到比特币地址将导致资金损失。</string>
+  <string name="bch_invalid_address">无效的比特币现金地址</string>
+  <string name="confirm_currency">确认币种</string>
+  <string name="confirm_currency_message">请选择您要扫描的货币的QR码。</string>
+  <string name="testnet_warning">警告！这是testnet3区块链。</string>
+  <string name="buy_sell">买卖</string>
+  <string name="buy_sell_create_account">创建帐号</string>
+  <string name="sunriver_invalid_url_message">您的XLM已被声明。</string>
+  <string name="sunriver_invalid_url_title">不好了！</string>
+  <string name="sunriver_invalid_campaign_user">很抱歉，您所在的位置当前无法使用空投计划。</string>
+  <string name="sunriver_user_already_registered">看来您已经收到空投了！</string>
+  <string name="sunriver_campaign_expired">很抱歉，XLM空投结束了。完成你的
+个人资料，有资格进行未来的空投和交易。 
+</string>
+  <string name="sunriver_generic_error">糟糕！我们无法处理您的空投。请再试一遍。</string>
+  <string name="sunriver_set_memo">设定备忘</string>
+  <string name="stablecoin_announcement_introducing_title">数字美元</string>
+  <string name="stablecoin_announcement_introducing_description_1">向您介绍USD Digital，这是一种安全稳定的加密资产，可用于存储价值。 1 USD-D = 1 USD。</string>
+  <string name="stablecoin_announcement_introducing_link_1">获取美元数字</string>
+  <string name="pax_no_transactions_message_1">您完成后，您的USD数字交易将显示在此处
+进行您的第一笔交易。 
+</string>
+  <string name="pax_learn_more_link_1">了解有关USD Digital的更多信息</string>
+  <string name="pax_swap_now_1">立即兑换美元数字</string>
+  <string name="swap_announcement_title">买卖加密货币</string>
+  <string name="swap_announcement_description">不用离开钱包就用一种加密货币换另一种加密货币。获得有竞争力的实时价格和快速的链上结算。</string>
+  <string name="swap_announcement_introducing_link">查看 Swap</string>
+  <string name="pax_title_1">美元数字</string>
+  <string name="pax_wallet_name_1">我的美元数字钱包</string>
+  <string name="morph_exchange">Swap</string>
   <string name="morph_order_history">订单历史</string>
-  <string name="morph_incoming">来</string>
-  <string name="morph_select_state_residency">选择您的居住状态</string>
-  <string name="morph_select_state">选择状态</string>
-  <string name="morph_unavailable_in_state">您所在的州尚未提供此服务。</string>
-  <string name="morph_deposit_from">来自ShapeShift的存款</string>
+  <string name="morph_deposit_from">从ShapeShift存款</string>
   <string name="morph_deposit_to">存入ShapeShift</string>
   <string name="morph_error">错误</string>
-  <string name="morph_use_minimum">使用最少</string>
-  <string name="morph_use_maximum">使用最大值</string>
-  <string name="morph_getting_information">从ShapeShift加载信息，请稍候...</string>
-  <string name="morph_getting_information_failed">加载ShapeShift信息失败</string>
-  <string name="morph_btc">比特币</string>
-  <string name="morph_eth">醚</string>
-  <string name="morph_bch">比特币现金</string>
-  <string name="morph_switch_currency_description">反转货币对</string>
-  <string name="morph_getting_fees_failed">获取费用时出错</string>
-  <string name="morph_fetching_unspent_outputs_failed">获取未使用的输出时出错</string>
-  <string name="morph_fetching_eth_account_failed">获取剩余以太网时出错</string>
-  <string name="morph_deriving_address_failed">导出地址时出错</string>
   <string name="morph_new_exchange">新交换</string>
-  <string name="morph_no_funds_title">没有资金交换</string>
-  <string name="morph_no_funds_message">您目前没有足够的余额来交换。首先请求将一些资金存入您的钱包。</string>
-  <string name="morph_confirmation_agree">同意ShapeShift</string>
-  <string name="morph_confirmation_terms">条款和条件</string>
-  <string name="morph_network_fee">网络交易费</string>
   <string name="morph_transaction_fee">手续费</string>
   <string name="morph_exchange_rate">汇率</string>
   <string name="morph_time_remaining">报价在%1$s到期</string>
-  <string name="morph_deposit_title">%1$s存款</string>
-  <string name="morph_receive_title">收到%1$s</string>
-  <string name="morph_total_title">总花费%1$s</string>
+  <string name="morph_deposit_title">存入%1$s</string>
+  <string name="morph_receive_title">将收到%1$s</string>
   <string name="morph_exchange_rate_formatted">1 %1$s = %2$s %3$s</string>
   <string name="morph_exchange_rate_placeholder">%1$s - &gt; %2$s</string>
-  <string name="morph_balance_title">你的%1$s余额</string>
-  <string name="morph_quote_expired_error">报价过期了</string>
-  <string name="morph_quote_expired_error_message">此交易已到期，因为我们仍未收到您的资金。如果我们收到您的资金，我们将完成您的交易。如果您需要进一步的帮助，请联系支持。</string>
+  <string name="morph_balance_title">可用的%1$s</string>
   <string name="morph_amount_to_low">交换需要%1$s %2$s</string>
-  <string name="morph_confirmation_eth_pending">以太交易失败，请等到您之前的交易确认。</string>
-  <string name="morph_failed_explanation">这笔交易失败了。请返回“交换”选项卡以开始新的交易</string>
-  <string name="morph_refunded_explanation">此交易已到期，因为我们仍未收到您的资金。如果我们收到您的资金，我们将完成您的交易。如果您需要进一步的帮助，请联系支持。</string>
-  <string name="morph_sending_title">发送资金</string>
+  <string name="morph_confirmation_eth_pending">以太网交易失败，请等到您的
+先前的交易确认。 
+</string>
+  <string name="morph_failed_explanation">这项交易失败了。请返回“交换”标签以
+开始新交易
+</string>
+  <string name="morph_refunded_explanation">此交易已过期，因为我们仍未收到
+您的资金。如果我们收到您的资金，我们将完成您的交易。如果您需要进一步
+协助，请联系支持。 
+</string>
+  <string name="morph_sending_title">汇款</string>
   <string name="morph_in_progress_title">进行中</string>
   <string name="morph_complete_title">完成</string>
-  <string name="morph_failed_title">失败</string>
-  <string name="morph_refunded_title">过期</string>
-  <string name="morph_step_number">步骤%1$s为3</string>
+  <string name="morph_failed_title">失败的</string>
+  <string name="morph_refunded_title">已过期</string>
+  <string name="morph_step_number">第3步，共%1$s</string>
   <string name="morph_confirm">确认</string>
-  <string name="morph_success_dlg_text">成功！你的交流了
-已经开始了！</string>
-  <string name="morph_success_for_first_gold_pax_trade_title">您的Exchange已经启动！</string>
-  <string name="morph_success_for_first_gold_pax_trade_description">更好的是，由于您需要ETH进行美元PAX交易，我们只需将足够的ETH空投到您的电子钱包中以涵盖前3笔交易
- 🙌</string>
+  <string name="morph_success_dlg_text">成功！您的交易所有
+开始了！</string>
+  <string name="morph_success_for_first_gold_pax_trade_title">您的交流已经开始！</string>
+  <string name="morph_success_for_first_gold_pax_trade_description_1">更好，因为您需要
+进行美元兑美元交易的以太坊，我们只是将足够的以太币空投到您的电子钱包中，以覆盖您的
+前3笔交易
+ 🙌 
+</string>
   <string name="morph_success_dlg_button">查看订单详情</string>
-  <string name="morph_order_id_title">订单ID</string>
-  <string name="morph_trade_not_found">交易未找到</string>
+  <string name="morph_order_id_title">订单编号</string>
+  <string name="morph_trade_not_found">找不到交易</string>
   <string name="morph_in_progress_summary">交换正在进行中</string>
   <string name="morph_failed_summary">交换失败</string>
   <string name="morph_refunded_summary">交换过期</string>
-  <string name="locked_disclaimer_message">由于市场活动，您发送和接收的金额可能会略有变化。订单开始后，我们无法阻止它</string>
-  <string name="send_to">发送至</string>
+  <string name="locked_disclaimer_message">您发送和接收的金额可能会略有变化
+由于市场活动。订单开始后，我们将无法停止
+</string>
+  <string name="send_to">发给</string>
   <string name="receive">接收</string>
   <string name="fees">费用</string>
   <string name="value">值</string>
   <string name="status">状态</string>
-  <string name="order_id">订单ID</string>
   <string name="order_detail">订单详情</string>
+  <string name="swap_now">立即兑换</string>
   <string name="order_history">订单历史</string>
-  <string name="no_orders_found">没有找到订单</string>
-  <string name="confirm_exchange">确认交换</string>
-  <string name="exchange_locked">交换锁定</string>
-  <string name="status_inprogress_detail">感谢您的交易！资金通常会在2小时内到达您的钱包，我们会在发生这种情况时向您发送通知。在订单历史记录区域中跟踪您的交易进度。</string>
-  <string name="status_refund_in_progress_detail">此交易已到期，因为我们仍未收到您的资金。如果我们收到您的资金，我们将完成您的交易。如果您需要进一步的帮助，请联系支持。</string>
-  <string name="status_refunded_detail">交换锁定</string>
-  <string name="status_expired_detail">此交易已到期，因为我们仍未收到您的资金。如果我们收到您的资金，我们将完成您的交易。如果您需要进一步的帮助，请联系支持。</string>
+  <string name="no_orders_found">找不到订单</string>
+  <string name="confirm_swap">确认交换</string>
+  <string name="status_inprogress_detail">感谢您下单！资金通常会达到
+您会在2小时内收到您的钱包，一旦发生，我们会向您发送通知。追踪
+订单历史记录区域中的交易进度。 
+</string>
+  <string name="status_failed_expired_detail">大部分掉期交易都在
+两个小时请联系我们。在一起，我们可以弄清楚这一点。 
+</string>
+  <string name="failed_expired_status_title">嗯，有些不对劲。 👀</string>
   <string name="status_request_refund">联系支持</string>
   <string name="morph_status_in_progress">进行中</string>
   <string name="morph_status_complete">完成</string>
-  <string name="morph_status_expired">过期</string>
-  <string name="morph_status_failed">失败</string>
-  <string name="morph_status_refunded">退款</string>
-  <string name="morph_status_refund_in_progress">退款正在进行中</string>
+  <string name="morph_status_expired">已过期</string>
+  <string name="morph_status_failed">失败的</string>
+  <string name="morph_status_refunded">已退款</string>
+  <string name="morph_status_refund_in_progress">退款进行中</string>
   <string name="morph_status_refund_unknown">未知</string>
-  <string name="morph_status_refund_received">收到</string>
+  <string name="morph_status_refund_received">已收到</string>
   <string name="morph_status_refund_resolved">解决</string>
   <string name="execution_error_title">执行交易时出错</string>
-  <string name="execution_error_message">执行交易时出错。如果问题仍然存在，请重试，或与支持小组联系。</string>
-  <string name="homebrew_confirmation_error_fetching_fee">提取费用出错</string>
-  <string name="under_limit">在极限下</string>
-  <string name="over_limit">过量</string>
-  <string name="morph_help_dialog_need_some_help">\@字符串/ need_some_help</string>
-  <string name="morph_help_dialog_need_some_help_body">我们的区块链支持团队随时准备回答您的任何问题。</string>
-  <string name="morph_help_dialog_view_swap_limit">查看我的交换限额</string>
-  <string name="morph_help_dialog_contact_support">\@字符串/ contact_support</string>
-  <string name="toolbar_cmd_home">家</string>
-  <string name="toolbar_cmd_send">发送</string>
-  <string name="toolbar_cmd_receive">请求</string>
-  <string name="toolbar_cmd_activity">活动</string>
-  <string name="toolbar_cmd_swap">交换</string>
-  <string name="request">请求</string>
-  <string name="swap_info_contact_support">联系支持</string>
-  <string name="swap_info_swap_limits">交换限制</string>
+  <string name="homebrew_confirmation_error_fetching_fee">错误收取费用</string>
+  <string name="under_limit">低于限制</string>
+  <string name="swap_info_contact_support">联系技术支持</string>
+  <string name="swap_info_swap_limits">兑换限额</string>
   <string name="swap_info_order_history">订单历史</string>
-  <string name="item_buy_sell">买卖</string>
-  <string name="item_backup">备用资金</string>
-  <string name="item_lockbox">密码箱</string>
-  <string name="status_failed_expired_detail">Swap上的大多数交易都在两小时内无缝完成。请联系我们。我们可以一起解决这个问题。</string>
-  <string name="failed_expired_status_title">嗯，有些不对劲。 👀</string>
-  <string name="airdrop_program_card_title">空投计划</string>
-  <string name="airdrop_program_card_body">你有资格参加未来的空投。</string>
-  <string name="airdrop_program_card_button">现在选择加入</string>
-  <string name="kyc_veriff_splash_country_supported_header">我国是否受到支持？</string>
-  <string name="gold_level_under_review_sunriver_large_backlog">黄金验证正在审核中，一旦经过验证，您将能够使用掉期交易并达到我们的黄金级别限制。 
-
-请注意，Stellar空投有很多等待名单，遗憾的是，并非所有免费XLM申请都会成功。</string>
-  <string name="kyc_veriff_splash_error_silver">银验证</string>
-  <string name="kyc_gold_unavailable_text_support">如果您想了解有关我们验证过程的更多信息，请访问我们的<annotation link="gold_error">支持中心</annotation> 。</string>
-  <string name="kyc_gold_unavailable_text_line_2">如果你是银牌验证，你可以在交换中交换你的加密。</string>
-  <string name="kyc_gold_unavailable_text_line_1">很抱歉，我们无法验证您的金牌。这可能有多种原因，例如您的国家目前可能不受支持。</string>
-  <string name="kyc_gold_unavailable_text_title">黄金此时不可用</string>
-  <string name="kyc_gold_unavailable_goto_swap">开始交易</string>
-  <string name="gold_unavailable">黄金不可用</string>
-  <string name="veriff_identify">Veriff识别</string>
-  <string name="pax_intro_popup_title">数字美元</string>
-  <string name="pax_intro_popup_text">推出 USD PAX，一种安全稳定的加密货币资产，可用于存储价值。 1 PAX等于1美元。</string>
-  <string name="pax_intro_popup_cta_btn">立即获得 USD PAX</string>
-  <string name="buy_sell_error_country_not_supported">目前您所在的国家/地区不支持买入/卖出。我们正在努力尽快为更多地区增加支持。</string>
-  <string name="no_sell_available_message">很抱歉，目前您所在的地区无法购买 &amp; 售出。我们正努力尽快开通该业务。</string>
-  <string name="send">发送</string>
-  <string name="item_the_pit">The Blockchain Exchange</string>
-  <string name="btn_close">关闭</string>
-  <string name="sunriver_announcement_stellar_claim_title">领取您的恒星币 (XLM)</string>
-  <string name="sunriver_announcement_stellar_claim_message">似乎您已经开始验证身份，但并未完成。请从上次停止的地方继续。
-    </string>
-  <string name="sunriver_announcement_stellar_claim_cta">继续验证</string>
-  <string name="sunriver_announcement_stellar_on_the_way_title">您的恒星币即将到账</string>
-  <string name="sunriver_announcement_stellar_on_the_way_message">验证身份成功。
-....</string>
-  <string name="pit_announcement_description">是时候升级使用更好的加密货币交易平台了。前100,000名注册交易者将可免费交易30 天。</string>
-  <string name="pit_announcement_introducing_link">查看</string>
-  <string name="pit_logo_content_descr">PIT 商标</string>
-  <string name="pit_slogan_kyc_promo">连接到您的钱包的唯一交易平台。</string>
-  <string name="pit_thunder_kyc_promo">闪电般快速交易</string>
-  <string name="pit_built_kyc_promo">由 Blockchain.com 打造</string>
-  <string name="pit_dollar_kyc_promo">费用少</string>
-  <string name="pit_permission_app_can">该应用将能够：</string>
-  <string name="pit_permission_app_cant">该应用将不能：</string>
-  <string name="pit_permission_subtitle">将不能：</string>
-  <string name="pit_permission_1">促进帐户之间的加密货币传输</string>
-  <string name="pit_permission_2">分享您的金级或银级身份</string>
-  <string name="pit_permission_3">添加您的关联银行</string>
-  <string name="pit_permission_4">查看您的电子钱包密码</string>
-  <string name="pit_connect_now">立即连接</string>
-  <string name="pit_setting_connect">连接</string>
-  <string name="pit_setting_connected">已连接</string>
-  <string name="launch_the_pit">启动 PIT</string>
-  <string name="pit_contact_support">联系技术支持</string>
-  <string name="pit_loading_dialog_title">跳转至 PIT 交易平台 </string>
-  <string name="pit_loading_dialog_description">10秒内打开新窗口。</string>
-  <string name="pit_verify_email_title">验证您的邮件</string>
-  <string name="pit_verify_email_description">我们刚向您发送了一封验证电子邮件。您需要先验证电子邮箱地址，才能连接到 PIT。</string>
-  <string name="pit_open_email_app">打开电子邮箱应用程序</string>
-  <string name="pit_did_not_get_email">没有收到电子邮件？</string>
-  <string name="pit_send_again">再次发送</string>
-  <string name="mail_resent_succeed">已发送邮件。查看您的收件箱继续。</string>
-  <string name="mail_resent_failed">出错了。请刷新重试。</string>
-  <string name="pit_email_verified_description">您已完成所有设置，准备将 Blockchain Wallet 连接到 PIT。</string>
-  <string name="pit_email_verified_title">电子邮箱已通过验证</string>
-  <string name="pit_connection_error_title">连接错误</string>
-  <string name="pit_connection_error_description">无法将您的钱包连接到 PIT。请返回 PIT 交易平台重试。</string>
-  <string name="pit_connection_success_title">成功！</string>
-  <string name="pit_connection_success_description">您已将 Blockchain Wallet 连接到 PIT。</string>
-  <string name="pit_default_account_label">我的 PIT %1$s 地址</string>
-  <string name="the_pit_title">Blockchain Exchange</string>
-  <string name="kyc_veriff_splash_country_supported_subheader">目前并非所有国家都受到支持。在继续之前，请查阅我们最新的 <annotation link="country_list">国家/地区</annotation>列表。</string>
+  <string name="the_exchange_announcement_title">交易所介绍</string>
+  <string name="the_exchange_announcement_body">是时候升级到更好的加密货币交易所了。在Blockchain.com交易所中购买，出售和交易更多数字资产。</string>
+  <string name="the_exchange_announcement_cta_text">结帐交易所</string>
+  <string name="the_exchange_slogan_kyc_promo">有一种新的交易方式。关联您的电子钱包即可立即访问。</string>
+  <string name="the_exchange_thunder_kyc_promo">贸易方式
+快如闪电</string>
+  <string name="the_exchange_built_kyc_promo">由__建造
+ Blockchain.com</string>
+  <string name="the_exchange_dollar_kyc_promo">访问更多
+加密货币</string>
+  <string name="the_exchange_bill_kyc_promo">入金与出金
+欧元/美元</string>
+  <string name="the_exchange_permission_app_can">我们的交易所将能够：</string>
+  <string name="the_exchange_permission_app_cant">将不会：</string>
+  <string name="the_exchange_permission_subtitle">将不能够：</string>
+  <string name="the_exchange_permission_1">将地址与电子钱包同步，以便您可以安全地在帐户之间清除加密</string>
+  <string name="the_exchange_permission_2">分享您的金或银级别状态以进行无限交易</string>
+  <string name="the_exchange_permission_3">添加您的关联银行</string>
+  <string name="the_exchange_permission_4">访问钱包中的加密货币，访问密钥或查看密码。</string>
+  <string name="the_exchange_connect_now">立即连线</string>
+  <string name="the_exchange_title">交换</string>
+  <string name="crypto_exchange">加密交易所</string>
+  <string name="crypto_trading">加密交易</string>
+  <string name="the_exchange_setting_connect">连接</string>
+  <string name="the_exchange_setting_connected">连接的</string>
+  <string name="launch_the_exchange">启动交易所</string>
+  <string name="the_exchange_contact_support">联系支持</string>
+  <string name="the_exchange_loading_dialog_title">带您去交流</string>
+  <string name="the_exchange_loading_dialog_description">新窗口应在10秒内打开。</string>
+  <string name="the_exchange_verify_email_title">验证您的电子邮件</string>
+  <string name="the_exchange_verify_email_description">我们刚刚向您发送了一封验证电子邮件。必须先验证您的电子邮件地址，然后才能连接到Exchange。</string>
+  <string name="the_exchange_open_email_app">打开电子邮件应用</string>
+  <string name="the_exchange_two_fa_unavailable">请在您的Exchange帐户上启用2FA以完成存款</string>
+  <string name="the_exchange_did_not_get_email">没收到邮件吗？</string>
+  <string name="the_exchange_send_again">重新发送</string>
+  <string name="mail_resent_succeed">邮件已发送。检查您的收件箱以继续。</string>
+  <string name="mail_resent_failed">有些不对劲。请点击再次发送。</string>
+  <string name="the_exchange_email_verified_description">您已经准备好将您的区块链钱包连接到Exchange。</string>
+  <string name="the_exchange_email_verified_title">电子邮件已验证。</string>
+  <string name="the_exchange_connection_error_title">连接错误</string>
+  <string name="the_exchange_connection_error_description">我们无法将您的电子钱包连接到Exchange。请返回交易所，然后重试。</string>
+  <string name="the_exchange_connection_success_title">成功！</string>
+  <string name="the_exchange_connection_success_description">您已将区块链钱包连接到交易所。返回并完成注册！</string>
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">欢迎使用 Swap！</string>
   <string name="swap_intro_title_page_two">实时汇率</string>
-  <string name="swap_intro_title_page_three">100％ 链接</string>
+  <string name="swap_intro_title_page_three">100％链接</string>
   <string name="swap_intro_title_page_four">掌控您的密钥</string>
   <string name="swap_intro_title_page_five">更好地管理风险</string>
-  <string name="swap_intro_description_page_one">在不离开钱包的情况下，将一种加密货币交换为另一种加密货币的最简单方法。</string>
+  <string name="swap_intro_description_page_one">在不离开钱包的情况下将一种加密货币交换为另一种加密货币的最简单方法。</string>
   <string name="swap_intro_description_page_two">有竞争力的加密货币价格触手可及。</string>
   <string name="swap_intro_description_page_three">所有 Swap 交易均已确认并直接在链上结算。</string>
-  <string name="swap_intro_description_page_four">通过 Swap，您的加密货币安全而可靠，密钥始终完整。</string>
-  <string name="swap_intro_description_page_five">推出 Digital Dollars (USDp) 以降低您的加密货币投资风险或锁定收益。</string>
+  <string name="swap_intro_description_page_four">通过Swap，您的加密货币安全而可靠，密钥始终完整。</string>
+  <string name="swap_intro_description_page_five_1">推出Digital Dollars（USD-D）降低您的加密货币投资风险或锁定收益。</string>
   <string name="swap_intro_get_started">开始</string>
-  <string name="bitpay_remaining_time">剩余时间</string>
-  <string name="bitpay_invoice_expired">BitPay 发票已过期</string>
-  <string name="bitpay_invoice_expired_message">发票仅在 15 分钟内有效。如果您想重新提交付款，请返回商家。</string>
-  <string name="transaction_failed">交易失败</string>
-  <string name="received_usd_pax">收到美元 PAX</string>
-  <string name="pit_no_two_fa_available">请在您的 Blockchain Exchange 帐户上启用 2FA 以完成存款。</string>
-  <string name="pit_bill_kyc_promo">存款与提取
-欧元/美元</string>
-  <string name="bitpay_announcement_body">借助 BitPay，您现在可以将您的 Blockchain 钱包用于与支持的零售商进行交易。</string>
-  <string name="kyc_more_info_title">需要更多信息</string>
-  <string name="kyc_more_info_body">要继续使用买卖服务，您需要更新个人资料。完成后，您还可以在 Swap 中解锁更高额的交易权限。 </string>
-  <string name="kyc_more_info_cta">立即更新</string>
-  <string name="pit_announcement_title">Blockchain Exchange 简介</string>
-  <string name="pit_announcement_cta_text">查看 Blockchain Exchange</string>
-  <string name="tour_card_title">欢迎来到 Blockchain！</string>
-  <string name="tour_card_body">以下是一些提示，可帮助您启动钱包并运行，我们还将帮助您确保一切安全无虞。</string>
-  <string name="tour_card_cta">导览</string>
-  <string name="tour_card_dismiss">稍后再说</string>
-  <string name="verify_email_card_title">验证您的电子邮件地址</string>
-  <string name="verify_email_card_body">要开始使用您的 Blockchain 钱包，需要确认您的电子邮件地址。</string>
-  <string name="verify_email_card_cta">验证电子邮件地址</string>
-  <string name="two_fa_card_title">启用双重验证</string>
-  <string name="two_fa_card_body">通过启用双重验证来保护您的钱包不会遭受未授权访问。</string>
-  <string name="two_fa_card_cta">启用双重验证</string>
-  <string name="buy_btc_card_title">买比特币</string>
-  <string name="buy_btc_card_body">使用您的信用卡或银行帐户购买比特币，以启动您的加密货币投资组合。</string>
-  <string name="buy_btc_card_cta">买比特币</string>
-  <string name="transfer_btc_card_title">以加密货币转帐</string>
+  <string name="tour_card_title">欢迎来到区块链！</string>
+  <string name="tour_card_body">这里有一些提示，可以启动您的钱包并开始运行。我们还将帮助您确保一切安全。</string>
+  <string name="tour_card_cta">逛一圈</string>
+  <string name="tour_card_dismiss">也许以后</string>
+  <string name="verify_email_card_title">确认你的邮件地址</string>
+  <string name="verify_email_card_body">为了开始使用您的区块链钱包，您需要确认您的电子邮件地址。</string>
+  <string name="verify_email_card_cta">确认电子邮件地址</string>
+  <string name="two_fa_card_title">启用两步验证</string>
+  <string name="two_fa_card_body">启用两步验证，保护您的钱包免遭未经授权的访问。</string>
+  <string name="two_fa_card_cta">启用两步验证</string>
+  <string name="buy_btc_card_title">购买比特币</string>
+  <string name="buy_btc_card_body">用您的信用卡或银行帐户购买比特币以启动您的加密货币投资组合。</string>
+  <string name="buy_btc_card_cta">购买比特币</string>
+  <string name="buy_crypto_card_title">购买加密</string>
+  <string name="buy_crypto_card_body">我们可以通过几个简单的步骤帮助您购买。</string>
+  <string name="buy_crypto_card_cta">立即购买加密货币</string>
+  <string name="transfer_btc_card_title">加密转移</string>
   <string name="transfer_btc_card_body">将加密货币存入您的钱包即可开始使用。这是在保持密钥控制的同时存储加密货币的最佳方法。</string>
-  <string name="transfer_btc_card_cta">开始</string>
-  <string name="recovery_card_title">钱包找回短语</string>
-  <string name="recovery_card_body">如果丢失密码或 Blockchain 服务中断，您的找回短语可用于恢复所有资金。</string>
-  <string name="recovery_card_cta">备份短语</string>
+  <string name="transfer_btc_card_cta">开始使用</string>
+  <string name="recovery_card_title">钱包恢复短语</string>
+  <string name="recovery_card_body">您控制自己的加密货币。写下您的恢复短语以恢复您所有的资金，以防万一您丢失密码。</string>
+  <string name="recovery_card_cta">备用词组</string>
+  <string name="simple_buy_finish_signup_card_title">完成注册。购买加密货币。</string>
+  <string name="simple_buy_finish_signup_card_body">您几乎完成了Blockchain.com钱包的注册。完成并获得批准后，就开始购买加密货币。</string>
+  <string name="simple_buy_finish_signup_card_cta">继续</string>
+  <string name="simple_buy_pending_buy_card_title">等待购买</string>
+  <string name="simple_buy_pending_buy_card_body">我们收到您的银行转帐后，您的购买订单将完成。</string>
+  <string name="simple_buy_pending_buy_card_cta">查看银行转账详细信息</string>
   <string name="register_fingerprint_card_title">指纹登录</string>
-  <string name="register_fingerprint_card_body">启用指纹即可快速登录您的钱包，而无需使用 PIN 码。</string>
+  <string name="register_fingerprint_card_body">启用指纹即可快速登录您的钱包，而无需使用PIN码。</string>
   <string name="register_fingerprint_card_cta">立即启用</string>
-  <string name="kyc_airdrop_card_title">需要免费 Crypto？</string>
-  <string name="kyc_airdrop_card_body">验证您的身份以参与我们的 Airdrop 计划，并从未来的 Airdrop 中获得免费的加密货币。</string>
+  <string name="kyc_airdrop_card_title">需要免费加密货币吗？</string>
+  <string name="kyc_airdrop_card_body">验证您的身份以参与我们的空投计划，并从未来的空投中获得免费的加密货币。</string>
   <string name="kyc_airdrop_card_cta">开始验证</string>
+  <string name="coinify_account_created_success">成功！ 
+帐户已创建</string>
+  <string name="buy_sell_launcher_error">提取买卖数据时出错</string>
+  <string name="airdrop_received_sheet_heading">空投</string>
+  <string name="airdrop_received_sheet_status_label">状态</string>
+  <string name="airdrop_received_sheet_date_label">日期</string>
+  <string name="airdrop_received_sheet_amount_label">量</string>
+  <string name="airdrop_received_sheet_close_btn">关</string>
+  <string name="airdrop_status_received">已收到</string>
+  <string name="airdrop_status_expired">已过期</string>
+  <string name="airdrop_status_pending">待定</string>
+  <string name="airdrop_status_unknown">--</string>
+  <string name="airdrop_sheet_stx_body">通过使用Blockstack构建的数百个去中心化应用程序来拥有自己的数字身份和数据。</string>
+  <string name="airdrop_sheet_stx_where_are_my_stacks_title">我的书架在哪里？</string>
+  <string name="airdrop_sheet_stx_where_are_my_stacks">堆栈（STX）存储在您的区块链钱包中。请注意，余额目前不可转让。</string>
+  <string name="custody_intro_title">您的保管钱包。</string>
+  <string name="custody_intro_body_1">当您购买加密货币时，我们会将您的资金安全地存储在加密货币交易钱包中。这些资金由我们代您存放。您可以与我们保持安全，也可以将其转移到非托管钱包中以拥有和存储自己。</string>
+  <string name="custody_intro_body_2">如果您想交换或发送这些资金，则需要将其转移到您的比特币钱包中。</string>
+  <string name="backup_before_send_title">备份钱包</string>
+  <string name="backup_before_send_body">如果您失去对钱包的访问权限，则备份短语将使您可以恢复加密货币。 
+
+请按顺序写下这12个字，并将它们放在安全的地方。切勿与任何人分享。如果您被锁定，备份短语是恢复加密货币的关键。</string>
+  <string name="backup_before_send_cta">立即备份</string>
+  <string name="basic_transfer_title">发送到%1s</string>
+  <string name="basic_transfer_body">Blockchain.com目前仅允许发送您的钱包总额。</string>
+  <string name="basic_transfer_cta">发送</string>
+  <string name="basic_transfer_complete_title" formatted="false">成功！ %1s发送%1s 。</string>
+  <string name="basic_transfer_complete_body">您的交易最多可能需要1个小时的时间。</string>
+  <string name="basic_transfer_complete_cta">好</string>
+  <string name="basic_transfer_error_title">糟糕！</string>
+  <string name="basic_transfer_error_body">有些不对劲。请返回重试。</string>
+  <string name="basic_transfer_error_in_progress_title">发送进行中</string>
+  <string name="basic_transfer_error_in_progress_body">正在进行交易。资金到帐后，我们会通知您。</string>
+  <string name="airdrop_status_date_active">下降%1s</string>
+  <string name="airdrop_status_date_inactive">在%1s</string>
+  <string name="buy_sell_buy">购买</string>
+  <string name="buy_sell_sell">卖</string>
+  <string name="buy_sell_overview_error_loading_transactions">提取交易时出错</string>
+  <string name="buy_sell_overview_pending_kyc_not_found">找不到待处理的KYC，请稍后再试。</string>
+  <string name="buy_sell_overview_could_not_start_kyc">无法重新启动KYC，请稍后再试。</string>
+  <string name="buy_sell_overview_empty_list">您的订单记录将显示在这里</string>
+  <string name="buy_sell_overview_in_review_title">完成您的个人资料</string>
+  <string name="buy_sell_overview_denied_title">身份验证
+被拒绝</string>
+  <string name="buy_sell_overview_pending_title">完整身份
+验证</string>
+  <string name="buy_sell_overview_in_review_button">现在用卡购买</string>
+  <string name="buy_sell_overview_denied_button">再试一次</string>
+  <string name="buy_sell_overview_pending_button">完成验证</string>
+  <string name="buy_sell_overview_in_review_message">在完成身份验证之前，无法出售超过%1$s的比特币。</string>
+  <string name="buy_sell_overview_denied_message">请尝试再次完成您的身份验证。在此之前，银行转帐将不可用。</string>
+  <string name="buy_sell_overview_pending_message">验证完成之前，无法进行大于%1$s银行转帐和销售金额。</string>
+  <string name="buy_sell_overview_next_recurring_order">您的下一个重复订单</string>
+  <string name="buy_sell_overview_subscription_daily">日常</string>
+  <string name="buy_sell_overview_subscription_weekly">每周，每%1$s</string>
+  <string name="buy_sell_overview_subscription_monthly">每月，在%1$s</string>
+  <string name="buy_sell_state_awaiting_funds">等待资金</string>
+  <string name="buy_sell_state_pending_buy">等待购买</string>
+  <string name="buy_sell_state_processing">处理中</string>
+  <string name="buy_sell_state_completed">已完成</string>
+  <string name="buy_sell_state_cancelled">取消</string>
+  <string name="buy_sell_state_rejected">拒绝</string>
+  <string name="buy_sell_state_expired">已过期</string>
+  <string name="buy_sell_detail_trade_id">贸易编号</string>
+  <string name="buy_sell_detail_exchange_rate">汇率</string>
+  <string name="buy_sell_detail_amount">量</string>
+  <string name="buy_sell_detail_payment_fee">付款费用</string>
+  <string name="buy_sell_detail_total">总计花费</string>
+  <string name="buy_sell_detail_title_buy">购买%1$s</string>
+  <string name="buy_sell_detail_title_sell">出售%1$s</string>
+  <string name="buy_sell_detail_currency_received">%1$s收到%1$s</string>
+  <string name="buy_sell_detail_currency_to_be_received">将收到%1$s</string>
+  <string name="buy_sell_detail_currency_sold">已售出%1$s</string>
+  <string name="buy_sell_detail_currency_to_be_sold">%1$s待售</string>
+  <string name="buy_sell_detail_bank_disclaimer">将资金存入您的银行帐户通常需要2至3个工作日。</string>
+  <string name="buy_sell_detail_refund_message">Coinify已取消此销售订单，并向您发送了一封电子邮件，其中包含有关如何退款的说明。</string>
+  <string name="buy_sell_details_whats_next">下一步是什么？</string>
+  <string name="buy_sell_awaiting_funds_description">在接下来的48小时内发送%1$s进行Coinify。 
+
+银行帐户的汇款资金必须与您政府签发的身份证件的名称相同。否则它将被拒绝。</string>
+  <string name="buy_sell_awaiting_funds_already_sent">我已经把钱寄给了Coinify</string>
+  <string name="buy_sell_awaiting_funds_reference_title">参考/消息</string>
+  <string name="buy_sell_awaiting_funds_reference_note">*必须包括在内！</string>
+  <string name="buy_sell_awaiting_funds_recipient_name_title">收件人姓名</string>
+  <string name="buy_sell_awaiting_funds_recipient_address_title">收件人地址</string>
+  <string name="buy_sell_awaiting_funds_iban_title">伊班</string>
+  <string name="buy_sell_awaiting_funds_bic_title">工商银行</string>
+  <string name="buy_sell_awaiting_funds_bank_title">银行</string>
+  <string name="buy_sell_awaiting_funds_copy_all">将所有信息复制到剪贴板</string>
+  <string name="buy_sell_awaiting_funds_already_sent_title">资金已经寄出了？</string>
+  <string name="buy_sell_awaiting_funds_already_sent_message">Coinify通常需要2到3个工作日才能处理订单并将资金发送到您的银行帐户。</string>
+  <string name="buy_sell_awaiting_funds_finish_payment">完成支付</string>
+  <string name="buy_sell_awaiting_funds_cancel_trade">取消交易</string>
+  <string name="buy_sell_awaiting_funds_cancel_trade_success">交易成功取消</string>
+  <string name="buy_sell_awaiting_funds_cancel_trade_failed">无法取消交易</string>
+  <string name="buy_sell_awaiting_funds_cancel_trade_dialog_title">取消交易？</string>
+  <string name="buy_sell_awaiting_funds_cancel_trade_dialog_disclaimer">注意：如果您已经从银行帐户中将资金发送到Coinify，则当他们收到您的转帐时，该交易仍将被处理，并且您将收到购买的比特币。</string>
+  <string name="buy_sell_id_verification_in_review">审查中的身份验证</string>
+  <string name="buy_sell_id_verification_in_review_loading">载入中...</string>
+  <string name="buy_sell_review_status_thanks">感谢您完成身份验证过程</string>
+  <string name="buy_sell_review_failed">身份验证过程失败</string>
+  <string name="buy_sell_review_status_message">我们的买卖合作伙伴Coinify将在48小时内通过电子邮件向您发送状态更新。</string>
+  <string name="buy_sell_review_status_failed">请联系我们的买卖伙伴Coinify</string>
+  <string name="buy_sell_review_status_pending_message">直到验证完成，事务才可用。请完成身份验证。</string>
+  <string name="buy_sell_review_finish_verification">完成验证</string>
+  <string name="buy_sell_review_finish_verification_title">完整的身份验证</string>
+  <string name="buy_sell_review_status">状态： %1$s</string>
+  <string name="buy_sell_review_status_in_pending">不完整</string>
+  <string name="buy_sell_review_status_in_rejected">拒绝</string>
+  <string name="buy_sell_review_status_in_failed">失败的</string>
+  <string name="buy_sell_review_status_in_expired">已过期</string>
+  <string name="buy_sell_review_status_in_completed">已完成</string>
+  <string name="buy_sell_review_status_in_reviewing">审核中</string>
+  <string name="buy_sell_review_status_in_docs_requested">要求文件</string>
+  <string name="buy_sell_review_status_fetching">请稍候，我们正在检查您的信息...</string>
+  <string name="buy_sell_isignthis_payment_method">付款方法</string>
+  <string name="buy_sell_error_fetching_quote">提取报价时出错</string>
+  <string name="buy_sell_review_transaction">查看订单</string>
+  <string name="buy_sell_remaining_buy_limit">您的剩余购买限额为%1$s</string>
+  <string name="buy_sell_remaining_sell_limit">您的剩余卖出限额为%1$s</string>
+  <string name="buy_sell_remaining_sell_minimum_limit">最低卖出限制为%1$s</string>
+  <string name="buy_sell_minimum_sell_limit">很遗憾，您至少需要%1$s才能出售，不包括交易费用</string>
+  <string name="buy_sell_not_enough_bitcoin">%1$s BTC超出了您当前的余额</string>
+  <string name="buy_sell_error_fetching_limit">错误提取限制</string>
+  <string name="buy_sell_amount_too_low">请输入大于%1$s的金额</string>
+  <string name="buy_sell_sell_bitcoin_max">您最多可以卖出余额的%1$s</string>
+  <string name="buy_sell_error_forced_delay">您之前的交易正在审核中。您不能在%1$s小时内进行其他交易。请稍后再试。</string>
+  <string name="buy_sell_error_limits_exceeded">您今天的限额已被超出。请明天再试。</string>
+  <string name="buy_sell_error_country_not_supported">目前不支持您所在国家/地区的买卖。我们正在努力为更多地区增加支持。</string>
+  <string name="buy_sell_error_trade_in_progress">您无法在进行交易时创建新交易。当前交易完成后，请重试。</string>
+  <string name="no_sell_available_message">不幸的是，您所在的州无法进行买卖。我们正在努力尽快将其恢复。</string>
+  <string name="buy_sell_confirmation_btc_amount">BTC金额</string>
+  <string name="buy_sell_confirmation_transaction_fee">手续费</string>
+  <string name="buy_sell_confirmation_btc_total">收到的总比特币</string>
+  <string name="buy_sell_confirmation_title_buy">确认购买</string>
+  <string name="buy_sell_confirmation_title_preview_buy">预览购买</string>
+  <string name="buy_sell_confirmation_title_sell">确认卖出</string>
+  <string name="buy_sell_confirmation_amount">量</string>
+  <string name="buy_sell_confirmation_payment_fee">付款费用</string>
+  <string name="buy_sell_confirmation_total_cost">总计花费</string>
+  <string name="buy_sell_confirmation_order_expired">您的报价已过期。请返回到订单页面以创建新订单。</string>
+  <string name="buy_sell_confirmation_order_id">合并订单编号</string>
+  <string name="buy_sell_confirmation_unexpected_error">一个意料之外的问题发生了。如果问题仍然存在，请稍后再试或联系支持。</string>
+  <string name="buy_sell_confirmation_card">卡</string>
+  <string name="buy_sell_confirmation_bank">传递</string>
+  <string name="buy_sell_confirmation_amount_too_high_title">金额太高</string>
+  <string name="buy_sell_confirmation_amount_too_high_message">超过%1$s订单只能通过银行转帐处理。</string>
+  <string name="buy_sell_confirmation_amount_too_high_use_card">使用卡</string>
+  <string name="buy_sell_confirmation_amount_too_high_use_transfer">使用转移</string>
+  <string name="buy_sell_confirmation_bank_rate_disclaimer">我接受Coinify处理我的订单时，比特币将以当前汇率进行交易，该汇率可能与上面显示的汇率有所不同。</string>
+  <string name="buy_sell_confirmation_btc_sell_amount">BTC出售</string>
+  <string name="buy_sell_confirmation_you_will_receive">欠贷总额</string>
+  <string name="buy_sell_confirmation_btc_to_receive_description">按提交后， %1$s BTC将直接从您的区块链钱包发送至Coinify。</string>
+  <string name="buy_sell_confirmation_sell_rate_disclaimer">我接受Coinify将在完成比特币交易后处理我的订单，并且该比特币将以当时可用的汇率进行交易，该汇率可能与显示的汇率有所不同。</string>
+  <string name="buy_sell_card_payment_success_title">成功！ 
+订单已创建</string>
+  <string name="buy_sell_card_payment_success_message">资金应在3天内到达您的帐户。</string>
+  <string name="buy_sell_card_order_created_title">订单已创建</string>
+  <string name="buy_sell_card_order_cancelled_title">订单已取消</string>
+  <string name="buy_sell_card_order_failed_title">订单失败</string>
+  <string name="buy_sell_card_order_expired_title">订单已过期</string>
+  <string name="buy_sell_card_order_declined_title">订单被拒</string>
+  <string name="buy_sell_card_order_rejected_title">订单被拒</string>
+  <string name="buy_sell_card_order_in_review_title">审核订单</string>
+  <string name="buy_sell_card_order_failed_message">您的付款卡已被拒绝。请重试或联系您的卡提供商。</string>
+  <string name="buy_sell_card_order_reviewing_message">您的订单将保留片刻，直到所有信息都经过验证。</string>
+  <string name="buy_sell_card_order_cancelled_message">您的订单已被取消。请稍后再试。</string>
+  <string name="buy_sell_card_order_expired_message">由于付款时间过长（15分钟），您的订单已过期。请创建一个新订单。</string>
+  <string name="buy_sell_welcome_message">现在创建一个帐户，以在几分钟之内开始购买加密货币。</string>
+  <string name="buy_sell_get_started">开始吧</string>
+  <string name="buy_sell_select_country">选择你的国家</string>
+  <string name="buy_sell_unverified_email_title">验证您的电子邮件</string>
+  <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
+  <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
+  <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意Coinify <a href="ignored">条款</a></string>
+  <string name="coinify">协整</string>
+  <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
+  <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>
+  <string name="buy_sell_identification_verification">识别验证</string>
+  <string name="buy_sell_identification_verification_message">政府反洗钱要求我们验证您的身份</string>
+  <string name="buy_sell_verification_status_title">验证状态</string>
+  <string name="buy_sell_invalid_country_title">您所在的国家/地区尚无法购买和出售比特币</string>
+  <string name="buy_sell_invalid_country_message">我们将尽快推出更多国家。</string>
+  <string name="submit">提交</string>
+  <string name="buy_sell_get_to_know_you_title">让我们认识你</string>
+  <string name="buy_sell_get_to_know_you_message">我们需要先了解一些有关您的信息，然后才能打开您的买卖帐户。</string>
+  <string name="buy_sell_cannot_open_file">无法打开文件选择器</string>
+  <string name="buy_sell_choose_file">选择文件</string>
+  <string name="buy_sell_add_account_title">新增帐户</string>
+  <string name="buy_sell_add_account_subtitle">添加银行账户</string>
+  <string name="buy_sell_add_account_iban_hint">国际银行帐号（IBAN）</string>
+  <string name="buy_sell_add_account_bic_hint">银行识别码（SWIFT / BIC）</string>
+  <string name="buy_sell_add_account_iban_empty">SWIFT / BIC不能为空</string>
+  <string name="buy_sell_add_account_bic_empty">IBAN不能为空</string>
+  <string name="buy_sell_account_selection_title">选择帐号</string>
+  <string name="buy_sell_account_selection_description">您想把资金汇到哪里？</string>
+  <string name="buy_sell_account_selection_error_message">加载银行帐户时出错，请重试。</string>
+  <string name="buy_sell_account_selection_add_button">+添加一个新帐户</string>
+  <string name="buy_sell_account_selection_delete_title">删除帐户</string>
+  <string name="buy_sell_account_selection_delete_message">您确定要删除此银行帐户吗？</string>
+  <string name="buy_sell_account_selection_delete_failure">删除银行帐户失败</string>
+  <string name="buy_sell_add_address_subtitle">新增地址</string>
+  <string name="buy_sell_add_address_name_hint">帐户持有人的全名</string>
+  <string name="buy_sell_add_address_street_hint">街道和门牌号</string>
+  <string name="buy_sell_add_address_city_hint">市</string>
+  <string name="buy_sell_add_address_post_code_hint">邮编</string>
+  <string name="buy_sell_add_address_post_country_hint">国家</string>
+  <string name="buy_sell_add_address_name_empty">名称不能为空</string>
+  <string name="buy_sell_add_address_street_empty">街道不能为空</string>
+  <string name="buy_sell_add_address_city_empty">城市不能为空</string>
+  <string name="buy_sell_add_address_postcode_empty">邮政编码不能为空</string>
+  <string name="buy_sell_recurring_order_title">重复订单</string>
+  <string name="buy_sell_recurring_order_subtitle">您的下一个重复订单已排定</string>
+  <string name="buy_sell_recurring_order_description">要管理重复订单，请在Web浏览器中登录到您的钱包。</string>
+  <string name="buy_sell_recurring_order_frequency_title">频率</string>
+  <string name="buy_sell_recurring_order_duration_title">持续时间</string>
+  <string name="buy_sell_recurring_order_duration_until_cancelled">达到%1$s或达到上限，以先到者为准。</string>
+  <string name="buy_sell_recurring_order_duration_you_cancelled">直到您取消</string>
+  <string name="buy_sell_recurring_order_duration_until">直到</string>
+  <string name="buy_sell_recurring_order_amount">%1$s %2$s （+ %3$s %4$s付款费）</string>
+  <string name="buy_sell_recurring_frequency_weekly">每周，每%1$s</string>
+  <string name="buy_sell_recurring_frequency_daily">每天</string>
+  <string name="buy_sell_recurring_frequency_monthly">每月的%1$s</string>
+  <string name="buy_sell_transaction_list_label">合并订单ID＃ %1$s</string>
+  <string name="kyc_non_specific_server_error">错误，请重试</string>
+  <string name="kyc_splash_title">Swap</string>
+  <string name="kyc_splash_apply_now">现在开始</string>
+  <string name="kyc_splash_message">通过 Blockchain 宣布 Swap — 更快更智能的 crypto 交易方式。</string>
+  <string name="kyc_splash_terms_and_conditions">点击立即开始，即表示您同意Blockchain的</string>
+  <string name="kyc_splash_terms_and_conditions_submit">点击提交，即表示您同意区块链的</string>
+  <string name="kyc_splash_terms_and_conditions_terms">服务条款</string>
+  <string name="kyc_splash_terms_and_conditions_privacy">隐私政策</string>
+  <string name="kyc_country_selection_title">居住国家</string>
+  <string name="kyc_country_selection_state_title">州</string>
+  <string name="kyc_country_selection_header">你为什么需要这个？</string>
+  <string name="kyc_country_selection_message">每个国家在交易加密货币方面都有不同的规则。</string>
+  <string name="kyc_country_selection_message_state">每个州在交易加密货币方面都有不同的规则。</string>
+  <string name="kyc_country_selection_search_hint">搜索你的国家</string>
+  <string name="kyc_state_selection_search_hint">搜索您的状态</string>
+  <string name="kyc_country_selection_connection_error">请检查您的连接</string>
+  <string name="kyc_country_selection_please_wait">请耐心等待…</string>
+  <string name="kyc_profile_title">轮廓</string>
+  <string name="kyc_profile_header">为什么我们需要这些信息？</string>
+  <string name="kyc_profile_message">我们需要此信息来验证您的身份，以便您使用此改进的功能。只需要几分钟。</string>
+  <string name="kyc_profile_first_name_hint">名字</string>
+  <string name="kyc_profile_last_name_hint">姓</string>
+  <string name="kyc_profile_dob_hint">出生日期</string>
+  <string name="kyc_profile_next">下一个</string>
+  <string name="kyc_profile_submit">提交</string>
+  <string name="kyc_profile_error">创建用户详细信息时出错，请稍后再试</string>
+  <string name="kyc_profile_error_conflict">该电子邮件地址已经存在一个用户</string>
+  <string name="kyc_invalid_country_message_me">有空时通知我</string>
+  <string name="kyc_invalid_country_no_thanks">不用了，谢谢</string>
+  <string name="kyc_invalid_country_header">即将到%1$s</string>
+  <string name="kyc_invalid_country_message">每个国家对如何买卖加密货币都有不同的规定。睁大你的眼睛，我们将在%1$s启动后立即通知您！</string>
+  <string name="kyc_address_title">家庭地址</string>
+  <string name="kyc_address_header">我的地址是做什么用的？</string>
+  <string name="kyc_address_message">这些信息仅用于帮助我们验证您的身份。</string>
+  <string name="kyc_address_search_hint">搜索您的%1$s</string>
+  <string name="kyc_address_search_hint_postcode">邮编</string>
+  <string name="kyc_address_search_hint_zipcode">邮政编码</string>
+  <string name="kyc_address_street_line_1">街1号线</string>
+  <string name="kyc_address_street_line_2">街2号线</string>
+  <string name="kyc_address_address_line_1">地址第一行</string>
+  <string name="kyc_address_address_line_2">地址行2</string>
+  <string name="kyc_address_city_town_village">城市/城镇/乡村</string>
+  <string name="kyc_address_state_region_province_county">州/地区/省/县</string>
+  <string name="kyc_address_postal_code">邮政编码</string>
+  <string name="kyc_address_address_first_line_hint">地址</string>
+  <string name="kyc_address_address_apt_name_hint">公寓，楼层，＃</string>
+  <string name="kyc_address_address_postcode_hint">邮编</string>
+  <string name="kyc_address_address_zip_code_hint">邮政编码</string>
+  <string name="kyc_address_address_city_hint">市</string>
+  <string name="kyc_address_address_state_hint">州</string>
+  <string name="kyc_address_address_county_hint">县</string>
+  <string name="kyc_address_address_country_hint">国家</string>
+  <string name="kyc_address_google_not_available">Google Play服务在此设备上不可用。</string>
+  <string name="kyc_address_error_saving">保存地址错误，请重试</string>
+  <string name="kyc_address_error_loading_places">连接地址搜索时出错</string>
+  <string name="kyc_email_title">验证您的电子邮件</string>
+  <string name="kyc_email_message">我们需要验证您的电子邮件地址，以增加安全性。</string>
+  <string name="kyc_email_hint_focused">你的邮件</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_error_saving_email">保存电子邮件时出错，请重试</string>
+  <string name="kyc_email_send_verification">发送电子邮件</string>
+  <string name="kyc_email_validation_header">检查你的收件箱。</string>
+  <string name="kyc_email_validation_message">我们只是给您发送了一封电子邮件，其中包含更多说明。</string>
+  <string name="kyc_email_did_not_see_email">没看到电子邮件吗？ <annotation link="send_again">重新发送</annotation></string>
+  <string name="kyc_email_send_again_hyperlink">重新发送</string>
+  <string name="kyc_email_email_was_resent">电子邮件已重新发送</string>
+  <string name="kyc_phone_number_title">验证您的设备</string>
+  <string name="kyc_phone_number_message">这将有助于我们今天验证您的身份，并在以后确保您的帐户安全。为此，一条SMS将通过验证码发送到您的手机。</string>
+  <string name="kyc_phone_number_hint_focused">您的手机号码</string>
+  <string name="kyc_phone_number_hint_unfocused">+1 2345 678910</string>
+  <string name="kyc_phone_send_again">
+    <annotation link="resend_code">重新发送代码</annotation>
+  </string>
+  <string name="kyc_phone_number_error_saving_number">保存手机号码时出错，请重试</string>
+  <string name="kyc_phone_number_code_was_resent">重新发送了代码</string>
+  <string name="kyc_phone_number_validation_header">输入发送到的代码</string>
+  <string name="kyc_phone_number_validation_hint">验证码</string>
+  <string name="kyc_phone_number_validation_error_incorrect">验证码不正确。请仔细检查我们发送给您的验证码，然后重试。</string>
+  <string name="kyc_phone_number_error_resending">发送代码时出错，请重试</string>
+  <string name="kyc_onfido_splash_header">让我们确认是你</string>
+  <string name="kyc_onfido_splash_verification_error">验证ID出错，请重试</string>
+  <string name="kyc_veriff_splash_country_supported_header">支持我的国家吗？</string>
+  <string name="kyc_veriff_splash_country_supported_subheader">目前，并非所有国家都支持。在继续之前，请检查我们最新的<annotation link="country_list">国家</annotation>列表&lt;/annotation&gt; 。</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_error_silver">银色验证</string>
+  <string name="kyc_veriff_splash_header">让我们确认是你</string>
+  <string name="kyc_veriff_splash_subtitle">您需要以下ID类型之一才能继续。</string>
+  <string name="kyc_veriff_splash_enable_camera_title">另外，启用您的相机！</string>
+  <string name="kyc_veriff_splash_enable_camera_body">请允许您的区块链应用访问您的相机以上传您的ID并进行自拍照。</string>
+  <string name="kyc_veriff_splash_verification_error">验证ID出错，请重试</string>
+  <string name="kyc_veriff_splash_passport">有效护照</string>
+  <string name="kyc_veriff_splash_drivers_license">驾照</string>
+  <string name="kyc_veriff_splash_id_card">国家身份证</string>
+  <string name="kyc_veriff_splash_residence_permit">居留证</string>
+  <string name="kyc_veriff_splash_continue">继续</string>
+  <string name="kyc_complete_title">申请完成</string>
+  <string name="kyc_complete_header">做完了！</string>
+  <string name="kyc_complete_subtitle">您已成功提交信息。您的帐户正在审核中！</string>
+  <string name="kyc_complete_button_done">完成</string>
+  <string name="kyc_complete_country_selected">所选国家</string>
+  <string name="kyc_complete_profile_created">个人资料已创建</string>
+  <string name="kyc_complete_home_address">家庭地址已添加</string>
+  <string name="kyc_complete_device_verified">设备验证</string>
+  <string name="kyc_complete_id_uploaded">ID已上传</string>
+  <string name="kyc_complete_video_uploaded">视频已上传</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help_body">我们的区块链支持团队已编写了帮助指南，解释了为什么我们需要验证您的身份。</string>
+  <string name="kyc_help_dialog_read_now">现在读</string>
+  <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/zh-CN/categories/360001135512-Identity-Verification</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/zh-CN/requests/new?ticket_form_id=360000186571</string>
+  <string name="kyc_settings_identity_verification">身份验证</string>
+  <string name="kyc_settings_status_none">未验证</string>
+  <string name="kyc_settings_status_rejected">失败的</string>
+  <string name="kyc_settings_status_verified">已验证</string>
+  <string name="kyc_settings_swap_limit">兑换限额</string>
+  <string name="kyc_settings_tier_status_locked">已锁定</string>
+  <string name="kyc_settings_silver_level_in_review">银级-评论中</string>
+  <string name="kyc_settings_gold_level_in_review">黄金级-审核中</string>
+  <string name="kyc_settings_gold_level_approved">金级-已批准</string>
+  <string name="kyc_settings_silver_level_approved">银级-已批准</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_status_error">提取KYC状态时出错</string>
+  <string name="kyc_status_title_in_progress">正在进行验证</string>
+  <string name="kyc_status_title_approved">帐户已批准</string>
+  <string name="kyc_status_title_failed">验证失败</string>
+  <string name="kyc_status_title_in_review">审核中的验证</string>
+  <string name="kyc_status_subtitle">接下来发生什么？</string>
+  <string name="kyc_status_message_in_progress">您的信息正在审查中。当一切看起来不错时，您就可以交流了。您应该在5分钟内收到通知。</string>
+  <string name="kyc_status_message_verified">恭喜你！我们已成功验证您的身份。您现在可以在区块链上交换加密货币。</string>
+  <string name="kyc_status_message_failed">不幸的是，我们在使用您提供的文件来验证您的身份时遇到了一些麻烦，目前无法验证您的帐户。</string>
+  <string name="kyc_status_message_under_review">我们无法使用提供的文件来验证您的帐户。我们的支持团队会尽快与您联系以解决此问题。</string>
+  <string name="kyc_status_button_notify_me">提醒我</string>
+  <string name="kyc_status_button_get_started">开始吧</string>
+  <string name="kyc_status_button_notifications_enabled_title">启用通知</string>
+  <string name="kyc_status_button_notifications_enabled_message">您的身份通过验证后，我们会立即通知您。</string>
+  <string name="kyc_status_button_notifications_error">启用通知时出错</string>
+  <string name="kyc_status_button_notifications_enabled">启用通知</string>
+  <string name="kyc_more_info_splash_title">需要更多信息</string>
+  <string name="kyc_more_info_splash_header">我们需要更多信息来完成您的个人资料</string>
+  <string name="kyc_more_info_splash_subtitle">您需要验证您的电话号码。提供政府签发的身份证和自拍照。</string>
   <string name="kyc_drop_off_card_title">完成验证您的帐户</string>
+  <string name="kyc_drop_off_card_description">从您上次停下来的地方取走并完成身份验证。</string>
+  <string name="kyc_drop_off_card_button">继续验证</string>
+  <string name="kyc_documents_needed">所需文件</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_description">您提供的文档有一些问题。请尝试再次上传文档，以继续进行验证。</string>
+  <string name="kyc_resubmission_card_button">上传文件</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_description_1">我们无法验证您的身份，需要您重新上传所需的文档。</string>
+  <string name="kyc_resubmission_splash_description_2">发生这种情况的主要原因：</string>
+  <string name="kyc_resubmission_splash_description_3">所需的照片丢失。</string>
+  <string name="kyc_resubmission_splash_description_4">您提交的文件不正确。</string>
+  <string name="kyc_resubmission_splash_description_5">由于图像质量，我们无法读取您提交的图像。</string>
+  <string name="sunriver_splash_title">身份验证</string>
+  <string name="sunriver_status_message">您的信息正在审查中。审查应尽快完成。</string>
+  <string name="buy_sell_splash_title">买卖</string>
+  <string name="buy_sell_splash_message">您可以通过我们的合作伙伴Coinify使用您的信用卡或银行帐户买卖比特币（BTC）。</string>
+  <string name="buy_sell_splash_terms_and_conditions">轻按[立即开始]，即表示您同意Coinify的</string>
+  <string name="buy_sell_please_wait">请耐心等待…</string>
+  <string name="tiers_splash_header_text">交易您的加密货币并不意味着失去控制权</string>
+  <string name="announcing_swap">区块链Swap使您能够以最优惠的价格和快速结算交易加密，同时保持对您资金的完全控制。</string>
+  <string name="stacks_airdrop_complete_card_title">您的空投降落了</string>
+  <string name="stacks_airdrop_complete_card_description">现在，您的钱包就在钱包里。这些信息一经使用，我们就会立即通知您。</string>
+  <string name="stacks_airdrop_complete_card_button">查看详情</string>
+  <string name="stacks_airdrop_registered_mini_card_title">获得金牌奖励</string>
+  <string name="stacks_airdrop_registered_mini_card_body">我们将在2020年向您空投免费加密货币</string>
+  <string name="stacks_airdrop_share_msg">嘿!我刚刚通过Blockstack获得了Blockchain最新空投的位置。注册并获得验证以获取免费筹码！ 
+ http://blockchain.com/getcrypto</string>
+  <string name="gold_level">金级</string>
+  <string name="silver_level">银级</string>
+  <string name="unlock">开锁</string>
+  <string name="_1_000">$ 1,000</string>
+  <string name="_25_000">$ 25,000</string>
+  <string name="annual_swap_limit">年兑换限额</string>
+  <string name="daily_swap_limit">日兑换限额</string>
+  <string name="get_free_crypto">免费获取密码</string>
+  <string name="by_completing_gold_level_you_will_be_eligible_to_participate_in_our_airdrop_program">完成金级要求后，您自动符合我们的空投计划的资格。</string>
+  <string name="airdrop_learn_more_url">https://support.blockchain.com/hc/zh-CN/categories/360001126692-Airdrop-Program</string>
+  <string name="start_arrow">开始箭头</string>
+  <string name="approved">已批准！</string>
+  <string name="in_review">回顾中</string>
+  <string name="available">可用的</string>
+  <string name="swap_limit">您的最高 crypto 交易兑换限额</string>
+  <string name="swap_unavailable">兑换功能目前不可用</string>
+  <string name="swap_unavailable_explained">我们无法验证您的身份。您的交换功能目前已被禁用。</string>
+  <string name="tier_x_in_review">区块链支持成员目前正在审核您的%1$s验证</string>
+  <string name="contact_support">联系支持</string>
+  <string name="requires_email_name_date_of_birth_and_address">需要电子邮件，姓名，出生日期和地址</string>
+  <string name="requires_silver_level_govt_id_and_a_selfie">需要银级，政府。身份证和肖像照片</string>
+  <string name="kyc_gold_unavailable_text_support">如果您想了解有关我们验证过程的更多信息，请访问我们的<annotation link="gold_error">支持中心</annotation> 。</string>
+  <string name="kyc_gold_unavailable_text_line_2">如果你是银牌验证，你可以在交换中交换你的加密。</string>
+  <string name="kyc_gold_unavailable_text_line_1">很抱歉，我们无法验证您的金牌身份。原因可能有多种，例如，您的国家/地区目前可能不受支持。</string>
+  <string name="kyc_gold_unavailable_text_title">黄金目前无法使用</string>
+  <string name="kyc_gold_unavailable_goto_swap">开始交易</string>
+  <string name="gold_unavailable">黄金不可用</string>
+  <string name="veriff_identify">真实识别</string>
   <string name="tour_step_one_title">查看您的投资组合</string>
-  <string name="tour_step_one_body">从电子钱包的仪表板跟踪您的加密余额。您的钱包目前支持比特币、以太币、比特币现金、Stellar XLM 和 USD PAX。</string>
-  <string name="tour_step_one_btn">下一步</string>
+  <string name="tour_step_one_body_1">从电子钱包的仪表板跟踪您的加密余额。您的钱包目前支持比特币，以太币，比特币现金，Stellar XLM和USD Digital。</string>
+  <string name="tour_step_one_btn">下一个</string>
   <string name="tour_step_two_title">发送</string>
-  <string name="tour_step_two_body">随时随地发送加密货币。您需要的只是收件人的加密货币地址。</string>
-  <string name="tour_step_two_btn">下一步</string>
+  <string name="tour_step_two_body">随时随地发送加密货币。您只需要收件人的加密地址。</string>
+  <string name="tour_step_two_btn">下一个</string>
   <string name="tour_step_three_title">请求</string>
-  <string name="tour_step_three_body">要接收加密货币，所有发送者需要您的加密货币地址。您可以在这里找到这些地址。</string>
-  <string name="tour_step_three_btn">下一步</string>
+  <string name="tour_step_three_body">要将加密货币接收到您的钱包，请在此处为每个加密货币获取一个唯一的地址，您可以与发送者共享该地址。</string>
+  <string name="tour_step_three_btn">下一个</string>
   <string name="tour_step_four_title">Swap</string>
-  <string name="tour_step_four_body">不用离开钱包，即可以低廉的价格交易加密货币。</string>
-  <string name="tour_step_four_btn">完成</string>
-  <string name="tour_step_five_title">买卖服务</string>
-  <string name="tour_step_five_body">使用您的信用卡或银行帐户购买比特币，以启动您的加密货币投资组合。</string>
+  <string name="tour_step_four_body">以低廉的价格交易加密货币，同时保持对密钥的控制。扩展您的投资组合，摆脱风险，或简单地兑换成您需要的加密货币。</string>
+  <string name="tour_step_four_btn">下一个</string>
+  <string name="tour_step_five_title">买卖</string>
+  <string name="tour_step_five_body">用您的信用卡或银行帐户购买比特币以启动您的加密货币投资组合。</string>
   <string name="tour_step_five_btn">完成</string>
-  <string name="the_pit_exchange_title">Blockchain Exchange</string>
-  <string name="pit_announcement_body_variant_a">我们建立了自己的交易所，可链接到您的 Wallet。即时访问更多加密货币并存入/提取现金。</string>
-  <string name="pit_announcement_body_variant_b">在我们的全新 Crypto Exchange 上升级您的交易。链接您的 Wallet 即可立即购买、出售和交易加密货币。</string>
-  <string name="btn_scan_pairing_code">扫描配对码</string>
-  <string name="btn_manual_pairing">手动配对</string>
-  <string name="login_auto_pair_title">自动配对</string>
-  <string name="landing_title">欢迎来到 Blockchain</string>
-  <string name="landing_body"><b>发送</b>、<b>接收</b>、<b>存储</b>和<b>交易</b>数字货币的简单方法。</string>
-  <string name="btn_continue">继续</string>
-  <string name="btn_forgot_password">忘记密码？</string>
-  <string name="edit_transaction_hint">编辑交易说明</string>
-  <string name="pie_chart_content">饼形图</string>
-  <string name="crypto_exchange">Crypto 交易平台</string>
-  <string name="crypto_trading">Crypto 交易</string>
-  <string name="content_desc_edit_account_label">编辑帐户标签</string>
-  <string name="edit_wallet_name">编辑名称</string>
-  <string name="edit_wallet_name_helper_text">为此新钱包命名。</string>
-  <string name="create_a_new_wallet">创建新钱包</string>
-  <string name="create_a_new_wallet_helper_text">为此新钱包命名。</string>
-  <string name="create_now">立即建立</string>
+  <string name="dashboard_total_balance">总余额</string>
+  <string name="asset_card_rate_period">24小时</string>
+  <string name="cannot_launch_app">区块链钱包无法在此设备上运行。</string>
+  <string name="help">救命</string>
+  <string name="need_some_help">需要一些帮助？</string>
+  <string name="pax_need_more_eth_error_body_1">您将需要ETH来发送您的USD-D</string>
+  <string name="pax_need_more_eth_error_title">需要更多的ETH</string>
+  <string name="invalid_address">无效地址</string>
+  <string name="transaction_failed_min_send">您可以发送的最低%1$s为%1$s</string>
+  <string name="xlm_transaction_failed_min_balance_new_account">新帐户至少需要%1$s</string>
+  <string name="transaction_submitted">交易完成</string>
+  <string name="insufficient_funds">不充足的资金</string>
+  <string name="insufficient_eth_for_fees">ETH不足以支付交易费用</string>
+  <string name="not_enough_funds_with_currency">%1$s不够</string>
+  <string name="minimum_balance_body">恒星币要求所有恒星币账户的最低流明余额为XLM。 
+这意味着您不能从Stellar Wallet寄出余额，该余额会使Stellar Wallet的余额少于最低余额。 
+这也意味着，为了将XLM发送到新的Stellar帐户，您必须发送足够的XLM以满足最低余额要求。 
+当前的最低余额要求为1 XLM。 
+</string>
+  <string name="minimum_balance_read_more_blurb">您可以在Stellar.org上阅读有关Stellar最低余额要求的更多信息。</string>
+  <string name="minimum_balance_explanation_title">最低余额</string>
+  <string name="minimum_balance_read_more">阅读更多</string>
+  <string name="minimum_balance_total_funds">资金总额</string>
+  <string name="minimum_balance_xlm_balance_requirement">XLM余额要求</string>
+  <string name="minimum_balance_transaction_fee">手续费</string>
+  <string name="minimum_balance_available_to_send">可发送</string>
+  <string name="minimum_balance_url">https://www.stellar.org/developers/guides/concepts/fees.html#minimum-account-balance</string>
+  <string name="learn_more_lead">了解Stellar的最低余额要求</string>
+  <string name="xlm_memo_text">备忘文字</string>
+  <string name="xlm_memo">备忘录</string>
+  <string name="xlm_memo_sending_exchange">要发送给交易所吗？</string>
+  <string name="xlm_memo_sending_exchange_description">添加一个备忘录以避免丢失资金，或使用 Swap 在此钱包中进行兑换。</string>
+  <string name="memo_required">需要</string>
+  <string name="xlm_memo_id">备忘录ID</string>
+  <string name="xlm_memo_hash">备注哈希</string>
+  <string name="xlm_memo_return">备注返回哈希</string>
+  <string name="xlm_memo_toolbar_title">添加备忘录</string>
+  <string name="xlm_memo_explain">备注用于将可选信息传达给收件人。</string>
+  <string name="xlm_memo_text_hint">备忘录</string>
+  <string name="xlm_memo_id_hint">数字编号</string>
+  <string name="xlm_memo_hash_hint">32字节十六进制哈希</string>
+  <string name="airdrop_activity_title">空投</string>
+  <string name="simple_buy_intro_title">欢迎来到区块链</string>
+  <string name="simple_buy_buy_crypto">购买加密</string>
+  <string name="simple_buy_instructions_to_buy">我们可以通过几个简单的步骤帮助您购买。</string>
+  <string name="simple_buy_intro_main_button_action">立即购买加密货币</string>
+  <string name="simple_buy_deposit_my_crypto">游览钱包</string>
+  <string name="simple_buy_skip_text">探索您的新区块链钱包。</string>
+  <string name="simple_buy_get_started">开始使用</string>
+  <string name="simple_buy_what_you_want_to_buy">你想要买什么？</string>
+  <string name="simple_buy_enter_amount">输入金额</string>
+  <string name="simple_buy_buy_crypto_title">购买加密货币</string>
+  <string name="simple_buy_verify_email_instruction">我们向%1$s发送了一封包含验证链接的电子邮件。没听懂吗？检查您的垃圾邮件文件夹。</string>
+  <string name="simple_buy_error_fetching_price">提取最新价格时出错。</string>
+  <string name="simple_buy_up_to_amount">最多%1$s</string>
+  <string name="use_max">使用MAX</string>
+  <string name="too_high">太高</string>
+  <string name="use_min">使用MIN</string>
+  <string name="too_low">太低</string>
+  <string name="checkout">查看</string>
+  <string name="checkout_subtitle">请查看并确认您购买的%1$s 。</string>
+  <string name="total_cost">总计花费</string>
+  <string name="date">日期</string>
+  <string name="purchase_note">收到您的资金后，我们将开始您的%1$s购买订单。请注意，您的最终金额可能会因应市场活动而改变。可能需要付费。</string>
+  <string name="buy_crypto">购买%1$s</string>
+  <string name="kyc_verifying_info">验证您的信息</string>
+  <string name="kyc_verifying_time_info">通常只需不到一分钟的时间。</string>
+  <string name="kyc_verifying_manual_review_required_info">您已经成功提交了申请。区块链支持会员将审查您的信息。</string>
+  <string name="kyc_manual_review_required">需要人工审核</string>
+  <string name="kyc_pending_review">待审核</string>
+  <string name="kyc_veriff_but_not_eligible_review">成功申请</string>
+  <string name="kyc_veriff_but_not_eligible_review_info">您的身份已成功验证。您现在是黄金级，每天可以交易多达25000美元。 
+
+您所在的地区尚无法购买，我们会在发生这种情况时立即通知您。</string>
+  <string name="continue_to_wallet">继续钱包</string>
+  <string name="simple_buy_securely_transfer">将%1$s从您的银行帐户安全地转移到区块链。根据转帐方式和资金可用性的不同，此过程最多可能需要1个工作日。</string>
+  <string name="simple_buy_bank_account_sheet_instructions">请将%1$s从您的银行帐户转移到Blockchain.com。收到资金后，我们将创建您的%2$s购买订单。</string>
+  <string name="simple_buy_amount_to_send">汇款金额</string>
+  <string name="simple_buy_pending_buy_sheet_title">等待%1s购买</string>
+  <string name="recipient_name_must_match_eur">您上方的收款人姓名必须与银行帐户中帐户持有人的姓名相符，才能成功进行转移。如果没有匹配项，您的转账可能会被拒绝。</string>
+  <string name="recipient_name_must_match_gbp">您上方的收款人姓名必须与银行帐户中帐户持有人的姓名相符，才能成功进行转移。如果没有匹配项，您的转账可能会被拒绝。 
+
+将资金存入该帐户，即表示您同意我们的银行合作伙伴<annotation link="modular_terms_and_conditions">条款和条件</annotation> 。</string>
+  <string name="recipient_name_must_match">仅使用您的名字从银行帐户发送资金。如果没有，您的存款可能会被延迟或拒绝。</string>
+  <string name="simple_buy_no_currencies_available_title">无可用货币</string>
+  <string name="simple_buy_no_currencies_available">不幸的是，目前没有可以交易的货币:(</string>
+  <string name="are_ypu_sure">你确定吗？</string>
+  <string name="cancel_order">取消订单</string>
+  <string name="cancel_order_do_cancel">取消订单</string>
+  <string name="cancel_order_go_back">回去</string>
+  <string name="cancel_order_do_cancel_dashboard">是的，取消</string>
+  <string name="cancel_order_go_back_dashboard">不，保持秩序</string>
+  <string name="cancel_token_instruction">这将删除您的%1$s购买订单。</string>
+  <string name="transfer_details">转账明细</string>
+  <string name="ops">糟糕！</string>
+  <string name="something_went_wrong_try_again">有些不对劲。请再试一遍。</string>
+  <string name="simple_buy_token">购买%1s</string>
+  <string name="simple_buy_copied_to_clipboard">%1s在剪贴板上</string>
+  <string name="account_number">帐号</string>
+  <string name="bank_code_swift_bic">银行代码（SWIFT / BIC）</string>
+  <string name="recipient_name">接受者</string>
+  <string name="sort_code">分类码</string>
+  <string name="bank_name">银行名称</string>
+  <string name="bank_country">银行国家</string>
+  <string name="iban">伊班</string>
+  <string name="estonia">爱沙尼亚</string>
+  <string name="lets_setup_wallet">让我们来设置您的钱包。您可以立即购买加密货币，也可以稍后再购买。</string>
+  <string name="btc_default_wallet_name">我的比特币钱包</string>
+  <string name="bch_default_account_label">我的比特币现金钱包</string>
+  <string name="eth_default_account_label">我的以太钱包</string>
+  <string name="xlm_default_account_label">我的恒星钱包</string>
+  <string name="pax_default_account_label_1">我的美元数字钱包</string>
+  <string name="exchange_default_account_label">我的交易所%1$s地址</string>
+  <string name="tx_sent">已发送</string>
+  <string name="tx_received">已收到</string>
+  <string name="tx_moved">转入</string>
+  <string name="tx_swapped">交换</string>
+  <string name="tx_bought">买了</string>
+  <string name="tx_sold">已售出</string>
+  <string name="linked_cards">链接卡</string>
+  <string name="tx_title_send">发送%1s</string>
+  <string name="tx_title_receive">收到%1s</string>
+  <string name="tx_title_sell">出售%1s</string>
+  <string name="tx_title_buy">购买%1s</string>
+  <string name="tx_title_swap">交换%1s</string>
+  <string name="tx_title_transfer">转移%1s</string>
+  <string name="tx_title_fee">费用%1s</string>
+  <string name="transaction_detail_value_at_time_swapped">交换后的值： \u0020</string>
+  <string name="transaction_detail_value_at_time_bought">购买时的价值： \u0020</string>
+  <string name="transaction_detail_value_at_time_sold">售后价格： \u0020</string>
+  <string name="activities_title">活动</string>
+  <string name="simple_buy_add_card_card_title">您被批准购买加密货币。</string>
+  <string name="simple_buy_add_card_card_body">通过将您的信用卡或借记卡添加到区块链钱包中来完成订单。</string>
+  <string name="simple_buy_add_card_card_cta">新增卡</string>
+  <string name="kyc_settings_accounts_limit">账户限额</string>
+  <string name="annual_swap_and_buy_limit">年度掉期和购买限制</string>
+  <string name="daily_swap_and_buy_limit">每日掉期和买入限额</string>
+  <string name="simple_buy_own_crypto">在短短几分钟内拥有自己的加密货币</string>
+  <string name="simple_buy_verify_your_identity">验证您的身份并购买加密货币</string>
+  <string name="simple_buy_skip">跳跃</string>
+  <string name="simple_buy_currency_selection_header">您以本币存储的本地货币，作为您的区块链钱包中的资金。</string>
+  <string name="payment_methods">支付方式</string>
+  <string name="payment_method">付款方法</string>
+  <string name="simple_buy_select_currency">选择您的货币</string>
+  <string name="change_currency">更改币种</string>
+  <string name="maximum_buy">最高%1$s</string>
+  <string name="minimum_buy">最低%1$s</string>
+  <string name="buy_min">购买最低</string>
+  <string name="buy_max">买最大</string>
+  <string name="bank_wire_transfer">银行电汇</string>
+  <string name="credit_or_debit_card">信用卡或借记卡</string>
+  <string name="add_credit_or_debit_card">添加信用卡或借记卡</string>
+  <string name="select_payment_method">选择付款方式</string>
+  <string name="payment_method_limit">上限为%1$s</string>
+  <string name="order_details">订单详情</string>
+  <string name="estimated_amount">美东时间。量</string>
+  <string name="buying_fee">购买费用</string>
+  <string name="purchase_bank_note">收到您的资金后，我们将开始您的%1$s购买订单。请注意，您的最终金额可能会因应市场活动而改变。可能需要付费。</string>
+  <string name="purchase_card_note">我们将在2个工作日内从您的付款方式中扣款。您的最终金额可能会因市场活动而变化。</string>
+  <string name="complete_payment">完成支付</string>
+  <string name="card_payment">信用卡支付</string>
+  <string name="buy_now">立即购买</string>
+  <string name="default_label_all_wallets">所有钱包</string>
+  <string name="approximately_symbol">〜 %1$s</string>
+  <string name="custodial_wallet_default_label">%1s交易钱包</string>
+  <string name="select_account_sheet_title">选择一个钱包</string>
+  <string name="activity_state_initialised">已初始化</string>
+  <string name="activity_state_uninitialised">未初始化</string>
+  <string name="activity_state_awaiting_funds">等待资金</string>
+  <string name="activity_state_pending">待定</string>
+  <string name="activity_state_canceled">取消</string>
+  <string name="activity_state_unknown">未知</string>
+  <string name="activity_state_failed">失败的</string>
+  <string name="activity_wallet_total_balance">总余额</string>
+  <string name="card_number">卡号</string>
+  <string name="name_on_card">卡片上的名字</string>
+  <string name="expiry_date">到期日</string>
+  <string name="card_cvv">CVV2</string>
+  <string name="card_not_supported">卡不支持</string>
+  <string name="privacy_protected_ssl">隐私受256位SSL加密保护。</string>
+  <string name="add_card_title">添加一张信用卡</string>
+  <string name="add_card_address_title">帐单地址</string>
+  <string name="linking_card_title">安全地链接您的卡</string>
+  <string name="linking_card_subtitle">这最多可能需要1分钟。</string>
+  <string name="linking_card_error_title">糟糕！出问题了。</string>
+  <string name="card_error_subtitle">请返回重试。</string>
+  <string name="card_expiry_date">经验： %1s</string>
+  <string name="card_buying">正在购买%1s</string>
+  <string name="card_in_progress">%1s正在进行购买</string>
+  <string name="we_will_notify_order_complete">您的订单完成后，我们会通知您。</string>
+  <string name="completing_card_buy">我们现在完成您的购买。</string>
+  <string name="card_purchased" formatted="false">%1s购买%1s</string>
+  <string name="card_purchased_available_now">您的%1s现在可以在电子钱包中使用。</string>
+  <string name="invalid_cvv">无效的CVV</string>
+  <string name="invalid_date">失效日期</string>
+  <string name="invalid_card_number">无效的卡号</string>
+  <string name="full_name">全名</string>
+  <string name="billing_address_line_1">地址 1</string>
+  <string name="billing_address_line_2">地址2</string>
+  <string name="billing_address_city">市</string>
+  <string name="billing_address_zip">压缩</string>
+  <string name="billing_address_postcode">邮编</string>
+  <string name="billing_address_state">州</string>
+  <string name="billing_address_country">国家</string>
+  <string name="currency_not_supported_title">不支持您的货币</string>
+  <string name="currency_not_supported" formatted="false">目前，我们不支持使用%1s购买加密%1s</string>
+  <string name="activity_no_activity_title">您没有活动</string>
+  <string name="activity_no_activity_text">您的所有交易都将显示在这里。</string>
+  <string name="activity_custodial_pending_value">银行转账</string>
+  <string name="checkout_bank_transfer_label">银行转账</string>
+  <string name="activity_loading_error">无法加载活动，请稍后重试</string>
+  <string name="order_pending">待定</string>
+  <string name="order_complete">完成</string>
+  <string name="expired">已过期</string>
+  <string name="remove_card">取出卡</string>
+  <string name="save_my_card">保存我的卡</string>
+  <string name="custodial_activity_not_supported">此版本不支持交易电子钱包活动详细信息</string>
+  <string name="common_hyphenated_strings">%1$s %2$s</string>
+  <string name="common_spaced_strings">%1$s %2$s</string>
+  <string name="server_unreachable_exit">无法连接到服务器，请稍后再试。</string>
+  <string name="dashboard_asset_balance_interest">赚取%1$.1f %% APY</string>
+  <string name="default_label_interest_wallet">兴趣钱包</string>
+  <string name="activity_details_created">日期</string>
+  <string name="activity_details_completed">已完成</string>
+  <string name="activity_details_fee">费用</string>
+  <string name="activity_details_amount">量</string>
+  <string name="activity_details_value">值</string>
+  <string name="activity_details_to">至</string>
+  <string name="activity_details_from">从</string>
+  <string name="activity_details_action">在区块链浏览器上查看</string>
+  <string name="activity_details_cancel_action">取消购买</string>
+  <string name="activity_detail_description_action">增加一个说明</string>
+  <string name="activity_detail_description_label">描述</string>
+  <string name="activity_details_label_pending">待定</string>
+  <string name="activity_details_label_complete">完成</string>
+  <string name="activity_details_title_transferred">传递</string>
+  <string name="activity_details_title_received">接收</string>
+  <string name="activity_details_title_sent">发送</string>
+  <string name="activity_details_title_buy">购买</string>
+  <string name="activity_details_title_sell">卖</string>
+  <string name="activity_details_title_swap">交换</string>
+  <string name="activity_details_label_confirming">确认中</string>
+  <string name="activity_details_label_waiting_on_funds">等待资金</string>
+  <string name="activity_details_label_confirmations">%1$d ，共%2$d 
+确认书</string>
+  <string name="activity_details_title_fee">汽油费</string>
+  <string name="activity_details_transaction_fee">供气</string>
+  <string name="activity_details_label_pending_execution">待执行</string>
+  <string name="activity_details_buy_tx_id">交易编号</string>
+  <string name="activity_details_buy_sending_to">发送到</string>
+  <string name="activity_details_buy_purchase_amount">购买</string>
+  <string name="activity_details_buy_fees">费用</string>
+  <string name="activity_details_buy_payment_method">付款方法</string>
+  <string name="activity_details_view_bank_transfer_details">查看银行转账详细信息</string>
+  <string name="activity_details_buy_again">再次购买</string>
+  <string name="activity_details_description_updated">说明已更新</string>
+  <string name="activity_details_description_not_updated">说明无法更新</string>
+  <string name="activity_details_transaction_fee_send">正在发送%1$s</string>
+  <string name="activity_details_transaction_fee_unknown">未知</string>
+  <string name="activity_details_payment_load_fail">无法加载卡的详细信息</string>
+  <string name="activity_details_fee_load_fail">无法加载费用信息</string>
+  <string name="activity_details_value_load_fail">无法加载值信息</string>
+  <string name="activity_details_to_load_fail">无法加载地址信息</string>
+  <string name="activity_details_from_load_fail">无法从地址信息加载</string>
+  <string name="card_already_saved">此卡已保存。</string>
+  <string name="activity_details_historic_sent">发送时的价值</string>
+  <string name="activity_details_historic_received">收到时的价值</string>
+  <string name="activity_details_historic_transferred">转让时的价值</string>
+  <string name="activity_details_historic_value_load_fail">无法加载历史价值信息</string>
+  <string name="received_usdt">收到系绳</string>
+  <string name="watch_only_not_supported">导入非消耗性地址（地址或公钥脚本） 
+不支持相应的私钥）。请再试一次
+地址和私钥。 
+</string>
+  <string name="linked_banks">关联银行</string>
+  <string name="tx_title_deposit">存款%1s</string>
+  <string name="tx_title_withdraw">提现%1s</string>
+  <string name="usdt_to_field_helper_no_dropdown_1">输入TETHER / ETH地址</string>
+  <string name="usdt_to_field_helper_1">输入TETHER / ETH地址或选择</string>
+  <string name="usdt_invalid_address_1">无效的TETHER地址</string>
+  <string name="usdt_wallet_name">我的系绳钱包</string>
+  <string name="bank_transfer">银行转帐</string>
+  <string name="instantly_buy_crypto_with_card">立即使用任何Visa或Mastercard购买加密货币。</string>
+  <string name="send_funds_directly_from_your_bank">将资金从您的银行直接发送到您的区块链钱包。我们收到手动转帐后，请使用该现金购买加密货币。</string>
+  <string name="by_depositing_funds_terms_and_conds">将资金存入该帐户，即表示您同意我们的银行合作伙伴<annotation link="modular_terms_and_conditions">条款</annotation> 。</string>
+  <string name="add_bank_with_currency">添加%1s银行</string>
+  <string name="deposit_currency">存款%1s</string>
+  <string name="currency_bank_transfer">银行转帐</string>
+  <string name="link_transfer_instructions">请将%1s从您的个人银行转移到Blockchain.com。这样可以安全地关联您的银行帐户。</string>
+  <string name="payment">付款</string>
+  <string name="buy_now_1">购买%1s</string>
+  <string name="simple_buy_transfer_details_error">加载转移详细信息时出了点问题。 
+
+请稍后再试。</string>
+  <string name="algo_default_account_label">我的Algorand钱包</string>
+  <string name="usdt_default_account_label">我的系绳钱包</string>
+  <string name="add_bank_title">添加%1s银行</string>
+  <string name="order_error_subtitle">不用担心您的钱很安全。请重试或联系我们的Suppport团队寻求帮助。</string>
+  <string name="currency_not_supported_1" formatted="false">目前，我们不支持使用%1s购买加密%1s</string>
+  <string name="checkout_funds_label">资金</string>
+  <string name="checkout_funds_transfer_label">我的%1s钱包</string>
+  <string name="transfer_wallets_empty_title">没有加密发送</string>
+  <string name="transfer_wallets_empty_details">看起来您的钱包是空的，我们可以帮助您购买加密货币</string>
+  <string name="transfer_wallets_load_error">加载钱包时出错，请稍后再试</string>
+  <string name="remove_bank">删除银行</string>
+  <string name="pounds">磅</string>
+  <string name="euros">欧元</string>
+  <string name="deposit_cash">存入现金</string>
+  <string name="send_me_instructions">给我发指令</string>
+  <string name="bank_transfer_only">仅银行转帐</string>
+  <string name="bank_transfer_only_subtitle">仅使用您的名字从银行帐户发送资金。如果没有，您的存款可能会被延迟或拒绝。</string>
+  <string name="processing_time">处理时间</string>
+  <string name="processing_time_subtitle_eur">我们会在收到款项后立即将款项存入您的EUR钱包。 SEPA转移通常需要大约1个工作日才能到达。</string>
+  <string name="processing_time_subtitle_gbp">我们会在收到款项后立即将款项存入您的GBP钱包。在英国快速付款网络中，这可能需要几个小时。</string>
+  <string name="deposit_limits">存款限额</string>
+  <string name="deposit_limits_subtitle">请注意，如果您存入的资金超过每日提款限额，您将无法一次提取所有资金。</string>
+  <string name="unable_to_load_bank_details">我们无法加载我们的银行存款详细信息。</string>
+  <string name="most_popular">最受欢迎</string>
+  <string name="fiat_funds_detail_deposit_title">存款</string>
+  <string name="fiat_funds_detail_withdraw_title">退出</string>
+  <string name="fiat_funds_detail_deposit_details">从您的银行添加现金</string>
+  <string name="fiat_funds_detail_activity_title">活动</string>
+  <string name="fiat_funds_detail_activity_details">查看所有交易</string>
+  <string name="fiat_funds_no_kyc_announcement_title">将现金存入钱包</string>
+  <string name="fiat_funds_no_kyc_announcement_description">验证您的身份以将现金存入电子钱包并购买加密货币。</string>
+  <string name="fiat_funds_no_kyc_sheet_description">验证您的身份以将现金存入电子钱包。买卖加密货币。随时提款。</string>
+  <string name="fiat_funds_no_kyc_step_1_title">验证您的身份</string>
+  <string name="fiat_funds_no_kyc_step_1_description">我们需要确保确实是您通过上传ID来防止欺诈。</string>
+  <string name="fiat_funds_no_kyc_step_2_title">存入现金</string>
+  <string name="fiat_funds_no_kyc_step_2_description">从您的银行转移现金，并启用您的现金余额。</string>
+  <string name="fiat_funds_no_kyc_step_3_title">用现金购买加密货币</string>
+  <string name="fiat_funds_no_kyc_step_3_description">使用您的现金钱包作为购买BTC，ETH，XLM等的付款方式。</string>
+  <string name="fiat_funds_no_kyc_positive_action">验证我的身份</string>
+  <string name="fiat_funds_no_kyc_negative_action">现在不要</string>
+  <string name="fiat_funds_no_kyc_step_1_label">1个</string>
+  <string name="fiat_funds_no_kyc_step_2_label">2</string>
+  <string name="fiat_funds_no_kyc_step_3_label">3</string>
+  <string name="fiat_funds_kyc_announcement_title">链接银行购买加密货币</string>
+  <string name="fiat_funds_kyc_announcement_description">将现金存入您的Blockchain.com钱包。随时存款和取款。</string>
+  <string name="fiat_funds_kyc_announcement_action">连结银行</string>
+  <string name="transfer_wallet_buy_crypto">购买加密</string>
+  <string name="transfer_send_crypto">发送加密</string>
+  <string name="transfer_second_pswd_title">第二密码</string>
+  <string name="transfer_second_pswd_desc">请输入您的第二个密码，然后您就可以继续发送了。</string>
+  <string name="transfer_second_pswd_hint">第二密码</string>
+  <string name="algorand_announcement_title">向Algorand打招呼！</string>
+  <string name="algorand_announcement_description">在钱包中购买并持有ALGO。出售和提现即将到来。</string>
+  <string name="algorand_announcement_action">购买Algorand</string>
+  <string name="currency_wallet">我的%1s钱包</string>
+  <string name="tether_announcement_title">对系绳问好！</string>
+  <string name="tether_announcement_description">USDT是世界上最大的稳定币。从您的应用购买和交换。 Web钱包提供完整的发送和接收功能。</string>
+  <string name="tether_announcement_action">立即购买系绳</string>
+  <string name="dashboard_asset_item_label_title">请注意。</string>
+  <string name="algorand_asset_label">目前无法使用从交易钱包中提取ALGO的功能，但即将推出。</string>
+  <string name="usdt_asset_label">Web钱包提供完整的发送和接收功能。</string>
+  <string name="send_state_no_funds">没有资金</string>
+  <string name="send_state_not_supported">此帐户不支持发送</string>
+  <string name="send_state_not_enough_gas">ETH余额低，无法支付网络费用</string>
+  <string name="send_state_send_in_flight">由于待处理的交易而无法使用。</string>
+  <string name="common_send">发送</string>
+  <string name="common_receive">接收</string>
+  <string name="common_swap">交换</string>
+  <string name="common_from">从</string>
+  <string name="common_to">至</string>
+  <string name="common_yes">是</string>
+  <string name="common_no">没有</string>
+  <string name="common_ok">好</string>
+  <string name="common_cancel">取消</string>
+  <string name="common_total">总</string>
+  <string name="common_deposit">存款</string>
+  <string name="common_transfer">转让</string>
+  <string name="common_error">出问题了，请重试</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">确认</string>
+  <string name="toolbar_cmd_transfer">转让</string>
+  <string name="notification_2fa_summary">2FA通知</string>
+  <string name="notification_2fa_description">与两因素身份验证有关的通知</string>
+  <string name="notification_payments_summary">付款通知</string>
+  <string name="notification_payments_description">与付款有关的通知</string>
+  <string name="enable_cloud_backup">启用云备份</string>
+  <string name="enable_cloud_backup_summary">将加密的备份存储在您的Google云端硬盘帐户中， 
+如果可供使用的话。如果您丢失了此设备，则可以恢复钱包。 
+</string>
+  <string name="tx_title_interest">%1$s赚取%1$s利息</string>
+  <string name="dashboard_asset_actions_send_dsc">将%1$s转移到任何电子钱包</string>
+  <string name="dashboard_asset_actions_receive_dsc">接受或分享您的%1$s地址</string>
+  <string name="dashboard_asset_actions_swap_dsc">将%1$s换成另一个加密货币</string>
+  <string name="dashboard_asset_actions_deposit_dsc">将%1$s添加到您的兴趣钱包</string>
+  <string name="dashboard_asset_actions_summary_title">兴趣摘要</string>
+  <string name="dashboard_asset_actions_summary_dsc">查看您的应计%1$s利息</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">无法加载兴趣详情</string>
+  <string name="asset_details_chart_load_failed_toast">无法加载图表详细信息，请重试</string>
+  <string name="asset_details_load_failed_toast">无法加载钱包详细信息，请重试</string>
+  <string name="asset_details_exchange_load_failed_toast">汇率信息失败，请重试</string>
+  <string name="dashboard_asset_actions_tx_in_progress">已经有交易在进行中，请等待直到交易完成</string>
+  <string name="cloud_backup_card_title">介绍云备份</string>
+  <string name="cloud_backup_card_body">您现在可以将您的钱包安全地备份到云中。您可以选择退出钱包设置中的备份。</string>
+  <string name="cloud_backup_card_cta">学到更多</string>
+  <string name="basic_transfer_lock_warn" formatted="false">您可以提取的余额为%1s 。余额%2s将在7天内提取。</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">了解更多</annotation> 。</string>
+  <string name="basic_transfer_error_insufficient_funds_title">不充足的资金</string>
+  <string name="basic_transfer_error_insufficient_funds">您的帐户资金不足，无法完成此交易。</string>
+  <string name="basic_transfer_error_locked_funds">您的密码将可在7天内撤回。 <annotation link="balance_lock">了解更多</annotation> 。</string>
+  <string name="erc20_need_more_eth_error_body_1">您将需要ETH来发送您的%1$s</string>
+  <string name="purchase_card_note_1">您的最终金额可能会因市场活动而改变。最初的保留期为7天，将适用于您的资金。</string>
+  <string name="select_deposit_source_title">从转移</string>
+  <string name="activity_state_cleared">已清除</string>
+  <string name="activity_state_rejected">拒绝</string>
+  <string name="activity_state_refunded">已退款</string>
+  <string name="activity_details_label_manual_review">人工审核</string>
+  <string name="activity_details_label_processing">处理中</string>
+  <string name="activity_details_title_deposit">存款</string>
+  <string name="activity_details_title_interest_earned">利息</string>
+  <string name="activity_details_title_withdraw">退出</string>
+  <string name="transfer_receive_crypto">接收加密</string>
+  <string name="send_select_target_title">目的地</string>
+  <string name="send_enter_amount_from">发件人： %1$s</string>
+  <string name="send_enter_amount_to">至： %1$s</string>
+  <string name="send_enter_amount_title">发送%1$s</string>
+  <string name="send_enter_amount_available">可用的</string>
+  <string name="send_enter_amount_max">发送最大值</string>
+  <string name="send_enter_amount_deposit_max">转移上限</string>
+  <string name="send_enter_amount_min_deposit">最低转移%1$s</string>
+  <string name="send_confirmation_title">发送%1$s</string>
+  <string name="send_confirmation_fee">费用-常规</string>
+  <string name="send_confirmation_regular_estimation">（ETA 60分钟）</string>
+  <string name="send_confirmation_fee_loading">载入中...</string>
+  <string name="send_confirmation_fee_error">错误加载费</string>
+  <string name="send_confirmation_add_note_hint">添加便条</string>
+  <string name="send_confirmation_add_note_success">注意已成功添加</string>
+  <string name="send_confirmation_cta_button">发送%1$s</string>
+  <string name="send_confirmation_deposit_cta_button">确认转账</string>
+  <string name="send_confirmation_interest_tos_pp">我已阅读并同意<annotation link="interest_tos">服务条款</annotation>和<annotation link="interest_pp">隐私政策</annotation> 。</string>
+  <string name="send_confirmation_interest_holding_period_1">接受此即表示您同意转让</string>
+  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）%2$s从您的比特币钱包到您的兴趣帐户。最初的保留期为7天，将适用于您的资金。</string>
+  <string name="send_confirmation_progress_title">转移%1$s</string>
+  <string name="send_confirmation_progress_message">我们正在转移您的%1$s 。</string>
+  <string name="send_confirmation_success_title">%1$s转移%1$s</string>
+  <string name="send_confirmation_success_message">您的%1$s已成功转移。</string>
+  <string name="send_progress_sending_title">正在发送%1$s</string>
+  <string name="send_progress_sending_subtitle">我们正在发送您的交易。</string>
+  <string name="send_progress_complete_title">%1$s发送%1$s</string>
+  <string name="send_progress_complete_subtitle">您的%1$s已成功发送。</string>
+  <string name="send_progress_error_title">糟糕！出了些问题。</string>
+  <string name="send_progress_error_subtitle">不用担心您的钱很安全。请重试或联系我们的支持团队以寻求帮助。</string>
+  <string name="send_enter_asset_address_hint">%1s地址</string>
+  <string name="send_warn_internal_send_only">仅内部发送</string>
+  <string name="send_scan_qr_code">扫描二维码</string>
+  <string name="send_error_not_valid_asset_address">不是有效的%1s地址</string>
+  <string name="send_error_address_is_eth_contract">地址不是用户地址</string>
+  <string name="send_enter_amount_error_insufficient_funds">您的钱包中没有%1$s 。</string>
+  <string name="send_enter_amount_error_invalid_amount">发送0.00000001 %1$s或更多。</string>
+  <string name="send_enter_invalid_password">密码错误。</string>
+  <string name="send_enter_unexpected_error">发生意外的错误。请再试一遍。</string>
+  <string name="send_enter_insufficient_gas">您没有足够的ETH来处理此交易。</string>
+  <string name="send_select_a_wallet_title">或选择一个钱包</string>
+  <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
+  <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link">了解更多信息。 </annotation>
+  </string>
+  <string name="interest_announcement_title">今天就对您的加密货币感兴趣！</string>
+  <string name="interest_announcement_description">转移加密货币并开始赚取BTC，ETH等的利息。</string>
+  <string name="interest_announcement_action">学到更多</string>
+  <string name="purchase_card_note_2">您的加密货币将可在以下时间内提取</string>
+  <string name="purchase_card_note_2_1">7天。</string>
+  <string name="buy_any_crypto">购买加密</string>
+  <string name="select_send_sheet_title">从发送</string>
+  <string name="select_send_source_title">从发送</string>
+  <string name="currency_funds_wallet">我的%1s钱包</string>
+  <string name="transfer_receive_empty_title">无法加载您的钱包</string>
+  <string name="transfer_receive_empty_details">看来您的网际网路连线有问题。请检查并重试</string>
+  <string name="transfer_receive_empty_cta">点按即可刷新</string>
+  <string name="us_dollars">美元</string>
+  <string name="fiat_funds_detail_withdraw_details">兑现到您的银行</string>
+  <string name="withdraw_currency">提现%1$s</string>
+  <string name="withdraw_title">退出</string>
+  <string name="withdraw_to">撤回</string>
+  <string name="add_a_bank">添加银行</string>
+  <string name="transfer_send_crypto_title">发送加密</string>
+  <string name="transfer_send_crypto_label">选择您要发送的电子钱包。</string>
+  <string name="transfer_receive_crypto_title">接收加密</string>
+  <string name="transfer_receive_crypto_label">选择一个钱包以接收加密货币。</string>
+  <string name="withdraw_amount">提现%1$s</string>
+  <string name="withdrawal_amount">%1$s提款</string>
+  <string name="withdrawing_amount">提现%1$s</string>
+  <string name="withdrawing_amount_message">我们正在完成您的提款。</string>
+  <string name="withdrawal_success_message">成功！我们现在正在从您的%1$s电子钱包中提取现金。资金应在1-3个工作日内存入您的银行。</string>
+  <string name="sell_enter_amount_max">卖出最高</string>
+  <string name="sell_enter_amount_min_error">%1$s</string>
+  <string name="sell_enter_amount_max_error">最多%1$s</string>
+  <string name="send_enter_amount_min_send">最少需要发送%1$s</string>
+  <string name="sell_confirmation_cta_button">出售%1$s</string>
+  <string name="sell_confirmation_progress_title">出售%1$s</string>
+  <string name="sell_confirmation_progress_message">我们现在完成您的出售。</string>
+  <string name="sell_confirmation_success_message">现在，您可以在%1$s电子钱包中使用现金了。</string>
+  <string name="send_state_locked_funds">您的资金将在7天内可用</string>
+  <string name="sell_progress_complete_title">已售出%1$s</string>
+  <string name="earn_interest">赚取利息</string>
+  <string name="interest_summary_total">赚取的总利息</string>
+  <string name="interest_summary_total_fail">无法加载总利息</string>
+  <string name="interest_summary_next_payment">下次利息支付</string>
+  <string name="interest_summary_accrued">本月应计利息</string>
+  <string name="interest_summary_accrued_fail">无法加载应计利息</string>
+  <string name="interest_summary_hold_period">初始保留期</string>
+  <string name="interest_summary_hold_period_days">%1$f天</string>
+  <string name="interest_summary_hold_period_fail">无法加载保留期详细信息</string>
+  <string name="interest_summary_rate">利率</string>
+  <string name="interest_summary_rate_fail">无法加载利率</string>
+  <string name="interest_dashboard_title">利息账户</string>
+  <string name="interest_dashboard_item_balance_title">%1$s余额</string>
+  <string name="interest_dashboard_item_accrued_title">赚取的总利息</string>
+  <string name="interest_dashboard_item_action_earn">赚取利息</string>
+  <string name="interest_dashboard_item_action_view">视图</string>
+  <string name="interest_dashboard_item_rate_1">赚取高达</string>
+  <string name="interest_dashboard_item_rate_2">每年在您的%1$s</string>
+  <string name="interest_dashboard_verify_title">在您的加密货币上赚取利息</string>
+  <string name="interest_dashboard_verify_label">当您将加密货币转移到您的利息帐户时，即刻赚取高达12％的收益。</string>
+  <string name="interest_dashboard_verify_point_one_title">验证您的身份</string>
+  <string name="interest_dashboard_verify_point_one_label">为了防止身份盗用或欺诈，我们需要通过上传ID来确保您确实是您。</string>
+  <string name="interest_dashboard_verify_point_two_title">购买加密</string>
+  <string name="interest_dashboard_verify_point_two_label">使用您的银行，借记卡或信用卡为任何加密货币购买提供资金。</string>
+  <string name="interest_dashboard_verify_point_three_title">赚取利息</string>
+  <string name="interest_dashboard_verify_point_three_label">转入您的利息帐户并获得每月利息支付。</string>
+  <string name="interest_summary_disclaimer_label">使用网络钱包提取资金</string>
+  <string name="buy">购买</string>
+  <string name="sell">卖</string>
+  <string name="buy_and_sell">买卖</string>
+  <string name="buy_with_cash">用现金或卡购买。</string>
+  <string name="select_crypto_you_want">选择您要购买的加密货币。</string>
+  <string name="sell_intro_kyc_title_1">验证您的身份</string>
+  <string name="sell_intro_kyc_subtitle_1">为了防止身份盗用或欺诈，我们需要通过上传ID来确保您确实是您。</string>
+  <string name="sell_intro_kyc_title_2">购买加密</string>
+  <string name="sell_intro_kyc_subtitle_2">使用您的银行，借记卡或信用卡为任何加密货币购买提供资金。</string>
+  <string name="sell_intro_kyc_title_3">随时出售</string>
+  <string name="sell_intro_kyc_subtitle_3">立即以现金出售您的加密货币。将现金存放在钱包中或提取到关联的银行。</string>
+  <string name="sell_crypto">出售加密货币</string>
+  <string name="sell_crypto_subtitle">验证您的身份以出售现金加密货币。</string>
+  <string name="sell_for_cash">以现金出售加密货币</string>
+  <string name="select_wallet_to_sell">选择要出售的钱包。</string>
+  <string name="common_to_coloned">至：</string>
+  <string name="common_from_coloned">从：</string>
+  <string name="common_sell">卖</string>
+  <string name="sell_quote_price">%1$s价格</string>
+  <string name="convert_your_crypto_to_cash">将您的加密货币转换为现金</string>
+  <string name="scan_mismatch_transaction_target">扫描的代码不是%1$s QR码。</string>
+  <string name="scan_failed">无法识别QR码，请重试。</string>
+  <string name="could_not_save_card">我们无法保存您的卡。请联系支持。</string>
+  <string name="could_not_activate_card">我们无法激活您的卡。请联系支持。</string>
+  <string name="card_still_pending">我们等待了两分钟，没有收到银行卡提供商的更新。您的卡可能仍会在以后获得批准。如有任何疑问，请联系支持。</string>
+  <string name="card_link_failed">卡无法链接。如果您认为这是错误的，请重试或联系支持人员。</string>
+  <string name="tx_view_locked_funds">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在7天内从Blockchain.com上发送或提取这些资金。</string>
+  <string name="unable_to_verify_id">无法验证您的ID</string>
+  <string name="unable_to_verify_id_description">我们无法验证您的身份。发生这种情况可能有几个原因。</string>
+  <string name="invalid_id">无效的ID</string>
+  <string name="invalid_id_description">上传的图像或文档不符合要求。</string>
+  <string name="information_missmatch">信息不匹配</string>
+  <string name="information_missmatch_description">所有信息必须与您的法律文件上显示的完全一样。注意：请勿使用昵称。</string>
+  <string name="blocked_by_local_laws">被当地法律封锁</string>
+  <string name="blocked_by_local_laws_description">在Blockchain.com，我们努力遵守所有当地法律。根据您所在的位置，我们目前不允许购买或出售数字货币。</string>
+  <string name="error_contact_support">如果您认为这是错误的操作或想要对帐户进行人工审核，请与支持人员联系。</string>
+  <string name="common_empty_title">无法加载您的钱包</string>
+  <string name="common_empty_details">看来您的网际网路连线有问题。请检查并重试</string>
+  <string name="common_empty_cta">点按即可刷新</string>
+  <string name="email_request_subject_usdt_1">系绳付款请求</string>
+  <string name="email_request_body_usdt_1">请将USDT发送到Tether地址%1$s 。</string>
+  <string name="send_error_tx_in_flight">交易已在进行中</string>
+  <string name="send_error_tx_option_invalid">发生了错误</string>
+  <string name="send_to_exchange_xlm_title">要发送给交易所吗？</string>
+  <string name="send_to_exchange_xlm_blurb">添加备忘录，以免造成资金损失。</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link">了解有关余额要求的更多信息。 </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">添加记事（最多28个字符）</string>
+  <string name="send_confirm_memo_id_hint">添加一个ID</string>
+  <string name="send_invalid_option_dsc_memo">无效的说明/备注</string>
+  <string name="interest_error_title">无法加载兴趣详细信息</string>
+  <string name="interest_error_desc">加载兴趣帐户详细信息时发生错误。 
+请检查您的互联网连接，然后重试；如果问题仍然存在，请与支持人员联系。</string>
+  <string name="sell_is_coming_soon">买卖即将到来</string>
+  <string name="sell_is_coming_soon_description">目前，我们不支持在您所在地区购买或出售加密货币。完成后，我们会向您发送更新。</string>
+  <string name="error_scan_failed_general">扫描失败。请再试一次。</string>
+  <string name="error_scan_failed_bitpay">无法检索BitPay发票。它过期了吗？</string>
+  <string name="backup_before_send_later_cta">继续而不备份</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">您有%1$d发送但没有备份剩余</item>
+  </plurals>
+  <string name="backup_before_send_now_label">您必须先备份，然后再发送</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d天。</item>
+  </plurals>
+  <string name="card_info_title">不接受虚拟卡</string>
+  <string name="card_info_description">目前，我们不支持使用虚拟信用卡和借记卡购买加密货币。您必须使用实体卡的编号，日期和安全码。</string>
+  <string name="send_confirmation_tx_fee">手续费</string>
+  <string name="send_confirmation_insufficient_fee">没有足够的资金支付优先费，请调整您的发送金额。</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees">了解更多</annotation>有关网络费用的信息。</string>
+  <string name="send_state_locked_funds_1">您有待处理的交易。</string>
+  <string name="sell_info_title">想要从您的其他电子钱包中出售？</string>
+  <string name="sell_info_blurb_1">将电子钱包中的加密货币发送到您的</string>
+  <string name="sell_info_blurb_2">交易钱包。</string>
+  <string name="sell_info_blurb_3">发送完成后，以现金出售该加密货币。</string>
+  <string name="sell_info_action">立即发送→</string>
+  <string name="tx_view_locked_funds_1">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在%2$s从Blockchain.com上发送或提取这些资金%2$s</string>
+  <string name="common_pending">待定</string>
+  <string name="confirm_status_msg_insufficient_funds">您的帐户资金不足，无法处理此交易</string>
+  <string name="confirm_status_msg_option_invalid">请确保您已同意我们的条款。</string>
 </resources>

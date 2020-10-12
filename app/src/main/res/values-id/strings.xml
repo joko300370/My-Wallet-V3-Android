@@ -15,14 +15,14 @@
     <item>kata kedua belas</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d alamat yang diimpor</item>
@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">Menerima</string>
   <string name="toolbar_cmd_activity">Aktivitas</string>
   <string name="toolbar_cmd_view_activity">Lihat Aktivitas</string>
-  <string name="toolbar_cmd_swap">Menukar</string>
+  <string name="common_swap">Menukar</string>
   <string name="cancel">Membatalkan</string>
   <string name="btn_ok">baik</string>
-  <string name="yes">Iya</string>
-  <string name="no">Tidak</string>
+  <string name="common_yes">Iya</string>
+  <string name="common_no">Tidak</string>
   <string name="polite_no">Tidak, terima kasih</string>
   <string name="done">Selesai</string>
   <string name="btn_close">Menutup</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Terus</string>
   <string name="btn_forgot_password">Tidak ingat kata sandi?\"</string>
   <string name="SEND">Kirim</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Gunakan total saldo yang bisa dihabiskan:</string>
   <string name="bitpay_remaining_time">Waktu yang tersisa</string>
   <string name="bitpay_invoice_expired">Faktur BitPay Berakhir</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Kata sandi yang dipilih terlalu lemah untuk mengamankan dana Anda. Kami sangat 
  sarankan Anda memilih yang berbeda. Apakah Anda ingin menetapkan kata sandi baru? 
 </string>
-  <string name="from">Dari</string>
-  <string name="to">Untuk</string>
+  <string name="common_from">Dari</string>
+  <string name="common_to">Untuk</string>
   <string name="confirm_details">Konfirmasi pembayaran</string>
   <string name="fee">Biaya</string>
   <string name="exit_confirm">Tekan kembali tombol untuk keluar</string>
@@ -349,17 +349,6 @@
  Alamat Bitcoin %1$s . Silakan pindai kode QR. 
 </string>
   <string name="invalid_private_key">Kunci pribadi tidak valid</string>
-  <string name="watch_only_import_warning">Anda akan mengimpor alamat yang tidak dapat dihabiskan, sebuah 
- alamat (atau skrip kunci publik) 
- disimpan di dompet tanpa kunci pribadi yang sesuai. Ini 
- berarti bahwa dana tersebut dapat dihabiskan HANYA jika Anda memiliki kunci pribadi yang disimpan di tempat lain. Jika kamu 
- melakukan 
- tidak memiliki kunci pribadi yang disimpan, JANGAN menginstruksikan siapa pun untuk mengirimi Anda bitcoin ke 
- tidak bisa dihabiskan 
- alamat. 
-
- Opsi ini direkomendasikan hanya untuk pengguna tingkat lanjut. Terus? 
-</string>
   <string name="scan_private_key">Pindai kunci pribadi</string>
   <string name="private_key_successfully_imported">Kunci pribadi berhasil diimpor.</string>
   <string name="private_key_not_matching_address">CATATAN: Kunci pribadi yang dipindai tidak 
@@ -638,7 +627,7 @@
  ikon di peluncur, membuat menerima bitcoin lebih cepat. 
 </string>
   <string name="shortcut_settings_enable">Pintasan Peluncur</string>
-  <string name="confirm">Konfirmasi</string>
+  <string name="common_confirm">Konfirmasi</string>
   <string name="swipe_receive_hint">Geser untuk menerima</string>
   <string name="swipe_receive_preference_summary">Mengungkapkan alamat penerimaan ketika Anda menggesek kiri 
  layar PIN, membuat menerima dana lebih cepat. 
@@ -826,7 +815,7 @@
  karena aktivitas pasar. Setelah pesanan dimulai, kami tidak dapat menghentikannya 
 </string>
   <string name="send_to">Kirim ke</string>
-  <string name="receive">Menerima</string>
+  <string name="common_receive">Menerima</string>
   <string name="fees">Biaya</string>
   <string name="value">Nilai</string>
   <string name="status">Status</string>
@@ -1123,8 +1112,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami mengirim tautan verifikasi ke</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk melanjutkan transaksi Anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka Email</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Setuju untuk Coinify <a href="ignored"> syarat dan ketentuan </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email terverifikasi!</string>
   <string name="buy_sell_verified_email_message">Mitra kami %1$s akan memproses transaksi bitcoin Anda. Dengan mengklik Setuju dan \'Lanjutkan\' Anda akan membuat akun dengan %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikasi verifikasi</string>
@@ -1231,7 +1219,7 @@
   <string name="kyc_email_title">Verifikasi Email Anda</string>
   <string name="kyc_email_message">Kami perlu memverifikasi alamat email Anda sebagai lapisan keamanan tambahan.</string>
   <string name="kyc_email_hint_focused">Email mu</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Kesalahan menyimpan email, silakan coba lagi</string>
   <string name="kyc_email_send_verification">Mengirim email</string>
   <string name="kyc_email_validation_header">Periksa kotak masuk Anda.</string>
@@ -1256,7 +1244,7 @@
   <string name="kyc_onfido_splash_verification_error">Kesalahan saat memverifikasi ID, silakan coba lagi</string>
   <string name="kyc_veriff_splash_country_supported_header">Apakah negara saya didukung?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Tidak semua negara didukung saat ini. Periksa <annotation link="country_list"> daftar negara kami yang terbaru </annotation> sebelum melanjutkan.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER DIVERIFIKASI</string>
   <string name="kyc_veriff_splash_header">Mari Konfirmasikan Itu Anda</string>
   <string name="kyc_veriff_splash_subtitle">Anda perlu 1 tipe ID di bawah untuk melanjutkan.</string>
@@ -1278,11 +1266,11 @@
   <string name="kyc_complete_device_verified">Perangkat Terverifikasi</string>
   <string name="kyc_complete_id_uploaded">ID Diunggah</string>
   <string name="kyc_complete_video_uploaded">Video diunggah</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Tim Dukungan Blockchain kami telah menulis Panduan Bantuan yang menjelaskan mengapa kami perlu memverifikasi identitas Anda.</string>
   <string name="kyc_help_dialog_read_now">Baca sekarang</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Verifikasi Identitas</string>
   <string name="kyc_settings_status_none">Tidak diverifikasi</string>
@@ -1294,7 +1282,7 @@
   <string name="kyc_settings_gold_level_in_review">Level Emas - Dalam ulasan</string>
   <string name="kyc_settings_gold_level_approved">Level Emas - Disetujui</string>
   <string name="kyc_settings_silver_level_approved">Level Perak - Disetujui</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Kesalahan saat mengambil status KYC</string>
   <string name="kyc_status_title_in_progress">Verifikasi Sedang Berlangsung</string>
   <string name="kyc_status_title_approved">Akun Disetujui</string>
@@ -1318,10 +1306,10 @@
   <string name="kyc_drop_off_card_description">Ambil di mana Anda tinggalkan dan lengkapi verifikasi identitas Anda.</string>
   <string name="kyc_drop_off_card_button">Lanjutkan verifikasi</string>
   <string name="kyc_documents_needed">Dokumen diperlukan</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Kami memiliki beberapa masalah dengan dokumen yang Anda berikan. Silakan coba unggah dokumen lagi untuk melanjutkan verifikasi Anda.</string>
   <string name="kyc_resubmission_card_button">Unggah Dokumen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Kami tidak dapat memverifikasi identitas Anda dan meminta Anda mengunggah dokumen yang diperlukan.</string>
   <string name="kyc_resubmission_splash_description_2">Alasan utama hal ini terjadi:</string>
   <string name="kyc_resubmission_splash_description_3">Foto yang diperlukan tidak ada.</string>
@@ -1541,7 +1529,6 @@
   <string name="estimated_amount">Est. Jumlah</string>
   <string name="buying_fee">Biaya Pembelian</string>
   <string name="purchase_bank_note">Setelah kami menerima dana Anda, kami akan memulai pesanan pembelian %1$s . Perhatikan, jumlah akhir Anda mungkin berubah menjadi aktivitas pasar yang seharusnya. Biaya mungkin berlaku.</string>
-  <string name="purchase_card_note">Kami akan mendebit metode pembayaran Anda dalam 2 hari kerja. Jumlah akhir Anda mungkin berubah karena aktivitas pasar.</string>
   <string name="complete_payment">Selesaikan Pembayaran</string>
   <string name="card_payment">Pembayaran Kartu</string>
   <string name="buy_now">Beli sekarang</string>

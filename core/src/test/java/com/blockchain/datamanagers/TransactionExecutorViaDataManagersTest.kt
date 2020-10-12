@@ -8,6 +8,11 @@ import com.blockchain.datamanagers.fees.XlmFees
 import com.blockchain.fees.FeeType
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.SendException
+import com.blockchain.sunriver.SendFundsResult
+import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.ether
@@ -16,11 +21,6 @@ import com.blockchain.testutils.satoshi
 import com.blockchain.testutils.satoshiCash
 import com.blockchain.testutils.stroops
 import com.blockchain.testutils.wei
-import com.blockchain.transactions.Memo
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.SendException
-import com.blockchain.transactions.SendFundsResult
-import com.blockchain.transactions.TransactionSender
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
@@ -66,7 +66,7 @@ class TransactionExecutorViaDataManagersTest {
     private val ethereumAccountWrapper: EthereumAccountWrapper = mock()
     private val addressResolver: AddressResolver = mock()
     private val accountLookup: AccountLookup = mock()
-    private val xlmSender: TransactionSender = mock()
+    private val xlmSender: XlmDataManager = mock()
     private val analytics: Analytics = mock()
     private val coinSelectionRemoteConfig: CoinSelectionRemoteConfig = mock()
 

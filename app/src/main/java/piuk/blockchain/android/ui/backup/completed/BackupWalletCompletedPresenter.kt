@@ -4,7 +4,7 @@ import com.blockchain.preferences.WalletStatus
 import io.reactivex.rxkotlin.plusAssign
 import android.annotation.SuppressLint
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
+import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import timber.log.Timber
 

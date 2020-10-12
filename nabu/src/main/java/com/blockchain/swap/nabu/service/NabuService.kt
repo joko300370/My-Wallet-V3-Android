@@ -2,7 +2,9 @@ package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
+import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
@@ -24,12 +26,16 @@ import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
 import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
+import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -240,11 +246,13 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         action: String,
         currencyPair: String,
+        currency: String,
         amount: String
     ): Single<SimpleBuyQuoteResponse> = service.getSimpleBuyQuote(
         authorization = sessionToken.authHeader,
         action = action,
         currencyPair = currencyPair,
+        currency = currency,
         amount = amount
     )
 
@@ -288,10 +296,44 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun getOutstandingBuyOrders(
+    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse) = service.withdrawFee(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    internal fun fetchWithdrawLocksRules(sessionToken: NabuSessionTokenResponse, paymentMethod: PaymentMethodType) =
+        service.getWithdrawalLocksCheck(
+            sessionToken.authHeader,
+            WithdrawLocksCheckRequestBody(paymentMethod.name)
+        ).wrapErrorMessage()
+
+    internal fun createWithdrawOrder(
+        sessionToken: NabuSessionTokenResponse,
+        amount: String,
+        currency: String,
+        beneficiaryId: String
+    ) = service.withdrawOrder(
+        sessionToken.authHeader,
+        WithdrawRequestBody(beneficiary = beneficiaryId, amount = amount, currency = currency)
+    ).wrapErrorMessage()
+
+    internal fun createDepositTransaction(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String,
+        address: String,
+        hash: String,
+        amount: String,
+        product: String
+    ) = service.createDepositOrder(
+        sessionToken.authHeader,
+        DepositRequestBody(
+            currency = currency, depositAddress = address, txHash = hash, amount = amount, product = product
+        )
+    )
+
+    internal fun getOutstandingOrders(
         sessionToken: NabuSessionTokenResponse,
         pendingOnly: Boolean
-    ) = service.getBuyOrders(
+    ) = service.getOrders(
         sessionToken.authHeader,
         pendingOnly
     ).wrapErrorMessage()
@@ -382,18 +424,18 @@ class NabuService(retrofit: Retrofit) {
     fun transferFunds(
         sessionToken: NabuSessionTokenResponse,
         request: TransferRequest
-    ): Completable = service.transferFunds(
+    ): Single<String> = service.transferFunds(
         sessionToken.authHeader,
         request
-    ).onErrorResumeNext {
-        if (it is HttpException) {
-            when (it.code()) {
-                403 -> Completable.error(SimpleBuyError.WithdrawlAlreadyPending)
-                409 -> Completable.error(SimpleBuyError.WithdrawlInsufficientFunds)
-                else -> Completable.error(it)
-            }
-        } else {
-            Completable.error(it)
+    ).map {
+        when (it.code()) {
+            200 -> it.body()?.id ?: ""
+            403 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
+                throw SimpleBuyError.WithdrawalBalanceLocked
+            else
+                throw SimpleBuyError.WithdrawalAlreadyPending
+            409 -> throw SimpleBuyError.WithdrawalInsufficientFunds
+            else -> throw SimpleBuyError.UnexpectedError
         }
     }.wrapErrorMessage()
 
@@ -425,7 +467,7 @@ class NabuService(retrofit: Retrofit) {
     fun getInterestAccountBalance(
         sessionToken: NabuSessionTokenResponse,
         currency: String
-    ) = service.getInterestAccountBalance(
+    ) = service.getInterestAccountDetails(
         authorization = sessionToken.authHeader,
         cryptoSymbol = currency
     ).flatMapMaybe {
@@ -435,6 +477,45 @@ class NabuService(retrofit: Retrofit) {
             else -> Maybe.error(HttpException(it))
         }
     }.wrapErrorMessage()
+
+    fun getInterestAccountDetails(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAccountDetails(
+        authorization = sessionToken.authHeader,
+        cryptoSymbol = currency
+    ).flatMap {
+        when (it.code()) {
+            200 -> Single.just(it.body())
+            204 -> Single.just(
+                InterestAccountDetailsResponse("0", "0", "0", "0")
+            )
+            else -> Single.error(HttpException(it))
+        }
+    }.wrapErrorMessage()
+
+    fun getInterestAddress(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestAddress(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun getInterestActivity(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestActivity(authorization = sessionToken.authHeader, product = "savings", currency = currency)
+        .wrapErrorMessage()
+
+    fun getInterestLimits(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getInterestLimits(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun getInterestEnabled(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getInterestEnabled(authorization = sessionToken.authHeader)
+        .wrapErrorMessage()
 
     companion object {
         internal const val CLIENT_TYPE = "APP"

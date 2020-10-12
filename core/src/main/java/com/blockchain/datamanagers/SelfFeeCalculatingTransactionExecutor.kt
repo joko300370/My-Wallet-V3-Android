@@ -3,7 +3,7 @@ package com.blockchain.datamanagers
 import com.blockchain.datamanagers.fees.getFeeOptions
 import com.blockchain.fees.FeeType
 import com.blockchain.logging.SwapDiagnostics
-import com.blockchain.transactions.Memo
+import com.blockchain.sunriver.Memo
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20

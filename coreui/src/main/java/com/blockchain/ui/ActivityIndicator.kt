@@ -1,6 +1,7 @@
 package com.blockchain.ui
 
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -32,6 +33,14 @@ class ActivityIndicator {
         }
     }
 
+    fun <T> Maybe<T>.trackLoading(): Maybe<T> {
+        return this.doOnSubscribe {
+            increment()
+        }.doFinally {
+            decrement()
+        }
+    }
+
     fun Completable.trackLoading(): Completable {
         return this.doOnSubscribe {
             increment()
@@ -54,6 +63,13 @@ class ActivityIndicator {
 }
 
 fun <T> Observable<T>.trackLoading(activityIndicator: ActivityIndicator?): Observable<T> =
+    activityIndicator?.let {
+        with(it) {
+            trackLoading()
+        }
+    } ?: this
+
+fun <T> Maybe<T>.trackLoading(activityIndicator: ActivityIndicator?): Maybe<T> =
     activityIndicator?.let {
         with(it) {
             trackLoading()

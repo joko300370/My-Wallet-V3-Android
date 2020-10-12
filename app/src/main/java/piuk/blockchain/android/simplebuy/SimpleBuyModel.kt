@@ -1,14 +1,12 @@
 package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuyOrder
+import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
-import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -35,15 +33,11 @@ class SimpleBuyModel(
                 interactor.fetchBuyLimitsAndSupportedCryptoCurrencies(intent.fiatCurrency)
                     .subscribeBy(
                         onSuccess = { pairs ->
-                            val selectedCryptoCurrency =
-                                getSelectedCryptoCurrency(pairs, intent.fiatCurrency, previousState)
-
-                            process(SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(pairs,
-                                selectedCryptoCurrency))
-
-                            selectedCryptoCurrency?.let {
-                                process(SimpleBuyIntent.NewCryptoCurrencySelected(it))
-                            }
+                            process(
+                                SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(pairs,
+                                    intent.cryptoCurrency
+                                ))
+                            process(SimpleBuyIntent.NewCryptoCurrencySelected(intent.cryptoCurrency))
                         },
                         onError = { process(SimpleBuyIntent.ErrorIntent()) }
                     )
@@ -133,6 +127,17 @@ class SimpleBuyModel(
                     onSuccess = { process(it) },
                     onError = { }
                 )
+            is SimpleBuyIntent.FetchWithdrawLockTime -> {
+                require(previousState.selectedPaymentMethod != null)
+                interactor.fetchWithdrawLockTime(
+                    previousState.selectedPaymentMethod.paymentMethodType
+                )
+                    .subscribeBy(
+                        onSuccess = { process(it) },
+                        onError = { }
+                    )
+            }
+
             is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.fetchPaymentMethods(
                 intent.fiatCurrency,
                 intent.selectedPaymentMethodId
@@ -195,7 +200,7 @@ class SimpleBuyModel(
         process(SimpleBuyIntent.CheckOrderStatus)
     }
 
-    private fun handleCardPayment(order: BuyOrder) {
+    private fun handleCardPayment(order: BuySellOrder) {
         order.attributes?.everypay?.let { attrs ->
             if (attrs.paymentState == EverypayPaymentAttrs.WAITING_3DS &&
                 order.state == OrderState.AWAITING_FUNDS
@@ -212,15 +217,6 @@ class SimpleBuyModel(
             process(SimpleBuyIntent.ErrorIntent()) // todo handle case of partner not supported
         }
     }
-
-    private fun getSelectedCryptoCurrency(
-        pairs: SimpleBuyPairs,
-        fiatCurrency: String,
-        previousState: SimpleBuyState
-    ): CryptoCurrency? =
-        previousState.selectedCryptoCurrency ?: pairs.pairs.firstOrNull {
-            it.fiatCurrency == fiatCurrency
-        }?.cryptoCurrency
 
     override fun onStateUpdate(s: SimpleBuyState) {
         prefs.updateSimpleBuyState(gson.toJson(s))

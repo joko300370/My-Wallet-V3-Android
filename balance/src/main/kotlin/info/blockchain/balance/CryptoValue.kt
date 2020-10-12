@@ -23,7 +23,7 @@ data class CryptoValue(
 
     override fun toNetworkString(): String = format(Locale.US).removeComma()
 
-    override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String) =
+    override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String): FiatValue =
         FiatValue.fromMajor(
             fiatCurrency,
             exchangeRates.getLastPrice(currency, fiatCurrency).toBigDecimal() * toBigDecimal()

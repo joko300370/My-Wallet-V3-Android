@@ -25,12 +25,13 @@ class NotificationsUtil(
         text: String,
         @DrawableRes icon: Int,
         pendingIntent: PendingIntent,
-        id: Int
+        id: Int,
+        channelId: String? = null
     ) {
 
         val builder = NotificationCompat.Builder(
             context,
-            NOTIFICATION_CHANNEL_ID
+            channelId ?: NOTIFICATION_CHANNEL_ID
         ).setSmallIcon(icon)
             .setColor(ContextCompat.getColor(context, R.color.primary_navy_medium))
             .setContentTitle(title)
@@ -47,9 +48,9 @@ class NotificationsUtil(
 
         if (AndroidUtils.is26orHigher()) {
             // TODO: Maybe pass in specific channel names here, such as "payments" and "contacts"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val notificationChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
+                channelId ?: NOTIFICATION_CHANNEL_ID,
                 context.getString(R.string.app_name),
                 importance
             ).apply {

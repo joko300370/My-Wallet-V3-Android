@@ -4,6 +4,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
+import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
@@ -17,9 +18,13 @@ enum class AssetFilter {
 
 enum class AssetAction {
     ViewActivity,
-    Send,
+    NewSend,
+    Withdraw,
     Receive,
-    Swap
+    Swap,
+    Sell,
+    Summary,
+    Deposit
 }
 
 typealias AvailableActions = Set<AssetAction>
@@ -28,11 +33,11 @@ interface Asset {
     fun init(): Completable
     val isEnabled: Boolean
 
-    fun accountGroup(filter: AssetFilter = AssetFilter.All): Single<AccountGroup>
+    fun accountGroup(filter: AssetFilter = AssetFilter.All): Maybe<AccountGroup>
 
-    fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList>
+    fun transactionTargets(account: SingleAccount): Single<SingleAccountList>
 
-    fun parseAddress(address: String): ReceiveAddress?
+    fun parseAddress(address: String): Maybe<ReceiveAddress>
 }
 
 interface CryptoAsset : Asset {

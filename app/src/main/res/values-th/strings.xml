@@ -15,14 +15,14 @@
     <item>คำที่สิบสอง</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ สตริง / xlm_memo_text</item>
-    <item>\@ สตริง / xlm_memo_id</item>
-    <item>\@ สตริง / xlm_memo_hash</item>
-    <item>\@ สตริง / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ สตริง / xlm_memo_text</item>
-    <item>\@ สตริง / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d ที่อยู่ที่นำเข้า</item>
@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">รับ</string>
   <string name="toolbar_cmd_activity">กิจกรรม</string>
   <string name="toolbar_cmd_view_activity">ดูกิจกรรม</string>
-  <string name="toolbar_cmd_swap">แลกเปลี่ยน</string>
+  <string name="common_swap">แลกเปลี่ยน</string>
   <string name="cancel">ยกเลิก</string>
   <string name="btn_ok">ตกลง</string>
-  <string name="yes">ใช่</string>
-  <string name="no">ไม่</string>
+  <string name="common_yes">ใช่</string>
+  <string name="common_no">ไม่</string>
   <string name="polite_no">ไม่เป็นไรขอบคุณ</string>
   <string name="done">เสร็จสิ้น</string>
   <string name="btn_close">ปิด</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">ต่อ</string>
   <string name="btn_forgot_password">ลืมรหัสผ่าน?\"</string>
   <string name="SEND">ส่ง</string>
-  <string name="total">รวม</string>
+  <string name="common_total">รวม</string>
   <string name="max_available">ใช้ยอดดุลที่ใช้จ่ายได้ทั้งหมด:</string>
   <string name="bitpay_remaining_time">เวลาที่เหลือ</string>
   <string name="bitpay_invoice_expired">ใบแจ้งหนี้ BitPay หมดอายุแล้ว</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">รหัสผ่านที่เลือกนั้นอ่อนแอเกินไปที่จะทำให้เงินของคุณปลอดภัย พวกเราอย่างยิ่ง 
  แนะนำให้คุณเลือกอันอื่น คุณต้องการกำหนดรหัสผ่านใหม่หรือไม่ 
 </string>
-  <string name="from">จาก</string>
-  <string name="to">ถึง</string>
+  <string name="common_from">จาก</string>
+  <string name="common_to">ถึง</string>
   <string name="confirm_details">ยืนยันการชำระเงิน</string>
   <string name="fee">ค่าธรรมเนียม</string>
   <string name="exit_confirm">กดปุ่มย้อนกลับอีกครั้งเพื่อออก</string>
@@ -349,17 +349,6 @@
  ที่อยู่ Bitcoin %1$s กรุณาสแกนรหัส QR 
 </string>
   <string name="invalid_private_key">รหัสส่วนตัวไม่ถูกต้อง</string>
-  <string name="watch_only_import_warning">คุณกำลังจะนำเข้าที่อยู่ที่ไม่สามารถใช้จ่ายได้ 
- ที่อยู่ (หรือสคริปต์กุญแจสาธารณะ) 
- เก็บไว้ในกระเป๋าโดยไม่มีรหัสส่วนตัวที่เกี่ยวข้อง นี้ 
- หมายความว่าสามารถใช้เงินได้เฉพาะเมื่อคุณมีรหัสส่วนตัวที่เก็บไว้ที่อื่น ถ้าคุณ 
- ทำ 
- ไม่มีคีย์ส่วนตัวที่เก็บไว้อย่าสั่งให้ใครส่ง bitcoin ให้คุณ 
- ไม่ใช่ spendable 
- ที่อยู่ 
-
- แนะนำให้ใช้ตัวเลือกเหล่านี้สำหรับผู้ใช้ขั้นสูงเท่านั้น ต่อหรือไม่? 
-</string>
   <string name="scan_private_key">สแกนรหัสส่วนตัว</string>
   <string name="private_key_successfully_imported">นำเข้ากุญแจส่วนตัวสำเร็จแล้ว</string>
   <string name="private_key_not_matching_address">หมายเหตุ: รหัสส่วนตัวที่สแกนไม่ได้ 
@@ -638,7 +627,7 @@
  ไอคอนในตัวเรียกใช้งานทำให้การรับ bitcoin เร็วยิ่งขึ้น 
 </string>
   <string name="shortcut_settings_enable">ทางลัดของตัวเรียกใช้</string>
-  <string name="confirm">ยืนยัน</string>
+  <string name="common_confirm">ยืนยัน</string>
   <string name="swipe_receive_hint">ปัดเพื่อรับ</string>
   <string name="swipe_receive_preference_summary">เปิดเผยที่อยู่ที่รับเมื่อคุณปัดไปทางซ้าย 
  หน้าจอ PIN ทำให้การรับเงินเร็วขึ้น 
@@ -826,7 +815,7 @@
  เนื่องจากกิจกรรมการตลาด เมื่อคำสั่งเริ่มต้นเราไม่สามารถหยุดได้ 
 </string>
   <string name="send_to">ส่งถึง</string>
-  <string name="receive">รับ</string>
+  <string name="common_receive">รับ</string>
   <string name="fees">ค่าเล่าเรียน</string>
   <string name="value">ราคา</string>
   <string name="status">สถานะ</string>
@@ -1123,8 +1112,7 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">ยอมรับการ Coinify <a href="ignored"> ข้อกำหนดในการให้บริการ </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>
@@ -1231,7 +1219,7 @@
   <string name="kyc_email_title">ยืนยันอีเมลของคุณ</string>
   <string name="kyc_email_message">เราจำเป็นต้องยืนยันที่อยู่อีเมลของคุณเพื่อเพิ่มระดับความปลอดภัย</string>
   <string name="kyc_email_hint_focused">อีเมลของคุณ</string>
-  <string name="kyc_email_hint_unfocused">\@ สตริง / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">เกิดข้อผิดพลาดในการบันทึกอีเมลโปรดลองอีกครั้ง</string>
   <string name="kyc_email_send_verification">ส่งอีเมล</string>
   <string name="kyc_email_validation_header">ตรวจสอบกล่องจดหมายของคุณ.</string>
@@ -1256,7 +1244,7 @@
   <string name="kyc_onfido_splash_verification_error">เกิดข้อผิดพลาดในการยืนยัน ID โปรดลองอีกครั้ง</string>
   <string name="kyc_veriff_splash_country_supported_header">ประเทศของฉันรองรับหรือไม่</string>
   <string name="kyc_veriff_splash_country_supported_subheader">ไม่รองรับทุกประเทศในขณะนี้ ตรวจสอบ <annotation link="country_list"> รายการประเทศ </annotation> ก่อนดำเนินการต่อ</string>
-  <string name="kyc_veriff_splash_title">\@ สตริง / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ตรวจสอบเงินแล้ว</string>
   <string name="kyc_veriff_splash_header">มายืนยันกันเถอะ</string>
   <string name="kyc_veriff_splash_subtitle">คุณจะต้องมี 1 ประเภท ID ด้านล่างนี้เพื่อดำเนินการต่อ</string>
@@ -1278,11 +1266,11 @@
   <string name="kyc_complete_device_verified">ตรวจสอบอุปกรณ์แล้ว</string>
   <string name="kyc_complete_id_uploaded">อัปโหลด ID</string>
   <string name="kyc_complete_video_uploaded">วิดีโอที่อัปโหลด</string>
-  <string name="kyc_help_dialog_need_some_help">\@ สตริง / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ทีมสนับสนุน Blockchain ของเราได้เขียนคำแนะนำช่วยเหลืออธิบายว่าทำไมเราต้องยืนยันตัวตนของคุณ</string>
   <string name="kyc_help_dialog_read_now">อ่านตอนนี้</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ สตริง / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">การยืนยันตัวตน</string>
   <string name="kyc_settings_status_none">ไม่สอบ</string>
@@ -1294,7 +1282,7 @@
   <string name="kyc_settings_gold_level_in_review">ระดับทอง - อยู่ระหว่างการตรวจสอบ</string>
   <string name="kyc_settings_gold_level_approved">ระดับทอง - ได้รับการอนุมัติ</string>
   <string name="kyc_settings_silver_level_approved">ระดับเงิน - อนุมัติแล้ว</string>
-  <string name="kyc_settings_tier_status_failed">\@ สตริง / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">เกิดข้อผิดพลาดในการดึงสถานะ KYC</string>
   <string name="kyc_status_title_in_progress">กำลังตรวจสอบความคืบหน้า</string>
   <string name="kyc_status_title_approved">บัญชีได้รับการอนุมัติ</string>
@@ -1318,10 +1306,10 @@
   <string name="kyc_drop_off_card_description">เลือกสถานที่ที่คุณค้างไว้และทำการยืนยันตัวตนให้เสร็จสมบูรณ์</string>
   <string name="kyc_drop_off_card_button">ทำการตรวจสอบต่อ</string>
   <string name="kyc_documents_needed">เอกสารที่จำเป็น</string>
-  <string name="kyc_resubmission_card_title">\@ สตริง / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">เรามีปัญหากับเอกสารที่คุณให้มา โปรดลองอัปโหลดเอกสารอีกครั้งเพื่อดำเนินการยืนยันต่อ</string>
   <string name="kyc_resubmission_card_button">อัพโหลดเอกสาร</string>
-  <string name="kyc_resubmission_splash_title">\@ สตริง / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">เราไม่สามารถยืนยันตัวตนของคุณและต้องการให้คุณอัปโหลดเอกสารที่จำเป็นอีกครั้ง</string>
   <string name="kyc_resubmission_splash_description_2">สาเหตุหลักที่ทำให้สิ่งนี้เกิดขึ้น:</string>
   <string name="kyc_resubmission_splash_description_3">ภาพถ่ายที่ต้องการหายไป</string>
@@ -1543,7 +1531,6 @@
   <string name="estimated_amount">Est จำนวน</string>
   <string name="buying_fee">ค่าธรรมเนียมการซื้อ</string>
   <string name="purchase_bank_note">เมื่อเราได้รับเงินของคุณแล้วเราจะเริ่มสั่งซื้อ %1$s หมายเหตุจำนวนเงินสุดท้ายของคุณอาจเปลี่ยนเป็นกิจกรรมการตลาดที่ครบกำหนด อาจมีค่าธรรมเนียม</string>
-  <string name="purchase_card_note">เราจะหักเงินจากวิธีการชำระเงินของคุณใน 2 วันทำการ จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมการตลาด</string>
   <string name="complete_payment">ชำระเงินให้เสร็จสมบูรณ์</string>
   <string name="card_payment">ชำระเงินด้วยบัตร</string>
   <string name="buy_now">ซื้อเลย</string>

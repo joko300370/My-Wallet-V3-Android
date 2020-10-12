@@ -54,7 +54,7 @@ class AccountInfoGroup @JvmOverloads constructor(
 
         wallet_name.text = account.label
 
-        asset_name.text = context.getString(R.string.activity_wallet_total_balance)
+        asset_subtitle.text = context.getString(R.string.activity_wallet_total_balance)
 
         wallet_balance_fiat.invisible()
         wallet_currency.text = currency

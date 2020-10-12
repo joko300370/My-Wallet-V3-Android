@@ -74,7 +74,7 @@ class PinEntryPresenter(
                 fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE) != null)
 
     val isCreatingNewPin: Boolean
-        get() = prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "").isEmpty()
+        get() = prefs.pinId.isEmpty()
 
     private val isChangingPin: Boolean
         get() = isCreatingNewPin && accessState.pin.isNotEmpty()
@@ -198,7 +198,7 @@ class PinEntryPresenter(
     @Thunk
     internal fun validateAndConfirmPin() {
         // Validate
-        if (!prefs.getValue(PersistentPrefs.KEY_PIN_IDENTIFIER, "").isEmpty()) {
+        if (prefs.pinId.isNotEmpty()) {
             view.setTitleVisibility(View.INVISIBLE)
             validatePIN(userEnteredPin)
         } else if (userEnteredConfirmationPin == null) {
@@ -317,7 +317,7 @@ class PinEntryPresenter(
     private fun handlePasswordValidated() {
         showMessageToast(R.string.pin_4_strikes_password_accepted)
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS)
-        prefs.removeValue(PersistentPrefs.KEY_PIN_IDENTIFIER)
+        prefs.pinId = ""
         crashLogger.logEvent("new password. pin reset")
         accessState.clearPin()
         view.restartPageAndClearTop()

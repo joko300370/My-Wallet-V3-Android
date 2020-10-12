@@ -74,7 +74,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             CampaignType.SimpleBuy,
             CampaignType.Blockstack,
             CampaignType.Resubmission,
-            CampaignType.FiatFunds -> R.string.sunriver_splash_title
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         container.visibility = if (showContent) View.VISIBLE else View.GONE
         progressListener.setHostTitle(title)

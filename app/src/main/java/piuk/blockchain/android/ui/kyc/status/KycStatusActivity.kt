@@ -51,7 +51,8 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
             CampaignType.Resubmission,
-            CampaignType.FiatFunds -> R.string.sunriver_splash_title
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 
@@ -95,7 +96,8 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,
             CampaignType.Sunriver,
-            CampaignType.FiatFunds -> R.string.sunriver_status_message
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_status_message
         }
         textViewMessage.setText(message)
     }

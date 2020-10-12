@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -35,7 +36,7 @@ class TetherAvailableAnnouncement(
                 ctaText = R.string.tether_announcement_action,
                 ctaFunction = {
                     host.dismissAnnouncementCard()
-                    host.startSimpleBuy()
+                    host.startSimpleBuy(CryptoCurrency.USDT)
                 },
                 dismissFunction = {
                     host.dismissAnnouncementCard()

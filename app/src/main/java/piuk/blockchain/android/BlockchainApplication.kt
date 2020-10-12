@@ -2,8 +2,11 @@ package piuk.blockchain.android
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.blockchain.koin.KoinStarter
@@ -34,7 +37,6 @@ import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.lifecycle.AppLifecycleListener
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
-import piuk.blockchain.android.util.start
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent
@@ -59,6 +61,7 @@ open class BlockchainApplication : Application(), FrameworkInterface {
     private val appUtils: AppUtil by inject()
     private val osUtil: OSUtil by inject()
     private val crashLogger: CrashLogger by inject()
+    private val coinsWebSocketService: CoinsWebSocketService by inject()
 
     private val lifecycleListener: AppLifecycleListener by lazy {
         AppLifecycleListener(lifeCycleInterestedComponent)
@@ -124,6 +127,9 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         Logging.init(this)
         Logging.logEvent(appLaunchEvent(isGooglePlayServicesAvailable(this)))
 
+        // Register the notification channel if necessary
+        initNotifications()
+
         initRxBus()
     }
 
@@ -147,14 +153,36 @@ open class BlockchainApplication : Application(), FrameworkInterface {
     }
 
     private fun startCoinsWebService() {
-        if (ApplicationLifeCycle.getInstance().isForeground) {
-            CoinsWebSocketService::class.java.start(this, osUtil)
-        }
+        coinsWebSocketService.start()
     }
 
     private fun initLifecycleListener() {
         ProcessLifecycleOwner.get().lifecycle
             .addObserver(lifecycleListener)
+    }
+
+    private fun initNotifications() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            // Create the NotificationChannel
+            val channel2FA = NotificationChannel(
+                "notifications_2fa",
+                getString(R.string.notification_2fa_summary),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply { description = getString(R.string.notification_2fa_description) }
+
+            // We create two channels, since the user may want to opt out of
+            // payments notifications in the settings, and we don't need the
+            // high importance flag on those.
+            val channelPayments = NotificationChannel(
+                "notifications_payments",
+                getString(R.string.notification_payments_summary),
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply { description = getString(R.string.notification_payments_description) }
+            // TODO do we want some custom vibration pattern?
+            notificationManager.createNotificationChannel(channel2FA)
+            notificationManager.createNotificationChannel(channelPayments)
+        }
     }
 
     // FrameworkInterface

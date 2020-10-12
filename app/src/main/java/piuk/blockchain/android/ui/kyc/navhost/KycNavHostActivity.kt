@@ -63,7 +63,8 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
             CampaignType.SimpleBuy,
             CampaignType.Blockstack,
             CampaignType.Resubmission,
-            CampaignType.FiatFunds -> R.string.sunriver_splash_title
+            CampaignType.FiatFunds,
+            CampaignType.Interest -> R.string.sunriver_splash_title
         }
         setupToolbar(toolBar, title)
 

@@ -6,10 +6,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/sb_buy_crypto_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/grey_900"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -18,18 +17,27 @@
             android:id="@+id/coin_selector"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/tiny_margin"
-            android:layout_marginBottom="@dimen/tiny_margin"
-            android:background="@drawable/simple_buy_coin_selector_background">
+            android:layout_margin="@dimen/tiny_margin">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/buy_icon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/buy_currency_background"
+                app:layout_constraintBottom_toBottomOf="@+id/crypto_icon"
+                app:layout_constraintStart_toStartOf="@+id/crypto_icon"
+                app:layout_constraintTop_toTopOf="@+id/crypto_icon"
+                app:srcCompat="@drawable/ic_tx_buy"
+                app:tint="@color/btc" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/crypto_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginEnd="@dimen/huge_margin"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/vector_bitcoin_colored" />
 
@@ -38,11 +46,10 @@
                 style="@style/Text.Semibold.16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginStart="@dimen/standard_margin"
                 android:layout_marginTop="@dimen/tiny_margin"
-                android:textColor="@color/white"
                 app:layout_constraintBottom_toTopOf="@+id/guideline"
-                app:layout_constraintStart_toEndOf="@+id/crypto_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintVertical_bias="1.0"
                 tools:text="Bitcoin" />
 
@@ -55,27 +62,22 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/crypto_exchange_rate"
-                style="@style/Text.Standard.14"
+                style="@style/Text.Light.14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginStart="@dimen/standard_margin"
                 android:layout_marginBottom="@dimen/tiny_margin"
-                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/crypto_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/guideline"
-                tools:text="1 BTC = $6,389.31 USD" />
+                tools:text="$6,389.31 USD" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/arrow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
+            <View
+                style="@style/Separator"
+                android:layout_margin="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_arrow_down"
-                app:tint="@color/white" />
+                app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
@@ -88,7 +90,7 @@
         android:layout_marginEnd="@dimen/small_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintTop_toBottomOf="@+id/sb_buy_crypto_header"
         app:layout_goneMarginEnd="@dimen/small_margin"
         tools:layout_height="20dp" />
 
@@ -96,18 +98,18 @@
         android:id="@+id/payment_method"
         style="@style/Text.Semibold.12"
         android:layout_width="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
         android:text="@string/payment_method"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_amount" />
 
     <View
+        android:id="@+id/payment_method_separator"
         style="@style/Separator"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:id="@+id/payment_method_separator"
         android:layout_marginStart="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="@+id/payment_method"
         app:layout_constraintStart_toEndOf="@+id/payment_method"

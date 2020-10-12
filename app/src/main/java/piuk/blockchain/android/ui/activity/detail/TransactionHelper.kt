@@ -31,7 +31,7 @@ class TransactionHelper(
         val inputXpubList = ArrayList<String>()
 
         // Inputs / From field
-        if (tx.direction == TransactionSummary.Direction.RECEIVED && tx.inputsMap.isNotEmpty()) {
+        if (tx.transactionType == TransactionSummary.TransactionType.RECEIVED && tx.inputsMap.isNotEmpty()) {
             // Only 1 addr for receive
             val treeMap = TreeMap(tx.inputsMap)
             inputMap[treeMap.lastKey()] = treeMap.lastEntry().value
@@ -70,8 +70,7 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                payloadDataManager.wallet!!.legacyAddressStringList.contains(outputAddress) ||
-                payloadDataManager.wallet!!.watchOnlyAddressStringList.contains(outputAddress)
+                payloadDataManager.wallet!!.legacyAddressStringList.contains(outputAddress)
             ) { // If output address belongs to a legacy address we own - we have to check if it's change
                 // If it goes back to same address AND if it's not the total amount sent
                 // (inputs x and y could send to output y in which case y is not receiving change,
@@ -87,7 +86,7 @@ class TransactionHelper(
                 }
                 outputMap[outputAddress] = outputValue
             } else {
-                if (tx.direction != TransactionSummary.Direction.RECEIVED) {
+                if (tx.transactionType != TransactionSummary.TransactionType.RECEIVED) {
                     outputMap[outputAddress] = outputValue
                 }
             }
@@ -102,7 +101,7 @@ class TransactionHelper(
         val outputMap = HashMap<String, Money>()
         val inputXpubList = ArrayList<String>()
         // Inputs / From field
-        if (tx.direction == TransactionSummary.Direction.RECEIVED && tx.inputsMap.isNotEmpty()) {
+        if (tx.transactionType == TransactionSummary.TransactionType.RECEIVED && tx.inputsMap.isNotEmpty()) {
             for ((address, value) in tx.inputsMap) {
                 if (value.toBigInteger() == Payment.DUST)
                     continue
@@ -149,8 +148,7 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                bchDataManager.getLegacyAddressStringList().contains(outputAddress) ||
-                bchDataManager.getWatchOnlyAddressStringList().contains(outputAddress)
+                bchDataManager.getLegacyAddressStringList().contains(outputAddress)
             ) { // If output address belongs to a legacy address we own - we have to check if it's
                 // change
                 // If it goes back to same address AND if it's not the total amount sent
@@ -167,7 +165,7 @@ class TransactionHelper(
                 }
                 outputMap[outputAddress] = outputValue
             } else {
-                if (tx.direction != TransactionSummary.Direction.RECEIVED) {
+                if (tx.transactionType != TransactionSummary.TransactionType.RECEIVED) {
                     outputMap[outputAddress] = outputValue
                 }
             }

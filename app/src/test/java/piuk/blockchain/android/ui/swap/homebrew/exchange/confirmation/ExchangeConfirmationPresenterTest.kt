@@ -15,10 +15,10 @@ import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
-import com.blockchain.transactions.Memo
-import com.blockchain.transactions.SendDetails
-import com.blockchain.transactions.SendException
-import com.blockchain.transactions.SendFundsResult
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.SendException
+import com.blockchain.sunriver.SendFundsResult
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock

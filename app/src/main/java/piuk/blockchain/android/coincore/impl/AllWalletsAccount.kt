@@ -20,8 +20,11 @@ class AllWalletsAccount(
 
     override val label: String = labels.getAllWalletLabel()
 
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Wallets meta account"))
+
+    override val pendingBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified pending balance for All Wallets meta account"))
 
     override val activity: Single<ActivitySummaryList>
         get() = allActivities()

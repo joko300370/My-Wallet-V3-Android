@@ -15,14 +15,14 @@
     <item>al douăsprezecelea cuvânt</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
-    <item>\@ String / xlm_memo_hash</item>
-    <item>\@ String / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ String / xlm_memo_text</item>
-    <item>\@ String / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 adresă importată</item>
@@ -47,11 +47,11 @@
   <string name="toolbar_cmd_receive_crypto">A primi</string>
   <string name="toolbar_cmd_activity">Activitate</string>
   <string name="toolbar_cmd_view_activity">Vizualizare activitate</string>
-  <string name="toolbar_cmd_swap">schimb</string>
+  <string name="common_swap">schimb</string>
   <string name="cancel">Anulare</string>
   <string name="btn_ok">O.K</string>
-  <string name="yes">da</string>
-  <string name="no">Nu</string>
+  <string name="common_yes">da</string>
+  <string name="common_no">Nu</string>
   <string name="polite_no">Nu multumesc</string>
   <string name="done">Terminat</string>
   <string name="btn_close">Închide</string>
@@ -163,7 +163,7 @@
   <string name="btn_continue">Continua</string>
   <string name="btn_forgot_password">Ați uitat parola?\"</string>
   <string name="SEND">Trimite</string>
-  <string name="total">Total</string>
+  <string name="common_total">Total</string>
   <string name="max_available">Folosiți soldul total cheltuibil:</string>
   <string name="bitpay_remaining_time">Timp rămas</string>
   <string name="bitpay_invoice_expired">Factura BitPay a expirat</string>
@@ -189,8 +189,8 @@
   <string name="weak_password">Parola selectată este prea slabă pentru a vă asigura fondurile. Noi puternic 
  sugerează să selectezi una diferită. Doriți să definiți o nouă parolă? 
 </string>
-  <string name="from">Din</string>
-  <string name="to">La</string>
+  <string name="common_from">Din</string>
+  <string name="common_to">La</string>
   <string name="confirm_details">Confirma plata</string>
   <string name="fee">taxă</string>
   <string name="exit_confirm">Apăsați din nou butonul pentru a ieși</string>
@@ -351,17 +351,6 @@
  Adresa Bitcoin %1$s . Vă rugăm să scanați codul QR. 
 </string>
   <string name="invalid_private_key">Cheie privată nevalidă</string>
-  <string name="watch_only_import_warning">Ești pe cale să importezi o adresă care nu poate fi cheltuită, an 
- adresa (sau script-ul cu cheie publică) 
- stocate în portofel fără cheia privată corespunzătoare. Acest 
- înseamnă că fondurile pot fi cheltuite DOAR dacă aveți cheia privată stocată în altă parte. daca tu 
- do 
- nu aveți cheia privată stocată, NU instruiți pe nimeni să vă trimită bitcoin la 
- non-spendable 
- abordare. 
-
- Aceste opțiuni sunt recomandate numai pentru utilizatorii avansați. Continua? 
-</string>
   <string name="scan_private_key">Scanează cheia privată</string>
   <string name="private_key_successfully_imported">Cheia privată a fost importată cu succes.</string>
   <string name="private_key_not_matching_address">NOTĂ: Cheia privată scanată nu 
@@ -640,7 +629,7 @@
  pictogramă în lansator, făcând primirea bitcoin și mai rapid. 
 </string>
   <string name="shortcut_settings_enable">Comenzi rapide de lansare</string>
-  <string name="confirm">A confirma</string>
+  <string name="common_confirm">A confirma</string>
   <string name="swipe_receive_hint">Glisați pentru a primi</string>
   <string name="swipe_receive_preference_summary">Dezvăluiți o adresă de primire când glisați spre stânga 
  ecranul PIN, făcând primirea de fonduri și mai rapidă. 
@@ -828,7 +817,7 @@
  datorită activității pieței. Odată ce începe o comandă, nu putem să o oprim 
 </string>
   <string name="send_to">Trimite catre</string>
-  <string name="receive">A primi</string>
+  <string name="common_receive">A primi</string>
   <string name="fees">Taxe</string>
   <string name="value">Valoare</string>
   <string name="status">stare</string>
@@ -1125,8 +1114,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Am trimis un link de verificare la</string>
   <string name="buy_sell_unverified_email_verify_message2">Faceți clic pe el și reveniți aici pentru a continua cu tranzacția.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Deschideți e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Sunt de acord să coinificați <a href="ignored"> termeni și condiții </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Verificat prin e-mail!</string>
   <string name="buy_sell_verified_email_message">Partenerul nostru %1$s va procesa tranzacția bitcoin. Făcând clic pe De acord și pe „Continuare” veți crea un cont cu %1$s .</string>
   <string name="buy_sell_identification_verification">Identificați verificarea</string>
@@ -1233,7 +1221,7 @@
   <string name="kyc_email_title">Verifica-ți email-ul</string>
   <string name="kyc_email_message">Trebuie să verificăm adresa de e-mail ca un nivel suplimentar de securitate.</string>
   <string name="kyc_email_hint_focused">Email-ul tau</string>
-  <string name="kyc_email_hint_unfocused">\@ String / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Eroare la salvarea e-mailului, încercați din nou</string>
   <string name="kyc_email_send_verification">Trimite email</string>
   <string name="kyc_email_validation_header">Verifica-ti casuta.</string>
@@ -1245,7 +1233,7 @@
   <string name="kyc_phone_number_message">Acest lucru ne va ajuta să vă verificăm identitatea astăzi și, de asemenea, să vă păstrăm contul în siguranță în viitor. Pentru aceasta, un SMS va fi trimis către telefonul dvs. cu un cod de verificare.</string>
   <string name="kyc_phone_number_hint_focused">Numărul tău de telefon</string>
   <string name="kyc_phone_number_hint_unfocused">+1 2345 678 910</string>
-  <string name="kyc_phone_send_again"><![CDATA[<annotation link=\"resend_code\"> Cod de <annotation link=\"resend_code\"> </annotation>]]></string>
+  <string name="kyc_phone_send_again"><annotation link="resend_code"> Cod de </annotation></string>
   <string name="kyc_phone_number_error_saving_number">Eroare la salvarea numărului mobil, încercați din nou</string>
   <string name="kyc_phone_number_code_was_resent">Codul a fost resentit</string>
   <string name="kyc_phone_number_validation_header">Introduceți codul trimis la</string>
@@ -1256,7 +1244,7 @@
   <string name="kyc_onfido_splash_verification_error">Eroare la verificarea ID-ului, încercați din nou</string>
   <string name="kyc_veriff_splash_country_supported_header">Este țara mea susținută?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Nu toate țările sunt sprijinite în acest moment. Verificați lista noastră actualizată <annotation link="country_list"> țări </annotation> înainte de a continua.</string>
-  <string name="kyc_veriff_splash_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFICAT</string>
   <string name="kyc_veriff_splash_header">Să confirmăm că ești tu</string>
   <string name="kyc_veriff_splash_subtitle">Pentru a continua, veți avea nevoie de 1 dintre tipurile de identificare</string>
@@ -1278,11 +1266,11 @@
   <string name="kyc_complete_device_verified">Verificat dispozitiv</string>
   <string name="kyc_complete_id_uploaded">ID încărcat</string>
   <string name="kyc_complete_video_uploaded">Videoclipul încărcat</string>
-  <string name="kyc_help_dialog_need_some_help">\@ String / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Echipa noastră de asistență Blockchain a scris Ghiduri de ajutor care explică de ce trebuie să vă verificăm identitatea.</string>
   <string name="kyc_help_dialog_read_now">Citeste acum</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ String / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Verificarea identității</string>
   <string name="kyc_settings_status_none">neverificat</string>
@@ -1294,7 +1282,7 @@
   <string name="kyc_settings_gold_level_in_review">Nivelul de aur - în revizuire</string>
   <string name="kyc_settings_gold_level_approved">Nivel de aur - aprobat</string>
   <string name="kyc_settings_silver_level_approved">Nivel de argint - aprobat</string>
-  <string name="kyc_settings_tier_status_failed">\@ String / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Eroare la preluarea stării KYC</string>
   <string name="kyc_status_title_in_progress">Verificare în curs</string>
   <string name="kyc_status_title_approved">Cont aprobat</string>
@@ -1318,10 +1306,10 @@
   <string name="kyc_drop_off_card_description">Alege locul unde ai plecat și completează verificarea identității.</string>
   <string name="kyc_drop_off_card_button">Continuați verificarea</string>
   <string name="kyc_documents_needed">Documente necesare</string>
-  <string name="kyc_resubmission_card_title">\@ String / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Am avut câteva probleme cu documentele furnizate. Încercați să încărcați din nou documentele pentru a continua verificarea.</string>
   <string name="kyc_resubmission_card_button">Încărcați documente</string>
-  <string name="kyc_resubmission_splash_title">\@ String / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nu putem să vă verificăm identitatea și avem nevoie să vă încărcați documentele necesare.</string>
   <string name="kyc_resubmission_splash_description_2">Motivele principale pentru ca acest lucru să se întâmple:</string>
   <string name="kyc_resubmission_splash_description_3">Fotografiile solicitate lipsesc.</string>
@@ -1541,7 +1529,6 @@
   <string name="estimated_amount">Est. Cantitate</string>
   <string name="buying_fee">Taxa de cumpărare</string>
   <string name="purchase_bank_note">După ce primim fondurile dvs., vom începe comanda dvs. de cumpărare de %1$s . Rețineți, valoarea dvs. finală s-ar putea modifica în funcție de activitatea pieței scadente. Se pot aplica comisioane.</string>
-  <string name="purchase_card_note">Vom debita metoda de plată în 2 zile lucrătoare. Suma dvs. finală s-ar putea modifica din cauza activității pieței.</string>
   <string name="complete_payment">Plata completă</string>
   <string name="card_payment">Plata cu cardul</string>
   <string name="buy_now">Cumpără acum</string>

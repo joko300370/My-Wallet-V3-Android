@@ -1,9 +1,10 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.logging.CrashLogger
-
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -13,27 +14,34 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetFilter
-import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import timber.log.Timber
 import java.math.BigDecimal
 
 internal abstract class CryptoAssetBase(
+    protected val payloadManager: PayloadDataManager,
     protected val exchangeRates: ExchangeRateDataManager,
     private val historicRates: ChartsDataManager,
     protected val currencyPrefs: CurrencyPrefs,
     protected val labels: DefaultLabels,
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
-    protected val crashLogger: CrashLogger
+    protected val crashLogger: CrashLogger,
+    private val tiersService: TierService,
+    protected val environmentConfig: EnvironmentConfig
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -74,31 +82,47 @@ internal abstract class CryptoAssetBase(
     abstract fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>
 
     private fun loadInterestAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.fromCallable {
-            listOf(
-                CryptoInterestAccount(
-                    asset,
-                    labels.getDefaultInterestWalletLabel(asset),
-                    custodialManager,
-                    exchangeRates
-                )
+        Single.just(
+            CryptoInterestAccount(
+                asset,
+                labels.getDefaultInterestWalletLabel(asset),
+                custodialManager,
+                exchangeRates,
+                environmentConfig
             )
+        ).flatMap { account ->
+            account.isInterestEnabled().map {
+                if (account.isConfigured) {
+                    listOf(account)
+                } else {
+                    emptyList()
+                }
+            }
         }
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
 
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            listOf(CustodialTradingAccount(
-                asset,
-                labels.getDefaultCustodialWalletLabel(asset),
-                exchangeRates,
-                custodialManager
-            ))
-        )
+            CustodialTradingAccount(
+                asset = asset,
+                label = labels.getDefaultCustodialWalletLabel(asset),
+                exchangeRates = exchangeRates,
+                custodialWalletManager = custodialManager,
+                environmentConfig = environmentConfig
+            )
+        ).flatMap { account ->
+            account.accountBalance.map {
+                if (account.isConfigured) {
+                    listOf(account)
+                } else {
+                    emptyList()
+                }
+            }
+        }
 
-    final override fun accountGroup(filter: AssetFilter): Single<AccountGroup> =
-        Single.fromCallable {
+    final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
+        Maybe.fromCallable {
             filterTokenAccounts(asset, labels, accounts, filter)
         }
 
@@ -109,9 +133,8 @@ internal abstract class CryptoAssetBase(
 
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
-            .doOnSuccess { Timber.d("@@@@ got unfiltered list: $it") }
             .map { group -> group.accounts.mapNotNull { it as? SingleAccount } }
-            .doOnSuccess { Timber.d("@@@@ got list: $it") }
+            .toSingle(emptyList())
 
     final override fun exchangeRate(): Single<ExchangeRate> =
         exchangeRates.fetchExchangeRate(asset, currencyPrefs.selectedFiatCurrency)
@@ -136,28 +159,56 @@ internal abstract class CryptoAssetBase(
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
 
-    protected fun getPitLinkingAccount(): Maybe<SingleAccount> =
+    private fun getPitLinkingAccount(): Maybe<SingleAccount> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
             .map { address ->
                 CryptoExchangeAccount(
-                    cryptoCurrency = asset,
+                    asset = asset,
                     label = labels.getDefaultExchangeWalletLabel(asset),
                     address = address,
-                    exchangeRates = exchangeRates
+                    exchangeRates = exchangeRates,
+                    environmentConfig = environmentConfig
                 )
             }
 
-    final override fun canTransferTo(account: BlockchainAccount): Single<SingleAccountList> =
-        when (account) {
-            is CustodialTradingAccount -> getNonCustodialAccountList()
-            is CryptoInterestAccount -> Single.just(emptyList())
-            is CryptoExchangeAccount -> Single.just(emptyList())
-            is CryptoNonCustodialAccount -> getPitLinkingAccount()
-                    .map { listOf(it) }
-                    .toSingle(emptyList())
+    private fun getInterestAccount(): Maybe<SingleAccount> =
+        tiersService.tiers().flatMapMaybe { tier ->
+            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
+                val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
+                if (interestAccounts.isNotEmpty()) {
+                    Maybe.just(interestAccounts.first())
+                } else {
+                    Maybe.empty()
+                }
+            } else {
+                Maybe.empty()
+            }
+        }
+
+    private fun getCustodialAccount(): Maybe<SingleAccount> =
+        accountGroup(AssetFilter.Custodial)
+            .map { it.accounts.first() }
+            .onErrorComplete()
+
+    final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
+        require(account is CryptoAccount)
+        require(account.asset == asset)
+
+        return when (account) {
+            is TradingAccount -> getNonCustodialAccountList()
+            is NonCustodialAccount ->
+                Maybe.concat(
+                    listOf(
+                        getPitLinkingAccount(),
+                        getInterestAccount(),
+                        getCustodialAccount()
+                    )
+                ).toList()
+                    .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())
         }
+    }
 }
 
 fun ExchangeRateDataManager.fetchExchangeRate(

@@ -35,10 +35,12 @@ interface AnnouncementHost {
     fun startStxReceivedDetail()
     fun startSimpleBuyPaymentDetail()
     fun finishSimpleBuySignup()
-    fun startSimpleBuy()
+    fun startSimpleBuy(cryptoCurrency: CryptoCurrency = CryptoCurrency.BTC)
+    fun startInterestDashboard()
 
     fun showFiatFundsKyc()
     fun showBankLinking()
+    fun openBrowserLink(url: String)
 }
 
 abstract class AnnouncementRule(private val dismissRecorder: DismissRecorder) {

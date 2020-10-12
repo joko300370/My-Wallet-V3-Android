@@ -12,6 +12,7 @@ import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payload.data.Wallet
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
+import info.blockchain.wallet.stx.STXAccount
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -66,9 +67,6 @@ class PayloadDataManager(
     val legacyAddressStringList: List<String>
         get() = wallet?.legacyAddressStringList ?: emptyList()
 
-    val watchOnlyAddressStringList: List<String>
-        get() = wallet?.watchOnlyAddressStringList ?: emptyList()
-
     val wallet: Wallet?
         get() = payloadManager.payload
 
@@ -92,6 +90,15 @@ class PayloadDataManager(
 
     val isDoubleEncrypted: Boolean
         get() = wallet!!.isDoubleEncryption
+
+    val stxAccount: STXAccount
+        get() {
+            val hdWallets = payloadManager.payload?.hdWallets
+                ?: throw IllegalStateException("Wallet not available")
+
+            return hdWallets[0].stxAccount
+                ?: throw IllegalStateException("Wallet not available")
+        }
 
     val isBackedUp: Boolean
         get() = (

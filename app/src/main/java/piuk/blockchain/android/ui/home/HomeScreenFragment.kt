@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
@@ -19,9 +18,6 @@ interface HomeScreenFragment {
 }
 
 interface HomeNavigator {
-    fun showNavigation()
-    fun hideNavigation()
-
     fun gotoDashboard()
 
     fun launchSwapOrKyc(targetCurrency: CryptoCurrency? = null, fromCryptoCurrency: CryptoCurrency? = null)
@@ -35,9 +31,6 @@ interface HomeNavigator {
     fun launchKycIntro()
     fun launchThePitLinking(linkId: String = "")
     fun launchThePit()
-    fun launchSimpleBuy()
-    fun showProgress()
-    fun hideProgress()
     fun launchBackupFunds(fragment: Fragment? = null, requestCode: Int = 0)
     fun launchSetup2Fa()
     fun launchVerifyEmail()
@@ -45,14 +38,13 @@ interface HomeNavigator {
     fun launchTransfer()
     fun launchIntroTour()
 
-    @Deprecated(message = "Switch to accounts")
-    fun gotoSendFor(cryptoCurrency: CryptoCurrency)
-    fun gotoSendFor(account: SingleAccount)
-    fun gotoReceiveFor(account: SingleAccount)
     fun gotoActivityFor(account: BlockchainAccount?)
+    fun goToWithdraw(currency: String)
+    fun goToTransfer()
 
     fun resumeSimpleBuyKyc()
-    fun startSimpleBuy()
+    fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
+    fun startInterestDashboard()
 }
 
 abstract class HomeScreenMvpFragment<V : MvpView, P : MvpPresenter<V>> : MvpFragment<V, P>(), HomeScreenFragment {

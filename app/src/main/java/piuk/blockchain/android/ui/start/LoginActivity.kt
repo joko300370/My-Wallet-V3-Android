@@ -1,24 +1,19 @@
 package piuk.blockchain.android.ui.start
 
-import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import timber.log.Timber
 
 class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
@@ -34,7 +29,7 @@ class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
         step_one.text = getString(R.string.pair_wallet_step_1, WEB_WALLET_URL_PROD)
 
         btn_manual_pair.setOnClickListener { onClickManualPair() }
-        btn_scan_qr.setOnClickListener { requestCameraPermissionIfNeeded() }
+        btn_scan_qr.setOnClickListener { requestScan() }
     }
 
     override fun showToast(message: Int, toastType: String) = toast(message, toastType)
@@ -56,24 +51,11 @@ class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     override fun onSupportNavigateUp() = consume { onBackPressed() }
 
-    private fun requestCameraPermissionIfNeeded() {
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(main_layout, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { requestCameraPermissionIfNeeded() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            startScanActivity()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
+    private fun requestScan() {
+        QrScanHandler.requestScanPermissions(
+            activity = this,
+            rootView = main_layout
+        ) { startScanActivity() }
     }
 
     private fun onClickManualPair() {

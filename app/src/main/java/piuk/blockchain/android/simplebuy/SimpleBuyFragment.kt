@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.base.FlowFragment
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
@@ -9,11 +10,10 @@ interface SimpleBuyScreen : SlidingModalBottomDialog.Host, FlowFragment {
     override fun onSheetClosed() {}
 }
 
-interface SimpleBuyNavigator {
+interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
     fun exitSimpleBuyFlow()
-    fun goToBuyCryptoScreen(addToBackStack: Boolean = true)
+    fun goToBuyCryptoScreen(addToBackStack: Boolean = true, preselectedCrypto: CryptoCurrency)
     fun goToCheckOutScreen(addToBackStack: Boolean = true)
-    fun goToCurrencySelection(addToBackStack: Boolean = true)
     fun goToKycVerificationScreen(addToBackStack: Boolean = true)
     fun goToBankDetailsScreen(addToBackStack: Boolean = true)
     fun goToPendingOrderScreen()

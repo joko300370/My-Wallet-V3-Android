@@ -31,6 +31,7 @@ enum class AnalyticsEvents(
     KycBlockstackStart("kyc_blockstack_start"),
     KycSimpleBuyStart("kyc_simple_buy_start"),
     KycFiatFundsStart("kyc_fiat_funds_start"),
+    KycInterestStart("kyc_interest_start"),
     KycMoreInfo("kyc_more_info"),
     KycTiers("kyc_tiers"),
     Lockbox("lockbox"),
@@ -69,7 +70,8 @@ enum class AnalyticsEvents(
     WalletSignupCreated("wallet_signup_wallet_created"),
     WalletSignupPINFirst("wallet_signup_pin_first"),
     WalletSignupPINSecond("wallet_signup_pin_second"),
-    WalletSignupFirstLogIn("wallet_signup_login")
+    WalletSignupFirstLogIn("wallet_signup_login"),
+    SellTabInfo("sell_send_now_clicked")
 }
 
 fun kycTierStart(tier: Int): AnalyticsEvent = object : AnalyticsEvent {

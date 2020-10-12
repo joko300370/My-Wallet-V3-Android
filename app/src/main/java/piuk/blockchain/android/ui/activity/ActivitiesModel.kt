@@ -18,6 +18,13 @@ enum class ActivitiesSheet {
     BANK_ORDER_CANCEL
 }
 
+enum class CryptoAccountType {
+    NON_CUSTODIAL,
+    CUSTODIAL_TRADING,
+    CUSTODIAL_INTEREST,
+    UNKNOWN
+}
+
 data class ActivitiesState(
     val account: BlockchainAccount? = null,
     val activityList: ActivitySummaryList = emptyList(),
@@ -27,7 +34,7 @@ data class ActivitiesState(
     val selectedTxId: String = "",
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val selectedFiatCurrency: String? = null,
-    val isCustodial: Boolean = false
+    val accountType: CryptoAccountType = CryptoAccountType.UNKNOWN
 ) : MviState
 
 class ActivitiesModel(

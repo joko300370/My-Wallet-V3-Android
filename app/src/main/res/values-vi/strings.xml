@@ -15,14 +15,14 @@
     <item>từ thứ mười hai</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ chuỗi / xlm_memo bản</item>
-    <item>\@ chuỗi / xlm_memo_id</item>
-    <item>\@ chuỗi / xlm_memo_hash</item>
-    <item>\@ chuỗi / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ chuỗi / xlm_memo bản</item>
-    <item>\@ chuỗi / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d địa chỉ đã nhập</item>
@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">Nhận được</string>
   <string name="toolbar_cmd_activity">Hoạt động</string>
   <string name="toolbar_cmd_view_activity">Xem hoạt động</string>
-  <string name="toolbar_cmd_swap">Trao đổi</string>
+  <string name="common_swap">Trao đổi</string>
   <string name="cancel">Hủy bỏ</string>
   <string name="btn_ok">đồng ý</string>
-  <string name="yes">Đúng</string>
-  <string name="no">Không</string>
+  <string name="common_yes">Đúng</string>
+  <string name="common_no">Không</string>
   <string name="polite_no">Không, cám ơn</string>
   <string name="done">Làm xong</string>
   <string name="btn_close">Đóng</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">Tiếp tục</string>
   <string name="btn_forgot_password">Quên mật khẩu?\"</string>
   <string name="SEND">Gửi</string>
-  <string name="total">Toàn bộ</string>
+  <string name="common_total">Toàn bộ</string>
   <string name="max_available">Sử dụng tổng số dư chi tiêu:</string>
   <string name="bitpay_remaining_time">Thời gian còn lại</string>
   <string name="bitpay_invoice_expired">Hóa đơn BitPay đã hết hạn</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">Mật khẩu được chọn quá yếu để đảm bảo tiền của bạn. Chúng tôi mạnh mẽ 
  đề nghị bạn chọn một cái khác Bạn có muốn xác định một mật khẩu mới? 
 </string>
-  <string name="from">Từ</string>
-  <string name="to">Đến</string>
+  <string name="common_from">Từ</string>
+  <string name="common_to">Đến</string>
   <string name="confirm_details">Xác nhận thanh toán</string>
   <string name="fee">Học phí</string>
   <string name="exit_confirm">Nhấn nút quay lại lần nữa để thoát</string>
@@ -349,17 +349,6 @@
  Địa chỉ bitcoin %1$s . Vui lòng quét mã QR. 
 </string>
   <string name="invalid_private_key">Khóa riêng không hợp lệ</string>
-  <string name="watch_only_import_warning">Bạn sắp nhập một địa chỉ không thể chi tiêu, một 
- địa chỉ (hoặc tập lệnh khóa công khai) 
- được lưu trữ trong ví mà không có khóa riêng tương ứng. Điều này 
- có nghĩa là tiền có thể được chi tiêu CHỈ nếu bạn có khóa riêng được lưu trữ ở nơi khác. nếu bạn 
- làm 
- không có khóa riêng được lưu trữ, KHÔNG hướng dẫn bất cứ ai gửi bitcoin cho bạn 
- không chi tiêu 
- Địa chỉ. 
-
- Các tùy chọn này chỉ được khuyến nghị cho người dùng nâng cao. Tiếp tục? 
-</string>
   <string name="scan_private_key">Quét khóa riêng</string>
   <string name="private_key_successfully_imported">Khóa riêng được nhập thành công.</string>
   <string name="private_key_not_matching_address">LƯU Ý: Khóa riêng được quét không 
@@ -638,7 +627,7 @@
  biểu tượng trong trình khởi chạy, giúp nhận bitcoin nhanh hơn. 
 </string>
   <string name="shortcut_settings_enable">Phím tắt Launcher</string>
-  <string name="confirm">Xác nhận</string>
+  <string name="common_confirm">Xác nhận</string>
   <string name="swipe_receive_hint">Vuốt để nhận</string>
   <string name="swipe_receive_preference_summary">Hiển thị địa chỉ nhận khi bạn vuốt sang trái 
  màn hình PIN, giúp nhận tiền nhanh hơn. 
@@ -826,7 +815,7 @@
  do hoạt động thị trường. Khi một đơn đặt hàng bắt đầu, chúng tôi không thể dừng nó 
 </string>
   <string name="send_to">Gửi đến</string>
-  <string name="receive">Nhận được</string>
+  <string name="common_receive">Nhận được</string>
   <string name="fees">Lệ phí</string>
   <string name="value">Giá trị</string>
   <string name="status">Trạng thái</string>
@@ -1123,8 +1112,7 @@
   <string name="buy_sell_unverified_email_verify_message1">Chúng tôi đã gửi một liên kết xác minh đến</string>
   <string name="buy_sell_unverified_email_verify_message2">Nhấn vào đó và trở lại đây để tiếp tục với giao dịch của bạn.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Mở email</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Đồng ý với Coinify <a href="ignored"> điều khoản và điều kiện </a></string>
-  <string name="coinify">Coinify</string>
+
   <string name="buy_sell_verified_email_title">Email đã kích hoạt!</string>
   <string name="buy_sell_verified_email_message">Đối tác của chúng tôi %1$s sẽ xử lý giao dịch bitcoin của bạn. Bằng cách nhấp vào Đồng ý và \'Tiếp tục\', bạn sẽ tạo một tài khoản với %1$s .</string>
   <string name="buy_sell_identification_verification">Xác định xác minh</string>
@@ -1231,7 +1219,7 @@
   <string name="kyc_email_title">Xác nhận email của bạn</string>
   <string name="kyc_email_message">Chúng tôi cần xác minh địa chỉ email của bạn dưới dạng một lớp bảo mật được thêm vào.</string>
   <string name="kyc_email_hint_focused">Email của bạn</string>
-  <string name="kyc_email_hint_unfocused">\@ chuỗi / kyc_email_hint_f Focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Lỗi lưu email, vui lòng thử lại</string>
   <string name="kyc_email_send_verification">Gửi email</string>
   <string name="kyc_email_validation_header">Kiểm tra hộp thư của bạn.</string>
@@ -1256,7 +1244,7 @@
   <string name="kyc_onfido_splash_verification_error">Lỗi khi xác minh ID, vui lòng thử lại</string>
   <string name="kyc_veriff_splash_country_supported_header">Đất nước tôi có được hỗ trợ không?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Không phải tất cả các quốc gia được hỗ trợ tại thời điểm này. Kiểm tra của chúng tôi được cập nhật <annotation link="country_list"> danh sách các nước </annotation> trước khi tiếp tục.</string>
-  <string name="kyc_veriff_splash_title">\@ chuỗi / kyc_document_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">BẠC XÁC MINH</string>
   <string name="kyc_veriff_splash_header">Hãy xác nhận đó là bạn</string>
   <string name="kyc_veriff_splash_subtitle">Bạn sẽ cần 1 trong số các loại ID dưới đây để tiếp tục.</string>
@@ -1278,11 +1266,11 @@
   <string name="kyc_complete_device_verified">Đã xác minh thiết bị</string>
   <string name="kyc_complete_id_uploaded">Đã tải lên ID</string>
   <string name="kyc_complete_video_uploaded">Video được tải lên</string>
-  <string name="kyc_help_dialog_need_some_help">\@ chuỗi / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Nhóm hỗ trợ Blockchain của chúng tôi đã viết Hướng dẫn trợ giúp giải thích lý do tại sao chúng tôi cần xác minh danh tính của bạn.</string>
   <string name="kyc_help_dialog_read_now">Đọc ngay</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/c chuyên mục000001135512-Ententity -Verifying</string>
-  <string name="kyc_help_dialog_contact_support">\@ chuỗi / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Xác minh danh tính</string>
   <string name="kyc_settings_status_none">Chưa được xác minh</string>
@@ -1294,7 +1282,7 @@
   <string name="kyc_settings_gold_level_in_review">Cấp vàng - Đang xem xét</string>
   <string name="kyc_settings_gold_level_approved">Cấp vàng - Đã được phê duyệt</string>
   <string name="kyc_settings_silver_level_approved">Cấp bạc - Đã được phê duyệt</string>
-  <string name="kyc_settings_tier_status_failed">\@ chuỗi / kyc_sinstall_status_Vjection</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Lỗi khi tìm nạp trạng thái KYC</string>
   <string name="kyc_status_title_in_progress">Đang xác minh</string>
   <string name="kyc_status_title_approved">Tài khoản được phê duyệt</string>
@@ -1318,10 +1306,10 @@
   <string name="kyc_drop_off_card_description">Chọn nơi bạn rời đi và hoàn thành xác minh danh tính của bạn.</string>
   <string name="kyc_drop_off_card_button">Tiếp tục xác minh</string>
   <string name="kyc_documents_needed">Tài liệu cần thiết</string>
-  <string name="kyc_resubmission_card_title">\@ chuỗi / kyc_document_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Chúng tôi đã có một số vấn đề với các tài liệu bạn đã cung cấp. Vui lòng thử tải lên các tài liệu một lần nữa để tiếp tục xác minh của bạn.</string>
   <string name="kyc_resubmission_card_button">Tải lên Tài liệu</string>
-  <string name="kyc_resubmission_splash_title">\@ chuỗi / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Chúng tôi không thể xác minh danh tính của bạn và cần bạn tải lên lại các tài liệu cần thiết.</string>
   <string name="kyc_resubmission_splash_description_2">Lý do chính cho điều này xảy ra:</string>
   <string name="kyc_resubmission_splash_description_3">Những bức ảnh yêu cầu bị thiếu.</string>
@@ -1543,7 +1531,6 @@
   <string name="estimated_amount">Est. Số tiền</string>
   <string name="buying_fee">Phí mua</string>
   <string name="purchase_bank_note">Khi chúng tôi nhận được tiền của bạn, chúng tôi sẽ bắt đầu đơn đặt hàng mua %1$s . Lưu ý, số tiền cuối cùng của bạn có thể thay đổi thành hoạt động thị trường do. Lệ phí có thể áp dụng.</string>
-  <string name="purchase_card_note">Chúng tôi sẽ ghi nợ phương thức thanh toán của bạn trong 2 ngày làm việc. Số tiền cuối cùng của bạn có thể thay đổi do hoạt động thị trường.</string>
   <string name="complete_payment">Hoàn thành thanh toán</string>
   <string name="card_payment">Thanh toán thẻ</string>
   <string name="buy_now">Mua ngay</string>

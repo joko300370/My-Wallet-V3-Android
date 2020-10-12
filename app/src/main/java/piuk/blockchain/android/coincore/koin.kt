@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -30,26 +31,33 @@ val coincoreModule = module {
                 custodialManager = get(),
                 crashLogger = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
         scoped {
             BtcAsset(
                 exchangeRates = get(),
-                environmentSettings = get(),
+                sendDataManager = get(),
+                feeDataManager = get(),
+                environmentConfig = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
-                payloadDataManager = get(),
+                payloadManager = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                walletPreferences = get()
             )
         }
 
         scoped {
             BchAsset(
+                payloadManager = get(),
                 bchDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -58,26 +66,36 @@ val coincoreModule = module {
                 stringUtils = get(),
                 custodialManager = get(),
                 environmentSettings = get(),
+                feeDataManager = get(),
+                sendDataManager = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                walletPreferences = get()
             )
         }
 
         scoped {
             XlmAsset(
+                payloadManager = get(),
                 xlmDataManager = get(),
+                xlmFeesFetcher = get(),
+                walletOptionsDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
         scoped {
             EthAsset(
+                payloadManager = get(),
                 ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
@@ -86,32 +104,41 @@ val coincoreModule = module {
                 crashLogger = get(),
                 custodialManager = get(),
                 pitLinking = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
         scoped {
             PaxAsset(
+                payloadManager = get(),
                 paxAccount = get(paxAccount),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
         scoped {
             AlgoAsset(
+                payloadManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 crashLogger = get(),
-                labels = get()
+                labels = get(),
+                tiersService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -128,14 +155,18 @@ val coincoreModule = module {
 
         scoped {
             UsdtAsset(
+                payloadManager = get(),
                 usdtAccount = get(usdtAccount),
+                feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 custodialManager = get(),
                 crashLogger = get(),
                 labels = get(),
-                pitLinking = get()
+                pitLinking = get(),
+                tierService = get(),
+                environmentConfig = get()
             )
         }
 
@@ -153,7 +184,18 @@ val coincoreModule = module {
                     CryptoCurrency.ALGO to get<AlgoAsset>(),
                     CryptoCurrency.USDT to get<UsdtAsset>()
                 ),
-                defaultLabels = get()
+                txProcessorFactory = get(),
+                defaultLabels = get(),
+                crashLogger = get()
+            )
+        }
+
+        scoped {
+            TxProcessorFactory(
+                bitPayManager = get(),
+                exchangeRates = get(),
+                walletManager = get(),
+                walletPrefs = get()
             )
         }
 

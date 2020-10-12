@@ -2,35 +2,46 @@ package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Single
+import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.data.currency.CurrencyState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import java.math.BigInteger
 
 class BtcAccountActivityTest {
 
-    private val currencyState: CurrencyState = mock()
     private val payloadDataManager: PayloadDataManager = mock()
+    private val sendDataManager: SendDataManager = mock()
+    private val feeDataManager: FeeDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val networkParameters: NetworkParameters = mock()
+    private val walletPrefs: WalletStatus = mock()
 
     private val subject =
         BtcCryptoWalletAccount(
             label = "TestBtcAccount",
             address = "",
-            payloadDataManager = payloadDataManager,
+            payloadManager = payloadDataManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
             isDefault = true,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            networkParameters = networkParameters,
+            internalAccount = mock(),
+            isHDAccount = true,
+            walletPreferences = walletPrefs
         )
 
     @get:Rule
@@ -43,7 +54,6 @@ class BtcAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(currencyState.cryptoCurrency).thenReturn(CryptoCurrency.BTC)
     }
 
     @Test
@@ -51,7 +61,7 @@ class BtcAccountActivityTest {
 
         val summary = TransactionSummary().apply {
             confirmations = 3
-            direction = TransactionSummary.Direction.RECEIVED
+            transactionType = TransactionSummary.TransactionType.RECEIVED
             fee = BigInteger.ONE
             total = BigInteger.TEN
             hash = "hash"

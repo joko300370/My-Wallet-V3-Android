@@ -10,6 +10,7 @@ abstract class Money : Serializable {
 
     // Use [symbol] for user display. This can be used by APIs etc.
     abstract val currencyCode: String
+
     // User displayable symbol
     abstract val symbol: String
 
@@ -32,6 +33,7 @@ abstract class Money : Serializable {
     // Format for display
     abstract fun toStringWithSymbol(): String
     abstract fun toStringWithoutSymbol(): String
+
     // Format for network transmission
     abstract fun toNetworkString(): String
 

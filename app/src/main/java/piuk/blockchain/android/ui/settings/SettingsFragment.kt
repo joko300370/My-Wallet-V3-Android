@@ -59,6 +59,7 @@ import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
@@ -134,6 +135,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
+    }
+    private val cloudBackupPref by lazy {
+        findPreference<SwitchPreferenceCompat>("cloud_backup")
     }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
@@ -241,6 +245,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             true
         }
 
+        cloudBackupPref?.setOnPreferenceChangeListener { _, newValue ->
+            settingsPresenter.updateCloudData(newValue as Boolean)
+            analytics.logEvent(SettingsAnalyticsEvents.CloudBackupSwitch)
+            true
+        }
+
         // App
         findPreference<Preference>("about")?.apply {
             summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
@@ -259,8 +269,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {
-            }
+            intent == null -> {}
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
@@ -374,10 +383,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-    override fun updateBanks(banks: List<LinkedBank>) {
+    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
         val existingBanks = prefsExistingBanks()
 
-        val newBanks = banks.filterNot { existingBanks.contains(it.id) }
+        val newBanks = linkedAndSupportedCurrencies.linkedBanks.filterNot { existingBanks.contains(it.id) }
 
         newBanks.forEach { bank ->
             banksPref?.addPreference(
@@ -390,31 +399,42 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             )
         }
 
-        addOrUpdateLinkBankForCurrencies(banks.size + 1, listOf("GBP", "EUR"))
+        addOrUpdateLinkBankForCurrencies(
+            linkedAndSupportedCurrencies.linkedBanks.size + 1,
+            linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
+        )
     }
 
     private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
-
-        currencies.forEach { currency ->
-            banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
-                it.order = it.order + firstIndex + currencies.indexOf(currency)
-            } ?: banksPref?.addPreference(
-                BankPreference(context = requireContext(), fiatCurrency = currency).apply {
-                    onClick {
-                        linkBankWithCurrency(currency)
+        if (currencies.isEmpty()) {
+            banksPref?.isVisible = false
+        } else {
+            currencies.forEach { currency ->
+                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
+                    it.order = it.order + firstIndex + currencies.indexOf(currency)
+                } ?: banksPref?.addPreference(
+                    BankPreference(context = requireContext(), fiatCurrency = currency).apply {
+                        onClick {
+                            linkBankWithCurrency(currency)
+                        }
+                        key = LINK_BANK_KEY.plus(currency)
                     }
-                    key = LINK_BANK_KEY.plus(currency)
-                }
-            )
+                )
+            }
         }
     }
 
+    data class LinkedBanksAndSupportedCurrencies(
+        val linkedBanks: List<LinkedBank>,
+        val supportedCurrencies: List<String>
+    )
+
     private fun removeBank(bank: LinkedBank) {
-        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, "BOTTOM_SHEET")
+        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     private fun linkBankWithCurrency(currency: String) {
-        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, "BOTTOM_SHEET")
+        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
@@ -428,7 +448,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             cardsPref?.addPreference(
                 CardPreference(context = requireContext(), card = card).apply {
                     onClick {
-                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, "BOTTOM_SHEET")
+                        RemoveCardBottomSheet.newInstance(card).show(childFragmentManager, BOTTOM_SHEET)
                     }
                     key = card.cardId
                 }
@@ -489,7 +509,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_disable_message)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 settingsPresenter.setFingerprintUnlockEnabled(
                     false
                 )
@@ -506,7 +526,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_no_fingerprints_added)
             .setCancelable(true)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
                     Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
                     0
@@ -668,7 +688,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setTitle(R.string.app_name)
             .setMessage(R.string.guid_to_clipboard)
             .setCancelable(false)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
                     activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
@@ -676,7 +696,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 showCustomToast(R.string.copied_to_clipboard)
                 analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton(R.string.common_no, null)
             .show()
     }
 
@@ -859,7 +879,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                                     .setTitle(R.string.app_name)
                                     .setMessage(R.string.weak_password)
                                     .setCancelable(false)
-                                    .setPositiveButton(R.string.yes) { _, _ ->
+                                    .setPositiveButton(R.string.common_yes) { _, _ ->
                                         newPasswordConfirmation.setText("")
                                         newPasswordConfirmation.requestFocus()
                                         newPassword.setText("")

@@ -2,8 +2,6 @@ package piuk.blockchain.android.ui.account
 
 import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.CryptoValue
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 data class ItemAccount @JvmOverloads constructor(
     val label: String = "",
@@ -20,9 +18,5 @@ data class ItemAccount @JvmOverloads constructor(
     }
 }
 
-fun ItemAccount.formatDisplayBalance(currencyState: CurrencyState, exchangeRates: ExchangeRateDataManager) =
-    if (currencyState.displayMode == CurrencyState.DisplayMode.Fiat) {
-        balance?.toFiat(exchangeRates, currencyState.fiatUnit)
-    } else {
-        balance
-    }?.toStringWithSymbol() ?: ""
+fun ItemAccount.formatDisplayBalance() =
+        balance?.toStringWithSymbol() ?: ""

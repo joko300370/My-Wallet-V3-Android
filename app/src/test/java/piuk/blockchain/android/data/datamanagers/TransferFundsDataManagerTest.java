@@ -13,7 +13,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.bitcoinj.core.ECKey;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +22,9 @@ import org.mockito.MockitoAnnotations;
 import piuk.blockchain.android.data.cache.DynamicFeeCache;
 import piuk.blockchain.android.testutils.RxTest;
 import piuk.blockchain.android.ui.account.ItemAccount;
-import piuk.blockchain.android.ui.send.PendingTransaction;
+import piuk.blockchain.android.ui.account.PendingTransaction;
+import piuk.blockchain.android.ui.account.TransferFundsDataManager;
+import piuk.blockchain.android.ui.account.TransferableFundTransactionList;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.payments.SendDataManager;
 

@@ -1,42 +1,58 @@
 package piuk.blockchain.android.coincore.erc20.pax
 
+import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.util.FormatsUtil
+import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.charts.PriceSeries
 import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class PaxAsset(
-    private val paxAccount: Erc20Account,
+    payloadManager: PayloadDataManager,
+    paxAccount: Erc20Account,
+    feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ChartsDataManager,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
-    crashLogger: CrashLogger
+    crashLogger: CrashLogger,
+    tiersService: TierService,
+    environmentConfig: EnvironmentConfig
 ) : Erc20TokensBase(
+    payloadManager,
     paxAccount,
+    feeDataManager,
     custodialManager,
     exchangeRates,
     historicRates,
     currencyPrefs,
     labels,
     pitLinking,
-    crashLogger
+    crashLogger,
+    tiersService,
+    environmentConfig
 ) {
 
     override val asset = CryptoCurrency.PAX
@@ -45,22 +61,36 @@ internal class PaxAsset(
         Single.just(listOf(getNonCustodialPaxAccount()))
 
     private fun getNonCustodialPaxAccount(): CryptoAccount {
-        val paxAddress = paxAccount.ethDataManager.getEthWallet()?.account?.address
+        val paxAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No ether wallet found")
 
         return PaxCryptoWalletAccount(
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX), paxAddress, erc20Account,
-            exchangeRates)
+            payloadManager,
+            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
+            paxAddress,
+            erc20Account,
+            feeDataManager,
+            exchangeRates
+        )
     }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
         Single.just(emptyList())
 
-    override fun parseAddress(address: String): CryptoAddress? =
-        if (isValidAddress(address)) {
-            PaxAddress(address)
-        } else {
-            null
+    @CommonCode("Exists in EthAsset and UsdtAsset")
+    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+        Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
+            if (isValid) {
+                erc20Account.ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
+                    if (isContract) {
+                        throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
+                    } else {
+                        Maybe.just(PaxAddress(address))
+                    }
+                }
+            } else {
+                Maybe.empty<ReceiveAddress>()
+            }
         }
 
     private fun isValidAddress(address: String): Boolean =
@@ -68,8 +98,6 @@ internal class PaxAsset(
 }
 
 internal class PaxAddress(
-    override val address: String,
-    override val label: String = address
-) : CryptoAddress {
-    override val asset: CryptoCurrency = CryptoCurrency.PAX
-}
+    address: String,
+    label: String = address
+) : Erc20Address(CryptoCurrency.PAX, address, label)

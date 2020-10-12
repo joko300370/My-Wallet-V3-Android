@@ -6,12 +6,6 @@ import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
-import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
-
 import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
@@ -19,11 +13,9 @@ import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
 import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
-import com.blockchain.swap.nabu.datamanagers.LinkedBank;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
-import com.blockchain.swap.nabu.models.nabu.KycTiersKt;
 import com.blockchain.swap.nabu.models.nabu.NabuApiException;
 import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
 
@@ -36,6 +28,7 @@ import info.blockchain.wallet.payload.PayloadManager;
 import info.blockchain.wallet.settings.SettingsManager;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import piuk.blockchain.android.R;
@@ -43,6 +36,7 @@ import piuk.blockchain.android.data.rxjava.RxUtil;
 import piuk.blockchain.android.thepit.PitLinking;
 import piuk.blockchain.android.thepit.PitLinkingState;
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper;
+import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper;
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper;
 import piuk.blockchain.android.util.StringUtils;
 import piuk.blockchain.androidcore.data.access.AccessState;
@@ -85,26 +79,26 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     // Show dialog "are you sure you want to disable fingerprint login?
     public SettingsPresenter(
-            FingerprintHelper fingerprintHelper,
-            AuthDataManager authDataManager,
-            SettingsDataManager settingsDataManager,
-            EmailSyncUpdater emailUpdater,
-            PayloadManager payloadManager,
-            PayloadDataManager payloadDataManager,
-            StringUtils stringUtils,
-            PersistentPrefs prefs,
-            AccessState accessState,
-            CustodialWalletManager custodialWalletManager,
-            SwipeToReceiveHelper swipeToReceiveHelper,
-            NotificationTokenManager notificationTokenManager,
-            ExchangeRateDataManager exchangeRateDataManager,
-            KycStatusHelper kycStatusHelper,
-            PitLinking pitLinking,
-            Analytics analytics,
-            FeatureFlag featureFlag,
-            FeatureFlag cardsFeatureFlag,
-            FeatureFlag fundsFeatureFlag,
-            SimpleBuyPrefs simpleBuyPrefs
+        FingerprintHelper fingerprintHelper,
+        AuthDataManager authDataManager,
+        SettingsDataManager settingsDataManager,
+        EmailSyncUpdater emailUpdater,
+        PayloadManager payloadManager,
+        PayloadDataManager payloadDataManager,
+        StringUtils stringUtils,
+        PersistentPrefs prefs,
+        AccessState accessState,
+        CustodialWalletManager custodialWalletManager,
+        SwipeToReceiveHelper swipeToReceiveHelper,
+        NotificationTokenManager notificationTokenManager,
+        ExchangeRateDataManager exchangeRateDataManager,
+        KycStatusHelper kycStatusHelper,
+        PitLinking pitLinking,
+        Analytics analytics,
+        FeatureFlag featureFlag,
+        FeatureFlag cardsFeatureFlag,
+        FeatureFlag fundsFeatureFlag,
+        SimpleBuyPrefs simpleBuyPrefs
     ) {
         this.fingerprintHelper = fingerprintHelper;
         this.authDataManager = authDataManager;
@@ -133,19 +127,19 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getView().showProgressDialog(R.string.please_wait);
         // Fetch updated settings
         getCompositeDisposable().add(
-                settingsDataManager.fetchSettings()
-                        .doAfterTerminate(this::handleUpdate)
-                        .doOnNext(ignored -> loadKyc2TierState())
-                        .subscribe(
-                                updatedSettings -> settings = updatedSettings,
-                                throwable -> {
-                                    if (settings == null) {
-                                        // Show unloaded if necessary, keep old settings if failed update
-                                        settings = new Settings();
-                                    }
-                                    // Warn error when updating
-                                    getView().showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR);
-                                }));
+            settingsDataManager.fetchSettings()
+                .doAfterTerminate(this::handleUpdate)
+                .doOnNext(ignored -> loadKyc2TierState())
+                .subscribe(
+                    updatedSettings -> settings = updatedSettings,
+                    throwable -> {
+                        if (settings == null) {
+                            // Show unloaded if necessary, keep old settings if failed update
+                            settings = new Settings();
+                        }
+                        // Warn error when updating
+                        getView().showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR);
+                    }));
         updateCards();
         updateBanks();
         getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated, throwable -> {
@@ -155,51 +149,54 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void updateCards() {
         getCompositeDisposable().add(
-                Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
-                        (enabled, kycState) -> enabled && kycState.isApprovedFor(KycTierLevel.GOLD))
-                        .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
-                        .flatMap(enabled -> {
-                            if (enabled) {
-                                return custodialWalletManager.updateSupportedCardTypes(getFiatUnits(), true).andThen(
-                                        custodialWalletManager.fetchUnawareLimitsCards(
-                                                Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)));
-                            } else {
-                                return Single.just(Collections.<PaymentMethod.Card>emptyList());
-                            }
-                        })
-                        .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
-                    getView().cardsEnabled(false);
-                    onCardsUpdated(Collections.emptyList());
-                    getView().updateBanks(Collections.emptyList());
-                }).subscribe(this::onCardsUpdated));
+            Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
+                (enabled, kycState) -> enabled && kycState.isApprovedFor(KycTierLevel.GOLD))
+                .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
+                .flatMap(enabled -> {
+                    if (enabled) {
+                        return custodialWalletManager.updateSupportedCardTypes(getFiatUnits(), true).andThen(
+                            custodialWalletManager.fetchUnawareLimitsCards(
+                                Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)));
+                    } else {
+                        return Single.just(Collections.<PaymentMethod.Card>emptyList());
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
+                getView().cardsEnabled(false);
+                onCardsUpdated(Collections.emptyList());
+                getView().updateBanks(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
+            }).subscribe(this::onCardsUpdated));
     }
 
     private void updateBanks() {
         getCompositeDisposable().add(
-                Single.zip(fundsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
-                        (enabled, kycState) -> new Pair<>(enabled, kycState.isApprovedFor(KycTierLevel.GOLD)))
-                        .flatMap(pair -> {
-                            if (pair.first)
-                                return canLinkBank(getFiatUnits(), pair.second).doOnSuccess(canLink ->
-                                        getView().banksEnabled(canLink)).zipWith(custodialWalletManager.getLinkedBanks(), (canLink, linkedBanks) -> linkedBanks);
-                            else
-                                return Single.just(Collections.<LinkedBank>emptyList());
-                        })
-                        .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
-                    getView().banksEnabled(false);
-                    onBanksUpdated(Collections.emptyList());
-                    getView().updateBanks(Collections.emptyList());
-                }).subscribe(this::onBanksUpdated));
+            Single.zip(fundsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
+                (enabled, kycState) -> new Pair<>(enabled, kycState.isApprovedFor(KycTierLevel.GOLD)))
+                .flatMap(pair -> {
+                    if (pair.first) {
+                        return canLinkBank(getFiatUnits(), pair.second).doOnSuccess(linkDetails ->
+                            getView().banksEnabled(linkDetails.first)).zipWith(custodialWalletManager.getLinkedBanks(), (linkDetails, linkedBanks) -> new SettingsFragment.LinkedBanksAndSupportedCurrencies(linkedBanks, linkDetails.second));
+                    } else {
+                        return Single.just(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
+                getView().banksEnabled(false);
+                onBanksUpdated(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
+                getView().updateBanks(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
+            }).subscribe(this::onBanksUpdated));
     }
 
-    private Single<Boolean> canLinkBank(String fiat, boolean isGold) {
-        return custodialWalletManager.getSupportedFundsFiats(fiat, isGold).map(supportedCurrencies -> supportedCurrencies.size() > 0);
+    private Single<Pair<Boolean, List<String>>> canLinkBank(String fiat, boolean isGold) {
+        return custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
+            .map(supportedCurrencies ->
+                new Pair<>(supportedCurrencies.size() > 0, supportedCurrencies)
+            );
     }
 
-    private void onBanksUpdated(List<LinkedBank> banks) {
-        getView().updateBanks(banks);
+    private void onBanksUpdated(SettingsFragment.LinkedBanksAndSupportedCurrencies linkedAndSupportedCurrencies) {
+        getView().updateBanks(linkedAndSupportedCurrencies);
     }
-
 
     private void showPitItem(Boolean pitEnabled) {
         getView().isPitEnabled(pitEnabled);
@@ -216,11 +213,11 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void loadKyc2TierState() {
         getCompositeDisposable().add(
-                kycStatusHelper.getSettingsKycStateTier()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                settingsKycState -> getView().setKycState(settingsKycState),
-                                Timber::e)
+            kycStatusHelper.getSettingsKycStateTier()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    settingsKycState -> getView().setKycState(settingsKycState),
+                    Timber::e)
         );
     }
 
@@ -441,13 +438,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             getView().setEmailSummary(stringUtils.getString(R.string.not_specified));
         } else {
             getCompositeDisposable().add(
-                    emailUpdater.updateEmailAndSync(email)
-                            .flatMap(e -> settingsDataManager.fetchSettings().singleOrError())
-                            .subscribe(settings -> {
-                                this.settings = settings;
-                                updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false);
-                                getView().showDialogEmailVerification();
-                            }, throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+                emailUpdater.updateEmailAndSync(email)
+                    .flatMap(e -> settingsDataManager.fetchSettings().singleOrError())
+                    .subscribe(settings -> {
+                        this.settings = settings;
+                        updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false);
+                        getView().showDialogEmailVerification();
+                    }, throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
         }
     }
 
@@ -461,16 +458,16 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             getView().setSmsSummary(stringUtils.getString(R.string.not_specified));
         } else {
             getCompositeDisposable().add(
-                    settingsDataManager.updateSms(sms)
-                            .doOnNext(settings -> this.settings = settings)
-                            .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(() -> {
-                                updateNotification(Settings.NOTIFICATION_TYPE_SMS, false);
-                                getView().showDialogVerifySms();
-                            }, throwable -> {
-                                getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR);
-                            }));
+                settingsDataManager.updateSms(sms)
+                    .doOnNext(settings -> this.settings = settings)
+                    .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> {
+                        updateNotification(Settings.NOTIFICATION_TYPE_SMS, false);
+                        getView().showDialogVerifySms();
+                    }, throwable -> {
+                        getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR);
+                    }));
         }
     }
 
@@ -482,30 +479,30 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     void verifySms(@NonNull String code) {
         getView().showProgressDialog(R.string.please_wait);
         getCompositeDisposable().add(
-                settingsDataManager.verifySms(code)
-                        .doOnNext(settings -> this.settings = settings)
-                        .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doAfterTerminate(() -> {
-                            getView().hideProgressDialog();
-                            updateUi();
-                        })
-                        .subscribe(
-                                () -> getView().showDialogSmsVerified(),
-                                throwable -> getView().showWarningDialog(R.string.verify_sms_failed)));
+            settingsDataManager.verifySms(code)
+                .doOnNext(settings -> this.settings = settings)
+                .flatMapCompletable(ignored -> syncPhoneNumberWithNabu())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doAfterTerminate(() -> {
+                    getView().hideProgressDialog();
+                    updateUi();
+                })
+                .subscribe(
+                    () -> getView().showDialogSmsVerified(),
+                    throwable -> getView().showWarningDialog(R.string.verify_sms_failed)));
     }
 
     private Completable syncPhoneNumberWithNabu() {
         return kycStatusHelper.syncPhoneNumberWithNabu()
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof NabuApiException) {
-                        if (((NabuApiException) throwable).getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered) {
-                            return Completable.complete();
-                        }
+            .onErrorResumeNext(throwable -> {
+                if (throwable instanceof NabuApiException) {
+                    if (((NabuApiException) throwable).getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered) {
+                        return Completable.complete();
                     }
+                }
 
-                    return Completable.error(throwable);
-                });
+                return Completable.error(throwable);
+            });
     }
 
     /**
@@ -515,11 +512,11 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void updateTor(boolean blocked) {
         getCompositeDisposable().add(
-                settingsDataManager.updateTor(blocked)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> this.settings = settings,
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+            settingsDataManager.updateTor(blocked)
+                .doAfterTerminate(this::updateUi)
+                .subscribe(
+                    settings -> this.settings = settings,
+                    throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     /**
@@ -530,11 +527,11 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void updateTwoFa(int type) {
         getCompositeDisposable().add(
-                settingsDataManager.updateTwoFactor(type)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> this.settings = settings,
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+            settingsDataManager.updateTwoFactor(type)
+                .doAfterTerminate(this::updateUi)
+                .subscribe(
+                    settings -> this.settings = settings,
+                    throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     /**
@@ -556,40 +553,40 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
 
         getCompositeDisposable().add(
-                Observable.just(enable)
-                        .flatMap(aBoolean -> {
-                            if (aBoolean) {
-                                return settingsDataManager.enableNotification(type, settings.getNotificationsType());
-                            } else {
-                                return settingsDataManager.disableNotification(type, settings.getNotificationsType());
-                            }
-                        })
-                        .doOnNext(settings -> this.settings = settings)
-                        .flatMapCompletable(ignored -> {
-                            if (enable) {
-                                return payloadDataManager.syncPayloadAndPublicKeys();
-                            } else {
-                                return payloadDataManager.syncPayloadWithServer();
-                            }
-                        })
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                () -> {
-                                    // No-op
-                                },
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+            Observable.just(enable)
+                .flatMap(aBoolean -> {
+                    if (aBoolean) {
+                        return settingsDataManager.enableNotification(type, settings.getNotificationsType());
+                    } else {
+                        return settingsDataManager.disableNotification(type, settings.getNotificationsType());
+                    }
+                })
+                .doOnNext(settings -> this.settings = settings)
+                .flatMapCompletable(ignored -> {
+                    if (enable) {
+                        return payloadDataManager.syncPayloadAndPublicKeys();
+                    } else {
+                        return payloadDataManager.syncPayloadWithServer();
+                    }
+                })
+                .doAfterTerminate(this::updateUi)
+                .subscribe(
+                    () -> {
+                        // No-op
+                    },
+                    throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     private boolean isNotificationTypeEnabled(int type) {
         return settings.isNotificationsOn()
-                && (settings.getNotificationsType().contains(type)
-                || settings.getNotificationsType().contains(SettingsManager.NOTIFICATION_TYPE_ALL));
+            && (settings.getNotificationsType().contains(type)
+            || settings.getNotificationsType().contains(SettingsManager.NOTIFICATION_TYPE_ALL));
     }
 
     private boolean isNotificationTypeDisabled(int type) {
         return settings.getNotificationsType().contains(SettingsManager.NOTIFICATION_TYPE_NONE)
-                || (!settings.getNotificationsType().contains(SettingsManager.NOTIFICATION_TYPE_ALL)
-                && !settings.getNotificationsType().contains(type));
+            || (!settings.getNotificationsType().contains(SettingsManager.NOTIFICATION_TYPE_ALL)
+            && !settings.getNotificationsType().contains(type));
     }
 
     /**
@@ -597,7 +594,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS);
-        prefs.removeValue(PersistentPrefs.KEY_PIN_IDENTIFIER);
+        prefs.setPinId("");
 
         getView().goToPinEntryPage();
     }
@@ -613,16 +610,16 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         payloadManager.setTempPassword(password);
 
         authDataManager.createPin(password, accessState.getPin())
-                .doOnSubscribe(ignored -> getView().showProgressDialog(R.string.please_wait))
-                .doOnTerminate(() -> getView().hideProgressDialog())
-                .andThen(payloadDataManager.syncPayloadWithServer())
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                .subscribe(
-                        () -> {
-                            getView().showToast(R.string.password_changed, ToastCustom.TYPE_OK);
-                            analytics.logEvent(SettingsAnalyticsEvents.PasswordChanged.INSTANCE);
-                        },
-                        throwable -> showUpdatePasswordFailed(fallbackPassword));
+            .doOnSubscribe(ignored -> getView().showProgressDialog(R.string.please_wait))
+            .doOnTerminate(() -> getView().hideProgressDialog())
+            .andThen(payloadDataManager.syncPayloadWithServer())
+            .compose(RxUtil.addCompletableToCompositeDisposable(this))
+            .subscribe(
+                () -> {
+                    getView().showToast(R.string.password_changed, ToastCustom.TYPE_OK);
+                    analytics.logEvent(SettingsAnalyticsEvents.PasswordChanged.INSTANCE);
+                },
+                throwable -> showUpdatePasswordFailed(fallbackPassword));
     }
 
     private void showUpdatePasswordFailed(@NonNull String fallbackPassword) {
@@ -637,33 +634,40 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
      */
     void updateFiatUnit(String fiatUnit) {
         getCompositeDisposable().add(
-                settingsDataManager.updateFiatUnit(fiatUnit)
-                        .doAfterTerminate(this::updateUi)
-                        .subscribe(
-                                settings -> {
-                                    if (prefs.getSelectedFiatCurrency().equals(fiatUnit))
-                                        analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency);
-                                    prefs.setSelectedFiatCurrency(fiatUnit);
-                                    simpleBuyPrefs.clearState();
-                                    this.settings = settings;
-                                    analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged.INSTANCE);
-                                },
-                                throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+            settingsDataManager.updateFiatUnit(fiatUnit)
+                .doAfterTerminate(this::updateUi)
+                .subscribe(
+                    settings -> {
+                        if (prefs.getSelectedFiatCurrency().equals(fiatUnit))
+                            analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency);
+                        prefs.setSelectedFiatCurrency(fiatUnit);
+                        simpleBuyPrefs.clearState();
+                        this.settings = settings;
+                        analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged.INSTANCE);
+                    },
+                    throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     void storeSwipeToReceiveAddresses() {
         getCompositeDisposable().add(
-                swipeToReceiveHelper.generateAddresses()
-                        .subscribeOn(Schedulers.computation())
-                        .doOnSubscribe(disposable -> getView().showProgressDialog(R.string.please_wait))
-                        .doOnTerminate(() -> getView().hideProgressDialog())
-                        .subscribe(() -> {
-                            // No-op
-                        }, throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
+            swipeToReceiveHelper.generateAddresses()
+                .subscribeOn(Schedulers.computation())
+                .doOnSubscribe(disposable -> getView().showProgressDialog(R.string.please_wait))
+                .doOnTerminate(() -> getView().hideProgressDialog())
+                .subscribe(() -> {
+                    // No-op
+                }, throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
     void clearSwipeToReceiveData() {
         swipeToReceiveHelper.clearStoredData();
+    }
+
+    void updateCloudData(boolean newValue) {
+        if (newValue) {
+            swipeToReceiveHelper.clearStoredData();
+        }
+        prefs.setBackupEnabled(newValue);
     }
 
     boolean arePushNotificationEnabled() {
@@ -672,25 +676,25 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     void enablePushNotifications() {
         notificationTokenManager.enableNotifications()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                .doOnComplete(() -> {
-                    getView().setPushNotificationPref(true);
-                })
-                .subscribe(() -> {
-                    //no-op
-                }, Timber::e);
+            .compose(RxUtil.addCompletableToCompositeDisposable(this))
+            .doOnComplete(() -> {
+                getView().setPushNotificationPref(true);
+            })
+            .subscribe(() -> {
+                //no-op
+            }, Timber::e);
     }
 
     void disablePushNotifications() {
 
         notificationTokenManager.disableNotifications()
-                .compose(RxUtil.addCompletableToCompositeDisposable(this))
-                .doOnComplete(() -> {
-                    getView().setPushNotificationPref(false);
-                })
-                .subscribe(() -> {
-                    //no-op
-                }, Timber::e);
+            .compose(RxUtil.addCompletableToCompositeDisposable(this))
+            .doOnComplete(() -> {
+                getView().setPushNotificationPref(false);
+            })
+            .subscribe(() -> {
+                //no-op
+            }, Timber::e);
     }
 
     public String[] getCurrencyLabels() {

@@ -16,8 +16,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SendProcessor
-import piuk.blockchain.android.coincore.SendState
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.util.concurrent.atomic.AtomicBoolean
@@ -32,12 +31,27 @@ internal class FiatCustodialAccount(
 ) : FiatAccount {
     private val hasFunds = AtomicBoolean(false)
 
-    override val balance: Single<Money>
-        get() = assetBalancesRepository.getBalanceForAsset(fiatCurrency)
+    override val accountBalance: Single<Money>
+        get() = assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
             .toSingle(FiatValue.zero(fiatCurrency)).map {
                 it as Money
             }.doOnSuccess {
                 hasFunds.set(it.isPositive)
+            }
+
+    override val actionableBalance: Single<Money>
+        get() = assetBalancesRepository.getActionableBalanceForAsset(fiatCurrency)
+            .toSingle(FiatValue.zero(fiatCurrency)).map {
+                it as Money
+            }.doOnSuccess {
+                hasFunds.set(it.isPositive)
+            }
+
+    override val pendingBalance: Single<Money>
+        get() = assetBalancesRepository.getPendingBalanceForAsset(fiatCurrency)
+            .toSingle(FiatValue.zero(fiatCurrency))
+            .map {
+                it as Money
             }
 
     override var hasTransactions: Boolean = false
@@ -61,8 +75,10 @@ internal class FiatCustodialAccount(
             }
         }
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: AvailableActions =
+        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit, AssetAction.Withdraw)
+        else
+            setOf(AssetAction.ViewActivity)
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -72,16 +88,13 @@ internal class FiatCustodialAccount(
     }
 
     override fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money> =
-        balance.map { it.toFiat(exchangeRates, fiatCurrency) }
+        accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = Single.error(NotImplementedError("Send to fiat not supported"))
 
-    override val sendState: Single<SendState>
-        get() = Single.just(SendState.NOT_SUPPORTED)
-
-    override fun createSendProcessor(address: ReceiveAddress): Single<SendProcessor> =
-        Single.error(NotImplementedError("Send to fiat not supported"))
+    override val sourceState: Single<TxSourceState>
+        get() = Single.just(TxSourceState.NOT_SUPPORTED)
 }
 
 class FiatAccountGroup(
@@ -89,8 +102,11 @@ class FiatAccountGroup(
     override val accounts: SingleAccountList
 ) : AccountGroup {
     // Produce the sum of all balances of all accounts
-    override val balance: Single<Money>
+    override val accountBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
+
+    override val pendingBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified pending balance for All Fiat accounts"))
 
     // All the activities for all the accounts
     override val activity: Single<ActivitySummaryList>

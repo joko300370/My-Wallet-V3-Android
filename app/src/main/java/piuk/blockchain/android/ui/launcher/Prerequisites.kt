@@ -39,7 +39,7 @@ class Prerequisites(
         metadataManager.attemptMetadataSetup().logOnError(METADATA_ERROR_MESSAGE)
             .then { feesCompletable().logOnError(FEES_ERROR) }
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
-            .then { coincore.init().logOnError(COINCORE_INIT) }
+            .then { coincore.init() } // Coincore signals the crash logger internally
             .then { generateAndUpdateReceiveAddresses().logAndCompleteOnError(RECEIVE_ADDRESSES) }
             .doOnComplete {
                 rxBus.emitEvent(MetadataEvent::class.java, MetadataEvent.SETUP_COMPLETE)

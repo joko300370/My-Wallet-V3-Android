@@ -22,15 +22,15 @@ internal class EthActivitySummaryItem(
 
     override val cryptoCurrency: CryptoCurrency = CryptoCurrency.ETHER
 
-    override val direction: TransactionSummary.Direction by unsafeLazy {
+    override val transactionType: TransactionSummary.TransactionType by unsafeLazy {
         val ethAddress = account.address.toLowerCase()
         when {
             ethAddress == ethTransaction.to && ethAddress == ethTransaction.from ->
-                TransactionSummary.Direction.TRANSFERRED
+                TransactionSummary.TransactionType.TRANSFERRED
             ethAddress == ethTransaction.from ->
-                TransactionSummary.Direction.SENT
+                TransactionSummary.TransactionType.SENT
             else ->
-                TransactionSummary.Direction.RECEIVED
+                TransactionSummary.TransactionType.RECEIVED
         }
     }
 
@@ -38,8 +38,8 @@ internal class EthActivitySummaryItem(
 
     override val value: CryptoValue by unsafeLazy {
         CryptoValue.fromMinor(CryptoCurrency.ETHER,
-            when (direction) {
-                TransactionSummary.Direction.RECEIVED -> ethTransaction.value
+            when (transactionType) {
+                TransactionSummary.TransactionType.RECEIVED -> ethTransaction.value
                 else -> ethTransaction.value.plus(ethTransaction.gasUsed.multiply(ethTransaction.gasPrice))
             }
         )

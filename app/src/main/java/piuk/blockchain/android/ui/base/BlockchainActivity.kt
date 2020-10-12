@@ -184,7 +184,17 @@ abstract class BlockchainActivity : ToolBarActivity() {
 
     @UiThread
     fun showBottomSheet(bottomSheet: BottomSheetDialogFragment) =
-        bottomSheet.show(supportFragmentManager, "BOTTOM_DIALOG")
+        bottomSheet.show(supportFragmentManager, BOTTOM_DIALOG)
+
+    @UiThread
+    fun clearBottomSheet() {
+        val dlg = supportFragmentManager.findFragmentByTag(BOTTOM_DIALOG)
+
+        dlg?.let {
+            (it as? SlidingModalBottomDialog)?.dismiss()
+                ?: throw IllegalStateException("Fragment is not a $BOTTOM_DIALOG")
+        }
+    }
 
     override fun onBackPressed() {
         val fragments = supportFragmentManager.fragments
@@ -209,6 +219,10 @@ abstract class BlockchainActivity : ToolBarActivity() {
             return true
         }
         return false
+    }
+
+    companion object {
+        private const val BOTTOM_DIALOG = "BOTTOM_DIALOG"
     }
 }
 

@@ -5,7 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Quote
-import com.blockchain.swap.nabu.datamanagers.SimpleBuyPair
+import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.math.BigInteger
 import java.util.Date
 import java.util.regex.Pattern
 
@@ -25,7 +26,7 @@ import java.util.regex.Pattern
  */
 data class SimpleBuyState(
     val id: String? = null,
-    val supportedPairsAndLimits: List<SimpleBuyPair>? = null,
+    val supportedPairsAndLimits: List<BuySellPair>? = null,
     private val amount: FiatValue? = null,
     val fiatCurrency: String = "USD",
     val predefinedAmounts: List<FiatValue> = emptyList(),
@@ -36,7 +37,7 @@ data class SimpleBuyState(
     val kycStartedButNotCompleted: Boolean = false,
     val kycVerificationState: KycState? = null,
     val bankAccount: BankAccount? = null,
-    val currentScreen: FlowScreen = FlowScreen.INTRO,
+    val currentScreen: FlowScreen = FlowScreen.ENTER_AMOUNT,
     val selectedPaymentMethod: SelectedPaymentMethod? = null,
     val orderExchangePrice: FiatValue? = null,
     val orderValue: CryptoValue? = null,
@@ -48,6 +49,7 @@ data class SimpleBuyState(
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
     val paymentSucceeded: Boolean = false,
+    val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
@@ -167,7 +169,7 @@ enum class KycState {
 }
 
 enum class FlowScreen {
-    INTRO, CURRENCY_SELECTOR, ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
+    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
 }
 
 enum class InputError {
@@ -200,4 +202,5 @@ data class SelectedPaymentMethod(
 ) {
     fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
     fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
+    fun isFunds() = paymentMethodType == PaymentMethodType.FUNDS
 }

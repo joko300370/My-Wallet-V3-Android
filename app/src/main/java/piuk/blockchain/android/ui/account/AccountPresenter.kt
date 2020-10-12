@@ -23,13 +23,10 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.data.currency.CurrencyState
-import piuk.blockchain.android.data.datamanagers.TransferFundsDataManager
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -52,10 +49,8 @@ class AccountPresenter internal constructor(
     private val appUtil: AppUtil,
     private val privateKeyFactory: PrivateKeyFactory,
     private val environmentSettings: EnvironmentConfig,
-    private val currencyState: CurrencyState,
     private val analytics: Analytics,
-    private val coinsWebSocketStrategy: CoinsWebSocketStrategy,
-    private val exchangeRates: ExchangeRateDataManager
+    private val coinsWebSocketStrategy: CoinsWebSocketStrategy
 ) : BasePresenter<AccountView>() {
 
     internal var doubleEncryptionPassword: String? = null
@@ -70,18 +65,12 @@ class AccountPresenter internal constructor(
         get() = when (cryptoCurrency) {
             CryptoCurrency.BTC -> getBtcAccounts().size
             CryptoCurrency.BCH -> getBchAccounts().size
-            CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
-            CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
-            CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            else ->
+                throw IllegalStateException("${cryptoCurrency.networkTicker} is not supported on this page")
         }
 
     override fun onViewReady() {
-        currencyState.cryptoCurrency = cryptoCurrency
         if (environmentSettings.environment == Environment.TESTNET) {
-            currencyState.cryptoCurrency = CryptoCurrency.BTC
             view.hideCurrencyHeader()
         }
         view.updateAccountList(getDisplayList())
@@ -362,7 +351,6 @@ class AccountPresenter internal constructor(
                     label, null,
                     balance,
                     account.isArchived,
-                    false,
                     defaultAccount.xpub == account.xpub,
                     AccountItem.TYPE_ACCOUNT_BTC
                 )
@@ -394,7 +382,6 @@ class AccountPresenter internal constructor(
                     address,
                     balance,
                     legacyAddress.isArchived,
-                    legacyAddress.isWatchOnly,
                     false,
                     AccountItem.TYPE_ACCOUNT_BTC
                 )
@@ -429,7 +416,6 @@ class AccountPresenter internal constructor(
                     label, null,
                     balance,
                     account.isArchived,
-                    false,
                     defaultAccount?.xpub == account.xpub,
                     AccountItem.TYPE_ACCOUNT_BCH
                 )
@@ -487,11 +473,7 @@ class AccountPresenter internal constructor(
     }
 
     private fun getUiString(amount: CryptoValue) =
-        if (currencyState.displayMode == CurrencyState.DisplayMode.Fiat) {
-            amount.toFiat(exchangeRates, currencyState.fiatUnit)
-        } else {
-            amount
-        }.toStringWithSymbol()
+        amount.toStringWithSymbol()
 
     private fun getBalanceFromBtcAddress(address: String) =
         payloadDataManager.getAddressBalance(address)

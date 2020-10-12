@@ -203,12 +203,12 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.weak_password)
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setPositiveButton(R.string.common_yes) { _, _ ->
                 wallet_pass.setText("")
                 wallet_pass_confirm.setText("")
                 wallet_pass.requestFocus()
             }
-            .setNegativeButton(R.string.no) { _, _ ->
+            .setNegativeButton(R.string.common_no) { _, _ ->
                 presenter.createOrRecoverWallet(email, password)
             }.show()
     }

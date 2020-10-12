@@ -2,7 +2,57 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/card_info_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:tint="@color/blue_600"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vector_card" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/card_info_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_circle_grey" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/card_info_title"
+        style="@style/Text.Semibold.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:text="@string/card_info_title"
+        app:layout_constraintStart_toEndOf="@id/card_info_icon"
+        app:layout_constraintTop_toTopOf="@id/card_info_icon" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/card_info_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/tiny_margin"
+        android:text="@string/card_info_description"
+        app:layout_constraintEnd_toStartOf="@id/card_info_close"
+        app:layout_constraintStart_toStartOf="@id/card_info_title"
+        app:layout_constraintTop_toBottomOf="@id/card_info_title" />
+
+    <View
+        android:id="@+id/card_info_separator"
+        style="@style/SeparatorWithoutMargins"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/standard_margin"
+        app:layout_constraintTop_toBottomOf="@id/card_info_desc" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/card_name_input"
@@ -13,7 +63,7 @@
         android:hint="@string/name_on_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/card_info_separator">
 
         <com.braintreepayments.cardform.view.CardholderNameEditText
             android:id="@+id/card_name"
@@ -136,5 +186,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/card_info_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="card_info_close, card_info_desc, card_info_icon, card_info_title, card_info_separator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

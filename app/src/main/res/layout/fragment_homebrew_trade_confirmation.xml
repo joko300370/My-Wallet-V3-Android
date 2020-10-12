@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/receive"
+        android:text="@string/common_receive"
         app:layout_constraintStart_toStartOf="@+id/to_amount"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -177,7 +177,7 @@
         android:textColor="@color/exchange_text_dark_color"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:text="@string/receive"
+        android:text="@string/common_receive"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fees_title" />
 

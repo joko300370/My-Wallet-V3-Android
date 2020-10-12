@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.account
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
@@ -24,9 +23,6 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.google.zxing.BarcodeFormat
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.listener.single.CompositePermissionListener
-import com.karumi.dexter.listener.single.SnackbarOnDeniedPermissionListener
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.disposables.CompositeDisposable
@@ -36,6 +32,7 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.account.adapter.AccountAdapter
@@ -49,12 +46,10 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.CameraPermissionListener
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import timber.log.Timber
 import java.util.EnumSet
 import java.util.Locale
 
@@ -64,7 +59,6 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
 
     override val locale: Locale = Locale.getDefault()
 
-    private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
     private val accountPresenter: AccountPresenter by scopedInject()
 
@@ -157,31 +151,14 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onImportAddressClicked() {
-        importAddress()
+        QrScanHandler.requestScanPermissions(
+            activity = this,
+            rootView = linear_layout_root
+        ) { onScanButtonClicked() }
     }
 
     override fun onAccountClicked(cryptoCurrency: CryptoCurrency, correctedPosition: Int) {
         onRowClick(cryptoCurrency, correctedPosition)
-    }
-
-    private fun importAddress() {
-        val deniedPermissionListener = SnackbarOnDeniedPermissionListener.Builder
-            .with(linear_layout_root, R.string.request_camera_permission)
-            .withButton(android.R.string.ok) { importAddress() }
-            .build()
-
-        val grantedPermissionListener = CameraPermissionListener(analytics, {
-            onScanButtonClicked()
-        })
-
-        val compositePermissionListener =
-            CompositePermissionListener(deniedPermissionListener, grantedPermissionListener)
-
-        Dexter.withActivity(this)
-            .withPermission(Manifest.permission.CAMERA)
-            .withListener(compositePermissionListener)
-            .withErrorListener { error -> Timber.wtf("Dexter permissions error $error") }
-            .check()
     }
 
     private fun onRowClick(cryptoCurrency: CryptoCurrency, position: Int) {

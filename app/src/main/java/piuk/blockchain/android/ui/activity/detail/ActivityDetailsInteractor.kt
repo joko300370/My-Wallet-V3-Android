@@ -4,19 +4,27 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
+import piuk.blockchain.android.util.StringUtils
 import java.text.ParseException
 import java.util.Date
 
@@ -24,39 +32,46 @@ class ActivityDetailsInteractor(
     private val currencyPrefs: CurrencyPrefs,
     private val transactionInputOutputMapper: TransactionInOutMapper,
     private val assetActivityRepository: AssetActivityRepository,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    private val stringUtils: StringUtils,
+    private val coincore: Coincore
 ) {
 
-    fun loadCustodialItems(
-        custodialActivitySummaryItem: CustodialActivitySummaryItem
+    fun loadCustodialTradingItems(
+        summaryItem: CustodialTradingActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
         val list = mutableListOf(
-            BuyTransactionId(custodialActivitySummaryItem.txId),
-            Created(Date(custodialActivitySummaryItem.timeStampMs)),
-            BuyPurchaseAmount(custodialActivitySummaryItem.fundedFiat),
-            BuyCryptoWallet(custodialActivitySummaryItem.cryptoCurrency),
-            BuyFee(custodialActivitySummaryItem.fee)
+            TransactionId(summaryItem.txId),
+            Created(Date(summaryItem.timeStampMs)),
+            if (summaryItem.type == OrderType.BUY) BuyPurchaseAmount(summaryItem.fundedFiat) else
+                SellPurchaseAmount(summaryItem.fundedFiat),
+            if (summaryItem.type == OrderType.BUY) BuyCryptoWallet(summaryItem.cryptoCurrency) else
+                SellCryptoWallet(summaryItem.fundedFiat.currencyCode),
+            BuyFee(summaryItem.fee)
         )
 
-        return if (custodialActivitySummaryItem.paymentMethodId != PaymentMethod.BANK_PAYMENT_ID) {
-            custodialWalletManager.getCardDetails(custodialActivitySummaryItem.paymentMethodId)
+        return if (summaryItem.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
+            custodialWalletManager.getCardDetails(
+                summaryItem.paymentMethodId
+            )
                 .map { paymentMethod ->
-                    addPaymentDetailsToList(list, paymentMethod, custodialActivitySummaryItem)
+                    addPaymentDetailsToList(list, paymentMethod,
+                        summaryItem)
 
                     list.toList()
                 }.onErrorReturn {
-                    addPaymentDetailsToList(list, null, custodialActivitySummaryItem)
+                    addPaymentDetailsToList(list, null, summaryItem)
 
                     list.toList()
                 }
         } else {
             list.add(BuyPaymentMethod(
-                PaymentDetails(custodialActivitySummaryItem.paymentMethodId, label = null,
+                PaymentDetails(summaryItem.paymentMethodId, label = null,
                     endDigits = null
                 )))
 
-            if (custodialActivitySummaryItem.status == OrderState.AWAITING_FUNDS ||
-                custodialActivitySummaryItem.status == OrderState.PENDING_EXECUTION
+            if (summaryItem.status == OrderState.AWAITING_FUNDS ||
+                summaryItem.status == OrderState.PENDING_EXECUTION
             ) {
                 list.add(CancelAction())
             }
@@ -64,30 +79,75 @@ class ActivityDetailsInteractor(
         }
     }
 
+    fun loadCustodialInterestItems(
+        summaryItem: CustodialInterestActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> {
+        val list = mutableListOf(
+            TransactionId(summaryItem.txId),
+            Created(Date(summaryItem.timeStampMs))
+        )
+        when (summaryItem.type) {
+            TransactionSummary.TransactionType.DEPOSIT -> {
+                list.add(To(summaryItem.account.label))
+            }
+            TransactionSummary.TransactionType.WITHDRAW -> {
+                list.add(From(stringUtils.getString(R.string.common_company_name)))
+            }
+            TransactionSummary.TransactionType.INTEREST_EARNED -> {
+                list.add(From(stringUtils.getString(R.string.common_company_name)))
+                list.add(To(summaryItem.account.label))
+            }
+            else -> {
+                // do nothing
+            }
+        }
+        return if (summaryItem.type == TransactionSummary.TransactionType.WITHDRAW) {
+            coincore.findAccountByAddress(summaryItem.account.asset,
+                summaryItem.accountRef).map {
+                list.add(To(if (it !is NullCryptoAccount) {
+                    it.label
+                } else {
+                    summaryItem.accountRef
+                }))
+                list.toList()
+            }.toSingle()
+        } else {
+            Single.just(list.toList())
+        }
+    }
+
     private fun addPaymentDetailsToList(
         list: MutableList<ActivityDetailsType>,
         paymentMethod: PaymentMethod.Card?,
-        custodialActivitySummaryItem: CustodialActivitySummaryItem
+        summaryItem: CustodialTradingActivitySummaryItem
     ) {
         paymentMethod?.let {
             list.add(BuyPaymentMethod(PaymentDetails(
                 it.cardId, it.uiLabel(), it.endDigits
             )))
         } ?: list.add(BuyPaymentMethod(
-            PaymentDetails(custodialActivitySummaryItem.paymentMethodId,
+            PaymentDetails(summaryItem.paymentMethodId,
                 label = null, endDigits = null)
         ))
 
-        if (custodialActivitySummaryItem.status == OrderState.PENDING_CONFIRMATION) {
+        if (summaryItem.status == OrderState.PENDING_CONFIRMATION) {
             list.add(CancelAction())
         }
     }
 
-    fun getCustodialActivityDetails(
+    fun getCustodialTradingActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
-    ): CustodialActivitySummaryItem? =
-        assetActivityRepository.findCachedItem(cryptoCurrency, txHash) as? CustodialActivitySummaryItem
+    ): CustodialTradingActivitySummaryItem? =
+        assetActivityRepository.findCachedItem(cryptoCurrency,
+            txHash) as? CustodialTradingActivitySummaryItem
+
+    fun getCustodialInterestActivityDetails(
+        cryptoCurrency: CryptoCurrency,
+        txHash: String
+    ): CustodialInterestActivitySummaryItem? =
+        assetActivityRepository.findCachedItem(cryptoCurrency,
+            txHash) as? CustodialInterestActivitySummaryItem
 
     fun getFiatActivityDetails(
         currency: String,
@@ -99,7 +159,8 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): NonCustodialActivitySummaryItem? =
-        assetActivityRepository.findCachedItem(cryptoCurrency, txHash) as? NonCustodialActivitySummaryItem
+        assetActivityRepository.findCachedItem(cryptoCurrency,
+            txHash) as? NonCustodialActivitySummaryItem
 
     fun loadCreationDate(
         activitySummaryItem: ActivitySummaryItem
@@ -134,7 +195,7 @@ class ActivityDetailsInteractor(
     ) = listOfNotNull(
         Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
-        HistoricValue(fiatValue, item.direction),
+        HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addFeeForTransaction(item),
         checkIfShouldAddDescription(item),
@@ -166,7 +227,7 @@ class ActivityDetailsInteractor(
     ) = listOfNotNull(
         Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
-        HistoricValue(fiatValue, item.direction),
+        HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),
@@ -198,7 +259,7 @@ class ActivityDetailsInteractor(
     ) = listOfNotNull(
         Amount(item.value),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
-        HistoricValue(fiatValue, item.direction),
+        HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),
@@ -243,7 +304,7 @@ class ActivityDetailsInteractor(
         Amount(item.value),
         Fee(cryptoValue),
         Value(item.fiatValue(currencyPrefs.selectedFiatCurrency)),
-        HistoricValue(fiatValue, item.direction),
+        HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
         checkIfShouldAddDescription(item),
@@ -285,7 +346,8 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         description: String
     ): Completable {
-        return when (val activityItem = assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
+        return when (val activityItem =
+            assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
             is BtcActivitySummaryItem -> activityItem.updateDescription(description)
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
             is Erc20ActivitySummaryItem -> activityItem.updateDescription(description)
@@ -299,10 +361,11 @@ class ActivityDetailsInteractor(
     private fun addFeeForTransaction(item: NonCustodialActivitySummaryItem): FeeForTransaction? {
         return when (item) {
             is EthActivitySummaryItem -> {
-                val relatedItem = assetActivityRepository.findCachedItemById(item.ethTransaction.hash)
+                val relatedItem =
+                    assetActivityRepository.findCachedItemById(item.ethTransaction.hash)
                 relatedItem?.let {
                     FeeForTransaction(
-                        item.direction,
+                        item.transactionType,
                         it.value
                     )
                 }
