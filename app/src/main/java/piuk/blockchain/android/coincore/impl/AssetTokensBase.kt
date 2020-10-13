@@ -13,6 +13,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -195,8 +196,9 @@ internal abstract class CryptoAssetBase(
 
     private fun getNonCustodialTargets(exclude: SingleAccount? = null): Maybe<SingleAccountList> =
         getNonCustodialAccountList()
-            .map { it.filter { a -> a !== exclude } }
-            .toMaybe()
+            .map { ll ->
+                ll.filter { a -> a !== exclude && a.actions.contains(AssetAction.Receive) }
+            }.toMaybe()
 
     final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)

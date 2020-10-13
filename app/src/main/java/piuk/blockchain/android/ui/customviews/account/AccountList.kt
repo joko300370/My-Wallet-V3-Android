@@ -93,6 +93,8 @@ class AccountList @JvmOverloads constructor(
 
                     if (it.isEmpty()) {
                         onEmptyList()
+                    } else {
+                        onListLoaded()
                     }
                 },
                 onError = {
@@ -104,6 +106,7 @@ class AccountList @JvmOverloads constructor(
     var onLoadError: (Throwable) -> Unit = {}
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
     var onEmptyList: () -> Unit = {}
+    var onListLoaded: () -> Unit = {}
 }
 
 private class AccountsDelegateAdapter(
