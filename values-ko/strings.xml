@@ -1890,7 +1890,7 @@
   <string name="interest_summary_accrued">이번 달 발생한이자</string>
   <string name="interest_summary_accrued_fail">발생한이자를로드 할 수 없습니다.</string>
   <string name="interest_summary_hold_period">초기 보류 기간</string>
-  <string name="interest_summary_hold_period_days">%1$f 일</string>
+  <string name="interest_summary_hold_period_days">%1$d 일</string>
   <string name="interest_summary_hold_period_fail">보유 기간 세부 정보를로드 할 수 없습니다.</string>
   <string name="interest_summary_rate">이자율</string>
   <string name="interest_summary_rate_fail">이자율을로드 할 수 없습니다.</string>

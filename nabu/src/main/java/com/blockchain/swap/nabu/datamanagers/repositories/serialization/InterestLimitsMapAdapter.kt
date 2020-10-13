@@ -15,9 +15,8 @@ class InterestLimitsMapAdapter {
         while (reader.hasNext()) {
             when (reader.peek()) {
                 JsonReader.Token.NAME ->
-                    when (reader.nextName()) {
-                        "limits" -> {
-                            var k = ""
+                    when (reader.selectName(KEYS)) {
+                        0 -> {
                             var currency = ""
                             var lockUpDuration: Int = -1
                             var maxWithdrawalAmount = ""
@@ -25,15 +24,15 @@ class InterestLimitsMapAdapter {
 
                             reader.beginObject()
                             while (reader.hasNext()) {
-                                k = reader.nextName()
+                                val k = reader.nextName()
                                 reader.beginObject()
                                 while (reader.hasNext()) {
-                                    when (reader.nextName()) {
-                                        "currency" -> currency = reader.nextString()
-                                        "lockUpDuration" -> lockUpDuration = reader.nextInt()
-                                        "maxWithdrawalAmount" -> maxWithdrawalAmount =
+                                    when (reader.selectName(SUB_KEYS)) {
+                                        0 -> currency = reader.nextString()
+                                        1 -> lockUpDuration = reader.nextInt()
+                                        2 -> maxWithdrawalAmount =
                                             reader.nextString()
-                                        "minDepositAmount" -> minDepositAmount = reader.nextString()
+                                        3 -> minDepositAmount = reader.nextString()
                                     }
                                 }
                                 reader.endObject()
@@ -53,5 +52,11 @@ class InterestLimitsMapAdapter {
         val limitsObject = AssetLimitsResponse(map)
 
         return InterestLimitsFullResponse(limitsObject)
+    }
+
+    companion object {
+        private val KEYS = JsonReader.Options.of("limits")
+        private val SUB_KEYS =
+            JsonReader.Options.of("currency", "lockUpDuration", "maxWithdrawalAmount", "minDepositAmount")
     }
 }

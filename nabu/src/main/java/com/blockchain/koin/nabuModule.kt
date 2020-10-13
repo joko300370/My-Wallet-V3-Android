@@ -29,12 +29,14 @@ import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProvider
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEligibilityProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEligibilityProviderImpl
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestEligibilityMapAdapter
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestLimitsMapAdapter
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
@@ -100,8 +102,7 @@ val nabuModule = module {
                 fundsFeatureFlag = get(simpleBuyFundsFeatureFlag),
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
-                interestLimitsRepository = get(),
-                interestEnabledRepository = get()
+                interestRepository = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -115,11 +116,18 @@ val nabuModule = module {
         }.bind(InterestLimitsProvider::class)
 
         factory {
-            InterestEnabledProviderImpl(
+            InterestAvailabilityProviderImpl(
                 nabuService = get(),
                 authenticator = get()
             )
-        }.bind(InterestEnabledProvider::class)
+        }.bind(InterestAvailabilityProvider::class)
+
+        factory {
+            InterestEligibilityProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(InterestEligibilityProvider::class)
 
         factory {
             BalanceProviderImpl(
@@ -180,12 +188,13 @@ val nabuModule = module {
         }
 
         scoped {
-            InterestLimitsRepository(interestLimitsProvider = get())
+            InterestRepository(
+                interestAvailabilityProvider = get(),
+                interestEligibilityProvider = get(),
+                interestLimitsProvider = get()
+            )
         }
 
-        scoped {
-            InterestEnabledRepository(interestEnabledProvider = get())
-        }
         scoped {
             WithdrawLocksRepository(custodialWalletManager = get())
         }
@@ -197,6 +206,10 @@ val nabuModule = module {
 
     moshiInterceptor(interestLimits) { builder ->
         builder.add(InterestLimitsMapAdapter())
+    }
+
+    moshiInterceptor(interestEligibility) { builder ->
+        builder.add(InterestEligibilityMapAdapter())
     }
 
     single { NabuSessionTokenStore() }

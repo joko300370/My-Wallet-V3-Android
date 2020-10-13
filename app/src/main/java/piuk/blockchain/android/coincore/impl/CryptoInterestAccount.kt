@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -113,11 +114,10 @@ internal class CryptoInterestAccount(
         }.toList()
     }
 
-    fun isInterestEnabled() =
-        custodialWalletManager.getInterestEnabledForAsset(asset)
-            .map {
-                nabuAccountExists.set(it)
-            }
+    fun isInterestSupported() = custodialWalletManager.getInterestAvailabilityForAsset(asset)
+        .map {
+            nabuAccountExists.set(it)
+        }
 
     val isConfigured: Boolean
         get() = nabuAccountExists.get()
@@ -125,10 +125,8 @@ internal class CryptoInterestAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val isDefault: Boolean =
-        false // Default is, presently, only ever a non-custodial account.
+    override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
-    // TODO: Where is this called?
     override val sourceState: Single<TxSourceState>
         get() = Single.just(
             if (nabuAccountExists.get()) {
@@ -137,6 +135,16 @@ internal class CryptoInterestAccount(
                 TxSourceState.NOT_SUPPORTED
             }
         )
+
+    override val isEnabled: Single<Boolean>
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (enabled, _) ->
+            enabled
+        }
+
+    override val disabledReason: Single<DisabledReason>
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (_, reason) ->
+            reason
+        }
 
     override val actions: AvailableActions = setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
 

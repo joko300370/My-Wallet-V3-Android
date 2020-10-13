@@ -1891,7 +1891,7 @@
   <string name="interest_summary_accrued">Nashromážděný úrok tento měsíc</string>
   <string name="interest_summary_accrued_fail">Nelze načíst nahromaděný úrok</string>
   <string name="interest_summary_hold_period">Počáteční období pozastavení</string>
-  <string name="interest_summary_hold_period_days">%1$f dnů</string>
+  <string name="interest_summary_hold_period_days">%1$d dnů</string>
   <string name="interest_summary_hold_period_fail">Nelze načíst podrobnosti doby zadržení</string>
   <string name="interest_summary_rate">Úroková sazba</string>
   <string name="interest_summary_rate_fail">Nelze načíst úrokovou sazbu</string>

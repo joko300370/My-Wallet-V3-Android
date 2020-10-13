@@ -1890,7 +1890,7 @@
   <string name="interest_summary_accrued">Dobânda acumulată luna aceasta</string>
   <string name="interest_summary_accrued_fail">Nu se pot încărca dobânzile acumulate</string>
   <string name="interest_summary_hold_period">Perioada inițială de reținere</string>
-  <string name="interest_summary_hold_period_days">%1$f Zile</string>
+  <string name="interest_summary_hold_period_days">%1$d Zile</string>
   <string name="interest_summary_hold_period_fail">Nu se pot încărca detaliile perioadei de păstrare</string>
   <string name="interest_summary_rate">Rata dobânzii</string>
   <string name="interest_summary_rate_fail">Nu se poate încărca rata dobânzii</string>

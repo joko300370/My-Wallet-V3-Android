@@ -6,9 +6,10 @@ import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.interest.InterestActivityResponse
 import com.blockchain.swap.nabu.models.interest.InterestAddressResponse
+import com.blockchain.swap.nabu.models.interest.InterestEligibilityFullResponse
 import com.blockchain.swap.nabu.models.interest.InterestEnabledResponse
 import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestResponse
+import com.blockchain.swap.nabu.models.interest.InterestRateResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
@@ -368,7 +369,7 @@ internal interface Nabu {
     fun getInterestRates(
         @Header("authorization") authorization: String,
         @Query("ccy") currency: String
-    ): Single<Response<InterestResponse>>
+    ): Single<InterestRateResponse>
 
     @GET(NABU_INTEREST_ACCOUNT_BALANCE)
     fun getInterestAccountDetails(
@@ -380,23 +381,28 @@ internal interface Nabu {
     fun getInterestAddress(
         @Header("authorization") authorization: String,
         @Query("ccy") currency: String
-    ): Single<Response<InterestAddressResponse>>
+    ): Single<InterestAddressResponse>
 
     @GET(NABU_INTEREST_ACTIVITY)
     fun getInterestActivity(
         @Header("authorization") authorization: String,
         @Query("product") product: String,
         @Query("currency") currency: String
-    ): Single<Response<InterestActivityResponse>>
+    ): Single<InterestActivityResponse>
 
     @GET(NABU_INTEREST_LIMITS)
     fun getInterestLimits(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String
-    ): Single<Response<InterestLimitsFullResponse>>
+    ): Single<InterestLimitsFullResponse>
 
     @GET(NABU_INTEREST_ENABLED)
     fun getInterestEnabled(
         @Header("authorization") authorization: String
-    ): Single<Response<InterestEnabledResponse>>
+    ): Single<InterestEnabledResponse>
+
+    @GET(NABU_INTEREST_ELIGIBILITY)
+    fun getInterestEligibility(
+        @Header("authorization") authorization: String
+    ): Single<InterestEligibilityFullResponse>
 }

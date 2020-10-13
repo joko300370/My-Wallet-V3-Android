@@ -5,18 +5,20 @@ import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
-class InterestEnabledProviderImpl(
+interface InterestAvailabilityProvider {
+    fun getEnabledStatusForAllAssets(): Single<List<CryptoCurrency>>
+}
+
+class InterestAvailabilityProviderImpl(
     private val nabuService: NabuService,
     private val authenticator: Authenticator
-) : InterestEnabledProvider {
+) : InterestAvailabilityProvider {
     override fun getEnabledStatusForAllAssets(): Single<List<CryptoCurrency>> =
         authenticator.authenticate { token ->
-            nabuService.getInterestEnabled(token).map { response ->
-                response.body()?.let { instrumentsResponse ->
-                    instrumentsResponse.instruments.map {
-                        CryptoCurrency.fromNetworkTicker(it)!!
-                    }
-                } ?: emptyList()
+            nabuService.getInterestEnabled(token).map { instrumentsResponse ->
+                instrumentsResponse.instruments.map {
+                    CryptoCurrency.fromNetworkTicker(it)
+                }.mapNotNull { it }
             }
         }
 }

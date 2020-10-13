@@ -29,9 +29,9 @@ import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestEnabledRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
-import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimitsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -78,8 +78,7 @@ class LiveCustodialWalletManager(
     private val paymentAccountMapperMappers: Map<String, PaymentAccountMapper>,
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
-    private val interestLimitsRepository: InterestLimitsRepository,
-    private val interestEnabledRepository: InterestEnabledRepository
+    private val interestRepository: InterestRepository
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -284,7 +283,7 @@ class LiveCustodialWalletManager(
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
         this.filter { order ->
             order.outputCurrency == crypto.networkTicker ||
-                    order.inputCurrency == crypto.networkTicker
+                order.inputCurrency == crypto.networkTicker
         }
             .map { order -> order.toBuySellOrder() }
 
@@ -523,7 +522,7 @@ class LiveCustodialWalletManager(
     override fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double> =
         authenticator.authenticate { sessionToken ->
             nabuService.getInterestRates(sessionToken, crypto.networkTicker).map {
-                it.body()?.rate ?: 0.0
+                it.rate
             }
         }
 
@@ -555,7 +554,7 @@ class LiveCustodialWalletManager(
 
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency
-    ): Single<InterestAccountDetails?> =
+    ): Single<InterestAccountDetails> =
         authenticator.authenticate { sessionToken ->
             nabuService.getInterestAccountDetails(sessionToken, crypto.networkTicker).map {
                 it.toInterestAccountDetails(crypto)
@@ -565,7 +564,7 @@ class LiveCustodialWalletManager(
     override fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String> =
         authenticator.authenticate { sessionToken ->
             nabuService.getInterestAddress(sessionToken, crypto.networkTicker).map {
-                it.body()?.accountRef ?: ""
+                it.accountRef
             }
         }
 
@@ -577,12 +576,12 @@ class LiveCustodialWalletManager(
                     authenticator.authenticate { sessionToken ->
                         nabuService.getInterestActivity(sessionToken, crypto.networkTicker)
                             .map { interestActivityResponse ->
-                                interestActivityResponse.body()?.items?.map {
+                                interestActivityResponse.items.map {
                                     val cryptoCurrency =
                                         CryptoCurrency.fromNetworkTicker(it.amount.symbol)!!
 
                                     it.toInterestActivityItem(cryptoCurrency)
-                                } ?: emptyList()
+                                }
                             }
                     }
                 } else {
@@ -591,13 +590,16 @@ class LiveCustodialWalletManager(
             }
 
     override fun getInterestLimits(crypto: CryptoCurrency): Maybe<InterestLimits> =
-        interestLimitsRepository.getLimitForAsset(crypto)
+        interestRepository.getLimitForAsset(crypto)
 
-    override fun getInterestEnabledForAsset(crypto: CryptoCurrency): Single<Boolean> =
-        interestEnabledRepository.getEnabledForAsset(crypto)
+    override fun getInterestAvailabilityForAsset(crypto: CryptoCurrency): Single<Boolean> =
+        interestRepository.getAvailabilityForAsset(crypto)
 
     override fun getInterestEnabledAssets(): Single<List<CryptoCurrency>> =
-        interestEnabledRepository.getEnabledAssets()
+        interestRepository.getAvailableAssets()
+
+    override fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility> =
+        interestRepository.getEligibilityForAsset(crypto)
 
     override fun getSupportedFundsFiats(
         fiatCurrency: String,
@@ -609,7 +611,7 @@ class LiveCustodialWalletManager(
         }.map { paymentMethodsResponse ->
             paymentMethodsResponse.methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -762,7 +764,8 @@ private fun BuySellOrderResponse.type() =
     }
 
 enum class OrderType {
-    BUY, SELL
+    BUY,
+    SELL
 }
 
 private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
@@ -789,11 +792,11 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
         paymentMethodId = paymentMethodId ?: (
-                when (paymentType.toPaymentMethodType()) {
-                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                }),
+            when (paymentType.toPaymentMethodType()) {
+                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+            }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLong())

@@ -1890,7 +1890,7 @@
   <string name="interest_summary_accrued">今月の未収利息</string>
   <string name="interest_summary_accrued_fail">経過利息を読み込めません</string>
   <string name="interest_summary_hold_period">最初の保留期間</string>
-  <string name="interest_summary_hold_period_days">%1$f日</string>
+  <string name="interest_summary_hold_period_days">%1$d日</string>
   <string name="interest_summary_hold_period_fail">保持期間の詳細を読み込めません</string>
   <string name="interest_summary_rate">金利</string>
   <string name="interest_summary_rate_fail">金利を読み込めません</string>

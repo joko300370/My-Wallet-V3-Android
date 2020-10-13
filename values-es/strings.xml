@@ -1887,7 +1887,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="interest_summary_accrued">Interés acumulado este mes</string>
   <string name="interest_summary_accrued_fail">No se pueden cargar los intereses acumulados</string>
   <string name="interest_summary_hold_period">Período de retención inicial</string>
-  <string name="interest_summary_hold_period_days">%1$f días</string>
+  <string name="interest_summary_hold_period_days">%1$d días</string>
   <string name="interest_summary_hold_period_fail">No se pueden cargar los detalles del período de retención</string>
   <string name="interest_summary_rate">Tasa de interés</string>
   <string name="interest_summary_rate_fail">No se puede cargar la tasa de interés</string>

@@ -517,6 +517,11 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getInterestEnabled(authorization = sessionToken.authHeader)
         .wrapErrorMessage()
 
+    fun getInterestEligibility(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getInterestEligibility(authorization = sessionToken.authHeader)
+        .wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }

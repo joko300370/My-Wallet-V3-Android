@@ -32,6 +32,6 @@ sealed class InterestDashboardItem
 
 object InterestIdentityVerificationItem : InterestDashboardItem()
 class InterestAssetInfoItem(
-    val isKyc: Boolean,
+    val isKycGold: Boolean,
     val cryptoCurrency: CryptoCurrency
 ) : InterestDashboardItem()

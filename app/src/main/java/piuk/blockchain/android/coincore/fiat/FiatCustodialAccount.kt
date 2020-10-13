@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -16,8 +17,8 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -95,6 +96,12 @@ internal class FiatCustodialAccount(
 
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 }
 
 class FiatAccountGroup(

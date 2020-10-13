@@ -1890,7 +1890,7 @@
   <string name="interest_summary_accrued">本月应计利息</string>
   <string name="interest_summary_accrued_fail">无法加载应计利息</string>
   <string name="interest_summary_hold_period">初始保留期</string>
-  <string name="interest_summary_hold_period_days">%1$f天</string>
+  <string name="interest_summary_hold_period_days">%1$d天</string>
   <string name="interest_summary_hold_period_fail">无法加载保留期详细信息</string>
   <string name="interest_summary_rate">利率</string>
   <string name="interest_summary_rate_fail">无法加载利率</string>

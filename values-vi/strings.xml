@@ -1890,7 +1890,7 @@
   <string name="interest_summary_accrued">Tiền lãi tích lũy trong tháng này</string>
   <string name="interest_summary_accrued_fail">Không thể tải lãi tích lũy</string>
   <string name="interest_summary_hold_period">Thời gian giữ ban đầu</string>
-  <string name="interest_summary_hold_period_days">%1$f Ngày</string>
+  <string name="interest_summary_hold_period_days">%1$d Ngày</string>
   <string name="interest_summary_hold_period_fail">Không thể tải chi tiết thời gian lưu giữ</string>
   <string name="interest_summary_rate">Lãi suất</string>
   <string name="interest_summary_rate_fail">Không thể tải lãi suất</string>

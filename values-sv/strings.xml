@@ -1891,7 +1891,7 @@
   <string name="interest_summary_accrued">Upplupet ränta den här månaden</string>
   <string name="interest_summary_accrued_fail">Det går inte att ladda upplupen ränta</string>
   <string name="interest_summary_hold_period">Inledande hållperiod</string>
-  <string name="interest_summary_hold_period_days">%1$f dagar</string>
+  <string name="interest_summary_hold_period_days">%1$d dagar</string>
   <string name="interest_summary_hold_period_fail">Det gick inte att ladda information om innehavsperiod</string>
   <string name="interest_summary_rate">Ränta</string>
   <string name="interest_summary_rate_fail">Det gick inte att ladda räntan</string>

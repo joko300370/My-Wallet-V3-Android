@@ -91,7 +91,7 @@ internal abstract class CryptoAssetBase(
                 environmentConfig
             )
         ).flatMap { account ->
-            account.isInterestEnabled().map {
+            account.isInterestSupported().map {
                 if (account.isConfigured) {
                     listOf(account)
                 } else {

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -23,6 +24,10 @@ interface BlockchainAccount {
     val isFunded: Boolean
 
     val hasTransactions: Boolean
+
+    val isEnabled: Single<Boolean>
+
+    val disabledReason: Single<DisabledReason>
 
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
@@ -70,6 +75,12 @@ interface FiatAccount : SingleAccount {
 
 interface AccountGroup : BlockchainAccount {
     val accounts: SingleAccountList
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 
     fun includes(account: BlockchainAccount): Boolean
 }
@@ -120,6 +131,12 @@ class NullCryptoAccount(
         exchangeRates: ExchangeRates
     ): Single<Money> =
         Single.just(FiatValue.zero(fiatCurrency))
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 }
 
 object NullFiatAccount : FiatAccount {
@@ -148,6 +165,12 @@ object NullFiatAccount : FiatAccount {
     override val actions: AvailableActions = emptySet()
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 
     override fun fiatBalance(
         fiatCurrency: String,

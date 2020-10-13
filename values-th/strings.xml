@@ -1892,7 +1892,7 @@
   <string name="interest_summary_accrued">ดอกเบี้ยคงค้างของเดือนนี้</string>
   <string name="interest_summary_accrued_fail">ไม่สามารถโหลดดอกเบี้ยค้างรับ</string>
   <string name="interest_summary_hold_period">ระยะเวลาการระงับเริ่มต้น</string>
-  <string name="interest_summary_hold_period_days">%1$f วัน</string>
+  <string name="interest_summary_hold_period_days">%1$d วัน</string>
   <string name="interest_summary_hold_period_fail">ไม่สามารถโหลดรายละเอียดระยะเวลาการถือครอง</string>
   <string name="interest_summary_rate">อัตราดอกเบี้ย</string>
   <string name="interest_summary_rate_fail">ไม่สามารถโหลดอัตราดอกเบี้ย</string>

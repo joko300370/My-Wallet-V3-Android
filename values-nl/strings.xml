@@ -1891,7 +1891,7 @@
   <string name="interest_summary_accrued">Opgebouwde rente deze maand</string>
   <string name="interest_summary_accrued_fail">Kan opgebouwde rente niet laden</string>
   <string name="interest_summary_hold_period">Initiële wachtperiode</string>
-  <string name="interest_summary_hold_period_days">%1$f dagen</string>
+  <string name="interest_summary_hold_period_days">%1$d dagen</string>
   <string name="interest_summary_hold_period_fail">Kan details van de holdingsperiode niet laden</string>
   <string name="interest_summary_rate">Rente</string>
   <string name="interest_summary_rate_fail">Kan rentetarief niet laden</string>

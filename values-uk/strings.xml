@@ -1893,7 +1893,7 @@
   <string name="interest_summary_accrued">Нараховані відсотки цього місяця</string>
   <string name="interest_summary_accrued_fail">Неможливо завантажити нараховані відсотки</string>
   <string name="interest_summary_hold_period">Початковий період утримання</string>
-  <string name="interest_summary_hold_period_days">%1$f днів</string>
+  <string name="interest_summary_hold_period_days">%1$d днів</string>
   <string name="interest_summary_hold_period_fail">Не вдається завантажити деталі періоду витримки</string>
   <string name="interest_summary_rate">Процентна ставка</string>
   <string name="interest_summary_rate_fail">Неможливо завантажити процентну ставку</string>

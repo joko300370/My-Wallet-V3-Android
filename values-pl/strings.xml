@@ -1891,7 +1891,7 @@
   <string name="interest_summary_accrued">Narosłe odsetki w tym miesiącu</string>
   <string name="interest_summary_accrued_fail">Nie można załadować narosłych odsetek</string>
   <string name="interest_summary_hold_period">Początkowy okres wstrzymania</string>
-  <string name="interest_summary_hold_period_days">%1$f dni</string>
+  <string name="interest_summary_hold_period_days">%1$d dni</string>
   <string name="interest_summary_hold_period_fail">Nie można załadować szczegółów okresu utrzymywania</string>
   <string name="interest_summary_rate">Oprocentowanie</string>
   <string name="interest_summary_rate_fail">Nie można załadować stopy procentowej</string>

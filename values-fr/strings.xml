@@ -1891,7 +1891,7 @@ Veuillez réessayer plus tard.</string>
   <string name="interest_summary_accrued">Intérêts courus ce mois-ci</string>
   <string name="interest_summary_accrued_fail">Impossible de charger les intérêts courus</string>
   <string name="interest_summary_hold_period">Période de conservation initiale</string>
-  <string name="interest_summary_hold_period_days">%1$f jours</string>
+  <string name="interest_summary_hold_period_days">%1$d jours</string>
   <string name="interest_summary_hold_period_fail">Impossible de charger les détails de la période de détention</string>
   <string name="interest_summary_rate">Taux d\'intérêt</string>
   <string name="interest_summary_rate_fail">Impossible de charger le taux d\'intérêt</string>

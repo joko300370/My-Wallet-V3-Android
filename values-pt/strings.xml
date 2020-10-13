@@ -1890,7 +1890,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="interest_summary_accrued">Juros acumulados este mês</string>
   <string name="interest_summary_accrued_fail">Incapaz de carregar juros acumulados</string>
   <string name="interest_summary_hold_period">Período de espera inicial</string>
-  <string name="interest_summary_hold_period_days">%1$f dias</string>
+  <string name="interest_summary_hold_period_days">%1$d dias</string>
   <string name="interest_summary_hold_period_fail">Incapaz de carregar os detalhes do período de espera</string>
   <string name="interest_summary_rate">Taxa de juro</string>
   <string name="interest_summary_rate_fail">Incapaz de carregar taxa de juros</string>

@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu.models.interest
 
-data class InterestResponse(
+data class InterestRateResponse(
     val rate: Double
 )
 
@@ -80,3 +80,20 @@ data class InterestLimitsResponse(
 data class InterestEnabledResponse(
     val instruments: List<String>
 )
+
+data class InterestEligibilityFullResponse(
+    val eligibleList: Map<String, InterestEligibilityResponse>
+)
+
+data class InterestEligibilityResponse(
+    val eligible: Boolean,
+    val ineligibilityReason: DisabledReason
+)
+
+enum class DisabledReason {
+    REGION,
+    KYC_TIER,
+    BLOCKED,
+    OTHER,
+    NONE
+}

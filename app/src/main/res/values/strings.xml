@@ -1961,20 +1961,19 @@
     <!-- Interest -->
     <string name="earn_interest">Earn Interest</string>
     <string name="interest_summary_total">Total Interest Earned</string>
-    <string name="interest_summary_total_fail">Unable to load total interest</string>
     <string name="interest_summary_next_payment">Next Interest Payment</string>
     <string name="interest_summary_accrued">Accrued Interest This Month</string>
-    <string name="interest_summary_accrued_fail">Unable to load accrued interest</string>
     <string name="interest_summary_hold_period">Initial Hold Period</string>
-    <string name="interest_summary_hold_period_days">%1$f Days</string>
-    <string name="interest_summary_hold_period_fail">Unable to load holding period details</string>
+    <string name="interest_summary_hold_period_days">%1$d Days</string>
     <string name="interest_summary_rate">Interest Rate</string>
-    <string name="interest_summary_rate_fail">Unable to load interest rate</string>
     <string name="interest_dashboard_title">Interest Account</string>
     <string name="interest_dashboard_item_balance_title">%1$s Balance</string>
     <string name="interest_dashboard_item_accrued_title">Total Interest Earned</string>
     <string name="interest_dashboard_item_action_earn">Earn Interest</string>
     <string name="interest_dashboard_item_action_view">View</string>
+    <string name="interest_item_issue_region">Not available in your region</string>
+    <string name="interest_item_issue_kyc">You need to be Gold verified to start Earning Interest</string>
+    <string name="interest_item_issue_other">Currently unavailable, please check again later</string>
     <string name="interest_dashboard_item_rate_1">Earn up to&#160;</string>
     <string name="interest_dashboard_item_rate_2">&#160;annually on your %1$s</string>
     <string name="interest_dashboard_verify_title">Earn Interest on Your Crypto</string>

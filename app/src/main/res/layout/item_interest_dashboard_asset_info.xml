@@ -98,8 +98,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/very_small_margin"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/item_interest_explainer"
         app:layout_constraintTop_toBottomOf="@id/item_interest_acc_balance_label"
         tools:text="Earn interest" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/item_interest_explainer"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:drawableStart="@drawable/ic_information"
+        android:drawablePadding="@dimen/miniscule_margin"
+        android:gravity="start"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_interest_cta"
+        tools:text="There was an issue with interest and lets make this message long"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
