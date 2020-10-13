@@ -19,6 +19,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
 
 val transactionFlowScope = named("TransactionScope")
@@ -79,6 +80,12 @@ val transactionModule = module {
         )
     }
 
+    factory {
+        TxFlowErrorReporting(
+            crashLogger = get()
+        )
+    }
+
     scope(transactionFlowScope) {
 
         scoped {
@@ -92,7 +99,8 @@ val transactionModule = module {
             TransactionModel(
                 initialState = TransactionState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                errorLogger = get()
             )
         }
     }

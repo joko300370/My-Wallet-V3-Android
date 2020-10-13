@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -16,6 +17,8 @@ import io.reactivex.rxkotlin.Singles
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Transaction
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
@@ -61,7 +64,8 @@ class BtcOnChainTxEngine(
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword
-), BitPayClientEngine {
+), BitPayClientEngine, KoinComponent {
+
     override fun assertInputsValid() {
         require(sourceAccount is BtcCryptoWalletAccount)
         require(txTarget is CryptoAddress)
@@ -117,8 +121,7 @@ class BtcOnChainTxEngine(
                 // a problem:
                 .map { utxo ->
                     if (utxo.unspentOutputs.isEmpty()) {
-                        Timber.e("No BTC UTXOs found for non-zero balance!")
-                        throw IllegalStateException("No BTC UTXOs found for non-zero balance")
+                        throw fatalError(IllegalStateException("No BTC UTXOs found for non-zero balance"))
                     } else {
                         utxo
                     }
@@ -253,6 +256,7 @@ class BtcOnChainTxEngine(
             .then { validateAmounts(pendingTx) }
             .then { validateSufficientFunds(pendingTx) }
             .then { validateOptions(pendingTx) }
+            .logValidityFailure()
             .updateTxValidity(pendingTx)
 
     private fun validateAddress(): Completable =
@@ -334,13 +338,11 @@ class BtcOnChainTxEngine(
         }
 
     override fun doOnTransactionSuccess(pendingTx: PendingTx) {
-        // logPaymentSentEvent(true, CryptoCurrency.BTC, pendingTransaction.bigIntAmount)
         incrementBtcReceiveAddress(pendingTx)
     }
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
-        // logPaymentSentEvent(false, CryptoCurrency.BTC, pendingTransaction.bigIntAmount)
     }
 
     private fun getBtcKeys(pendingTx: PendingTx, secondPassword: String): Single<List<ECKey>> {
@@ -361,7 +363,7 @@ class BtcOnChainTxEngine(
                     btcDataManager.getAddressECKey(
                         legacyAddress = btcSource.internalAccount as LegacyAddress,
                         secondPassword = secondPassword
-                    ) ?: throw TransferError("Private key not found for legacy BTC address")
+                    ) ?: throw fatalError(TransferError("Private key not found for legacy BTC address"))
                 )
             )
         }
@@ -412,6 +414,17 @@ class BtcOnChainTxEngine(
         const val LARGE_TX_FEE = 0.5
         const val LARGE_TX_SIZE = 1024
         val LARGE_TX_PERCENTAGE = 1.0.toBigDecimal()
+    }
+
+    // TEMP diagnostics - TODO Remove this once we're stable
+    private val crashLogger: CrashLogger by inject()
+
+    private fun Completable.logValidityFailure(): Completable =
+        this.doOnError { crashLogger.logException(it) }
+
+    private fun fatalError(e: Throwable): Throwable {
+        crashLogger.logException(e)
+        return e
     }
 }
 

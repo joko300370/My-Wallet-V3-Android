@@ -75,13 +75,10 @@ data class TransactionState(
     val asset: CryptoCurrency = sendingAccount.asset
 
     val amount: Money
-        get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: BEtter default required
+        get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: Better default required
 
     val availableBalance: Money
-        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset) // TODO: BEtter default required
-
-    val feeAmount: Money
-        get() = pendingTx?.fees ?: throw IllegalStateException("No pending tx, fees unavailable")
+        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
 
     val canGoBack: Boolean
         get() = stepsBackStack.isNotEmpty()
@@ -90,7 +87,8 @@ data class TransactionState(
 class TransactionModel(
     initialState: TransactionState,
     mainScheduler: Scheduler,
-    private val interactor: TransactionInteractor
+    private val interactor: TransactionInteractor,
+    private val errorLogger: TxFlowErrorReporting
 ) : MviModel<TransactionState, TransactionIntent>(
     initialState,
     mainScheduler
@@ -144,6 +142,7 @@ class TransactionModel(
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")
+        errorLogger.log(TxFlowLogError.LoopFail(t))
     }
 
     override fun onStateUpdate(s: TransactionState) {
@@ -156,12 +155,9 @@ class TransactionModel(
                 onComplete = {
                     process(TransactionIntent.ReturnToPreviousStep)
                 },
-                onError = {
-                    process(
-                        TransactionIntent.FatalTransactionError(
-                            it
-                        )
-                    )
+                onError = { t ->
+                    errorLogger.log(TxFlowLogError.ResetFail(t))
+                    process(TransactionIntent.FatalTransactionError(t))
                 }
             )
 
@@ -171,9 +167,7 @@ class TransactionModel(
                 onSuccess = {
                     process(
                         if (it) {
-                            TransactionIntent.UpdatePasswordIsValidated(
-                                password
-                            )
+                            TransactionIntent.UpdatePasswordIsValidated(password)
                         } else {
                             TransactionIntent.UpdatePasswordNotValidated
                         }
@@ -189,24 +183,13 @@ class TransactionModel(
         interactor.validateTargetAddress(address, expectedAsset)
             .subscribeBy(
                 onSuccess = {
-                    process(
-                        TransactionIntent.TargetAddressValidated(
-                            it
-                        )
-                    )
+                    process(TransactionIntent.TargetAddressValidated(it))
                 },
-                onError = {
-                    when (it) {
-                        is TxValidationFailure -> process(
-                            TransactionIntent.TargetAddressInvalid(
-                                it
-                            )
-                        )
-                        else -> process(
-                            TransactionIntent.FatalTransactionError(
-                                it
-                            )
-                        )
+                onError = { t ->
+                    errorLogger.log(TxFlowLogError.AddressFail(t))
+                    when (t) {
+                        is TxValidationFailure -> process(TransactionIntent.TargetAddressInvalid(t))
+                        else -> process(TransactionIntent.FatalTransactionError(t))
                     }
                 }
             )
@@ -229,25 +212,16 @@ class TransactionModel(
                 },
                 onError = {
                     Timber.e("!TRANSACTION!> Processor failed: $it")
+                    errorLogger.log(TxFlowLogError.TargetFail(it))
                     process(TransactionIntent.FatalTransactionError(it))
                 }
             )
 
-    private fun onFirstUpdate(
-        amount: Money
-    ) {
-        process(
-            TransactionIntent.PendingTransactionStarted(
-                interactor.canTransactFiat
-            )
-        )
+    private fun onFirstUpdate(amount: Money) {
+        process(TransactionIntent.PendingTransactionStarted(interactor.canTransactFiat))
         process(TransactionIntent.FetchFiatRates)
         process(TransactionIntent.FetchTargetRates)
-        process(
-            TransactionIntent.AmountChanged(
-                amount
-            )
-        )
+        process(TransactionIntent.AmountChanged(amount))
     }
 
     private fun processAmountChanged(amount: Money): Disposable =
@@ -255,6 +229,7 @@ class TransactionModel(
             .subscribeBy(
                 onError = {
                     Timber.e("!TRANSACTION!> Unable to get update available balance")
+                    errorLogger.log(TxFlowLogError.BalanceFail(it))
                     process(TransactionIntent.FatalTransactionError(it))
                 }
             )
@@ -267,11 +242,8 @@ class TransactionModel(
                 },
                 onError = {
                     Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
-                    process(
-                        TransactionIntent.FatalTransactionError(
-                            it
-                        )
-                    )
+                    errorLogger.log(TxFlowLogError.ExecuteFail(it))
+                    process(TransactionIntent.FatalTransactionError(it))
                 }
             )
 
@@ -287,25 +259,30 @@ class TransactionModel(
     private fun processGetFiatRate(): Disposable =
         interactor.startFiatRateFetch()
             .subscribeBy(
-                onNext = { process(
-                    TransactionIntent.FiatRateUpdated(
-                        it
-                    )
-                ) },
+                onNext = { process(TransactionIntent.FiatRateUpdated(it)) },
                 onComplete = { Timber.d("Fiat exchange Rate completed") },
-                onError = { Timber.e("Failed getting exchange rate") }
+                onError = { Timber.e("Failed getting fiat exchange rate") }
             )
 
     private fun processGetTargetRate(): Disposable =
         interactor.startTargetRateFetch()
             .subscribeBy(
-                onNext = { process(
-                    TransactionIntent.CryptoRateUpdated(
-                        it
-                    )
-                ) },
+                onNext = { process(TransactionIntent.CryptoRateUpdated(it)) },
                 onComplete = { Timber.d("Target exchange Rate completed") },
                 onError = { Timber.e("Failed getting target exchange rate") }
+            )
+
+    private fun processValidateTransaction(): Disposable? =
+        interactor.validateTransaction()
+            .subscribeBy(
+                onError = {
+                    Timber.e("!TRANSACTION!> Unable to validate transaction: $it")
+                    errorLogger.log(TxFlowLogError.ValidateFail(it))
+                    process(TransactionIntent.FatalTransactionError(it))
+                },
+                onComplete = {
+                    Timber.d("!TRANSACTION!> Tx validation complete")
+                }
             )
 
     override fun distinctIntentFilter(
@@ -324,18 +301,6 @@ class TransactionModel(
             else -> super.distinctIntentFilter(previousIntent, nextIntent)
         }
     }
-
-    private fun processValidateTransaction(): Disposable? =
-        interactor.validateTransaction()
-            .subscribeBy(
-                onError = {
-                    Timber.e("!TRANSACTION!> Unable to validate transaction: $it")
-                    process(TransactionIntent.FatalTransactionError(it))
-                },
-                onComplete = {
-                    Timber.d("!TRANSACTION!> Tx validation complete")
-                }
-            )
 }
 
 private var firstCall = true
