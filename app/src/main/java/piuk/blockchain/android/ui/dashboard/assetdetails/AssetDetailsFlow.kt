@@ -108,7 +108,7 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
                     this,
-                    filterNonCustodialAccounts(localState.hostAction == AssetAction.Receive),
+                    filterNonCustodialAccounts(localState.hostAction, localState.hostAction == AssetAction.Receive),
                     when (localState.hostAction) {
                         AssetAction.Deposit -> R.string.select_deposit_source_title
                         AssetAction.NewSend -> R.string.select_send_sheet_title
@@ -118,11 +118,14 @@ class AssetDetailsFlow(
         )
     }
 
-    private fun filterNonCustodialAccounts(showUnFunded: Boolean): Single<List<BlockchainAccount>> =
+    private fun filterNonCustodialAccounts(
+        action: AssetAction?,
+        showUnFunded: Boolean
+    ): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
             .map {
-                it.filter { a -> showUnFunded || a.isFunded }
+                it.filter { a -> (showUnFunded || a.isFunded) && a.actions.contains(action) }
             }
 
     private fun handleHostAction(
