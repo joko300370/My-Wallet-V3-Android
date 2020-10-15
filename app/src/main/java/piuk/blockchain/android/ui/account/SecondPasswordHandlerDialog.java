@@ -5,7 +5,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
 import android.text.InputType;
-import com.blockchain.ui.CurrentContextAccess;
+import piuk.blockchain.android.util.CurrentContextAccess;
 import info.blockchain.wallet.payload.PayloadManager;
 import io.reactivex.Observable;
 import org.jetbrains.annotations.NotNull;

@@ -12,7 +12,6 @@ class CredentialsWiper(
     private val usdtAccount: Erc20Account,
     private val accessState: AccessState,
     private val appUtil: AppUtil
-
 ) {
     fun unload() {
         payloadManagerWiper.wipe()

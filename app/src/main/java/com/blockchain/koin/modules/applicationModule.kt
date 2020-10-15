@@ -23,13 +23,14 @@ import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.xlm
+import com.blockchain.logging.DigitalTrust
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
-import com.blockchain.ui.CurrentContextAccess
+import piuk.blockchain.android.util.CurrentContextAccess
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
@@ -55,6 +56,7 @@ import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrate
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
+import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.simplebuy.EURPaymentAccountMapper
 import piuk.blockchain.android.simplebuy.GBPPaymentAccountMapper
@@ -163,6 +165,13 @@ val applicationModule = module {
     single { CurrentContextAccess() }
 
     single { LifecycleInterestedComponent() }
+
+    single {
+        SiftDigitalTrust(
+            accountId = BuildConfig.SIFT_ACCOUNT_ID,
+            beaconKey = BuildConfig.SIFT_BEACON_KEY
+        )
+    }.bind(DigitalTrust::class)
 
     scope(payloadScopeQualifier) {
         factory {

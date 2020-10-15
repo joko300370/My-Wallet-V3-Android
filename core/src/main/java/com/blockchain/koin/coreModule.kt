@@ -273,7 +273,8 @@ val coreModule = module {
             context = get(),
             prefs = get(),
             rxBus = get(),
-            crashLogger = get()
+            crashLogger = get(),
+            trust = get()
         )
     }.bind(AccessState::class)
 

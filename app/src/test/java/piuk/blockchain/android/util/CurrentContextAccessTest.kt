@@ -1,4 +1,4 @@
-package com.blockchain.ui
+package piuk.blockchain.android.util
 
 import androidx.appcompat.app.AppCompatActivity
 import org.amshove.kluent.`should be`
@@ -13,33 +13,32 @@ class CurrentContextAccessTest {
     }
 
     @Test
-    fun `on resume, the context is stored`() {
+    fun `context is saved on contextOpen()`() {
         val access = CurrentContextAccess()
         val activity = mock<AppCompatActivity>()
-        access.createCallBacks().onActivityResumed(activity)
+        access.contextOpen(activity)
         access.context `should be` activity
     }
 
     @Test
-    fun `on pause, the context is released`() {
+    fun `context is released when closed`() {
         val access = CurrentContextAccess()
         val activity = mock<AppCompatActivity>()
-        access.createCallBacks().apply {
-            onActivityResumed(activity)
-            onActivityPaused(activity)
-        }
+
+        access.contextOpen(activity)
+        access.contextClose(activity)
+
         access.context `should be` null
     }
 
     @Test
-    fun `on pause of a different activity, the context is not touched`() {
+    fun `closing a different context does not affect the current one`() {
         val access = CurrentContextAccess()
         val activity1 = mock<AppCompatActivity>()
         val activity2 = mock<AppCompatActivity>()
-        access.createCallBacks().apply {
-            onActivityResumed(activity1)
-            onActivityPaused(activity2)
-        }
+        access.contextOpen(activity1)
+        access.contextClose(activity2)
+
         access.context `should be` activity1
     }
 }

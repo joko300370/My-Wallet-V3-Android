@@ -96,6 +96,7 @@ object Versions {
     // Third Party SDKs
     const val veriff = "3.2.0"
     const val probity = "1.0.0"
+    const val sift = "0.10.5"
     const val cardForm = "4.2.0"
     const val xlmSunriver = "0.19.0"
 
@@ -173,10 +174,8 @@ object Libraries {
 
     // Networking, RxJava
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val retrofitJacksonConverter =
-        "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
-    const val retrofitRxMoshiConverter =
-        "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
+    const val retrofitJacksonConverter = "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}"
+    const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:2.5.0"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
@@ -195,10 +194,8 @@ object Libraries {
     const val rxKotlin = "io.reactivex.rxjava2:rxkotlin:${Versions.rxKotlin}"
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxBinding = "com.jakewharton.rxbinding2:rxbinding-kotlin:${Versions.rxBinding}"
-    const val rxBindingV4 =
-        "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:${Versions.rxBinding}"
-    const val rxBindingV7 =
-        "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:${Versions.rxBinding}"
+    const val rxBindingV4 = "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:${Versions.rxBinding}"
+    const val rxBindingV7 = "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:${Versions.rxBinding}"
     const val rxReplayShare = "com.jakewharton.rx2:replaying-share-kotlin:${Versions.rxReplayShare}"
     const val rxRelay = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxRelay}"
     const val rxFingerprint = "com.mtramin:rxfingerprint:${Versions.rxFingerprint}"
@@ -224,18 +221,17 @@ object Libraries {
     const val charts = "com.github.PhilJay:MPAndroidChart:v${Versions.charts}"
     const val circleIndicator = "me.relex:circleindicator:${Versions.circleIndicator}@aar"
     const val bottomNav = "com.aurelhubert:ahbottomnavigation:${Versions.bottomNav}"
-    const val countryPicker =
-        "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
+    const val countryPicker = "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
-    const val materialDatePicker =
-        "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
+    const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 
     // Third Party SDKs
     const val veriff = "com.veriff:veriff-library:${Versions.veriff}"
     const val probity = "io.probity.sdk:collector:${Versions.probity}"
+    const val sift = "com.siftscience:sift-android:${Versions.sift}"
     const val cardForm = "com.braintreepayments:card-form:${Versions.cardForm}"
     const val sunriver = "com.github.stellar:java-stellar-sdk:${Versions.xlmSunriver}"
 
@@ -243,10 +239,8 @@ object Libraries {
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
     const val slf4j = "org.slf4j:slf4j-simple:${Versions.slf4j}"
     const val slf4jNoOp = "org.slf4j:slf4j-nop:${Versions.slf4j}"
-    const val firebaseCrashlytics =
-        "com.google.firebase:firebase-crashlytics:${Versions.firebaseCrashlytics}"
-    const val firebaseCrashlyticsPlugin =
-        "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsPlugin}"
+    const val firebaseCrashlytics = "com.google.firebase:firebase-crashlytics:${Versions.firebaseCrashlytics}"
+    const val firebaseCrashlyticsPlugin = "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsPlugin}"
     const val firebaseAnalytics = "com.google.firebase:firebase-analytics:${Versions.firebaseAnalytics}"
 
     // Debugging

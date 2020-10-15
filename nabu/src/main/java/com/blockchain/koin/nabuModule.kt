@@ -86,7 +86,8 @@ val nabuModule = module {
                 payloadDataManager = get(),
                 prefs = get(),
                 walletReporter = get(uniqueId),
-                userReporter = get(uniqueUserAnalytics)
+                userReporter = get(uniqueUserAnalytics),
+                trust = get()
             )
         }.bind(NabuDataManager::class)
 

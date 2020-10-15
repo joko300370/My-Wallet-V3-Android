@@ -132,6 +132,8 @@ android {
             buildConfigField "String", "ENVIRONMENT", '"env_prod"'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigField "String", "COMMIT_HASH", "\"\""
+            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['prodSiftAccount']
+            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['prodSiftBeaconId']
         }
         envDev {
             dimension "environment"
@@ -154,8 +156,11 @@ android {
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['devCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
-            versionNameSuffix '-dev'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['devSiftAccount']
+            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['devSiftBeaconId']
+
+            versionNameSuffix '-dev'
             applicationId "piuk.blockchain.android.dev"
             resValue "string", "app_name", "BlockDev"
         }
@@ -180,8 +185,11 @@ android {
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['stagingCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_staging"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
-            versionNameSuffix '-staging'
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
+            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['stagingSiftBeaconId']
+
+            versionNameSuffix '-staging'
             applicationId "piuk.blockchain.android.staging"
             resValue "string", "app_name", "BlockStaging"
         }
@@ -203,6 +211,8 @@ android {
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['testnetPitDoLink']
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['testnetPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['testnetCoinsWebsocket']
+            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
+            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['stagingSiftBeaconId']
             buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
             versionNameSuffix '-testnet'
@@ -224,6 +234,13 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
         exclude 'META-INF/rxjava.properties'
         exclude 'jni/**'
         exclude 'solidity/**'
@@ -284,6 +301,7 @@ dependencies {
     implementation Libraries.gson
     implementation Libraries.sparkline
     implementation Libraries.cardForm
+    implementation Libraries.sift
 
     // Google core
     implementation Libraries.googlePlayCore
