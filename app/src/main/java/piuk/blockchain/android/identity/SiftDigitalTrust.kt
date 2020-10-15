@@ -15,6 +15,7 @@ class SiftDigitalTrust(
         Sift.Config.Builder()
             .withAccountId(accountId)
             .withBeaconKey(beaconKey)
+            .withDisallowLocationCollection(true)
             .build().apply {
                 Sift.open(activity, this)
                 Sift.collect()
