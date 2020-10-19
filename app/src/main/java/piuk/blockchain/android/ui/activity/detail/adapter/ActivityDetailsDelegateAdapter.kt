@@ -13,17 +13,9 @@ class ActivityDetailsDelegateAdapter(
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
             addAdapterDelegate(ActivityDetailInfoItemDelegate())
-            addAdapterDelegate(
-                ActivityDetailDescriptionItemDelegate(
-                    onDescriptionItemUpdated
-                )
-            )
+            addAdapterDelegate(ActivityDetailDescriptionItemDelegate(onDescriptionItemUpdated))
             addAdapterDelegate(ActivityDetailActionItemDelegate(onActionItemClicked))
-            addAdapterDelegate(
-                ActivityDetailCancelActionItemDelegate(
-                    onCancelActionItemClicked
-                )
-            )
+            addAdapterDelegate(ActivityDetailCancelActionItemDelegate(onCancelActionItemClicked))
         }
     }
 }

@@ -25,6 +25,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
@@ -94,22 +95,40 @@ private class InterestAssetItemViewHolder(val parent: View) :
         }.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { details ->
-                    with(itemView) {
-                        item_interest_acc_earned_label.text = details.totalInterest.toStringWithSymbol()
-
-                        item_interest_acc_balance_label.text = details.balance.toStringWithSymbol()
-
-                        setDisabledExplanation(details)
-
-                        setCta(item, details, itemClicked)
-
-                        setInterestInfo(details, item)
-                    }
+                    showInterestDetails(details, item, itemClicked)
                 },
                 onError = {
                     Timber.e("Error loading interest dashboard item: $it")
+                    showDisabledState()
                 }
             )
+    }
+
+    private fun showDisabledState() {
+        with(itemView) {
+            item_interest_cta.isEnabled = false
+            item_interest_cta.text = context.getString(R.string.interest_dashboard_item_action_earn)
+            item_interest_explainer.visible()
+            item_interest_explainer.text = context.getString(R.string.interest_item_issue_other)
+        }
+    }
+
+    private fun showInterestDetails(
+        details: InterestDetails,
+        item: InterestAssetInfoItem,
+        itemClicked: (CryptoCurrency, Boolean) -> Unit
+    ) {
+        with(itemView) {
+            item_interest_acc_earned_label.text = details.totalInterest.toStringWithSymbol()
+
+            item_interest_acc_balance_label.text = details.balance.toStringWithSymbol()
+
+            setDisabledExplanation(details)
+
+            setCta(item, details, itemClicked)
+
+            setInterestInfo(details, item)
+        }
     }
 
     private fun View.setCta(

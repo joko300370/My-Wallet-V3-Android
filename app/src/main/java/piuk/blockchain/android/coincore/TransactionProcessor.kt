@@ -338,7 +338,7 @@ class TransactionProcessor(
     // Execute the transaction.
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
     // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
-    fun execute(secondPassword: String = ""): Completable {
+    fun execute(secondPassword: String): Completable {
         if (requireSecondPassword && secondPassword.isEmpty())
             throw IllegalArgumentException("Second password not supplied")
 

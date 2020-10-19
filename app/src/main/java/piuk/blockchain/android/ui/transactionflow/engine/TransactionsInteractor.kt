@@ -72,8 +72,8 @@ class TransactionInteractor(
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun verifyAndExecute(): Completable =
-        transactionProcessor?.execute() ?: throw IllegalStateException("TxProcessor not initialised")
+    fun verifyAndExecute(secondPassword: String): Completable =
+        transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun modifyOptionValue(newOption: TxOptionValue): Completable =
         transactionProcessor?.setOption(newOption) ?: throw IllegalStateException("TxProcessor not initialised")

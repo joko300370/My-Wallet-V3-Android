@@ -102,7 +102,7 @@ class TransactionModel(
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
             is TransactionIntent.PrepareTransaction -> null
-            is TransactionIntent.ExecuteTransaction -> processExecuteTransaction()
+            is TransactionIntent.ExecuteTransaction -> processExecuteTransaction(previousState.secondPassword)
             is TransactionIntent.ValidateInputTargetAddress ->
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
             is TransactionIntent.TargetAddressValidated -> null
@@ -234,8 +234,8 @@ class TransactionModel(
                 }
             )
 
-    private fun processExecuteTransaction(): Disposable? =
-        interactor.verifyAndExecute()
+    private fun processExecuteTransaction(secondPassword: String): Disposable? =
+        interactor.verifyAndExecute(secondPassword)
             .subscribeBy(
                 onComplete = {
                     process(TransactionIntent.UpdateTransactionComplete)

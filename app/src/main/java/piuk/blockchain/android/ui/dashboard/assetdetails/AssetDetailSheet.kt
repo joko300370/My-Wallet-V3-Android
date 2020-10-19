@@ -67,8 +67,11 @@ class AssetDetailSheet :
     }
 
     private val detailsAdapter by lazy {
-        AssetDetailAdapter(::onAccountSelected,
-            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token) {
+        AssetDetailAdapter(
+            ::onAccountSelected,
+            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
+            token
+        ) {
             PendingBalanceAccountDecorator(it.account)
         }
     }

@@ -182,8 +182,10 @@ class BtcOnChainTxEngine(
             // Need to run and validate amounts. And then build a fresh confirmation set, as the total
             // will need updating as well as the fees:
             if (newOption.selectedLevel != pendingTx.feeLevel) {
-                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BTC,
-                    newOption.selectedLevel.mapFeeLevelToSavedValue())
+                walletPreferences.setFeeTypeForAsset(
+                    CryptoCurrency.BTC,
+                    newOption.selectedLevel.mapFeeLevelToSavedValue()
+                )
                 doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
                     .flatMap { pTx -> doValidateAmount(pTx) }
                     .flatMap { pTx -> doBuildConfirmations(pTx) }

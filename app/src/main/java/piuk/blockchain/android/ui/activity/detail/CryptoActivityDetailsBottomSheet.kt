@@ -92,9 +92,14 @@ class CryptoActivityDetailsBottomSheet :
             newState.transactionType?.let {
                 showTransactionTypeUi(newState, dialogView)
 
-                renderCompletedOrPending(newState.isPending, newState.isPendingExecution,
-                    newState.confirmations, newState.totalConfirmations, newState.transactionType,
-                    newState.isFeeTransaction)
+                renderCompletedOrPending(
+                    newState.isPending,
+                    newState.isPendingExecution,
+                    newState.confirmations,
+                    newState.totalConfirmations,
+                    newState.transactionType,
+                    newState.isFeeTransaction
+                )
             }
         }
 

@@ -43,9 +43,13 @@ class ActivityDetailsInteractor(
         val list = mutableListOf(
             TransactionId(summaryItem.txId),
             Created(Date(summaryItem.timeStampMs)),
-            if (summaryItem.type == OrderType.BUY) BuyPurchaseAmount(summaryItem.fundedFiat) else
+            if (summaryItem.type == OrderType.BUY)
+                BuyPurchaseAmount(summaryItem.fundedFiat)
+            else
                 SellPurchaseAmount(summaryItem.fundedFiat),
-            if (summaryItem.type == OrderType.BUY) BuyCryptoWallet(summaryItem.cryptoCurrency) else
+            if (summaryItem.type == OrderType.BUY)
+                BuyCryptoWallet(summaryItem.cryptoCurrency)
+            else
                 SellCryptoWallet(summaryItem.fundedFiat.currencyCode),
             BuyFee(summaryItem.fee)
         )
@@ -55,8 +59,7 @@ class ActivityDetailsInteractor(
                 summaryItem.paymentMethodId
             )
                 .map { paymentMethod ->
-                    addPaymentDetailsToList(list, paymentMethod,
-                        summaryItem)
+                    addPaymentDetailsToList(list, paymentMethod, summaryItem)
 
                     list.toList()
                 }.onErrorReturn {
@@ -376,31 +379,26 @@ class ActivityDetailsInteractor(
 
     private fun addSingleOrMultipleFromAddresses(
         it: TransactionInOutDetails?
-    ) = when {
-        it == null -> {
-            From(null)
+    ) = From(
+        when {
+            it == null -> null
+            it.inputs.size == 1 -> it.inputs[0].address
+            else -> it.inputs.toJoinedString()
         }
-        it.inputs.size == 1 -> {
-            From(it.inputs[0].address)
-        }
-        else -> {
-            From(it.inputs.joinToString("\n"))
-        }
-    }
+    )
 
     private fun addSingleOrMultipleToAddresses(
         it: TransactionInOutDetails?
-    ) = when {
-        it == null -> {
-            To(null)
+    ) = To(
+        when {
+            it == null -> null
+            it.outputs.size == 1 -> it.outputs[0].address
+            else -> it.outputs.toJoinedString()
         }
-        it.outputs.size == 1 -> {
-            To(it.outputs[0].address)
-        }
-        else -> {
-            To(it.outputs.joinToString("\n"))
-        }
-    }
+    )
+
+    private fun List<TransactionDetailModel>.toJoinedString(): String =
+        this.map { o -> o.address }.joinToString("\n")
 
     private fun checkIfShouldAddDescription(
         item: NonCustodialActivitySummaryItem
