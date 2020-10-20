@@ -358,6 +358,7 @@
         suspicious or unusual activity is detected, to remind you of your wallet login ID, and to
         send bitcoin payment alerts when you receive funds.
     </string>
+    <string name="two_fa_new_request">Requesting new code…</string>
 
     <string name="disable_root_warning">Disable rooted device warning</string>
     <string name="auth_failed">Authorization failed. Please try again.</string>
@@ -807,6 +808,7 @@
     <string name="two_factor_dialog_hint">2FA code</string>
     <string name="two_factor_null_error">2FA code cannot be empty</string>
     <string name="two_factor_incorrect_error">2FA code incorrect</string>
+    <string name="two_factor_resend_sms">Resend SMS</string>
     <string name="confirm_payment_change_fee">Change fee</string>
 
     <!-- CONFIRM PAYMENT -->

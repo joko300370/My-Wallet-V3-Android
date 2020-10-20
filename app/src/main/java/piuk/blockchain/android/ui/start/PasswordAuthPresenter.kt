@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.start
 import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -21,14 +20,13 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import retrofit2.Response
 import timber.log.Timber
-import java.lang.RuntimeException
 
 interface PasswordAuthView : MvpView {
     fun goToPinPage()
@@ -116,12 +114,27 @@ abstract class PasswordAuthPresenter<T : PasswordAuthView> : MvpPresenter<T>() {
             .flatMap { sessionId -> authDataManager.getEncryptedPayload(guid, sessionId) }
             .subscribe(
                 { response -> handleResponse(password, guid, response) },
-                { throwable ->
-                    Timber.e(throwable)
-                    sessionId = null
-                    onAuthFailed()
-                }
+                { throwable -> handleSessionError(throwable) }
             )
+    }
+
+    fun requestNew2FaCode(password: String, guid: String) {
+        compositeDisposable += getSessionId(guid)
+            .doOnSubscribe {
+                view?.showProgressDialog(R.string.two_fa_new_request)
+            }
+            .doOnNext { s -> sessionId = s }
+            .flatMap { sessionId -> authDataManager.getEncryptedPayload(guid, sessionId) }
+            .subscribe(
+                { response -> handleResponse(password, guid, response) },
+                { throwable -> handleSessionError(throwable) }
+            )
+    }
+
+    private fun handleSessionError(throwable: Throwable) {
+        Timber.e(throwable)
+        sessionId = null
+        onAuthFailed()
     }
 
     private fun handleResponse(password: String, guid: String, response: Response<ResponseBody>) {

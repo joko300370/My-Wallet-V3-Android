@@ -2,19 +2,16 @@ package piuk.blockchain.android.ui.start
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import android.text.InputType
-import android.text.method.DigitsKeyListener
-import androidx.annotation.StringRes
-import androidx.appcompat.widget.AppCompatEditText
 import com.blockchain.koin.scopedInject
-import info.blockchain.wallet.api.data.Settings
 import kotlinx.android.synthetic.main.activity_password_required.*
 import org.json.JSONObject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
+import piuk.blockchain.android.ui.customviews.getTwoFactorDialog
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -81,37 +78,18 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
     ) {
         ViewUtils.hideKeyboard(this)
 
-        val editText = AppCompatEditText(this)
-        editText.setHint(R.string.two_factor_dialog_hint)
-
-        val message = when (authType) {
-            Settings.AUTH_TYPE_GOOGLE_AUTHENTICATOR -> {
-                editText.inputType = InputType.TYPE_NUMBER_VARIATION_NORMAL
-                editText.keyListener = DigitsKeyListener.getInstance("1234567890")
-                R.string.two_factor_dialog_message_authenticator
-            }
-            Settings.AUTH_TYPE_SMS -> {
-                editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
-                R.string.two_factor_dialog_message_sms
-            }
-            else -> throw IllegalArgumentException("Auth Type $authType should not be passed to this function")
-        }
-
         showAlert(
-            AlertDialog.Builder(this, R.style.AlertDialogStyle)
-                .setTitle(R.string.two_factor_dialog_title)
-                .setMessage(message)
-                .setView(ViewUtils.getAlertDialogPaddedView(this, editText))
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    presenter.submitTwoFactorCode(responseObject,
-                        sessionId,
-                        guid,
-                        password,
-                        editText.text.toString())
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-        )
+            getTwoFactorDialog(this, authType, positiveAction = {
+                presenter.submitTwoFactorCode(responseObject,
+                    sessionId,
+                    guid,
+                    password,
+                    it
+                )
+            }, resendAction = {
+                presenter.requestNew2FaCode(password, guid)
+            }
+            ))
     }
 
     override fun onDestroy() {
