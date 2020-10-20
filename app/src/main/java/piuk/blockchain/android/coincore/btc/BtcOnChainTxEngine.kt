@@ -351,11 +351,12 @@ class BtcOnChainTxEngine(
                 )
             )
         } else {
+            val password = if (btcDataManager.isDoubleEncrypted) secondPassword else null
             return Single.just(
                 listOf(
                     btcDataManager.getAddressECKey(
                         legacyAddress = btcSource.internalAccount as LegacyAddress,
-                        secondPassword = secondPassword
+                        secondPassword = password
                     ) ?: throw fatalError(TransferError("Private key not found for legacy BTC address"))
                 )
             )
