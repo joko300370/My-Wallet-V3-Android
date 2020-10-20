@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20.usdt
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -15,13 +16,15 @@ class UsdtCryptoWalletAccount(
     private val address: String,
     override val erc20Account: Erc20Account,
     fees: FeeDataManager,
-    exchangeRates: ExchangeRateDataManager
+    exchangeRates: ExchangeRateDataManager,
+    walletPreferences: WalletStatus
 ) : Erc20NonCustodialAccount(
     payloadManager,
     CryptoCurrency.USDT,
     fees,
     label,
-    exchangeRates
+    exchangeRates,
+    walletPreferences
 ) {
 
     override val receiveAddress: Single<ReceiveAddress>

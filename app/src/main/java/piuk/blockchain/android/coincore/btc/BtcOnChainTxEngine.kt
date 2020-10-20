@@ -60,10 +60,11 @@ class BtcOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val feeDataManager: FeeDataManager,
     private val btcNetworkParams: NetworkParameters,
-    private val walletPreferences: WalletStatus,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
+    requireSecondPassword,
+    walletPreferences
 ), BitPayClientEngine, KoinComponent {
 
     override fun assertInputsValid() {
@@ -95,8 +96,7 @@ class BtcOnChainTxEngine(
                 amount = CryptoValue.ZeroBtc,
                 available = CryptoValue.ZeroBtc,
                 fees = CryptoValue.ZeroBtc,
-                feeLevel = mapSavedFeeToFeeLevel(
-                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BTC)),
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.BTC)),
                 selectedFiat = userFiat
             )
         )
@@ -179,18 +179,9 @@ class BtcOnChainTxEngine(
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
         if (newOption is TxOptionValue.FeeSelection) {
-            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
-            // will need updating as well as the fees:
             if (newOption.selectedLevel != pendingTx.feeLevel) {
-                walletPreferences.setFeeTypeForAsset(
-                    CryptoCurrency.BTC,
-                    newOption.selectedLevel.mapFeeLevelToSavedValue()
-                )
-                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
-                    .flatMap { pTx -> doValidateAmount(pTx) }
-                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+                updateFeeSelection(CryptoCurrency.BTC, pendingTx, newOption)
             } else {
-                // The option hasn't changed, revert to our known settings
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
         } else {
@@ -226,7 +217,7 @@ class BtcOnChainTxEngine(
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
+            feeDetails = getFeeState(pendingTx.fees, pendingTx.amount, pendingTx.available),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(
@@ -275,7 +266,7 @@ class BtcOnChainTxEngine(
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
 
-            if (amount > 2_100_000_000_000_000L.toBigInteger()) {
+            if (amount > maxBTCAmount.toBigInteger()) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
 

@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
@@ -39,7 +40,8 @@ internal class XlmAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    private val walletPreferences: WalletStatus
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -69,7 +71,8 @@ internal class XlmAsset(
                         xlmManager = xlmDataManager,
                         exchangeRates = exchangeRates,
                         xlmFeesFetcher = xlmFeesFetcher,
-                        walletOptionsDataManager = walletOptionsDataManager
+                        walletOptionsDataManager = walletOptionsDataManager,
+                        walletPreferences = walletPreferences
                     )
                 )
             }

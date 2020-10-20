@@ -116,11 +116,8 @@ sealed class TxOptionValue(open val option: TxOption) {
 
     data class Total(val total: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
 
-    @Deprecated("Replace with FeeSelection")
-    data class Fee(val fee: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
-
     data class FeeSelection(
-        val absoluteFee: Money? = null,
+        val feeDetails: FeeState? = null,
         val exchange: Money? = null,
         val selectedLevel: FeeLevel,
         val availableLevels: Set<FeeLevel> = emptySet()
@@ -143,6 +140,12 @@ sealed class TxOptionValue(open val option: TxOption) {
         val value: Boolean = false
     ) : TxOptionValue(option)
 }
+
+sealed class FeeState
+object FeeTooHigh : FeeState()
+data class FeeDetails(
+    val absoluteFee: Money
+) : FeeState()
 
 abstract class TxEngine : KoinComponent {
 

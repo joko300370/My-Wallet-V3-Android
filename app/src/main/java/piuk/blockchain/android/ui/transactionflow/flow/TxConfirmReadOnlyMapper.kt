@@ -49,15 +49,6 @@ class FeedTotalFormatter(private val resources: Resources) : TxOptionsFormatter 
     }
 }
 
-class FeePropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-
-    override fun format(property: TxOptionValue): Pair<String, String>? =
-        if (property is TxOptionValue.Fee) {
-            val feeTitle = resources.getString(R.string.send_confirmation_tx_fee)
-            feeTitle to property.fee.formatWithExchange(property.exchange)
-        } else null
-}
-
 class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormatter {
 
     override fun format(property: TxOptionValue): Pair<String, String>? =

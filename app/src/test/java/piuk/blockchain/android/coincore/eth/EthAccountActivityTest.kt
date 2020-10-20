@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -27,6 +28,7 @@ class EthAccountActivityTest {
     private val feeDataManager: FeeDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val walletPrefs: WalletStatus = mock()
 
     private val subject =
         spy(EthCryptoWalletAccount(
@@ -35,7 +37,8 @@ class EthAccountActivityTest {
             address = "Test Address",
             ethDataManager = ethDataManager,
             fees = feeDataManager,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            walletPreferences = walletPrefs
         ))
 
     @get:Rule

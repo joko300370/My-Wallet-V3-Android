@@ -15,6 +15,7 @@ import com.blockchain.ui.urllinks.URL_TX_FEES
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_select_fee.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -67,13 +68,14 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                     fee_switcher.displayedChild = SHOW_STATIC
                 }
 
-                val fee = item.absoluteFee
-                if (fee?.isPositive == true) {
-                    fee_option_value.text = fee.formatWithExchange(item.exchange)
-                    fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.grey_800))
-                } else {
-                    fee_option_value.text = context.getString(R.string.send_confirmation_insufficient_fee)
-                    fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.red_600))
+                item.feeDetails?.let {
+                    if (it is FeeDetails) {
+                        fee_option_value.text = it.absoluteFee.formatWithExchange(item.exchange)
+                        fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.grey_800))
+                    } else {
+                        fee_option_value.text = context.getString(R.string.send_confirmation_insufficient_fee)
+                        fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.red_600))
+                    }
                 }
 
                 val linksMap = mapOf<String, Uri>(

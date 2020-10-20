@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -29,9 +30,11 @@ import java.math.BigInteger
 open class EthOnChainTxEngine(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
+    requireSecondPassword,
+    walletPreferences
 ) {
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)
@@ -45,7 +48,7 @@ open class EthOnChainTxEngine(
                 amount = CryptoValue.ZeroEth,
                 available = CryptoValue.ZeroEth,
                 fees = CryptoValue.ZeroEth,
-                feeLevel = FeeLevel.Regular,
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.ETHER)),
                 selectedFiat = userFiat
             )
         )
@@ -55,7 +58,7 @@ open class EthOnChainTxEngine(
             pendingTx.copy(options = listOf(
                 TxOptionValue.From(from = sourceAccount.label),
                 TxOptionValue.To(to = txTarget.label),
-                TxOptionValue.Fee(fee = pendingTx.fees, exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
+                makeFeeSelectionOption(pendingTx),
                 TxOptionValue.FeedTotal(
                     amount = pendingTx.amount,
                     fee = pendingTx.fees,
@@ -65,16 +68,32 @@ open class EthOnChainTxEngine(
                 TxOptionValue.Description()
             )))
 
-    private fun absoluteFee(): Single<CryptoValue> =
+    private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
                 Convert.toWei(
-                    BigDecimal.valueOf(it.gasLimit * it.regularFee),
+                    BigDecimal.valueOf(it.gasLimit * it.mapFeeLevel(feeLevel)),
                     Convert.Unit.GWEI
                 )
             )
         }
+
+    private fun FeeOptions.mapFeeLevel(feeLevel: FeeLevel) =
+        when (feeLevel) {
+            FeeLevel.None -> 0L
+            FeeLevel.Regular -> regularFee
+            FeeLevel.Priority -> priorityFee
+            FeeLevel.Custom -> priorityFee
+        }
+
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
+        TxOptionValue.FeeSelection(
+            feeDetails = getFeeState(pendingTx.fees, pendingTx.amount, pendingTx.available),
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+        )
 
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
@@ -85,7 +104,7 @@ open class EthOnChainTxEngine(
 
         return Singles.zip(
             sourceAccount.actionableBalance.map { it as CryptoValue },
-            absoluteFee()
+            absoluteFee(pendingTx.feeLevel)
         ) { available, fees ->
             pendingTx.copy(
                 amount = amount,
@@ -94,6 +113,17 @@ open class EthOnChainTxEngine(
             )
         }
     }
+
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
+        if (newOption is TxOptionValue.FeeSelection) {
+            if (newOption.selectedLevel != pendingTx.feeLevel) {
+                updateFeeSelection(CryptoCurrency.ETHER, pendingTx, newOption)
+            } else {
+                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
+            }
+        } else {
+            super.doOptionUpdateRequest(pendingTx, newOption)
+        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
@@ -136,7 +166,7 @@ open class EthOnChainTxEngine(
             ethDataManager.createEthTransaction(
                 nonce = nonce,
                 to = targetAddress.address,
-                gasPriceWei = fees.gasPrice,
+                gasPriceWei = fees.gasPrice(pendingTx.feeLevel),
                 gasLimitGwei = fees.getGasLimit(isContract),
                 weiValue = pendingTx.amount.toBigInteger()
             )
@@ -144,9 +174,9 @@ open class EthOnChainTxEngine(
     }
 
     // TODO: Have FeeOptions deal with this conversion
-    private val FeeOptions.gasPrice: BigInteger
-        get() = Convert.toWei(
-            BigDecimal.valueOf(regularFee),
+    private fun FeeOptions.gasPrice(feeLevel: FeeLevel): BigInteger =
+        Convert.toWei(
+            BigDecimal.valueOf(this.mapFeeLevel(feeLevel)),
             Convert.Unit.GWEI
         ).toBigInteger()
 
@@ -165,7 +195,7 @@ open class EthOnChainTxEngine(
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Singles.zip(
             sourceAccount.actionableBalance,
-            absoluteFee()
+            absoluteFee(pendingTx.feeLevel)
         ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)

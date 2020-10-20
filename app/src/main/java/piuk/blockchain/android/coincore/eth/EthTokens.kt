@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.eth
 import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
@@ -34,6 +35,7 @@ internal class EthAsset(
     exchangeRates: ExchangeRateDataManager,
     historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
+    private val walletPrefs: WalletStatus,
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
@@ -70,6 +72,7 @@ internal class EthAsset(
                     ethDataManager,
                     feeDataManager,
                     ethDataManager.getEthWallet()?.account ?: throw Exception("No ether wallet found"),
+                    walletPrefs,
                     exchangeRates
                 )
             )

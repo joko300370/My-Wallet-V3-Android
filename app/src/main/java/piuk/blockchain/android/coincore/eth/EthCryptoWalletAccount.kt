@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -8,8 +9,8 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -23,6 +24,7 @@ internal class EthCryptoWalletAccount(
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
+    private val walletPreferences: WalletStatus,
     override val exchangeRates: ExchangeRateDataManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
 
@@ -31,6 +33,7 @@ internal class EthCryptoWalletAccount(
         ethDataManager: EthDataManager,
         fees: FeeDataManager,
         jsonAccount: EthereumAccount,
+        walletPreferences: WalletStatus,
         exchangeRates: ExchangeRateDataManager
     ) : this(
         payloadManager,
@@ -38,6 +41,7 @@ internal class EthCryptoWalletAccount(
         jsonAccount.address,
         ethDataManager,
         fees,
+        walletPreferences,
         exchangeRates
     )
 
@@ -109,6 +113,7 @@ internal class EthCryptoWalletAccount(
         EthOnChainTxEngine(
             ethDataManager = ethDataManager,
             feeManager = fees,
-            requireSecondPassword = ethDataManager.requireSecondPassword
+            requireSecondPassword = ethDataManager.requireSecondPassword,
+            walletPreferences = walletPreferences
         )
 }

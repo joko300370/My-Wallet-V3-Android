@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.pax
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
@@ -29,6 +30,7 @@ class PaxAccountActivityTest {
     private val ethDataManager: EthDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val walletPreferences: WalletStatus = mock()
 
     private val paxAccount: Erc20Account = mock()
 
@@ -39,7 +41,8 @@ class PaxAccountActivityTest {
             address = "Test Px Address",
             fees = mock(),
             erc20Account = paxAccount,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            walletPreferences = walletPreferences
         )
 
     @get:Rule

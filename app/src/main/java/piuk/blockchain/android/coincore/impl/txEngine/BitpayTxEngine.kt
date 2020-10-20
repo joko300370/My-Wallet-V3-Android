@@ -8,13 +8,14 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
@@ -25,7 +26,6 @@ import piuk.blockchain.android.data.api.bitpay.models.BitPayTransaction
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import java.lang.IllegalStateException
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -98,7 +98,7 @@ class BtcBitpayTxEngine(
     // underlying asset engine.
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
+            feeDetails = FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Priority)

@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.erc20.pax
 import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
@@ -39,7 +40,8 @@ internal class PaxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    private val walletPreferences: WalletStatus
 ) : Erc20TokensBase(
     payloadManager,
     paxAccount,
@@ -70,7 +72,8 @@ internal class PaxAsset(
             paxAddress,
             erc20Account,
             feeDataManager,
-            exchangeRates
+            exchangeRates,
+            walletPreferences
         )
     }
 

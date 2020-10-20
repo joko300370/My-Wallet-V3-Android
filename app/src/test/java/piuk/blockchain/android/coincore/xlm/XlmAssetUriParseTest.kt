@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
@@ -40,6 +41,7 @@ class XlmAssetUriParseTest {
     private val crashLogger: CrashLogger = mock()
     private val tiersService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
+    private val walletPreferences: WalletStatus = mock()
 
     private val subject = XlmAsset(
         payloadManager,
@@ -54,7 +56,8 @@ class XlmAssetUriParseTest {
         pitLinking,
         crashLogger,
         tiersService,
-        environmentConfig
+        environmentConfig,
+        walletPreferences
     )
 
     @Test

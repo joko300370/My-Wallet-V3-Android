@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
@@ -34,6 +35,7 @@ class XlmAccountActivityTest {
     private val xlmDataManager: XlmDataManager = mock()
     private val xlmFeesFetcher: XlmFeesFetcher = mock()
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
+    private val walletPreferences: WalletStatus = mock()
 
     private val subject =
         XlmCryptoWalletAccount(
@@ -43,7 +45,8 @@ class XlmAccountActivityTest {
             xlmManager = xlmDataManager,
             exchangeRates = exchangeRates,
             xlmFeesFetcher = xlmFeesFetcher,
-            walletOptionsDataManager = walletOptionsDataManager
+            walletOptionsDataManager = walletOptionsDataManager,
+            walletPreferences = walletPreferences
         )
 
     @get:Rule

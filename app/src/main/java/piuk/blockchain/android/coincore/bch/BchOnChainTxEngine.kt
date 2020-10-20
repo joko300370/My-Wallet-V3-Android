@@ -43,10 +43,11 @@ class BchOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val bchDataManager: BchDataManager,
     private val payloadDataManager: PayloadDataManager,
-    private val walletPreferences: WalletStatus,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
+    requireSecondPassword,
+    walletPreferences
 ) {
 
     private val bchSource: BchCryptoWalletAccount by unsafeLazy {
@@ -69,8 +70,7 @@ class BchOnChainTxEngine(
                 amount = CryptoValue.ZeroBch,
                 available = CryptoValue.ZeroBch,
                 fees = CryptoValue.ZeroBch,
-                feeLevel = mapSavedFeeToFeeLevel(
-                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BCH)),
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.BCH)),
                 selectedFiat = userFiat
             )
         )
@@ -156,16 +156,9 @@ class BchOnChainTxEngine(
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
         if (newOption is TxOptionValue.FeeSelection) {
-            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
-            // will need updating as well as the fees:
             if (newOption.selectedLevel != pendingTx.feeLevel) {
-                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BCH,
-                    newOption.selectedLevel.mapFeeLevelToSavedValue())
-                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
-                    .flatMap { pTx -> doValidateAmount(pTx) }
-                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+                updateFeeSelection(CryptoCurrency.BCH, pendingTx, newOption)
             } else {
-                // The option hasn't changed, revert to our known settings
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
         } else {
@@ -175,7 +168,7 @@ class BchOnChainTxEngine(
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             val amount = pendingTx.amount.toBigInteger()
-            if (amount < Payment.DUST || amount > 2_100_000_000_000_000L.toBigInteger() || amount <= BigInteger.ZERO) {
+            if (amount < Payment.DUST || amount > maxBCHAmount.toBigInteger() || amount <= BigInteger.ZERO) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -206,11 +199,11 @@ class BchOnChainTxEngine(
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
+            feeDetails = getFeeState(pendingTx.fees, pendingTx.amount, pendingTx.available),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(
-                FeeLevel.Regular, FeeLevel.Priority
+                FeeLevel.Regular // BCH only has one fee level
             )
         )
 

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.fees.FeeType
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.Memo
 import com.blockchain.sunriver.SendDetails
 import com.blockchain.sunriver.XlmDataManager
@@ -13,6 +14,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxOption
@@ -29,8 +31,9 @@ class XlmOnChainTxEngine(
     private val xlmDataManager: XlmDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
     private val walletOptionsDataManager: WalletOptionsDataManager,
-    requireSecondPassword: Boolean
-) : OnChainTxEngineBase(requireSecondPassword) {
+    requireSecondPassword: Boolean,
+    walletPreferences: WalletStatus
+) : OnChainTxEngineBase(requireSecondPassword, walletPreferences) {
 
     private val targetXlmAddress: XlmAddress by lazy {
         txTarget as XlmAddress
@@ -102,8 +105,7 @@ class XlmOnChainTxEngine(
                 options = listOf(
                     TxOptionValue.From(from = sourceAccount.label),
                     TxOptionValue.To(to = txTarget.label),
-                    TxOptionValue.Fee(fee = pendingTx.fees,
-                        exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
+                    makeFeeSelectionOption(pendingTx),
                     TxOptionValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
@@ -117,6 +119,14 @@ class XlmOnChainTxEngine(
                     )
                 )
             )
+        )
+
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
+        TxOptionValue.FeeSelection(
+            feeDetails = FeeDetails(pendingTx.fees),
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(FeeLevel.Regular)
         )
 
     private fun String.containsMemo() = contains(":")

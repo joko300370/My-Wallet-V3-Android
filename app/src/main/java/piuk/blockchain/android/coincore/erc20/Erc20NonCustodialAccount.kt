@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -9,9 +10,9 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
@@ -27,7 +28,8 @@ abstract class Erc20NonCustodialAccount(
     asset: CryptoCurrency,
     private val fees: FeeDataManager,
     override val label: String,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    private val walletPreferences: WalletStatus
 ) : CryptoNonCustodialAccount(payloadManager, asset) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -103,7 +105,8 @@ abstract class Erc20NonCustodialAccount(
         Erc20OnChainTxEngine(
             erc20Account = erc20Account,
             feeManager = fees,
-            requireSecondPassword = ethDataManager.requireSecondPassword
+            requireSecondPassword = ethDataManager.requireSecondPassword,
+            walletPreferences = walletPreferences
         )
 }
 

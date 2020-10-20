@@ -6,11 +6,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionInteractor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.FeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
@@ -18,8 +19,6 @@ import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
-import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
 
 val transactionFlowScope = named("TransactionScope")
@@ -52,12 +51,6 @@ val transactionModule = module {
 
     factory {
         FeedTotalFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        FeePropertyFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)

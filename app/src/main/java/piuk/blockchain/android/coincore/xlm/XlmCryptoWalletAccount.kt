@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.xlm
 
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import info.blockchain.balance.AccountReference
@@ -25,7 +26,8 @@ internal class XlmCryptoWalletAccount(
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
-    private val walletOptionsDataManager: WalletOptionsDataManager
+    private val walletOptionsDataManager: WalletOptionsDataManager,
+    private val walletPreferences: WalletStatus
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
@@ -68,7 +70,8 @@ internal class XlmCryptoWalletAccount(
             xlmDataManager = xlmManager,
             xlmFeesFetcher = xlmFeesFetcher,
             walletOptionsDataManager = walletOptionsDataManager,
-            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted,
+            walletPreferences = walletPreferences
         )
 
     constructor(
@@ -77,7 +80,8 @@ internal class XlmCryptoWalletAccount(
         xlmManager: XlmDataManager,
         exchangeRates: ExchangeRateDataManager,
         xlmFeesFetcher: XlmFeesFetcher,
-        walletOptionsDataManager: WalletOptionsDataManager
+        walletOptionsDataManager: WalletOptionsDataManager,
+        walletPreferences: WalletStatus
     ) : this(
         payloadManager = payloadManager,
         label = account.label,
@@ -85,6 +89,7 @@ internal class XlmCryptoWalletAccount(
         xlmManager = xlmManager,
         exchangeRates = exchangeRates,
         xlmFeesFetcher = xlmFeesFetcher,
-        walletOptionsDataManager = walletOptionsDataManager
+        walletOptionsDataManager = walletOptionsDataManager,
+        walletPreferences = walletPreferences
     )
 }
