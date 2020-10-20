@@ -67,6 +67,8 @@
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
+        android:scrollbarSize="@dimen/miniscule_margin"
+        android:scrollbars="vertical"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
         app:layout_constraintEnd_toEndOf="parent"
