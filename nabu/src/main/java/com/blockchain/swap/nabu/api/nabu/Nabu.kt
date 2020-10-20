@@ -369,7 +369,7 @@ internal interface Nabu {
     fun getInterestRates(
         @Header("authorization") authorization: String,
         @Query("ccy") currency: String
-    ): Single<InterestRateResponse>
+    ): Single<Response<InterestRateResponse>>
 
     @GET(NABU_INTEREST_ACCOUNT_BALANCE)
     fun getInterestAccountDetails(

@@ -458,10 +458,20 @@ class NabuService(retrofit: Retrofit) {
         authorization = sessionToken.authHeader
     ).wrapErrorMessage()
 
+    /**
+     * If there is no rate for a given asset, this endpoint returns a 204, which must be parsed
+     */
     fun getInterestRates(
         sessionToken: NabuSessionTokenResponse,
         currency: String
     ) = service.getInterestRates(authorization = sessionToken.authHeader, currency = currency)
+        .flatMapMaybe {
+            when (it.code()) {
+                200 -> Maybe.just(it.body())
+                204 -> Maybe.empty()
+                else -> Maybe.error(HttpException(it))
+            }
+        }
         .wrapErrorMessage()
 
     fun getInterestAccountBalance(

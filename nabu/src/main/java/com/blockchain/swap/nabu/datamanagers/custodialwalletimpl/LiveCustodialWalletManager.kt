@@ -39,6 +39,7 @@ import com.blockchain.swap.nabu.models.cards.PaymentMethodResponse
 import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
+import com.blockchain.swap.nabu.models.interest.InterestRateResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.State
 import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
@@ -521,9 +522,10 @@ class LiveCustodialWalletManager(
 
     override fun getInterestAccountRates(crypto: CryptoCurrency): Single<Double> =
         authenticator.authenticate { sessionToken ->
-            nabuService.getInterestRates(sessionToken, crypto.networkTicker).map {
-                it.rate
-            }
+            nabuService.getInterestRates(sessionToken, crypto.networkTicker).toSingle(InterestRateResponse(0.0))
+                .flatMap {
+                    Single.just(it.rate)
+                }
         }
 
     override fun getInterestAccountBalance(
