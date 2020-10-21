@@ -14,6 +14,7 @@ import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import org.koin.core.KoinComponent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
@@ -124,8 +125,7 @@ sealed class TxOptionValue(open val option: TxOption) {
     ) : TxOptionValue(TxOption.FEE_SELECTION)
 
     data class BitPayCountdown(
-        val expireTime: Long = 0,
-        val isExpired: Boolean = false
+        val timeRemainingSecs: Long
     ) : TxOptionValue(TxOption.INVOICE_COUNTDOWN)
 
     data class ErrorNotice(val status: ValidationState) : TxOptionValue(TxOption.ERROR_NOTICE)
@@ -149,9 +149,14 @@ data class FeeDetails(
 
 abstract class TxEngine : KoinComponent {
 
+    interface RefreshTrigger {
+        fun refreshConfirmations(revalidate: Boolean = false): Completable
+    }
+
     private lateinit var _sourceAccount: CryptoAccount
     private lateinit var _txTarget: TransactionTarget
     private lateinit var _exchangeRates: ExchangeRateDataManager
+    private lateinit var _refresh: RefreshTrigger
 
     protected val sourceAccount: CryptoAccount
         get() = _sourceAccount
@@ -162,15 +167,20 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
+    protected fun refreshConfirmations(revalidate: Boolean = false) =
+        _refresh.refreshConfirmations(revalidate).emptySubscribe()
+
     @CallSuper
     open fun start(
         sourceAccount: CryptoAccount,
         txTarget: TransactionTarget,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        refreshTrigger: RefreshTrigger
     ) {
         this._sourceAccount = sourceAccount
         this._txTarget = txTarget
         this._exchangeRates = exchangeRates
+        this._refresh = refreshTrigger
     }
 
     // Optionally assert, via require() etc, that sourceAccounts and txTarget
@@ -204,6 +214,9 @@ abstract class TxEngine : KoinComponent {
         }
 
     abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
+
+    open fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(pendingTx)
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates
     // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
@@ -247,12 +260,14 @@ class TransactionProcessor(
     txTarget: TransactionTarget,
     exchangeRates: ExchangeRateDataManager,
     private val engine: TxEngine
-) {
+) : TxEngine.RefreshTrigger {
+
     init {
         engine.start(
             sourceAccount,
             txTarget,
-            exchangeRates
+            exchangeRates,
+            this
         )
         engine.assertInputsValid()
     }
@@ -362,6 +377,27 @@ class TransactionProcessor(
     // sell and or swap are fully integrated into this flow
     fun targetExchangeRate(): Observable<ExchangeRate> =
         engine.targetExchangeRate()
+
+    // Called back my the engine if it has received an external signal and the existing confirmation set
+    // requires a refresh
+    override fun refreshConfirmations(revalidate: Boolean): Completable {
+        val pendingTx = getPendingTx()
+        // Don't refresh if confirmations are not created yet:
+        return if (pendingTx.options.isNotEmpty()) {
+            engine.doRefreshConfirmations(pendingTx)
+                .flatMap {
+                    if (revalidate) {
+                        engine.doValidateAll(it)
+                    } else {
+                        Single.just(it)
+                    }
+                }.doOnSuccess {
+                    updatePendingTx(it)
+                }.ignoreElement()
+        } else {
+            Completable.complete()
+        }
+    }
 }
 
 fun Completable.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> =
@@ -394,3 +430,6 @@ sealed class TxResult(val amount: Money) {
     class HashedTxResult(val txHash: String, amount: Money) : TxResult(amount)
     class UnHashedTxResult(amount: Money) : TxResult(amount)
 }
+
+internal fun <K, V> Map<K, V>.copyAndPut(k: K, v: V): Map<K, V> =
+    toMutableMap().apply { put(k, v) }.toMap()

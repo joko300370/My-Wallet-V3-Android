@@ -1,9 +1,6 @@
 package piuk.blockchain.android.ui.account
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.coin.GenericMetadataAccount
-import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import java.math.BigInteger
@@ -25,30 +22,9 @@ class PendingTransaction {
     var warningText: String = ""
     var warningSubText: String = ""
 
-    var bitpayMerchant: String? = null
-
     val total: BigInteger
         @JsonIgnore
         get() = bigIntAmount.add(bigIntFee)
-
-    val displayableReceivingLabel: String?
-        @JsonIgnore
-        get() = if (receivingObject != null && !receivingObject!!.label.isNullOrEmpty()) {
-            receivingObject!!.label
-        } else if (bitpayMerchant != null) {
-            bitpayMerchant
-        } else {
-            receivingAddress
-        }
-
-    @JsonIgnore
-    fun isHD(currency: CryptoCurrency): Boolean {
-        return if (currency === CryptoCurrency.BTC) {
-            sendingObject!!.accountObject is Account
-        } else {
-            sendingObject!!.accountObject is GenericMetadataAccount
-        }
-    }
 
     val senderAsLegacyAddress
         @JsonIgnore
@@ -82,15 +58,4 @@ class PendingTransaction {
             ", warningSubText=$warningSubText" +
             "}"
     }
-
-    companion object {
-        @Deprecated("Watch only, and hence import private keys, and hence this tag is no longer supported")
-        const val WATCH_ONLY_SPEND_TAG = -5
-    }
 }
-
-data class TransferableFundTransactionList(
-    val pendingTransactions: List<PendingTransaction>,
-    val totalToSend: BigInteger,
-    val totalFee: BigInteger
-)

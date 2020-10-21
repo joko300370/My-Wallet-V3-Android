@@ -25,10 +25,11 @@ class InterestDepositTxEngine(
     override fun start(
         sourceAccount: CryptoAccount,
         txTarget: TransactionTarget,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        refreshTrigger: RefreshTrigger
     ) {
-        super.start(sourceAccount, txTarget, exchangeRates)
-        onChainTxEngine.start(sourceAccount, txTarget, exchangeRates)
+        super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
+        onChainTxEngine.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =

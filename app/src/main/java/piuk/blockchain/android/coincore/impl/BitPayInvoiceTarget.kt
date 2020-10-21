@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.util.FormatsUtil
@@ -11,6 +12,8 @@ import piuk.blockchain.android.data.api.bitpay.BITPAY_LIVE_BASE
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
 import timber.log.Timber
+import java.lang.IllegalStateException
+import java.util.Calendar
 import java.util.regex.Pattern
 
 class BitPayInvoiceTarget(
@@ -19,10 +22,20 @@ class BitPayInvoiceTarget(
     val amount: CryptoValue,
     val invoiceId: String,
     val merchant: String,
-    val expires: String
+    private val expires: String
 ) : InvoiceTarget, CryptoAddress {
 
     override val label: String = "BitPay[$merchant]"
+
+    val expireTimeMs: Long by lazy {
+        expires.fromIso8601ToUtc()?.let {
+            val calendar = Calendar.getInstance()
+            val timeZone = calendar.timeZone
+            val offset = timeZone.getOffset(it.time).toLong()
+
+            it.time + offset
+        } ?: throw IllegalStateException("Unknown countdown time")
+    }
 
     companion object {
         private const val INVOICE_PREFIX = "$BITPAY_LIVE_BASE$PATH_BITPAY_INVOICE/"

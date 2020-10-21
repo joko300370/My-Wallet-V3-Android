@@ -22,6 +22,7 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -129,9 +130,7 @@ class BchOnChainTxEngine(
             amount = amount,
             available = CryptoValue.fromMinor(CryptoCurrency.BCH, maxAvailable),
             fees = CryptoValue.fromMinor(CryptoCurrency.BCH, unspentOutputs.absoluteFee),
-            engineState = mapOf(
-                STATE_UTXO to unspentOutputs
-            )
+            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, unspentOutputs)
         )
     }
 

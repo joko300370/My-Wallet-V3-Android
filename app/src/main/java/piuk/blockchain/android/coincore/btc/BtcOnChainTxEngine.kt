@@ -32,6 +32,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
 import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -171,9 +172,7 @@ class BtcOnChainTxEngine(
             amount = amount,
             available = CryptoValue.fromMinor(CryptoCurrency.BTC, maxAvailable),
             fees = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
-            engineState = mapOf(
-                STATE_UTXO to utxoBundle
-            )
+            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, utxoBundle)
         )
     }
 
@@ -238,7 +237,6 @@ class BtcOnChainTxEngine(
         )
 
         val relativeFee = 100.toBigDecimal() * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
-
         return fiatValue.toBigDecimal() > LARGE_TX_FEE.toBigDecimal() &&
                 txSize > LARGE_TX_SIZE &&
                 relativeFee > LARGE_TX_PERCENTAGE
