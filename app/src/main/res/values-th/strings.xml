@@ -1572,7 +1572,7 @@
   <string name="card_error_subtitle">โปรดย้อนกลับและลองอีกครั้ง</string>
   <string name="card_expiry_date">ประสบการณ์: %1s</string>
   <string name="card_buying">ซื้อ %1s</string>
-  <string name="card_in_progress" formatted="false">%1s ซื้อ %1s</string>
+  <string name="card_in_progress" formatted="false">%1s ซื้อ</string>
   <string name="we_will_notify_order_complete">เราจะแจ้งให้คุณทราบเมื่อการสั่งซื้อของคุณเสร็จสมบูรณ์</string>
   <string name="completing_card_buy">เรากำลังทำการสั่งซื้อของคุณให้เสร็จสิ้นในตอนนี้</string>
   <string name="card_purchased">ซื้อแล้ว %1s</string>

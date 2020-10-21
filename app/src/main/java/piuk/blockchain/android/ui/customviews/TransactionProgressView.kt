@@ -68,6 +68,11 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         setText(title, subtitle)
     }
 
+    override fun onDetachedFromWindow() {
+        compositeDisposable.clear()
+        super.onDetachedFromWindow()
+    }
+
     fun showTxSuccess(
         title: String,
         subtitle: String,

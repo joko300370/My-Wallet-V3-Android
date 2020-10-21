@@ -1573,7 +1573,7 @@
   <string name="card_error_subtitle">Vraťte se a zkuste to znovu.</string>
   <string name="card_expiry_date">Exp: %1s</string>
   <string name="card_buying">Nákup %1s</string>
-  <string name="card_in_progress" formatted="false">%1s nákup %1s</string>
+  <string name="card_in_progress" formatted="false">%1s nákup</string>
   <string name="we_will_notify_order_complete">Až bude vaše objednávka dokončena, upozorníme vás.</string>
   <string name="completing_card_buy">Dokončujeme váš nákup.</string>
   <string name="card_purchased">Zakoupeno: %1s</string>

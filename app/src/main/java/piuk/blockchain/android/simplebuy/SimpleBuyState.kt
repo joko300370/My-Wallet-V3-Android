@@ -49,6 +49,7 @@ data class SimpleBuyState(
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
     val paymentSucceeded: Boolean = false,
+    val showRating: Boolean = false,
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating

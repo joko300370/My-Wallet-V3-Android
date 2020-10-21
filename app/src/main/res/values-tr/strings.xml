@@ -1572,7 +1572,7 @@
   <string name="card_in_progress">%1s Satın Al Devam Ediyor</string>
   <string name="we_will_notify_order_complete">Siparişiniz tamamlandığında size haber vereceğiz.</string>
   <string name="completing_card_buy">Satın alma işleminizi şimdi tamamlıyoruz.</string>
-  <string name="card_purchased" formatted="false">%1s Satın %1s</string>
+  <string name="card_purchased" formatted="false">%1s Satın</string>
   <string name="card_purchased_available_now">%1s artık Cüzdanınızda kullanılabilir.</string>
   <string name="invalid_cvv">Geçersiz CVV</string>
   <string name="invalid_date">Geçersiz tarih</string>

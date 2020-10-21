@@ -159,6 +159,14 @@ class PrefsUtil(
         get() = getValue(KEY_ADD_CARD_INFO, false)
         set(dismissed) = setValue(KEY_ADD_CARD_INFO, dismissed)
 
+    override var hasSeenRatingDialog: Boolean
+        get() = getValue(HAS_SEEN_RATING, false)
+        set(value) = setValue(HAS_SEEN_RATING, value)
+
+    override var preRatingActionCompletedTimes: Int
+        get() = getValue(PRE_RATING_ACTION_COMPLETED_TIMES, 0)
+        set(value) = setValue(PRE_RATING_ACTION_COMPLETED_TIMES, value)
+
     // From Onboarding
     override var swapIntroCompleted: Boolean
         get() = getValue(KEY_SWAP_INTRO_COMPLETED, false)
@@ -289,7 +297,7 @@ class PrefsUtil(
 
     override fun hasBackup(): Boolean =
         backupEnabled &&
-            backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
+                backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
 
     @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
@@ -427,5 +435,9 @@ class PrefsUtil(
         private const val KEY_ENCRYPTED_GUID = "encrypted_guid"
         private const val KEY_ENCRYPTED_SHARED_KEY = "encrypted_shared_key"
         private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
+
+        // Rating
+        private const val HAS_SEEN_RATING = "has_seen_rating"
+        private const val PRE_RATING_ACTION_COMPLETED_TIMES = "pre_rating_action_completed_times"
     }
 }

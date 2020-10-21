@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
@@ -18,6 +19,7 @@ import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class SimpleBuyModel(
     private val prefs: SimpleBuyPrefs,
+    private val ratingPrefs: RatingPrefs,
     initialState: SimpleBuyState,
     scheduler: Scheduler,
     private val gson: Gson,
@@ -175,7 +177,9 @@ class SimpleBuyModel(
             )
                 .subscribeBy(
                     onSuccess = {
-                        process(SimpleBuyIntent.OrderCreated(it))
+                        val orderCreatedSuccessfully = it.state == OrderState.FINISHED
+                        if (orderCreatedSuccessfully) updatePreRatingCompletedActionsCounter()
+                        process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
                     },
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
@@ -193,8 +197,20 @@ class SimpleBuyModel(
                     process(SimpleBuyIntent.ErrorIntent())
                 }
             )
+            is SimpleBuyIntent.AppRatingShown -> {
+                ratingPrefs.hasSeenRatingDialog = true
+                null
+            }
             else -> null
         }
+
+    private fun updatePreRatingCompletedActionsCounter() {
+        ratingPrefs.preRatingActionCompletedTimes = ratingPrefs.preRatingActionCompletedTimes + 1
+    }
+
+    private fun shouldShowAppRating(orderCreatedSuccessFully: Boolean): Boolean =
+        ratingPrefs.preRatingActionCompletedTimes >= COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING &&
+                !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
 
     private fun pollForOrderStatus() {
         process(SimpleBuyIntent.CheckOrderStatus)
@@ -220,5 +236,9 @@ class SimpleBuyModel(
 
     override fun onStateUpdate(s: SimpleBuyState) {
         prefs.updateSimpleBuyState(gson.toJson(s))
+    }
+
+    companion object {
+        private const val COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING = 1
     }
 }

@@ -8,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.google.android.play.core.review.ReviewInfo
+import com.google.android.play.core.review.ReviewManagerFactory
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.fragment_simple_buy_payment.*
 import piuk.blockchain.android.R
@@ -23,9 +26,16 @@ import java.math.BigInteger
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen {
+
     override val model: SimpleBuyModel by scopedInject()
 
+    private val ratingPrefs: RatingPrefs by scopedInject()
+    private var reviewInfo: ReviewInfo? = null
     private var isFirstLoad = false
+
+    private val reviewManager by lazy {
+        ReviewManagerFactory.create(activity)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +51,20 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.setupToolbar(R.string.payment, false)
+
+        // we need to make the request as soon as possible and cache the result
+        if (!ratingPrefs.hasSeenRatingDialog) {
+            val request = reviewManager.requestReviewFlow()
+            request.addOnCompleteListener { request ->
+                if (request.isSuccessful) {
+                    reviewInfo = request.result
+                }
+            }
+        }
     }
 
     override fun render(newState: SimpleBuyState) {
-        transaction_progress_view.setAssetIcon(newState.selectedCryptoCurrency?.maskedAsset() ?: -1)
+        transaction_progress_view.setAssetIcon(newState.selectedCryptoCurrency?.maskedAsset() ?: 0)
 
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
             model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
@@ -80,6 +100,19 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 newState.everypayAuthOptions.paymentLink,
                 newState.everypayAuthOptions.exitLink
             )
+        }
+
+        if (newState.showRating) {
+            tryToShowInAppRating()
+        }
+    }
+
+    private fun tryToShowInAppRating() {
+        reviewInfo?.let {
+            val flow = reviewManager.launchReviewFlow(activity, it)
+            flow.addOnCompleteListener {
+                model.process(SimpleBuyIntent.AppRatingShown)
+            }
         }
     }
 

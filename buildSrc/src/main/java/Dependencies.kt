@@ -38,7 +38,7 @@ object Versions {
     // Support Libraries
     const val googleServices = "17.1.0"
     const val googleServicesPlaces = "17.0.0"
-    const val googlePlayCore = "1.6.1"
+    const val googlePlayCore = "1.8.2"
     const val firebaseMessaging = "20.2.0"
     const val firebaseCore = "17.4.2"
     const val firebaseConfig = "19.1.0"
@@ -240,7 +240,8 @@ object Libraries {
     const val slf4j = "org.slf4j:slf4j-simple:${Versions.slf4j}"
     const val slf4jNoOp = "org.slf4j:slf4j-nop:${Versions.slf4j}"
     const val firebaseCrashlytics = "com.google.firebase:firebase-crashlytics:${Versions.firebaseCrashlytics}"
-    const val firebaseCrashlyticsPlugin = "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsPlugin}"
+    const val firebaseCrashlyticsPlugin =
+        "com.google.firebase:firebase-crashlytics-gradle:${Versions.firebaseCrashlyticsPlugin}"
     const val firebaseAnalytics = "com.google.firebase:firebase-analytics:${Versions.firebaseAnalytics}"
 
     // Debugging

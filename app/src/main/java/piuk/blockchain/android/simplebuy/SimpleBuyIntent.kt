@@ -285,7 +285,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     }
 
     class OrderCreated(
-        private val buyOrder: BuySellOrder
+        private val buyOrder: BuySellOrder,
+        private val showInAppRating: Boolean = false
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(orderState = buyOrder.state,
@@ -295,8 +296,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 orderValue = buyOrder.orderValue as CryptoValue,
                 orderExchangePrice = buyOrder.price,
                 paymentSucceeded = buyOrder.state == OrderState.FINISHED,
-                isLoading = false
+                isLoading = false,
+                showRating = showInAppRating
             )
+    }
+
+    object AppRatingShown : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(showRating = false)
     }
 
     class UpdateSelectedPaymentMethod(

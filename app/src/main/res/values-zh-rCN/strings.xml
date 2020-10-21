@@ -1575,7 +1575,7 @@
   <string name="card_in_progress">%1s正在进行购买</string>
   <string name="we_will_notify_order_complete">您的订单完成后，我们会通知您。</string>
   <string name="completing_card_buy">我们现在完成您的购买。</string>
-  <string name="card_purchased" formatted="false">%1s购买%1s</string>
+  <string name="card_purchased" formatted="false">%1s购买</string>
   <string name="card_purchased_available_now">您的%1s现在可以在电子钱包中使用。</string>
   <string name="invalid_cvv">无效的CVV</string>
   <string name="invalid_date">失效日期</string>

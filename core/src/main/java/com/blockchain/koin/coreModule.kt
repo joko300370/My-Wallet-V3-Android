@@ -21,6 +21,7 @@ import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -248,6 +249,7 @@ val coreModule = module {
         .bind(SecurityPrefs::class)
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
+        .bind(RatingPrefs::class)
         .bind(WalletStatus::class)
         .bind(EncryptedPrefs::class)
 

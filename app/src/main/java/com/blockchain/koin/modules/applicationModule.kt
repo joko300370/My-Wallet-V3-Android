@@ -517,6 +517,7 @@ val applicationModule = module {
                 interactor = get(),
                 scheduler = AndroidSchedulers.mainThread(),
                 initialState = SimpleBuyState(),
+                ratingPrefs = get(),
                 prefs = get(),
                 gson = get(),
                 cardActivators = listOf(

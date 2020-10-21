@@ -1571,7 +1571,7 @@
   <string name="linking_card_error_title">おっとっと！何かが間違っていました。</string>
   <string name="card_error_subtitle">戻ってもう一度お試しください。</string>
   <string name="card_expiry_date">経験： %1s</string>
-  <string name="card_buying" formatted="false">%1s購入してい%1s</string>
+  <string name="card_buying" formatted="false">%1s購入してい</string>
   <string name="card_in_progress">%1s購入中</string>
   <string name="we_will_notify_order_complete">ご注文が完了しましたらお知らせします。</string>
   <string name="completing_card_buy">現在、購入を完了しています。</string>
