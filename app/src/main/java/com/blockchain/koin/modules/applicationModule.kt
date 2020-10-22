@@ -30,7 +30,6 @@ import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
-import piuk.blockchain.android.util.CurrentContextAccess
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
@@ -73,6 +72,7 @@ import piuk.blockchain.android.thepit.PitLinkingImpl
 import piuk.blockchain.android.thepit.ThePitDeepLinkParser
 import piuk.blockchain.android.ui.account.AccountEditPresenter
 import piuk.blockchain.android.ui.account.AccountPresenter
+import piuk.blockchain.android.ui.account.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.airdrops.AirdropCentrePresenter
 import piuk.blockchain.android.ui.auth.FirebaseMobileNoticeRemoteConfig
@@ -118,6 +118,7 @@ import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
+import piuk.blockchain.android.util.CurrentContextAccess
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.ResourceDefaultLabels
@@ -454,6 +455,10 @@ val applicationModule = module {
                 environmentConfig = get(),
                 walletPreferences = get()
             )
+        }
+
+        factory {
+            ConfirmPaymentPresenter()
         }
 
         factory {
