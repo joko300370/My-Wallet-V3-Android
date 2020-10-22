@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.transactionflow.analytics
 import com.blockchain.notifications.analytics.Analytics
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
@@ -136,6 +137,12 @@ class TxFlowAnalytics(
             AssetAction.NewSend -> analytics.logEvent(SendAnalyticsEvent.TransactionFailed)
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionFailed)
             else -> {}
+        }
+    }
+
+    fun onFeeLevelChanged(oldLevel: FeeLevel, newLevel: FeeLevel) {
+        if (oldLevel != newLevel) {
+            analytics.logEvent(SendAnalyticsEvent.FeeChanged(oldLevel, newLevel))
         }
     }
 }

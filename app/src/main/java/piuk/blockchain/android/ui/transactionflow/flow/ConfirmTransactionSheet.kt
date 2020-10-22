@@ -34,6 +34,7 @@ class ConfirmTransactionSheet(
             model = model,
             stringUtils = stringUtils,
             activityContext = requireActivity(),
+            analytics = analyticsHooks,
             mapper = mapper,
             selectedCurrency = prefs.selectedFiatCurrency,
             exchangeRates = exchangeRates

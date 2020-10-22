@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.analytics
 
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.coincore.FeeLevel
 
 sealed class SendAnalyticsEvent(
     override val event: String,
@@ -41,10 +42,21 @@ sealed class SendAnalyticsEvent(
             )
         )
 
+    data class FeeChanged(val oldFee: FeeLevel, val newFee: FeeLevel) :
+        SendAnalyticsEvent(
+            "send_change_fee_click",
+            mapOf(
+                PARAM_OLD_FEE to oldFee.name,
+                PARAM_NEW_FEE to newFee.name
+            )
+        )
+
     companion object {
         private const val PARAM_ASSET = "asset"
         private const val PARAM_SOURCE = "source"
         private const val PARAM_TARGET = "target"
+        private const val PARAM_OLD_FEE = "old_fee"
+        private const val PARAM_NEW_FEE = "new_fee"
         private const val FEE_SCHEDULE = "fee_level"
     }
 }

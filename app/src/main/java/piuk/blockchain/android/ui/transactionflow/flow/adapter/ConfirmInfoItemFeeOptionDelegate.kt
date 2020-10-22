@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
@@ -27,6 +28,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmInfoItemFeeOptionDelegate<in T>(
     private val model: TransactionModel,
+    private val analytics: TxFlowAnalytics,
     private val activityContext: Activity,
     private val stringUtils: StringUtils
 ) : AdapterDelegate<T> {
@@ -41,12 +43,40 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as FeeOptionViewHolder).bind(items[position] as TxOptionValue.FeeSelection, model, activityContext,
-        stringUtils)
+    ) = (holder as FeeOptionViewHolder).bind(
+        items[position] as TxOptionValue.FeeSelection,
+        model,
+        analytics,
+        activityContext,
+        stringUtils
+    )
 
     private class FeeOptionViewHolder(
         view: View
     ) : RecyclerView.ViewHolder(view), LayoutContainer {
+
+        private val feeList = mutableListOf<FeeLevel>()
+        private val displayList = mutableListOf<String>()
+        private fun feeToPosition(feeLevel: FeeLevel): Int = feeList.indexOf(feeLevel)
+        private fun posToFeeLevel(pos: Int): FeeLevel = feeList[pos]
+        private fun updateFeeList(list: List<FeeLevel>) {
+            feeList.clear()
+            feeList.addAll(list)
+
+            displayList.clear()
+            feeList.forEach {
+                displayList.add(
+                    itemView.context.getString(
+                        when (it) {
+                            FeeLevel.None -> TODO()
+                            FeeLevel.Regular -> R.string.fee_options_regular
+                            FeeLevel.Priority -> R.string.fee_options_priority
+                            FeeLevel.Custom -> TODO()
+                        }
+                    )
+                )
+            }
+        }
 
         override val containerView: View?
             get() = itemView
@@ -54,15 +84,16 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         fun bind(
             item: TxOptionValue.FeeSelection,
             model: TransactionModel,
+            analytics: TxFlowAnalytics,
             activityContext: Activity,
             stringUtils: StringUtils
         ) {
-            val availableOptions = item.availableLevels
+            updateFeeList(item.availableLevels.toList())
             val selectedOption = item.selectedLevel
 
             with(itemView) {
-                if (availableOptions.size > 1) {
-                    fee_option_select_spinner.setupSpinner(selectedOption, model)
+                if (feeList.size > 1) {
+                    fee_option_select_spinner.setupSpinner(selectedOption, model, analytics)
                     fee_switcher.displayedChild = SHOW_DROPDOWN
                 } else {
                     fee_switcher.displayedChild = SHOW_STATIC
@@ -92,62 +123,56 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             }
         }
 
-        // We can get away with a fixed list ATM, until we support CustomFees at least.
-        private val optionList = listOf(
-            itemView.context.getString(R.string.fee_options_priority),
-            itemView.context.getString(R.string.fee_options_regular)
-        )
-
-        private fun AppCompatSpinner.setupSpinner(currentLevel: FeeLevel, model: TransactionModel) {
-
+        private fun AppCompatSpinner.setupSpinner(
+            currentLevel: FeeLevel,
+            model: TransactionModel,
+            analytics: TxFlowAnalytics
+        ) {
             val spinnerArrayAdapter: ArrayAdapter<String> =
                 CustomPaddingArrayAdapter(
                     context,
                     android.R.layout.simple_spinner_dropdown_item,
-                    optionList.toMutableList()
+                    displayList
                 )
 
             adapter = spinnerArrayAdapter
-            // Assumption here - when we extend the list, this assumption will break
-            val newSelection = if (currentLevel == FeeLevel.Priority) PRIORITY_FEE else REGULAR_FEE
+            val newSelection = feeToPosition(currentLevel)
             onItemSelectedListener = null
             setSelection(newSelection)
-            post { addSpinnerListener(model) }
+
+            post {
+                onItemSelectedListener = createSpinnerListener(model, analytics, currentLevel)
+            }
         }
 
-        private fun AppCompatSpinner.addSpinnerListener(model: TransactionModel) {
-            onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        model.process(
-                            TransactionIntent.ModifyTxOption(
-                                TxOptionValue.FeeSelection(
-                                    selectedLevel = if (position == PRIORITY_FEE) {
-                                        FeeLevel.Priority
-                                    } else {
-                                        FeeLevel.Regular
-                                    }
-                                )
-                            ))
-                    }
+        private fun createSpinnerListener(
+            model: TransactionModel,
+            analytics: TxFlowAnalytics,
+            currentLevel: FeeLevel
+        ) = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val newFeeLevel = posToFeeLevel(position)
+                model.process(
+                    TransactionIntent.ModifyTxOption(TxOptionValue.FeeSelection(selectedLevel = newFeeLevel)
+                    )
+                )
+                analytics.onFeeLevelChanged(currentLevel, newFeeLevel)
+            }
 
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-                        // do nothing
-                    }
-                }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // do nothing
+            }
         }
+    }
 
-        companion object {
-            private const val SHOW_DROPDOWN = 0
-            private const val SHOW_STATIC = 1
-            private const val PRIORITY_FEE = 0
-            private const val REGULAR_FEE = 1
-        }
+    companion object {
+        private const val SHOW_DROPDOWN = 0
+        private const val SHOW_STATIC = 1
     }
 }
 
