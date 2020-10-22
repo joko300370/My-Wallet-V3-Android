@@ -105,9 +105,10 @@ internal class BtcAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address.removePrefix(BTC_URL_PREFIX))) {
+            val normalisedAddress = address.removePrefix(BTC_URL_PREFIX)
+            if (isValidAddress(normalisedAddress)) {
                 BtcAddress(
-                    address = address,
+                    address = normalisedAddress,
                     networkParams = environmentConfig.bitcoinNetworkParameters
                 )
             } else {
