@@ -21,8 +21,8 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
-import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.copyAndPut
+import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -84,7 +84,11 @@ class BchOnChainTxEngine(
             getDynamicFeePerKb(pendingTx)
         ) { coins, feePerKb ->
             updatePendingTx(amount, pendingTx, feePerKb, coins)
-        }
+        }.onErrorReturnItem(
+            pendingTx.copy(
+                validationState = ValidationState.INSUFFICIENT_FUNDS
+            )
+        )
     }
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =

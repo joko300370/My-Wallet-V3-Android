@@ -112,7 +112,11 @@ class BtcOnChainTxEngine(
                 feePerKb,
                 coins
             )
-        }
+        }.onErrorReturnItem(
+            pendingTx.copy(
+                validationState = ValidationState.INSUFFICIENT_FUNDS
+            )
+        )
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
         if (btcDataManager.getAddressBalance(address) > CryptoValue.ZeroBtc) {
