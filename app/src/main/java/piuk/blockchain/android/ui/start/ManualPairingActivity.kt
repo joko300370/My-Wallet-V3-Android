@@ -3,18 +3,24 @@ package piuk.blockchain.android.ui.start
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import com.blockchain.koin.scopedInject
+import com.blockchain.preferences.WalletStatus
 import kotlinx.android.synthetic.main.activity_manual_pairing.*
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.customviews.getTwoFactorDialog
+import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_FA_COUNTDOWN
+import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_FA_STEP
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 
@@ -23,6 +29,21 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
 
     override val view: ManualPairingView = this
     override val presenter: ManualPairingPresenter by scopedInject()
+    private val walletPrefs: WalletStatus by inject()
+
+    private var isTwoFATimerRunning = false
+    private val twoFATimer by lazy {
+        object : CountDownTimer(TWO_FA_COUNTDOWN, TWO_FA_STEP) {
+            override fun onTick(millisUntilFinished: Long) {
+                isTwoFATimerRunning = true
+            }
+
+            override fun onFinish() {
+                isTwoFATimerRunning = false
+                walletPrefs.setResendSmsRetries(3)
+            }
+        }
+    }
 
     private val guid: String
         get() = wallet_id.text.toString()
@@ -76,18 +97,26 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
 
         ViewUtils.hideKeyboard(this)
 
-        showAlert(
-            getTwoFactorDialog(this, authType, positiveAction = {
-                presenter.submitTwoFactorCode(responseObject,
-                    sessionId,
-                    guid,
-                    password,
-                    it
-                )
-            }, resendAction = {
+        val dialog = getTwoFactorDialog(this, authType, walletPrefs, positiveAction = {
+            presenter.submitTwoFactorCode(responseObject,
+                sessionId,
+                guid,
+                password,
+                it
+            )
+        }, resendAction = { limitReached ->
+            if (!limitReached) {
                 presenter.requestNew2FaCode(password, guid)
+            } else {
+                ToastCustom.makeText(this, getString(R.string.two_factor_retries_exceeded),
+                    Toast.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+                if (!isTwoFATimerRunning) {
+                    twoFATimer.start()
+                }
             }
-        ))
+        })
+
+        showAlert(dialog)
     }
 
     override fun resetPasswordField() {

@@ -20,4 +20,7 @@ interface WalletStatus {
 
     val hasSeenSwapPromo: Boolean
     fun setSeenSwapPromo()
+
+    val resendSmsRetries: Int
+    fun setResendSmsRetries(retries: Int)
 }

@@ -5,6 +5,7 @@ import android.text.InputType
 import android.text.method.DigitsKeyListener
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.ViewUtils
@@ -12,8 +13,9 @@ import piuk.blockchain.androidcoreui.utils.ViewUtils
 fun getTwoFactorDialog(
     context: Context,
     authType: Int,
+    walletPrefs: WalletStatus,
     positiveAction: (String) -> Unit,
-    resendAction: () -> Unit
+    resendAction: (Boolean) -> Unit
 ): AlertDialog {
     val editText = AppCompatEditText(context)
     editText.setHint(R.string.two_factor_dialog_hint)
@@ -41,8 +43,12 @@ fun getTwoFactorDialog(
         .setNegativeButton(android.R.string.cancel, null)
 
     if (authType == Settings.AUTH_TYPE_SMS) {
-        builder.setNeutralButton(R.string.two_factor_resend_sms) { _, _ ->
-            resendAction()
+        builder.setNeutralButton(
+            context.getString(R.string.two_factor_resend_sms, walletPrefs.resendSmsRetries)) { _, _ ->
+            if (walletPrefs.resendSmsRetries > 0) {
+                walletPrefs.setResendSmsRetries(walletPrefs.resendSmsRetries - 1)
+            }
+            resendAction(walletPrefs.resendSmsRetries == 0)
         }
     }
 
