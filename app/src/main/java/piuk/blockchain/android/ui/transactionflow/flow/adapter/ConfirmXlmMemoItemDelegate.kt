@@ -90,9 +90,16 @@ private class XlmMemoItemViewHolder(
             if (!item.text.isNullOrBlank()) {
                 confirm_details_memo_spinner.setSelection(TEXT_INDEX)
                 confirm_details_memo_input.setText(item.text, TextView.BufferType.EDITABLE)
+                model.process(
+                    TransactionIntent.ModifyTxOption(item.copy(text = item.text.toString())))
             } else if (item.id != null) {
                 confirm_details_memo_spinner.setSelection(ID_INDEX)
                 confirm_details_memo_input.setText(item.id.toString(), TextView.BufferType.EDITABLE)
+                model.process(TransactionIntent.ModifyTxOption(
+                    item.copy(id = item.text.toString().toLong())))
+            } else {
+                model.process(
+                    TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
             }
 
             confirm_details_memo_spinner.addSpinnerListener(model, item, confirm_details_memo_input)
@@ -135,6 +142,7 @@ private class XlmMemoItemViewHolder(
         item: TxOptionValue.Memo,
         editText: EditText
     ) {
+        var isFirstTime = true
         onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -144,10 +152,12 @@ private class XlmMemoItemViewHolder(
                     id: Long
                 ) {
                     editText.configureForSelection(position)
-                    itemView.apply {
+                    if (!isFirstTime) {
                         model.process(
                             TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
+                        editText.setText("", TextView.BufferType.EDITABLE)
                     }
+                    isFirstTime = false
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -166,7 +176,6 @@ private class XlmMemoItemViewHolder(
                 context.getString(R.string.send_confirm_memo_id_hint)
             confirm_details_memo_input.inputType = InputType.TYPE_CLASS_NUMBER
         }
-        setText("", TextView.BufferType.EDITABLE)
     }
 
     private fun View.showExchangeInfo() {

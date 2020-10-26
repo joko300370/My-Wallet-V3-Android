@@ -17,15 +17,26 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOption
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
+
+private const val STATE_MEMO = "XLM_MEMO"
+
+private val PendingTx.memo: TxOptionValue.Memo
+    get() = (this.engineState[STATE_MEMO] as? TxOptionValue.Memo)
+        ?: throw IllegalStateException("XLM memo option null")
+
+private fun PendingTx.setMemo(memo: TxOptionValue.Memo): PendingTx =
+    this.copy(
+        engineState = engineState.copyAndPut(STATE_MEMO, memo)
+    )
 
 class XlmOnChainTxEngine(
     private val xlmDataManager: XlmDataManager,
@@ -52,12 +63,12 @@ class XlmOnChainTxEngine(
                 fees = CryptoValue.ZeroXlm,
                 feeLevel = FeeLevel.Regular,
                 selectedFiat = userFiat,
-                options = listOf(
-                    TxOptionValue.Memo(
-                        text = targetXlmAddress.memo,
-                        isRequired = isMemoRequired(),
-                        id = null
-                    )
+                engineState = hashMapOf()
+            ).setMemo(
+                TxOptionValue.Memo(
+                    text = targetXlmAddress.memo,
+                    isRequired = isMemoRequired(),
+                    id = null
                 )
             )
         )
@@ -118,14 +129,18 @@ class XlmOnChainTxEngine(
                         exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
-                    TxOptionValue.Memo(
-                        text = targetXlmAddress.memo,
-                        isRequired = isMemoRequired(),
-                        id = null
-                    )
+                    pendingTx.memo
                 )
             )
         )
+
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> {
+        return super.doOptionUpdateRequest(pendingTx, newOption).flatMap { tx ->
+            (newOption as? TxOptionValue.Memo)?.let {
+                Single.just(tx.setMemo(newOption))
+            } ?: Single.just(tx)
+        }
+    }
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
@@ -189,8 +204,7 @@ class XlmOnChainTxEngine(
         }.ignoreElement()
 
     private fun getMemoOption(pendingTx: PendingTx) =
-        pendingTx.getOption<TxOptionValue.Memo>(TxOption.MEMO) ?: throw IllegalStateException(
-            "XLM memo option null")
+        pendingTx.memo
 
     private fun TxOptionValue.Memo.toXlmMemo(): Memo =
         if (!this.text.isNullOrEmpty()) {

@@ -8,6 +8,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -41,6 +42,7 @@ interface TransactionFlowCustomiser {
     // Format those flash error messages:
     fun issueFlashMessage(state: TransactionState): String?
     fun selectIssueType(state: TransactionState): IssueType
+    fun showTargetIcon(state: TransactionState): Boolean
 }
 
 class TransactionFlowCustomiserImpl(
@@ -275,7 +277,7 @@ class TransactionFlowCustomiserImpl(
                     MAX_ACCOUNTS_FOR_SHEET).map { it as BlockchainAccount })
             }
         } else {
-            TargetAddressSheetState.TargetAccountSelected(state.selectedTarget as BlockchainAccount)
+            TargetAddressSheetState.TargetAccountSelected(state.selectedTarget)
         }
     }
 
@@ -328,6 +330,9 @@ class TransactionFlowCustomiserImpl(
             else -> IssueType.ERROR
         }
 
+    override fun showTargetIcon(state: TransactionState): Boolean =
+        state.action == AssetAction.Swap
+
     override fun transactionProgressIcon(state: TransactionState): Int =
         when (state.action) {
             AssetAction.Swap -> R.drawable.swap_masked_asset
@@ -344,8 +349,9 @@ enum class IssueType {
     INFO
 }
 
-sealed class TargetAddressSheetState(val accounts: List<BlockchainAccount>) {
+sealed class TargetAddressSheetState(val accounts: List<TransactionTarget>) {
     object SelectAccountWhenOverMaxLimitSurpassed : TargetAddressSheetState(emptyList())
-    class TargetAccountSelected(account: BlockchainAccount) : TargetAddressSheetState(listOf(account))
-    class SelectAccountWhenWithinMaxLimit(accounts: List<BlockchainAccount>) : TargetAddressSheetState(accounts)
+    class TargetAccountSelected(account: TransactionTarget) : TargetAddressSheetState(listOf(account))
+    class SelectAccountWhenWithinMaxLimit(accounts: List<BlockchainAccount>) :
+        TargetAddressSheetState(accounts.map { it as TransactionTarget })
 }

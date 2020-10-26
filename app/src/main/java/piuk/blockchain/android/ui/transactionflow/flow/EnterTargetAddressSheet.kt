@@ -61,7 +61,7 @@ class EnterTargetAddressSheet(
 
             select_an_account.visibleIf {
                 customiser.enterTargetAddressSheetState(newState) is
-                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
             }
 
             cacheState(newState)
@@ -167,7 +167,7 @@ class EnterTargetAddressSheet(
     private fun setupTransferList(targetAddressSheetState: TargetAddressSheetState) {
         with(dialogView.wallet_select) {
             initialise(
-                Single.just(targetAddressSheetState.accounts)
+                Single.just(targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>())
             )
             when (targetAddressSheetState) {
                 is TargetAddressSheetState.SelectAccountWhenWithinMaxLimit -> {
@@ -181,7 +181,8 @@ class EnterTargetAddressSheet(
                         model.process(TransactionIntent.ShowTargetSelection)
                     }
                 }
-                else -> {}
+                else -> {
+                }
             }
         }
     }

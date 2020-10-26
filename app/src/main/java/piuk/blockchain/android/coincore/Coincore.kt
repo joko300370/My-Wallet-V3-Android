@@ -97,6 +97,7 @@ class Coincore internal constructor(
                     it is CryptoAccount &&
                             it.asset != sourceAccount.asset &&
                             it !is FiatAccount &&
+                            it !is InterestAccount &&
                             if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }

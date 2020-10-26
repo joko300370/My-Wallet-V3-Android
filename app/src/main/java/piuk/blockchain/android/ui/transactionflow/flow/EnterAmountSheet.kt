@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.dialog_tx_flow_enter_amount.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
@@ -76,7 +77,7 @@ class EnterAmountSheet(
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                            "(${availableBalance.toStringWithSymbol()})"
+                                "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -156,6 +157,11 @@ class EnterAmountSheet(
     private fun updatePendingTxDetails(state: TransactionState) {
         with(dialogView) {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
+
+            if (customiser.showTargetIcon(state)) {
+                amount_sheet_target_icon.setCoinIcon((state.selectedTarget as CryptoAccount).asset)
+                amount_sheet_asset_direction.translationZ = 1f
+            } else amount_sheet_target_icon.gone()
 
             amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
             amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
