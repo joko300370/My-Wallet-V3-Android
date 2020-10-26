@@ -95,6 +95,11 @@ data class FiatValue private constructor(
         return FiatValue(currencyCode, amount - other.amount)
     }
 
+    override fun division(other: Money): Money {
+        require(other is FiatValue)
+        return FiatValue(currencyCode, amount / other.amount)
+    }
+
     override fun compare(other: Money): Int {
         require(other is FiatValue)
         return amount.compareTo(other.amount)

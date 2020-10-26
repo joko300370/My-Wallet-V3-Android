@@ -12,10 +12,12 @@ import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_tx_flow_enter_amount.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.setAssetIconColours
@@ -65,7 +67,11 @@ class EnterAmountSheet(
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                amount_sheet_input.maxLimit = newState.availableBalance
+                if (amount_sheet_input.isConfigured) {
+                    amount_sheet_input.maxLimit = newState.availableBalance
+                    if (amount_sheet_input.exchangeRate != newState.fiatRate)
+                        amount_sheet_input.exchangeRate = newState.fiatRate
+                }
 
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
@@ -79,9 +85,15 @@ class EnterAmountSheet(
 
             updatePendingTxDetails(newState)
 
-            customiser.errorFlashMessage(newState)?.let {
-                amount_sheet_input.showError(it)
-            } ?: amount_sheet_input.hideError()
+            customiser.issueFlashMessage(newState)?.let {
+                when (customiser.selectIssueType(newState)) {
+                    IssueType.ERROR -> amount_sheet_input.showError(it)
+                    IssueType.INFO -> amount_sheet_input.showInfo(it) {
+                        dismiss()
+                        KycNavHostActivity.start(requireActivity(), CampaignType.Swap)
+                    }
+                }
+            } ?: amount_sheet_input.hideLabels()
 
             if (!newState.canGoBack) {
                 amount_sheet_back.gone()
@@ -147,11 +159,15 @@ class EnterAmountSheet(
 
             amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
             amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
+        }
 
-            amount_sheet_from.text =
-                getString(R.string.send_enter_amount_from, state.sendingAccount.label)
-            amount_sheet_to.text =
-                getString(R.string.send_enter_amount_to, state.selectedTarget.label)
+        updateSourceAndTargetDetails(state)
+    }
+
+    private fun updateSourceAndTargetDetails(state: TransactionState) {
+        with(dialogView) {
+            amount_sheet_from.text = customiser.enterAmountSourceLabel(state)
+            amount_sheet_to.text = customiser.enterAmountTargetLabel(state)
         }
     }
 

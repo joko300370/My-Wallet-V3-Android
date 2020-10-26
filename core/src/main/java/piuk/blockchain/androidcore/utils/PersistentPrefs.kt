@@ -27,6 +27,8 @@ interface PersistentPrefs :
 
     var pinId: String
 
+    var newSwapEnabled: Boolean
+
     fun getValue(name: String): String?
     fun getValue(name: String, defaultValue: String): String
     fun getValue(name: String, defaultValue: Int): Int

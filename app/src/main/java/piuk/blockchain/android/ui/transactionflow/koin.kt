@@ -14,6 +14,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
@@ -62,6 +64,18 @@ val transactionModule = module {
     }.bind(TxOptionsFormatter::class)
 
     factory {
+        SwapSourcePropertyFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
+        SwapDestinationPropertyFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
         TxConfirmReadOnlyMapper(
             formatters = getAll()
         )
@@ -84,7 +98,8 @@ val transactionModule = module {
         scoped {
             TransactionInteractor(
                 coincore = payloadScope.get(),
-                addressFactory = payloadScope.get()
+                addressFactory = payloadScope.get(),
+                swapPairsRepository = payloadScope.get()
             )
         }
 

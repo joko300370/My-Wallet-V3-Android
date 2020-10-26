@@ -34,11 +34,11 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             CryptoToCrypto(to, from, rateInverse)
     }
 
-    class CryptoToFiat(
+    data class CryptoToFiat(
         val from: CryptoCurrency,
         val to: String,
-        rate: BigDecimal
-    ) : ExchangeRate(rate) {
+        private val _rate: BigDecimal
+    ) : ExchangeRate(_rate) {
         fun applyRate(cryptoValue: CryptoValue): FiatValue {
             validateCurrency(from, cryptoValue.currency)
             return FiatValue.fromMajor(

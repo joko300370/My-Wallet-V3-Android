@@ -76,6 +76,22 @@ class ToPropertyFormatter(private val resources: Resources) : TxOptionsFormatter
         else null
 }
 
+class SwapSourcePropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxOptionValue): Pair<String, String>? =
+        if (property is TxOptionValue.SwapSourceValue)
+            resources.getString(R.string.common_swap) to property.swappingAssetValue.toStringWithSymbol()
+        else null
+}
+
+class SwapDestinationPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxOptionValue): Pair<String, String>? =
+        if (property is TxOptionValue.SwapDestinationValue)
+            resources.getString(R.string.common_receive) to property.receivingAssetValue.toStringWithSymbol()
+        else null
+}
+
 fun Money.formatWithExchange(exchange: Money?) =
     exchange?.let {
         "${this.toStringWithSymbol()} (${it.toStringWithSymbol()})"

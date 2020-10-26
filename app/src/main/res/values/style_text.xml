@@ -113,6 +113,10 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="Text.Blue.Semibold.Centered.14">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="Text.Blue.Semibold.Centered.16">
         <item name="android:textSize">16sp</item>
     </style>
@@ -180,7 +184,7 @@
     <style name="Text.Semibold.12">
         <item name="android:textSize">12sp</item>
     </style>
-    
+
     <style name="Text.Semibold.Centered">
         <item name="android:gravity">center</item>
     </style>
@@ -192,6 +196,7 @@
     <style name="Text.Semibold.Light">
         <item name="android:textColor">@color/grey_600</item>
     </style>
+
     <style name="Text.Semibold.Light.14">
         <item name="android:textSize">14sp</item>
     </style>
@@ -212,6 +217,12 @@
         <item name="android:textColor">@color/red_600</item>
         <item name="android:textSize">14sp</item>
         <item name="android:background">@drawable/rounded_error_text_background</item>
+    </style>
+
+    <style name="Text.Info">
+        <item name="android:textColor">@color/blue_600</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:background">@drawable/rounded_info_text_bkgd</item>
     </style>
 
 </resources>

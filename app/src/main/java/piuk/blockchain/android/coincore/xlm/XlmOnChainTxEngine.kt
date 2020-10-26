@@ -35,9 +35,8 @@ class XlmOnChainTxEngine(
     walletPreferences: WalletStatus
 ) : OnChainTxEngineBase(requireSecondPassword, walletPreferences) {
 
-    private val targetXlmAddress: XlmAddress by lazy {
-        txTarget as XlmAddress
-    }
+    private val targetXlmAddress: XlmAddress
+        get() = txTarget as XlmAddress
 
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)
@@ -52,7 +51,14 @@ class XlmOnChainTxEngine(
                 available = CryptoValue.ZeroXlm,
                 fees = CryptoValue.ZeroXlm,
                 feeLevel = FeeLevel.Regular,
-                selectedFiat = userFiat
+                selectedFiat = userFiat,
+                options = listOf(
+                    TxOptionValue.Memo(
+                        text = targetXlmAddress.memo,
+                        isRequired = isMemoRequired(),
+                        id = null
+                    )
+                )
             )
         )
 
@@ -128,8 +134,6 @@ class XlmOnChainTxEngine(
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Regular)
         )
-
-    private fun String.containsMemo() = contains(":")
 
     private fun isMemoRequired(): Boolean =
         walletOptionsDataManager.isXlmAddressExchange(targetXlmAddress.address)

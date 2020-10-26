@@ -260,7 +260,7 @@ class CryptoActivityDetailsBottomSheet :
         dialogView.apply {
             status.text = getString(R.string.activity_details_label_complete)
             status.background =
-                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_received)
+                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
             status.setTextColor(
                 ContextCompat.getColor(requireContext(), R.color.green_600))
         }

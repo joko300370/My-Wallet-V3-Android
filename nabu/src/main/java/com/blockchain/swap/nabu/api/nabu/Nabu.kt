@@ -51,6 +51,11 @@ import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckResponse
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
+import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.swap.QuoteResponse
+import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
+import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -268,6 +273,12 @@ internal interface Nabu {
         @Body depositRequestBody: DepositRequestBody
     ): Completable
 
+    @GET(NABU_SWAP_ORDER)
+    fun getSwapOrders(@Header("authorization") authorization: String): Single<List<SwapOrderResponse>>
+
+    @GET(NABU_SWAP_PAIRS)
+    fun getSwapAvailablePairs(@Header("authorization") authorization: String): Single<List<String>>
+
     @GET(NABU_SIMPLE_BUY_ORDERS)
     fun getOrders(
         @Header("authorization") authorization: String,
@@ -405,4 +416,23 @@ internal interface Nabu {
     fun getInterestEligibility(
         @Header("authorization") authorization: String
     ): Single<InterestEligibilityFullResponse>
+
+    @POST(NABU_QUOTES)
+    fun fetchQuote(
+        @Header("authorization") authorization: String,
+        @Body quoteRequest: QuoteRequest
+    ): Single<QuoteResponse>
+
+    @POST(NABU_SWAP_ORDER)
+    fun createSwapOrder(
+        @Header("authorization") authorization: String,
+        @Body order: CreateOrderRequest
+    ): Single<SwapOrderResponse>
+
+    @GET(NABU_SWAP_LIMITS)
+    fun fetchSwapLimits(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("minor") useMinor: Boolean = true
+    ): Single<SwapLimitsResponse>
 }

@@ -19,8 +19,8 @@ import java.util.EmptyStackException
 sealed class TransactionIntent : MviIntent<TransactionState> {
 
     class InitialiseWithSourceAccount(
-        private val action: AssetAction,
-        private val fromAccount: CryptoAccount,
+        val action: AssetAction,
+        val fromAccount: CryptoAccount,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
@@ -29,20 +29,12 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 sendingAccount = fromAccount,
                 errorState = TransactionErrorState.NONE,
                 passwordRequired = passwordRequired,
-                currentStep = selectStep(passwordRequired),
                 nextEnabled = passwordRequired
-            ).updateBackstack(oldState)
-
-        private fun selectStep(passwordRequired: Boolean): TransactionStep =
-            if (passwordRequired) {
-                TransactionStep.ENTER_PASSWORD
-            } else {
-                TransactionStep.ENTER_ADDRESS
-            }
+            )
     }
 
     class InitialiseWithSourceAndTargetAccount(
-        private val action: AssetAction,
+        val action: AssetAction,
         val fromAccount: CryptoAccount,
         val target: TransactionTarget,
         private val passwordRequired: Boolean
@@ -67,6 +59,24 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 target is InvoiceTarget -> TransactionStep.CONFIRM_DETAIL
                 else -> TransactionStep.ENTER_AMOUNT
             }
+    }
+
+    class InitialiseWithSourceAndPreferredTarget(
+        val action: AssetAction,
+        val fromAccount: CryptoAccount,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                sendingAccount = fromAccount,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                currentStep = TransactionStep.ENTER_ADDRESS,
+                nextEnabled = true
+            ).updateBackstack(oldState)
     }
 
     class ValidatePassword(
@@ -106,6 +116,21 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    class AvailableAccountsListUpdated(private val targets: List<TransactionTarget>) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                availableTargets = targets,
+                currentStep = selectStep(oldState.passwordRequired)
+            ).updateBackstack(oldState)
+
+        private fun selectStep(passwordRequired: Boolean): TransactionStep =
+            if (passwordRequired) {
+                TransactionStep.ENTER_PASSWORD
+            } else {
+                TransactionStep.ENTER_ADDRESS
+            }
+    }
+
     // Check a manually entered address is correct. If it is, the interactor will send a
     // TargetAddressValidated intent which, in turn, will enable the next cta on the enter
     // address sheet
@@ -117,7 +142,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class TargetAddressValidated(
-        val transactionTarget: TransactionTarget
+        private val transactionTarget: TransactionTarget
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
@@ -147,6 +172,15 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 errorState = TransactionErrorState.NONE,
                 selectedTarget = transactionTarget,
                 currentStep = TransactionStep.ENTER_AMOUNT,
+                nextEnabled = false
+            ).updateBackstack(oldState)
+    }
+
+    object ShowTargetSelection : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                errorState = TransactionErrorState.NONE,
+                currentStep = TransactionStep.SELECT_TARGET_ACCOUNT,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }
@@ -187,6 +221,17 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 errorState = TransactionErrorState.NONE,
                 allowFiatInput = canTransactFiat,
                 nextEnabled = false
+            ).updateBackstack(oldState)
+    }
+
+    class TargetAccountSelected(
+        private val selectedTarget: TransactionTarget
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.ENTER_ADDRESS,
+                selectedTarget = selectedTarget,
+                nextEnabled = true
             ).updateBackstack(oldState)
     }
 
@@ -280,6 +325,11 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         }
     }
 
+    object ShowMoreAccounts : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(currentStep = TransactionStep.SELECT_TARGET_ACCOUNT).updateBackstack(oldState)
+    }
+
     // Fired from when the confirm transaction sheet is created.
     // Forces a validation pass; we will get a
     object ValidateTransaction : TransactionIntent() {
@@ -316,6 +366,8 @@ private fun ValidationState.mapToTransactionError() =
         ValidationState.HAS_TX_IN_FLIGHT -> TransactionErrorState.TRANSACTION_IN_FLIGHT
         ValidationState.OPTION_INVALID -> TransactionErrorState.TX_OPTION_INVALID
         ValidationState.OVER_MAX_LIMIT -> TransactionErrorState.ABOVE_MAX_LIMIT
+        ValidationState.OVER_SILVER_TIER_LIMIT -> TransactionErrorState.OVER_SILVER_TIER_LIMIT
+        ValidationState.OVER_GOLD_TIER_LIMIT -> TransactionErrorState.OVER_GOLD_TIER_LIMIT
         ValidationState.INVOICE_EXPIRED, // We shouldn't see this here
         ValidationState.UNKNOWN_ERROR -> TransactionErrorState.UNKNOWN_ERROR
     }

@@ -17,4 +17,7 @@ interface WalletStatus {
 
     fun setFeeTypeForAsset(cryptoCurrency: CryptoCurrency, type: Int)
     fun getFeeTypeForAsset(cryptoCurrency: CryptoCurrency): Int?
+
+    val hasSeenSwapPromo: Boolean
+    fun setSeenSwapPromo()
 }

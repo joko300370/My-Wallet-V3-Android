@@ -4,7 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.BankAccount
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -33,7 +33,7 @@ data class SimpleBuyState(
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val orderState: OrderState = OrderState.UNINITIALISED,
     private val expirationDate: Date? = null,
-    val quote: Quote? = null,
+    val custodialQuote: CustodialQuote? = null,
     val kycStartedButNotCompleted: Boolean = false,
     val kycVerificationState: KycState? = null,
     val bankAccount: BankAccount? = null,
@@ -63,7 +63,7 @@ data class SimpleBuyState(
             orderState,
             amount,
             expirationDate,
-            quote
+            custodialQuote
         )
     }
 
@@ -186,7 +186,7 @@ data class SimpleBuyOrder(
     val orderState: OrderState = OrderState.UNINITIALISED,
     val amount: FiatValue? = null,
     val expirationDate: Date? = null,
-    val quote: Quote? = null
+    val custodialQuote: CustodialQuote? = null
 )
 
 data class PaymentOptions(

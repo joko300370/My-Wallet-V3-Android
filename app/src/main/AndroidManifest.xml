@@ -133,16 +133,16 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swap.detail.TradeDetailActivity"
+            android:name=".ui.swapold.detail.TradeDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swap.homebrew.exchange.history.TradeHistoryActivity"
+            android:name=".ui.swapold.exchange.history.TradeHistoryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swap.homebrew.exchange.detail.HomebrewTradeDetailActivity"
+            android:name=".ui.swapold.exchange.detail.HomebrewTradeDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swap.homebrew.exchange.host.HomebrewNavHostActivity"
+            android:name=".ui.swapold.exchange.host.HomebrewNavHostActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask" />
         <activity

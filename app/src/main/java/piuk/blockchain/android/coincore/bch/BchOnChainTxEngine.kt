@@ -55,9 +55,8 @@ class BchOnChainTxEngine(
         sourceAccount as BchCryptoWalletAccount
     }
 
-    private val bchTarget: CryptoAddress by unsafeLazy {
-        txTarget as CryptoAddress
-    }
+    private val bchTarget: CryptoAddress
+        get() = txTarget as CryptoAddress
 
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)

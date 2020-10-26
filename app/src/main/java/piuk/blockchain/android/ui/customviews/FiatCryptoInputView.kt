@@ -8,6 +8,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
@@ -17,7 +18,6 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -45,10 +45,28 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     val amount: Observable<Money>
         get() = amountSubject
 
-    private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
+    private val defExchangeRateDataManager: ExchangeRateDataManager by scopedInject()
+
+    private val defCryptoToFiat: ExchangeRate.CryptoToFiat
+        get() = ExchangeRate.CryptoToFiat(
+            cryptoCurrency,
+            configuration.fiatCurrency,
+            defExchangeRateDataManager.getLastPrice(cryptoCurrency, configuration.fiatCurrency)
+                .toBigDecimal()
+        )
+
     private val currencyPrefs: CurrencyPrefs by inject()
 
-    private val cryptoCurrency: CryptoCurrency
+    var exchangeRate: ExchangeRate.CryptoToFiat? = null
+        set(value) {
+            field = value
+            updateExchangeAmountAndOutput(configuration.input)
+        }
+
+    private val cryptoToFiatRate: ExchangeRate.CryptoToFiat
+        get() = exchangeRate ?: defCryptoToFiat
+
+    val cryptoCurrency: CryptoCurrency
         get() = configuration.cryptoCurrency ?: throw IllegalStateException("Cryptocurrency not set")
 
     init {
@@ -58,31 +76,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             override fun afterTextChanged(s: Editable?) {
                 if (configuration.isInitialised.not())
                     return
-                if (configuration.input == CurrencyType.Fiat) {
-
-                    val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
-                        FiatValue.fromMajor(configuration.fiatCurrency, amount)
-                    } ?: FiatValue.zero(configuration.fiatCurrency)
-
-                    val cryptoAmount = fiatAmount.toCrypto(exchangeRateDataManager, cryptoCurrency)
-                    exchange_amount.text = cryptoAmount.toStringWithSymbol()
-
-                    amountSubject.onNext(
-                        if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
-                    )
-                } else {
-
-                    val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
-                        CryptoValue.fromMajor(cryptoCurrency, amount)
-                    } ?: CryptoValue.zero(cryptoCurrency)
-
-                    val fiatAmount = cryptoAmount.toFiat(exchangeRateDataManager, configuration.fiatCurrency)
-
-                    exchange_amount.text = fiatAmount.toStringWithSymbol()
-                    amountSubject.onNext(
-                        if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
-                    )
-                }
+                updateExchangeAmountAndOutput(configuration.input)
             }
         })
 
@@ -105,12 +99,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             if (configuration.input == CurrencyType.Fiat) FiatValue.fromMajor(configuration.fiatCurrency, enterAmount)
             else CryptoValue.fromMajor(cryptoCurrency, enterAmount)
         } ?: FiatValue.zero(configuration.fiatCurrency)
-
-    var maxLimit by Delegates.observable<Money>(FiatValue.fromMinor(currencyPrefs.defaultFiatCurrency,
-        Long.MAX_VALUE)) { _, oldValue, newValue ->
-        if (newValue != oldValue)
-            updateFilters(enter_amount.configuration.prefixOrSuffix)
-    }
 
     var configuration: FiatCryptoViewConfiguration by Delegates.observable(
         FiatCryptoViewConfiguration(
@@ -151,9 +139,29 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         }
     }
 
+    var maxLimit by Delegates.observable<Money?>(null) { _, oldValue, newValue ->
+        if (newValue != oldValue)
+            updateFilters(enter_amount.configuration.prefixOrSuffix)
+    }
+
     fun showError(errorMessage: String) {
         error.text = errorMessage
         error.visible()
+        info.gone()
+        hideExchangeAmount()
+    }
+
+    fun showInfo(infoMessage: String, onClick: () -> Unit) {
+        info.text = infoMessage
+        error.gone()
+        info.visible()
+        info.setOnClickListener {
+            onClick()
+        }
+        hideExchangeAmount()
+    }
+
+    private fun hideExchangeAmount() {
         exchange_amount.gone()
         currency_swap.let {
             it.isEnabled = false
@@ -161,8 +169,13 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         }
     }
 
-    fun hideError() {
+    fun hideLabels() {
         error.gone()
+        info.gone()
+        showExchangeAmount()
+    }
+
+    private fun showExchangeAmount() {
         exchange_amount.visible()
         currency_swap.let {
             it.isEnabled = true
@@ -178,12 +191,12 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun updateFilters(prefixOrSuffix: String) {
         if (configuration.input == CurrencyType.Fiat) {
-            val maxDecimalDigitsForAmount = maxLimit.inFiat().userDecimalPlaces
-            val maxIntegerDigitsForAmount = maxLimit.inFiat().toStringParts().major.length
+            val maxDecimalDigitsForAmount = maxLimit?.inFiat()?.userDecimalPlaces ?: return
+            val maxIntegerDigitsForAmount = maxLimit?.inFiat()?.toStringParts()?.major?.length ?: return
             enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
         } else {
-            val maxDecimalDigitsForAmount = maxLimit.inCrypto().userDecimalPlaces
-            val maxIntegerDigitsForAmount = maxLimit.inCrypto().toStringParts().major.length
+            val maxDecimalDigitsForAmount = maxLimit?.inCrypto()?.userDecimalPlaces ?: return
+            val maxIntegerDigitsForAmount = maxLimit?.inCrypto()?.toStringParts()?.major?.length ?: return
             enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
         }
     }
@@ -205,21 +218,48 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun Money.inFiat(): FiatValue =
         when (this) {
-            is CryptoValue -> toFiat(exchangeRateDataManager, configuration.fiatCurrency)
+            is CryptoValue -> cryptoToFiatRate.convert(this) as FiatValue
             is FiatValue -> this
             else -> throw IllegalStateException("Illegal money type")
         }
 
     private fun Money.inCrypto(): CryptoValue =
         when (this) {
-            is FiatValue -> toCrypto(exchangeRateDataManager,
-                configuration.cryptoCurrency ?: throw IllegalStateException("Currency not specified"))
+            is FiatValue -> cryptoToFiatRate.inverse().convert(this) as CryptoValue
             is CryptoValue -> this
             else -> throw IllegalStateException("Illegal money type")
         }
 
     private fun CurrencyType.swap(): CurrencyType =
         if (this == CurrencyType.Fiat) CurrencyType.Crypto else CurrencyType.Fiat
+
+    private fun updateExchangeAmountAndOutput(currencyType: CurrencyType) {
+        if (configuration.input == CurrencyType.Fiat) {
+
+            val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                FiatValue.fromMajor(configuration.fiatCurrency, amount)
+            } ?: FiatValue.zero(configuration.fiatCurrency)
+
+            val cryptoAmount = cryptoToFiatRate.inverse().convert(fiatAmount)
+            exchange_amount.text = cryptoAmount.toStringWithSymbol()
+
+            amountSubject.onNext(
+                if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
+            )
+        } else {
+
+            val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                CryptoValue.fromMajor(cryptoCurrency, amount)
+            } ?: CryptoValue.zero(cryptoCurrency)
+
+            val fiatAmount = cryptoToFiatRate.convert(cryptoAmount)
+
+            exchange_amount.text = fiatAmount.toStringWithSymbol()
+            amountSubject.onNext(
+                if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
+            )
+        }
+    }
 }
 
 data class FiatCryptoViewConfiguration(
@@ -236,5 +276,6 @@ data class FiatCryptoViewConfiguration(
 }
 
 enum class CurrencyType {
-    Fiat, Crypto
+    Fiat,
+    Crypto
 }

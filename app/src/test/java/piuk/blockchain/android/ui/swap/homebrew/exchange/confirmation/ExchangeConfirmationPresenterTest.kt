@@ -39,6 +39,8 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationPresenter
+import piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationView
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.math.BigDecimal
 import java.util.Locale

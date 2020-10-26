@@ -6,21 +6,20 @@ import android.text.Editable
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_tx_flow_enter_address.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -31,6 +30,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 
@@ -40,7 +40,6 @@ class EnterTargetAddressSheet(
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
 
     private val appUtil: AppUtil by inject()
-    private val coincore: Coincore by scopedInject()
     private val customiser: TransactionFlowCustomiser by inject()
 
     private val disposables = CompositeDisposable()
@@ -56,18 +55,24 @@ class EnterTargetAddressSheet(
                     disposables,
                     DefaultCellDecorator()
                 )
-                setupTransferList(newState.sendingAccount, newState)
+                setupTransferList(customiser.enterTargetAddressSheetState(newState))
             }
             cta_button.isEnabled = newState.nextEnabled
 
+            select_an_account.visibleIf {
+                customiser.enterTargetAddressSheetState(newState) is
+                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            }
+
             cacheState(newState)
+
             if (customiser.selectTargetShowManualEnterAddress(newState)) {
                 showManualAddressEntry(newState)
             } else {
                 hideManualAddressEntry(newState)
             }
 
-            customiser.errorFlashMessage(newState)?.let {
+            customiser.issueFlashMessage(newState)?.let {
                 address_entry.setBackgroundColor(
                     ContextCompat.getColor(requireContext(), R.color.red_000))
                 error_msg.apply {
@@ -116,11 +121,14 @@ class EnterTargetAddressSheet(
                 }
 
                 title_pick.gone()
+                pick_separator.gone()
                 input_switcher.displayedChild = CUSTODIAL_INPUT
             } else {
                 input_switcher.gone()
+                pick_separator.gone()
                 title_pick.gone()
             }
+            cta_button.visibleIf { newState.selectedTarget != NullAddress }
         }
     }
 
@@ -142,22 +150,40 @@ class EnterTargetAddressSheet(
             address_entry.addTextChangedListener(addressTextWatcher)
             btn_scan.setOnClickListener { onLaunchAddressScan() }
             cta_button.setOnClickListener { onCtaClick() }
-
+            select_an_account.setOnClickListener { showMoreAccounts() }
             wallet_select.apply {
                 onLoadError = {
                     hideTransferList()
                 }
-                onAccountSelected = { accountSelected(it) }
                 onEmptyList = { hideTransferList() }
             }
         }
     }
 
-    private fun setupTransferList(account: CryptoAccount, state: TransactionState) {
-        dialogView.wallet_select.initialise(
-            coincore.getTransactionTargets(account, state.action)
-                .map { it.map { a -> a as BlockchainAccount } }
-        )
+    private fun showMoreAccounts() {
+        model.process(TransactionIntent.ShowMoreAccounts)
+    }
+
+    private fun setupTransferList(targetAddressSheetState: TargetAddressSheetState) {
+        with(dialogView.wallet_select) {
+            initialise(
+                Single.just(targetAddressSheetState.accounts)
+            )
+            when (targetAddressSheetState) {
+                is TargetAddressSheetState.SelectAccountWhenWithinMaxLimit -> {
+                    onAccountSelected = {
+                        accountSelected(it)
+                    }
+                }
+                is TargetAddressSheetState.TargetAccountSelected -> {
+
+                    onAccountSelected = {
+                        model.process(TransactionIntent.ShowTargetSelection)
+                    }
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun hideTransferList() {

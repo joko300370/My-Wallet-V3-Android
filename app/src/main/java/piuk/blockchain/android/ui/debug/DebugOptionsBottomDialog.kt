@@ -51,6 +51,12 @@ class DebugOptionsBottomDialog : BottomSheetDialogFragment() {
         device_currency.text = "Select a new currency. Current one is ${currencyPrefs.selectedFiatCurrency}"
         firebase_token.text = prefs.firebaseToken
 
+        swap_switch.setOnCheckedChangeListener { _, isChecked ->
+            prefs.newSwapEnabled = isChecked
+        }
+
+        swap_switch.isChecked = prefs.newSwapEnabled
+
         radio_eur.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 currencyPrefs.selectedFiatCurrency = "EUR"

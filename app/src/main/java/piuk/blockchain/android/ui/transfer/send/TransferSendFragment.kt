@@ -26,8 +26,8 @@ class TransferSendFragment :
 
     override val filterFn: AccountListFilterFn = { account ->
         (account is CryptoAccount) &&
-            account.isFunded &&
-            account.actions.contains(AssetAction.NewSend)
+                account.isFunded &&
+                account.actions.contains(AssetAction.NewSend)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

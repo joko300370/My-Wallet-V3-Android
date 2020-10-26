@@ -5,11 +5,11 @@ import androidx.annotation.StringRes
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
-import piuk.blockchain.android.ui.transactionflow.transactionInject
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.transactionInject
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 abstract class TransactionFlowSheet(

@@ -5,6 +5,7 @@ import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -32,6 +33,8 @@ enum class ValidationState {
     OPTION_INVALID,
     UNDER_MIN_LIMIT,
     OVER_MAX_LIMIT,
+    OVER_SILVER_TIER_LIMIT,
+    OVER_GOLD_TIER_LIMIT,
     INVOICE_EXPIRED,
     UNKNOWN_ERROR
 }
@@ -139,6 +142,10 @@ sealed class TxOptionValue(open val option: TxOption) {
         val data: T? = null,
         val value: Boolean = false
     ) : TxOptionValue(option)
+
+    data class SwapSourceValue(val swappingAssetValue: CryptoValue) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class SwapDestinationValue(val receivingAssetValue: CryptoValue) : TxOptionValue(TxOption.READ_ONLY)
 }
 
 sealed class FeeState
@@ -175,7 +182,9 @@ abstract class TxEngine : KoinComponent {
         sourceAccount: CryptoAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
-        refreshTrigger: RefreshTrigger
+        refreshTrigger: RefreshTrigger = object : RefreshTrigger {
+            override fun refreshConfirmations(revalidate: Boolean): Completable = Completable.complete()
+        }
     ) {
         this._sourceAccount = sourceAccount
         this._txTarget = txTarget

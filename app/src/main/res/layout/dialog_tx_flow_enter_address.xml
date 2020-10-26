@@ -96,8 +96,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginBottom="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin">
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/small_margin">
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/address_entry"
@@ -106,10 +106,10 @@
                 android:background="@color/grey_000"
                 android:hint="@string/send_enter_asset_address_hint"
                 android:inputType="textNoSuggestions"
-                android:paddingTop="@dimen/very_small_margin"
-                android:paddingBottom="@dimen/very_small_margin"
                 android:paddingStart="@dimen/very_small_margin"
+                android:paddingTop="@dimen/very_small_margin"
                 android:paddingEnd="@dimen/xlarge_margin"
+                android:paddingBottom="@dimen/very_small_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -197,6 +197,7 @@
         app:layout_constraintTop_toBottomOf="@id/input_switcher" />
 
     <View
+        android:id="@+id/pick_separator"
         style="@style/SeparatorWithoutMargins"
         android:layout_width="0dp"
         android:layout_height="2dp"
@@ -204,6 +205,40 @@
         app:layout_constraintBottom_toBottomOf="@id/title_pick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_pick" />
+
+    <LinearLayout
+        android:id="@+id/select_an_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/very_small_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0"
+        android:layout_marginBottom="@dimen/xlarge_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_pick">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_select_account" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            style="@style/Text.Semibold.16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/select_an_account" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_arrow_down" />
+    </LinearLayout>
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/wallet_select"
@@ -215,7 +250,8 @@
         app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_pick" />
+        app:layout_constraintTop_toBottomOf="@id/title_pick"
+        app:layout_goneMarginBottom="@dimen/standard_margin" />
 
     <Button
         android:id="@+id/cta_button"

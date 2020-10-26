@@ -70,7 +70,7 @@ class FiatActivityDetailsBottomSheet :
         when (state) {
             TransactionState.COMPLETED -> {
                 text = getString(R.string.activity_details_completed)
-                setBackgroundResource(R.drawable.bkgd_status_received)
+                setBackgroundResource(R.drawable.bkgd_green_100_rounded)
                 setTextColor(ContextCompat.getColor(context, R.color.green_600))
             }
             else -> {

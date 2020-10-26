@@ -1,13 +1,18 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.content.res.Resources
+import info.blockchain.balance.CryptoValue
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.maskedAsset
 
 interface TransactionFlowCustomiser {
     // UI Element text, icons etc may be customised here:
@@ -19,6 +24,8 @@ interface TransactionFlowCustomiser {
     fun enterAmountTitle(state: TransactionState): String
     fun enterAmountActionIcon(state: TransactionState): Int
     fun enterAmountMaxButton(state: TransactionState): String
+    fun enterAmountSourceLabel(state: TransactionState): String
+    fun enterAmountTargetLabel(state: TransactionState): String
     fun confirmTitle(state: TransactionState): String
     fun confirmCtaText(state: TransactionState): String
     fun confirmListItemTitle(assetAction: AssetAction): String
@@ -26,9 +33,14 @@ interface TransactionFlowCustomiser {
     fun transactionProgressMessage(state: TransactionState): String
     fun transactionCompleteTitle(state: TransactionState): String
     fun transactionCompleteMessage(state: TransactionState): String
+    fun selectTargetAccountTitle(state: TransactionState): String
+    fun selectTargetAccountDescription(state: TransactionState): String
+    fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState
+    fun transactionProgressIcon(state: TransactionState): Int
 
     // Format those flash error messages:
-    fun errorFlashMessage(state: TransactionState): String?
+    fun issueFlashMessage(state: TransactionState): String?
+    fun selectIssueType(state: TransactionState): IssueType
 }
 
 class TransactionFlowCustomiserImpl(
@@ -38,7 +50,7 @@ class TransactionFlowCustomiserImpl(
         return when (state.action) {
             AssetAction.NewSend -> R.drawable.ic_tx_sent
             AssetAction.Deposit -> R.drawable.ic_tx_deposit_arrow
-            // AssetAction.Swap -> resources.getString(R.string.common_swap)
+            AssetAction.Swap -> R.drawable.ic_tx_swap
             AssetAction.Sell -> R.drawable.ic_tx_sell
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
@@ -70,7 +82,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(R.string.common_send)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
             AssetAction.Deposit -> resources.getString(R.string.common_transfer)
-            // AssetAction.Swap -> resources.getString(R.string.common_swap)
+            AssetAction.Swap -> resources.getString(R.string.common_swap)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
 
@@ -85,7 +97,9 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_enter_amount_title, state.sendingAccount.asset.displayTicker
             )
-            // AssetAction.Swap -> "Swap..."
+            AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_title,
+                state.sendingAccount.asset.displayTicker
+            )
             AssetAction.Deposit -> resources.getString(R.string.tx_title_deposit,
                 state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.tx_title_sell,
@@ -98,9 +112,30 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_max)
             AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_deposit_max)
-            // AssetAction.Swap -> "Swap..."
+            AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_max)
             AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_max)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
+        }
+
+    override fun enterAmountSourceLabel(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_source,
+                state.amount.toStringWithSymbol())
+            else -> resources.getString(R.string.send_enter_amount_from, state.sendingAccount.label)
+        }
+
+    override fun enterAmountTargetLabel(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.Swap -> {
+                val amount = state.targetRate?.convert(state.amount) ?: CryptoValue.zero(
+                    (state.selectedTarget as CryptoAccount).asset
+                )
+                resources.getString(
+                    R.string.swap_enter_amount_target,
+                    amount.toStringWithSymbol()
+                )
+            }
+            else -> resources.getString(R.string.send_enter_amount_to, state.selectedTarget.label)
         }
 
     override fun confirmTitle(state: TransactionState): String {
@@ -110,7 +145,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_confirmation_title, amount
             )
-            // AssetAction.Swap -> "Swap ${state.sendingAccount.asset.displayTicker}"
+            AssetAction.Swap -> resources.getString(R.string.common_confirm)
             AssetAction.Deposit -> resources.getString(R.string.common_confirm)
             AssetAction.Sell -> resources.getString(R.string.checkout)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
@@ -124,7 +159,11 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_confirmation_cta_button, amount
             )
-            // AssetAction.Swap -> "Execute Trade"
+            AssetAction.Swap -> resources.getString(
+                R.string.swap_confirmation_cta_button,
+                state.sendingAccount.asset,
+                (state.selectedTarget as CryptoAccount).asset
+            )
             AssetAction.Sell -> resources.getString(
                 R.string.sell_confirmation_cta_button, amount
             )
@@ -150,7 +189,14 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_progress_sending_title, amount
             )
-            // AssetAction.Swap -> "Execute Trade"
+            AssetAction.Swap -> {
+                val receivingAmount = state.targetRate?.convert(state.amount) ?: CryptoValue.zero(
+                    (state.selectedTarget as CryptoAccount).asset
+                )
+                resources.getString(R.string.swap_progress_title,
+                    state.amount.toStringWithSymbol(), receivingAmount.toStringWithSymbol()
+                )
+            }
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_progress_title,
                 amount)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_title,
@@ -165,6 +211,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_progress_message,
                 state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_message)
+            AssetAction.Swap -> resources.getString(R.string.swap_confirmation_progress_message)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
@@ -176,6 +223,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(
                 R.string.send_progress_complete_title, amount
             )
+            AssetAction.Swap -> resources.getString(R.string.swap_progress_complete_title)
             AssetAction.Sell ->
                 resources.getString(
                     R.string.sell_progress_complete_title, state.pendingTx?.amount?.toStringWithSymbol()
@@ -196,11 +244,42 @@ class TransactionFlowCustomiserImpl(
                 state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_success_message,
                 (state.selectedTarget as? FiatAccount)?.fiatCurrency)
+            AssetAction.Swap -> resources.getString(R.string.swap_confirmation_success_message,
+                (state.selectedTarget as CryptoAccount).asset.displayTicker)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
 
-    override fun errorFlashMessage(state: TransactionState): String? =
+    override fun selectTargetAccountTitle(state: TransactionState): String {
+        return when (state.action) {
+            AssetAction.Swap -> resources.getString(R.string.swap)
+            AssetAction.NewSend -> resources.getString(R.string.send)
+            AssetAction.Sell -> resources.getString(R.string.sell)
+            else -> ""
+        }
+    }
+
+    override fun selectTargetAccountDescription(state: TransactionState): String {
+        return when (state.action) {
+            AssetAction.Swap -> resources.getString(R.string.select_target_account_for_swap)
+            else -> ""
+        }
+    }
+
+    override fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState {
+        return if (state.selectedTarget == NullAddress) {
+            if (state.targetCount > MAX_ACCOUNTS_FOR_SHEET) {
+                TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            } else {
+                TargetAddressSheetState.SelectAccountWhenWithinMaxLimit(state.availableTargets.take(
+                    MAX_ACCOUNTS_FOR_SHEET).map { it as BlockchainAccount })
+            }
+        } else {
+            TargetAddressSheetState.TargetAccountSelected(state.selectedTarget as BlockchainAccount)
+        }
+    }
+
+    override fun issueFlashMessage(state: TransactionState): String? =
         when (state.errorState) {
             TransactionErrorState.NONE -> null
             TransactionErrorState.INSUFFICIENT_FUNDS -> resources.getString(
@@ -235,8 +314,38 @@ class TransactionFlowCustomiserImpl(
             }
             TransactionErrorState.ABOVE_MAX_LIMIT -> resources.getString(R.string.sell_enter_amount_max_error,
                 state.pendingTx?.maxLimit?.toStringWithSymbol())
+            TransactionErrorState.OVER_SILVER_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_silver_limit)
+            TransactionErrorState.OVER_GOLD_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_over_limit,
+                state.pendingTx?.maxLimit?.toStringWithSymbol())
             TransactionErrorState.TRANSACTION_IN_FLIGHT -> resources.getString(R.string.send_error_tx_in_flight)
             TransactionErrorState.TX_OPTION_INVALID -> resources.getString(R.string.send_error_tx_option_invalid)
             TransactionErrorState.UNKNOWN_ERROR -> resources.getString(R.string.send_error_tx_option_invalid)
         }
+
+    override fun selectIssueType(state: TransactionState): IssueType =
+        when (state.errorState) {
+            TransactionErrorState.OVER_SILVER_TIER_LIMIT -> IssueType.INFO
+            else -> IssueType.ERROR
+        }
+
+    override fun transactionProgressIcon(state: TransactionState): Int =
+        when (state.action) {
+            AssetAction.Swap -> R.drawable.swap_masked_asset
+            else -> state.sendingAccount.asset.maskedAsset()
+        }
+
+    companion object {
+        const val MAX_ACCOUNTS_FOR_SHEET = 3
+    }
+}
+
+enum class IssueType {
+    ERROR,
+    INFO
+}
+
+sealed class TargetAddressSheetState(val accounts: List<BlockchainAccount>) {
+    object SelectAccountWhenOverMaxLimitSurpassed : TargetAddressSheetState(emptyList())
+    class TargetAccountSelected(account: BlockchainAccount) : TargetAddressSheetState(listOf(account))
+    class SelectAccountWhenWithinMaxLimit(accounts: List<BlockchainAccount>) : TargetAddressSheetState(accounts)
 }

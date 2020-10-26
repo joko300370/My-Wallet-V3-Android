@@ -84,6 +84,8 @@ import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
+import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
+import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
@@ -107,7 +109,7 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
-import piuk.blockchain.android.ui.swap.SwapStarter
+import piuk.blockchain.android.ui.swapold.SwapStarter
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -800,6 +802,10 @@ val applicationModule = module {
     factory {
         SwapStarter(prefs = get())
     }.bind(StartSwap::class)
+
+    factory {
+        SwapTrendingPairsProvider()
+    }.bind(TrendingPairsProvider::class)
 
     factory { DateUtil(get()) }
 

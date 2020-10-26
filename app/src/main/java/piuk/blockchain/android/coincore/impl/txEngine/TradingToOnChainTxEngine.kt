@@ -16,7 +16,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
 
 // Transfer from a custodial trading account to an onChain non-custodial account
-open class TradingToOnChainTxEngine(
+class TradingToOnChainTxEngine(
     private val isNoteSupported: Boolean,
     private val walletManager: CustodialWalletManager
 ) : TxEngine() {

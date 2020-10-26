@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/exchangeFragment"
-        android:name="piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeFragment"
+        android:name="piuk.blockchain.android.ui.swapold.exchange.ExchangeFragment"
         android:label="ExchangeActivity" >
         <action
             android:id="@+id/action_exchangeFragment_to_exchangeConfirmationFragment"
@@ -13,6 +13,6 @@
     </fragment>
     <fragment
         android:id="@+id/exchangeConfirmationFragment"
-        android:name="piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation.ExchangeConfirmationFragment"
+        android:name="piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationFragment"
         android:label="ExchangeConfirmationFragment" />
 </navigation>

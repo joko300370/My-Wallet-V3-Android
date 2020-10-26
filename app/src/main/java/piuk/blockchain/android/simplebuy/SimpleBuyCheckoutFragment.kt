@@ -18,7 +18,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.eventWithPaymentMethod
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import info.blockchain.balance.FiatValue
@@ -181,7 +181,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     private fun showAmountForMethod(newState: SimpleBuyState) {
         amount.text = if (newState.selectedPaymentMethod?.isBank() == true) {
             if (newState.orderState == OrderState.PENDING_CONFIRMATION) {
-                newState.quote?.estimatedAmount()
+                newState.custodialQuote?.estimatedAmount()
             } else {
                 newState.orderValue?.toStringWithSymbol()
             }
@@ -202,7 +202,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             newState.orderState == OrderState.FINISHED -> {
                 status.text = getString(R.string.order_complete)
                 status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_received)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
                 status.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.green_600))
             }
@@ -216,7 +216,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         listOf(
             if (state.selectedPaymentMethod?.isBank() == true) {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
-                    "${state.quote?.rate?.toStringWithSymbol()} / " +
+                    "${state.custodialQuote?.rate?.toStringWithSymbol()} / " +
                             "${state.selectedCryptoCurrency?.displayTicker}")
             } else {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
@@ -238,7 +238,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             )
         )
 
-    private fun Quote.estimatedAmount(): String =
+    private fun CustodialQuote.estimatedAmount(): String =
         getString(R.string.approximately_symbol, estimatedAmount.toStringWithSymbol())
 
     private fun isPendingOrAwaitingFunds(orderState: OrderState) =

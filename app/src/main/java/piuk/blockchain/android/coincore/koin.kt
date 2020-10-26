@@ -200,7 +200,10 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 walletManager = get(),
                 walletPrefs = get(),
-                analytics = get()
+                quotesProvider = get(),
+                analytics = get(),
+                kycTierService = get(),
+                environmentConfig = get()
             )
         }
 

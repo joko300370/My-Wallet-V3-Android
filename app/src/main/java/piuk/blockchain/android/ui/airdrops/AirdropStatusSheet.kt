@@ -99,7 +99,7 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
                 setStatusView(
                     R.string.airdrop_status_expired,
                     R.color.grey_600,
-                    R.drawable.bkgd_status_expired
+                    R.drawable.bkgd_grey_100_rounded
                 )
             AirdropState.PENDING ->
                 setStatusView(
@@ -111,7 +111,7 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
                 setStatusView(
                     R.string.airdrop_status_received,
                     R.color.green_600,
-                    R.drawable.bkgd_status_received
+                    R.drawable.bkgd_green_100_rounded
                 )
             AirdropState.REGISTERED -> TODO()
         }.exhaustive

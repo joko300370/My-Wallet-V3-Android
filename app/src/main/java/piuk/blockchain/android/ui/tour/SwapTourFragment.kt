@@ -23,7 +23,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_homebrew_exchange.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.swap.customviews.ThreePartText
+import piuk.blockchain.android.ui.swapold.customviews.ThreePartText
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 

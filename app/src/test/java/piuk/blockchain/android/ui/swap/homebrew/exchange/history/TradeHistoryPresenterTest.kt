@@ -10,6 +10,9 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.ui.swapold.exchange.history.ExchangeUiState
+import piuk.blockchain.android.ui.swapold.exchange.history.TradeHistoryPresenter
+import piuk.blockchain.android.ui.swapold.exchange.history.TradeHistoryView
 import piuk.blockchain.androidcoreui.utils.DateUtil
 import java.util.Locale
 

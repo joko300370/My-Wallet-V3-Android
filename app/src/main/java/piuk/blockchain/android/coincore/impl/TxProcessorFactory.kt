@@ -3,11 +3,15 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.Direction
+import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
@@ -16,7 +20,10 @@ import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapEngine
+import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class TxProcessorFactory(
@@ -24,7 +31,10 @@ class TxProcessorFactory(
     private val exchangeRates: ExchangeRateDataManager,
     private val walletManager: CustodialWalletManager,
     private val walletPrefs: WalletStatus,
-    private val analytics: Analytics
+    private val quotesProvider: QuotesProvider,
+    private val analytics: Analytics,
+    private val kycTierService: TierService,
+    private val environmentConfig: EnvironmentConfig
 ) {
     fun createProcessor(
         source: CryptoAccount,
@@ -76,14 +86,31 @@ class TxProcessorFactory(
                     engine = onChainEngine
                 )
             )
-            is CryptoAccount -> target.receiveAddress.map {
+            is CryptoAccount -> if (action != AssetAction.Swap) target.receiveAddress.map {
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = it,
                     engine = onChainEngine
                 )
-            }
+            } else Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = OnChainSwapEngine(
+                        isNoteSupported = false,
+                        quotesProvider = quotesProvider,
+                        walletManager = walletManager,
+                        tiersService = kycTierService,
+                        engine = onChainEngine as OnChainTxEngineBase,
+                        environmentConfig = environmentConfig,
+                        direction = if (target is CustodialTradingAccount)
+                            Direction.FROM_USERKEY else Direction.ON_CHAIN
+                    )
+                )
+            )
+
             else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
         }
     }
@@ -102,6 +129,20 @@ class TxProcessorFactory(
                     engine = TradingToOnChainTxEngine(
                         walletManager = walletManager,
                         isNoteSupported = source.isNoteSupported
+                    )
+                )
+            )
+        is TradingAccount ->
+            Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = TradingToTradingSwapTxEngine(
+                        isNoteSupported = source.isNoteSupported,
+                        walletManager = walletManager,
+                        quotesProvider = quotesProvider,
+                        kycTierService = kycTierService
                     )
                 )
             )

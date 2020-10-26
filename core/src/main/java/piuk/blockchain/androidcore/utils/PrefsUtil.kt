@@ -54,6 +54,12 @@ class PrefsUtil(
             BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
         }
 
+    override var newSwapEnabled: Boolean
+        get() = getValue(NEW_SWAP_ENABLED, false)
+        set(value) {
+            setValue(NEW_SWAP_ENABLED, value)
+        }
+
     override var devicePreIDVCheckFailed: Boolean
         get() = getValue(KEY_PRE_IDV_FAILED, false)
         set(value) = setValue(KEY_PRE_IDV_FAILED, value)
@@ -221,6 +227,11 @@ class PrefsUtil(
 
     override fun getFeeTypeForAsset(cryptoCurrency: CryptoCurrency): Int =
         getValue(NETWORK_FEE_PRIORITY_KEY + cryptoCurrency.networkTicker, -1)
+
+    override val hasSeenSwapPromo: Boolean
+        get() = getValue(SWAP_KYC_PROMO, false)
+
+    override fun setSeenSwapPromo() = setValue(SWAP_KYC_PROMO, true)
 
     // Notification prefs
     override var arePushNotificationsEnabled: Boolean
@@ -423,10 +434,13 @@ class PrefsUtil(
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
         private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
+        private const val SWAP_KYC_PROMO = "SWAP_KYC_PROMO"
 
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_IS_DEVICE_ID_RANDOMISED = "random_device_id"
+
+        const val NEW_SWAP_ENABLED = "swap_v_2_enabled"
 
         private const val KEY_FIREBASE_TOKEN = "firebase_token"
         private const val KEY_PUSH_NOTIFICATION_ENABLED = "push_notification_enabled"

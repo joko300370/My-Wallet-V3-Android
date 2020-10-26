@@ -36,6 +36,11 @@ import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
+import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.swap.QuoteResponse
+import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
+import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -229,6 +234,30 @@ class NabuService(retrofit: Retrofit) {
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
 
+    internal fun fetchQuote(
+        sessionToken: NabuSessionTokenResponse,
+        quoteRequest: QuoteRequest
+    ): Single<QuoteResponse> = service.fetchQuote(
+        sessionToken.authHeader,
+        quoteRequest
+    ).wrapErrorMessage()
+
+    internal fun createSwapOrder(
+        sessionToken: NabuSessionTokenResponse,
+        createOrderRequest: CreateOrderRequest
+    ): Single<SwapOrderResponse> = service.createSwapOrder(
+        sessionToken.authHeader,
+        createOrderRequest
+    ).wrapErrorMessage()
+
+    internal fun getSwapLimits(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ): Single<SwapLimitsResponse> = service.fetchSwapLimits(
+        sessionToken.authHeader,
+        currency
+    ).wrapErrorMessage()
+
     internal fun getSupportedCurrencies(
         fiatCurrency: String? = null
     ): Single<SimpleBuyPairsResp> =
@@ -337,6 +366,11 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader,
         pendingOnly
     ).wrapErrorMessage()
+
+    internal fun getSwapTrades(sessionToken: NabuSessionTokenResponse) = service.getSwapOrders(sessionToken.authHeader)
+
+    internal fun getSwapAvailablePairs(sessionToken: NabuSessionTokenResponse) =
+        service.getSwapAvailablePairs(sessionToken.authHeader)
 
     internal fun deleteBuyOrder(
         sessionToken: NabuSessionTokenResponse,

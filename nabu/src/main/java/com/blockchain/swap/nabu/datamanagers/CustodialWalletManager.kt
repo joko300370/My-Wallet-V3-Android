@@ -21,6 +21,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Date
 
@@ -67,7 +68,7 @@ interface CustodialWalletManager {
         action: String,
         currency: String,
         amount: String
-    ): Single<Quote>
+    ): Single<CustodialQuote>
 
     fun fetchWithdrawFee(currency: String): Single<FiatValue>
 
@@ -167,6 +168,9 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
+    fun createSwapOrder(direction: Direction, quoteId: String, volume: Money, destinationAddress: String? = null):
+            Single<SwapOrder>
+
     fun createPendingDeposit(
         crypto: CryptoCurrency,
         address: String,
@@ -174,6 +178,10 @@ interface CustodialWalletManager {
         amount: Money,
         product: Product
     ): Completable
+
+    fun getSwapLimits(currency: String): Single<SwapLimits>
+
+    fun getSwapTrades(): Single<List<SwapOrder>>
 }
 
 data class InterestActivityItem(
@@ -282,6 +290,14 @@ enum class TransactionState {
     UNKNOWN
 }
 
+enum class SwapOrderState {
+    PENDING_EXECUTION, PENDING_DEPOSIT, FINISH_DEPOSIT, PENDING_WITHDRAWAL, EXPIRED, FINISHED, FAILED, UNKNOWN;
+
+    val isPending: Boolean
+        get() =
+            this == PENDING_EXECUTION || this == PENDING_DEPOSIT || this == PENDING_WITHDRAWAL || this == FINISH_DEPOSIT
+}
+
 data class BuySellPairs(val pairs: List<BuySellPair>)
 
 data class BuySellPair(private val pair: String, val buyLimits: BuySellLimits, val sellLimits: BuySellLimits) {
@@ -295,12 +311,16 @@ data class BuySellLimits(private val min: Long, private val max: Long) {
     fun maxLimit(currency: String): FiatValue = FiatValue.fromMinor(currency, max)
 }
 
-data class Quote(
+data class CustodialQuote(
     val date: Date,
     val fee: FiatValue,
     val estimatedAmount: CryptoValue,
     val rate: FiatValue
 )
+
+enum class Direction {
+    ON_CHAIN, FROM_USERKEY, TO_USERKEY, INTERNAL;
+}
 
 data class BankAccount(val details: List<BankDetail>)
 
@@ -416,3 +436,34 @@ enum class Partner {
     EVERYPAY,
     UNKNOWN
 }
+
+data class SwapQuote(
+    val id: String = "",
+    val prices: List<PriceTier> = emptyList(),
+    val expirationDate: Date = Date(),
+    val creationDate: Date = Date(),
+    val sampleDepositAddress: String
+)
+
+data class PriceTier(
+    val volume: BigDecimal,
+    val price: BigDecimal,
+    val marginPrice: BigDecimal
+)
+
+data class SwapLimits(
+    val minLimit: FiatValue,
+    val maxOrder: FiatValue,
+    val maxLimit: FiatValue
+)
+
+data class SwapOrder(
+    val id: String,
+    val state: SwapOrderState,
+    val depositAddress: String?
+)
+
+data class SwapPair(
+    val source: CryptoCurrency,
+    val destination: CryptoCurrency
+)

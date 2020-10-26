@@ -26,6 +26,7 @@ enum class TransactionStep(val addToBackStack: Boolean = false) {
     ZERO,
     ENTER_PASSWORD,
     ENTER_ADDRESS(true),
+    SELECT_TARGET_ACCOUNT(true),
     ENTER_AMOUNT(true),
     CONFIRM_DETAIL,
     IN_PROGRESS
@@ -40,6 +41,8 @@ enum class TransactionErrorState {
     INVALID_AMOUNT,
     BELOW_MIN_LIMIT,
     ABOVE_MAX_LIMIT,
+    OVER_SILVER_TIER_LIMIT,
+    OVER_GOLD_TIER_LIMIT,
     NOT_ENOUGH_GAS,
     UNEXPECTED_ERROR,
     TRANSACTION_IN_FLIGHT,
@@ -82,6 +85,9 @@ data class TransactionState(
 
     val canGoBack: Boolean
         get() = stepsBackStack.isNotEmpty()
+
+    val targetCount: Int
+        get() = availableTargets.size
 }
 
 class TransactionModel(
@@ -97,7 +103,9 @@ class TransactionModel(
         Timber.v("!TRANSACTION!> Send Model: performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is TransactionIntent.InitialiseWithSourceAccount -> null
+            is TransactionIntent.InitialiseWithSourceAccount -> processAccountsListUpdate(intent.fromAccount,
+                intent.action
+            )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
@@ -112,7 +120,7 @@ class TransactionModel(
                     sourceAccount = intent.fromAccount,
                     amount = CryptoValue.zero(intent.fromAccount.asset),
                     transactionTarget = intent.target,
-                    action = previousState.action
+                    action = intent.action
                 )
                 null
             }
@@ -123,22 +131,37 @@ class TransactionModel(
                     intent.transactionTarget,
                     previousState.action
                 )
+            is TransactionIntent.InitialiseWithSourceAndPreferredTarget -> null
             is TransactionIntent.PendingTransactionStarted -> null
+            is TransactionIntent.TargetAccountSelected -> null
             is TransactionIntent.FatalTransactionError -> null
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
             is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
             is TransactionIntent.PendingTxUpdated -> null
             is TransactionIntent.UpdateTransactionComplete -> null
             is TransactionIntent.ReturnToPreviousStep -> null
+            is TransactionIntent.ShowTargetSelection -> null
             is TransactionIntent.FetchFiatRates -> processGetFiatRate()
             is TransactionIntent.FetchTargetRates -> processGetTargetRate()
             is TransactionIntent.FiatRateUpdated -> null
             is TransactionIntent.CryptoRateUpdated -> null
             is TransactionIntent.ValidateTransaction -> processValidateTransaction()
             is TransactionIntent.EnteredAddressReset -> null
+            is TransactionIntent.AvailableAccountsListUpdated -> null
+            is TransactionIntent.ShowMoreAccounts -> null
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
         }
     }
+
+    private fun processAccountsListUpdate(fromAccount: CryptoAccount, action: AssetAction): Disposable =
+        interactor.getTargetAccounts(fromAccount, action).subscribeBy(
+            onSuccess = {
+                process(
+                    TransactionIntent.AvailableAccountsListUpdated(it)
+                )
+            },
+            onError = { }
+        )
 
     override fun onScanLoopError(t: Throwable) {
         Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")

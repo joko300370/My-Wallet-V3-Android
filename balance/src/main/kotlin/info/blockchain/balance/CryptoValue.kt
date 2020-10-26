@@ -118,6 +118,11 @@ data class CryptoValue(
         return amount.compareTo(other.amount)
     }
 
+    override fun division(other: Money): Money {
+        require(other is CryptoValue)
+        return CryptoValue(currency, amount / other.amount)
+    }
+
     override fun ensureComparable(operation: String, other: Money) {
         if (other is CryptoValue) {
             if (currency != other.currency) {

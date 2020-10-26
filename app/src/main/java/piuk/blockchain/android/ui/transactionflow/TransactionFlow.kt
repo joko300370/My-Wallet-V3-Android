@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -25,8 +26,8 @@ import piuk.blockchain.android.ui.transactionflow.flow.ConfirmTransactionSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterSecondPasswordSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterTargetAddressSheet
+import piuk.blockchain.android.ui.transactionflow.flow.SelectTargetAccountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionProgressSheet
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import timber.log.Timber
 
 abstract class DialogFlow : SlidingModalBottomDialog.Host {
@@ -86,6 +87,8 @@ class TransactionFlow(
         fragmentManager: FragmentManager,
         host: FlowHost
     ) {
+        require(sourceAccount !is NullCryptoAccount)
+
         super.startFlow(fragmentManager, host)
         // Create the send scope
         openScope()
@@ -102,21 +105,30 @@ class TransactionFlow(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    if (target !is NullCryptoAccount &&
-                        sourceAccount !is NullCryptoAccount
-                    ) {
-                        model.process(
-                            TransactionIntent.InitialiseWithSourceAndTargetAccount(
-                                action, sourceAccount, target, passwordRequired
+                    when {
+                        target !is NullCryptoAccount && sourceAccount !is NullCryptoAccount -> {
+                            if (action == AssetAction.Swap) {
+                                model.process(
+                                    TransactionIntent.InitialiseWithSourceAndPreferredTarget(
+                                        action, sourceAccount, target, passwordRequired
+                                    )
+                                )
+                            } else {
+                                model.process(
+                                    TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                                        action, sourceAccount, target, passwordRequired
+                                    )
+                                )
+                            }
+                        }
+                        sourceAccount !is NullCryptoAccount -> {
+                            model.process(
+                                TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
                             )
-                        )
-                    } else if (sourceAccount !is NullCryptoAccount) {
-                        model.process(
-                            TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
-                        )
-                    } else {
-                        throw IllegalStateException(
-                            "Transaction flow initialised without at least one target")
+                        }
+                        else -> {
+                            throw IllegalStateException("Transaction flow initialised without at least one target")
+                        }
                     }
                 },
                 onError = {
@@ -155,6 +167,9 @@ class TransactionFlow(
                     this
                 )
                 TransactionStep.ENTER_AMOUNT -> EnterAmountSheet(
+                    this
+                )
+                TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet(
                     this
                 )
                 TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(

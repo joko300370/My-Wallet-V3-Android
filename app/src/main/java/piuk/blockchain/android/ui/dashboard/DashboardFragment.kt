@@ -13,6 +13,8 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import com.blockchain.preferences.CurrencyPrefs
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -33,6 +35,8 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
+import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -40,7 +44,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
-import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsNoKycDetailsSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
@@ -59,12 +62,13 @@ import timber.log.Timber
 class EmptyDashboardItem : DashboardItem
 
 private typealias RefreshFn = () -> Unit
+
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
     ForceBackupForSendSheet.Host,
     BankDetailsBottomSheet.Host,
     SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
-    FiatFundsNoKycDetailsSheet.Host,
+    KycBenefitsBottomSheet.Host,
     DialogFlow.FlowHost,
     AssetDetailsFlow.AssetDetailsHost,
     InterestSummarySheet.Host {
@@ -72,6 +76,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
+    private val currencyPrefs: CurrencyPrefs by inject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -206,20 +211,47 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 }
                 DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
                     state.selectedFiatAccount
-                    ?: return
+                        ?: return
                 )
                 DashboardSheet.LINK_OR_DEPOSIT -> {
                     state.selectedFiatAccount?.let {
                         LinkBankAccountDetailsBottomSheet.newInstance(it)
                     } ?: LinkBankAccountDetailsBottomSheet.newInstance()
                 }
-                DashboardSheet.FIAT_FUNDS_NO_KYC -> FiatFundsNoKycDetailsSheet.newInstance()
+                DashboardSheet.FIAT_FUNDS_NO_KYC -> showFiatFundsKyc()
                 DashboardSheet.INTEREST_SUMMARY -> InterestSummarySheet.newInstance(
                     state.selectedCryptoAccount!!,
                     state.selectedAsset!!
                 )
                 null -> null
             }
+        )
+    }
+
+    private fun showFiatFundsKyc(): BottomSheetDialogFragment {
+        val currencyIcon = when (currencyPrefs.selectedFiatCurrency) {
+            "EUR" -> R.drawable.ic_funds_euro
+            "GBP" -> R.drawable.ic_funds_gbp
+            else -> R.drawable.ic_funds_usd // show dollar if currency isn't selected
+        }
+
+        return KycBenefitsBottomSheet.newInstance(
+            KycBenefitsBottomSheet.BenefitsDetails(
+                title = getString(R.string.fiat_funds_no_kyc_announcement_title),
+                description = getString(R.string.fiat_funds_no_kyc_announcement_description),
+                listOfBenefits = listOf(
+                    VerifyIdentityBenefit(
+                        getString(R.string.fiat_funds_no_kyc_step_1_title),
+                        getString(R.string.fiat_funds_no_kyc_step_1_description)),
+                    VerifyIdentityBenefit(
+                        getString(R.string.fiat_funds_no_kyc_step_2_title),
+                        getString(R.string.fiat_funds_no_kyc_step_2_description)),
+                    VerifyIdentityBenefit(
+                        getString(R.string.fiat_funds_no_kyc_step_3_title),
+                        getString(R.string.fiat_funds_no_kyc_step_3_description))
+                ),
+                icon = currencyIcon
+            )
         )
     }
 
@@ -426,7 +458,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
     }
 
-    override fun fiatFundsVerifyIdentityCta() {
+    override fun verificationCtaClicked() {
         navigator().launchKyc(CampaignType.FiatFunds)
     }
 

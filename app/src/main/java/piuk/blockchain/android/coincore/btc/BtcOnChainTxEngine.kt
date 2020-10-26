@@ -29,10 +29,10 @@ import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
 import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
-import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -75,9 +75,8 @@ class BtcOnChainTxEngine(
         require(asset == CryptoCurrency.BTC)
     }
 
-    private val btcTarget: CryptoAddress by unsafeLazy {
-        txTarget as CryptoAddress
-    }
+    private val btcTarget: CryptoAddress
+        get() = txTarget as CryptoAddress
 
     private val btcSource: BtcCryptoWalletAccount by unsafeLazy {
         sourceAccount as BtcCryptoWalletAccount

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.customviews.account
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -41,9 +42,9 @@ class AccountList @JvmOverloads constructor(
     private val itemList = mutableListOf<BlockchainAccount>()
 
     init {
+        setBackgroundColor(Color.WHITE)
+        setFadingEdgeLength(resources.getDimensionPixelSize(R.dimen.size_small))
         isVerticalFadingEdgeEnabled = true
-        setFadingEdgeLength(resources.getDimension(R.dimen.very_small_margin).toInt())
-
         layoutManager = LinearLayoutManager(
             context,
             VERTICAL,

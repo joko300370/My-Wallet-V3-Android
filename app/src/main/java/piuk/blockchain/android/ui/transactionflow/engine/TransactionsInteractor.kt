@@ -1,18 +1,22 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxOptionValue
@@ -22,7 +26,8 @@ import timber.log.Timber
 
 class TransactionInteractor(
     private val coincore: Coincore,
-    private val addressFactory: AddressFactory
+    private val addressFactory: AddressFactory,
+    private val swapPairsRepository: SwapPairsRepository
 ) {
     private var transactionProcessor: TransactionProcessor? = null
 
@@ -71,6 +76,16 @@ class TransactionInteractor(
 
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
+
+    fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
+        if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
+        else coincore.getTransactionTargets(sourceAccount, action).zipWith(swapPairsRepository.getSwapAvailablePairs())
+            .map { (accountList, pairs) ->
+                accountList.filterIsInstance(CryptoAccount::class.java)
+                    .filter { account ->
+                        pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
+                    }
+            }
 
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")

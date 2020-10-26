@@ -6,7 +6,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -62,23 +62,42 @@ class Coincore internal constructor(
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,
         action: AssetAction
-    ): Single<SingleAccountList> =
+    ): Single<SingleAccountList> {
         // We only support transfers between similar assets and (soon; to - but not from - fiat)
         // at this time. If and when, say, swap is supported this will need revisiting
-        Singles.zip(
-            get(sourceAccount.asset).transactionTargets(sourceAccount),
-            fiatAsset.transactionTargets(sourceAccount)
-        ) { crypto, fiat ->
-            crypto + fiat
-        }.flattenAsObservable { it }
-            .filter(getActionFilter(action))
-            .toList()
+        val sameCurrencyTransactionTargets =
+            get(sourceAccount.asset).transactionTargets(sourceAccount)
 
-    private fun getActionFilter(action: AssetAction): (SingleAccount) -> Boolean =
+        val fiatTargets = fiatAsset.transactionTargets(sourceAccount)
+
+        val sameCurrencyPlusFiat = sameCurrencyTransactionTargets.zipWith(fiatTargets) { crypto, fiat ->
+            crypto + fiat
+        }
+
+        return allWallets().map { it.accounts }.flatMap { allWallets ->
+            if (action != AssetAction.Swap) {
+                sameCurrencyPlusFiat
+            } else
+                Single.just(allWallets)
+        }.map {
+            it.filter(getActionFilter(action, sourceAccount))
+        }
+    }
+
+    private fun getActionFilter(action: AssetAction, sourceAccount: CryptoAccount): (SingleAccount) -> Boolean =
         when (action) {
             AssetAction.Sell -> {
                 {
                     it is FiatAccount
+                }
+            }
+
+            AssetAction.Swap -> {
+                {
+                    it is CryptoAccount &&
+                            it.asset != sourceAccount.asset &&
+                            it !is FiatAccount &&
+                            if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
             AssetAction.NewSend -> {

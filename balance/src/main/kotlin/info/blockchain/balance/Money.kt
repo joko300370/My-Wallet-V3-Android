@@ -89,6 +89,11 @@ abstract class Money : Serializable {
         return subtract(other)
     }
 
+    operator fun div(other: Money): Money {
+        ensureComparable("division", other)
+        return division(other)
+    }
+
     operator fun compareTo(other: Money): Int {
         ensureComparable("compare", other)
         return compare(other)
@@ -97,6 +102,7 @@ abstract class Money : Serializable {
     internal abstract fun ensureComparable(operation: String, other: Money)
     protected abstract fun add(other: Money): Money
     protected abstract fun subtract(other: Money): Money
+    protected abstract fun division(other: Money): Money
     protected abstract fun compare(other: Money): Int
 
     companion object {

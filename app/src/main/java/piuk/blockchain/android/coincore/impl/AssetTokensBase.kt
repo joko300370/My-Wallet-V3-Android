@@ -105,22 +105,14 @@ internal abstract class CryptoAssetBase(
 
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            CustodialTradingAccount(
+            listOf(CustodialTradingAccount(
                 asset = asset,
                 label = labels.getDefaultCustodialWalletLabel(asset),
                 exchangeRates = exchangeRates,
                 custodialWalletManager = custodialManager,
                 environmentConfig = environmentConfig
-            )
-        ).flatMap { account ->
-            account.accountBalance.map {
-                if (account.isConfigured) {
-                    listOf(account)
-                } else {
-                    emptyList()
-                }
-            }
-        }
+            ))
+        )
 
     final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
         Maybe.fromCallable {

@@ -37,6 +37,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -61,7 +62,8 @@ import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
-import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.swap.SwapFragment
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
@@ -76,6 +78,7 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
@@ -91,6 +94,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     DialogFlow.FlowHost {
 
     override val presenter: MainPresenter by scopedInject()
+    private val prefs: PersistentPrefs by inject()
     override val view: MainView = this
 
     var drawerOpen = false
@@ -121,7 +125,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
-                        presenter.startSwapOrKyc(null, null)
+                        if (prefs.newSwapEnabled) startSwapFragment() else
+                            presenter.startSwapOrKyc(null, null)
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
@@ -597,6 +602,14 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         val buySellFragment = BuySellFragment.newInstance(viewType)
         replaceContentFragment(buySellFragment)
+    }
+
+    private fun startSwapFragment() {
+        setCurrentTabItem(ITEM_SWAP)
+        toolbar_general.title = getString(R.string.swap)
+
+        val swapFragment = SwapFragment.newInstance()
+        replaceContentFragment(swapFragment)
     }
 
     override fun gotoDashboard() {

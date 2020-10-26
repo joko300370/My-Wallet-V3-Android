@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
-import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -147,7 +147,7 @@ class CustodialSellTxEngine(
         }
     }
 
-    private fun updateOptionFromQuote(quote: Quote, pendingTx: PendingTx): PendingTx {
+    private fun updateOptionFromQuote(quote: CustodialQuote, pendingTx: PendingTx): PendingTx {
 
         val options = listOf(
             TxOptionValue.ExchangePriceOption(quote.rate, sourceAccount.asset),

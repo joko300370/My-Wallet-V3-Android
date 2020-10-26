@@ -210,7 +210,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 R.string.annual_swap_limit else R.string.annual_swap_and_buy_limit
             limits?.dailyFiat != null -> if (tier.state.ordinal == SILVER_TIER_INDEX)
                 R.string.daily_swap_limit else R.string.daily_swap_and_buy_limit
-            else -> 0
+            else -> R.string.generic_limit
         }
     }
 

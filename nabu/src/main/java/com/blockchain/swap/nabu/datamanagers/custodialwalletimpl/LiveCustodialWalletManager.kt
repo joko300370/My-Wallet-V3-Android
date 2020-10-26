@@ -11,7 +11,9 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.Direction
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.InterestAccountDetails
@@ -23,7 +25,9 @@ import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.SwapLimits
+import com.blockchain.swap.nabu.datamanagers.SwapOrder
+import com.blockchain.swap.nabu.datamanagers.SwapOrderState
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
@@ -52,6 +56,8 @@ import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.TransactionResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
 import com.blockchain.swap.nabu.service.NabuService
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -88,7 +94,7 @@ class LiveCustodialWalletManager(
         action: String,
         currency: String,
         amount: String
-    ): Single<Quote> =
+    ): Single<CustodialQuote> =
         authenticator.authenticate {
             nabuService.getSimpleBuyQuote(
                 sessionToken = it,
@@ -100,7 +106,7 @@ class LiveCustodialWalletManager(
         }.map { quoteResponse ->
             val amountCrypto = CryptoValue.fromMajor(cryptoCurrency,
                 (amount.toBigInteger().toFloat().div(quoteResponse.rate)).toBigDecimal())
-            Quote(
+            CustodialQuote(
                 date = quoteResponse.time.toLocalTime(),
                 fee = FiatValue.fromMinor(fiatCurrency,
                     quoteResponse.fee.times(amountCrypto.toBigInteger().toLong())),
@@ -284,7 +290,7 @@ class LiveCustodialWalletManager(
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
         this.filter { order ->
             order.outputCurrency == crypto.networkTicker ||
-                order.inputCurrency == crypto.networkTicker
+                    order.inputCurrency == crypto.networkTicker
         }
             .map { order -> order.toBuySellOrder() }
 
@@ -613,7 +619,7 @@ class LiveCustodialWalletManager(
         }.map { paymentMethodsResponse ->
             paymentMethodsResponse.methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -641,6 +647,44 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
+    override fun createSwapOrder(
+        direction: Direction,
+        quoteId: String,
+        volume: Money,
+        destinationAddress: String?
+    ): Single<SwapOrder> =
+        authenticator.authenticate { sessionToken ->
+            nabuService.createSwapOrder(
+                sessionToken,
+                CreateOrderRequest(
+                    direction = direction.toString(),
+                    quoteId = quoteId,
+                    volume = volume.toBigInteger().toString(),
+                    destinationAddress = destinationAddress
+                )
+            ).map {
+                SwapOrder(
+                    id = it.id,
+                    state = it.state.toSwapState(),
+                    depositAddress = it.kind.depositAddress
+                )
+            }
+        }
+
+    override fun getSwapLimits(currency: String): Single<SwapLimits> =
+        authenticator.authenticate {
+            nabuService.getSwapLimits(
+                it,
+                currency
+            ).map { response ->
+                SwapLimits(
+                    minLimit = FiatValue.fromMinor(currency, response.minOrder.toLong()),
+                    maxOrder = FiatValue.fromMinor(currency, response.maxOrder.toLong()),
+                    maxLimit = FiatValue.fromMinor(currency, response.maxPossibleOrder.toLong())
+                )
+            }
+        }
+
     override fun createPendingDeposit(
         crypto: CryptoCurrency,
         address: String,
@@ -656,6 +700,7 @@ class LiveCustodialWalletManager(
                 hash = hash,
                 amount = amount.toBigInteger().toString(),
                 product = product.toString()
+
             )
         }
 
@@ -693,6 +738,19 @@ class LiveCustodialWalletManager(
             else -> CardStatus.UNKNOWN
         }
 
+    override fun getSwapTrades(): Single<List<SwapOrder>> =
+        authenticator.authenticate { sessionToken ->
+            nabuService.getSwapTrades(sessionToken)
+        }.map { response ->
+            response.map { orderResp ->
+                SwapOrder(
+                    id = orderResp.id,
+                    state = orderResp.state.toSwapState(),
+                    depositAddress = orderResp.kind.depositAddress
+                )
+            }
+        }
+
     companion object {
         private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
 
@@ -706,6 +764,18 @@ private fun String.toTransactionState(): TransactionState =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
         else -> TransactionState.UNKNOWN
+    }
+
+private fun String.toSwapState(): SwapOrderState =
+    when (this) {
+        SwapOrderResponse.PENDING_EXECUTION -> SwapOrderState.PENDING_EXECUTION
+        SwapOrderResponse.PENDING_DEPOSIT -> SwapOrderState.PENDING_DEPOSIT
+        SwapOrderResponse.PENDING_WITHDRAWAL -> SwapOrderState.PENDING_WITHDRAWAL
+        SwapOrderResponse.FINISH_DEPOSIT -> SwapOrderState.FINISH_DEPOSIT
+        SwapOrderResponse.EXPIRED -> SwapOrderState.EXPIRED
+        SwapOrderResponse.FINISHED -> SwapOrderState.FINISHED
+        SwapOrderResponse.FAILED -> SwapOrderState.FAILED
+        else -> SwapOrderState.UNKNOWN
     }
 
 private fun String.toTransactionType(): TransactionType =
@@ -794,11 +864,11 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
         paymentMethodId = paymentMethodId ?: (
-            when (paymentType.toPaymentMethodType()) {
-                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-            }),
+                when (paymentType.toPaymentMethodType()) {
+                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLong())
