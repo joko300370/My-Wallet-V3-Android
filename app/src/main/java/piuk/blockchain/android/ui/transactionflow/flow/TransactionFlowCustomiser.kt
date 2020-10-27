@@ -38,6 +38,7 @@ interface TransactionFlowCustomiser {
     fun selectTargetAccountDescription(state: TransactionState): String
     fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState
     fun transactionProgressIcon(state: TransactionState): Int
+    fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
 
     // Format those flash error messages:
     fun issueFlashMessage(state: TransactionState): String?
@@ -338,6 +339,9 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Swap -> R.drawable.swap_masked_asset
             else -> state.sendingAccount.asset.maskedAsset()
         }
+
+    override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
+        state.action != AssetAction.Swap
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3

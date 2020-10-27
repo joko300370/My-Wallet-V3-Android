@@ -50,6 +50,7 @@ class ConfirmTransactionSheet(
             listAdapter.items = newState.pendingTx.options.toList()
             listAdapter.notifyDataSetChanged()
             dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
+            dialogView.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
         }
 
         with(dialogView) {
