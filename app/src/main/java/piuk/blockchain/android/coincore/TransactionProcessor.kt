@@ -54,6 +54,7 @@ data class PendingTx(
     val fees: Money,
     val selectedFiat: String,
     val feeLevel: FeeLevel = FeeLevel.Regular,
+    val customFeeAmount: Long = -1L,
     val options: List<TxOptionValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -74,7 +75,7 @@ data class PendingTx(
         )
 
     internal fun addOrReplaceOption(newOption: TxOptionValue, prepend: Boolean = false): PendingTx =
-        copy(
+        this.copy(
             options = if (hasOption(newOption.option)) {
                 val old = options.find { it.option == newOption.option }
                 options.replace(old, newOption).filterNotNull()
@@ -124,8 +125,18 @@ sealed class TxOptionValue(open val option: TxOption) {
         val feeDetails: FeeState? = null,
         val exchange: Money? = null,
         val selectedLevel: FeeLevel,
-        val availableLevels: Set<FeeLevel> = emptySet()
-    ) : TxOptionValue(TxOption.FEE_SELECTION)
+        val customFeeAmount: Long = -1L,
+        val availableLevels: Set<FeeLevel> = emptySet(),
+        val feeInfo: FeeInfo? = null
+    ) : TxOptionValue(TxOption.FEE_SELECTION) {
+        data class FeeInfo(
+            val regularFee: Long,
+            val priorityFee: Long
+        )
+
+        fun hasOptionChanged(oldLevel: FeeLevel, oldAmount: Long) =
+            selectedLevel != oldLevel || (selectedLevel == FeeLevel.Custom && oldAmount != customFeeAmount)
+    }
 
     data class BitPayCountdown(
         val timeRemainingSecs: Long
@@ -150,6 +161,10 @@ sealed class TxOptionValue(open val option: TxOption) {
 
 sealed class FeeState
 object FeeTooHigh : FeeState()
+object FeeUnderMinLimit : FeeState()
+object FeeUnderRecommended : FeeState()
+object FeeOverRecommended : FeeState()
+object ValidCustomFee : FeeState()
 data class FeeDetails(
     val absoluteFee: Money
 ) : FeeState()
@@ -430,7 +445,7 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
 
 private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
-        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(status = pendingTx.validationState), true)
+        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(status = pendingTx.validationState))
     } else {
         pendingTx.removeOption(TxOption.ERROR_NOTICE)
     }

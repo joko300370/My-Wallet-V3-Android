@@ -692,9 +692,6 @@
     <string name="fee_options_custom_warning">Doar utilizatori avansați</string>
     <string name="fee_options_fee_too_low">Taxa mică nu este recomandată</string>
     <string name="fee_options_fee_too_high">Taxa inutilmente mare</string>
-    <string name="fee_options_advanced_warning">Această caracteristică este recomandată numai pentru utilizatorii avansați.
- Alegând o taxă personalizată, riscați să plătiți excesiv sau tranzacția dvs. nu va fi niciodată confirmată. 
-</string>
     <string name="fee_options_sat_byte_hint">sat / b</string>
     <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , prioritate: %2$s</string>
     <string name="dismiss">destitui</string>

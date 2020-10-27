@@ -691,9 +691,7 @@
     <string name="fee_options_custom_warning">Nur für fortgeschrittene Benutzer</string>
     <string name="fee_options_fee_too_low">Niedrige Gebühr nicht empfohlen</string>
     <string name="fee_options_fee_too_high">Unnötig hohe Gebühr</string>
-    <string name="fee_options_advanced_warning">Diese Funktion wird nur fortgeschrittenen Benutzern empfohlen.
- Wenn Sie eine benutzerdefinierte Gebühr wählen, riskieren Sie eine Überzahlung oder Ihre Transaktion wird nie bestätigt. 
-</string>
+
     <string name="fee_options_sat_byte_hint">saß / b</string>
     <string name="fee_options_sat_byte_inline_hint">Normal: %1$s , Priorität: %2$s</string>
     <string name="dismiss">Entlassen</string>

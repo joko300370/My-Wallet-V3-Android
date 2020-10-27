@@ -13,7 +13,6 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import java.lang.IllegalStateException
 
 class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -21,7 +20,7 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        ViewHolder(parent.inflate(R.layout.item_send_confirm_error_notice))
+        ViewHolder(parent.inflate(R.layout.item_send_confirm_error_notice), parent)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -32,13 +31,17 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
     )
 
     class ViewHolder(
-        val parent: View
+        val parent: View,
+        private val parentView: ViewGroup
     ) : RecyclerView.ViewHolder(parent), LayoutContainer {
 
         override val containerView: View?
             get() = itemView
 
         fun bind(item: TxOptionValue.ErrorNotice) {
+            if (parentView is RecyclerView) {
+                parentView.smoothScrollToPosition(parentView.adapter!!.itemCount - 1)
+            }
             itemView.error_msg.text = item.status.toText(context)
         }
 
@@ -52,6 +55,8 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
                 ValidationState.INSUFFICIENT_GAS -> ctx.getString(R.string.confirm_status_msg_insufficient_gas)
                 ValidationState.OPTION_INVALID -> ctx.getString(R.string.confirm_status_msg_option_invalid)
                 ValidationState.INVOICE_EXPIRED -> ctx.getString(R.string.confirm_status_msg_invoice_expired)
+                ValidationState.UNDER_MIN_LIMIT -> ctx.getString(R.string.fee_options_sat_byte_min_error)
+                ValidationState.INVALID_AMOUNT -> ctx.getString(R.string.fee_options_invalid_amount)
                 else -> ctx.getString(R.string.confirm_status_msg_unexpected_error)
             }
     }

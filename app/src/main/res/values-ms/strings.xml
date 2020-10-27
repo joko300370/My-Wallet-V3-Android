@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">Pengguna lanjutan sahaja</string>
   <string name="fee_options_fee_too_low">Bayaran yang rendah tidak digalakkan</string>
   <string name="fee_options_fee_too_high">Bayaran yang tidak perlu</string>
-  <string name="fee_options_advanced_warning">Ciri ini disyorkan untuk pengguna canggih sahaja. 
- Dengan memilih yuran adat, anda berisiko melebihkan atau transaksi anda tidak disahkan. 
-</string>
   <string name="fee_options_sat_byte_hint">duduk / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , Keutamaan: %2$s</string>
   <string name="dismiss">Buangkan</string>

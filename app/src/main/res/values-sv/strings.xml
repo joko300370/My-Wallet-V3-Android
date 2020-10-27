@@ -691,9 +691,6 @@
   <string name="fee_options_custom_warning">Endast avancerade användare</string>
   <string name="fee_options_fee_too_low">Låg avgift rekommenderas inte</string>
   <string name="fee_options_fee_too_high">Onödigt hög avgift</string>
-  <string name="fee_options_advanced_warning">Den här funktionen rekommenderas endast för avancerade användare. 
- Genom att välja en anpassad avgift riskerar du att betala för mycket eller att din transaktion aldrig bekräftas. 
-</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Vanlig: %1$s , Prioritet: %2$s</string>
   <string name="dismiss">Avfärda</string>

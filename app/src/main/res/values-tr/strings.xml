@@ -691,9 +691,6 @@
   <string name="fee_options_custom_warning">Yalnızca ileri düzey kullanıcılar</string>
   <string name="fee_options_fee_too_low">Düşük ücret önerilmez</string>
   <string name="fee_options_fee_too_high">Gereksiz yere yüksek ücret</string>
-  <string name="fee_options_advanced_warning">Bu özellik yalnızca ileri düzey kullanıcılar için önerilir. 
- Özel bir ücret seçerek fazla ödeme yapma veya işleminizin asla onaylanma riskiyle karşı karşıya kalırsınız. 
-</string>
   <string name="fee_options_sat_byte_hint">doymuş / b</string>
   <string name="fee_options_sat_byte_inline_hint">Normal: %1$s , Öncelik: %2$s</string>
   <string name="dismiss">Reddet</string>

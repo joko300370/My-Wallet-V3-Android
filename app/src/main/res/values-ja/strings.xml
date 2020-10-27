@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">上級ユーザーのみ</string>
   <string name="fee_options_fee_too_low">低料金は推奨されません</string>
   <string name="fee_options_fee_too_high">不必要に高い料金</string>
-  <string name="fee_options_advanced_warning">この機能は、上級ユーザーのみにお勧めします。 
-カスタム料金を選択することにより、あなたは過払いのリスクを負うか、取引が確認されないことがあります。 
-</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">通常： %1$s 、優先度： %2$s</string>
   <string name="dismiss">退出させる</string>

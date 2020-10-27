@@ -691,9 +691,6 @@
   <string name="fee_options_custom_warning">Somente usuários avançados</string>
   <string name="fee_options_fee_too_low">Taxa baixa não recomendada</string>
   <string name="fee_options_fee_too_high">Taxa desnecessariamente alta</string>
-  <string name="fee_options_advanced_warning">Esse recurso é recomendado apenas para usuários avançados. 
- Ao escolher uma taxa personalizada, você corre o risco de pagar a mais ou de sua transação nunca ser confirmada. 
-</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , Prioridade: %2$s</string>
   <string name="dismiss">Dispensar</string>

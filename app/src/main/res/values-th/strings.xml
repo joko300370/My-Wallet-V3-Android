@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">ผู้ใช้ขั้นสูงเท่านั้น</string>
   <string name="fee_options_fee_too_low">ค่าธรรมเนียมต่ำไม่แนะนำ</string>
   <string name="fee_options_fee_too_high">ค่าธรรมเนียมสูงโดยไม่จำเป็น</string>
-  <string name="fee_options_advanced_warning">คุณลักษณะนี้เหมาะสำหรับผู้ใช้ขั้นสูงเท่านั้น 
- โดยการเลือกค่าธรรมเนียมที่กำหนดเองคุณจะเสี่ยงกับการจ่ายเงินมากเกินไปหรือการทำธุรกรรมของคุณไม่เคยได้รับการยืนยัน 
-</string>
   <string name="fee_options_sat_byte_hint">SAT / b</string>
   <string name="fee_options_sat_byte_inline_hint">ปกติ: %1$s , ลำดับความสำคัญ: %2$s</string>
   <string name="dismiss">ยกเลิก</string>

@@ -693,9 +693,6 @@
     <string name="fee_options_custom_warning">Tylko dla zaawansowanych użytkowników</string>
     <string name="fee_options_fee_too_low">Niska opłata nie jest zalecana</string>
     <string name="fee_options_fee_too_high">Niepotrzebnie wysoka opłata</string>
-    <string name="fee_options_advanced_warning">Ta funkcja jest zalecana tylko dla zaawansowanych użytkowników.
- Wybierając niestandardową opłatę, ryzykujesz przepłacenie lub transakcja nigdy nie zostanie potwierdzona. 
-</string>
     <string name="fee_options_sat_byte_hint">sat / b</string>
     <string name="fee_options_sat_byte_inline_hint">Zwykły: %1$s , Priorytet: %2$s</string>
     <string name="dismiss">Odwołać</string>

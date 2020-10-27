@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">仅限高级用户</string>
   <string name="fee_options_fee_too_low">不推荐低费用</string>
   <string name="fee_options_fee_too_high">不必要的高额费用</string>
-  <string name="fee_options_advanced_warning">仅建议高级用户使用此功能。 
-通过选择自定义费用，您可能会面临多付或您的交易从未被确认的风险。 
-</string>
   <string name="fee_options_sat_byte_hint">坐/ b</string>
   <string name="fee_options_sat_byte_inline_hint">常规： %1$s ，优先级： %2$s</string>
   <string name="dismiss">解雇</string>

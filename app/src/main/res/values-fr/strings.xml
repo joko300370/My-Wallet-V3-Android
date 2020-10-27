@@ -691,9 +691,7 @@
   <string name="fee_options_custom_warning">Utilisateurs avancés uniquement</string>
   <string name="fee_options_fee_too_low">Frais peu recommandés</string>
   <string name="fee_options_fee_too_high">Frais inutilement élevés</string>
-  <string name="fee_options_advanced_warning">Cette fonctionnalité est recommandée aux utilisateurs avancés uniquement. 
- En choisissant des frais personnalisés, vous risquez de surpayer ou de ne jamais confirmer votre transaction. 
-</string>
+
   <string name="fee_options_sat_byte_hint">sam / b</string>
   <string name="fee_options_sat_byte_inline_hint">Régulier: %1$s , Priorité: %2$s</string>
   <string name="dismiss">Rejeter</string>

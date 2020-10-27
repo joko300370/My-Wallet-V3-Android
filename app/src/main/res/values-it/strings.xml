@@ -691,9 +691,6 @@
   <string name="fee_options_custom_warning">Solo utenti esperti</string>
   <string name="fee_options_fee_too_low">Tariffa bassa non consigliata</string>
   <string name="fee_options_fee_too_high">Commissione inutilmente elevata</string>
-  <string name="fee_options_advanced_warning">Questa funzione è consigliata solo per utenti esperti. 
- Scegliendo una commissione personalizzata, rischi di pagare in eccesso o la tua transazione non verrà mai confermata. 
-</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regolare: %1$s , Priorità: %2$s</string>
   <string name="dismiss">Respingere</string>

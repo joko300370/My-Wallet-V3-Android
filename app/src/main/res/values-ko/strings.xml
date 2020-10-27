@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">고급 사용자 만</string>
   <string name="fee_options_fee_too_low">낮은 수수료는 권장하지 않습니다</string>
   <string name="fee_options_fee_too_high">불필요하게 높은 수수료</string>
-  <string name="fee_options_advanced_warning">이 기능은 고급 사용자에게만 권장됩니다. 
- 맞춤 수수료를 선택하면 초과 지불 또는 거래가 확인되지 않을 위험이 있습니다. 
-</string>
   <string name="fee_options_sat_byte_hint">토 / b</string>
   <string name="fee_options_sat_byte_inline_hint">일반 : %1$s , 우선 순위 : %2$s</string>
   <string name="dismiss">간단히 처리해 버리다</string>

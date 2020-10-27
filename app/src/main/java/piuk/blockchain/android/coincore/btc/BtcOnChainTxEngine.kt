@@ -6,6 +6,7 @@ import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.Payment
@@ -43,9 +44,13 @@ import timber.log.Timber
 import java.math.BigInteger
 
 private const val STATE_UTXO = "btc_utxo"
+private const val FEE_OPTIONS = "fee_options"
 
 private val PendingTx.utxoBundle: SpendableUnspentOutputs
     get() = (this.engineState[STATE_UTXO] as? SpendableUnspentOutputs) ?: SpendableUnspentOutputs()
+
+private val PendingTx.feeOptions: FeeOptions
+    get() = (this.engineState[FEE_OPTIONS] as? FeeOptions) ?: FeeOptions()
 
 private class BtcPreparedTx(
     val btcTx: Transaction
@@ -105,11 +110,12 @@ class BtcOnChainTxEngine(
         Singles.zip(
             getDynamicFeePerKb(pendingTx),
             getUnspentApiResponse(sourceAddress)
-        ).map { (feePerKb, coins) ->
+        ).map { (optionsAndFeePerKb, coins) ->
             updatePendingTxFromAmount(
                 amount as CryptoValue,
                 pendingTx,
-                feePerKb,
+                optionsAndFeePerKb.second,
+                optionsAndFeePerKb.first,
                 coins
             )
         }.onErrorReturnItem(
@@ -135,14 +141,14 @@ class BtcOnChainTxEngine(
             Single.error(Throwable("No BTC funds"))
         }
 
-    private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<CryptoValue> =
+    private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<Pair<FeeOptions, CryptoValue>> =
         feeDataManager.btcFeeOptions
             .map { feeOptions ->
                 when (pendingTx.feeLevel) {
-                    FeeLevel.Regular -> feeToCrypto(feeOptions.regularFee)
-                    FeeLevel.None -> CryptoValue.ZeroBtc
-                    FeeLevel.Priority -> feeToCrypto(feeOptions.priorityFee)
-                    FeeLevel.Custom -> TODO() // feeToCrypto(view!!.getCustomFeeValue())
+                    FeeLevel.None -> Pair(feeOptions, CryptoValue.ZeroBtc)
+                    FeeLevel.Regular -> Pair(feeOptions, feeToCrypto(feeOptions.regularFee))
+                    FeeLevel.Priority -> Pair(feeOptions, feeToCrypto(feeOptions.priorityFee))
+                    FeeLevel.Custom -> Pair(feeOptions, feeToCrypto(pendingTx.customFeeAmount))
                 }
             }.singleOrError()
 
@@ -153,6 +159,7 @@ class BtcOnChainTxEngine(
         amount: CryptoValue,
         pendingTx: PendingTx,
         feePerKb: CryptoValue,
+        feeOptions: FeeOptions,
         coins: UnspentOutputs
     ): PendingTx {
         val sweepBundle = sendDataManager.getMaximumAvailable(
@@ -175,13 +182,13 @@ class BtcOnChainTxEngine(
             amount = amount,
             available = CryptoValue.fromMinor(CryptoCurrency.BTC, maxAvailable),
             fees = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
-            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, utxoBundle)
+            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, utxoBundle).copyAndPut(FEE_OPTIONS, feeOptions)
         )
     }
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
         if (newOption is TxOptionValue.FeeSelection) {
-            if (newOption.selectedLevel != pendingTx.feeLevel) {
+            if (newOption.hasOptionChanged(pendingTx.feeLevel, pendingTx.customFeeAmount)) {
                 updateFeeSelection(CryptoCurrency.BTC, pendingTx, newOption)
             } else {
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
@@ -219,12 +226,20 @@ class BtcOnChainTxEngine(
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx.fees, pendingTx.amount, pendingTx.available),
+            feeDetails = getFeeState(pendingTx, pendingTx.feeOptions),
+            customFeeAmount = pendingTx.customFeeAmount,
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(
-                FeeLevel.Regular, FeeLevel.Priority
-            )
+                FeeLevel.Regular, FeeLevel.Priority, FeeLevel.Custom
+            ),
+            feeInfo = buildFeeInfo(pendingTx)
+        )
+
+    private fun buildFeeInfo(pendingTx: PendingTx): TxOptionValue.FeeSelection.FeeInfo =
+        TxOptionValue.FeeSelection.FeeInfo(
+            regularFee = pendingTx.feeOptions.regularFee,
+            priorityFee = pendingTx.feeOptions.priorityFee
         )
 
     // Returns true if bitcoin transaction is large by checking against 3 criteria:
@@ -241,8 +256,8 @@ class BtcOnChainTxEngine(
 
         val relativeFee = 100.toBigDecimal() * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
         return fiatValue.toBigDecimal() > LARGE_TX_FEE.toBigDecimal() &&
-                txSize > LARGE_TX_SIZE &&
-                relativeFee > LARGE_TX_PERCENTAGE
+            txSize > LARGE_TX_SIZE &&
+            relativeFee > LARGE_TX_PERCENTAGE
     }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
@@ -295,6 +310,14 @@ class BtcOnChainTxEngine(
                     TxOption.LARGE_TRANSACTION_WARNING)?.value == false
             ) {
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
+            }
+
+            if (pendingTx.feeLevel == FeeLevel.Custom) {
+                when {
+                    pendingTx.customFeeAmount == -1L -> throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    pendingTx.customFeeAmount < MINIMUM_CUSTOM_FEE -> throw TxValidationFailure(
+                        ValidationState.UNDER_MIN_LIMIT)
+                }
             }
         }
 

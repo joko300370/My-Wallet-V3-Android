@@ -89,7 +89,7 @@ open class EthOnChainTxEngine(
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
         TxOptionValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx.fees, pendingTx.amount, pendingTx.available),
+            feeDetails = getFeeState(pendingTx),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)

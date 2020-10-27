@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">Chỉ người dùng nâng cao</string>
   <string name="fee_options_fee_too_low">Phí thấp không được đề xuất</string>
   <string name="fee_options_fee_too_high">Phí cao không cần thiết</string>
-  <string name="fee_options_advanced_warning">Tính năng này chỉ được khuyến nghị cho người dùng nâng cao. 
- Bằng cách chọn một khoản phí tùy chỉnh, bạn có nguy cơ trả quá nhiều hoặc giao dịch của bạn không bao giờ được xác nhận. 
-</string>
   <string name="fee_options_sat_byte_hint">ngồi / b</string>
   <string name="fee_options_sat_byte_inline_hint">Thường xuyên: %1$s , Ưu tiên: %2$s</string>
   <string name="dismiss">Bỏ qua</string>

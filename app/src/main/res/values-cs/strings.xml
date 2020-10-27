@@ -693,9 +693,6 @@
   <string name="fee_options_custom_warning">Pouze pro pokročilé</string>
   <string name="fee_options_fee_too_low">Nízký poplatek se nedoporučuje</string>
   <string name="fee_options_fee_too_high">Zbytečně vysoký poplatek</string>
-  <string name="fee_options_advanced_warning">Tato funkce je doporučena pouze pro pokročilé uživatele. 
- Výběrem vlastního poplatku riskujete přeplatek nebo vaše transakce nebude nikdy potvrzena. 
-</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Pravidelné: %1$s , priorita: %2$s</string>
   <string name="dismiss">Zavrhnout</string>
