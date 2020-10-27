@@ -25,13 +25,6 @@ class OnChainSwapEngine(
     isNoteSupported, quotesProvider, walletManager, tiersService
 ) {
 
-    private val refreshTrigger = object : RefreshTrigger {
-        override fun refreshConfirmations(revalidate: Boolean): Completable {
-            // TODO for swap quote updates
-            return Completable.complete()
-        }
-    }
-
     override fun doInitialiseTx(): Single<PendingTx> {
         return quotesEngine.quote.firstOrError().doOnSuccess { quote ->
             engine.start(
@@ -43,8 +36,7 @@ class OnChainSwapEngine(
                     environmentConfig = environmentConfig,
                     postTransactions = { Completable.complete() }
                 ),
-                exchangeRates = exchangeRates,
-                refreshTrigger = refreshTrigger
+                exchangeRates = exchangeRates
             )
         }.flatMap {
             super.doInitialiseTx()

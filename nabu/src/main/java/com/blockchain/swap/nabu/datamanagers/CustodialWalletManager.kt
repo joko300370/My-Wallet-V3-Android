@@ -442,8 +442,14 @@ data class SwapQuote(
     val prices: List<PriceTier> = emptyList(),
     val expirationDate: Date = Date(),
     val creationDate: Date = Date(),
+    val networkFee: Money,
     val sampleDepositAddress: String
 )
+
+sealed class CurrencyPair(val rawValue: String) {
+    data class CryptoCurrencyPair(val source: CryptoCurrency, val destination: CryptoCurrency) :
+        CurrencyPair("${source.networkTicker}-${destination.networkTicker}")
+}
 
 data class PriceTier(
     val volume: BigDecimal,

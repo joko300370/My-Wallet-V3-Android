@@ -77,7 +77,7 @@ data class PendingTx(
     internal fun addOrReplaceOption(newOption: TxOptionValue, prepend: Boolean = false): PendingTx =
         this.copy(
             options = if (hasOption(newOption.option)) {
-                val old = options.find { it.option == newOption.option }
+                val old = options.find { it::class == newOption::class }
                 options.replace(old, newOption).filterNotNull()
             } else {
                 val opts = options.toMutableList()
@@ -113,6 +113,19 @@ sealed class TxOptionValue(open val option: TxOption) {
         val fee: Money,
         val exchangeAmount: Money? = null,
         val exchangeFee: Money? = null
+    ) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class NetworkFee(
+        val fee: Money
+    ) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class SwapExchangeRate(
+        val unitCryptoCurrency: Money,
+        val price: Money
+    ) : TxOptionValue(TxOption.READ_ONLY)
+
+    data class SwapReceiveValue(
+        val receiveAmount: Money
     ) : TxOptionValue(TxOption.READ_ONLY)
 
     data class From(val from: String) : TxOptionValue(TxOption.READ_ONLY)
@@ -206,6 +219,8 @@ abstract class TxEngine : KoinComponent {
         this._exchangeRates = exchangeRates
         this._refresh = refreshTrigger
     }
+
+    open fun stop(pendingTx: PendingTx) {}
 
     // Optionally assert, via require() etc, that sourceAccounts and txTarget
     // are valid for this engine.
@@ -421,6 +436,10 @@ class TransactionProcessor(
         } else {
             Completable.complete()
         }
+    }
+
+    fun reset() {
+        engine.stop(getPendingTx())
     }
 }
 

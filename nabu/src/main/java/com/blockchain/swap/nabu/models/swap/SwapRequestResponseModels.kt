@@ -11,6 +11,7 @@ class QuoteResponse(
     val product: String,
     val pair: String,
     val quote: Quote,
+    val networkFee: String,
     val createdAt: String,
     val sampleDepositAddress: String,
     val expiresAt: String

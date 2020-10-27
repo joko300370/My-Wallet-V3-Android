@@ -163,8 +163,8 @@ class TransactionFlowCustomiserImpl(
             )
             AssetAction.Swap -> resources.getString(
                 R.string.swap_confirmation_cta_button,
-                state.sendingAccount.asset,
-                (state.selectedTarget as CryptoAccount).asset
+                state.sendingAccount.asset.displayTicker,
+                (state.selectedTarget as CryptoAccount).asset.displayTicker
             )
             AssetAction.Sell -> resources.getString(
                 R.string.sell_confirmation_cta_button, amount

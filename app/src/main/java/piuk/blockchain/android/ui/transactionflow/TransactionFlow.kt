@@ -140,6 +140,9 @@ class TransactionFlow(
     override fun finishFlow() {
         currentStep = TransactionStep.ZERO
         disposables.clear()
+        model.process(
+            TransactionIntent.ResetFlow
+        )
         closeScope()
         super.finishFlow()
     }

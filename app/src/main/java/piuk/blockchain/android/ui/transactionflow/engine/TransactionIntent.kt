@@ -79,6 +79,10 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    object ResetFlow : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
+    }
+
     class ValidatePassword(
         val password: String
     ) : TransactionIntent() {

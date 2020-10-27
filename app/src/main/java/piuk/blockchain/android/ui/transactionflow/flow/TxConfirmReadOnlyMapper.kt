@@ -60,6 +60,27 @@ class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormat
         }
 }
 
+class SwapExchangeRateFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxOptionValue): Pair<String, String>? =
+        if (property is TxOptionValue.SwapExchangeRate) {
+            resources.getString(R.string.exchange_rate) to resources.getString(R.string.current_unit_price,
+                property.unitCryptoCurrency.toStringWithSymbol(), property.price.toStringWithSymbol())
+        } else {
+            null
+        }
+}
+
+class SwapReceiveFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxOptionValue): Pair<String, String>? =
+        if (property is TxOptionValue.SwapReceiveValue) {
+            resources.getString(R.string.receive) to property.receiveAmount.toStringWithSymbol()
+        } else {
+            null
+        }
+}
+
 class TotalFormatter(private val resources: Resources) : TxOptionsFormatter {
 
     override fun format(property: TxOptionValue): Pair<String, String>? =
@@ -73,6 +94,13 @@ class ToPropertyFormatter(private val resources: Resources) : TxOptionsFormatter
     override fun format(property: TxOptionValue): Pair<String, String>? =
         if (property is TxOptionValue.To)
             resources.getString(R.string.common_to) to property.to
+        else null
+}
+
+class NetworkFeeFormatter(private val resources: Resources) : TxOptionsFormatter {
+    override fun format(property: TxOptionValue): Pair<String, String>? =
+        if (property is TxOptionValue.NetworkFee)
+            resources.getString(R.string.network_fee) to property.fee.toStringWithSymbol()
         else null
 }
 

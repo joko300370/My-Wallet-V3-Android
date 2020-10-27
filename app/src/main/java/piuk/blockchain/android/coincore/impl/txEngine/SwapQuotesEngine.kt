@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.Direction
 import com.blockchain.swap.nabu.datamanagers.SwapQuote
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
@@ -15,7 +16,7 @@ import kotlin.math.absoluteValue
 class SwapQuotesEngine(
     private val quotesProvider: QuotesProvider,
     private val direction: Direction,
-    private val pair: String
+    private val pair: CurrencyPair.CryptoCurrencyPair
 ) {
     private lateinit var latestQuote: SwapQuote
 

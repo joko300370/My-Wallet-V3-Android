@@ -2096,7 +2096,10 @@
     <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
     <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
     <string name="pending_swap_info_message">You have 1 swap pending. Once that clears, you can make a new swap.</string>
-
+    <string name="network_fee">Network Fee</string>
+    <string name="current_unit_price">%1$s = %2$s</string>
+    <string name="exchange_rate">Exchange Rate</string>
+    <string name="receive">Receive</string>
     <!-- Fee options -->
 
 </resources>

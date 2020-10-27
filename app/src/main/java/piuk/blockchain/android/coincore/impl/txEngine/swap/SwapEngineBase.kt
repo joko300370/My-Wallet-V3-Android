@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.Direction
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
@@ -13,6 +14,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
@@ -22,15 +24,26 @@ import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.SwapQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
+import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import java.math.BigDecimal
 
 private const val USER_TIER = "USER_TIER"
 
 private val PendingTx.userTier: KycTiers
     get() = (this.engineState[USER_TIER] as KycTiers)
+
+const val QUOTE_SUB = "quote_sub"
+private val PendingTx.quoteSub: Disposable?
+    get() = (this.engineState[QUOTE_SUB] as? Disposable)
+
+const val RATES_SUB = "rates_sub"
+private val PendingTx.ratesSub: Disposable?
+    get() = (this.engineState[RATES_SUB] as? Disposable)
 
 abstract class SwapEngineBase(
     private val isNoteSupported: Boolean,
@@ -123,31 +136,89 @@ abstract class SwapEngineBase(
             quotesEngine.updateAmount(it.amount.toBigDecimal())
         }
 
-    private val pair: String
-        get() = "${sourceAccount.asset.networkTicker}-${target.asset.networkTicker}"
+    private val pair: CurrencyPair.CryptoCurrencyPair
+        get() = CurrencyPair.CryptoCurrencyPair(sourceAccount.asset, target.asset)
 
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            pendingTx.copy(
-                options = pendingTx.options.toMutableList().apply {
-                    add(TxOptionValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue))
-                    /*   add(TxOptionValue.SwapDestinationValue(
-                           receivingAssetValue = targetRate.value?.convert(pendingTx.amount) as CryptoValue))*/
-                    add(TxOptionValue.From(from = sourceAccount.label))
-                    add(TxOptionValue.To(to = txTarget.label))
-                    add(TxOptionValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.fees,
-                        exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                    ))
-
-                    if (isNoteSupported) {
-                        add(TxOptionValue.Description())
-                    }
-                }.toList()
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
+        return quotesEngine.getRate().firstOrError().flatMap { rate ->
+            Single.just(
+                pendingTx.copy(
+                    options = listOf(
+                        TxOptionValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue),
+                        TxOptionValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
+                            pendingTx.amount.toBigDecimal().times(rate))),
+                        TxOptionValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
+                            CryptoValue.fromMajor(target.asset, rate)),
+                        TxOptionValue.From(from = sourceAccount.label),
+                        TxOptionValue.To(to = txTarget.label),
+                        TxOptionValue.NetworkFee(
+                            fee = quotesEngine.getLatestQuote().networkFee
+                        )
+                    )
+                )
             )
+        }.flatMap {
+            startQuotesFetchingIfNotStarted(it)
+        }.flatMap {
+            startRatesFetchingIfNotStarted(it)
+        }
+    }
+
+    private fun startRatesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            if (pendingTx.ratesSub == null) {
+                pendingTx.copy(
+                    engineState = pendingTx.engineState.copyAndPut(
+                        RATES_SUB, startRatesFetching()
+                    )
+                )
+            } else {
+                pendingTx
+            })
+
+    private fun startRatesFetching(): Disposable =
+        quotesEngine.getRate().doOnNext {
+            refreshConfirmations(false)
+        }.emptySubscribe()
+
+    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        quotesEngine.getRate().firstOrError().flatMap { rate ->
+            Single.just(pendingTx.apply {
+                addOrReplaceOption(
+                    TxOptionValue.NetworkFee(
+                        fee = quotesEngine.getLatestQuote().networkFee
+                    )
+                )
+                addOrReplaceOption(
+                    TxOptionValue.SwapExchangeRate(
+                        CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
+                        CryptoValue.fromMajor(target.asset, rate)
+                    )
+                )
+                addOrReplaceOption(
+                    TxOptionValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
+                        pendingTx.amount.toBigDecimal().times(rate)))
+                )
+            })
+        }
+
+    private fun startQuotesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            if (pendingTx.quoteSub == null) {
+                pendingTx.copy(
+                    engineState = pendingTx.engineState.copyAndPut(
+                        QUOTE_SUB, startQuotesFetching()
+                    )
+                )
+            } else {
+                pendingTx
+            }
         )
+
+    private fun startQuotesFetching(): Disposable =
+        quotesEngine.quote.doOnNext {
+            refreshConfirmations(false)
+        }.emptySubscribe()
 
     protected fun createOrder(pendingTx: PendingTx): Single<SwapOrder> =
         target.receiveAddress.flatMap {
@@ -157,7 +228,16 @@ abstract class SwapEngineBase(
                 volume = pendingTx.amount,
                 destinationAddress = if (direction.requiresDestinationAddress()) it.address else null
             )
+        }.doOnTerminate {
+            pendingTx.quoteSub?.dispose()
+            pendingTx.ratesSub?.dispose()
         }
 
-    private fun Direction.requiresDestinationAddress() = this == Direction.ON_CHAIN || this == Direction.TO_USERKEY
+    override fun stop(pendingTx: PendingTx) {
+        pendingTx.quoteSub?.dispose()
+        pendingTx.ratesSub?.dispose()
+    }
+
+    private fun Direction.requiresDestinationAddress() =
+        this == Direction.ON_CHAIN || this == Direction.TO_USERKEY
 }

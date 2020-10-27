@@ -103,6 +103,10 @@ class TransactionInteractor(
 
     fun validateTransaction(): Completable =
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
+
+    fun reset() {
+        transactionProcessor?.reset() ?: throw IllegalStateException("TxProcessor not initialised")
+    }
 }
 
 private val Throwable.isUnexpectedContractError

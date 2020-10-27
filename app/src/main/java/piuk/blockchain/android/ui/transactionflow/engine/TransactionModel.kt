@@ -150,6 +150,11 @@ class TransactionModel(
             is TransactionIntent.AvailableAccountsListUpdated -> null
             is TransactionIntent.ShowMoreAccounts -> null
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
+            TransactionIntent.ResetFlow -> {
+                interactor.reset()
+                destroy()
+                null
+            }
         }
     }
 
