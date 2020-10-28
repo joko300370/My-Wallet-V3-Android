@@ -1908,6 +1908,7 @@
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
+    <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
     <string name="send_error_tx_in_flight">A transaction is already in progress</string>
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="send_confirmation_title">Send %1$s</string>

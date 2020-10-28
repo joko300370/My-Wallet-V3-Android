@@ -103,13 +103,16 @@ abstract class SwapEngineBase(
     private fun validateAmount(pendingTx: PendingTx): Completable {
         return sourceAccount.actionableBalance.flatMapCompletable { balance ->
             if (pendingTx.amount <= balance) {
-                pendingTx.maxLimit?.let { limit ->
-                    if (pendingTx.amount > limit) {
-                        throw validationFailureForTier(pendingTx)
-                    } else {
-                        Completable.complete()
+                if (pendingTx.maxLimit != null && pendingTx.minLimit != null) {
+                    when {
+                        pendingTx.amount < pendingTx.minLimit -> throw TxValidationFailure(
+                            ValidationState.UNDER_MIN_LIMIT)
+                        pendingTx.amount > pendingTx.maxLimit -> throw validationFailureForTier(pendingTx)
+                        else -> Completable.complete()
                     }
-                } ?: throw TxValidationFailure(ValidationState.UNKNOWN_ERROR)
+                } else {
+                    throw TxValidationFailure(ValidationState.UNKNOWN_ERROR)
+                }
             } else {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
             }

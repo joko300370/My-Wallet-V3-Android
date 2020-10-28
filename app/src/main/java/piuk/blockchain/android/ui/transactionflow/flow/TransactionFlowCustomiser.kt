@@ -326,6 +326,8 @@ class TransactionFlowCustomiserImpl(
                     state.pendingTx?.minLimit?.toStringWithSymbol())
                 AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_min_send,
                     state.pendingTx?.minLimit?.toStringWithSymbol())
+                AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_min_swap,
+                    state.pendingTx?.minLimit?.toStringWithSymbol())
                 else -> throw IllegalArgumentException(
                     "Action not supported by Send Flow ${state.action}")
             }
