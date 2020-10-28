@@ -87,7 +87,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
                 val fragment = AccountSelectSheet.newInstance(
                     this@SwapFragment, getAccountList(),
                     R.string.swap_account_select,
-                    ::statusDecorator
+                    ::statusDecorator,
+                    R.string.which_wallet_to_swap
                 )
                 childFragmentManager.beginTransaction().add(fragment, TAG).commit()
             }

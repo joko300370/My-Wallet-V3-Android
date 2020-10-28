@@ -88,6 +88,11 @@ data class TransactionState(
 
     val targetCount: Int
         get() = availableTargets.size
+
+    val maxSpendable: Money
+        get() = pendingTx?.let {
+            Money.min(it.available, it.maxLimit ?: it.available)
+        } ?: CryptoValue.zero(asset)
 }
 
 class TransactionModel(

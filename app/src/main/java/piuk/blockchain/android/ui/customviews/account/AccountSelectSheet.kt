@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class AccountSelectSheet(
     override val host: Host
@@ -39,6 +40,7 @@ class AccountSelectSheet(
             .map { it.filter { a -> a.hasTransactions } }
 
     private var sheetTitle: Int = R.string.select_account_sheet_title
+    private var sheetSubtitle: Int = R.string.empty
     private var statusDecorator: StatusDecorator = { DefaultCellDecorator() }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
@@ -63,6 +65,8 @@ class AccountSelectSheet(
             onLoadError = ::doOnLoadError
 
             view.account_list_title.text = getString(sheetTitle)
+            view.account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
+            view.account_list_subtitle.text = getString(sheetSubtitle)
 
             if (host is SelectAndBackHost) {
                 showBackArrow(view)
@@ -103,12 +107,14 @@ class AccountSelectSheet(
             host: Host,
             accountList: Single<List<BlockchainAccount>>,
             @StringRes sheetTitle: Int,
-            statusDecorator: StatusDecorator
+            statusDecorator: StatusDecorator,
+            @StringRes sheetSubtitle: Int = R.string.empty
         ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
                 this.accountList = accountList
                 this.sheetTitle = sheetTitle
                 this.statusDecorator = statusDecorator
+                this.sheetSubtitle = sheetSubtitle
             }
     }
 }

@@ -178,7 +178,7 @@ class EnterAmountSheet(
     }
 
     private fun onUseMaxClick() {
-        dialogView.amount_sheet_input.showValue(state.availableBalance)
+        dialogView.amount_sheet_input.showValue(state.maxSpendable)
     }
 
     private fun onCtaClick() {

@@ -85,7 +85,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.NewSend -> resources.getString(R.string.common_send)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
             AssetAction.Deposit -> resources.getString(R.string.common_transfer)
-            AssetAction.Swap -> resources.getString(R.string.common_swap)
+            AssetAction.Swap -> resources.getString(R.string.common_receive)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
 

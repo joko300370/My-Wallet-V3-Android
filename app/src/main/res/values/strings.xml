@@ -2068,7 +2068,7 @@
     <string name="swap_kyc_3_title">Start Swapping</string>
     <string name="swap_kyc_3_label">Once verified, come back to Swap and exchange your crypto.</string>
     <string name="swap_cta">New Swap</string>
-    <string name="swap_account_select">Swap from</string>
+    <string name="swap_account_select">New Swap</string>
     <string name="swap_low_fees">Low Fees</string>
     <string name="swap_kyc_upsell_title">You’re Close to Your Swap Limit. Upgrade to Swap Larger Amounts.</string>
     <string name="swap_kyc_upsell_desc">Verify your identity to increase how much you can Swap every day.</string>
@@ -2078,7 +2078,6 @@
     <string name="swap_kyc_upsell_2_desc">This is to ensure you’re a human being. No robots allowed.</string>
     <string name="swap_kyc_upsell_3_title">Swap up to $25,000 a Day</string>
     <string name="swap_kyc_upsell_3_desc">Once verified, come back to Swap and exchange your crypto.</string>
-
 
     <string name="trending_label">Trending</string>
     <string name="trending_swap">Swap %1$s</string>
@@ -2100,6 +2099,7 @@
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Exchange Rate</string>
     <string name="receive">Receive</string>
+    <string name="which_wallet_to_swap">Which wallet do you want to Swap from?</string>
     <string name="in_progress">In-Progress</string>
     <string name="swap_direction">%1$s->%2$s</string>
     <!-- Fee options -->
