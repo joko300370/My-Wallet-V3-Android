@@ -18,7 +18,6 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import org.amshove.kluent.`it returns`
 import org.junit.Before
@@ -115,10 +114,10 @@ class MainPresenterTest {
 
         // Act
         subject.onViewReady()
-        subject.startSwapOrKyc(toCurrency = CryptoCurrency.ETHER, fromCurrency = CryptoCurrency.BTC)
+        subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap(any(), any(), any())
+        verify(view, never()).launchSwap(any(), any())
         verify(view, never()).launchSwapIntro()
         verify(view).launchPendingVerificationScreen(CampaignType.Swap)
     }
@@ -130,12 +129,10 @@ class MainPresenterTest {
         whenever(nabuDatamanager.getUser(any())).thenReturn(Single.just(userTierOne))
         // Act
         subject.onViewReady()
-        subject.startSwapOrKyc(toCurrency = CryptoCurrency.ETHER, fromCurrency = CryptoCurrency.BTC)
+        subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view).launchSwap(defCurrency = "USD",
-            toCryptoCurrency = CryptoCurrency.ETHER,
-            fromCryptoCurrency = CryptoCurrency.BTC)
+        verify(view).launchSwap(null, null)
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view, never()).launchSwapIntro()
     }
@@ -148,12 +145,11 @@ class MainPresenterTest {
 
         // Act
         subject.onViewReady()
-        subject.startSwapOrKyc(toCurrency = CryptoCurrency.ETHER, fromCurrency = CryptoCurrency.BTC)
+        subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view).launchSwap("USD",
-            toCryptoCurrency = CryptoCurrency.ETHER,
-            fromCryptoCurrency = CryptoCurrency.BTC
+        verify(view).launchSwap(
+            null, null
         )
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view, never()).launchSwapIntro()
@@ -168,10 +164,10 @@ class MainPresenterTest {
 
         // Act
         subject.onViewReady()
-        subject.startSwapOrKyc(toCurrency = CryptoCurrency.ETHER, fromCurrency = CryptoCurrency.BTC)
+        subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap("USD", CryptoCurrency.ETHER)
+        verify(view, never()).launchSwap(any(), any())
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view).launchSwapIntro()
     }

@@ -385,8 +385,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap(swapTarget: CryptoCurrency) = navigator().launchSwapOrKyc(
-            targetCurrency = swapTarget)
+        override fun startSwap() = navigator().launchSwap()
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -524,9 +523,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         when (account) {
             is CryptoNonCustodialAccount -> {
                 clearBottomSheet()
-                navigator().launchSwapOrKyc(
-                    fromCryptoCurrency = account.asset,
-                    targetCurrency = account.asset.defaultSwapTo
+                navigator().launchSwap(
+                    sourceAccount = account
                 )
             }
             else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")

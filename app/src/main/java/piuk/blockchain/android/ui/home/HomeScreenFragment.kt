@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
@@ -20,13 +21,10 @@ interface HomeScreenFragment {
 interface HomeNavigator {
     fun gotoDashboard()
 
-    fun launchSwapOrKyc(targetCurrency: CryptoCurrency? = null, fromCryptoCurrency: CryptoCurrency? = null)
     fun launchSwap(
-        defCurrency: String,
-        fromCryptoCurrency: CryptoCurrency? = null,
-        toCryptoCurrency: CryptoCurrency? = null
+        sourceAccount: CryptoAccount? = null,
+        targetAccount: CryptoAccount? = null
     )
-
     fun launchKyc(campaignType: CampaignType)
     fun launchKycIntro()
     fun launchThePitLinking(linkId: String = "")

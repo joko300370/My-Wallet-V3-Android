@@ -15,7 +15,6 @@ import com.blockchain.swap.nabu.models.nabu.CampaignData
 import com.blockchain.swap.nabu.models.nabu.KycState
 import com.blockchain.swap.nabu.models.nabu.NabuApiException
 import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -28,6 +27,7 @@ import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
@@ -222,6 +222,8 @@ class MainPresenter internal constructor(
             is LinkState.EmailVerifiedDeepLink -> handleEmailVerifiedDeepLink(linkState)
             is LinkState.KycDeepLink -> handleKycDeepLink(linkState)
             is LinkState.ThePitDeepLink -> handleThePitDeepLink(linkState)
+            else -> {
+            }
         }
     }
 
@@ -232,6 +234,8 @@ class MainPresenter internal constructor(
                 R.string.sunriver_invalid_url_message
             )
             is CampaignLinkState.Data -> registerForCampaign(linkState.link.campaignData)
+            else -> {
+            }
         }
     }
 
@@ -246,6 +250,8 @@ class MainPresenter internal constructor(
                 } else {
                     view?.launchKyc(CampaignType.Swap)
                 }
+            }
+            else -> {
             }
         }
     }
@@ -327,14 +333,13 @@ class MainPresenter internal constructor(
         accessState.logout()
     }
 
-    internal fun startSwapOrKyc(toCurrency: CryptoCurrency?, fromCurrency: CryptoCurrency?) {
+    internal fun startSwapOrKyc(source: CryptoAccount?, target: CryptoAccount?) {
         compositeDisposable += nabuUser.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { it.printStackTrace() }, onSuccess = { nabuUser ->
                 if (nabuUser.tiers?.current ?: 0 > 0) {
                     view?.launchSwap(
-                        defCurrency = prefs.selectedFiatCurrency,
-                        toCryptoCurrency = toCurrency,
-                        fromCryptoCurrency = fromCurrency
+                        sourceAccount = source,
+                        targetAccount = target
                     )
                 } else {
                     if (nabuUser.kycState == KycState.Rejected ||
@@ -377,7 +382,9 @@ class MainPresenter internal constructor(
                 onError = {
                     when (it) {
                         is QrScanError -> view?.showScanTargetError(it)
-                        else -> { Timber.d("Scan failed") }
+                        else -> {
+                            Timber.d("Scan failed")
+                        }
                     }
                 }
             )

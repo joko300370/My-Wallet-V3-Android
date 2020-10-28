@@ -3,7 +3,6 @@ package com.blockchain.koin.modules
 import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AsyncAllAccountList
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
 import com.blockchain.koin.cardPaymentsFeatureFlag
@@ -109,7 +108,6 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
-import piuk.blockchain.android.ui.swapold.SwapStarter
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -798,10 +796,6 @@ val applicationModule = module {
     factory {
         FirebaseMobileNoticeRemoteConfig(remoteConfig = get())
     }.bind(MobileNoticeRemoteConfig::class)
-
-    factory {
-        SwapStarter(prefs = get())
-    }.bind(StartSwap::class)
 
     factory {
         SwapTrendingPairsProvider()
