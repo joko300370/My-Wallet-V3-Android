@@ -11,6 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.BuySellPair
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.Direction
@@ -663,11 +664,7 @@ class LiveCustodialWalletManager(
                     destinationAddress = destinationAddress
                 )
             ).map {
-                SwapOrder(
-                    id = it.id,
-                    state = it.state.toSwapState(),
-                    depositAddress = it.kind.depositAddress
-                )
+                it.toSwapOrder() ?: throw java.lang.IllegalStateException("Invalid order created")
             }
         }
 
@@ -742,14 +739,29 @@ class LiveCustodialWalletManager(
         authenticator.authenticate { sessionToken ->
             nabuService.getSwapTrades(sessionToken)
         }.map { response ->
-            response.map { orderResp ->
-                SwapOrder(
-                    id = orderResp.id,
-                    state = orderResp.state.toSwapState(),
-                    depositAddress = orderResp.kind.depositAddress
-                )
+            response.mapNotNull { orderResp ->
+                orderResp.toSwapOrder()
             }
         }
+
+    private fun SwapOrderResponse.toSwapOrder(): SwapOrder? {
+        return SwapOrder(
+            id = this.id,
+            state = this.state.toSwapState(),
+            depositAddress = this.kind.depositAddress,
+            createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
+            inputMoney = CryptoValue.fromMinor(
+                CryptoCurrency.fromNetworkTicker(
+                    this.pair.toCryptoCurrencyPair()?.source.toString()
+                ) ?: return null, this.priceFunnel.inputMoney.toBigInteger()
+            ),
+            outputMoney = CryptoValue.fromMinor(
+                CryptoCurrency.fromNetworkTicker(
+                    this.pair.toCryptoCurrencyPair()?.destination.toString()
+                ) ?: return null, this.priceFunnel.outputMoney.toBigInteger()
+            )
+        )
+    }
 
     companion object {
         private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
@@ -758,6 +770,14 @@ class LiveCustodialWalletManager(
             "GBP", "EUR", "USD"
         )
     }
+}
+
+private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {
+    val parts = split("-")
+    if (parts.size != 2) return null
+    val source = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return null
+    val destination = CryptoCurrency.fromNetworkTicker(parts[1]) ?: return null
+    return CurrencyPair.CryptoCurrencyPair(source, destination)
 }
 
 private fun String.toTransactionState(): TransactionState =

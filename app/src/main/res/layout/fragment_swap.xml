@@ -46,6 +46,17 @@
                 app:layout_constraintTop_toBottomOf="@id/swap_header"
                 app:trending_type="swap" />
 
+            <include
+                android:id="@+id/pending_swaps"
+                layout="@layout/pending_swaps_layout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/very_small_margin"
+                android:visibility="gone"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintBottom_toTopOf="@id/swap_cta"
+                app:layout_constraintTop_toBottomOf="@id/swap_header" />
+
             <Button
                 android:id="@+id/swap_cta"
                 style="@style/CtaButton.Blue"
@@ -53,20 +64,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/swap_cta"
                 app:layout_constraintBottom_toBottomOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/info_text"
-                style="@style/Text.Blue.Semibold.Centered.16"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/xlarge_margin"
-                android:layout_marginEnd="@dimen/xlarge_margin"
-                android:background="@drawable/info_text_background"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="You have 1 swap pending. Once that clears, you can make a new swap." />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

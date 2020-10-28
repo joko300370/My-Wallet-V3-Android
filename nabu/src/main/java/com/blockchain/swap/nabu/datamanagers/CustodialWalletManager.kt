@@ -466,7 +466,10 @@ data class SwapLimits(
 data class SwapOrder(
     val id: String,
     val state: SwapOrderState,
-    val depositAddress: String?
+    val depositAddress: String?,
+    val createdAt: Date,
+    val inputMoney: Money,
+    val outputMoney: Money
 )
 
 data class SwapPair(

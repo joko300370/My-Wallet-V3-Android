@@ -2100,6 +2100,8 @@
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Exchange Rate</string>
     <string name="receive">Receive</string>
+    <string name="in_progress">In-Progress</string>
+    <string name="swap_direction">%1$s->%2$s</string>
     <!-- Fee options -->
 
 </resources>

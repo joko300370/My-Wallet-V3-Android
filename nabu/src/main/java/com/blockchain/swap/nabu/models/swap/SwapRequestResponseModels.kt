@@ -20,7 +20,10 @@ class QuoteResponse(
 class SwapOrderResponse(
     val id: String,
     val state: String,
-    val kind: OrderKind
+    val kind: OrderKind,
+    val pair: String,
+    val priceFunnel: PriceFunnel,
+    val createdAt: String
 ) {
     companion object {
         const val PENDING_EXECUTION = "PENDING_EXECUTION"
