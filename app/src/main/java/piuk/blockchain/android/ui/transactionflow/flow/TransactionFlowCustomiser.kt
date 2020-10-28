@@ -22,6 +22,8 @@ interface TransactionFlowCustomiser {
     fun selectTargetAddressInputHint(state: TransactionState): String
     fun selectTargetNoAddressMessageText(state: TransactionState): String?
     fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean
+    fun selectTargetShouldShowSubtitle(state: TransactionState): Boolean
+    fun selectTargetSubtitle(state: TransactionState): String
     fun enterAmountTitle(state: TransactionState): String
     fun enterAmountActionIcon(state: TransactionState): Int
     fun enterAmountMaxButton(state: TransactionState): String
@@ -88,6 +90,18 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Swap -> resources.getString(R.string.common_receive)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
+
+    override fun selectTargetShouldShowSubtitle(state: TransactionState): Boolean =
+        when (state.action) {
+            AssetAction.Swap -> true
+            else -> false
+        }
+
+    override fun selectTargetSubtitle(state: TransactionState): String =
+        resources.getString(when (state.action) {
+            AssetAction.Swap -> R.string.swap_select_target_subtitle
+            else -> R.string.empty
+        })
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
         when (state.action) {
@@ -255,7 +269,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.swap)
+            AssetAction.Swap -> resources.getString(R.string.receive)
             AssetAction.NewSend -> resources.getString(R.string.send)
             AssetAction.Sell -> resources.getString(R.string.sell)
             else -> ""

@@ -23,6 +23,7 @@
     <string name="common_empty_title">Can’t load your Wallets</string>
     <string name="common_empty_details">Looks like there is an issue with your internet connection. Please check and try again</string>
     <string name="common_empty_cta">Tap to refresh</string>
+    <string name="common_pending">Pending</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -1974,6 +1975,7 @@
     <string name="swap_enter_amount_max">Swap Max</string>
     <string name="swap_enter_amount_silver_limit">Tap here to upgrade your profile and swap this amount.</string>
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
+    <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
 
     <!-- Interest -->
     <string name="earn_interest">Earn Interest</string>
@@ -2053,8 +2055,6 @@
     <string name="sell_is_coming_soon">Buy &amp; Sell Coming Soon</string>
     <string name="sell_is_coming_soon_description">Currently, we don’t support buying or selling crypto in your region. We’ll send you an update when we do.</string>
 
-    <string name="select_target_account_for_swap">Which wallet do you want to Swap to?</string>
-
     <!-- Swap -->
     <string name="swap_header_title">Swap Your Crypto</string>
     <string name="swap_header_label">Instantly exchange your crypto into any currency we offer for your wallet.</string>
@@ -2068,7 +2068,10 @@
     <string name="swap_kyc_3_title">Start Swapping</string>
     <string name="swap_kyc_3_label">Once verified, come back to Swap and exchange your crypto.</string>
     <string name="swap_cta">New Swap</string>
-    <string name="swap_account_select">New Swap</string>
+    <string name="swap_account_select">Swap</string>
+    <string name="swap_account_select_subtitle">Which wallet do you want to Swap from?</string>
+    <string name="select_target_account_for_swap">Which wallet do you want to Receive into?</string>
+
     <string name="swap_low_fees">Low Fees</string>
     <string name="swap_kyc_upsell_title">You’re Close to Your Swap Limit. Upgrade to Swap Larger Amounts.</string>
     <string name="swap_kyc_upsell_desc">Verify your identity to increase how much you can Swap every day.</string>
@@ -2084,9 +2087,7 @@
     <string name="trending_empty">Fund your Trading Wallets to see Trending Swaps with lower fees.</string>
     <string name="trending_receive">Receive %1$s</string>
     <string name="show_more_accounts">Show more</string>
-    <string name="select_an_account">Select an account</string>
-
-    <string name="common_pending">Pending</string>
+    <string name="select_a_wallet">Select a Wallet</string>
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
@@ -2099,7 +2100,6 @@
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Exchange Rate</string>
     <string name="receive">Receive</string>
-    <string name="which_wallet_to_swap">Which wallet do you want to Swap from?</string>
     <string name="in_progress">In-Progress</string>
     <string name="swap_direction">%1$s->%2$s</string>
     <!-- Fee options -->

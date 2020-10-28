@@ -29,6 +29,19 @@
         tools:text="Destination" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/subtitle"
+        style="@style/Text.Light.14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="Blurb about screen" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title_from"
         style="@style/Text.Semibold.14"
         android:layout_width="wrap_content"
@@ -39,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
     <View
         style="@style/SeparatorWithoutMargins"
@@ -231,7 +244,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
-            android:text="@string/select_an_account" />
+            android:text="@string/select_a_wallet" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"

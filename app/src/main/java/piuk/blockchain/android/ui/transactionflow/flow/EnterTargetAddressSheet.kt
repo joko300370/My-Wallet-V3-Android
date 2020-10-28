@@ -82,6 +82,8 @@ class EnterTargetAddressSheet(
             } ?: hideErrorState()
 
             title.text = customiser.selectTargetAddressTitle(newState)
+            subtitle.visibleIf { customiser.selectTargetShouldShowSubtitle(newState) }
+            subtitle.text = customiser.selectTargetSubtitle(newState)
         }
     }
 

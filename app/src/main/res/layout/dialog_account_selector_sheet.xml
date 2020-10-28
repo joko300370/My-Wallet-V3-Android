@@ -8,9 +8,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/account_list_indicator"
-        android:layout_marginTop="@dimen/tiny_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -42,19 +42,21 @@
         app:layout_constraintTop_toBottomOf="@id/account_list_indicator"
         tools:text="Select a Wallet" />
 
-
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/account_list_subtitle"
         style="@style/Text.Light.14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/tiny_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/select_account_sheet_title"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/account_list_back"
         app:layout_constraintTop_toBottomOf="@id/account_list_title"
-        tools:text="@string/which_wallet_to_swap" />
+        tools:text="Descriptive subtitle"
+        tools:visibility="visible" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/account_list"

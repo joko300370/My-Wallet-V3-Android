@@ -58,15 +58,15 @@ class AccountSelectSheet(
     }
 
     override fun initControls(view: View) {
-        with(view.account_list) {
+        with(view) {
 
-            onAccountSelected = ::doOnAccountSelected
-            onEmptyList = ::doOnEmptyList
-            onLoadError = ::doOnLoadError
+            account_list.onAccountSelected = ::doOnAccountSelected
+            account_list.onEmptyList = ::doOnEmptyList
+            account_list.onLoadError = ::doOnLoadError
 
-            view.account_list_title.text = getString(sheetTitle)
-            view.account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
-            view.account_list_subtitle.text = getString(sheetSubtitle)
+            account_list_title.text = getString(sheetTitle)
+            account_list_subtitle.text = getString(sheetSubtitle)
+            account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
 
             if (host is SelectAndBackHost) {
                 showBackArrow(view)
@@ -74,7 +74,7 @@ class AccountSelectSheet(
                 view.account_list_back.gone()
             }
 
-            initialise(accountList, statusDecorator)
+            account_list.initialise(accountList, statusDecorator)
         }
     }
 
@@ -107,14 +107,14 @@ class AccountSelectSheet(
             host: Host,
             accountList: Single<List<BlockchainAccount>>,
             @StringRes sheetTitle: Int,
-            statusDecorator: StatusDecorator,
-            @StringRes sheetSubtitle: Int = R.string.empty
+            @StringRes sheetSubtitle: Int,
+            statusDecorator: StatusDecorator
         ): AccountSelectSheet =
             AccountSelectSheet(host).apply {
                 this.accountList = accountList
                 this.sheetTitle = sheetTitle
-                this.statusDecorator = statusDecorator
                 this.sheetSubtitle = sheetSubtitle
+                this.statusDecorator = statusDecorator
             }
     }
 }

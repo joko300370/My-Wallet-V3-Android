@@ -2,13 +2,14 @@ package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.view.View
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.select_target_account_sheet_layout.view.*
+import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : TransactionFlowSheet(host) {
 
@@ -16,21 +17,28 @@ class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
 
     override fun render(newState: TransactionState) {
         with(dialogView) {
-            accounts_list.initialise(
+            account_list.initialise(
                 source = Single.just(newState.availableTargets.map { it as SingleAccount })
             )
-            title.text = customiser.selectTargetAccountTitle(newState)
-            description.text = customiser.selectTargetAccountDescription(newState)
+            account_list_title.text = customiser.selectTargetAccountTitle(newState)
+            account_list_subtitle.text = customiser.selectTargetAccountDescription(newState)
+            account_list_subtitle.visible()
         }
     }
 
     override val layoutResource: Int
-        get() = R.layout.select_target_account_sheet_layout
+        get() = R.layout.dialog_account_selector_sheet
 
     override fun initControls(view: View) {
-        view.accounts_list.onAccountSelected = {
-            require(it is SingleAccount)
-            model.process(TransactionIntent.TargetAccountSelected(it))
+        view.apply {
+            account_list.onAccountSelected = {
+                require(it is SingleAccount)
+                model.process(TransactionIntent.TargetAccountSelected(it))
+            }
+            account_list_back.visible()
+            account_list_back.setOnClickListener {
+                model.process(TransactionIntent.ReturnToPreviousStep)
+            }
         }
     }
 }
