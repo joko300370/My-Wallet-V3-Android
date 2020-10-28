@@ -136,7 +136,8 @@ class TransactionModel(
                     intent.transactionTarget,
                     previousState.action
                 )
-            is TransactionIntent.InitialiseWithSourceAndPreferredTarget -> null
+            is TransactionIntent.InitialiseWithSourceAndPreferredTarget ->
+                processAccountsListUpdate(intent.fromAccount, intent.action)
             is TransactionIntent.PendingTransactionStarted -> null
             is TransactionIntent.TargetAccountSelected -> null
             is TransactionIntent.FatalTransactionError -> null

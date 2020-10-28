@@ -752,12 +752,12 @@ class LiveCustodialWalletManager(
             createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
             inputMoney = CryptoValue.fromMinor(
                 CryptoCurrency.fromNetworkTicker(
-                    this.pair.toCryptoCurrencyPair()?.source.toString()
+                    this.pair.toCryptoCurrencyPair()?.source?.networkTicker.toString()
                 ) ?: return null, this.priceFunnel.inputMoney.toBigInteger()
             ),
             outputMoney = CryptoValue.fromMinor(
                 CryptoCurrency.fromNetworkTicker(
-                    this.pair.toCryptoCurrencyPair()?.destination.toString()
+                    this.pair.toCryptoCurrencyPair()?.destination?.networkTicker.toString()
                 ) ?: return null, this.priceFunnel.outputMoney.toBigInteger()
             )
         )
