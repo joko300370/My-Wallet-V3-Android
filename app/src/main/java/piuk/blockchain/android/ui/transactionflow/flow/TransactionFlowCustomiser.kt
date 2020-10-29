@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.assetName
@@ -41,6 +42,7 @@ interface TransactionFlowCustomiser {
     fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState
     fun transactionProgressIcon(state: TransactionState): Int
     fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
+    fun defInputType(state: TransactionState): CurrencyType
 
     // Format those flash error messages:
     fun issueFlashMessage(state: TransactionState): String?
@@ -358,6 +360,9 @@ class TransactionFlowCustomiserImpl(
 
     override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
         state.action != AssetAction.Swap
+
+    override fun defInputType(state: TransactionState): CurrencyType =
+        if (state.action == AssetAction.Swap) CurrencyType.Fiat else CurrencyType.Crypto
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -16,6 +17,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -51,16 +53,7 @@ class EnterAmountSheet(
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
             if (!amount_sheet_input.isConfigured) {
-                newState.pendingTx?.selectedFiat?.let {
-                    amount_sheet_input.configuration = FiatCryptoViewConfiguration(
-                        input = CurrencyType.Crypto,
-                        output = CurrencyType.Crypto,
-                        fiatCurrency = it,
-                        cryptoCurrency = newState.sendingAccount.asset,
-                        predefinedAmount = newState.amount
-                    )
-                    showKeyboard()
-                }
+                amount_sheet_input.configure(newState, customiser.defInputType(state))
             }
 
             val availableBalance = newState.availableBalance
@@ -188,6 +181,32 @@ class EnterAmountSheet(
 
     private fun hideKeyboard() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
+    }
+
+    private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
+        if (input == CurrencyType.Crypto) {
+            newState.pendingTx?.selectedFiat?.let {
+                configuration = FiatCryptoViewConfiguration(
+                    input = CurrencyType.Crypto,
+                    output = CurrencyType.Crypto,
+                    fiatCurrency = it,
+                    cryptoCurrency = newState.sendingAccount.asset,
+                    predefinedAmount = newState.amount
+                )
+            }
+        } else {
+            val selectedFiat = newState.pendingTx?.selectedFiat ?: return
+            val fiatRate = newState.fiatRate ?: return
+            val amount = newState.amount as? CryptoValue ?: return
+            configuration = FiatCryptoViewConfiguration(
+                input = CurrencyType.Fiat,
+                output = CurrencyType.Crypto,
+                fiatCurrency = selectedFiat,
+                cryptoCurrency = newState.sendingAccount.asset,
+                predefinedAmount = fiatRate.applyRate(amount)
+            )
+        }
+        showKeyboard()
     }
 
     private fun showKeyboard() {
