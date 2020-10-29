@@ -83,7 +83,8 @@ internal class BchAsset(
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.isArchived
                         )
                     }
             }

@@ -52,7 +52,8 @@ class BtcAccountActivityTest {
             internalAccount = mock(),
             isHDAccount = true,
             walletPreferences = walletPrefs,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = false
         )
 
     @get:Rule

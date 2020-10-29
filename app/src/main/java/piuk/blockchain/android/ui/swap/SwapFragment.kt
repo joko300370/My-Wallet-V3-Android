@@ -107,13 +107,14 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator =
-        SwapSourceAccountSelectSheetDecorator(account)
+        SwapAccountSelectSheetFeeDecorator(account)
 
     private fun getAccountList(): Single<List<BlockchainAccount>> =
         coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
             accountGroup.accounts.filter { account ->
                 (account is TradingAccount || account is NonCustodialAccount) &&
-                        (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
+                    (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false &&
+                    account.isFunded && !account.isArchived
             }
         }
 

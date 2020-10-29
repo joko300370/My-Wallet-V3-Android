@@ -23,7 +23,6 @@ import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
@@ -70,7 +69,7 @@ class EnterAmountSheet(
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                                "(${availableBalance.toStringWithSymbol()})"
+                            "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -153,11 +152,11 @@ class EnterAmountSheet(
 
             if (customiser.showTargetIcon(state)) {
                 amount_sheet_target_icon.setCoinIcon((state.selectedTarget as CryptoAccount).asset)
-                amount_sheet_asset_direction.translationZ = 1f
-            } else amount_sheet_target_icon.gone()
+            } else {
+                amount_sheet_target_icon.gone()
+            }
 
             amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
-            amount_sheet_asset_direction.setAssetIconColours(state.sendingAccount.asset, context)
         }
 
         updateSourceAndTargetDetails(state)

@@ -8,6 +8,7 @@ import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -82,7 +83,8 @@ internal class BtcAsset(
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
                             walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.isArchived
                         )
                     )
                 }
@@ -97,7 +99,8 @@ internal class BtcAsset(
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
                             walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.tag == LegacyAddress.ARCHIVED_ADDRESS
                         )
                     )
                 }

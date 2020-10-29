@@ -44,7 +44,8 @@ internal class BtcCryptoWalletAccount(
     val internalAccount: JsonSerializableAccount,
     val isHDAccount: Boolean,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    override val isArchived: Boolean
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -125,7 +126,8 @@ internal class BtcCryptoWalletAccount(
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = hdAccountIndex,
@@ -139,7 +141,8 @@ internal class BtcCryptoWalletAccount(
             internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
 
         fun createLegacyAccount(
@@ -150,7 +153,8 @@ internal class BtcCryptoWalletAccount(
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = LEGACY_ACCOUNT_NO_INDEX,
@@ -164,7 +168,8 @@ internal class BtcCryptoWalletAccount(
             internalAccount = legacyAccount,
             isHDAccount = false,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
 
         private const val LEGACY_ACCOUNT_NO_INDEX = -1

@@ -59,7 +59,7 @@ class TransactionFlowCustomiserImpl(
         return when (state.action) {
             AssetAction.NewSend -> R.drawable.ic_tx_sent
             AssetAction.Deposit -> R.drawable.ic_tx_deposit_arrow
-            AssetAction.Swap -> R.drawable.ic_tx_swap
+            AssetAction.Swap -> R.drawable.ic_swap_light_blue
             AssetAction.Sell -> R.drawable.ic_tx_sell
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }

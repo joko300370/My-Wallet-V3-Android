@@ -41,7 +41,8 @@ internal class BchCryptoWalletAccount private constructor(
     // TransactionProcessor defined;
     val internalAccount: GenericMetadataAccount,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    override val isArchived: Boolean
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -109,7 +110,8 @@ internal class BchCryptoWalletAccount private constructor(
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             label = jsonAccount.label,
@@ -123,7 +125,8 @@ internal class BchCryptoWalletAccount private constructor(
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
 
         @Deprecated("Used in legacy Account List to generate a transfer source when importing addresses")
@@ -138,7 +141,8 @@ internal class BchCryptoWalletAccount private constructor(
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             label = label,
@@ -152,7 +156,8 @@ internal class BchCryptoWalletAccount private constructor(
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
 
         private const val IMPORT_ADDRESS_NO_INDEX = -1

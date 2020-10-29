@@ -185,7 +185,8 @@ class AccountPresenter internal constructor(
             exchangeRates = exchangeRates,
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = false
         )
 
         checkBalanceForTransfer(sendingAccount, defaultAccount)
@@ -203,7 +204,8 @@ class AccountPresenter internal constructor(
             networkParams = environmentConfig.bitcoinCashNetworkParameters,
             jsonAccount = GenericMetadataAccount(legacyAddress.label, false),
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            isArchived = false
         )
 
         checkBalanceForTransfer(sendingAccount, defaultAccount)

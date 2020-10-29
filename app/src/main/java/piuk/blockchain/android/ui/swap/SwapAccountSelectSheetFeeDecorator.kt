@@ -9,7 +9,7 @@ import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.TradingAccount
 
-class SwapSourceAccountSelectSheetDecorator(private val account: BlockchainAccount) : CellDecorator {
+class SwapAccountSelectSheetFeeDecorator(private val account: BlockchainAccount) : CellDecorator {
 
     override fun view(context: Context): Maybe<View> =
         if (account is TradingAccount) {

@@ -101,6 +101,7 @@ internal class CryptoExchangeAccount(
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager,
+    override val isArchived: Boolean = false,
     val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase() {
 
@@ -170,6 +171,9 @@ abstract class CryptoNonCustodialAccount(
     abstract fun createTxEngine(): TxEngine
 
     val nonCustodialSwapDirections = listOf(SwapDirection.ON_CHAIN, SwapDirection.FROM_USERKEY)
+
+    override val isArchived: Boolean
+        get() = false
 }
 
 // Currently only one custodial account is supported for each asset,
