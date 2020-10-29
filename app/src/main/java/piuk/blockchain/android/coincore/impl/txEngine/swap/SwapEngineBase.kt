@@ -89,7 +89,7 @@ abstract class SwapEngineBase(
         }
 
     override fun targetExchangeRate(): Observable<ExchangeRate> =
-        quotesEngine.getRate().map {
+        quotesEngine.rate.map {
             ExchangeRate.CryptoToCrypto(
                 from = sourceAccount.asset,
                 to = target.asset,
@@ -143,7 +143,7 @@ abstract class SwapEngineBase(
         get() = CurrencyPair.CryptoCurrencyPair(sourceAccount.asset, target.asset)
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return quotesEngine.getRate().firstOrError().flatMap { rate ->
+        return quotesEngine.rate.firstOrError().flatMap { rate ->
             Single.just(
                 pendingTx.copy(
                     options = listOf(
@@ -180,12 +180,12 @@ abstract class SwapEngineBase(
             })
 
     private fun startRatesFetching(): Disposable =
-        quotesEngine.getRate().doOnNext {
+        quotesEngine.rate.doOnNext {
             refreshConfirmations(false)
         }.emptySubscribe()
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        quotesEngine.getRate().firstOrError().flatMap { rate ->
+        quotesEngine.rate.firstOrError().flatMap { rate ->
             Single.just(pendingTx.apply {
                 addOrReplaceOption(
                     TxOptionValue.NetworkFee(

@@ -788,12 +788,16 @@ private fun String.toTransactionState(): TransactionState =
 
 private fun String.toSwapState(): SwapOrderState =
     when (this) {
+        SwapOrderResponse.CREATED -> SwapOrderState.CREATED
+        SwapOrderResponse.PENDING_CONFIRMATION -> SwapOrderState.PENDING_CONFIRMATION
         SwapOrderResponse.PENDING_EXECUTION -> SwapOrderState.PENDING_EXECUTION
         SwapOrderResponse.PENDING_DEPOSIT -> SwapOrderState.PENDING_DEPOSIT
-        SwapOrderResponse.PENDING_WITHDRAWAL -> SwapOrderState.PENDING_WITHDRAWAL
+        SwapOrderResponse.PENDING_LEDGER -> SwapOrderState.PENDING_LEDGER
         SwapOrderResponse.FINISH_DEPOSIT -> SwapOrderState.FINISH_DEPOSIT
+        SwapOrderResponse.PENDING_WITHDRAWAL -> SwapOrderState.PENDING_WITHDRAWAL
         SwapOrderResponse.EXPIRED -> SwapOrderState.EXPIRED
         SwapOrderResponse.FINISHED -> SwapOrderState.FINISHED
+        SwapOrderResponse.CANCELED -> SwapOrderState.CANCELED
         SwapOrderResponse.FAILED -> SwapOrderState.FAILED
         else -> SwapOrderState.UNKNOWN
     }

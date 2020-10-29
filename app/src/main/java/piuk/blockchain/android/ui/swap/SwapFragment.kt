@@ -146,7 +146,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
                 walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
-                walletManager.getSwapTrades()
+                walletManager.getSwapTrades().onErrorReturn { emptyList() }
             ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: SwapLimits, orders: List<SwapOrder> ->
                 SwapComposite(
                     tiers,

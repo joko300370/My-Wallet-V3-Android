@@ -26,13 +26,17 @@ class SwapOrderResponse(
     val createdAt: String
 ) {
     companion object {
+        const val CREATED = "CREATED"
+        const val PENDING_CONFIRMATION = "PENDING_CONFIRMATION"
         const val PENDING_EXECUTION = "PENDING_EXECUTION"
         const val PENDING_DEPOSIT = "PENDING_DEPOSIT"
+        const val PENDING_LEDGER = "PENDING_LEDGER"
         const val FINISH_DEPOSIT = "FINISH_DEPOSIT"
         const val PENDING_WITHDRAWAL = "PENDING_WITHDRAWAL"
         const val FAILED = "FAILED"
         const val FINISHED = "FINISHED"
         const val EXPIRED = "EXPIRED"
+        const val CANCELED = "CANCELED"
     }
 }
 

@@ -22,22 +22,26 @@ class SwapQuotesEngine(
 
     private val amount = BehaviorSubject.createDefault<BigDecimal>(BigDecimal.ZERO)
 
-    val quote = quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
-        quotesProvider.fetchQuote(direction = direction, pair = pair)
-            .delay(quote.creationDate.diffInSeconds(quote.expirationDate), TimeUnit.SECONDS)
-            .repeat().toObservable().startWith(quote)
-    }.doOnNext {
-        latestQuote = it
-    }.share().replay(1).refCount()
+    val quote: Observable<SwapQuote> =
+        quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
+            Observable.interval(
+                quote.creationDate.diffInSeconds(quote.expirationDate),
+                quote.creationDate.diffInSeconds(quote.expirationDate),
+                TimeUnit.SECONDS
+            ).flatMapSingle {
+                quotesProvider.fetchQuote(direction = direction, pair = pair)
+            }.startWith(quote)
+        }.doOnNext {
+            latestQuote = it
+        }.share().replay(1).refCount()
 
-    fun getRate(): Observable<BigDecimal> =
-        Observables.combineLatest(quote.map {
-            PricesInterpolator(
-                list = it.prices
-            )
-        }, amount).map { (interpolator, amount) ->
-            interpolator.getRate(amount)
-        }
+    val rate: Observable<BigDecimal> = Observables.combineLatest(quote.map {
+        PricesInterpolator(
+            list = it.prices
+        )
+    }, amount).map { (interpolator, amount) ->
+        interpolator.getRate(amount)
+    }
 
     fun getLatestQuote(): SwapQuote = latestQuote
 

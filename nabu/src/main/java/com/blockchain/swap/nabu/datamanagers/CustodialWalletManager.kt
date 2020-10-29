@@ -291,11 +291,31 @@ enum class TransactionState {
 }
 
 enum class SwapOrderState {
-    PENDING_EXECUTION, PENDING_DEPOSIT, FINISH_DEPOSIT, PENDING_WITHDRAWAL, EXPIRED, FINISHED, FAILED, UNKNOWN;
+    CREATED,
+    PENDING_CONFIRMATION,
+    PENDING_LEDGER,
+    CANCELED,
+    PENDING_EXECUTION,
+    PENDING_DEPOSIT,
+    FINISH_DEPOSIT,
+    PENDING_WITHDRAWAL,
+    EXPIRED,
+    FINISHED,
+    FAILED,
+    UNKNOWN;
+
+    private val pendingState: Set<SwapOrderState>
+        get() = setOf(
+            PENDING_EXECUTION,
+            PENDING_CONFIRMATION,
+            PENDING_LEDGER,
+            PENDING_DEPOSIT,
+            PENDING_WITHDRAWAL,
+            FINISH_DEPOSIT
+        )
 
     val isPending: Boolean
-        get() =
-            this == PENDING_EXECUTION || this == PENDING_DEPOSIT || this == PENDING_WITHDRAWAL || this == FINISH_DEPOSIT
+        get() = pendingState.contains(this)
 }
 
 data class BuySellPairs(val pairs: List<BuySellPair>)
