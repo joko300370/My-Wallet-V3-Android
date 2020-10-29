@@ -1508,7 +1508,7 @@
   <string name="tx_title_receive">Получать %1s</string>
   <string name="tx_title_sell">Продать %1s</string>
   <string name="tx_title_buy">Купить %1s</string>
-  <string name="tx_title_swap">Поменять %1s</string>
+  <string name="tx_title_swap">Поменять %1s → %2$s</string>
   <string name="tx_title_transfer">Перевод %1s</string>
   <string name="tx_title_fee">Плата %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Значение при \u0020 : \u0020</string>

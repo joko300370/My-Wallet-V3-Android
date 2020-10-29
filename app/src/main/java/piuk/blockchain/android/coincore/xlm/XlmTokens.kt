@@ -72,7 +72,8 @@ internal class XlmAsset(
                         exchangeRates = exchangeRates,
                         xlmFeesFetcher = xlmFeesFetcher,
                         walletOptionsDataManager = walletOptionsDataManager,
-                        walletPreferences = walletPreferences
+                        walletPreferences = walletPreferences,
+                        custodialWalletManager = custodialManager
                     )
                 )
             }

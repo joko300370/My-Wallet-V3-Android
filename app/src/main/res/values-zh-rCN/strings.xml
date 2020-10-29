@@ -1505,7 +1505,7 @@
   <string name="tx_title_receive">收到%1s</string>
   <string name="tx_title_sell">出售%1s</string>
   <string name="tx_title_buy">购买%1s</string>
-  <string name="tx_title_swap">交换%1s</string>
+  <string name="tx_title_swap">交换%1s → %2$s</string>
   <string name="tx_title_transfer">转移%1s</string>
   <string name="tx_title_fee">费用%1s</string>
   <string name="transaction_detail_value_at_time_swapped">交换后的值： \u0020</string>

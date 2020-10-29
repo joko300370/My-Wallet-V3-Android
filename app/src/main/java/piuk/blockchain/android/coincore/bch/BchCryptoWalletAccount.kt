@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.bch
 
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -39,7 +40,8 @@ internal class BchCryptoWalletAccount private constructor(
     // this can and will be removed when BCH is moved over and has a on-chain
     // TransactionProcessor defined;
     val internalAccount: GenericMetadataAccount,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -78,7 +80,11 @@ internal class BchCryptoWalletAccount private constructor(
                     exchangeRates,
                     account = this
                 ) as ActivitySummaryItem
-            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }
+            .flatMap {
+                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+            }
+            .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =
         BchOnChainTxEngine(
@@ -102,7 +108,8 @@ internal class BchCryptoWalletAccount private constructor(
             networkParams: NetworkParameters,
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
-            walletPreferences: WalletStatus
+            walletPreferences: WalletStatus,
+            custodialWalletManager: CustodialWalletManager
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             label = jsonAccount.label,
@@ -115,7 +122,8 @@ internal class BchCryptoWalletAccount private constructor(
             feeDataManager = feeDataManager,
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
         @Deprecated("Used in legacy Account List to generate a transfer source when importing addresses")
@@ -129,7 +137,8 @@ internal class BchCryptoWalletAccount private constructor(
             networkParams: NetworkParameters,
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
-            walletPreferences: WalletStatus
+            walletPreferences: WalletStatus,
+            custodialWalletManager: CustodialWalletManager
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             label = label,
@@ -142,7 +151,8 @@ internal class BchCryptoWalletAccount private constructor(
             feeDataManager = feeDataManager,
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
         private const val IMPORT_ADDRESS_NO_INDEX = -1

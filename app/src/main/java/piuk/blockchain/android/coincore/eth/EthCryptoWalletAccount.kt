@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -25,7 +26,8 @@ internal class EthCryptoWalletAccount(
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     private val walletPreferences: WalletStatus,
-    override val exchangeRates: ExchangeRateDataManager
+    override val exchangeRates: ExchangeRateDataManager,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
 
     constructor(
@@ -34,7 +36,8 @@ internal class EthCryptoWalletAccount(
         fees: FeeDataManager,
         jsonAccount: EthereumAccount,
         walletPreferences: WalletStatus,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        custodialWalletManager: CustodialWalletManager
     ) : this(
         payloadManager,
         jsonAccount.label,
@@ -42,7 +45,8 @@ internal class EthCryptoWalletAccount(
         ethDataManager,
         fees,
         walletPreferences,
-        exchangeRates
+        exchangeRates,
+        custodialWalletManager
     )
 
     private val hasFunds = AtomicBoolean(false)
@@ -87,6 +91,9 @@ internal class EthCryptoWalletAccount(
                                 account = this
                             ) as ActivitySummaryItem
                         }
+                    }
+                    .flatMap {
+                        appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }

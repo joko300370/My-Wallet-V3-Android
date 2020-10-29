@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.account
 import android.annotation.SuppressLint
 import com.blockchain.extensions.exhaustive
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.spy
@@ -77,6 +78,7 @@ class AccountPresenterTest {
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
     @Before
     fun setUp() {
@@ -96,7 +98,8 @@ class AccountPresenterTest {
             feeDataManager,
             exchangeRates,
             environmentConfig,
-            walletPreferences
+            walletPreferences,
+            custodialWalletManager
         ))
 
         subject.initView(activity)

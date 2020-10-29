@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.Direction
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.Money
@@ -18,7 +18,7 @@ class OnChainSwapEngine(
     private val quotesProvider: QuotesProvider,
     walletManager: CustodialWalletManager,
     tiersService: TierService,
-    override val direction: Direction,
+    override val direction: SwapDirection,
     private val engine: OnChainTxEngineBase,
     private val environmentConfig: EnvironmentConfig
 ) : SwapEngineBase(

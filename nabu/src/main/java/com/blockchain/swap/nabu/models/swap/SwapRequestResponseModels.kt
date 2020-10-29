@@ -17,13 +17,17 @@ class QuoteResponse(
     val expiresAt: String
 )
 
-class SwapOrderResponse(
+data class SwapOrderResponse(
     val id: String,
     val state: String,
+    val quote: OrderQuote,
     val kind: OrderKind,
     val pair: String,
     val priceFunnel: PriceFunnel,
-    val createdAt: String
+    val createdAt: String,
+    val updatedAt: String,
+    val fiatValue: String,
+    val fiatCurrency: String
 ) {
     companion object {
         const val CREATED = "CREATED"
@@ -40,7 +44,14 @@ class SwapOrderResponse(
     }
 }
 
-class OrderKind(
+data class OrderQuote(
+    val pair: String,
+    val networkFee: String,
+    val staticFee: String
+)
+
+data class OrderKind(
+    val direction: String,
     val depositAddress: String?,
     val withdrawalAddress: String?
 )

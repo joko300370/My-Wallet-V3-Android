@@ -14,7 +14,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.SwapPair
-import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -79,7 +79,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val trendingPairsProvider: TrendingPairsProvider by scopedInject()
     private val walletManager: CustodialWalletManager by scopedInject()
-    private val swapPairsRepository: SwapPairsRepository by scopedInject()
+    private val swapRepository: SwapRepository by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val walletPrefs: WalletStatus by inject()
 
@@ -111,7 +111,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
         SwapSourceAccountSelectSheetDecorator(account)
 
     private fun getAccountList(): Single<List<BlockchainAccount>> =
-        coincore.allWallets().zipWith(swapPairsRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
+        coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
             accountGroup.accounts.filter { account ->
                 (account is TradingAccount || account is NonCustodialAccount) &&
                         (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false

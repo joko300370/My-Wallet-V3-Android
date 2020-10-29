@@ -1503,7 +1503,7 @@
   <string name="tx_title_receive">Terima %1s</string>
   <string name="tx_title_sell">Jual %1s</string>
   <string name="tx_title_buy">Beli %1s</string>
-  <string name="tx_title_swap">Tukar %1s</string>
+  <string name="tx_title_swap">Tukar %1s → %2$s</string>
   <string name="tx_title_transfer">Transfer %1s</string>
   <string name="tx_title_fee">Biaya %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Nilai saat ditukar: \u0020</string>

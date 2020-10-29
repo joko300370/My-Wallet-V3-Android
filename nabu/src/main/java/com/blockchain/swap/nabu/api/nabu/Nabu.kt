@@ -435,4 +435,10 @@ internal interface Nabu {
         @Query("currency") currency: String,
         @Query("minor") useMinor: Boolean = true
     ): Single<SwapLimitsResponse>
+
+    @GET(NABU_SWAP_ACTIVITY)
+    fun fetchSwapActivity(
+        @Header("authorization") authorization: String,
+        @Header("limit") limit: Int = 50
+    ): Single<List<SwapOrderResponse>>
 }

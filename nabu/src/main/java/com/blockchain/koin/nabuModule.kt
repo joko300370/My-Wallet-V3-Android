@@ -29,9 +29,6 @@ import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsProvider
-import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
@@ -42,6 +39,11 @@ import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimit
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestEligibilityMapAdapter
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestLimitsMapAdapter
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapPairsProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapPairsProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -107,7 +109,8 @@ val nabuModule = module {
                 fundsFeatureFlag = get(simpleBuyFundsFeatureFlag),
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
-                interestRepository = get()
+                interestRepository = get(),
+                swapRepository = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -147,6 +150,13 @@ val nabuModule = module {
                 authenticator = get()
             )
         }.bind(SwapPairsProvider::class)
+
+        factory {
+            SwapActivityProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(SwapActivityProvider::class)
 
         factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
@@ -200,7 +210,10 @@ val nabuModule = module {
         }
 
         scoped {
-            SwapPairsRepository(pairsProvider = get())
+            SwapRepository(
+                pairsProvider = get(),
+                activityProvider = get()
+            )
         }
 
         scoped {

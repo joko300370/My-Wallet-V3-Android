@@ -1504,7 +1504,7 @@
   <string name="tx_title_receive">Få %1s</string>
   <string name="tx_title_sell">Sälj %1s</string>
   <string name="tx_title_buy">Köp %1s</string>
-  <string name="tx_title_swap">Byt %1s</string>
+  <string name="tx_title_swap">Byt %1s → %2$s</string>
   <string name="tx_title_transfer">Överför %1s</string>
   <string name="tx_title_fee">Avgift %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Värde när du bytte: \u0020</string>

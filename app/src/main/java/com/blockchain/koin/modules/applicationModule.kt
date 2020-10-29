@@ -453,7 +453,8 @@ val applicationModule = module {
                 feeDataManager = get(),
                 exchangeRates = get(),
                 environmentConfig = get(),
-                walletPreferences = get()
+                walletPreferences = get(),
+                custodialWalletManager = get()
             )
         }
 

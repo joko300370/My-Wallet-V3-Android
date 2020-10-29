@@ -6,6 +6,7 @@ import com.blockchain.notifications.analytics.AddressAnalytics
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.WalletAnalytics
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.BitcoinCashWallet
@@ -62,7 +63,8 @@ class AccountPresenter internal constructor(
     private val feeDataManager: FeeDataManager,
     private val exchangeRates: ExchangeRateDataManager,
     private val environmentConfig: EnvironmentConfig,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : BasePresenter<AccountView>() {
 
     internal var doubleEncryptionPassword: String? = null
@@ -182,7 +184,8 @@ class AccountPresenter internal constructor(
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
             networkParameters = environmentConfig.bitcoinNetworkParameters,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
         checkBalanceForTransfer(sendingAccount, defaultAccount)
@@ -199,7 +202,8 @@ class AccountPresenter internal constructor(
             bchManager = bchDataManager,
             networkParams = environmentConfig.bitcoinCashNetworkParameters,
             jsonAccount = GenericMetadataAccount(legacyAddress.label, false),
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
         checkBalanceForTransfer(sendingAccount, defaultAccount)

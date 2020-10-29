@@ -9,7 +9,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import java.util.Date
@@ -41,6 +41,7 @@ data class TransactionId(val txId: String) : ActivityDetailsType()
 data class BuyCryptoWallet(val crypto: CryptoCurrency) : ActivityDetailsType()
 data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
 data class BuyPaymentMethod(val paymentDetails: PaymentDetails) : ActivityDetailsType()
+data class SwapReceiveAmount(val receivedAmount: Money) : ActivityDetailsType()
 
 data class PaymentDetails(val paymentMethodId: String, val label: String?, val endDigits: String?)
 
@@ -76,11 +77,12 @@ class ActivityDetailsModel(
     ): Disposable? {
         return when (intent) {
             is LoadActivityDetailsIntent -> {
-                when (intent.accountType) {
-                    CryptoAccountType.NON_CUSTODIAL -> loadNonCustodialActivityDetails(intent)
-                    CryptoAccountType.CUSTODIAL_TRADING -> loadCustodialTradingActivityDetails(intent)
-                    CryptoAccountType.CUSTODIAL_INTEREST -> loadCustodialInterestActivityDetails(intent)
-                    CryptoAccountType.UNKNOWN -> {
+                when (intent.activityType) {
+                    CryptoActivityType.NON_CUSTODIAL -> loadNonCustodialActivityDetails(intent)
+                    CryptoActivityType.CUSTODIAL_TRADING -> loadCustodialTradingActivityDetails(intent)
+                    CryptoActivityType.CUSTODIAL_INTEREST -> loadCustodialInterestActivityDetails(intent)
+                    CryptoActivityType.SWAP -> loadSwapActivityDetails(intent)
+                    CryptoActivityType.UNKNOWN -> {
                         throw IllegalStateException(
                             "Cannot load activity details for an unknown account type"
                         )
@@ -118,6 +120,7 @@ class ActivityDetailsModel(
             is ActivityDetailsLoadFailedIntent,
             is LoadCustodialTradingHeaderDataIntent,
             is LoadCustodialInterestHeaderDataIntent,
+            is LoadSwapHeaderDataIntent,
             is LoadNonCustodialHeaderDataIntent -> null
         }
     }
@@ -136,11 +139,9 @@ class ActivityDetailsModel(
             direction == TransactionSummary.TransactionType.SENT -> {
                 loadSentItems(nonCustodialActivitySummaryItem)
             }
-            direction == TransactionSummary.TransactionType.BUY ||
-                    direction == TransactionSummary.TransactionType.SELL -> {
-                // do nothing BUY & SELL are a custodial transaction
+            else -> {
+                // do nothing BUY & SELL are a custodial transaction & SWAP has its own activity
             }
-            direction == TransactionSummary.TransactionType.SWAP -> TODO()
         }
     }
 
@@ -172,6 +173,19 @@ class ActivityDetailsModel(
             interactor.loadCustodialInterestItems(it).subscribeBy(
                 onSuccess = { activityList ->
                     process(ListItemsLoadedIntent(activityList))
+                },
+                onError = {
+                    process(ListItemsFailedToLoadIntent)
+                })
+        } ?: process(ActivityDetailsLoadFailedIntent)
+
+    private fun loadSwapActivityDetails(intent: LoadActivityDetailsIntent) =
+        interactor.getSwapActivityDetails(cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash)?.let {
+            process(LoadSwapHeaderDataIntent(it))
+            interactor.loadSwapItems(it).subscribeBy(
+                onSuccess = { swapItems ->
+                    process(ListItemsLoadedIntent(swapItems))
                 },
                 onError = {
                     process(ListItemsFailedToLoadIntent)

@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -17,9 +18,9 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -100,6 +101,9 @@ open class CustodialTradingAccount(
         get() = custodialWalletManager.getAllOrdersFor(asset)
             .mapList { orderToSummary(it) }
             .filterActivityStates()
+            .flatMap {
+                appendSwapActivity(custodialWalletManager, asset, custodialSwapDirections, it)
+            }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
@@ -167,5 +171,7 @@ open class CustodialTradingAccount(
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION
         )
+
+        private val custodialSwapDirections = listOf(SwapDirection.INTERNAL)
     }
 }

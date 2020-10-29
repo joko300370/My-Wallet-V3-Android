@@ -82,7 +82,8 @@ internal class BchAsset(
                             networkParams = environmentSettings.bitcoinCashNetworkParameters,
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager
                         )
                     }
             }

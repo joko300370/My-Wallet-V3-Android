@@ -1505,7 +1505,7 @@
   <string name="tx_title_receive">Nhận %1s</string>
   <string name="tx_title_sell">Bán %1s</string>
   <string name="tx_title_buy">Mua %1s</string>
-  <string name="tx_title_swap">Hoán đổi %1s</string>
+  <string name="tx_title_swap">Hoán đổi %1s → %2$s</string>
   <string name="tx_title_transfer">Chuyển %1s</string>
   <string name="tx_title_fee">Phí %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Giá trị khi hoán đổi: \u0020</string>

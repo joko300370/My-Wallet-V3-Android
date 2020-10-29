@@ -112,7 +112,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                     newState.selectedCryptoCurrency?.let {
                         showBottomSheet(
                             CryptoActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId,
-                                newState.accountType))
+                                newState.activityType))
                     }
                 }
                 ActivitiesSheet.FIAT_ACTIVITY_DETAILS -> {
@@ -281,7 +281,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private fun onCryptoActivityClicked(
         cryptoCurrency: CryptoCurrency,
         txHash: String,
-        type: CryptoAccountType
+        type: CryptoActivityType
     ) {
         model.process(ShowActivityDetailsIntent(cryptoCurrency, txHash, type))
     }

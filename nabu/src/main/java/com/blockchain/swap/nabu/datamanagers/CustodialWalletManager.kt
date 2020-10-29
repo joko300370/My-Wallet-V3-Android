@@ -5,6 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -168,8 +169,8 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(direction: Direction, quoteId: String, volume: Money, destinationAddress: String? = null):
-            Single<SwapOrder>
+    fun createSwapOrder(direction: SwapDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
+        Single<SwapOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -182,6 +183,11 @@ interface CustodialWalletManager {
     fun getSwapLimits(currency: String): Single<SwapLimits>
 
     fun getSwapTrades(): Single<List<SwapOrder>>
+
+    fun getSwapActivityForAsset(
+        cryptoCurrency: CryptoCurrency,
+        directions: List<SwapDirection>
+    ): Single<List<SwapTransactionItem>>
 }
 
 data class InterestActivityItem(
@@ -338,8 +344,11 @@ data class CustodialQuote(
     val rate: FiatValue
 )
 
-enum class Direction {
-    ON_CHAIN, FROM_USERKEY, TO_USERKEY, INTERNAL;
+enum class SwapDirection {
+    ON_CHAIN, // from non-custodial to non-custodial
+    FROM_USERKEY, // from non-custodial to custodial
+    TO_USERKEY, // from custodial to non-custodial - not in use currently
+    INTERNAL; // from custodial to custodial
 }
 
 data class BankAccount(val details: List<BankDetail>)
@@ -429,7 +438,8 @@ data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable 
 }
 
 enum class Product {
-    SIMPLEBUY, SAVINGS
+    SIMPLEBUY,
+    SAVINGS
 }
 
 data class BillingAddress(

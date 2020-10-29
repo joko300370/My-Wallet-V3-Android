@@ -1504,7 +1504,7 @@
   <string name="tx_title_receive">Ontvang %1s</string>
   <string name="tx_title_sell">Verkoop %1s</string>
   <string name="tx_title_buy">Koop %1s</string>
-  <string name="tx_title_swap">Verwissel %1s</string>
+  <string name="tx_title_swap">Verwissel %1s → %2$s</string>
   <string name="tx_title_transfer">Breng %1s</string>
   <string name="tx_title_fee">Tarief %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Waarde bij verwisseling: \u0020</string>

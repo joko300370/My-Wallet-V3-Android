@@ -73,7 +73,8 @@ internal class EthAsset(
                     feeDataManager,
                     ethDataManager.getEthWallet()?.account ?: throw Exception("No ether wallet found"),
                     walletPrefs,
-                    exchangeRates
+                    exchangeRates,
+                    custodialManager
                 )
             )
         )

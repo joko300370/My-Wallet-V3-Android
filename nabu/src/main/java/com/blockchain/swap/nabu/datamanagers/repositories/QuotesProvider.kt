@@ -1,8 +1,8 @@
 package com.blockchain.swap.nabu.datamanagers.repositories
 
 import com.blockchain.swap.nabu.Authenticator
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.Direction
 import com.blockchain.swap.nabu.datamanagers.PriceTier
 import com.blockchain.swap.nabu.datamanagers.SwapQuote
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
@@ -17,7 +17,7 @@ class QuotesProvider(
     private val authenticator: Authenticator
 ) {
 
-    fun fetchQuote(product: String = "BROKERAGE", direction: Direction, pair: CurrencyPair.CryptoCurrencyPair) =
+    fun fetchQuote(product: String = "BROKERAGE", direction: SwapDirection, pair: CurrencyPair.CryptoCurrencyPair) =
         authenticator.authenticate { sessionToken ->
             nabuService.fetchQuote(sessionToken,
                 QuoteRequest(

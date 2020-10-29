@@ -24,6 +24,7 @@ import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.SellCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.SellPurchaseAmount
+import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
@@ -93,6 +94,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 is BuyCryptoWallet,
                 is SellCryptoWallet -> R.string.activity_details_buy_sending_to
                 is BuyPaymentMethod -> R.string.activity_details_buy_payment_method
+                is SwapReceiveAmount -> R.string.activity_details_swap_for
                 else -> R.string.empty
             })
 
@@ -146,6 +148,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                     }
                 }
             }
+            is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
             else -> ""
         }
 }

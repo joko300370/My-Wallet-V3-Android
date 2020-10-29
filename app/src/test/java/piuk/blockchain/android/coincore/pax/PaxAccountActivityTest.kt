@@ -3,11 +3,17 @@ package piuk.blockchain.android.coincore.pax
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -16,6 +22,7 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.pax.PaxCryptoWalletAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -31,6 +38,7 @@ class PaxAccountActivityTest {
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val walletPreferences: WalletStatus = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
     private val paxAccount: Erc20Account = mock()
 
@@ -42,7 +50,8 @@ class PaxAccountActivityTest {
             fees = mock(),
             erc20Account = paxAccount,
             exchangeRates = exchangeRates,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
     @get:Rule
@@ -70,6 +79,24 @@ class PaxAccountActivityTest {
             timestamp = 1557334297
         )
 
+        val swapSummary = SwapTransactionItem(
+            "123",
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroPax,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroBtc,
+            CryptoCurrency.PAX,
+            CryptoCurrency.BTC,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+
         whenever(paxAccount.getTransactions()).thenReturn(Observable.just(listOf(erc20Transfer)))
 
         whenever(ethDataManager
@@ -94,13 +121,16 @@ class PaxAccountActivityTest {
             )
         )
 
+        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
         subject.activity
             .test()
             .assertValueCount(1)
             .assertComplete()
             .assertNoErrors()
             .assertValue {
-                it.size == 1 && it[0].run {
+                it.size == 2 && it[0].run {
                     this is Erc20ActivitySummaryItem &&
                     cryptoCurrency == CryptoCurrency.PAX &&
                     !doubleSpend &&
@@ -115,6 +145,17 @@ class PaxAccountActivityTest {
                         CryptoValue.fromMinor(CryptoCurrency.PAX, 10000.toBigInteger()) &&
                     outputsMap["0x2ca28ffadd20474ffe2705580279a1e67cd10a29"] ==
                         CryptoValue.fromMinor(CryptoCurrency.PAX, 10000.toBigInteger())
+                } && it[1].run {
+                    this is SwapActivitySummaryItem &&
+                    txId == swapSummary.txId &&
+                    direction == swapSummary.direction &&
+                    sendingAsset == swapSummary.sendingAsset &&
+                    receivingAsset == swapSummary.receivingAsset &&
+                    sendingAddress == swapSummary.sendingAddress &&
+                    receivingAddress == swapSummary.receivingAddress &&
+                    state == swapSummary.state &&
+                    fiatValue == swapSummary.fiatValue &&
+                    fiatCurrency == swapSummary.fiatCurrency
                 }
             }
 

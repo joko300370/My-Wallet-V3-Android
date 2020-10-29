@@ -1499,10 +1499,10 @@
   <string name="tx_sold">Satıldı</string>
   <string name="linked_cards">Bağlantılı Kartlar</string>
   <string name="tx_title_send">%1s gönder</string>
-  <string name="tx_title_receive">%1s</string>
+  <string name="tx_title_receive">teslim almak %1s</string>
   <string name="tx_title_sell">%1s sat</string>
   <string name="tx_title_buy">%1s satın al</string>
-  <string name="tx_title_swap">%1s</string>
+  <string name="tx_title_swap">takas %1s → %2$s</string>
   <string name="tx_title_transfer">%1s aktarımı</string>
   <string name="tx_title_fee">Ücret %1s</string>
   <string name="transaction_detail_value_at_time_swapped">\u0020 değer: \u0020</string>

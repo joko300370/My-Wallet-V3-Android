@@ -72,7 +72,8 @@ internal class UsdtAsset(
             erc20Account,
             feeDataManager,
             exchangeRates,
-            walletPreferences
+            walletPreferences,
+            custodialManager
         )
     }
 

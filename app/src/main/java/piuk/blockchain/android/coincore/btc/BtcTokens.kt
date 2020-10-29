@@ -81,7 +81,8 @@ internal class BtcAsset(
                             isDefault = i == defaultIndex,
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager
                         )
                     )
                 }
@@ -95,7 +96,8 @@ internal class BtcAsset(
                             feeDataManager = feeDataManager,
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager
                         )
                     )
                 }

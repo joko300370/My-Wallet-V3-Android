@@ -73,7 +73,8 @@ internal class PaxAsset(
             erc20Account,
             feeDataManager,
             exchangeRates,
-            walletPreferences
+            walletPreferences,
+            custodialManager
         )
     }
 

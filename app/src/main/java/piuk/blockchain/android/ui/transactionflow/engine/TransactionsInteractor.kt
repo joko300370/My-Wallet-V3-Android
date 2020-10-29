@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
-import com.blockchain.swap.nabu.datamanagers.repositories.SwapPairsRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -27,7 +27,7 @@ import timber.log.Timber
 class TransactionInteractor(
     private val coincore: Coincore,
     private val addressFactory: AddressFactory,
-    private val swapPairsRepository: SwapPairsRepository
+    private val swapRepository: SwapRepository
 ) {
     private var transactionProcessor: TransactionProcessor? = null
 
@@ -79,7 +79,7 @@ class TransactionInteractor(
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
         if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else coincore.getTransactionTargets(sourceAccount, action).zipWith(swapPairsRepository.getSwapAvailablePairs())
+        else coincore.getTransactionTargets(sourceAccount, action).zipWith(swapRepository.getSwapAvailablePairs())
             .map { (accountList, pairs) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->

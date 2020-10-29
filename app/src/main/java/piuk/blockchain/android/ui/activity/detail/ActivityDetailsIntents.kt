@@ -7,7 +7,8 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import java.util.Date
 
@@ -16,7 +17,7 @@ sealed class ActivityDetailsIntents : MviIntent<ActivityDetailState>
 class LoadActivityDetailsIntent(
     val cryptoCurrency: CryptoCurrency,
     val txHash: String,
-    val accountType: CryptoAccountType
+    val activityType: CryptoActivityType
 ) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState
@@ -83,6 +84,19 @@ class LoadCustodialInterestHeaderDataIntent(
             isFeeTransaction = false,
             confirmations = summaryItem.confirmations,
             totalConfirmations = summaryItem.account.asset.requiredConfirmations
+        )
+    }
+}
+
+class LoadSwapHeaderDataIntent(
+    private val summaryItem: SwapActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            transactionType = TransactionSummary.TransactionType.SWAP,
+            amount = summaryItem.value,
+            isPending = summaryItem.state.isPending,
+            isFeeTransaction = false
         )
     }
 }

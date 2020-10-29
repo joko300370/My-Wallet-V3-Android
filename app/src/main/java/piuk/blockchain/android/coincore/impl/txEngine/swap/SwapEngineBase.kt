@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.Direction
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
@@ -52,7 +52,7 @@ abstract class SwapEngineBase(
     private val kycTierService: TierService
 ) : TxEngine() {
 
-    protected abstract val direction: Direction
+    protected abstract val direction: SwapDirection
 
     protected lateinit var quotesEngine: SwapQuotesEngine
 
@@ -241,6 +241,6 @@ abstract class SwapEngineBase(
         pendingTx.ratesSub?.dispose()
     }
 
-    private fun Direction.requiresDestinationAddress() =
-        this == Direction.ON_CHAIN || this == Direction.TO_USERKEY
+    private fun SwapDirection.requiresDestinationAddress() =
+        this == SwapDirection.ON_CHAIN || this == SwapDirection.TO_USERKEY
 }

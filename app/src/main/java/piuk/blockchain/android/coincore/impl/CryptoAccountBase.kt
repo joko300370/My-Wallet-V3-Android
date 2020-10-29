@@ -1,5 +1,8 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -18,6 +21,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -52,6 +56,43 @@ abstract class CryptoAccountBase : CryptoAccount {
 
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
+
+    private fun swapItemToSummary(item: SwapTransactionItem): ActivitySummaryItem {
+        val sendingAccount = this
+        return with(item) {
+            SwapActivitySummaryItem(
+                exchangeRates,
+                txId,
+                timeStampMs,
+                sendingValue,
+                sendingAccount,
+                sendingAddress,
+                receivingAddress,
+                state,
+                direction,
+                receivingValue,
+                networkFee,
+                asset,
+                receivingAsset,
+                fiatValue,
+                fiatCurrency
+            )
+        }
+    }
+
+    fun appendSwapActivity(
+        custodialWalletManager: CustodialWalletManager,
+        asset: CryptoCurrency,
+        directions: List<SwapDirection>,
+        activityList: List<ActivitySummaryItem>
+    ) =
+        custodialWalletManager.getSwapActivityForAsset(asset, directions).map { swapItems ->
+            swapItems.map {
+                swapItemToSummary(it)
+            }
+        }.map { swapActivity ->
+            activityList + swapActivity
+        }
 }
 
 // To handle Send to PIT
@@ -127,6 +168,8 @@ abstract class CryptoNonCustodialAccount(
         Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
     abstract fun createTxEngine(): TxEngine
+
+    val nonCustodialSwapDirections = listOf(SwapDirection.ON_CHAIN, SwapDirection.FROM_USERKEY)
 }
 
 // Currently only one custodial account is supported for each asset,

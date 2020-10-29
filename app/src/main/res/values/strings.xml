@@ -659,7 +659,7 @@
     <string name="tx_title_buy">Buy %1s</string>
     <string name="tx_title_deposit">Transfer %1s</string>
     <string name="tx_title_withdraw">Withdraw %1s</string>
-    <string name="tx_title_swap">Swap %1s -> %2s</string>
+    <string name="tx_title_swap">Swap %1$s → %2$s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
     <string name="tx_title_interest">%1$s Interest Earned</string>
@@ -1809,6 +1809,7 @@
     <string name="activity_details_buy_purchase_amount">Purchasing</string>
     <string name="activity_details_buy_fees">Fees</string>
     <string name="activity_details_buy_payment_method">Payment Method</string>
+    <string name="activity_details_swap_for">For</string>
     <string name="activity_details_view_bank_transfer_details">View Bank Transfer Details</string>
     <string name="activity_details_buy_again">Buy Again</string>
     <string name="activity_details_description_updated">Description updated</string>

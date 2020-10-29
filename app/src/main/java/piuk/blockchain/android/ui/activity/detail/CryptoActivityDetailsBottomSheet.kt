@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -339,9 +339,9 @@ class CryptoActivityDetailsBottomSheet :
     private fun loadActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String,
-        accountType: CryptoAccountType
+        activityType: CryptoActivityType
     ) {
-        model.process(LoadActivityDetailsIntent(cryptoCurrency, txHash, accountType))
+        model.process(LoadActivityDetailsIntent(cryptoCurrency, txHash, activityType))
     }
 
     override fun onDestroy() {
@@ -356,7 +356,7 @@ class CryptoActivityDetailsBottomSheet :
         fun newInstance(
             cryptoCurrency: CryptoCurrency,
             txHash: String,
-            accountType: CryptoAccountType
+            activityType: CryptoActivityType
         ): CryptoActivityDetailsBottomSheet {
             return CryptoActivityDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
@@ -364,7 +364,7 @@ class CryptoActivityDetailsBottomSheet :
                     putString(ARG_TRANSACTION_HASH, txHash)
                 }
 
-                loadActivityDetails(cryptoCurrency, txHash, accountType)
+                loadActivityDetails(cryptoCurrency, txHash, activityType)
             }
         }
     }

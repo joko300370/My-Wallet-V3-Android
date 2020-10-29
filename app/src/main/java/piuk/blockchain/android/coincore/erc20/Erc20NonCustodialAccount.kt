@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.erc20
 
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -29,7 +30,8 @@ abstract class Erc20NonCustodialAccount(
     private val fees: FeeDataManager,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, asset) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -87,7 +89,11 @@ abstract class Erc20NonCustodialAccount(
                         account = this
                     ) as ActivitySummaryItem
                 }
-            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }
+                .flatMap {
+                    appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                }
+                .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 
     override val sourceState: Single<TxSourceState>

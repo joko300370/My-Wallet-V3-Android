@@ -1503,7 +1503,7 @@
     <string name="tx_title_receive">Primește %1s</string>
     <string name="tx_title_sell">Vinde %1s</string>
     <string name="tx_title_buy">Cumpără %1s</string>
-    <string name="tx_title_swap">Schimbă %1s</string>
+    <string name="tx_title_swap">Schimbă %1s → %2$s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Taxa %1s</string>
     <string name="transaction_detail_value_at_time_swapped">Valoare la schimb: \u0020</string>

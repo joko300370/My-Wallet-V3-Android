@@ -1505,7 +1505,7 @@
   <string name="tx_title_receive">Recevez %1s</string>
   <string name="tx_title_sell">Vendre %1s</string>
   <string name="tx_title_buy">Acheter %1s</string>
-  <string name="tx_title_swap">Échanger %1s</string>
+  <string name="tx_title_swap">Échanger %1s → %2$s</string>
   <string name="tx_title_transfer">Transfert %1s</string>
   <string name="tx_title_fee">Frais %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Valeur lors de l\'échange: \u0020</string>

@@ -1505,7 +1505,7 @@
   <string name="tx_title_receive">%1s 받기</string>
   <string name="tx_title_sell">%1s 판매</string>
   <string name="tx_title_buy">%1s 구매</string>
-  <string name="tx_title_swap">%1s 교환</string>
+  <string name="tx_title_swap">%1s → %2$s 교환</string>
   <string name="tx_title_transfer">이체 %1s</string>
   <string name="tx_title_fee">수수료 %1s</string>
   <string name="transaction_detail_value_at_time_swapped">스왑시 값 : \u0020</string>

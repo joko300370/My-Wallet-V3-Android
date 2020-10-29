@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -27,7 +28,8 @@ internal class XlmCryptoWalletAccount(
     override val exchangeRates: ExchangeRateDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
     private val walletOptionsDataManager: WalletOptionsDataManager,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
@@ -62,6 +64,8 @@ internal class XlmCryptoWalletAccount(
                     exchangeRates,
                     account = this
                 ) as ActivitySummaryItem
+            }.flatMap {
+                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
@@ -81,7 +85,8 @@ internal class XlmCryptoWalletAccount(
         exchangeRates: ExchangeRateDataManager,
         xlmFeesFetcher: XlmFeesFetcher,
         walletOptionsDataManager: WalletOptionsDataManager,
-        walletPreferences: WalletStatus
+        walletPreferences: WalletStatus,
+        custodialWalletManager: CustodialWalletManager
     ) : this(
         payloadManager = payloadManager,
         label = account.label,
@@ -90,6 +95,7 @@ internal class XlmCryptoWalletAccount(
         exchangeRates = exchangeRates,
         xlmFeesFetcher = xlmFeesFetcher,
         walletOptionsDataManager = walletOptionsDataManager,
-        walletPreferences = walletPreferences
+        walletPreferences = walletPreferences,
+        custodialWalletManager = custodialWalletManager
     )
 }

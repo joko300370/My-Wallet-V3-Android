@@ -1506,7 +1506,7 @@
   <string name="tx_title_receive">Dostávat %1s</string>
   <string name="tx_title_sell">Prodejte %1s</string>
   <string name="tx_title_buy">Koupit %1s</string>
-  <string name="tx_title_swap">Zaměnit %1s</string>
+  <string name="tx_title_swap">Zaměnit %1$s → %2$s</string>
   <string name="tx_title_transfer">Převést %1s</string>
   <string name="tx_title_fee">Poplatek %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Hodnota při výměně: \u0020</string>

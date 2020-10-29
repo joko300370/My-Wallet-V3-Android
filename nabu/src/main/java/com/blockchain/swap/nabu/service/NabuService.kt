@@ -258,6 +258,10 @@ class NabuService(retrofit: Retrofit) {
         currency
     ).wrapErrorMessage()
 
+    internal fun fetchSwapActivity(
+        sessionToken: NabuSessionTokenResponse
+    ): Single<List<SwapOrderResponse>> = service.fetchSwapActivity(sessionToken.authHeader).wrapErrorMessage()
+
     internal fun getSupportedCurrencies(
         fiatCurrency: String? = null
     ): Single<SimpleBuyPairsResp> =

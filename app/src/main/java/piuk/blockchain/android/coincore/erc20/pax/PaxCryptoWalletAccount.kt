@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.erc20.pax
 
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -17,14 +18,16 @@ class PaxCryptoWalletAccount(
     override val erc20Account: Erc20Account,
     fees: FeeDataManager,
     exchangeRates: ExchangeRateDataManager,
-    walletPreferences: WalletStatus
+    walletPreferences: WalletStatus,
+    custodialWalletManager: CustodialWalletManager
 ) : Erc20NonCustodialAccount(
     payloadManager,
     CryptoCurrency.PAX,
     fees,
     label,
     exchangeRates,
-    walletPreferences
+    walletPreferences,
+    custodialWalletManager
 ) {
 
     override val receiveAddress: Single<ReceiveAddress>

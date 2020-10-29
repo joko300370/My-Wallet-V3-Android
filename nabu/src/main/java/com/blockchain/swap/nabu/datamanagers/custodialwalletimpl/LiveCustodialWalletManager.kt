@@ -14,7 +14,6 @@ import com.blockchain.swap.nabu.datamanagers.CardToBeActivated
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.Direction
 import com.blockchain.swap.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.swap.nabu.datamanagers.FiatTransaction
 import com.blockchain.swap.nabu.datamanagers.InterestAccountDetails
@@ -26,6 +25,7 @@ import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
@@ -37,6 +37,8 @@ import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepositor
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -86,7 +88,8 @@ class LiveCustodialWalletManager(
     private val paymentAccountMapperMappers: Map<String, PaymentAccountMapper>,
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
-    private val interestRepository: InterestRepository
+    private val interestRepository: InterestRepository,
+    private val swapRepository: SwapRepository
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -291,7 +294,7 @@ class LiveCustodialWalletManager(
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
         this.filter { order ->
             order.outputCurrency == crypto.networkTicker ||
-                    order.inputCurrency == crypto.networkTicker
+                order.inputCurrency == crypto.networkTicker
         }
             .map { order -> order.toBuySellOrder() }
 
@@ -620,7 +623,7 @@ class LiveCustodialWalletManager(
         }.map { paymentMethodsResponse ->
             paymentMethodsResponse.methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -649,7 +652,7 @@ class LiveCustodialWalletManager(
         }
 
     override fun createSwapOrder(
-        direction: Direction,
+        direction: SwapDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String?
@@ -681,6 +684,12 @@ class LiveCustodialWalletManager(
                 )
             }
         }
+
+    override fun getSwapActivityForAsset(
+        cryptoCurrency: CryptoCurrency,
+        directions: List<SwapDirection>
+    ): Single<List<SwapTransactionItem>> =
+        swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
 
     override fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -786,7 +795,7 @@ private fun String.toTransactionState(): TransactionState =
         else -> TransactionState.UNKNOWN
     }
 
-private fun String.toSwapState(): SwapOrderState =
+fun String.toSwapState(): SwapOrderState =
     when (this) {
         SwapOrderResponse.CREATED -> SwapOrderState.CREATED
         SwapOrderResponse.PENDING_CONFIRMATION -> SwapOrderState.PENDING_CONFIRMATION
@@ -888,11 +897,11 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
         paymentMethodId = paymentMethodId ?: (
-                when (paymentType.toPaymentMethodType()) {
-                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-                }),
+            when (paymentType.toPaymentMethodType()) {
+                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+            }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLong())
