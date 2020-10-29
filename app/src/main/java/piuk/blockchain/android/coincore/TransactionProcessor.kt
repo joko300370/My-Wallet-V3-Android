@@ -155,7 +155,8 @@ sealed class TxOptionValue(open val option: TxOption) {
         val timeRemainingSecs: Long
     ) : TxOptionValue(TxOption.INVOICE_COUNTDOWN)
 
-    data class ErrorNotice(val status: ValidationState) : TxOptionValue(TxOption.ERROR_NOTICE)
+    data class ErrorNotice(val status: ValidationState, val money: Money? = null) :
+        TxOptionValue(TxOption.ERROR_NOTICE)
 
     data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
 
@@ -464,7 +465,10 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
 
 private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
-        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(status = pendingTx.validationState))
+        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(
+            status = pendingTx.validationState,
+            money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
+        ))
     } else {
         pendingTx.removeOption(TxOption.ERROR_NOTICE)
     }

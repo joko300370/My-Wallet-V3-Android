@@ -17,7 +17,6 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
@@ -69,22 +68,15 @@ abstract class SwapEngineBase(
     val target: CryptoAccount
         get() = txTarget as CryptoAccount
 
-    override fun doInitialiseTx(): Single<PendingTx> =
+    protected fun updateLimits(pendingTx: PendingTx): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),
             walletManager.getSwapLimits(userFiat)
         ) { tier, limits ->
-            PendingTx(
-                amount = CryptoValue.zero(sourceAccount.asset),
-                available = CryptoValue.zero(sourceAccount.asset),
-                fees = CryptoValue.zero(sourceAccount.asset),
-                feeLevel = FeeLevel.None,
-                selectedFiat = userFiat,
+            pendingTx.copy(
                 minLimit = limits.minLimit.toCrypto(exchangeRates, sourceAccount.asset),
                 maxLimit = limits.maxLimit.toCrypto(exchangeRates, sourceAccount.asset),
-                engineState = mapOf(
-                    USER_TIER to tier
-                )
+                engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
             )
         }
 
@@ -157,7 +149,8 @@ abstract class SwapEngineBase(
                         TxOptionValue.NetworkFee(
                             fee = quotesEngine.getLatestQuote().networkFee
                         )
-                    )
+                    ),
+                    minLimit = minLimit(pendingTx, rate)
                 )
             )
         }.flatMap {
@@ -166,6 +159,14 @@ abstract class SwapEngineBase(
             startRatesFetchingIfNotStarted(it)
         }
     }
+
+    private fun minLimit(pendingTx: PendingTx, rate: BigDecimal): Money =
+        Money.max(
+            pendingTx.minLimit ?: minAmountToPayNetworkFees(
+                rate,
+                quotesEngine.getLatestQuote().networkFee
+            ), minAmountToPayNetworkFees(rate, quotesEngine.getLatestQuote().networkFee)
+        )
 
     private fun startRatesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
@@ -181,12 +182,14 @@ abstract class SwapEngineBase(
 
     private fun startRatesFetching(): Disposable =
         quotesEngine.rate.doOnNext {
-            refreshConfirmations(false)
+            refreshConfirmations(true)
         }.emptySubscribe()
 
-    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        quotesEngine.rate.firstOrError().flatMap { rate ->
-            Single.just(pendingTx.apply {
+    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
+        return quotesEngine.rate.firstOrError().map { rate ->
+            pendingTx.copy(
+                minLimit = minLimit(pendingTx, rate)
+            ).apply {
                 addOrReplaceOption(
                     TxOptionValue.NetworkFee(
                         fee = quotesEngine.getLatestQuote().networkFee
@@ -202,8 +205,9 @@ abstract class SwapEngineBase(
                     TxOptionValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
                         pendingTx.amount.toBigDecimal().times(rate)))
                 )
-            })
+            }
         }
+    }
 
     private fun startQuotesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
@@ -243,4 +247,7 @@ abstract class SwapEngineBase(
 
     private fun SwapDirection.requiresDestinationAddress() =
         this == SwapDirection.ON_CHAIN || this == SwapDirection.TO_USERKEY
+
+    private fun minAmountToPayNetworkFees(price: BigDecimal, networkFee: Money): Money =
+        CryptoValue.fromMajor(sourceAccount.asset, networkFee.toBigDecimal().times(price))
 }

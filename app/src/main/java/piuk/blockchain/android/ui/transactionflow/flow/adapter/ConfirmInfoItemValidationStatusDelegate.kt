@@ -42,20 +42,24 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
             if (parentView is RecyclerView) {
                 parentView.smoothScrollToPosition(parentView.adapter!!.itemCount - 1)
             }
-            itemView.error_msg.text = item.status.toText(context)
+            itemView.error_msg.text = item.toText(context)
         }
 
         // By the time we are on the confirmation screen most of these possible error should have been
         // filtered out. A few remain possible, because BE failures or BitPay invoices, thus:
-        private fun ValidationState.toText(ctx: Context) =
-            when (this) {
+        private fun TxOptionValue.ErrorNotice.toText(ctx: Context) =
+            when (this.status) {
                 ValidationState.CAN_EXECUTE -> throw IllegalStateException("Displaying OK in error status")
                 ValidationState.UNINITIALISED -> throw IllegalStateException("Displaying OK in error status")
                 ValidationState.INSUFFICIENT_FUNDS -> ctx.getString(R.string.confirm_status_msg_insufficient_funds)
                 ValidationState.INSUFFICIENT_GAS -> ctx.getString(R.string.confirm_status_msg_insufficient_gas)
                 ValidationState.OPTION_INVALID -> ctx.getString(R.string.confirm_status_msg_option_invalid)
                 ValidationState.INVOICE_EXPIRED -> ctx.getString(R.string.confirm_status_msg_invoice_expired)
-                ValidationState.UNDER_MIN_LIMIT -> ctx.getString(R.string.fee_options_sat_byte_min_error)
+                ValidationState.UNDER_MIN_LIMIT -> {
+                    this.money?.toStringWithSymbol()?.let {
+                        ctx.getString(R.string.min_with_value, it)
+                    } ?: ctx.getString(R.string.fee_options_sat_byte_min_error)
+                }
                 ValidationState.INVALID_AMOUNT -> ctx.getString(R.string.fee_options_invalid_amount)
                 else -> ctx.getString(R.string.confirm_status_msg_unexpected_error)
             }

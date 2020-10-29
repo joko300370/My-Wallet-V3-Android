@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
+import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class OnChainSwapEngine(
@@ -39,22 +40,26 @@ class OnChainSwapEngine(
                 exchangeRates = exchangeRates
             )
         }.flatMap {
-            super.doInitialiseTx()
-        }.flatMap {
             engine.doInitialiseTx()
+        }.flatMap {
+            updateLimits(it)
         }
     }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        return super.doUpdateAmount(amount, pendingTx).flatMap { engine.doUpdateAmount(amount, pendingTx) }
+        return engine.doUpdateAmount(amount, pendingTx).doOnSuccess {
+            quotesEngine.updateAmount(it.amount.toBigDecimal())
+        }
     }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
-        return super.doValidateAmount(pendingTx).flatMap { engine.doValidateAmount(pendingTx) }
+        return engine.doValidateAmount(pendingTx).flatMap { super.doValidateAmount(pendingTx) }
+            .updateTxValidity(pendingTx)
     }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doValidateAll(pendingTx)
+        return engine.doValidateAll(pendingTx).flatMap { super.doValidateAll(pendingTx) }
+            .updateTxValidity(pendingTx)
     }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
