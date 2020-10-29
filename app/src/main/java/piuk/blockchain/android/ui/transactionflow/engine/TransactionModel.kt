@@ -129,13 +129,14 @@ class TransactionModel(
                 )
                 null
             }
-            is TransactionIntent.TargetSelectionConfirmed ->
+            is TransactionIntent.TargetSelected ->
                 processTargetSelectionConfirmed(
                     previousState.sendingAccount,
                     previousState.amount,
-                    intent.transactionTarget,
+                    previousState.selectedTarget,
                     previousState.action
                 )
+            is TransactionIntent.TargetSelectionUpdated -> null
             is TransactionIntent.InitialiseWithSourceAndPreferredTarget ->
                 processAccountsListUpdate(intent.fromAccount, intent.action)
             is TransactionIntent.PendingTransactionStarted -> null

@@ -1978,6 +1978,7 @@
     <string name="swap_enter_amount_silver_limit">Tap here to upgrade your profile and swap this amount.</string>
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
+    <string name="swap_select_target_title">New Swap</string>
 
     <!-- Interest -->
     <string name="earn_interest">Earn Interest</string>

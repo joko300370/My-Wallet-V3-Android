@@ -168,15 +168,23 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     // Fired from the enter address sheet when a target address is confirmed - by selecting from the list
     // (in this build, this will change for swap) or when the CTA is clicked. Move to the enter amount sheet
     // once this has been processed. Do not send this from anywhere _but_ the enter address sheet.
-    class TargetSelectionConfirmed(
-        val transactionTarget: TransactionTarget
+    object TargetSelected : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                errorState = TransactionErrorState.NONE,
+                currentStep = TransactionStep.ENTER_AMOUNT,
+                nextEnabled = false
+            ).updateBackstack(oldState)
+    }
+
+    class TargetSelectionUpdated(
+        private val transactionTarget: TransactionTarget
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 errorState = TransactionErrorState.NONE,
                 selectedTarget = transactionTarget,
-                currentStep = TransactionStep.ENTER_AMOUNT,
-                nextEnabled = false
+                nextEnabled = true
             ).updateBackstack(oldState)
     }
 
@@ -299,6 +307,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 pendingTx = null,
+                selectedTarget = NullAddress,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }

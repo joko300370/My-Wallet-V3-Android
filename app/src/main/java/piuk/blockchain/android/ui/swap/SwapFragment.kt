@@ -45,7 +45,6 @@ import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.swapold.SwapSourceAccountSelectSheetDecorator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.getAccount

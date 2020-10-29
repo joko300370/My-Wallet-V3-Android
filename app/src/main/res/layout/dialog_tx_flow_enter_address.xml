@@ -118,6 +118,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/grey_000"
                 android:hint="@string/send_enter_asset_address_hint"
+                android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
                 android:paddingStart="@dimen/very_small_margin"
                 android:paddingTop="@dimen/very_small_margin"
@@ -224,14 +225,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/very_small_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0"
-        android:layout_marginBottom="@dimen/xlarge_margin"
+        app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_pick">
+        app:layout_constraintTop_toBottomOf="@id/title_pick"
+        app:layout_constraintVertical_bias="0">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"

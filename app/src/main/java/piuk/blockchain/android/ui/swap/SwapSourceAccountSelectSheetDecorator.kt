@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.swapold
+package piuk.blockchain.android.ui.swap
 
 import android.content.Context
 import android.view.LayoutInflater
