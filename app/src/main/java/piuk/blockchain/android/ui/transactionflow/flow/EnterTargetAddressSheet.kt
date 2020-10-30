@@ -50,10 +50,13 @@ class EnterTargetAddressSheet(
             if (address.isEmpty()) {
                 model.process(TransactionIntent.EnteredAddressReset)
             } else {
-                dialogView.wallet_select.clearSelectedAccount()
-
-                val asset = state.asset
-                addressEntered(address, asset)
+                if (customiser.enterTargetAddressSheetState(state) is
+                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed) {
+                    dialogView.select_an_account.visible()
+                } else {
+                    dialogView.wallet_select.clearSelectedAccount()
+                }
+                addressEntered(address, state.asset)
             }
         }
     }
@@ -74,9 +77,9 @@ class EnterTargetAddressSheet(
                 setupLabels(newState)
             }
 
-            select_an_account.visibleIf {
-                customiser.enterTargetAddressSheetState(newState) is
-                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            if (customiser.enterTargetAddressSheetState(newState) is
+                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed) {
+                select_an_account.visible()
             }
 
             if (customiser.selectTargetShowManualEnterAddress(newState)) {

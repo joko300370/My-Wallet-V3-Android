@@ -95,6 +95,8 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             }
         }
 
+        private lateinit var textChangedWatcher: AfterTextChangedWatcher
+
         override val containerView: View?
             get() = itemView
 
@@ -108,30 +110,18 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             updateFeeList(item.availableLevels.toList())
             val selectedOption = item.selectedLevel
 
-            val textWatcher = object : AfterTextChangedWatcher() {
-                override fun afterTextChanged(s: Editable) {
-                    val input = s.toString()
-                    if (input.isNotEmpty()) {
-                        val fee = input.toLong()
-                        if (fee != item.customFeeAmount) {
-                            model.process(TransactionIntent.ModifyTxOption(
-                                TxOptionValue.FeeSelection(selectedLevel = FeeLevel.Custom, customFeeAmount = fee)))
-                        }
-                    } else {
-                        itemView.fee_option_custom_il.error = ""
-                    }
-                }
+            if (!::textChangedWatcher.isInitialized) {
+                textChangedWatcher = makeTextWatcher(model)
             }
 
             with(itemView) {
-                fee_option_custom.removeTextChangedListener(textWatcher)
-                fee_option_custom.onFocusChangeListener = null
+                fee_option_custom.removeTextChangedListener(textChangedWatcher)
 
                 showFeeSelector(selectedOption, model, analytics, item)
 
                 showFeeDetails(item)
 
-                fee_option_custom.addTextChangedListener(textWatcher)
+                fee_option_custom.addTextChangedListener(textChangedWatcher)
 
                 val linksMap = mapOf<String, Uri>(
                     "send_tx_fees" to Uri.parse(URL_TX_FEES)
@@ -174,6 +164,20 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                 }
             }
         }
+
+        private fun makeTextWatcher(model: TransactionModel) =
+            object : AfterTextChangedWatcher() {
+                override fun afterTextChanged(s: Editable) {
+                    val input = s.toString()
+                    if (input.isNotEmpty()) {
+                        model.process(TransactionIntent.ModifyTxOption(
+                            TxOptionValue.FeeSelection(selectedLevel = FeeLevel.Custom,
+                                customFeeAmount = input.toLong())))
+                    } else {
+                        itemView.fee_option_custom_il.error = ""
+                    }
+                }
+            }
 
         private fun View.setCustomFeeValues(customFee: Long, error: String = "") {
             if (customFee != -1L) {
