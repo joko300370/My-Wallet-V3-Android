@@ -60,6 +60,10 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
         ToastCustom.makeText(this, getString(messageId), ToastCustom.LENGTH_SHORT, toastType)
     }
 
+    override fun showErrorToastWithParameter(@StringRes messageId: Int, message: String) {
+        ToastCustom.makeText(this, getString(messageId, message), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+    }
+
     override fun restartPage() {
         val intent = Intent(this, LauncherActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)

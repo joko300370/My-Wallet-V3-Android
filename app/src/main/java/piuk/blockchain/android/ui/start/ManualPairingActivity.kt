@@ -79,6 +79,10 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
         ToastCustom.makeText(this, getString(messageId), ToastCustom.LENGTH_SHORT, toastType)
     }
 
+    override fun showErrorToastWithParameter(@StringRes messageId: Int, message: String) {
+        ToastCustom.makeText(this, getString(messageId, message), ToastCustom.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+    }
+
     override fun goToPinPage() {
         startActivity(Intent(this, PinEntryActivity::class.java))
     }

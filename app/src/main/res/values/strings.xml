@@ -2,6 +2,7 @@
 <resources>
 
     <!-- common -->
+    <string name="common_replaceable_value">%1$s</string>
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
     <string name="common_send">Send</string>
