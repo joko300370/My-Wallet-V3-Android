@@ -63,18 +63,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="@dimen/very_small_margin"
+        android:layout_marginBottom="@dimen/miniscule_margin"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
         android:scrollbarSize="@dimen/miniscule_margin"
         android:scrollbars="vertical"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
+        app:layout_constraintBottom_toTopOf="@id/confirm_disclaimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount"
         tools:listitem="@layout/item_send_confirm_details" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/confirm_disclaimer"
+        style="@style/Text.Standard.12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
+        tools:text="Disclaimer blurb that spans several lines that spans several lines" />
 
     <Button
         android:id="@+id/confirm_cta_button"

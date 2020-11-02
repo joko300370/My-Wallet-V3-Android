@@ -46,7 +46,7 @@ class EnterAmountSheet(
 
     @SuppressLint("SetTextI18n")
     override fun render(newState: TransactionState) {
-        Timber.d("!SEND!> Rendering! EnterAmountSheet")
+        Timber.d("!TRANSACTION!> Rendering! EnterAmountSheet")
         cacheState(newState)
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled

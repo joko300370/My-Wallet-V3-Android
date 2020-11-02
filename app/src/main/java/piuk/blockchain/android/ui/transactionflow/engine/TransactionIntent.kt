@@ -10,7 +10,7 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -257,7 +257,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class ModifyTxOption(
-        val option: TxOptionValue
+        val confirmation: TxConfirmationValue
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState = oldState
     }

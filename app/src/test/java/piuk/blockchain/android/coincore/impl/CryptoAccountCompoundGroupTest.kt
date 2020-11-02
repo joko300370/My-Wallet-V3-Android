@@ -67,7 +67,7 @@ class CryptoAccountCompoundGroupTest {
     @Test
     fun `group with single account returns single account actions`() {
         // Arrange
-        val accountActions = setOf(AssetAction.NewSend, AssetAction.Receive)
+        val accountActions = setOf(AssetAction.Send, AssetAction.Receive)
 
         val account: CryptoAccount = mock {
             on { actions } itReturns accountActions
@@ -90,22 +90,22 @@ class CryptoAccountCompoundGroupTest {
     fun `group with three accounts returns the union of possible actions`() {
         // Arrange
         val accountActions1 = setOf(
-            AssetAction.NewSend,
+            AssetAction.Send,
             AssetAction.Receive
         )
 
         val accountActions2 = setOf(
-            AssetAction.NewSend,
+            AssetAction.Send,
             AssetAction.Swap
         )
 
         val accountActions3 = setOf(
-            AssetAction.NewSend,
+            AssetAction.Send,
             AssetAction.Receive
         )
 
         val expectedResult = setOf(
-            AssetAction.NewSend,
+            AssetAction.Send,
             AssetAction.Swap,
             AssetAction.Receive
         )

@@ -14,8 +14,8 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -31,10 +31,12 @@ open class EthOnChainTxEngine(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
     walletPreferences: WalletStatus,
-    requireSecondPassword: Boolean
+    requireSecondPassword: Boolean,
+    defaultFeeType: FeeLevel
 ) : OnChainTxEngineBase(
     requireSecondPassword,
-    walletPreferences
+    walletPreferences,
+    defaultFeeType
 ) {
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)
@@ -55,17 +57,17 @@ open class EthOnChainTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(options = listOf(
-                TxOptionValue.From(from = sourceAccount.label),
-                TxOptionValue.To(to = txTarget.label),
+            pendingTx.copy(confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
                 makeFeeSelectionOption(pendingTx),
-                TxOptionValue.FeedTotal(
+                TxConfirmationValue.FeedTotal(
                     amount = pendingTx.amount,
                     fee = pendingTx.fees,
                     exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
                     exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                 ),
-                TxOptionValue.Description()
+                TxConfirmationValue.Description()
             )))
 
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
@@ -87,12 +89,13 @@ open class EthOnChainTxEngine(
             FeeLevel.Custom -> priorityFee
         }
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
-        TxOptionValue.FeeSelection(
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+            asset = sourceAccount.asset
         )
 
     private fun feeOptions(): Single<FeeOptions> =
@@ -114,15 +117,15 @@ open class EthOnChainTxEngine(
         }
     }
 
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
-        if (newOption is TxOptionValue.FeeSelection) {
-            if (newOption.selectedLevel != pendingTx.feeLevel) {
-                updateFeeSelection(CryptoCurrency.ETHER, pendingTx, newOption)
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation is TxConfirmationValue.FeeSelection) {
+            if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
+                updateFeeSelection(CryptoCurrency.ETHER, pendingTx, newConfirmation)
             } else {
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
         } else {
-            super.doOptionUpdateRequest(pendingTx, newOption)
+            super.doOptionUpdateRequest(pendingTx, newConfirmation)
         }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
@@ -146,7 +149,7 @@ open class EthOnChainTxEngine(
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
-                pendingTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let { notes ->
+                pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
                     ethDataManager.updateErc20TransactionNotes(hash, notes.text)
                 }?.toSingle {
                     hash

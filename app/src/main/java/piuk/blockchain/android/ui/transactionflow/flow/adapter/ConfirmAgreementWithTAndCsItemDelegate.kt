@@ -11,8 +11,8 @@ import com.blockchain.ui.urllinks.INTEREST_TERMS_OF_SERVICE
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_agreement_tcs.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
@@ -26,7 +26,7 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
     private val activityContext: Activity
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        (items[position] as? TxOptionValue)?.option == TxOption.AGREEMENT_INTEREST_T_AND_C
+        (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.AGREEMENT_INTEREST_T_AND_C
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AgreementItemViewHolder(
@@ -38,7 +38,7 @@ class ConfirmAgreementWithTAndCsItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementItemViewHolder).bind(
-        items[position] as TxOptionValue.TxBooleanOption<Unit>,
+        items[position] as TxConfirmationValue.TxBooleanConfirmation<Unit>,
         model,
         stringUtils,
         activityContext
@@ -50,7 +50,7 @@ private class AgreementItemViewHolder(val parent: View) : RecyclerView.ViewHolde
         get() = itemView
 
     fun bind(
-        item: TxOptionValue.TxBooleanOption<Unit>,
+        item: TxConfirmationValue.TxBooleanConfirmation<Unit>,
         model: TransactionModel,
         stringUtils: StringUtils,
         activityContext: Activity

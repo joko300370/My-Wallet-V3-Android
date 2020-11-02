@@ -19,7 +19,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import timber.log.Timber
@@ -90,8 +90,8 @@ class TransactionInteractor(
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun modifyOptionValue(newOption: TxOptionValue): Completable =
-        transactionProcessor?.setOption(newOption) ?: throw IllegalStateException("TxProcessor not initialised")
+    fun modifyOptionValue(newConfirmation: TxConfirmationValue): Completable =
+        transactionProcessor?.setOption(newConfirmation) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
         transactionProcessor?.userExchangeRate()

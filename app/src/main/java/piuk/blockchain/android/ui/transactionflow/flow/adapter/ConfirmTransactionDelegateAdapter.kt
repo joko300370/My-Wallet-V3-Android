@@ -30,6 +30,7 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(InvoiceCountdownTimerDelegate())
             addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
             addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, activityContext, stringUtils))
+            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(activityContext, stringUtils))
         }
     }
 }

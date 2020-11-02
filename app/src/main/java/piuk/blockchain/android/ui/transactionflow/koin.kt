@@ -14,7 +14,6 @@ import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapReceiveFormatter
@@ -38,12 +37,6 @@ val transactionModule = module {
 
     factory {
         ExchangePriceFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        NetworkFeeFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)

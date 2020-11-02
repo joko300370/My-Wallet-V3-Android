@@ -15,7 +15,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
@@ -58,7 +58,7 @@ enum class TxExecutionStatus {
 }
 
 data class TransactionState(
-    val action: AssetAction = AssetAction.NewSend,
+    val action: AssetAction = AssetAction.Send,
     val currentStep: TransactionStep = TransactionStep.ZERO,
     val sendingAccount: CryptoAccount = NullCryptoAccount(),
     val selectedTarget: TransactionTarget = NullAddress,
@@ -143,7 +143,7 @@ class TransactionModel(
             is TransactionIntent.TargetAccountSelected -> null
             is TransactionIntent.FatalTransactionError -> null
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
-            is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.option)
+            is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.confirmation)
             is TransactionIntent.PendingTxUpdated -> null
             is TransactionIntent.UpdateTransactionComplete -> null
             is TransactionIntent.ReturnToPreviousStep -> null
@@ -282,9 +282,9 @@ class TransactionModel(
                 }
             )
 
-    private fun processModifyTxOptionRequest(newOption: TxOptionValue): Disposable? =
+    private fun processModifyTxOptionRequest(newConfirmation: TxConfirmationValue): Disposable? =
         interactor.modifyOptionValue(
-            newOption
+            newConfirmation
         ).subscribeBy(
             onError = {
                 Timber.e("Failed updating Tx options")

@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_countdown.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.context
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -17,7 +17,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return (items[position] as? TxOptionValue)?.option == TxOption.INVOICE_COUNTDOWN
+        return (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.INVOICE_COUNTDOWN
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -27,7 +27,7 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as ViewHolder).bind(items[position] as TxOptionValue.BitPayCountdown)
+    ) = (holder as ViewHolder).bind(items[position] as TxConfirmationValue.BitPayCountdown)
 
     class ViewHolder(
         val view: View
@@ -36,7 +36,7 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
         override val containerView: View?
             get() = itemView
 
-        fun bind(item: TxOptionValue.BitPayCountdown) {
+        fun bind(item: TxConfirmationValue.BitPayCountdown) {
             itemView.confirmation_item_label.setText(R.string.bitpay_remaining_time)
             updateCountdownElements(item.timeRemainingSecs)
         }

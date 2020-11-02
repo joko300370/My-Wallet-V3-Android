@@ -18,7 +18,7 @@ enum class AssetFilter {
 
 enum class AssetAction {
     ViewActivity,
-    NewSend,
+    Send,
     Withdraw,
     Receive,
     Swap,

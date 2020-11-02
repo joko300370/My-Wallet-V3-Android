@@ -23,7 +23,7 @@ import com.blockchain.ui.urllinks.URL_XLM_MIN_BALANCE
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_xlm_memo.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -38,7 +38,7 @@ class ConfirmXlmMemoItemDelegate<in T>(
     private val activity: Activity
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return items[position] is TxOptionValue.Memo
+        return items[position] is TxConfirmationValue.Memo
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -53,7 +53,7 @@ class ConfirmXlmMemoItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as XlmMemoItemViewHolder).bind(
-        items[position] as TxOptionValue.Memo,
+        items[position] as TxConfirmationValue.Memo,
         model
     )
 }
@@ -77,7 +77,7 @@ private class XlmMemoItemViewHolder(
     }
 
     fun bind(
-        item: TxOptionValue.Memo,
+        item: TxConfirmationValue.Memo,
         model: TransactionModel
     ) {
         itemView.apply {
@@ -109,7 +109,7 @@ private class XlmMemoItemViewHolder(
 
     private fun AppCompatEditText.setupOnDoneListener(
         model: TransactionModel,
-        item: TxOptionValue.Memo
+        item: TxConfirmationValue.Memo
     ) {
         inputType = INPUT_FIELD_FLAGS
         filters = arrayOf(InputFilter.LengthFilter(maxCharacters))
@@ -139,7 +139,7 @@ private class XlmMemoItemViewHolder(
 
     private fun AppCompatSpinner.addSpinnerListener(
         model: TransactionModel,
-        item: TxOptionValue.Memo,
+        item: TxConfirmationValue.Memo,
         editText: EditText
     ) {
         var isFirstTime = true

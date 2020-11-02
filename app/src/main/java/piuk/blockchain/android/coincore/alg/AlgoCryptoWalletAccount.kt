@@ -8,6 +8,7 @@ import org.apache.commons.lang3.NotImplementedException
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -39,7 +40,7 @@ internal class AlgoCryptoWalletAccount(
     override val actions: AvailableActions
         get() = setOf(AssetAction.ViewActivity)
 
-    override fun createTxEngine(): TxEngine {
+    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine {
         TODO("Not yet implemented")
     }
 }

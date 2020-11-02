@@ -11,6 +11,7 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -87,7 +88,7 @@ internal class BchCryptoWalletAccount private constructor(
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
-    override fun createTxEngine(): TxEngine =
+    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine =
         BchOnChainTxEngine(
             feeDataManager = feeDataManager,
             networkParams = networkParams,
@@ -95,7 +96,8 @@ internal class BchCryptoWalletAccount private constructor(
             bchDataManager = bchManager,
             payloadDataManager = payloadDataManager,
             requireSecondPassword = payloadDataManager.isDoubleEncrypted,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            defaultFeeType = defaultFeeType
         )
 
     companion object {

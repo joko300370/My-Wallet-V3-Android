@@ -55,43 +55,43 @@ data class PendingTx(
     val selectedFiat: String,
     val feeLevel: FeeLevel = FeeLevel.Regular,
     val customFeeAmount: Long = -1L,
-    val options: List<TxOptionValue> = emptyList(),
+    val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
     val validationState: ValidationState = ValidationState.UNINITIALISED,
     val engineState: Map<String, Any> = emptyMap()
 ) {
-    fun hasOption(option: TxOption): Boolean =
-        options.find { it.option == option } != null
+    fun hasOption(confirmation: TxConfirmation): Boolean =
+        confirmations.find { it.confirmation == confirmation } != null
 
-    inline fun <reified T : TxOptionValue> getOption(option: TxOption): T? =
-        options.find { it.option == option } as? T
+    inline fun <reified T : TxConfirmationValue> getOption(confirmation: TxConfirmation): T? =
+        confirmations.find { it.confirmation == confirmation } as? T
 
     // Internal, coincore only helper methods for managing option lists. If you're using these in
     // UI are client code, you're doing something wrong!
-    internal fun removeOption(option: TxOption): PendingTx =
+    internal fun removeOption(confirmation: TxConfirmation): PendingTx =
         this.copy(
-            options = options.filter { it.option != option }
+            confirmations = confirmations.filter { it.confirmation != confirmation }
         )
 
-    internal fun addOrReplaceOption(newOption: TxOptionValue, prepend: Boolean = false): PendingTx =
+    internal fun addOrReplaceOption(newConfirmation: TxConfirmationValue, prepend: Boolean = false): PendingTx =
         this.copy(
-            options = if (hasOption(newOption.option)) {
-                val old = options.find { it::class == newOption::class }
-                options.replace(old, newOption).filterNotNull()
+            confirmations = if (hasOption(newConfirmation.confirmation)) {
+                val old = confirmations.find { it::class == newConfirmation::class }
+                confirmations.replace(old, newConfirmation).filterNotNull()
             } else {
-                val opts = options.toMutableList()
+                val opts = confirmations.toMutableList()
                 if (prepend) {
-                    opts.add(0, newOption)
+                    opts.add(0, newConfirmation)
                 } else {
-                    opts.add(newOption)
+                    opts.add(newConfirmation)
                 }
                 opts.toList()
             }
         )
 }
 
-enum class TxOption {
+enum class TxConfirmation {
     DESCRIPTION,
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
@@ -100,39 +100,36 @@ enum class TxOption {
     LARGE_TRANSACTION_WARNING,
     FEE_SELECTION,
     ERROR_NOTICE,
-    INVOICE_COUNTDOWN
+    INVOICE_COUNTDOWN,
+    NETWORK_FEE
 }
 
-sealed class TxOptionValue(open val option: TxOption) {
+sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
-    data class ExchangePriceOption(val money: Money, val asset: CryptoCurrency) :
-        TxOptionValue(TxOption.READ_ONLY)
+    data class ExchangePriceConfirmation(val money: Money, val asset: CryptoCurrency) :
+        TxConfirmationValue(TxConfirmation.READ_ONLY)
 
     data class FeedTotal(
         val amount: Money,
         val fee: Money,
         val exchangeAmount: Money? = null,
         val exchangeFee: Money? = null
-    ) : TxOptionValue(TxOption.READ_ONLY)
-
-    data class NetworkFee(
-        val fee: Money
-    ) : TxOptionValue(TxOption.READ_ONLY)
+    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
     data class SwapExchangeRate(
         val unitCryptoCurrency: Money,
         val price: Money
-    ) : TxOptionValue(TxOption.READ_ONLY)
+    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
     data class SwapReceiveValue(
         val receiveAmount: Money
-    ) : TxOptionValue(TxOption.READ_ONLY)
+    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class From(val from: String) : TxOptionValue(TxOption.READ_ONLY)
+    data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class To(val to: String) : TxOptionValue(TxOption.READ_ONLY)
+    data class To(val to: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class Total(val total: Money, val exchange: Money? = null) : TxOptionValue(TxOption.READ_ONLY)
+    data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
     data class FeeSelection(
         val feeDetails: FeeState? = null,
@@ -140,8 +137,9 @@ sealed class TxOptionValue(open val option: TxOption) {
         val selectedLevel: FeeLevel,
         val customFeeAmount: Long = -1L,
         val availableLevels: Set<FeeLevel> = emptySet(),
-        val feeInfo: FeeInfo? = null
-    ) : TxOptionValue(TxOption.FEE_SELECTION) {
+        val feeInfo: FeeInfo? = null,
+        val asset: CryptoCurrency
+    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION) {
         data class FeeInfo(
             val regularFee: Long,
             val priorityFee: Long
@@ -153,24 +151,37 @@ sealed class TxOptionValue(open val option: TxOption) {
 
     data class BitPayCountdown(
         val timeRemainingSecs: Long
-    ) : TxOptionValue(TxOption.INVOICE_COUNTDOWN)
+    ) : TxConfirmationValue(TxConfirmation.INVOICE_COUNTDOWN)
 
     data class ErrorNotice(val status: ValidationState, val money: Money? = null) :
-        TxOptionValue(TxOption.ERROR_NOTICE)
+        TxConfirmationValue(TxConfirmation.ERROR_NOTICE)
 
-    data class Description(val text: String = "") : TxOptionValue(TxOption.DESCRIPTION)
+    data class Description(val text: String = "") : TxConfirmationValue(TxConfirmation.DESCRIPTION)
 
-    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) : TxOptionValue(TxOption.MEMO)
+    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) :
+        TxConfirmationValue(TxConfirmation.MEMO)
 
-    data class TxBooleanOption<T>(
-        override val option: TxOption,
+    data class NetworkFee(
+        val fee: Money,
+        val type: FeeType,
+        val asset: CryptoCurrency
+    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE) {
+        enum class FeeType {
+            DEPOSIT_FEE,
+            WITHDRAWAL_FEE
+        }
+    }
+
+    data class TxBooleanConfirmation<T>(
+        override val confirmation: TxConfirmation,
         val data: T? = null,
         val value: Boolean = false
-    ) : TxOptionValue(option)
+    ) : TxConfirmationValue(confirmation)
 
-    data class SwapSourceValue(val swappingAssetValue: CryptoValue) : TxOptionValue(TxOption.READ_ONLY)
+    data class SwapSourceValue(val swappingAssetValue: CryptoValue) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class SwapDestinationValue(val receivingAssetValue: CryptoValue) : TxOptionValue(TxOption.READ_ONLY)
+    data class SwapDestinationValue(val receivingAssetValue: CryptoValue) :
+        TxConfirmationValue(TxConfirmation.READ_ONLY)
 }
 
 sealed class FeeState
@@ -275,8 +286,8 @@ abstract class TxEngine : KoinComponent {
 
     // Process any TxOption updates, if required. The default just replaces the option and returns
     // the updated pendingTx. Subclasses may want to, eg, update amounts on fee changes etc
-    open fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
-        Single.just(pendingTx.addOrReplaceOption(newOption))
+    open fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        Single.just(pendingTx.addOrReplaceOption(newConfirmation))
 
     // Check the tx is complete, well formed and possible. If it is, set pendingTx to CAN_EXECUTE
     // Else set it to the appropriate error, and then return the updated PendingTx
@@ -339,14 +350,14 @@ class TransactionProcessor(
     // Set the option to the passed option value. If the option is not supported, it will not be
     // in the original list when the pendingTx is created. And if it is not supported, then trying to
     // update it will cause an error.
-    fun setOption(newOption: TxOptionValue): Completable {
+    fun setOption(newConfirmation: TxConfirmationValue): Completable {
 
         val pendingTx = getPendingTx()
-        if (!pendingTx.hasOption(newOption.option)) {
-            throw IllegalArgumentException("Unsupported TxOption: ${newOption.option}")
+        if (!pendingTx.hasOption(newConfirmation.confirmation)) {
+            throw IllegalArgumentException("Unsupported TxOption: ${newConfirmation.confirmation}")
         }
 
-        return engine.doOptionUpdateRequest(pendingTx, newOption)
+        return engine.doOptionUpdateRequest(pendingTx, newConfirmation)
             .flatMap { pTx ->
                 engine.doValidateAll(pTx)
             }.doOnSuccess { pTx ->
@@ -423,7 +434,7 @@ class TransactionProcessor(
     override fun refreshConfirmations(revalidate: Boolean): Completable {
         val pendingTx = getPendingTx()
         // Don't refresh if confirmations are not created yet:
-        return if (pendingTx.options.isNotEmpty()) {
+        return if (pendingTx.confirmations.isNotEmpty()) {
             engine.doRefreshConfirmations(pendingTx)
                 .flatMap {
                     if (revalidate) {
@@ -457,7 +468,7 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
             throw it
         }
     }.map { pTx ->
-        if (pTx.options.isNotEmpty())
+        if (pTx.confirmations.isNotEmpty())
             updateOptionsWithValidityWarning(pTx)
         else
             pTx
@@ -465,12 +476,12 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
 
 private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
-        pendingTx.addOrReplaceOption(TxOptionValue.ErrorNotice(
+        pendingTx.addOrReplaceOption(TxConfirmationValue.ErrorNotice(
             status = pendingTx.validationState,
             money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
         ))
     } else {
-        pendingTx.removeOption(TxOption.ERROR_NOTICE)
+        pendingTx.removeOption(TxConfirmation.ERROR_NOTICE)
     }
 
 sealed class TxResult(val amount: Money) {

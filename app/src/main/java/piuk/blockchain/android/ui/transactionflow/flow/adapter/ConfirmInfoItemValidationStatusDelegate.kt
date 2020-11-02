@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_error_notice.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.context
@@ -16,7 +16,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return (items[position] as? TxOptionValue)?.option == TxOption.ERROR_NOTICE
+        return (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.ERROR_NOTICE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -27,7 +27,7 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as ViewHolder).bind(
-        items[position] as TxOptionValue.ErrorNotice
+        items[position] as TxConfirmationValue.ErrorNotice
     )
 
     class ViewHolder(
@@ -38,7 +38,7 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
         override val containerView: View?
             get() = itemView
 
-        fun bind(item: TxOptionValue.ErrorNotice) {
+        fun bind(item: TxConfirmationValue.ErrorNotice) {
             if (parentView is RecyclerView) {
                 parentView.smoothScrollToPosition(parentView.adapter!!.itemCount - 1)
             }
@@ -47,7 +47,7 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
 
         // By the time we are on the confirmation screen most of these possible error should have been
         // filtered out. A few remain possible, because BE failures or BitPay invoices, thus:
-        private fun TxOptionValue.ErrorNotice.toText(ctx: Context) =
+        private fun TxConfirmationValue.ErrorNotice.toText(ctx: Context) =
             when (this.status) {
                 ValidationState.CAN_EXECUTE -> throw IllegalStateException("Displaying OK in error status")
                 ValidationState.UNINITIALISED -> throw IllegalStateException("Displaying OK in error status")

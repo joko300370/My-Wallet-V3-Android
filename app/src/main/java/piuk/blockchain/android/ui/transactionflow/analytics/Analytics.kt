@@ -25,7 +25,7 @@ class TxFlowAnalytics(
     // General
     fun onFlowCanceled(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend ->
+            AssetAction.Send ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
                     analytics.logEvent(SendAnalyticsEvent.CancelTransaction)
             AssetAction.Sell ->
@@ -37,7 +37,7 @@ class TxFlowAnalytics(
 
     fun onStepChanged(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend -> triggerSendScreenEvent(state.currentStep)
+            AssetAction.Send -> triggerSendScreenEvent(state.currentStep)
             AssetAction.Sell -> triggerSellScreenEvent(state.currentStep)
             else -> { }
         }
@@ -66,14 +66,14 @@ class TxFlowAnalytics(
 
     fun onScanQrClicked(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend -> analytics.logEvent(SendAnalyticsEvent.QrCodeScanned)
+            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.QrCodeScanned)
             else -> {}
         }
     }
 
     fun onAccountSelected(account: SingleAccount, state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend -> analytics.logEvent(SendAnalyticsEvent.EnterAddressCtaClick)
+            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.EnterAddressCtaClick)
             else -> {}
         }
     }
@@ -81,7 +81,7 @@ class TxFlowAnalytics(
     // Enter amount sheet
     fun onMaxClicked(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend -> analytics.logEvent(SendAnalyticsEvent.SendMaxClicked)
+            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.SendMaxClicked)
             else -> {}
         }
     }
@@ -90,7 +90,7 @@ class TxFlowAnalytics(
 
     fun onEnterAmountCtaClick(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend ->
+            AssetAction.Send ->
                 analytics.logEvent(SendAnalyticsEvent.EnterAmountCtaClick)
             AssetAction.Sell ->
                 analytics.logEvent(SellAnalyticsEvent.EnterAmountCtaClick(state.asset))
@@ -101,7 +101,7 @@ class TxFlowAnalytics(
     // Confirm sheet
     fun onConfirmationCtaClick(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend ->
+            AssetAction.Send ->
                 analytics.logEvent(
                     SendAnalyticsEvent.ConfirmTransaction(
                         asset = state.asset,
@@ -121,7 +121,7 @@ class TxFlowAnalytics(
     // Progress sheet
     fun onTransactionSuccess(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend ->
+            AssetAction.Send ->
                 analytics.logEvent(
                     SendAnalyticsEvent.TransactionSuccess(
                         asset = state.asset
@@ -134,7 +134,7 @@ class TxFlowAnalytics(
 
     fun onTransactionFailure(state: TransactionState) {
         when (state.action) {
-            AssetAction.NewSend -> analytics.logEvent(SendAnalyticsEvent.TransactionFailed)
+            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.TransactionFailed)
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionFailed)
             else -> {}
         }

@@ -35,6 +35,8 @@ interface TransactionFlowCustomiser {
     fun confirmTitle(state: TransactionState): String
     fun confirmCtaText(state: TransactionState): String
     fun confirmListItemTitle(assetAction: AssetAction): String
+    fun confirmDisclaimerBlurb(assetAction: AssetAction): String
+    fun confirmDisclaimerVisibility(assetAction: AssetAction): Boolean
     fun transactionProgressTitle(state: TransactionState): String
     fun transactionProgressMessage(state: TransactionState): String
     fun transactionCompleteTitle(state: TransactionState): String
@@ -57,7 +59,7 @@ class TransactionFlowCustomiserImpl(
 ) : TransactionFlowCustomiser {
     override fun enterAmountActionIcon(state: TransactionState): Int {
         return when (state.action) {
-            AssetAction.NewSend -> R.drawable.ic_tx_sent
+            AssetAction.Send -> R.drawable.ic_tx_sent
             AssetAction.Deposit -> R.drawable.ic_tx_deposit_arrow
             AssetAction.Swap -> R.drawable.ic_swap_light_blue
             AssetAction.Sell -> R.drawable.ic_tx_sell
@@ -69,7 +71,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAddressInputHint(state: TransactionState): String =
         when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_enter_asset_address_hint,
                 resources.getString(state.asset.assetName()))
             AssetAction.Sell -> ""
@@ -78,7 +80,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetNoAddressMessageText(state: TransactionState): String? =
         when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_internal_transfer_message,
                 resources.getString(state.asset.assetName()),
                 state.asset.displayTicker
@@ -88,7 +90,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAddressTitle(state: TransactionState): String =
         when (state.action) {
-            AssetAction.NewSend -> resources.getString(R.string.common_send)
+            AssetAction.Send -> resources.getString(R.string.common_send)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
             AssetAction.Deposit -> resources.getString(R.string.common_transfer)
             AssetAction.Swap -> resources.getString(R.string.swap_select_target_title)
@@ -121,13 +123,13 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
         when (state.action) {
-            AssetAction.NewSend -> !state.sendingAccount.isCustodial()
+            AssetAction.Send -> !state.sendingAccount.isCustodial()
             else -> false
         }
 
     override fun enterAmountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_enter_amount_title, state.sendingAccount.asset.displayTicker
             )
             AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_title,
@@ -143,7 +145,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun enterAmountMaxButton(state: TransactionState): String =
         when (state.action) {
-            AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_max)
+            AssetAction.Send -> resources.getString(R.string.send_enter_amount_max)
             AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_deposit_max)
             AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_max)
             AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_max)
@@ -175,7 +177,7 @@ class TransactionFlowCustomiserImpl(
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_confirmation_title, amount
             )
             AssetAction.Swap -> resources.getString(R.string.common_confirm)
@@ -189,7 +191,7 @@ class TransactionFlowCustomiserImpl(
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_confirmation_cta_button, amount
             )
             AssetAction.Swap -> resources.getString(
@@ -208,18 +210,30 @@ class TransactionFlowCustomiserImpl(
 
     override fun confirmListItemTitle(assetAction: AssetAction): String {
         return when (assetAction) {
-            AssetAction.NewSend -> resources.getString(R.string.common_send)
+            AssetAction.Send -> resources.getString(R.string.common_send)
             AssetAction.Deposit -> resources.getString(R.string.common_transfer)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
 
+    override fun confirmDisclaimerBlurb(assetAction: AssetAction): String =
+        when (assetAction) {
+            AssetAction.Swap -> resources.getString(R.string.swap_confirmation_disclaimer)
+            else -> throw IllegalStateException("Disclaimer not set for asset action $assetAction")
+        }
+
+    override fun confirmDisclaimerVisibility(assetAction: AssetAction): Boolean =
+        when (assetAction) {
+            AssetAction.Swap -> true
+            else -> false
+        }
+
     override fun transactionProgressTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_progress_sending_title, amount
             )
             AssetAction.Swap -> {
@@ -240,7 +254,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun transactionProgressMessage(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(R.string.send_progress_sending_subtitle)
+            AssetAction.Send -> resources.getString(R.string.send_progress_sending_subtitle)
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_progress_message,
                 state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_message)
@@ -253,7 +267,7 @@ class TransactionFlowCustomiserImpl(
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_progress_complete_title, amount
             )
             AssetAction.Swap -> resources.getString(R.string.swap_progress_complete_title)
@@ -270,7 +284,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun transactionCompleteMessage(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.NewSend -> resources.getString(
+            AssetAction.Send -> resources.getString(
                 R.string.send_progress_complete_subtitle, state.sendingAccount.asset.displayTicker
             )
             AssetAction.Deposit -> resources.getString(R.string.send_confirmation_success_message,
@@ -286,7 +300,7 @@ class TransactionFlowCustomiserImpl(
     override fun selectTargetAccountTitle(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.receive)
-            AssetAction.NewSend -> resources.getString(R.string.send)
+            AssetAction.Send -> resources.getString(R.string.send)
             AssetAction.Sell -> resources.getString(R.string.sell)
             else -> ""
         }
@@ -340,7 +354,7 @@ class TransactionFlowCustomiserImpl(
                     state.pendingTx?.minLimit?.toStringWithSymbol())
                 AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_min_error,
                     state.pendingTx?.minLimit?.toStringWithSymbol())
-                AssetAction.NewSend -> resources.getString(R.string.send_enter_amount_min_send,
+                AssetAction.Send -> resources.getString(R.string.send_enter_amount_min_send,
                     state.pendingTx?.minLimit?.toStringWithSymbol())
                 AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_min_swap,
                     state.pendingTx?.minLimit?.toStringWithSymbol())

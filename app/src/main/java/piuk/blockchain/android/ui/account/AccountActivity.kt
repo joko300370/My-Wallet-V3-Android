@@ -322,7 +322,7 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     private fun launchFlow(sourceAccount: CryptoAccount, targetAccount: SingleAccount) {
         TransactionFlow(
             sourceAccount = sourceAccount,
-            action = AssetAction.NewSend,
+            action = AssetAction.Send,
             target = targetAccount
         ).apply {
             startFlow(

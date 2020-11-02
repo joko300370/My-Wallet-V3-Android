@@ -136,7 +136,7 @@ open class CustodialTradingAccount(
             ).apply {
                 if (isFunded) {
                     add(AssetAction.Sell)
-                    add(AssetAction.NewSend)
+                    add(AssetAction.Send)
                 }
             }
 

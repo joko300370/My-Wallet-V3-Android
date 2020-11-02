@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_note.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.activity.detail.adapter.MAX_NOTE_LENGTH
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -21,7 +21,7 @@ class ConfirmNoteItemDelegate<in T>(
     private val model: TransactionModel
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return items[position] is TxOptionValue.Description
+        return items[position] is TxConfirmationValue.Description
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -34,7 +34,7 @@ class ConfirmNoteItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as NoteItemViewHolder).bind(
-        items[position] as TxOptionValue.Description,
+        items[position] as TxConfirmationValue.Description,
         model
     )
 }
@@ -47,7 +47,7 @@ private class NoteItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        item: TxOptionValue.Description,
+        item: TxConfirmationValue.Description,
         model: TransactionModel
     ) {
 
@@ -58,7 +58,7 @@ private class NoteItemViewHolder(val parent: View) :
             setOnEditorActionListener { v, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
                     model.process(
-                        TransactionIntent.ModifyTxOption(TxOptionValue.Description(text = v.text.toString())))
+                        TransactionIntent.ModifyTxOption(TxConfirmationValue.Description(text = v.text.toString())))
                     clearFocus()
                 }
                 false

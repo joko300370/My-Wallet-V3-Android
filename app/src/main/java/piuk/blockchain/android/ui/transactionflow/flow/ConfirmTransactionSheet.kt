@@ -47,7 +47,7 @@ class ConfirmTransactionSheet(
 
         // We _should_ always have a pending Tx when we get here
         newState.pendingTx?.let {
-            listAdapter.items = newState.pendingTx.options.toList()
+            listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
             dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
             dialogView.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
@@ -58,6 +58,8 @@ class ConfirmTransactionSheet(
             confirm_sheet_title.text = customiser.confirmTitle(newState)
             confirm_cta_button.isEnabled = newState.nextEnabled
             confirm_sheet_back.visibleIf { newState.canGoBack }
+            confirm_disclaimer.visibleIf { customiser.confirmDisclaimerVisibility(newState.action) }
+            confirm_disclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
         }
         cacheState(newState)
     }

@@ -2,9 +2,13 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -23,7 +27,7 @@ import piuk.blockchain.android.coincore.FeeOverRecommended
 import piuk.blockchain.android.coincore.FeeTooHigh
 import piuk.blockchain.android.coincore.FeeUnderMinLimit
 import piuk.blockchain.android.coincore.FeeUnderRecommended
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.ValidCustomFee
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -31,6 +35,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 
@@ -41,7 +46,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
     private val stringUtils: StringUtils
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return items[position] is TxOptionValue.FeeSelection
+        return items[position] is TxConfirmationValue.FeeSelection
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -52,7 +57,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as FeeOptionViewHolder).bind(
-        items[position] as TxOptionValue.FeeSelection,
+        items[position] as TxConfirmationValue.FeeSelection,
         model,
         analytics,
         activityContext,
@@ -101,7 +106,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             get() = itemView
 
         fun bind(
-            item: TxOptionValue.FeeSelection,
+            item: TxConfirmationValue.FeeSelection,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
             activityContext: Activity,
@@ -111,7 +116,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             val selectedOption = item.selectedLevel
 
             if (!::textChangedWatcher.isInitialized) {
-                textChangedWatcher = makeTextWatcher(model)
+                textChangedWatcher = makeTextWatcher(model, item)
             }
 
             with(itemView) {
@@ -127,17 +132,29 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                     "send_tx_fees" to Uri.parse(URL_TX_FEES)
                 )
 
-                fee_learn_more.text = stringUtils.getStringWithMappedLinks(
-                    R.string.send_confirmation_fee_learn_more,
+                val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)
+                val networkText = context.getString(R.string.tx_confirmation_fee_learn_more_2,
+                    context.getString(item.asset.assetName()))
+
+                val linkedText = stringUtils.getStringWithMappedLinks(
+                    R.string.tx_confirmation_fee_learn_more_3,
                     linksMap,
                     activityContext
                 )
 
+                val sb = SpannableStringBuilder()
+                    .append(boldText)
+                    .append(networkText)
+                    .append(linkedText)
+
+                sb.setSpan(StyleSpan(Typeface.BOLD), 0, boldText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                fee_learn_more.setText(sb, TextView.BufferType.SPANNABLE)
                 fee_learn_more.movementMethod = LinkMovementMethod.getInstance()
             }
         }
 
-        private fun View.showFeeDetails(item: TxOptionValue.FeeSelection) {
+        private fun View.showFeeDetails(item: TxConfirmationValue.FeeSelection) {
             item.feeDetails?.let {
                 when (it) {
                     is FeeUnderMinLimit -> {
@@ -165,14 +182,14 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             }
         }
 
-        private fun makeTextWatcher(model: TransactionModel) =
+        private fun makeTextWatcher(model: TransactionModel, item: TxConfirmationValue.FeeSelection) =
             object : AfterTextChangedWatcher() {
                 override fun afterTextChanged(s: Editable) {
                     val input = s.toString()
                     if (input.isNotEmpty()) {
                         model.process(TransactionIntent.ModifyTxOption(
-                            TxOptionValue.FeeSelection(selectedLevel = FeeLevel.Custom,
-                                customFeeAmount = input.toLong())))
+                            TxConfirmationValue.FeeSelection(selectedLevel = FeeLevel.Custom,
+                                customFeeAmount = input.toLong(), asset = item.asset)))
                     } else {
                         itemView.fee_option_custom_il.error = ""
                     }
@@ -194,7 +211,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             selectedOption: FeeLevel,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
-            item: TxOptionValue.FeeSelection
+            item: TxConfirmationValue.FeeSelection
         ) {
             if (feeList.size > 1) {
                 fee_option_select_spinner.setupSpinner(selectedOption, model, analytics, item)
@@ -208,7 +225,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             currentLevel: FeeLevel,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
-            item: TxOptionValue.FeeSelection
+            item: TxConfirmationValue.FeeSelection
         ) {
             val spinnerArrayAdapter: ArrayAdapter<String> =
                 CustomPaddingArrayAdapter(
@@ -239,7 +256,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             model: TransactionModel,
             analytics: TxFlowAnalytics,
             currentLevel: FeeLevel,
-            item: TxOptionValue.FeeSelection
+            item: TxConfirmationValue.FeeSelection
         ) = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -255,7 +272,9 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                     showStandardUi()
                 }
 
-                model.process(TransactionIntent.ModifyTxOption(TxOptionValue.FeeSelection(selectedLevel = newFeeLevel)))
+                model.process(
+                    TransactionIntent.ModifyTxOption(TxConfirmationValue.FeeSelection(selectedLevel = newFeeLevel,
+                    asset = item.asset)))
                 analytics.onFeeLevelChanged(currentLevel, newFeeLevel)
             }
 
@@ -264,7 +283,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             }
         }
 
-        private fun showCustomFeeUi(item: TxOptionValue.FeeSelection) {
+        private fun showCustomFeeUi(item: TxConfirmationValue.FeeSelection) {
             with(itemView) {
                 fee_option_custom_bounds.text = context.getString(R.string.fee_options_sat_byte_inline_hint,
                     item.feeInfo?.regularFee.toString(),

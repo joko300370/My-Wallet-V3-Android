@@ -19,8 +19,8 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
@@ -133,16 +133,18 @@ abstract class SwapEngineBase(
         return quotesEngine.rate.firstOrError().flatMap { rate ->
             Single.just(
                 pendingTx.copy(
-                    options = listOf(
-                        TxOptionValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue),
-                        TxOptionValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
+                    confirmations = listOf(
+                        TxConfirmationValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue),
+                        TxConfirmationValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
                             pendingTx.amount.toBigDecimal().times(rate))),
-                        TxOptionValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
+                        TxConfirmationValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
                             CryptoValue.fromMajor(target.asset, rate)),
-                        TxOptionValue.From(from = sourceAccount.label),
-                        TxOptionValue.To(to = txTarget.label),
-                        TxOptionValue.NetworkFee(
-                            fee = quotesEngine.getLatestQuote().networkFee
+                        TxConfirmationValue.From(from = sourceAccount.label),
+                        TxConfirmationValue.To(to = txTarget.label),
+                        TxConfirmationValue.NetworkFee(
+                            fee = quotesEngine.getLatestQuote().networkFee,
+                            type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
+                            asset = target.asset
                         )
                     ),
                     minLimit = minLimit(pendingTx, rate)
@@ -190,18 +192,20 @@ abstract class SwapEngineBase(
                 minLimit = minLimit(pendingTx, rate)
             ).apply {
                 addOrReplaceOption(
-                    TxOptionValue.NetworkFee(
-                        fee = quotesEngine.getLatestQuote().networkFee
+                    TxConfirmationValue.NetworkFee(
+                        fee = quotesEngine.getLatestQuote().networkFee,
+                        type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
+                        asset = target.asset
                     )
                 )
                 addOrReplaceOption(
-                    TxOptionValue.SwapExchangeRate(
+                    TxConfirmationValue.SwapExchangeRate(
                         CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
                         CryptoValue.fromMajor(target.asset, rate)
                     )
                 )
                 addOrReplaceOption(
-                    TxOptionValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
+                    TxConfirmationValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
                         pendingTx.amount.toBigDecimal().times(rate)))
                 )
             }

@@ -527,7 +527,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         TransactionFlow(
                             sourceAccount = sourceAccount,
                             target = targetAddress,
-                            action = AssetAction.NewSend
+                            action = AssetAction.Send
                         ).apply {
                             startFlow(
                                 fragmentManager = currentFragment.childFragmentManager,

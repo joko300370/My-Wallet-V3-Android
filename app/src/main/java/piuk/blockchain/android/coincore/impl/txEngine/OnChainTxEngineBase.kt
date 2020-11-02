@@ -14,13 +14,14 @@ import piuk.blockchain.android.coincore.FeeUnderMinLimit
 import piuk.blockchain.android.coincore.FeeUnderRecommended
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidCustomFee
 
 abstract class OnChainTxEngineBase(
     override val requireSecondPassword: Boolean,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val defaultFeeType: FeeLevel
 ) : TxEngine() {
 
     override fun assertInputsValid() {
@@ -34,10 +35,14 @@ abstract class OnChainTxEngineBase(
         txTarget.onTxCompleted(txResult)
 
     protected fun mapSavedFeeToFeeLevel(feeType: Int?): FeeLevel =
-        when (feeType) {
-            FeeLevel.Priority.ordinal -> FeeLevel.Priority
-            FeeLevel.Regular.ordinal -> FeeLevel.Regular
-            else -> FeeLevel.Regular
+        if (defaultFeeType != FeeLevel.None) {
+            defaultFeeType
+        } else {
+            when (feeType) {
+                FeeLevel.Priority.ordinal -> FeeLevel.Priority
+                FeeLevel.Regular.ordinal -> FeeLevel.Regular
+                else -> FeeLevel.Regular
+            }
         }
 
     private fun FeeLevel.mapFeeLevelToSavedValue() =
@@ -76,13 +81,13 @@ abstract class OnChainTxEngineBase(
     protected fun updateFeeSelection(
         cryptoCurrency: CryptoCurrency,
         pendingTx: PendingTx,
-        newOption: TxOptionValue.FeeSelection
+        newConfirmation: TxConfirmationValue.FeeSelection
     ): Single<PendingTx> {
-        setFeeType(cryptoCurrency, newOption.selectedLevel)
+        setFeeType(cryptoCurrency, newConfirmation.selectedLevel)
 
         return doUpdateAmount(pendingTx.amount, pendingTx.copy(
-            feeLevel = newOption.selectedLevel,
-            customFeeAmount = newOption.customFeeAmount
+            feeLevel = newConfirmation.selectedLevel,
+            customFeeAmount = newConfirmation.customFeeAmount
         ))
             .flatMap { pTx -> doValidateAmount(pTx) }
             .flatMap { pTx -> doBuildConfirmations(pTx) }

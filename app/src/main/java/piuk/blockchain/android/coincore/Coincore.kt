@@ -101,7 +101,7 @@ class Coincore internal constructor(
                             if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
-            AssetAction.NewSend -> {
+            AssetAction.Send -> {
                 {
                     it !is FiatAccount
                 }

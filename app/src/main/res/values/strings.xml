@@ -25,6 +25,7 @@
     <string name="common_empty_details">Looks like there is an issue with your internet connection. Please check and try again</string>
     <string name="common_empty_cta">Tap to refresh</string>
     <string name="common_pending">Pending</string>
+    <string name="common_free">Free</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -1920,13 +1921,13 @@
     <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
-    <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees">Learn more</annotation> about network fees.</string>
     <string name="send_confirmation_fee_loading">Loading…</string>
     <string name="send_confirmation_fee_error">Error loading fee</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_add_note_success">Note successfully added</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
+    <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>
@@ -1981,6 +1982,14 @@
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
     <string name="swap_select_target_title">New Swap</string>
+    <string name="tx_confirmation_withdrawal_fee">%1$s Withdrawal Fee</string>
+    <string name="tx_confirmation_deposit_fee">%1$s Deposit Fee</string>
+    <string name="tx_confirmation_fee_learn_more_1">Network&#160;</string>
+    <string name="tx_confirmation_fee_learn_more_2">fees are set by the %1$s network.&#160;</string>
+    <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Learn more about fees</annotation>.</string>
+    <string name="tx_confirmation_free_fee_learn_more_1">Network fees when using</string>
+    <string name="tx_confirmation_free_fee_learn_more_2">&#160;Trading Wallets&#160;</string>
+    <string name="tx_confirmation_free_fee_learn_more_3">are FREE! <annotation link="send_tx_fees">Learn more about fees</annotation>.</string>
 
     <!-- Interest -->
     <string name="earn_interest">Earn Interest</string>
@@ -2101,7 +2110,7 @@
     <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
     <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
     <string name="pending_swap_info_message">You have 1 swap pending. Once that clears, you can make a new swap.</string>
-    <string name="network_fee">Network Fee</string>
+    <string name="deposit_fee">Network Fee</string>
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Exchange Rate</string>
     <string name="receive">Receive</string>

@@ -13,9 +13,9 @@ import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -96,10 +96,10 @@ class BtcBitpayTxEngine(
                 startTimerIfNotStarted(pTx)
             }.map { pTx ->
                 pTx.addOrReplaceOption(
-                    TxOptionValue.BitPayCountdown(timeRemainingSecs()),
+                    TxConfirmationValue.BitPayCountdown(timeRemainingSecs()),
                     true
                 ).run {
-                    if (hasOption(TxOption.FEE_SELECTION)) {
+                    if (hasOption(TxConfirmation.FEE_SELECTION)) {
                         addOrReplaceOption(makeFeeSelectionOption(pTx))
                     } else {
                         this
@@ -108,7 +108,7 @@ class BtcBitpayTxEngine(
             }
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(pendingTx.addOrReplaceOption(TxOptionValue.BitPayCountdown(timeRemainingSecs()), true))
+        Single.just(pendingTx.addOrReplaceOption(TxConfirmationValue.BitPayCountdown(timeRemainingSecs()), true))
 
     private fun startTimerIfNotStarted(pendingTx: PendingTx): PendingTx =
         if (pendingTx.bitpayTimer == null) {
@@ -146,12 +146,13 @@ class BtcBitpayTxEngine(
 
     // BitPay invoices _always_ require priority fees, so replace the option as defined by the
     // underlying asset engine.
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
-        TxOptionValue.FeeSelection(
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
             feeDetails = FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Priority)
+            availableLevels = setOf(FeeLevel.Priority),
+            asset = asset
         )
 
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step

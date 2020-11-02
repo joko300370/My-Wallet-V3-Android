@@ -111,7 +111,7 @@ class AssetDetailsFlow(
                     filterNonCustodialAccounts(localState.hostAction, localState.hostAction == AssetAction.Receive),
                     when (localState.hostAction) {
                         AssetAction.Deposit -> R.string.select_deposit_source_title
-                        AssetAction.NewSend -> R.string.select_send_sheet_title
+                        AssetAction.Send -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
                     })
             }
@@ -141,7 +141,7 @@ class AssetDetailsFlow(
                     }
                 )
             }
-            AssetAction.NewSend -> {
+            AssetAction.Send -> {
                 selectAccountOrPerformAction(
                     state = newState,
                     singleAccountAction = {
@@ -240,7 +240,7 @@ class AssetDetailsFlow(
         val singleAccount = account as SingleAccount
         when (localState.hostAction) {
             AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
-            AssetAction.NewSend -> launchNewSend(singleAccount)
+            AssetAction.Send -> launchNewSend(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
@@ -274,7 +274,7 @@ class AssetDetailsFlow(
     }
 
     private fun launchNewSend(account: SingleAccount) {
-        assetFlowHost.launchNewSendFor(account, AssetAction.NewSend)
+        assetFlowHost.launchNewSendFor(account, AssetAction.Send)
         finishFlow()
     }
 

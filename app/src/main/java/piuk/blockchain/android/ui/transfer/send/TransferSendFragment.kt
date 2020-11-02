@@ -27,7 +27,7 @@ class TransferSendFragment :
     override val filterFn: AccountListFilterFn = { account ->
         (account is CryptoAccount) &&
                 account.isFunded &&
-                account.actions.contains(AssetAction.NewSend)
+                account.actions.contains(AssetAction.Send)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,7 +64,7 @@ class TransferSendFragment :
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         require(account is CryptoAccount)
-        require(account.actions.contains(AssetAction.NewSend))
+        require(account.actions.contains(AssetAction.Send))
 
         analytics.logEvent(TransferAnalyticsEvent.SourceWalletSelected(account))
         startTransactionFlow(account)
@@ -73,7 +73,7 @@ class TransferSendFragment :
     private fun startTransactionFlow(fromAccount: CryptoAccount) {
         flow = TransactionFlow(
             sourceAccount = fromAccount,
-            action = AssetAction.NewSend
+            action = AssetAction.Send
         ).apply {
             startFlow(
                 fragmentManager = childFragmentManager,
