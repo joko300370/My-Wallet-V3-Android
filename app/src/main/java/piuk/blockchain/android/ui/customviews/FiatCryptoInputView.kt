@@ -25,8 +25,8 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
-import java.util.Currency
 import java.util.Locale
+import java.util.Currency
 import kotlin.properties.Delegates
 
 class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
@@ -209,9 +209,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         filters =
             arrayOf(
                 DecimalDigitsInputFilter(
-                    maxIntegerDigitsForAmount,
-                    maxDecimalDigitsForAmount,
-                    prefixOrSuffix
+                    digitsAfterZero = maxDecimalDigitsForAmount,
+                    prefixOrSuffix = prefixOrSuffix
                 )
             )
     }

@@ -6,13 +6,13 @@ import android.text.Selection
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
-import androidx.appcompat.widget.AppCompatEditText
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import piuk.blockchain.androidcoreui.ui.customviews.AutofitEdittext
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import kotlin.properties.Delegates
 
-class PrefixedOrSuffixedEditText : AppCompatEditText {
+class PrefixedOrSuffixedEditText : AutofitEdittext {
 
     enum class ImeOptions {
         BACK,
@@ -62,6 +62,7 @@ class PrefixedOrSuffixedEditText : AppCompatEditText {
         }
 
         isEnabled = false
+        maxLines = 1
     }
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent?): Boolean {

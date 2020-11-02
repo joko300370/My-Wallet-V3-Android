@@ -126,9 +126,8 @@ class SingleCurrencyInputView(context: Context, attrs: AttributeSet) : Constrain
         filters =
             arrayOf(
                 DecimalDigitsInputFilter(
-                    maxIntegerDigitsForAmount,
-                    maxDecimalDigitsForAmount,
-                    prefixOrSuffix
+                    digitsAfterZero = maxDecimalDigitsForAmount,
+                    prefixOrSuffix = prefixOrSuffix
                 )
             )
     }
