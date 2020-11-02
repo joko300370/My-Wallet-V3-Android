@@ -6,6 +6,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.dialog_account_selector_sheet.*
 import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.DefaultCellDecorator
@@ -54,7 +55,7 @@ class AccountSelectSheet(
     }
 
     private fun doOnEmptyList() {
-        dismiss()
+        account_list_empty.visible()
     }
 
     override fun initControls(view: View) {

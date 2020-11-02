@@ -261,6 +261,7 @@ class EnterTargetAddressSheet(
                         onSuccess = {
                             // TODO update the selected target (address type) instead so the render method knows what to show  & hide
                             setAddressValue(it.address)
+                            dialogView.wallet_select.clearSelectedAccount()
                             model.process(TransactionIntent.TargetSelectionUpdated(it))
                         },
                         onComplete = {

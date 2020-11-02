@@ -1708,6 +1708,7 @@
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
     <string name="select_account_sheet_title">Select a Wallet</string>
+    <string name="select_account_sheet_empty">You have no eligible Wallets to perform this action.</string>
     <string name="select_send_sheet_title">Send from</string>
     <string name="select_deposit_source_title">Transfer from</string>
     <string name="select_send_source_title">Send from</string>
