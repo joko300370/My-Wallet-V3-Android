@@ -473,6 +473,7 @@ data class SwapQuote(
     val expirationDate: Date = Date(),
     val creationDate: Date = Date(),
     val networkFee: Money,
+    val staticFee: Money,
     val sampleDepositAddress: String
 )
 

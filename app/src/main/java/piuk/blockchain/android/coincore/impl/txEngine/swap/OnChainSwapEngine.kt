@@ -47,9 +47,7 @@ class OnChainSwapEngine(
     }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doUpdateAmount(amount, pendingTx).doOnSuccess {
-            quotesEngine.updateAmount(it.amount.toBigDecimal())
-        }
+        return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice()
     }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {

@@ -121,13 +121,8 @@ abstract class SwapEngineBase(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
-    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
-        sourceAccount.actionableBalance.map { balance -> balance as CryptoValue }.map { available ->
-            pendingTx.copy(
-                amount = amount,
-                available = available
-            )
-        }.doOnSuccess {
+    protected fun Single<PendingTx>.updateQuotePrice(): Single<PendingTx> =
+        doOnSuccess {
             quotesEngine.updateAmount(it.amount.toBigDecimal())
         }
 
@@ -164,9 +159,13 @@ abstract class SwapEngineBase(
         Money.max(
             pendingTx.minLimit ?: minAmountToPayNetworkFees(
                 rate,
-                quotesEngine.getLatestQuote().networkFee
-            ), minAmountToPayNetworkFees(rate, quotesEngine.getLatestQuote().networkFee)
-        )
+                quotesEngine.getLatestQuote().networkFee,
+                quotesEngine.getLatestQuote().staticFee
+            ), minAmountToPayNetworkFees(
+                rate,
+                quotesEngine.getLatestQuote().networkFee,
+                quotesEngine.getLatestQuote().staticFee
+            ))
 
     private fun startRatesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
@@ -248,6 +247,7 @@ abstract class SwapEngineBase(
     private fun SwapDirection.requiresDestinationAddress() =
         this == SwapDirection.ON_CHAIN || this == SwapDirection.TO_USERKEY
 
-    private fun minAmountToPayNetworkFees(price: BigDecimal, networkFee: Money): Money =
-        CryptoValue.fromMajor(sourceAccount.asset, networkFee.toBigDecimal().times(price))
+    private fun minAmountToPayNetworkFees(price: BigDecimal, networkFee: Money, staticFee: Money): Money =
+        CryptoValue.fromMajor(sourceAccount.asset,
+            (networkFee.toBigDecimal().times(price)).plus(staticFee.toBigDecimal()))
 }

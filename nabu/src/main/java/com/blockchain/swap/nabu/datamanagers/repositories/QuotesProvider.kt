@@ -33,6 +33,7 @@ class QuotesProvider(
                             marginPrice = price.marginPrice.toBigDecimal())
                     },
                     networkFee = CryptoValue.fromMinor(pair.destination, it.networkFee.toBigInteger()),
+                    staticFee = CryptoValue.fromMinor(pair.source, it.staticFee.toBigInteger()),
                     sampleDepositAddress = it.sampleDepositAddress,
                     expirationDate = it.expiresAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
                     creationDate = it.createdAt.fromIso8601ToUtc()?.toLocalTime() ?: Date()

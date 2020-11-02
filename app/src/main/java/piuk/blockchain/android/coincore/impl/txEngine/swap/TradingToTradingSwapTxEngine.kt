@@ -5,6 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
@@ -43,4 +44,12 @@ class TradingToTradingSwapTxEngine(
         createOrder(pendingTx).map {
             TxResult.UnHashedTxResult(pendingTx.amount)
         }
+
+    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
+        sourceAccount.actionableBalance.map { balance -> balance as CryptoValue }.map { available ->
+            pendingTx.copy(
+                amount = amount,
+                available = available
+            )
+        }.updateQuotePrice()
 }
