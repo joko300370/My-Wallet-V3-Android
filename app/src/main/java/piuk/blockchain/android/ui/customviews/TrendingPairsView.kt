@@ -37,6 +37,12 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
         inflate(context, R.layout.view_trending_pairs, this)
 
         setupView(context, attrs)
+        trending_list.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
     }
 
     fun initialise(pairs: List<TrendingPair>, onSwapPairClicked: (TrendingPair) -> Unit) {
@@ -59,12 +65,6 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
         } else {
             trending_empty.gone()
             trending_list.apply {
-                addItemDecoration(
-                    DividerItemDecoration(
-                        context,
-                        DividerItemDecoration.VERTICAL
-                    )
-                )
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 adapter = TrendingPairsAdapter(
                     type = viewType,

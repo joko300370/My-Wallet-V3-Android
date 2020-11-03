@@ -13,6 +13,7 @@ import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : TransactionFlowSheet(host) {
 
@@ -27,6 +28,7 @@ class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
             account_list_title.text = customiser.selectTargetAccountTitle(newState)
             account_list_subtitle.text = customiser.selectTargetAccountDescription(newState)
             account_list_subtitle.visible()
+            account_list_back.visibleIf { newState.canGoBack }
         }
     }
 
@@ -42,7 +44,6 @@ class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
                 require(it is SingleAccount)
                 model.process(TransactionIntent.TargetAccountSelected(it))
             }
-            account_list_back.visible()
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }

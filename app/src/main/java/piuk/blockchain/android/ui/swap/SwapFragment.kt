@@ -87,6 +87,11 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             }
             gone()
         }
+        pending_swaps.pending_list.addItemDecoration(DividerItemDecoration(
+            context,
+            DividerItemDecoration.VERTICAL
+        ))
+
         loadSwapOrKyc()
     }
 
@@ -239,12 +244,6 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     money.toFiat(exchangeRateDataManager, currencyPrefs.selectedFiatCurrency)
                 }
             layoutManager = LinearLayoutManager(activity)
-            addItemDecoration(
-                DividerItemDecoration(
-                    context,
-                    DividerItemDecoration.VERTICAL
-                )
-            )
         }
     }
 

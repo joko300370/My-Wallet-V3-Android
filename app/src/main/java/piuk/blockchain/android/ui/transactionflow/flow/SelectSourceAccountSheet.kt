@@ -10,6 +10,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SelectSourceAccountSheet(host: SlidingModalBottomDialog.Host) : TransactionFlowSheet(host) {
 
@@ -24,6 +25,7 @@ class SelectSourceAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
             account_list_title.text = customiser.selectSourceAccountTitle(newState)
             account_list_subtitle.text = customiser.selectSourceAccountSubtitle(newState)
             account_list_subtitle.visible()
+            account_list_back.visibleIf { newState.canGoBack }
         }
     }
 
@@ -36,7 +38,6 @@ class SelectSourceAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
                 require(it is CryptoAccount)
                 model.process(TransactionIntent.SourceAccountSelected(it))
             }
-            account_list_back.visible()
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }

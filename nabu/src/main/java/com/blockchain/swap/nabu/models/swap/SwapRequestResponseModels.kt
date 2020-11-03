@@ -80,6 +80,19 @@ class CreateOrderRequest(
     private val destinationAddress: String? = null
 )
 
+class UpdateSwapOrderBody(
+    private val action: String
+) {
+    companion object {
+        fun newInstance(success: Boolean): UpdateSwapOrderBody =
+            if (success) {
+                UpdateSwapOrderBody("DEPOSIT_SENT")
+            } else {
+                UpdateSwapOrderBody("CANCEL")
+            }
+    }
+}
+
 data class SwapLimitsResponse(
     val currency: String? = null,
     val minOrder: String? = null,

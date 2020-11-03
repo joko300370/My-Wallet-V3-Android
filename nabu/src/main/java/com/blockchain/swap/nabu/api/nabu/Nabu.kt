@@ -56,6 +56,7 @@ import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.models.swap.QuoteResponse
 import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
 import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -271,6 +272,13 @@ internal interface Nabu {
     fun createDepositOrder(
         @Header("authorization") authorization: String,
         @Body depositRequestBody: DepositRequestBody
+    ): Completable
+
+    @POST("$NABU_UDPATE_ORDER/{id}")
+    fun updateOrder(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: UpdateSwapOrderBody
     ): Completable
 
     @GET(NABU_SWAP_ORDER)

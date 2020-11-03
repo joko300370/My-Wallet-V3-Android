@@ -294,7 +294,7 @@ class LiveCustodialWalletManager(
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
         this.filter { order ->
             order.outputCurrency == crypto.networkTicker ||
-                order.inputCurrency == crypto.networkTicker
+                    order.inputCurrency == crypto.networkTicker
         }
             .map { order -> order.toBuySellOrder() }
 
@@ -623,7 +623,7 @@ class LiveCustodialWalletManager(
         }.map { paymentMethodsResponse ->
             paymentMethodsResponse.methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -694,6 +694,15 @@ class LiveCustodialWalletManager(
         directions: List<SwapDirection>
     ): Single<List<SwapTransactionItem>> =
         swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
+
+    override fun updateSwapOrder(id: String, success: Boolean): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.updateOrder(
+                sessionToken = sessionToken,
+                id = id,
+                success = success
+            )
+        }
 
     override fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -901,11 +910,11 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
         paymentMethodId = paymentMethodId ?: (
-            when (paymentType.toPaymentMethodType()) {
-                PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
-                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-            }),
+                when (paymentType.toPaymentMethodType()) {
+                    PaymentMethodType.BANK_ACCOUNT -> PaymentMethod.BANK_PAYMENT_ID
+                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLong())

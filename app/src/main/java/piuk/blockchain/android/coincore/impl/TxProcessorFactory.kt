@@ -105,6 +105,7 @@ class TxProcessorFactory(
                         tiersService = kycTierService,
                         engine = engine,
                         environmentConfig = environmentConfig,
+                        custodialWalletManager = walletManager,
                         direction = if (target is CustodialTradingAccount)
                             SwapDirection.FROM_USERKEY else SwapDirection.ON_CHAIN
                     )

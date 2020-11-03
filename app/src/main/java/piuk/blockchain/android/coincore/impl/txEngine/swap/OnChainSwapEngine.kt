@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class OnChainSwapEngine(
     isNoteSupported: Boolean,
@@ -23,7 +24,8 @@ class OnChainSwapEngine(
     tiersService: TierService,
     override val direction: SwapDirection,
     private val engine: OnChainTxEngineBase,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    private val custodialWalletManager: CustodialWalletManager
 ) : SwapEngineBase(
     isNoteSupported, quotesProvider, walletManager, tiersService
 ) {
@@ -82,8 +84,16 @@ class OnChainSwapEngine(
     }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
-        return createOrder(pendingTx).flatMap {
-            engine.doExecute(pendingTx, secondPassword)
+        return createOrder(pendingTx).flatMap { order ->
+            engine.doExecute(pendingTx, secondPassword).onErrorResumeNext { error ->
+                custodialWalletManager.updateSwapOrder(order.id, false).onErrorComplete().toSingle {
+                    throw error
+                }
+            }.flatMap { result ->
+                custodialWalletManager.updateSwapOrder(order.id, true).onErrorComplete().thenSingle {
+                    Single.just(result)
+                }
+            }
         }
     }
 }

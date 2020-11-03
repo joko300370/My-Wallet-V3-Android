@@ -41,6 +41,7 @@ import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.models.swap.QuoteResponse
 import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
 import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -370,6 +371,16 @@ class NabuService(retrofit: Retrofit) {
             currency = currency, depositAddress = address, txHash = hash, amount = amount, product = product
         )
     )
+
+    internal fun updateOrder(
+        sessionToken: NabuSessionTokenResponse,
+        id: String,
+        success: Boolean
+    ) = service.updateOrder(
+        sessionToken.authHeader,
+        id,
+        UpdateSwapOrderBody.newInstance(success)
+    ).wrapErrorMessage()
 
     internal fun getOutstandingOrders(
         sessionToken: NabuSessionTokenResponse,

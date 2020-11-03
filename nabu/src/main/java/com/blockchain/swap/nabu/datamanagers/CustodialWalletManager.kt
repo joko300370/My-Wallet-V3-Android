@@ -170,7 +170,7 @@ interface CustodialWalletManager {
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
     fun createSwapOrder(direction: SwapDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
-        Single<SwapOrder>
+            Single<SwapOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -188,6 +188,11 @@ interface CustodialWalletManager {
         cryptoCurrency: CryptoCurrency,
         directions: List<SwapDirection>
     ): Single<List<SwapTransactionItem>>
+
+    fun updateSwapOrder(
+        id: String,
+        success: Boolean
+    ): Completable
 }
 
 data class InterestActivityItem(
