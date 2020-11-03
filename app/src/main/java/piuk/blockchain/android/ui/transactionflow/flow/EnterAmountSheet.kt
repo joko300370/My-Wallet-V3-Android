@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
@@ -157,6 +158,9 @@ class EnterAmountSheet(
             }
 
             amount_sheet_asset_direction.setImageResource(customiser.enterAmountActionIcon(state))
+            if (customiser.enterAmountActionIconCustomisation(state)) {
+                amount_sheet_asset_direction.setAssetIconColours(state.asset, requireContext())
+            }
         }
 
         updateSourceAndTargetDetails(state)

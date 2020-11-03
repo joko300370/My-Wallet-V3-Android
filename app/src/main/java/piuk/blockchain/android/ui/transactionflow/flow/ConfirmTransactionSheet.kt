@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
@@ -58,8 +59,11 @@ class ConfirmTransactionSheet(
             confirm_sheet_title.text = customiser.confirmTitle(newState)
             confirm_cta_button.isEnabled = newState.nextEnabled
             confirm_sheet_back.visibleIf { newState.canGoBack }
-            confirm_disclaimer.visibleIf { customiser.confirmDisclaimerVisibility(newState.action) }
-            confirm_disclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
+
+            if (customiser.confirmDisclaimerVisibility(newState.action)) {
+                confirm_disclaimer.visible()
+                confirm_disclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
+            }
         }
         cacheState(newState)
     }

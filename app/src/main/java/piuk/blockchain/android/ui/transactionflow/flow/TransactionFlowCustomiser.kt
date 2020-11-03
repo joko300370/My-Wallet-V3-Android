@@ -17,7 +17,6 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
-import java.lang.IllegalStateException
 
 interface TransactionFlowCustomiser {
     // UI Element text, icons etc may be customised here:
@@ -32,6 +31,7 @@ interface TransactionFlowCustomiser {
     fun selectTargetDestinationLabel(state: TransactionState): String
     fun enterAmountTitle(state: TransactionState): String
     fun enterAmountActionIcon(state: TransactionState): Int
+    fun enterAmountActionIconCustomisation(state: TransactionState): Boolean
     fun enterAmountMaxButton(state: TransactionState): String
     fun enterAmountSourceLabel(state: TransactionState): String
     fun enterAmountTargetLabel(state: TransactionState): String
@@ -72,6 +72,12 @@ class TransactionFlowCustomiserImpl(
             else -> throw IllegalArgumentException("Action not supported by Send Flow")
         }
     }
+
+    override fun enterAmountActionIconCustomisation(state: TransactionState): Boolean =
+        when (state.action) {
+            AssetAction.Swap -> false
+            else -> true
+        }
 
     override fun selectSourceAddressTitle(state: TransactionState): String = "Select Source Address"
 
