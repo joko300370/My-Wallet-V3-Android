@@ -17,9 +17,7 @@ import piuk.blockchain.android.ui.transfer.AccountListFilterFn
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 
-class TransferSendFragment :
-    AccountSelectorFragment(),
-    DialogFlow.FlowHost {
+class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
 
     private val analytics: Analytics by inject()
     private var flow: TransactionFlow? = null
@@ -32,7 +30,6 @@ class TransferSendFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         renderList()
     }
 

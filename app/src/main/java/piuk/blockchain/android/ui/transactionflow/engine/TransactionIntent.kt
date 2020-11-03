@@ -43,7 +43,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 passwordRequired = passwordRequired,
                 errorState = TransactionErrorState.NONE,
                 currentStep = TransactionStep.SELECT_SOURCE
-            )
+            ).updateBackstack(oldState)
     }
 
     class InitialiseWithSourceAndTargetAccount(

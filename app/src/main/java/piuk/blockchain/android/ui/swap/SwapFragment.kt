@@ -14,7 +14,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.SwapPair
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -30,7 +29,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
@@ -57,11 +55,9 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     ): View? = container?.inflate(R.layout.fragment_swap)
 
     private val kycTierService: TierService by scopedInject()
-    private val coincore: Coincore by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val trendingPairsProvider: TrendingPairsProvider by scopedInject()
     private val walletManager: CustodialWalletManager by scopedInject()
-    private val swapRepository: SwapRepository by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val walletPrefs: WalletStatus by inject()
 
@@ -161,28 +157,26 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     private fun showKycUpsellIfEligible(limits: SwapLimits) {
-        if (limits.maxLimit != null && limits.maxOrder != null) {
-            val usedUpLimitPercent = (limits.maxLimit!! / limits.maxOrder!!).toFloat() * 100
-            if (usedUpLimitPercent >= KYC_UPSELL_PERCENTAGE && !walletPrefs.hasSeenSwapPromo) {
-                val fragment = KycBenefitsBottomSheet.newInstance(
-                    KycBenefitsBottomSheet.BenefitsDetails(
-                        title = getString(R.string.swap_kyc_upsell_title),
-                        description = getString(R.string.swap_kyc_upsell_desc),
-                        listOfBenefits = listOf(
-                            VerifyIdentityBenefit(
-                                getString(R.string.swap_kyc_upsell_1_title),
-                                getString(R.string.swap_kyc_upsell_1_desc)),
-                            VerifyIdentityBenefit(
-                                getString(R.string.swap_kyc_upsell_2_title),
-                                getString(R.string.swap_kyc_upsell_2_desc)),
-                            VerifyIdentityBenefit(
-                                getString(R.string.swap_kyc_upsell_3_title),
-                                getString(R.string.swap_kyc_upsell_3_desc))
-                        )
+        val usedUpLimitPercent = (limits.maxLimit / limits.maxOrder).toFloat() * 100
+        if (usedUpLimitPercent >= KYC_UPSELL_PERCENTAGE && !walletPrefs.hasSeenSwapPromo) {
+            val fragment = KycBenefitsBottomSheet.newInstance(
+                KycBenefitsBottomSheet.BenefitsDetails(
+                    title = getString(R.string.swap_kyc_upsell_title),
+                    description = getString(R.string.swap_kyc_upsell_desc),
+                    listOfBenefits = listOf(
+                        VerifyIdentityBenefit(
+                            getString(R.string.swap_kyc_upsell_1_title),
+                            getString(R.string.swap_kyc_upsell_1_desc)),
+                        VerifyIdentityBenefit(
+                            getString(R.string.swap_kyc_upsell_2_title),
+                            getString(R.string.swap_kyc_upsell_2_desc)),
+                        VerifyIdentityBenefit(
+                            getString(R.string.swap_kyc_upsell_3_title),
+                            getString(R.string.swap_kyc_upsell_3_desc))
                     )
                 )
-                childFragmentManager.beginTransaction().add(fragment, TAG).commit()
-            }
+            )
+            childFragmentManager.beginTransaction().add(fragment, TAG).commit()
         }
     }
 

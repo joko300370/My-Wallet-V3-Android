@@ -94,14 +94,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_to" />
 
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
     <ViewSwitcher
         android:id="@+id/input_switcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:measureAllChildren="false"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_to">
+        app:layout_constraintTop_toBottomOf="@id/title_to"
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/external_address"
@@ -220,6 +223,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_pick" />
 
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
     <LinearLayout
         android:id="@+id/select_an_account"
         android:layout_width="match_parent"
@@ -228,11 +232,13 @@
         android:layout_marginBottom="@dimen/standard_margin"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_pick"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintVertical_bias="0"
+        tools:visibility="visible">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
@@ -254,18 +260,22 @@
             app:srcCompat="@drawable/ic_arrow_down" />
     </LinearLayout>
 
+
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/wallet_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginBottom="@dimen/small_margin"
+        android:visibility="gone"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/cta_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_pick"
-        app:layout_goneMarginBottom="@dimen/standard_margin" />
+        app:layout_goneMarginBottom="@dimen/standard_margin"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/cta_button"

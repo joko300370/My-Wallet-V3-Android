@@ -145,7 +145,8 @@ class EnterTargetAddressSheet(
                 address_entry.setText(address, TextView.BufferType.EDITABLE)
             }
             address_entry.hint = customiser.selectTargetAddressInputHint(newState)
-
+            // set visibility of component here so bottom sheet grows to the correct height
+            input_switcher.visible()
             input_switcher.displayedChild = NONCUSTODIAL_INPUT
         }
     }
@@ -183,6 +184,8 @@ class EnterTargetAddressSheet(
                 Single.just(targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>()),
                 shouldShowSelectionStatus = true
             )
+            // set visibility of component here so bottom sheet grows to the correct height
+            visible()
             when (targetAddressSheetState) {
                 is TargetAddressSheetState.SelectAccountWhenWithinMaxLimit -> {
                     onAccountSelected = {
