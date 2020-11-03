@@ -74,8 +74,8 @@ abstract class SwapEngineBase(
             walletManager.getSwapLimits(userFiat)
         ) { tier, limits ->
             pendingTx.copy(
-                minLimit = limits.minLimit.toCrypto(exchangeRates, sourceAccount.asset),
-                maxLimit = limits.maxLimit.toCrypto(exchangeRates, sourceAccount.asset),
+                minLimit = limits.minLimit?.toCrypto(exchangeRates, sourceAccount.asset),
+                maxLimit = limits.maxLimit?.toCrypto(exchangeRates, sourceAccount.asset),
                 engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
             )
         }

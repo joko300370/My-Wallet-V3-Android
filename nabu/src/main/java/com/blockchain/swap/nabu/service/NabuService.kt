@@ -256,7 +256,15 @@ class NabuService(retrofit: Retrofit) {
     ): Single<SwapLimitsResponse> = service.fetchSwapLimits(
         sessionToken.authHeader,
         currency
-    ).wrapErrorMessage()
+    ).onErrorResumeNext {
+        if ((it as? HttpException)?.code() == 409) {
+            Single.just(
+                SwapLimitsResponse()
+            )
+        } else {
+            Single.error(it)
+        }
+    }.wrapErrorMessage()
 
     internal fun fetchSwapActivity(
         sessionToken: NabuSessionTokenResponse

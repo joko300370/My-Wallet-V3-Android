@@ -81,13 +81,13 @@ class CreateOrderRequest(
 )
 
 data class SwapLimitsResponse(
-    val currency: String,
-    val minOrder: String,
-    val maxOrder: String,
-    val maxPossibleOrder: String,
-    val daily: TimeLimitsResponse,
-    val weekly: TimeLimitsResponse,
-    val annual: TimeLimitsResponse
+    val currency: String? = null,
+    val minOrder: String? = null,
+    val maxOrder: String? = null,
+    val maxPossibleOrder: String? = null,
+    val daily: TimeLimitsResponse? = null,
+    val weekly: TimeLimitsResponse? = null,
+    val annual: TimeLimitsResponse? = null
 )
 
 data class TimeLimitsResponse(

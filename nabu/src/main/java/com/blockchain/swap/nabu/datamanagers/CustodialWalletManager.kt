@@ -492,7 +492,13 @@ data class SwapLimits(
     val minLimit: FiatValue,
     val maxOrder: FiatValue,
     val maxLimit: FiatValue
-)
+) {
+    constructor(currency: String) : this(
+        minLimit = FiatValue.zero(currency),
+        maxOrder = FiatValue.zero(currency),
+        maxLimit = FiatValue.zero(currency)
+    )
+}
 
 data class SwapOrder(
     val id: String,

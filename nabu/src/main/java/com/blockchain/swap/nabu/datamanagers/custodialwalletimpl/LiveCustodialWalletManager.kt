@@ -677,11 +677,15 @@ class LiveCustodialWalletManager(
                 it,
                 currency
             ).map { response ->
-                SwapLimits(
-                    minLimit = FiatValue.fromMinor(currency, response.minOrder.toLong()),
-                    maxOrder = FiatValue.fromMinor(currency, response.maxOrder.toLong()),
-                    maxLimit = FiatValue.fromMinor(currency, response.maxPossibleOrder.toLong())
-                )
+                if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
+                    SwapLimits(currency)
+                } else {
+                    SwapLimits(
+                        minLimit = FiatValue.fromMinor(currency, response.minOrder?.toLong() ?: 0L),
+                        maxOrder = FiatValue.fromMinor(currency, response.maxOrder?.toLong() ?: 0L),
+                        maxLimit = FiatValue.fromMinor(currency, response.maxPossibleOrder?.toLong() ?: 0L)
+                    )
+                }
             }
         }
 
