@@ -10,7 +10,6 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
@@ -53,6 +52,8 @@ class TxProcessorFactory(
         target: TransactionTarget,
         action: AssetAction
     ): Single<TransactionProcessor> {
+        val engine = source.createTxEngine() as OnChainTxEngineBase
+
         return when (target) {
             is BitPayInvoiceTarget -> Single.just(
                 TransactionProcessor(
@@ -62,7 +63,7 @@ class TxProcessorFactory(
                     engine = BtcBitpayTxEngine(
                         bitPayDataManager = bitPayManager,
                         walletPrefs = walletPrefs,
-                        assetEngine = source.createTxEngine() as OnChainTxEngineBase,
+                        assetEngine = engine,
                         analytics = analytics
                     )
                 )
@@ -73,7 +74,7 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = it,
                     engine = InterestDepositTxEngine(
-                        onChainTxEngine = source.createTxEngine() as OnChainTxEngineBase
+                        onChainTxEngine = engine
                     )
                 )
             }
@@ -82,7 +83,7 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = source.createTxEngine() as OnChainTxEngineBase
+                    engine = engine
                 )
             )
             is CryptoAccount -> if (action != AssetAction.Swap) target.receiveAddress.map {
@@ -90,7 +91,7 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = it,
-                    engine = source.createTxEngine() as OnChainTxEngineBase
+                    engine = engine
                 )
             } else Single.just(
                 TransactionProcessor(
@@ -102,7 +103,7 @@ class TxProcessorFactory(
                         quotesProvider = quotesProvider,
                         walletManager = walletManager,
                         tiersService = kycTierService,
-                        engine = source.createTxEngine(FeeLevel.Priority) as OnChainTxEngineBase,
+                        engine = engine,
                         environmentConfig = environmentConfig,
                         direction = if (target is CustodialTradingAccount)
                             SwapDirection.FROM_USERKEY else SwapDirection.ON_CHAIN

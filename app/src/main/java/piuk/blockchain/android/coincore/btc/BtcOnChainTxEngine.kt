@@ -67,12 +67,10 @@ class BtcOnChainTxEngine(
     private val feeDataManager: FeeDataManager,
     private val btcNetworkParams: NetworkParameters,
     walletPreferences: WalletStatus,
-    requireSecondPassword: Boolean,
-    defaultFeeType: FeeLevel
+    requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword,
-    walletPreferences,
-    defaultFeeType
+    walletPreferences
 ), BitPayClientEngine, KoinComponent {
 
     override fun assertInputsValid() {

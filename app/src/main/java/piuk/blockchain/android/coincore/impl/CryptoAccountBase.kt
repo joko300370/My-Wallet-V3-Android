@@ -18,7 +18,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -169,7 +168,7 @@ abstract class CryptoNonCustodialAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
-    abstract fun createTxEngine(defaultFeeType: FeeLevel = FeeLevel.None): TxEngine
+    abstract fun createTxEngine(): TxEngine
 
     val nonCustodialSwapDirections = listOf(SwapDirection.ON_CHAIN, SwapDirection.FROM_USERKEY)
 

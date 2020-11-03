@@ -4,7 +4,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -35,7 +34,7 @@ class StxCryptoWalletAccount(
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
-    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine {
+    override fun createTxEngine(): TxEngine {
         TODO("Not yet implemented")
     }
 }

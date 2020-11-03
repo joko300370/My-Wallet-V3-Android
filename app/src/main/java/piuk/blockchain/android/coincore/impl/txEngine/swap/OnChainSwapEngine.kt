@@ -7,6 +7,7 @@ import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
@@ -41,7 +42,9 @@ class OnChainSwapEngine(
                 exchangeRates = exchangeRates
             )
         }.flatMap {
-            engine.doInitialiseTx()
+            engine.doInitialiseTx().map {
+                it.copy(feeLevel = FeeLevel.Priority)
+            }
         }.flatMap {
             updateLimits(it)
         }

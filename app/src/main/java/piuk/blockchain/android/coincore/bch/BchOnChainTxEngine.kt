@@ -45,12 +45,10 @@ class BchOnChainTxEngine(
     private val bchDataManager: BchDataManager,
     private val payloadDataManager: PayloadDataManager,
     walletPreferences: WalletStatus,
-    requireSecondPassword: Boolean,
-    defaultFeeType: FeeLevel
+    requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword,
-    walletPreferences,
-    defaultFeeType
+    walletPreferences
 ) {
 
     private val bchSource: BchCryptoWalletAccount by unsafeLazy {

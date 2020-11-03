@@ -31,12 +31,10 @@ open class Erc20OnChainTxEngine(
     private val erc20Account: Erc20Account,
     private val feeManager: FeeDataManager,
     walletPreferences: WalletStatus,
-    requireSecondPassword: Boolean,
-    defaultFeeType: FeeLevel
+    requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword,
-    walletPreferences,
-    defaultFeeType
+    walletPreferences
 ) {
     private val ethDataManager: EthDataManager =
         erc20Account.ethDataManager

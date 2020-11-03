@@ -31,12 +31,10 @@ open class EthOnChainTxEngine(
     private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
     walletPreferences: WalletStatus,
-    requireSecondPassword: Boolean,
-    defaultFeeType: FeeLevel
+    requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
     requireSecondPassword,
-    walletPreferences,
-    defaultFeeType
+    walletPreferences
 ) {
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)

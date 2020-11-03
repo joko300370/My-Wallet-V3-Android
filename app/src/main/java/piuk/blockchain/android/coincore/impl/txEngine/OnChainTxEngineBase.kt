@@ -13,15 +13,14 @@ import piuk.blockchain.android.coincore.FeeTooHigh
 import piuk.blockchain.android.coincore.FeeUnderMinLimit
 import piuk.blockchain.android.coincore.FeeUnderRecommended
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidCustomFee
 
 abstract class OnChainTxEngineBase(
     override val requireSecondPassword: Boolean,
-    private val walletPreferences: WalletStatus,
-    private val defaultFeeType: FeeLevel
+    private val walletPreferences: WalletStatus
 ) : TxEngine() {
 
     override fun assertInputsValid() {
@@ -35,14 +34,10 @@ abstract class OnChainTxEngineBase(
         txTarget.onTxCompleted(txResult)
 
     protected fun mapSavedFeeToFeeLevel(feeType: Int?): FeeLevel =
-        if (defaultFeeType != FeeLevel.None) {
-            defaultFeeType
-        } else {
-            when (feeType) {
-                FeeLevel.Priority.ordinal -> FeeLevel.Priority
-                FeeLevel.Regular.ordinal -> FeeLevel.Regular
-                else -> FeeLevel.Regular
-            }
+        when (feeType) {
+            FeeLevel.Priority.ordinal -> FeeLevel.Priority
+            FeeLevel.Regular.ordinal -> FeeLevel.Regular
+            else -> FeeLevel.Regular
         }
 
     private fun FeeLevel.mapFeeLevelToSavedValue() =

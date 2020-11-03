@@ -9,7 +9,6 @@ import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
@@ -117,12 +116,11 @@ internal class EthCryptoWalletAccount(
             }
         }
 
-    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine =
+    override fun createTxEngine(): TxEngine =
         EthOnChainTxEngine(
             ethDataManager = ethDataManager,
             feeManager = fees,
             requireSecondPassword = ethDataManager.requireSecondPassword,
-            walletPreferences = walletPreferences,
-            defaultFeeType = defaultFeeType
+            walletPreferences = walletPreferences
         )
 }

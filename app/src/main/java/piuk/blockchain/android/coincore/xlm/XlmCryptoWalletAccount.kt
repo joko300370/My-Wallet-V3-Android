@@ -11,7 +11,6 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -70,14 +69,13 @@ internal class XlmCryptoWalletAccount(
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
-    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine =
+    override fun createTxEngine(): TxEngine =
         XlmOnChainTxEngine(
             xlmDataManager = xlmManager,
             xlmFeesFetcher = xlmFeesFetcher,
             walletOptionsDataManager = walletOptionsDataManager,
             requireSecondPassword = payloadDataManager.isDoubleEncrypted,
-            walletPreferences = walletPreferences,
-            defaultFeeType = defaultFeeType
+            walletPreferences = walletPreferences
         )
 
     constructor(

@@ -11,7 +11,6 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
@@ -108,13 +107,12 @@ abstract class Erc20NonCustodialAccount(
             }
         }
 
-    override fun createTxEngine(defaultFeeType: FeeLevel): TxEngine =
+    override fun createTxEngine(): TxEngine =
         Erc20OnChainTxEngine(
             erc20Account = erc20Account,
             feeManager = fees,
             requireSecondPassword = ethDataManager.requireSecondPassword,
-            walletPreferences = walletPreferences,
-            defaultFeeType = defaultFeeType
+            walletPreferences = walletPreferences
         )
 }
 
