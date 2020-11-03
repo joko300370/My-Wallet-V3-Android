@@ -80,7 +80,9 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     object ResetFlow : TransactionIntent() {
-        override fun reduce(oldState: TransactionState): TransactionState = oldState
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            currentStep = TransactionStep.CLOSED
+        )
     }
 
     class ValidatePassword(

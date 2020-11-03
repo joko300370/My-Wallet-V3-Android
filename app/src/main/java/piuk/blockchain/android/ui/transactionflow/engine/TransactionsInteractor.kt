@@ -105,7 +105,11 @@ class TransactionInteractor(
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun reset() {
-        transactionProcessor?.reset() ?: throw IllegalStateException("TxProcessor not initialised")
+        if (transactionProcessor != null) {
+            transactionProcessor?.reset() ?: throw IllegalStateException("TxProcessor not initialised")
+        } else {
+            Timber.e("Transaction Interactor - calling reset on uninitialised transaction")
+        }
     }
 }
 

@@ -29,7 +29,8 @@ enum class TransactionStep(val addToBackStack: Boolean = false) {
     SELECT_TARGET_ACCOUNT(true),
     ENTER_AMOUNT(true),
     CONFIRM_DETAIL,
-    IN_PROGRESS
+    IN_PROGRESS,
+    CLOSED
 }
 
 enum class TransactionErrorState {

@@ -8,7 +8,7 @@ import org.koin.core.scope.Scope
 import org.koin.java.KoinJavaComponent
 import timber.log.Timber
 
-private const val SCOPE_ID = "SENDING_SCOPE_ID"
+private const val SCOPE_ID = "TRANSACTION_SCOPE_ID"
 
 internal fun createTransactionScope(): Scope =
     KoinJavaComponent.getKoin().createScope(
@@ -23,7 +23,7 @@ internal fun closeTransactionScope() =
     try {
         transactionScope().close()
     } catch (t: ScopeNotCreatedException) {
-        Timber.d("Cannot close a non-existent scope")
+        Timber.e("Cannot close a non-existent scope")
     }
 
 internal inline fun <reified T : Any> ComponentCallbacks.transactionInject(
