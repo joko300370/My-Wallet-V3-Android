@@ -26,6 +26,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.ConfirmTransactionSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterSecondPasswordSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterTargetAddressSheet
+import piuk.blockchain.android.ui.transactionflow.flow.SelectSourceAccountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.SelectTargetAccountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionProgressSheet
 import timber.log.Timber
@@ -87,7 +88,6 @@ class TransactionFlow(
         fragmentManager: FragmentManager,
         host: FlowHost
     ) {
-        require(sourceAccount !is NullCryptoAccount)
 
         super.startFlow(fragmentManager, host)
         // Create the send scope
@@ -127,7 +127,9 @@ class TransactionFlow(
                             )
                         }
                         else -> {
-                            throw IllegalStateException("Transaction flow initialised without at least one target")
+                            model.process(
+                                TransactionIntent.InitialiseWithNoSourceOrTargetAccount(action, passwordRequired)
+                            )
                         }
                     }
                 },
@@ -163,6 +165,9 @@ class TransactionFlow(
                 TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet(
                     this
                 )
+                TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet(
+                    this
+                )
                 TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet(
                     this
                 )
@@ -181,6 +186,7 @@ class TransactionFlow(
                 TransactionStep.CLOSED -> {
                     currentStep = TransactionStep.ZERO
                     disposables.clear()
+                    model.destroy()
                     closeScope()
                     null
                 }

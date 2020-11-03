@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.swap.nabu.datamanagers.SwapPair
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -13,10 +14,12 @@ import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -87,6 +90,17 @@ class TransactionInteractor(
                     }
             }
 
+    fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
+        require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
+        return coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
+            accountGroup.accounts.filter { account ->
+                (account is TradingAccount || account is NonCustodialAccount) &&
+                        (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false &&
+                        account.isFunded && !account.isArchived
+            }
+        }.map { it.map { account -> account as CryptoAccount } }
+    }
+
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
 
@@ -112,6 +126,9 @@ class TransactionInteractor(
         }
     }
 }
+
+private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
+    pairs.any { it.source == this.asset }
 
 private val Throwable.isUnexpectedContractError
     get() = (this is AddressParseError && this.error == AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)

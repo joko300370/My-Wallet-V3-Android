@@ -12,7 +12,6 @@ import androidx.annotation.StringRes
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDirections
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -38,7 +37,13 @@ import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
+import com.blockchain.preferences.CurrencyPrefs
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.setImageDrawable
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
@@ -49,12 +54,13 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
-    KycTierSplashView {
+    KycTierSplashView, DialogFlow.FlowHost {
 
     private val presenter: KycTierSplashPresenter by scopedInject()
-    private val startSwap: StartSwap by inject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val prefs: PersistentPrefs by inject()
+    private val currencyPrefs: CurrencyPrefs by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -239,8 +245,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 .throttledClicks()
                 .subscribeBy(
                     onNext = {
-                        startSwap.startSwapActivity(activity!!)
-                        activity!!.finish()
+                        startSwap()
                     },
                     onError = { Timber.e(it) }
                 )
@@ -258,6 +263,25 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                     onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_CONTACT_SUPPORT))) },
                     onError = { Timber.e(it) }
                 )
+    }
+
+    private fun startSwap() {
+        if (prefs.newSwapEnabled) {
+            TransactionFlow(
+                action = AssetAction.Swap
+            ).apply {
+                startFlow(
+                    fragmentManager = childFragmentManager,
+                    host = this@KycTierSplashFragment
+                )
+            }
+        } else {
+            HomebrewNavHostActivity.start(
+                context!!,
+                currencyPrefs.selectedFiatCurrency
+            )
+            activity?.finish()
+        }
     }
 
     override fun onPause() {
@@ -290,5 +314,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     companion object {
         private const val SILVER_TIER_INDEX = 1
+    }
+
+    override fun onFlowFinished() {
     }
 }

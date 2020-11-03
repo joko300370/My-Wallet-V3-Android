@@ -25,6 +25,7 @@ import java.util.Stack
 enum class TransactionStep(val addToBackStack: Boolean = false) {
     ZERO,
     ENTER_PASSWORD,
+    SELECT_SOURCE(true),
     ENTER_ADDRESS(true),
     SELECT_TARGET_ACCOUNT(true),
     ENTER_AMOUNT(true),
@@ -73,7 +74,8 @@ data class TransactionState(
     val allowFiatInput: Boolean = false,
     val executionStatus: TxExecutionStatus = TxExecutionStatus.NOT_STARTED,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
-    val availableTargets: List<TransactionTarget> = emptyList()
+    val availableTargets: List<TransactionTarget> = emptyList(),
+    val availableSources: List<CryptoAccount> = emptyList()
 ) : MviState {
 
     val asset: CryptoCurrency = sendingAccount.asset
@@ -112,10 +114,15 @@ class TransactionModel(
             is TransactionIntent.InitialiseWithSourceAccount -> processAccountsListUpdate(intent.fromAccount,
                 intent.action
             )
+            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(intent.action)
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
             is TransactionIntent.PrepareTransaction -> null
+            is TransactionIntent.AvailableSourceAccountsListUpdated -> null
+            is TransactionIntent.SourceAccountSelected -> processAccountsListUpdate(intent.sourceAccount,
+                previousState.action
+            )
             is TransactionIntent.ExecuteTransaction -> processExecuteTransaction(previousState.secondPassword)
             is TransactionIntent.ValidateInputTargetAddress ->
                 processValidateAddress(intent.targetAddress, intent.expectedCrypto)
@@ -160,7 +167,6 @@ class TransactionModel(
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
-                destroy()
                 null
             }
         }
@@ -171,6 +177,16 @@ class TransactionModel(
             onSuccess = {
                 process(
                     TransactionIntent.AvailableAccountsListUpdated(it)
+                )
+            },
+            onError = { }
+        )
+
+    private fun processSourceAccountsListUpdate(action: AssetAction): Disposable =
+        interactor.getAvailableSourceAccounts(action).subscribeBy(
+            onSuccess = {
+                process(
+                    TransactionIntent.AvailableSourceAccountsListUpdated(it)
                 )
             },
             onError = { }

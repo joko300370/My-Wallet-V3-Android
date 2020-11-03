@@ -19,36 +19,27 @@ import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.Money
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_swap.*
 import kotlinx.android.synthetic.main.pending_swaps_layout.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NonCustodialAccount
-import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
 import piuk.blockchain.android.ui.customviews.TrendingPair
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
-import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -57,21 +48,13 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
-class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.SelectionHost, KycBenefitsBottomSheet.Host {
+class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Host {
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = container?.inflate(R.layout.fragment_swap)
-
-    private val destinationAccount: CryptoAccount? by lazy {
-        arguments?.getAccount(DESTINATION_ACCOUNT) as? CryptoAccount
-    }
-
-    private val sourceAccount: CryptoAccount? by lazy {
-        arguments?.getAccount(SOURCE_ACCOUNT) as? CryptoAccount
-    }
 
     private val kycTierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
@@ -93,42 +76,18 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
 
         swap_cta.apply {
             setOnClickListener {
-                val fragment = AccountSelectSheet.newInstance(
-                    this@SwapFragment, getAccountList(),
-                    R.string.swap_account_select,
-                    R.string.swap_account_select_subtitle,
-                    ::statusDecorator
-                )
-                childFragmentManager.beginTransaction().add(fragment, TAG).commit()
+                TransactionFlow(
+                    action = AssetAction.Swap
+                ).apply {
+                    startFlow(
+                        fragmentManager = childFragmentManager,
+                        host = this@SwapFragment
+                    )
+                }
             }
             gone()
         }
         loadSwapOrKyc()
-    }
-
-    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
-        SwapAccountSelectSheetFeeDecorator(account)
-
-    private fun getAccountList(): Single<List<BlockchainAccount>> =
-        coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
-            accountGroup.accounts.filter { account ->
-                (account is TradingAccount || account is NonCustodialAccount) &&
-                    (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false &&
-                    account.isFunded && !account.isArchived
-            }
-        }
-
-    override fun onAccountSelected(account: BlockchainAccount) {
-        require(account is CryptoAccount)
-        TransactionFlow(
-            sourceAccount = account,
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@SwapFragment
-            )
-        }
     }
 
     override fun verificationCtaClicked() {
@@ -177,7 +136,6 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
                             if (!composite.tiers.isApprovedFor(KycTierLevel.GOLD)) {
                                 showKycUpsellIfEligible(composite.limits)
                             }
-                            checkForPredefinedAccounts()
                         } else {
                             swap_view_switcher.displayedChild = KYC_VIEW
                             initKycView()
@@ -195,27 +153,6 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
 
                         Timber.e("Error loading swap kyc service $it")
                     })
-    }
-
-    private fun checkForPredefinedAccounts() {
-        val source = sourceAccount ?: return
-        val transactionFlow = destinationAccount?.let {
-            TransactionFlow(
-                sourceAccount = source,
-                target = it,
-                action = AssetAction.Swap
-            )
-        } ?: TransactionFlow(
-            sourceAccount = source,
-            action = AssetAction.Swap
-        )
-
-        transactionFlow.apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@SwapFragment
-            )
-        }
     }
 
     private fun showKycUpsellIfEligible(limits: SwapLimits) {
@@ -322,19 +259,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, AccountSelectSheet.Selecti
         private const val SWAP_VIEW = 0
         private const val KYC_VIEW = 1
         private const val TAG = "BOTTOM_SHEET"
-        private const val SOURCE_ACCOUNT = "SOURCE_ACCOUNT"
-        private const val DESTINATION_ACCOUNT = "DESTINATION_ACCOUNT"
-        fun newInstance(sourceAccount: CryptoAccount?, destinationAccount: CryptoAccount?): SwapFragment =
-            SwapFragment().apply {
-                val extras = Bundle()
-                sourceAccount?.let {
-                    extras.putAccount(SOURCE_ACCOUNT, it)
-                }
-                destinationAccount?.let {
-                    extras.putAccount(DESTINATION_ACCOUNT, it)
-                }
-                arguments = extras
-            }
+        fun newInstance(): SwapFragment =
+            SwapFragment()
     }
 
     override fun onFlowFinished() {

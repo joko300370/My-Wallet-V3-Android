@@ -45,6 +45,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
@@ -65,6 +66,7 @@ import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
@@ -125,8 +127,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
-                        if (prefs.newSwapEnabled) startSwapFragment() else
-                            presenter.startSwapOrKyc(null, null)
+                        launchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
@@ -469,7 +470,16 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
-        startSwapFragment(sourceAccount, targetAccount)
+        if (prefs.newSwapEnabled)
+            startSwapFlow(sourceAccount, targetAccount)
+        else {
+            HomebrewNavHostActivity.start(
+                this,
+                presenter.defaultCurrency,
+                toCryptoCurrency = targetAccount?.asset,
+                fromCryptoCurrency = sourceAccount?.asset
+            )
+        }
     }
 
     override fun getStartIntent(): Intent {
@@ -595,11 +605,27 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(buySellFragment)
     }
 
-    private fun startSwapFragment(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
-        setCurrentTabItem(ITEM_SWAP)
-        toolbar_general.title = getString(R.string.swap)
-        val swapFragment = SwapFragment.newInstance(sourceAccount, destinationAccount)
-        replaceContentFragment(swapFragment)
+    private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
+        if (sourceAccount == null && destinationAccount == null) {
+            setCurrentTabItem(ITEM_SWAP)
+            toolbar_general.title = getString(R.string.swap)
+            val swapFragment = SwapFragment.newInstance()
+            replaceContentFragment(swapFragment)
+        } else if (sourceAccount != null) {
+            val transactionFlow =
+                TransactionFlow(
+                    sourceAccount = sourceAccount,
+                    target = destinationAccount ?: NullCryptoAccount(),
+                    action = AssetAction.Swap
+                )
+
+            transactionFlow.apply {
+                startFlow(
+                    fragmentManager = supportFragmentManager,
+                    host = this@MainActivity
+                )
+            }
+        }
     }
 
     override fun gotoDashboard() {

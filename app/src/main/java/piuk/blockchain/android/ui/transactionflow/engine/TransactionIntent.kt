@@ -33,6 +33,19 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             )
     }
 
+    class InitialiseWithNoSourceOrTargetAccount(
+        val action: AssetAction,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                passwordRequired = passwordRequired,
+                errorState = TransactionErrorState.NONE,
+                currentStep = TransactionStep.SELECT_SOURCE
+            )
+    }
+
     class InitialiseWithSourceAndTargetAccount(
         val action: AssetAction,
         val fromAccount: CryptoAccount,
@@ -135,6 +148,13 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             } else {
                 TransactionStep.ENTER_ADDRESS
             }
+    }
+
+    class AvailableSourceAccountsListUpdated(private val accounts: List<CryptoAccount>) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                availableSources = accounts
+            ).updateBackstack(oldState)
     }
 
     // Check a manually entered address is correct. If it is, the interactor will send a
@@ -247,6 +267,15 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 selectedTarget = selectedTarget,
                 nextEnabled = true
             ).updateBackstack(oldState)
+    }
+
+    class SourceAccountSelected(
+        val sourceAccount: CryptoAccount
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                sendingAccount = sourceAccount
+            )
     }
 
     class AmountChanged(

@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
@@ -22,6 +21,7 @@ import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_GOLD_UNAVAILABLE_SUPPORT
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_KYC_SUPPORTED_COUNTRIES_LIST
@@ -45,7 +45,12 @@ import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_veriff_splash.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -53,11 +58,12 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import java.lang.IllegalStateException
 
 class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresenter>(),
-    VeriffSplashView {
+    VeriffSplashView, DialogFlow.FlowHost {
 
     private val presenter: VeriffSplashPresenter by scopedInject()
-    private val swapStarter: StartSwap by inject()
     private val stringUtils: StringUtils by inject()
+    private val currencyPrefs: CurrencyPrefs by inject()
+    private val prefs: PersistentPrefs by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     override val countryCode by unsafeLazy {
         VeriffSplashFragmentArgs.fromBundle(arguments ?: Bundle()).countryCode
@@ -169,8 +175,22 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     override fun continueToSwap() {
         val activity = requireActivity()
-        swapStarter.startSwapActivity(activity)
-        activity.finish()
+        if (prefs.newSwapEnabled) {
+            TransactionFlow(
+                action = AssetAction.Swap
+            ).apply {
+                startFlow(
+                    fragmentManager = childFragmentManager,
+                    host = this@VeriffSplashFragment
+                )
+            }
+        } else {
+            HomebrewNavHostActivity.start(
+                activity,
+                currencyPrefs.selectedFiatCurrency
+            )
+            activity.finish()
+        }
     }
 
     override fun createPresenter(): VeriffSplashPresenter = presenter
@@ -227,6 +247,9 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private fun showEmptyState() {
         throw IllegalStateException("UiState == EMPTY. This should never happen")
+    }
+
+    override fun onFlowFinished() {
     }
 
     companion object {

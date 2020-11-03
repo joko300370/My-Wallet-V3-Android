@@ -11,10 +11,13 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.account.StatusDecorator
+import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
+import java.lang.IllegalStateException
 
 interface TransactionFlowCustomiser {
     // UI Element text, icons etc may be customised here:
@@ -42,6 +45,8 @@ interface TransactionFlowCustomiser {
     fun transactionCompleteTitle(state: TransactionState): String
     fun transactionCompleteMessage(state: TransactionState): String
     fun selectTargetAccountTitle(state: TransactionState): String
+    fun selectSourceAccountTitle(state: TransactionState): String
+    fun selectSourceAccountSubtitle(state: TransactionState): String
     fun selectTargetAccountDescription(state: TransactionState): String
     fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState
     fun transactionProgressIcon(state: TransactionState): Int
@@ -52,6 +57,7 @@ interface TransactionFlowCustomiser {
     fun issueFlashMessage(state: TransactionState): String?
     fun selectIssueType(state: TransactionState): IssueType
     fun showTargetIcon(state: TransactionState): Boolean
+    fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator
 }
 
 class TransactionFlowCustomiserImpl(
@@ -306,6 +312,20 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
+    override fun selectSourceAccountTitle(state: TransactionState): String {
+        return when (state.action) {
+            AssetAction.Swap -> resources.getString(R.string.swap)
+            else -> ""
+        }
+    }
+
+    override fun selectSourceAccountSubtitle(state: TransactionState): String {
+        return when (state.action) {
+            AssetAction.Swap -> resources.getString(R.string.swap_account_select_subtitle)
+            else -> ""
+        }
+    }
+
     override fun selectTargetAccountDescription(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.select_target_account_for_swap)
@@ -391,6 +411,16 @@ class TransactionFlowCustomiserImpl(
 
     override fun defInputType(state: TransactionState): CurrencyType =
         if (state.action == AssetAction.Swap) CurrencyType.Fiat else CurrencyType.Crypto
+
+    override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
+        when (state.action) {
+            AssetAction.Swap -> {
+                {
+                    SwapAccountSelectSheetFeeDecorator(it)
+                }
+            }
+            else -> throw IllegalStateException("Action is not supported")
+        }
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3
