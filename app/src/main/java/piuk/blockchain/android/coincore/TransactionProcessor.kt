@@ -77,7 +77,9 @@ data class PendingTx(
     internal fun addOrReplaceOption(newConfirmation: TxConfirmationValue, prepend: Boolean = false): PendingTx =
         this.copy(
             confirmations = if (hasOption(newConfirmation.confirmation)) {
-                val old = confirmations.find { it::class == newConfirmation::class }
+                val old = confirmations.find {
+                    it.confirmation == newConfirmation.confirmation && it::class == newConfirmation::class
+                }
                 confirmations.replace(old, newConfirmation).filterNotNull()
             } else {
                 val opts = confirmations.toMutableList()

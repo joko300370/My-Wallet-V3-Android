@@ -121,7 +121,7 @@ private class NetworkFeeItemViewHolder(
             .append(networkText)
             .append(linkedText)
 
-        sb.setSpan(StyleSpan(Typeface.BOLD), boldText.length, boldText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(StyleSpan(Typeface.BOLD), 0, boldText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         return sb
     }

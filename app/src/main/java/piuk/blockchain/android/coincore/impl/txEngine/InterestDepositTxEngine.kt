@@ -54,6 +54,11 @@ class InterestDepositTxEngine(
         agreementChecked: Boolean = false
     ): PendingTx =
         pendingTx.removeOption(TxConfirmation.DESCRIPTION)
+            .removeOption(TxConfirmation.MEMO)
+            .removeOption(TxConfirmation.FEE_SELECTION)
+            .addOrReplaceOption(
+                TxConfirmationValue.NetworkFee(pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
+                    sourceAccount.asset))
             .addOrReplaceOption(
                 TxConfirmationValue.TxBooleanConfirmation<Unit>(
                     confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
