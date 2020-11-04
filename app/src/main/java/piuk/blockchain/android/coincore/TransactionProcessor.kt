@@ -451,7 +451,10 @@ class TransactionProcessor(
     }
 
     fun reset() {
-        engine.stop(getPendingTx())
+        // if initialise tx fails then getPendingTx will crash
+        try {
+            engine.stop(getPendingTx())
+        } catch (e: IllegalStateException) {}
     }
 }
 

@@ -33,7 +33,11 @@ class QuotesProvider(
                             price = CryptoValue.fromMinor(pair.destination, price.price.toBigInteger())
                         )
                     },
-                    networkFee = CryptoValue.fromMinor(pair.destination, it.networkFee.toBigInteger()),
+                    networkFee = if (direction.hasZeroNetworkFee()) CryptoValue.zero(pair.destination)
+                    else CryptoValue.fromMinor(
+                        pair.destination,
+                        it.networkFee.toBigInteger()
+                    ),
                     staticFee = CryptoValue.fromMinor(pair.source, it.staticFee.toBigInteger()),
                     sampleDepositAddress = it.sampleDepositAddress,
                     expirationDate = it.expiresAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
@@ -41,4 +45,7 @@ class QuotesProvider(
                 )
             }
         }
+
+    private fun SwapDirection.hasZeroNetworkFee(): Boolean =
+        this == SwapDirection.FROM_USERKEY || this == SwapDirection.INTERNAL
 }
