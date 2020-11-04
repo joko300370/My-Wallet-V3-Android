@@ -4,11 +4,12 @@ import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.SwapQuote
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import piuk.blockchain.android.coincore.impl.PricesInterpolator
-import java.math.BigDecimal
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
@@ -18,11 +19,11 @@ class SwapQuotesEngine(
     private val direction: SwapDirection,
     private val pair: CurrencyPair.CryptoCurrencyPair
 ) {
-    private lateinit var latestQuote: SwapQuote
+    private lateinit var latestQuote: PricedQuote
 
-    private val amount = BehaviorSubject.createDefault<BigDecimal>(BigDecimal.ZERO)
+    private val amount = BehaviorSubject.createDefault<Money>(CryptoValue.zero(pair.source))
 
-    val quote: Observable<SwapQuote> =
+    private val quote: Observable<SwapQuote> =
         quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
             Observable.interval(
                 quote.creationDate.diffInSeconds(quote.expirationDate),
@@ -31,21 +32,22 @@ class SwapQuotesEngine(
             ).flatMapSingle {
                 quotesProvider.fetchQuote(direction = direction, pair = pair)
             }.startWith(quote)
-        }.doOnNext {
-            latestQuote = it
         }.share().replay(1).refCount()
 
-    val rate: Observable<BigDecimal> = Observables.combineLatest(quote.map {
-        PricesInterpolator(
-            list = it.prices
-        )
-    }, amount).map { (interpolator, amount) ->
-        interpolator.getRate(amount)
+    val pricedQuote: Observable<PricedQuote> = Observables.combineLatest(quote, amount).map { (quote, amount) ->
+        PricedQuote(PricesInterpolator(
+            list = quote.prices,
+            pair = pair
+        ).getRate(amount), quote)
+    }.doOnNext {
+        latestQuote = it
     }
 
-    fun getLatestQuote(): SwapQuote = latestQuote
+    fun getLatestQuote(): PricedQuote = latestQuote
 
-    fun updateAmount(newAmount: BigDecimal) = amount.onNext(newAmount)
+    fun updateAmount(newAmount: Money) = amount.onNext(newAmount)
 }
+
+data class PricedQuote(val price: Money, val swapQuote: SwapQuote)
 
 private fun Date.diffInSeconds(other: Date): Long = (this.time - other.time).absoluteValue / 100

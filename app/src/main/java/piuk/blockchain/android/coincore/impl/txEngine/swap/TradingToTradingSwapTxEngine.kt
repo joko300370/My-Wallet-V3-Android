@@ -14,11 +14,10 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 
 class TradingToTradingSwapTxEngine(
-    isNoteSupported: Boolean,
     walletManager: CustodialWalletManager,
     quotesProvider: QuotesProvider,
     kycTierService: TierService
-) : SwapEngineBase(isNoteSupported, quotesProvider, walletManager, kycTierService) {
+) : SwapEngineBase(quotesProvider, walletManager, kycTierService) {
 
     override fun assertInputsValid() {
         require(txTarget is CustodialTradingAccount)
@@ -27,14 +26,16 @@ class TradingToTradingSwapTxEngine(
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        sourceAccount.actionableBalance.flatMap { balance ->
-            Single.just(PendingTx(
-                amount = CryptoValue.zero(sourceAccount.asset),
-                available = balance,
-                fees = CryptoValue.zero(sourceAccount.asset),
-                feeLevel = FeeLevel.None,
-                selectedFiat = userFiat)).flatMap {
-                updateLimits(it)
+        quotesEngine.pricedQuote.firstOrError().flatMap { pricedQuote ->
+            sourceAccount.actionableBalance.flatMap { balance ->
+                Single.just(PendingTx(
+                    amount = CryptoValue.zero(sourceAccount.asset),
+                    available = balance,
+                    fees = CryptoValue.zero(sourceAccount.asset),
+                    feeLevel = FeeLevel.None,
+                    selectedFiat = userFiat)).flatMap {
+                    updateLimits(it, pricedQuote)
+                }
             }
         }
 

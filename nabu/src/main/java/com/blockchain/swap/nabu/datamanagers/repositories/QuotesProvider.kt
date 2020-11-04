@@ -28,9 +28,10 @@ class QuotesProvider(
                 SwapQuote(
                     id = it.id,
                     prices = it.quote.priceTiers.map { price ->
-                        PriceTier(volume = price.volume.toBigDecimal(),
-                            price = price.price.toBigDecimal(),
-                            marginPrice = price.marginPrice.toBigDecimal())
+                        PriceTier(
+                            volume = CryptoValue.fromMinor(pair.source, price.volume.toBigInteger()),
+                            price = CryptoValue.fromMinor(pair.destination, price.price.toBigInteger())
+                        )
                     },
                     networkFee = CryptoValue.fromMinor(pair.destination, it.networkFee.toBigInteger()),
                     staticFee = CryptoValue.fromMinor(pair.source, it.staticFee.toBigInteger()),

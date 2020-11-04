@@ -13,12 +13,12 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
+import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class OnChainSwapEngine(
-    isNoteSupported: Boolean,
     private val quotesProvider: QuotesProvider,
     walletManager: CustodialWalletManager,
     tiersService: TierService,
@@ -27,29 +27,33 @@ class OnChainSwapEngine(
     private val environmentConfig: EnvironmentConfig,
     private val custodialWalletManager: CustodialWalletManager
 ) : SwapEngineBase(
-    isNoteSupported, quotesProvider, walletManager, tiersService
+    quotesProvider, walletManager, tiersService
 ) {
 
     override fun doInitialiseTx(): Single<PendingTx> {
-        return quotesEngine.quote.firstOrError().doOnSuccess { quote ->
-            engine.start(
-                sourceAccount = sourceAccount,
-                txTarget = makeExternalAssetAddress(
-                    asset = sourceAccount.asset,
-                    address = quote.sampleDepositAddress,
-                    label = quote.sampleDepositAddress,
-                    environmentConfig = environmentConfig,
-                    postTransactions = { Completable.complete() }
-                ),
-                exchangeRates = exchangeRates
-            )
-        }.flatMap {
-            engine.doInitialiseTx().map {
-                it.copy(feeLevel = FeeLevel.Priority)
+        return quotesEngine.pricedQuote.firstOrError().doOnSuccess { pricedQuote ->
+            startOnChainEngine(pricedQuote)
+        }.flatMap { quote ->
+            engine.doInitialiseTx().flatMap {
+                updateLimits(it, quote)
             }
-        }.flatMap {
-            updateLimits(it)
+        }.map { px ->
+            px.copy(feeLevel = FeeLevel.Priority)
         }
+    }
+
+    private fun startOnChainEngine(pricedQuote: PricedQuote) {
+        engine.start(
+            sourceAccount = sourceAccount,
+            txTarget = makeExternalAssetAddress(
+                asset = sourceAccount.asset,
+                address = pricedQuote.swapQuote.sampleDepositAddress,
+                label = pricedQuote.swapQuote.sampleDepositAddress,
+                environmentConfig = environmentConfig,
+                postTransactions = { Completable.complete() }
+            ),
+            exchangeRates = exchangeRates
+        )
     }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {

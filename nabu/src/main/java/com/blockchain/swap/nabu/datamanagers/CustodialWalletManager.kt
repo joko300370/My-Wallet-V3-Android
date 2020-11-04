@@ -22,7 +22,6 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Date
 
@@ -488,9 +487,8 @@ sealed class CurrencyPair(val rawValue: String) {
 }
 
 data class PriceTier(
-    val volume: BigDecimal,
-    val price: BigDecimal,
-    val marginPrice: BigDecimal
+    val volume: Money,
+    val price: Money
 )
 
 data class SwapLimits(

@@ -99,7 +99,6 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = target,
                     engine = OnChainSwapEngine(
-                        isNoteSupported = false,
                         quotesProvider = quotesProvider,
                         walletManager = walletManager,
                         tiersService = kycTierService,
@@ -140,7 +139,6 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = target,
                     engine = TradingToTradingSwapTxEngine(
-                        isNoteSupported = source.isNoteSupported,
                         walletManager = walletManager,
                         quotesProvider = quotesProvider,
                         kycTierService = kycTierService
