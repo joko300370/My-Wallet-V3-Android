@@ -26,6 +26,9 @@ class SelectSourceAccountSheet(host: SlidingModalBottomDialog.Host) : Transactio
             account_list_subtitle.text = customiser.selectSourceAccountSubtitle(newState)
             account_list_subtitle.visible()
             account_list_back.visibleIf { newState.canGoBack }
+            account_list.onEmptyList = {
+                account_list_empty.visible()
+            }
         }
     }
 

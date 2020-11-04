@@ -97,6 +97,8 @@ class EnterTargetAddressSheet(
                 }
             } ?: hideErrorState()
 
+            address_sheet_back.visibleIf { newState.canGoBack }
+
             cta_button.isEnabled = newState.nextEnabled
             cacheState(newState)
         }
@@ -113,6 +115,9 @@ class EnterTargetAddressSheet(
                     hideTransferList()
                 }
                 onEmptyList = { hideTransferList() }
+            }
+            address_sheet_back.setOnClickListener {
+                model.process(TransactionIntent.ReturnToPreviousStep)
             }
         }
     }
