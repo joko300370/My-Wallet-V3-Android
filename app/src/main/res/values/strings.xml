@@ -1982,8 +1982,7 @@
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
     <string name="swap_select_target_title">New Swap</string>
-    <string name="tx_confirmation_withdrawal_fee">%1$s Withdrawal Fee</string>
-    <string name="tx_confirmation_deposit_fee">%1$s Deposit Fee</string>
+    <string name="tx_confirmation_network_fee">%1$s Network Fee</string>
     <string name="tx_confirmation_fee_learn_more_1">Network&#160;</string>
     <string name="tx_confirmation_fee_learn_more_2">fees are set by the %1$s network.&#160;</string>
     <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Learn more about fees</annotation>.</string>

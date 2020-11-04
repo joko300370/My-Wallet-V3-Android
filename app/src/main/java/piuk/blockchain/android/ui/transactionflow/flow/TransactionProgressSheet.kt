@@ -9,7 +9,6 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
-import piuk.blockchain.android.util.maskedAsset
 import timber.log.Timber
 
 class TransactionProgressSheet(
@@ -23,7 +22,7 @@ class TransactionProgressSheet(
         Timber.d("!TRANSACTION!> Rendering! TransactionProgressSheet")
         require(newState.currentStep == TransactionStep.IN_PROGRESS)
 
-        dialogView.tx_progress_view.setAssetIcon(newState.sendingAccount.asset.maskedAsset())
+        dialogView.tx_progress_view.setAssetIcon(customiser.transactionProgressIcon(newState))
 
         when (newState.executionStatus) {
             TxExecutionStatus.IN_PROGRESS -> dialogView.tx_progress_view.showTxInProgress(

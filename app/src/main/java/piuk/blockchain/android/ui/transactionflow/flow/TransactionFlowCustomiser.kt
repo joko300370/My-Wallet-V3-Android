@@ -144,9 +144,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Send -> resources.getString(
                 R.string.send_enter_amount_title, state.sendingAccount.asset.displayTicker
             )
-            AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_title,
-                state.sendingAccount.asset.displayTicker
-            )
+            AssetAction.Swap -> resources.getString(R.string.common_swap)
             AssetAction.Deposit -> resources.getString(R.string.tx_title_deposit,
                 state.sendingAccount.asset.displayTicker)
             AssetAction.Sell -> resources.getString(R.string.tx_title_sell,

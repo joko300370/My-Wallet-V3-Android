@@ -60,11 +60,8 @@ private class NetworkFeeItemViewHolder(
         val linksMap = mapOf<String, Uri>("send_tx_fees" to Uri.parse(URL_TX_FEES))
 
         with(itemView) {
-            confirmation_fee_label.text = if (item.type == TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE) {
-                context.getString(R.string.tx_confirmation_withdrawal_fee, item.asset.displayTicker)
-            } else {
-                context.getString(R.string.tx_confirmation_deposit_fee, item.asset.displayTicker)
-            }
+            confirmation_fee_label.text =
+                context.getString(R.string.tx_confirmation_network_fee, item.asset.displayTicker)
 
             if (item.fee.isZero) {
                 confirmation_fee_value.gone()
