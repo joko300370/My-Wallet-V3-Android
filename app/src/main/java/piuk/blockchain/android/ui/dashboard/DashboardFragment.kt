@@ -128,7 +128,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         if (state?.activeFlow != newState.activeFlow) {
             state?.activeFlow?.let {
                 clearBottomSheet()
-                it.finishFlow()
             }
 
             newState.activeFlow?.startFlow(childFragmentManager, this)
