@@ -5,6 +5,7 @@ import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import piuk.blockchain.android.R
@@ -27,7 +28,8 @@ class CreateWalletPresenter(
     private val appUtil: AppUtil,
     private val accessState: AccessState,
     private val prngFixer: PrngFixer,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val walletPrefs: WalletStatus
 ) : BasePresenter<CreateWalletView>() {
 
     var recoveryPhrase: String = ""
@@ -112,6 +114,7 @@ class CreateWalletPresenter(
             .doOnTerminate { view.dismissProgressDialog() }
             .subscribe(
                 {
+                    walletPrefs.setNewUser()
                     prefs.setValue(PersistentPrefs.KEY_EMAIL, email)
                     view.startPinEntryActivity()
                     Logging.logSignUp(true)

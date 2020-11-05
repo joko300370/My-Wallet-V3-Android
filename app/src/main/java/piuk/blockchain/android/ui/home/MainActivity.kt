@@ -33,11 +33,12 @@ import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -65,6 +66,7 @@ import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
 import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
@@ -80,7 +82,6 @@ import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
-import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
@@ -96,7 +97,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     DialogFlow.FlowHost {
 
     override val presenter: MainPresenter by scopedInject()
-    private val prefs: PersistentPrefs by inject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
     override val view: MainView = this
 
     var drawerOpen = false
@@ -470,16 +472,22 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
-        if (prefs.newSwapEnabled)
-            startSwapFlow(sourceAccount, targetAccount)
-        else {
-            HomebrewNavHostActivity.start(
-                this,
-                presenter.defaultCurrency,
-                toCryptoCurrency = targetAccount?.asset,
-                fromCryptoCurrency = sourceAccount?.asset
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        startSwapFlow(sourceAccount, targetAccount)
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            this,
+                            presenter.defaultCurrency,
+                            toCryptoCurrency = targetAccount?.asset,
+                            fromCryptoCurrency = sourceAccount?.asset
+                        )
+                    }
+                }
             )
-        }
     }
 
     override fun getStartIntent(): Intent {

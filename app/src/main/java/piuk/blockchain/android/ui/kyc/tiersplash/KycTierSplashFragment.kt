@@ -18,6 +18,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -25,6 +26,7 @@ import com.blockchain.swap.nabu.models.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import com.blockchain.ui.urllinks.URL_LEARN_MORE_REJECTED
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -32,18 +34,17 @@ import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
-import com.blockchain.preferences.CurrencyPrefs
-import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.setImageDrawable
-import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
@@ -59,8 +60,9 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     private val presenter: KycTierSplashPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val prefs: PersistentPrefs by inject()
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -266,22 +268,28 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     }
 
     private fun startSwap() {
-        if (prefs.newSwapEnabled) {
-            TransactionFlow(
-                action = AssetAction.Swap
-            ).apply {
-                startFlow(
-                    fragmentManager = childFragmentManager,
-                    host = this@KycTierSplashFragment
-                )
-            }
-        } else {
-            HomebrewNavHostActivity.start(
-                context!!,
-                currencyPrefs.selectedFiatCurrency
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        TransactionFlow(
+                            action = AssetAction.Swap
+                        ).apply {
+                            startFlow(
+                                fragmentManager = childFragmentManager,
+                                host = this@KycTierSplashFragment
+                            )
+                        }
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            context!!,
+                            currencyPrefs.selectedFiatCurrency
+                        )
+                        activity?.finish()
+                    }
+                }
             )
-            activity?.finish()
-        }
     }
 
     override fun onPause() {

@@ -12,6 +12,7 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
@@ -108,6 +109,7 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -369,7 +371,8 @@ val applicationModule = module {
                 appUtil = get(),
                 accessState = get(),
                 prngFixer = get(),
-                analytics = get()
+                analytics = get(),
+                walletPrefs = get()
             )
         }
 
@@ -505,6 +508,14 @@ val applicationModule = module {
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
                 coincore = get()
+            )
+        }
+
+        factory {
+            SwapTypeSwitcher(
+                walletPrefs = get(),
+                newSwapFeatureFlag = get(newSwapFeatureFlag),
+                prefs = get()
             )
         }
 

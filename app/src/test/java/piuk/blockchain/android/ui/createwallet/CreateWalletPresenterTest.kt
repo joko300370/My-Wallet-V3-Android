@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.createwallet
 import android.content.Intent
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -15,12 +16,12 @@ import org.junit.Test
 import org.mockito.Mockito
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 
 class CreateWalletPresenterTest {
 
@@ -33,11 +34,13 @@ class CreateWalletPresenterTest {
     private var prefsUtil: PersistentPrefs = mock()
     private var prngFixer: PrngFixer = mock()
     private var analytics: Analytics = mock()
+    private var walletPrefs: WalletStatus = mock()
 
     @Before
     fun setUp() {
         subject =
-            CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState, prngFixer, analytics)
+            CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState, prngFixer, analytics,
+                walletPrefs)
         subject.initView(view)
     }
 

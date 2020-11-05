@@ -240,6 +240,13 @@ class PrefsUtil(
         setValue(TWO_FA_SMS_RETRIES, retries)
     }
 
+    override val isNewUser: Boolean
+        get() = getValue(IS_NEW_USER, false)
+
+    override fun setNewUser() {
+        setValue(IS_NEW_USER, true)
+    }
+
     // Notification prefs
     override var arePushNotificationsEnabled: Boolean
         get() = getValue(KEY_PUSH_NOTIFICATION_ENABLED, true)
@@ -443,6 +450,7 @@ class PrefsUtil(
         private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
         private const val SWAP_KYC_PROMO = "SWAP_KYC_PROMO"
         private const val TWO_FA_SMS_RETRIES = "TWO_FA_SMS_RETRIES"
+        private const val IS_NEW_USER = "IS_NEW_USER"
         private const val MAX_ALLOWED_RETRIES = 3
 
         // For QA:

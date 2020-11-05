@@ -23,4 +23,7 @@ interface WalletStatus {
 
     val resendSmsRetries: Int
     fun setResendSmsRetries(retries: Int)
+
+    val isNewUser: Boolean
+    fun setNewUser()
 }
