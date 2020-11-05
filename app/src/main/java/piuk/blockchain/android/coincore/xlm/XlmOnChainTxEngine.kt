@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
@@ -53,6 +54,18 @@ class XlmOnChainTxEngine(
         require(txTarget is CryptoAddress)
         require((txTarget as CryptoAddress).asset == CryptoCurrency.XLM)
         require(asset == CryptoCurrency.XLM)
+    }
+
+    override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
+        return super.restart(txTarget, pendingTx).map { px ->
+            targetXlmAddress.memo?.let {
+                px.setMemo(TxConfirmationValue.Memo(
+                    text = it,
+                    isRequired = isMemoRequired(),
+                    id = null
+                ))
+            }
+        }
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =

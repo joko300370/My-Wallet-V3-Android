@@ -234,6 +234,12 @@ abstract class TxEngine : KoinComponent {
         this._refresh = refreshTrigger
     }
 
+    @CallSuper
+    open fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
+        this._txTarget = txTarget
+        return Single.just(pendingTx)
+    }
+
     open fun stop(pendingTx: PendingTx) {}
 
     // Optionally assert, via require() etc, that sourceAccounts and txTarget
@@ -456,7 +462,8 @@ class TransactionProcessor(
         // if initialise tx fails then getPendingTx will crash
         try {
             engine.stop(getPendingTx())
-        } catch (e: IllegalStateException) {}
+        } catch (e: IllegalStateException) {
+        }
     }
 }
 

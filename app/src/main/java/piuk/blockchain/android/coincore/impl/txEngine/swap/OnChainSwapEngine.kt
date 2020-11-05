@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
+import java.lang.IllegalStateException
 
 class OnChainSwapEngine(
     private val quotesProvider: QuotesProvider,
@@ -89,14 +90,27 @@ class OnChainSwapEngine(
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
         return createOrder(pendingTx).flatMap { order ->
-            engine.doExecute(pendingTx, secondPassword).onErrorResumeNext { error ->
-                custodialWalletManager.updateSwapOrder(order.id, false).onErrorComplete().toSingle {
-                    throw error
-                }
-            }.flatMap { result ->
-                custodialWalletManager.updateSwapOrder(order.id, true).onErrorComplete().thenSingle {
-                    Single.just(result)
-                }
+            engine.restart(
+                txTarget = makeExternalAssetAddress(
+                    asset = sourceAccount.asset,
+                    address = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
+                    label = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
+                    environmentConfig = environmentConfig,
+                    postTransactions = { Completable.complete() }
+                ),
+                pendingTx = pendingTx
+            ).flatMap { px ->
+                engine.doExecute(px, secondPassword)
+                    .onErrorResumeNext { error ->
+                        custodialWalletManager.updateSwapOrder(order.id, false).onErrorComplete().toSingle {
+                            throw error
+                        }
+                    }
+                    .flatMap { result ->
+                        custodialWalletManager.updateSwapOrder(order.id, true).onErrorComplete().thenSingle {
+                            Single.just(result)
+                        }
+                    }
             }
         }
     }
