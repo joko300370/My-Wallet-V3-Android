@@ -26,6 +26,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
 class EnterAmountSheet(
@@ -70,18 +71,18 @@ class EnterAmountSheet(
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                            "(${availableBalance.toStringWithSymbol()})"
+                                "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
             amount_sheet_use_max.text = customiser.enterAmountMaxButton(newState)
-
+            amount_sheet_use_max.visibleIf { customiser.shouldDisableInput(state.errorState) }
             updatePendingTxDetails(newState)
 
             customiser.issueFlashMessage(newState)?.let {
                 when (customiser.selectIssueType(newState)) {
-                    IssueType.ERROR -> amount_sheet_input.showError(it)
+                    IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
                         dismiss()
                         KycNavHostActivity.start(requireActivity(), CampaignType.Swap)

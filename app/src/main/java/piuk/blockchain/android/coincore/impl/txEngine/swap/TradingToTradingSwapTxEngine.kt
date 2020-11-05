@@ -37,7 +37,14 @@ class TradingToTradingSwapTxEngine(
                     updateLimits(it, pricedQuote)
                 }
             }
-        }
+        }.handlePendingOrdersError(
+            PendingTx(
+                amount = CryptoValue.zero(sourceAccount.asset),
+                available = CryptoValue.zero(target.asset),
+                fees = CryptoValue.ZeroBch,
+                selectedFiat = userFiat
+            )
+        )
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return super.doBuildConfirmations(pendingTx).map {

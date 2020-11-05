@@ -7,6 +7,8 @@ import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -80,6 +82,17 @@ abstract class SwapEngineBase(
                 maxLimit = limits.maxLimit.toCrypto(exchangeRates, sourceAccount.asset),
                 engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
             )
+        }
+
+    protected fun Single<PendingTx>.handlePendingOrdersError(pendingTx: PendingTx): Single<PendingTx> =
+        this.onErrorResumeNext {
+            if (it is NabuApiException && it.getErrorCode() == NabuErrorCodes.PendingOrdersLimitReached) {
+                Single.just(
+                    pendingTx.copy(
+                        validationState = ValidationState.PENDING_ORDERS_LIMIT_REACHED
+                    )
+                )
+            } else Single.error(it)
         }
 
     override fun targetExchangeRate(): Observable<ExchangeRate> =

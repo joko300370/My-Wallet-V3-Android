@@ -105,6 +105,7 @@ enum class NabuErrorCodes(val code: Int) {
     // related link.
     InvalidCampaign(54),
     InvalidCampaignUser(55),
+    PendingOrdersLimitReached(53),
     CampaignUserAlreadyRegistered(56),
     CampaignExpired(57),
     InvalidCampaignInfo(58),

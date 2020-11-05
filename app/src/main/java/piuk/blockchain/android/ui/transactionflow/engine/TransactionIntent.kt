@@ -407,6 +407,7 @@ private fun ValidationState.mapToTransactionError() =
         ValidationState.INVALID_ADDRESS -> TransactionErrorState.INVALID_ADDRESS
         ValidationState.ADDRESS_IS_CONTRACT -> TransactionErrorState.ADDRESS_IS_CONTRACT
         ValidationState.UNDER_MIN_LIMIT -> TransactionErrorState.BELOW_MIN_LIMIT
+        ValidationState.PENDING_ORDERS_LIMIT_REACHED -> TransactionErrorState.PENDING_ORDERS_LIMIT_REACHED
         ValidationState.HAS_TX_IN_FLIGHT -> TransactionErrorState.TRANSACTION_IN_FLIGHT
         ValidationState.OPTION_INVALID -> TransactionErrorState.TX_OPTION_INVALID
         ValidationState.OVER_MAX_LIMIT -> TransactionErrorState.ABOVE_MAX_LIMIT

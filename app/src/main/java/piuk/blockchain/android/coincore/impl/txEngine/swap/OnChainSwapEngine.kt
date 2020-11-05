@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -40,7 +41,13 @@ class OnChainSwapEngine(
             }
         }.map { px ->
             px.copy(feeLevel = FeeLevel.Priority)
-        }
+        }.handlePendingOrdersError(
+            PendingTx(
+                amount = CryptoValue.zero(sourceAccount.asset),
+                available = CryptoValue.zero(target.asset),
+                fees = CryptoValue.ZeroBch,
+                selectedFiat = userFiat)
+        )
     }
 
     private fun startOnChainEngine(pricedQuote: PricedQuote) {

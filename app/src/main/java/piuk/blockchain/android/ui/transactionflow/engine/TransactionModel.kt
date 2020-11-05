@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
+import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
@@ -43,6 +44,7 @@ enum class TransactionErrorState {
     INVALID_AMOUNT,
     BELOW_MIN_LIMIT,
     ABOVE_MAX_LIMIT,
+    PENDING_ORDERS_LIMIT_REACHED,
     OVER_SILVER_TIER_LIMIT,
     OVER_GOLD_TIER_LIMIT,
     NOT_ENOUGH_GAS,
@@ -257,7 +259,12 @@ class TransactionModel(
         action: AssetAction
     ): Disposable =
         interactor.initialiseTransaction(sourceAccount, transactionTarget, action)
-            .doOnFirst { onFirstUpdate(amount) }
+            .doOnFirst {
+                if (it.validationState == ValidationState.UNINITIALISED ||
+                    it.validationState == ValidationState.CAN_EXECUTE
+                )
+                    onFirstUpdate(amount)
+            }
             .subscribeBy(
                 onNext = {
                     process(TransactionIntent.PendingTxUpdated(it))

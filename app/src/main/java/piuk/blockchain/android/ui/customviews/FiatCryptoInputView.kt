@@ -144,11 +144,12 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             updateFilters(enter_amount.configuration.prefixOrSuffix)
     }
 
-    fun showError(errorMessage: String) {
+    fun showError(errorMessage: String, shouldDisableInput: Boolean = false) {
         error.text = errorMessage
         error.visible()
         info.gone()
         hideExchangeAmount()
+        exchange_amount.isEnabled = !shouldDisableInput
     }
 
     fun showInfo(infoMessage: String, onClick: () -> Unit) {
