@@ -1838,7 +1838,7 @@
     <string name="send_enter_unexpected_error">Wystąpił nieoczekiwany błąd. Proszę spróbuj ponownie.</string>
     <string name="send_enter_insufficient_gas">Nie masz wystarczającej liczby ETH, aby przetworzyć tę transakcję.</string>
     <string name="send_select_a_wallet_title">lub Wybierz portfel</string>
-    <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %1$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
+    <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %2$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
     <string name="purchase_funds_note">Twoja ostateczna kwota może ulec zmianie ze względu na aktywność na rynku.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Dowiedz się więcej. </annotation>

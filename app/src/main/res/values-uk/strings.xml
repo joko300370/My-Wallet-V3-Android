@@ -1840,7 +1840,7 @@
   <string name="send_enter_unexpected_error">Виникла несподівана помилка. Будь ласка спробуйте ще раз.</string>
   <string name="send_enter_insufficient_gas">У вас недостатньо ETH для обробки цієї транзакції.</string>
   <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
-  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
+  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %2$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
   <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Докладніше. </annotation>

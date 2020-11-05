@@ -1837,7 +1837,7 @@
   <string name="send_enter_unexpected_error">Một lỗi không mong muốn đã xảy ra. Vui lòng thử lại.</string>
   <string name="send_enter_insufficient_gas">Bạn không có đủ ETH để xử lý giao dịch này.</string>
   <string name="send_select_a_wallet_title">hoặc Chọn một Ví</string>
-  <string name="send_internal_transfer_message">Tại thời điểm này, bạn chỉ có thể chuyển %1$s từ Ví thương mại %1$s sang Ví Vault của mình. Sau khi %1$s có trong Ví Vault, bạn có thể chuyển đến các địa chỉ bên ngoài.</string>
+  <string name="send_internal_transfer_message">Tại thời điểm này, bạn chỉ có thể chuyển %1$s từ Ví thương mại %2$s sang Ví Vault của mình. Sau khi %1$s có trong Ví Vault, bạn có thể chuyển đến các địa chỉ bên ngoài.</string>
   <string name="purchase_funds_note">Số tiền cuối cùng của bạn có thể thay đổi do hoạt động thị trường.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Tìm hiểu thêm. </annotation>

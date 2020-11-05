@@ -24,6 +24,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import java.math.RoundingMode
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 import java.util.Currency
@@ -131,10 +132,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                         .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), "")
                 )
             }
-            amountSubject.onNext(
-                if (newValue.output == CurrencyType.Crypto) newValue.predefinedAmount.inCrypto()
-                else newValue.predefinedAmount.inFiat()
-            )
             enter_amount.resetForTyping()
         }
     }
@@ -225,7 +222,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun Money.inCrypto(): CryptoValue =
         when (this) {
-            is FiatValue -> cryptoToFiatRate.inverse().convert(this) as CryptoValue
+            is FiatValue -> cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp)
+                .convert(this) as CryptoValue
             is CryptoValue -> this
             else -> throw IllegalStateException("Illegal money type")
         }
@@ -240,7 +238,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 FiatValue.fromMajor(configuration.fiatCurrency, amount)
             } ?: FiatValue.zero(configuration.fiatCurrency)
 
-            val cryptoAmount = cryptoToFiatRate.inverse().convert(fiatAmount)
+            val cryptoAmount = cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp).convert(fiatAmount)
             exchange_amount.text = cryptoAmount.toStringWithSymbol()
 
             amountSubject.onNext(

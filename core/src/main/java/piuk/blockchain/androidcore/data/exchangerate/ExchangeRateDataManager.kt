@@ -30,7 +30,7 @@ class ExchangeRateDataManager(
             .subscribeOn(Schedulers.io())
 
     override fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
-        exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
+            exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
 
     override fun getLastPriceOfFiat(targetFiat: String, sourceFiat: String) =
         exchangeRateDataStore.getFiatLastPrice(targetFiat = targetFiat, sourceFiat = sourceFiat)
@@ -50,10 +50,10 @@ class ExchangeRateDataManager(
     fun getCurrencyLabels() = exchangeRateDataStore.getCurrencyLabels()
 }
 
-fun FiatValue.toCrypto(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =
+fun FiatValue.toCrypto(exchangeRateDataManager: ExchangeRates, cryptoCurrency: CryptoCurrency) =
     toCryptoOrNull(exchangeRateDataManager, cryptoCurrency) ?: CryptoValue.zero(cryptoCurrency)
 
-fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRateDataManager, cryptoCurrency: CryptoCurrency) =
+fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRates, cryptoCurrency: CryptoCurrency) =
     if (isZero) {
         CryptoValue.zero(cryptoCurrency)
     } else {

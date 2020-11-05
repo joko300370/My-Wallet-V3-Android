@@ -1835,7 +1835,7 @@
     <string name="send_enter_unexpected_error">A aparut o eroare neasteptata. Vă rugăm să încercați din nou.</string>
     <string name="send_enter_insufficient_gas">Nu aveți suficient ETH pentru a procesa această tranzacție.</string>
     <string name="send_select_a_wallet_title">sau Selectați un portofel</string>
-    <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %1$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
+    <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %2$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
     <string name="purchase_funds_note">Suma finală se poate modifica din cauza activității de pe piață.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Aflați mai multe. </annotation>

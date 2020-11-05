@@ -1833,7 +1833,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="send_enter_unexpected_error">Ha ocurrido un error inesperado. Inténtelo de nuevo.</string>
   <string name="send_enter_insufficient_gas">No tiene suficiente ETH para efectuar esta transacción.</string>
   <string name="send_select_a_wallet_title">o seleccione una Wallet.</string>
-  <string name="send_internal_transfer_message">En este momento, solo podrá realizar transferencias %1$s desde su %1$s Trade Wallet a su Vault Wallet. En el momento en que %1$s esté en su Vault Wallet, podrá transferirlo a direcciones externas.</string>
+  <string name="send_internal_transfer_message">En este momento, solo podrá realizar transferencias %1$s desde su %2$s Trade Wallet a su Vault Wallet. En el momento en que %1$s esté en su Vault Wallet, podrá transferirlo a direcciones externas.</string>
   <string name="purchase_funds_note">Su cantidad definitiva podrá cambiar debido a la actividad del mercado.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Obtenga más información. </annotation>

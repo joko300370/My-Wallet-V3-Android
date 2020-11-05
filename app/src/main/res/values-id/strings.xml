@@ -1835,7 +1835,7 @@
   <string name="send_enter_unexpected_error">Terjadi sebuah kesalahan yang tidak diharapkan. Silakan coba lagi.</string>
   <string name="send_enter_insufficient_gas">Anda tidak memiliki cukup ETH untuk memproses transaksi ini.</string>
   <string name="send_select_a_wallet_title">atau Pilih Dompet</string>
-  <string name="send_internal_transfer_message">Saat ini, Anda hanya dapat mentransfer %1$s dari Dompet Dagang %1$s ke Dompet Vault Anda. Setelah %1$s ada di Vault Wallet, Anda dapat mentransfer ke alamat eksternal.</string>
+  <string name="send_internal_transfer_message">Saat ini, Anda hanya dapat mentransfer %1$s dari Dompet Dagang %2$s ke Dompet Vault Anda. Setelah %1$s ada di Vault Wallet, Anda dapat mentransfer ke alamat eksternal.</string>
   <string name="purchase_funds_note">Jumlah akhir Anda dapat berubah karena aktivitas pasar.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Pelajari lebih lanjut. </annotation>

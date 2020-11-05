@@ -1837,7 +1837,7 @@
     <string name="send_enter_unexpected_error">Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.</string>
     <string name="send_enter_insufficient_gas">Sie haben nicht genug ETH, um diese Transaktion abzuwickeln.</string>
     <string name="send_select_a_wallet_title">oder Wählen Sie eine Brieftasche</string>
-    <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %1$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
+    <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %2$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
     <string name="purchase_funds_note">Ihr endgültiger Betrag kann sich aufgrund von Marktaktivitäten ändern.</string>
     <string name="common_linked_learn_more"><annotation link="learn_more_link"> Weitere.</annotation></string>
     <string name="interest_announcement_title">Verdienen Sie noch heute Interesse an Ihrer Krypto!</string>

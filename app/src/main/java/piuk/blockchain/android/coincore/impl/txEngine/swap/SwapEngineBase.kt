@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.SwapQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -72,14 +71,22 @@ abstract class SwapEngineBase(
             kycTierService.tiers(),
             walletManager.getSwapLimits(userFiat)
         ) { tier, limits ->
+
+            val exchangeRate = ExchangeRate.CryptoToFiat(
+                sourceAccount.asset,
+                userFiat,
+                exchangeRates.getLastPrice(sourceAccount.asset, userFiat).toBigDecimal()
+            )
+
             pendingTx.copy(
-                minLimit = Money.max(
-                    limits.minLimit.toCrypto(exchangeRates, sourceAccount.asset),
+                minLimit = (Money.max(
+                    exchangeRate.inverse().convert(limits.minLimit),
                     minAmountToPayNetworkFees(pricedQuote.price,
                         pricedQuote.swapQuote.networkFee,
                         pricedQuote.swapQuote.staticFee
-                    )),
-                maxLimit = limits.maxLimit.toCrypto(exchangeRates, sourceAccount.asset),
+                    )) as CryptoValue).withUserDpRounding(RoundingMode.CEILING),
+                maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue).withUserDpRounding(
+                    RoundingMode.FLOOR),
                 engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
             )
         }
@@ -133,6 +140,9 @@ abstract class SwapEngineBase(
             TxValidationFailure(ValidationState.OVER_SILVER_TIER_LIMIT)
         }
 
+    private fun CryptoValue.withUserDpRounding(roundingMode: RoundingMode): CryptoValue =
+        CryptoValue.fromMajor(this.currency, this.toBigDecimal().setScale(pair.source.userDp, roundingMode))
+
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
@@ -171,7 +181,7 @@ abstract class SwapEngineBase(
     }
 
     private fun minLimit(pendingTx: PendingTx, price: Money): Money =
-        Money.max(
+        (Money.max(
             pendingTx.minLimit ?: minAmountToPayNetworkFees(
                 price,
                 quotesEngine.getLatestQuote().swapQuote.networkFee,
@@ -180,7 +190,7 @@ abstract class SwapEngineBase(
                 price,
                 quotesEngine.getLatestQuote().swapQuote.networkFee,
                 quotesEngine.getLatestQuote().swapQuote.staticFee
-            ))
+            )) as CryptoValue).withUserDpRounding(RoundingMode.CEILING)
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->

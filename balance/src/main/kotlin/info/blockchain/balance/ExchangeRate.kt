@@ -2,14 +2,13 @@ package info.blockchain.balance
 
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.util.Currency
 
 sealed class ExchangeRate(var rate: BigDecimal) {
 
-    protected val rateInverse: BigDecimal get() = BigDecimal.valueOf(1.0 / rate.toDouble())
-
     abstract fun convert(value: Money): Money
     abstract fun price(): Money
-    abstract fun inverse(): ExchangeRate
+    abstract fun inverse(roundingMode: RoundingMode = RoundingMode.HALF_UP, scale: Int = -1): ExchangeRate
 
     class CryptoToCrypto(
         val from: CryptoCurrency,
@@ -30,8 +29,10 @@ sealed class ExchangeRate(var rate: BigDecimal) {
         override fun price(): Money =
             CryptoValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            CryptoToCrypto(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            CryptoToCrypto(to,
+                from,
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros())
     }
 
     data class CryptoToFiat(
@@ -53,8 +54,10 @@ sealed class ExchangeRate(var rate: BigDecimal) {
         override fun price(): Money =
             FiatValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            FiatToCrypto(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            FiatToCrypto(to,
+                from,
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros())
     }
 
     class FiatToCrypto(
@@ -76,8 +79,15 @@ sealed class ExchangeRate(var rate: BigDecimal) {
         override fun price(): Money =
             CryptoValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            CryptoToFiat(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            CryptoToFiat(to,
+                from,
+                BigDecimal.ONE.divide(
+                    rate,
+                    if (scale == -1) Currency.getInstance(from).defaultFractionDigits else scale,
+                    roundingMode
+                ).stripTrailingZeros()
+            )
     }
 
     class FiatToFiat(
@@ -99,8 +109,13 @@ sealed class ExchangeRate(var rate: BigDecimal) {
         override fun price(): Money =
             FiatValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            FiatToFiat(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            FiatToFiat(to,
+                from,
+                BigDecimal.ONE.divide(rate,
+                    if (scale == -1) Currency.getInstance(from).defaultFractionDigits else scale,
+                    roundingMode).stripTrailingZeros()
+            )
     }
 
     companion object {

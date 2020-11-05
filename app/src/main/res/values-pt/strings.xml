@@ -1837,7 +1837,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="send_enter_unexpected_error">Ocorreu um erro inesperado. Por favor, tente novamente.</string>
   <string name="send_enter_insufficient_gas">Não tem ETH suficiente para processar esta transação.</string>
   <string name="send_select_a_wallet_title">ou selecione uma carteira</string>
-  <string name="send_internal_transfer_message">No momento, só pode transferir %1$s de sua %1$s Carteira Comercial para as suas Carteiras Vault. Assim que %1$s estiver na sua carteira do Vault,  pode transferir para endereços externos.a</string>
+  <string name="send_internal_transfer_message">No momento, só pode transferir %1$s de sua %2$s Carteira Comercial para as suas Carteiras Vault. Assim que %1$s estiver na sua carteira do Vault,  pode transferir para endereços externos.a</string>
   <string name="purchase_funds_note">O seu valor final pode mudar devido à atividade do mercado.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Saiba mais. </annotation>

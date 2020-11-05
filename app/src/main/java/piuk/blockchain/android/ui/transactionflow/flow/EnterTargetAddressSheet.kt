@@ -51,7 +51,8 @@ class EnterTargetAddressSheet(
                 model.process(TransactionIntent.EnteredAddressReset)
             } else {
                 if (customiser.enterTargetAddressSheetState(state) is
-                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed) {
+                            TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+                ) {
                     dialogView.select_an_account.visible()
                 } else {
                     dialogView.wallet_select.clearSelectedAccount()
@@ -78,7 +79,8 @@ class EnterTargetAddressSheet(
             }
 
             if (customiser.enterTargetAddressSheetState(newState) is
-                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed) {
+                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            ) {
                 select_an_account.visible()
             }
 
@@ -88,7 +90,7 @@ class EnterTargetAddressSheet(
                 hideManualAddressEntry(newState)
             }
 
-            customiser.issueFlashMessage(newState)?.let {
+            customiser.issueFlashMessage(newState, null)?.let {
                 address_entry.setBackgroundColor(
                     ContextCompat.getColor(requireContext(), R.color.red_000))
                 error_msg.apply {

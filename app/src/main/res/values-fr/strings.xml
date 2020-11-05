@@ -1837,7 +1837,7 @@ Veuillez réessayer plus tard.</string>
   <string name="send_enter_unexpected_error">Une erreur inattendue s\'est produite. Veuillez réessayer.</string>
   <string name="send_enter_insufficient_gas">Vous ne disposez pas de suffisamment d\'ETH pour traiter cette transaction.</string>
   <string name="send_select_a_wallet_title">ou sélectionnez un portefeuille</string>
-  <string name="send_internal_transfer_message">À l\'heure actuelle, vous ne pouvez transférer que %1$s de votre portefeuille commercial %1$s vers vos portefeuilles de coffre-fort. Une fois que %1$s est dans votre portefeuille de coffre-fort, vous pouvez le transférer à des adresses externes.</string>
+  <string name="send_internal_transfer_message">À l\'heure actuelle, vous ne pouvez transférer que %1$s de votre portefeuille commercial %2$s vers vos portefeuilles de coffre-fort. Une fois que %1$s est dans votre portefeuille de coffre-fort, vous pouvez le transférer à des adresses externes.</string>
   <string name="purchase_funds_note">Votre montant final peut changer en raison de l\'activité du marché.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> En savoir plus. </annotation>

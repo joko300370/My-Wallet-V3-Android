@@ -2,6 +2,9 @@ package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.content.res.Resources
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -54,7 +57,7 @@ interface TransactionFlowCustomiser {
     fun defInputType(state: TransactionState): CurrencyType
 
     // Format those flash error messages:
-    fun issueFlashMessage(state: TransactionState): String?
+    fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
     fun selectIssueType(state: TransactionState): IssueType
     fun showTargetIcon(state: TransactionState): Boolean
     fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator
@@ -354,8 +357,8 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    override fun issueFlashMessage(state: TransactionState): String? =
-        when (state.errorState) {
+    override fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String? {
+        return when (state.errorState) {
             TransactionErrorState.NONE -> null
             TransactionErrorState.INSUFFICIENT_FUNDS -> resources.getString(
                 R.string.send_enter_amount_error_insufficient_funds,
@@ -377,20 +380,16 @@ class TransactionFlowCustomiserImpl(
                 R.string.send_enter_insufficient_gas)
             TransactionErrorState.UNEXPECTED_ERROR -> resources.getString(
                 R.string.send_enter_unexpected_error)
-            TransactionErrorState.BELOW_MIN_LIMIT -> when (state.action) {
-                AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_min_deposit,
-                    state.pendingTx?.minLimit?.toStringWithSymbol())
-                AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_min_error,
-                    state.pendingTx?.minLimit?.toStringWithSymbol())
-                AssetAction.Send -> resources.getString(R.string.send_enter_amount_min_send,
-                    state.pendingTx?.minLimit?.toStringWithSymbol())
-                AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_min_swap,
-                    state.pendingTx?.minLimit?.toStringWithSymbol())
-                else -> throw IllegalArgumentException(
-                    "Action not supported by Send Flow ${state.action}")
+            TransactionErrorState.BELOW_MIN_LIMIT -> composeBelowLimitErrorMessage(state, input)
+            TransactionErrorState.ABOVE_MAX_LIMIT -> {
+                val exchangeRate = state.fiatRate ?: return ""
+                val amount =
+                    input?.let {
+                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate)
+                    } ?: state.pendingTx?.maxLimit?.toStringWithSymbol()
+
+                resources.getString(R.string.sell_enter_amount_max_error, amount)
             }
-            TransactionErrorState.ABOVE_MAX_LIMIT -> resources.getString(R.string.sell_enter_amount_max_error,
-                state.pendingTx?.maxLimit?.toStringWithSymbol())
             TransactionErrorState.OVER_SILVER_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_silver_limit)
             TransactionErrorState.OVER_GOLD_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_over_limit,
                 state.pendingTx?.maxLimit?.toStringWithSymbol())
@@ -400,6 +399,28 @@ class TransactionFlowCustomiserImpl(
             TransactionErrorState.PENDING_ORDERS_LIMIT_REACHED ->
                 resources.getString(R.string.too_many_pending_orders_error_message, state.asset.displayTicker)
         }
+    }
+
+    private fun composeBelowLimitErrorMessage(state: TransactionState, input: CurrencyType?): String {
+        val exchangeRate = state.fiatRate ?: return ""
+        val amount =
+            input?.let {
+                state.pendingTx?.minLimit?.toEnteredCurrency(it, exchangeRate)
+            } ?: state.pendingTx?.minLimit?.toStringWithSymbol()
+
+        return when (state.action) {
+            AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_min_deposit,
+                amount)
+            AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_min_error,
+                amount)
+            AssetAction.Send -> resources.getString(R.string.send_enter_amount_min_send,
+                amount)
+            AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_min_swap,
+                amount)
+            else -> throw IllegalArgumentException(
+                "Action not supported by Send Flow ${state.action}")
+        }
+    }
 
     override fun selectIssueType(state: TransactionState): IssueType =
         when (state.errorState) {
@@ -434,6 +455,21 @@ class TransactionFlowCustomiserImpl(
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3
+    }
+
+    private fun Money.toEnteredCurrency(
+        input: CurrencyType,
+        exchangeRate: ExchangeRate.CryptoToFiat
+    ): String {
+        if (input == CurrencyType.Crypto && this is CryptoValue)
+            return toStringWithSymbol()
+        if (input == CurrencyType.Fiat && this is FiatValue)
+            return toStringWithSymbol()
+        if (input == CurrencyType.Fiat && this is CryptoValue)
+            return exchangeRate.convert(this).toStringWithSymbol()
+        if (input == CurrencyType.Crypto && this is FiatValue)
+            return exchangeRate.inverse().convert(this).toStringWithSymbol()
+        throw IllegalStateException("Not valid currency")
     }
 }
 

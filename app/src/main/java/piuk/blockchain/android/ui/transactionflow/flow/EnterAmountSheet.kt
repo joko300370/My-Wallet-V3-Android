@@ -7,7 +7,9 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_tx_flow_enter_amount.view.*
@@ -28,6 +30,8 @@ import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
+import java.lang.IllegalStateException
+import java.math.RoundingMode
 
 class EnterAmountSheet(
     host: SlidingModalBottomDialog.Host
@@ -80,7 +84,7 @@ class EnterAmountSheet(
             amount_sheet_use_max.visibleIf { customiser.shouldDisableInput(state.errorState) }
             updatePendingTxDetails(newState)
 
-            customiser.issueFlashMessage(newState)?.let {
+            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {
                 when (customiser.selectIssueType(newState)) {
                     IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
@@ -114,10 +118,11 @@ class EnterAmountSheet(
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
             state.fiatRate?.let { rate ->
+                val px = state.pendingTx ?: throw IllegalStateException("Px is not initialised yet")
                 model.process(
                     TransactionIntent.AmountChanged(
                         if (!state.allowFiatInput && amount is FiatValue) {
-                            rate.inverse().convert(amount)
+                            convertFiatToCrypto(amount, rate, state)
                         } else {
                             amount
                         }
@@ -148,6 +153,25 @@ class EnterAmountSheet(
         }
     }
 
+    // in this method we try to convert the fiat value coming out from
+    // the view to a crypto which is withing the min and max limits allowed.
+    // We use floor rounding for max and ceiling for min just to make sure that we wont have problem with rounding once
+    // the amount reach the engine where the comparison with limits will happen.
+
+    private fun convertFiatToCrypto(
+        amount: FiatValue,
+        rate: ExchangeRate.CryptoToFiat,
+        state: TransactionState
+    ): Money {
+        val min = state.pendingTx?.minLimit ?: return rate.inverse().convert(amount)
+        val max = state.maxSpendable
+        val roundedUpAmount = rate.inverse(RoundingMode.CEILING, state.asset.userDp).convert(amount)
+        val roundedDownAmount = rate.inverse(RoundingMode.FLOOR, state.asset.userDp).convert(amount)
+        return if (roundedUpAmount >= min && roundedUpAmount <= max)
+            roundedUpAmount
+        else roundedDownAmount
+    }
+
     private fun updatePendingTxDetails(state: TransactionState) {
         with(dialogView) {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
@@ -175,7 +199,16 @@ class EnterAmountSheet(
     }
 
     private fun onUseMaxClick() {
-        dialogView.amount_sheet_input.showValue(state.maxSpendable)
+        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat)
+            dialogView.amount_sheet_input.configuration =
+                dialogView.amount_sheet_input.configuration.copy(
+                    input = CurrencyType.Crypto,
+                    output = CurrencyType.Crypto
+                )
+
+        dialogView.amount_sheet_input.showValue(
+            state.maxSpendable
+        )
     }
 
     private fun onCtaClick() {
@@ -204,7 +237,7 @@ class EnterAmountSheet(
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
                 input = CurrencyType.Fiat,
-                output = CurrencyType.Crypto,
+                output = CurrencyType.Fiat,
                 fiatCurrency = selectedFiat,
                 cryptoCurrency = newState.sendingAccount.asset,
                 predefinedAmount = fiatRate.applyRate(amount)

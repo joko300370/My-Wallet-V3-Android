@@ -1838,7 +1838,7 @@
   <string name="send_enter_unexpected_error">Došlo k neočekávané chybě. Prosím zkuste to znovu.</string>
   <string name="send_enter_insufficient_gas">Na zpracování této transakce nemáte dostatek ETH.</string>
   <string name="send_select_a_wallet_title">nebo Vyberte Peněženku</string>
-  <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %1$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
+  <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %2$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
   <string name="purchase_funds_note">Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Další informace. </annotation>
