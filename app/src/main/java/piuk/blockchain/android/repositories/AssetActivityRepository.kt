@@ -58,6 +58,11 @@ class AssetActivityRepository(
                         }
                     }
                 }.sorted()
+            }.map {
+                // FIXME added this to prevent swaps which are matched by asset type only from showing duplicates
+                // this is only filtering on a whole list, not for individual sub-wallets
+
+                it.distinctBy { it.txId }
             }
     }
 

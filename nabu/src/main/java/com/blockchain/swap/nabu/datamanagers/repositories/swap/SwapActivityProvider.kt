@@ -29,7 +29,7 @@ class SwapActivityProviderImpl(
             val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1])!!
 
             SwapTransactionItem(
-                it.id,
+                it.kind.depositTxHash ?: it.id,
                 it.createdAt.fromIso8601ToUtc()!!.time,
                 it.kind.direction.mapToDirection(),
                 it.kind.depositAddress,

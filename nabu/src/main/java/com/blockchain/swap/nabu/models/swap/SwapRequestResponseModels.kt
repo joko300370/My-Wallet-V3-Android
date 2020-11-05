@@ -54,6 +54,7 @@ data class OrderQuote(
 data class OrderKind(
     val direction: String,
     val depositAddress: String?,
+    val depositTxHash: String?,
     val withdrawalAddress: String?
 )
 
