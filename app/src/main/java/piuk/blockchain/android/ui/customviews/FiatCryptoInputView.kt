@@ -258,6 +258,10 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             )
         }
     }
+
+    fun fixExchange(it: Money) {
+        exchange_amount.text = it.toStringWithSymbol()
+    }
 }
 
 data class FiatCryptoViewConfiguration(

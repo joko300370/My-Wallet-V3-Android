@@ -121,7 +121,9 @@ class EnterAmountSheet(
                 model.process(
                     TransactionIntent.AmountChanged(
                         if (!state.allowFiatInput && amount is FiatValue) {
-                            convertFiatToCrypto(amount, rate, state)
+                            convertFiatToCrypto(amount, rate, state).also {
+                                view.amount_sheet_input.fixExchange(it)
+                            }
                         } else {
                             amount
                         }
@@ -164,8 +166,10 @@ class EnterAmountSheet(
     ): Money {
         val min = state.pendingTx?.minLimit ?: return rate.inverse().convert(amount)
         val max = state.maxSpendable
-        val roundedUpAmount = rate.inverse(RoundingMode.CEILING, state.asset.userDp).convert(amount)
-        val roundedDownAmount = rate.inverse(RoundingMode.FLOOR, state.asset.userDp).convert(amount)
+        val roundedUpAmount = rate.inverse(RoundingMode.CEILING, state.asset.userDp)
+            .convert(amount)
+        val roundedDownAmount = rate.inverse(RoundingMode.FLOOR, state.asset.userDp)
+            .convert(amount)
         return if (roundedUpAmount >= min && roundedUpAmount <= max)
             roundedUpAmount
         else roundedDownAmount

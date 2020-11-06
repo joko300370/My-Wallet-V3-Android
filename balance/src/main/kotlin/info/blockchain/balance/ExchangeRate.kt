@@ -6,7 +6,7 @@ import java.util.Currency
 
 sealed class ExchangeRate(var rate: BigDecimal) {
 
-    abstract fun convert(value: Money): Money
+    abstract fun convert(value: Money, round: Boolean = true): Money
     abstract fun price(): Money
     abstract fun inverse(roundingMode: RoundingMode = RoundingMode.HALF_UP, scale: Int = -1): ExchangeRate
 
@@ -23,7 +23,7 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as CryptoValue)
 
         override fun price(): Money =
@@ -40,16 +40,17 @@ sealed class ExchangeRate(var rate: BigDecimal) {
         val to: String,
         private val _rate: BigDecimal
     ) : ExchangeRate(_rate) {
-        fun applyRate(cryptoValue: CryptoValue): FiatValue {
+        fun applyRate(cryptoValue: CryptoValue, round: Boolean = false): FiatValue {
             validateCurrency(from, cryptoValue.currency)
             return FiatValue.fromMajor(
                 currencyCode = to,
-                major = rate.multiply(cryptoValue.toBigDecimal())
+                major = rate.multiply(cryptoValue.toBigDecimal()),
+                round = round
             )
         }
 
-        override fun convert(value: Money): Money =
-            applyRate(value as CryptoValue)
+        override fun convert(value: Money, round: Boolean): Money =
+            applyRate(value as CryptoValue, round)
 
         override fun price(): Money =
             FiatValue.fromMajor(to, rate)
@@ -73,7 +74,7 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as FiatValue)
 
         override fun price(): Money =
@@ -103,7 +104,7 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as FiatValue)
 
         override fun price(): Money =

@@ -87,7 +87,10 @@ class OnChainSwapEngine(
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
         return engine.doValidateAmount(pendingTx).flatMap {
-            if (it.validationState == ValidationState.CAN_EXECUTE) {
+            if (
+                it.validationState == ValidationState.CAN_EXECUTE ||
+                it.validationState == ValidationState.INVALID_AMOUNT
+            ) {
                 super.doValidateAmount(pendingTx)
             } else {
                 Single.just(it)
@@ -97,7 +100,10 @@ class OnChainSwapEngine(
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> {
         return engine.doValidateAll(pendingTx).flatMap {
-            if (it.validationState == ValidationState.CAN_EXECUTE) {
+            if (
+                it.validationState == ValidationState.CAN_EXECUTE ||
+                it.validationState == ValidationState.INVALID_AMOUNT
+            ) {
                 super.doValidateAll(pendingTx)
             } else {
                 Single.just(it)

@@ -20,6 +20,9 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.maskedAsset
+import java.math.BigInteger
+import java.math.RoundingMode
+import java.util.Currency
 
 interface TransactionFlowCustomiser {
     // UI Element text, icons etc may be customised here:
@@ -358,6 +361,11 @@ class TransactionFlowCustomiserImpl(
     }
 
     override fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String? {
+        if (state.pendingTx?.amount?.toBigInteger() == BigInteger.ZERO && (
+                    state.errorState == TransactionErrorState.INVALID_AMOUNT ||
+                            state.errorState == TransactionErrorState.BELOW_MIN_LIMIT
+                    )
+        ) return null
         return when (state.errorState) {
             TransactionErrorState.NONE -> null
             TransactionErrorState.INSUFFICIENT_FUNDS -> resources.getString(
@@ -385,7 +393,7 @@ class TransactionFlowCustomiserImpl(
                 val exchangeRate = state.fiatRate ?: return ""
                 val amount =
                     input?.let {
-                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate)
+                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.FLOOR)
                     } ?: state.pendingTx?.maxLimit?.toStringWithSymbol()
 
                 resources.getString(R.string.sell_enter_amount_max_error, amount)
@@ -405,7 +413,7 @@ class TransactionFlowCustomiserImpl(
         val exchangeRate = state.fiatRate ?: return ""
         val amount =
             input?.let {
-                state.pendingTx?.minLimit?.toEnteredCurrency(it, exchangeRate)
+                state.pendingTx?.minLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.CEILING)
             } ?: state.pendingTx?.minLimit?.toStringWithSymbol()
 
         return when (state.action) {
@@ -459,14 +467,18 @@ class TransactionFlowCustomiserImpl(
 
     private fun Money.toEnteredCurrency(
         input: CurrencyType,
-        exchangeRate: ExchangeRate.CryptoToFiat
+        exchangeRate: ExchangeRate.CryptoToFiat,
+        roundingMode: RoundingMode
     ): String {
         if (input == CurrencyType.Crypto && this is CryptoValue)
             return toStringWithSymbol()
         if (input == CurrencyType.Fiat && this is FiatValue)
             return toStringWithSymbol()
         if (input == CurrencyType.Fiat && this is CryptoValue)
-            return exchangeRate.convert(this).toStringWithSymbol()
+            return FiatValue.fromMajor(exchangeRate.to,
+                exchangeRate.convert(this, round = false).toBigDecimal().setScale(
+                    Currency.getInstance(exchangeRate.to).defaultFractionDigits, roundingMode
+                )).toStringWithSymbol()
         if (input == CurrencyType.Crypto && this is FiatValue)
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
         throw IllegalStateException("Not valid currency")
