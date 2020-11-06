@@ -110,7 +110,7 @@ public interface WalletExplorerEndpoints {
             @Field("guid") String guid,
             @Field("api_code") String apiCode);
 
-    @GET("wallet/{guid}?format=json&resend_code=true")
+    @GET("wallet/{guid}?format=json&resend_code=false")
     Observable<Response<ResponseBody>> getSessionId(
             @Path("guid") String guid);
 

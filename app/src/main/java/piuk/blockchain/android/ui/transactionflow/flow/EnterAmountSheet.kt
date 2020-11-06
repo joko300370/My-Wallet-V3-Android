@@ -28,9 +28,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.math.RoundingMode
 
 class EnterAmountSheet(
@@ -81,7 +80,7 @@ class EnterAmountSheet(
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
             amount_sheet_use_max.text = customiser.enterAmountMaxButton(newState)
-            amount_sheet_use_max.visibleIf { customiser.shouldDisableInput(state.errorState) }
+            amount_sheet_use_max.goneIf { customiser.shouldDisableInput(state.errorState) }
             updatePendingTxDetails(newState)
 
             customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {

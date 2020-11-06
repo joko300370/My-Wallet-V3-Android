@@ -12,13 +12,13 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
-import java.lang.IllegalStateException
 
 class OnChainSwapEngine(
     private val quotesProvider: QuotesProvider,
@@ -86,13 +86,23 @@ class OnChainSwapEngine(
     }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doValidateAmount(pendingTx).flatMap { super.doValidateAmount(pendingTx) }
-            .updateTxValidity(pendingTx)
+        return engine.doValidateAmount(pendingTx).flatMap {
+            if (it.validationState == ValidationState.CAN_EXECUTE) {
+                super.doValidateAmount(pendingTx)
+            } else {
+                Single.just(it)
+            }
+        }.updateTxValidity(pendingTx)
     }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doValidateAll(pendingTx).flatMap { super.doValidateAll(pendingTx) }
-            .updateTxValidity(pendingTx)
+        return engine.doValidateAll(pendingTx).flatMap {
+            if (it.validationState == ValidationState.CAN_EXECUTE) {
+                super.doValidateAll(pendingTx)
+            } else {
+                Single.just(it)
+            }
+        }.updateTxValidity(pendingTx)
     }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {

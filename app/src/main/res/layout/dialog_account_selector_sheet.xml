@@ -58,6 +58,14 @@
         tools:text="Descriptive subtitle"
         tools:visibility="visible" />
 
+    <View
+        android:id="@+id/account_list_separator"
+        style="@style/SeparatorWithoutMargins"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintTop_toBottomOf="@id/account_list_subtitle" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/account_list_empty"
         style="@style/Text.Semibold.16"
@@ -67,7 +75,7 @@
         android:paddingBottom="@dimen/standard_margin"
         android:text="@string/select_account_sheet_empty"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/account_list_subtitle"
+        app:layout_constraintTop_toBottomOf="@id/account_list_separator"
         tools:visibility="visible" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
@@ -76,6 +84,6 @@
         android:layout_height="wrap_content"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_list_subtitle" />
+        app:layout_constraintTop_toBottomOf="@id/account_list_separator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
