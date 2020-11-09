@@ -224,7 +224,7 @@ class EnterAmountSheet(
     }
 
     private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
-        if (input == CurrencyType.Crypto) {
+        if (input == CurrencyType.Crypto || newState.amount.isPositive) {
             newState.pendingTx?.selectedFiat?.let {
                 configuration = FiatCryptoViewConfiguration(
                     input = CurrencyType.Crypto,

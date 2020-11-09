@@ -99,7 +99,6 @@ open class Erc20OnChainTxEngine(
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
         require(amount.currency == asset)
-
         return Singles.zip(
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee(pendingTx.feeLevel)

@@ -77,5 +77,5 @@ class TradingToTradingSwapTxEngine(
                 amount = amount,
                 available = available
             )
-        }.updateQuotePrice()
+        }.updateQuotePrice().clearConfirmations()
 }

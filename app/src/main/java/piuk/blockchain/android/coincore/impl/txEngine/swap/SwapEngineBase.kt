@@ -153,6 +153,15 @@ abstract class SwapEngineBase(
             quotesEngine.updateAmount(it.amount)
         }
 
+    protected fun Single<PendingTx>.clearConfirmations(): Single<PendingTx> =
+        map {
+            it.quoteSub?.dispose()
+            it.copy(
+                confirmations = emptyList(),
+                engineState = it.engineState.toMutableMap().apply { remove(QUOTE_SUB) }.toMap()
+            )
+        }
+
     private val pair: CurrencyPair.CryptoCurrencyPair
         get() = CurrencyPair.CryptoCurrencyPair(sourceAccount.asset, target.asset)
 
@@ -244,12 +253,17 @@ abstract class SwapEngineBase(
                 volume = pendingTx.amount,
                 destinationAddress = if (direction.requiresDestinationAddress()) it.address else null
             )
-        }.doOnTerminate {
-            pendingTx.quoteSub?.dispose()
+        }.doFinally {
+            disposeQuotesFetching(pendingTx)
         }
 
-    override fun stop(pendingTx: PendingTx) {
+    private fun disposeQuotesFetching(pendingTx: PendingTx) {
         pendingTx.quoteSub?.dispose()
+        quotesEngine.stop()
+    }
+
+    override fun stop(pendingTx: PendingTx) {
+        disposeQuotesFetching(pendingTx)
     }
 
     private fun SwapDirection.requiresDestinationAddress() =

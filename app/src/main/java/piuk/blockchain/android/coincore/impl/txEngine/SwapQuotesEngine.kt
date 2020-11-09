@@ -9,6 +9,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.impl.PricesInterpolator
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -21,6 +22,8 @@ class SwapQuotesEngine(
 ) {
     private lateinit var latestQuote: PricedQuote
 
+    private val stop = PublishSubject.create<Unit>()
+
     private val amount = BehaviorSubject.createDefault<Money>(CryptoValue.zero(pair.source))
 
     private val quote: Observable<SwapQuote> =
@@ -32,7 +35,7 @@ class SwapQuotesEngine(
             ).flatMapSingle {
                 quotesProvider.fetchQuote(direction = direction, pair = pair)
             }.startWith(quote)
-        }.share().replay(1).refCount()
+        }.takeUntil(stop).share().replay(1).refCount()
 
     val pricedQuote: Observable<PricedQuote> = Observables.combineLatest(quote, amount).map { (quote, amount) ->
         PricedQuote(PricesInterpolator(
@@ -41,6 +44,10 @@ class SwapQuotesEngine(
         ).getRate(amount), quote)
     }.doOnNext {
         latestQuote = it
+    }
+
+    fun stop() {
+        stop.onNext(Unit)
     }
 
     fun getLatestQuote(): PricedQuote = latestQuote

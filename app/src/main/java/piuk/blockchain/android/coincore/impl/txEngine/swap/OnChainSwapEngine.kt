@@ -65,7 +65,7 @@ class OnChainSwapEngine(
     }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice()
+        return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice().clearConfirmations()
     }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
