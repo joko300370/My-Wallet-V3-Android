@@ -69,28 +69,26 @@ internal class CryptoInterestAccount(
         get() = custodialWalletManager.getInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
-            )
-            .doOnSuccess { hasFunds.set(it.isPositive) }
+            ).doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
-            )
-            .map { it as Money }
+            ).map { it as Money }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance // TODO This will need updating when we support transfer out of an interest account
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)
+            .onErrorReturn { emptyList() }
             .mapList { interestActivityToSummary(it) }
             .filterActivityStates()
             .doOnSuccess {
                 setHasTransactions(it.isNotEmpty())
             }
-            .onErrorReturn { emptyList() }
 
     private fun interestActivityToSummary(item: InterestActivityItem): ActivitySummaryItem =
         CustodialInterestActivitySummaryItem(

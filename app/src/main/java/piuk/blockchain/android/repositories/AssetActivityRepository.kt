@@ -97,7 +97,6 @@ class AssetActivityRepository(
     override fun getFromNetwork(): Maybe<ActivitySummaryList> =
         coincore.allWallets()
             .flatMap { it.activity }
-            .toMaybe()
             .doOnSuccess { activityList ->
                 // on error of activity returns onSuccess with empty list
                 if (activityList.isNotEmpty()) {
@@ -112,7 +111,7 @@ class AssetActivityRepository(
                 } else {
                     list
                 }
-            }
+            }.toMaybe()
 
     override fun getFromCache(): Maybe<ActivitySummaryList> {
         return if (transactionCache.isNotEmpty()) {

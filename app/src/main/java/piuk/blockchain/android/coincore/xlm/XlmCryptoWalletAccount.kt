@@ -58,6 +58,7 @@ internal class XlmCryptoWalletAccount(
 
     override val activity: Single<ActivitySummaryList>
         get() = xlmManager.getTransactionList()
+            .onErrorResumeNext { Single.just(emptyList()) }
             .mapList {
                 XlmActivitySummaryItem(
                     it,
@@ -66,8 +67,7 @@ internal class XlmCryptoWalletAccount(
                 ) as ActivitySummaryItem
             }.flatMap {
                 appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
-            }
-            .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =
         XlmOnChainTxEngine(

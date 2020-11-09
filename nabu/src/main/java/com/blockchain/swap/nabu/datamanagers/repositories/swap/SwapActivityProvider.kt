@@ -24,7 +24,7 @@ class SwapActivityProviderImpl(
         nabuService.fetchSwapActivity(sessionToken)
     }.map { response ->
         response.map {
-            val pairSplit = it.quote.pair.split("-")
+            val pairSplit = it.pair.split("-")
             val sendingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[0])!!
             val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1])!!
 

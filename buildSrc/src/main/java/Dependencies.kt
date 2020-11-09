@@ -18,7 +18,7 @@ object Versions {
     const val buildProperties = "0.4"
     const val ktlint = "0.27.0"
     const val kotlinJvmTarget = "1.6"
-    const val javaCompatibilityVersion = 1.7
+    const val javaCompatibilityVersion = 1.8
 
     // Androidx Libraries
     const val appCompact = "1.1.0"
@@ -52,7 +52,7 @@ object Versions {
     const val gson = "2.8.5"
     const val jacksonCore = "2.10.0"
     const val koin = "2.1.5"
-    const val rxJava = "2.2.11"
+    const val rxJava = "2.2.20"
     const val rxKotlin = "2.4.0"
     const val rxAndroid = "2.1.1"
     const val rxBinding = "2.1.1"
@@ -97,7 +97,7 @@ object Versions {
     const val probity = "1.0.0"
     const val sift = "0.10.5"
     const val cardForm = "4.2.0"
-    const val xlmSunriver = "0.19.0"
+    const val xlmSunriver = "0.21.1"
 
     // Logging
     const val timber = "4.7.1"

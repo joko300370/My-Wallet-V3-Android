@@ -11,7 +11,13 @@ import org.stellar.sdk.responses.operations.PaymentOperationResponse
 
 internal fun List<OperationResponse>.map(accountId: String, horizonProxy: HorizonProxy): List<XlmTransaction> =
     filter { it is CreateAccountOperationResponse || it is PaymentOperationResponse }
-        .map { mapOperationResponse(it, accountId, horizonProxy) }
+        .map {
+            mapOperationResponse(
+                it,
+                accountId,
+                horizonProxy
+            )
+        }
 
 internal fun mapOperationResponse(
     operationResponse: OperationResponse,
@@ -28,25 +34,41 @@ private fun CreateAccountOperationResponse.mapCreate(
     usersAccountId: String,
     horizonProxy: HorizonProxy
 ): XlmTransaction {
-    val transactionResponse = horizonProxy.getTransaction(transactionHash)
-    val fee = CryptoValue.lumensFromStroop(transactionResponse.feeCharged.toBigInteger())
-    return XlmTransaction(
-        timeStamp = createdAt,
-        value = deltaValueForAccount(usersAccountId, KeyPair.fromAccountId(funder), startingBalance),
-        fee = fee,
-        hash = transactionHash,
-        to = KeyPair.fromAccountId(account).toHorizonKeyPair().neuter(),
-        from = KeyPair.fromAccountId(funder).toHorizonKeyPair().neuter()
-    )
+    return try {
+        val transactionResponse = horizonProxy.getTransaction(transactionHash)
+        val fee = CryptoValue.fromMinor(CryptoCurrency.XLM, transactionResponse.feeCharged.toBigInteger())
+        toXlmTransaction(usersAccountId, startingBalance, account, funder, fee)
+    } catch (e: Throwable) {
+        // There's a bug in the xlm sdk (horizonProxy.getTransaction()) which throws a
+        // NoSuchMethodError when parsing a int memo on pre jdk 1.8 devices
+        // In this case, we can't know the fee but everything else is known, so:
+        toXlmTransaction(usersAccountId, startingBalance, account, funder, CryptoValue.ZeroXlm)
+    }
 }
 
 private fun PaymentOperationResponse.mapPayment(
     usersAccountId: String,
     horizonProxy: HorizonProxy
 ): XlmTransaction {
-    val transactionResponse = horizonProxy.getTransaction(transactionHash)
-    val fee = CryptoValue.lumensFromStroop(transactionResponse.feeCharged.toBigInteger())
-    return XlmTransaction(
+    return try {
+        val transactionResponse = horizonProxy.getTransaction(transactionHash)
+        val fee = CryptoValue.fromMinor(CryptoCurrency.XLM, transactionResponse.feeCharged.toBigInteger())
+        toXlmTransaction(usersAccountId, amount, to, from, fee)
+    } catch (e: Throwable) {
+        // There's a bug in the xlm sdk (horizonProxy.getTransaction()) which throws a
+        // NoSuchMethodError when parsing a int memo on pre jdk 1.8 devices
+        // In this case, we can't know the fee but everything else is known, so:
+        toXlmTransaction(usersAccountId, amount, to, from, CryptoValue.ZeroXlm)
+    }
+}
+
+private fun OperationResponse.toXlmTransaction(
+    usersAccountId: String,
+    amount: String,
+    to: String,
+    from: String,
+    fee: CryptoValue
+) = XlmTransaction(
         timeStamp = createdAt,
         value = deltaValueForAccount(usersAccountId, KeyPair.fromAccountId(from), amount),
         fee = fee,
@@ -54,7 +76,6 @@ private fun PaymentOperationResponse.mapPayment(
         to = KeyPair.fromAccountId(to).toHorizonKeyPair().neuter(),
         from = KeyPair.fromAccountId(from).toHorizonKeyPair().neuter()
     )
-}
 
 private fun deltaValueForAccount(
     usersAccountId: String,
