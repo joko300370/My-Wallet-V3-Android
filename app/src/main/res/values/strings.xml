@@ -2116,7 +2116,6 @@
     <string name="receive">Receive</string>
     <string name="in_progress">In-Progress</string>
     <string name="swap_direction">%1$s->%2$s</string>
-    <string name="security_locked_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.Learn more.</string>
     <!-- Fee options -->
 
 </resources>

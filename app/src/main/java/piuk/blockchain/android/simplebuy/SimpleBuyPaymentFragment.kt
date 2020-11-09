@@ -2,33 +2,24 @@ package piuk.blockchain.android.simplebuy
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
 import info.blockchain.balance.CryptoValue
 import kotlinx.android.synthetic.main.fragment_simple_buy_payment.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.math.BigInteger
@@ -37,7 +28,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     SimpleBuyScreen {
 
     override val model: SimpleBuyModel by scopedInject()
-    private val stringUtils: StringUtils by inject()
+
     private val ratingPrefs: RatingPrefs by scopedInject()
     private var reviewInfo: ReviewInfo? = null
     private var isFirstLoad = false
@@ -135,18 +126,12 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     ) {
         when {
             paymentSucceeded && value != null -> {
-                val lockedFundDays = lockedFundsTime.secondsToDays()
-                if (lockedFundDays <= 0L) {
-                    transaction_progress_view.showTxSuccess(
-                        getString(R.string.card_purchased, value.formatOrSymbolForZero()),
-                        getString(R.string.card_purchased_available_now,
-                            getString(value.currency.assetName())))
-                } else {
-                    transaction_progress_view.showPendingTx(
-                        getString(R.string.card_purchased, value.formatOrSymbolForZero()),
-                        subtitleForLockedFunds(lockedFundDays)
-                    )
-                }
+                transaction_progress_view.showTxSuccess(
+                    getString(R.string.card_purchased, value.formatOrSymbolForZero()),
+                    getString(R.string.card_purchased_available_now,
+                        getString(value.currency.assetName())),
+                    lockedFundsTime,
+                    requireActivity())
             }
             loading && value != null -> {
                 transaction_progress_view.showTxInProgress(
@@ -164,27 +149,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                     getString(R.string.order_error_subtitle))
             }
         }
-    }
-
-    private fun subtitleForLockedFunds(lockedFundDays: Long): SpannableStringBuilder {
-        val intro =
-            getString(R.string.security_locked_funds_explanation, lockedFundDays.toString())
-        val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
-
-        val learnLink = stringUtils.getStringWithMappedLinks(
-            R.string.common_linked_learn_more,
-            map,
-            activity)
-
-        val sb = SpannableStringBuilder()
-        sb.append(intro)
-            .append(learnLink)
-            .setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(activity, R.color.blue_600)),
-                intro.length, intro.length + learnLink.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        return sb
     }
 
     private fun openWebView(paymentLink: String, exitLink: String) {
