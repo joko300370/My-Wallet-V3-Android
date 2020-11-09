@@ -38,8 +38,7 @@
         app:layout_constraintCircleRadius="44dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_check_circle"
-        tools:visibility="gone" />
+        tools:src="@drawable/ic_locked_funds_pending" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/tx_guideline"
@@ -76,24 +75,6 @@
         app:layout_constraintTop_toBottomOf="@+id/tx_title"
         app:layout_constraintVertical_bias="0"
         tools:text="Oops! Something Went Wrong." />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tx_locked_funds"
-        style="@style/Text.Standard.Centered.14"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/tx_ok_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tx_subtitle"
-        app:layout_constraintVertical_bias="0"
-        tools:text="Locked funds"
-        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/tx_ok_btn"
