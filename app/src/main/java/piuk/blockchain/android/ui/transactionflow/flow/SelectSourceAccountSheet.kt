@@ -6,13 +6,12 @@ import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
-class SelectSourceAccountSheet(host: SlidingModalBottomDialog.Host) : TransactionFlowSheet(host) {
+class SelectSourceAccountSheet : TransactionFlowSheet() {
 
     private val customiser: TransactionFlowCustomiser by inject()
 

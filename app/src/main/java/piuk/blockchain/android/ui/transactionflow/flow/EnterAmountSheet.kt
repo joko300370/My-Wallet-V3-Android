@@ -17,7 +17,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
@@ -32,9 +31,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import timber.log.Timber
 import java.math.RoundingMode
 
-class EnterAmountSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class EnterAmountSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_amount
 
     private val customiser: TransactionFlowCustomiser by inject()

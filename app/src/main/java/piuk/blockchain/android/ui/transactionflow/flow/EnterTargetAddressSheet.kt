@@ -19,7 +19,6 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.scan.QrScanHandler
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.zxing.CaptureActivity
@@ -33,9 +32,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
 
-class EnterTargetAddressSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class EnterTargetAddressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
 
     private val appUtil: AppUtil by inject()

@@ -29,6 +29,10 @@ class PricesInterpolator(
             val nextVol = nextTier.volume
 
             if (thisVol < amount && amount <= nextVol) {
+                if (index == 0) {
+                    return nextTier.price
+                }
+
                 return CryptoValue.fromMajor(
                     pair.destination,
                     interpolator.interpolate(

@@ -160,27 +160,13 @@ class TransactionFlow(
         replaceBottomSheet(
             when (step) {
                 TransactionStep.ZERO -> null
-                TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet(
-                    this
-                )
-                TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet(
-                    this
-                )
-                TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet(
-                    this
-                )
-                TransactionStep.ENTER_AMOUNT -> EnterAmountSheet(
-                    this
-                )
-                TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet(
-                    this
-                )
-                TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(
-                    this
-                )
-                TransactionStep.IN_PROGRESS -> TransactionProgressSheet(
-                    this
-                )
+                TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet()
+                TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet()
+                TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet()
+                TransactionStep.ENTER_AMOUNT -> EnterAmountSheet()
+                TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet()
+                TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet()
+                TransactionStep.IN_PROGRESS -> TransactionProgressSheet()
                 TransactionStep.CLOSED -> {
                     currentStep = TransactionStep.ZERO
                     disposables.clear()

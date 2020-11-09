@@ -5,15 +5,12 @@ import android.view.View
 import kotlinx.android.synthetic.main.dialog_tx_flow_in_progress.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
 import timber.log.Timber
 
-class TransactionProgressSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class TransactionProgressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_in_progress
 
     private val customiser: TransactionFlowCustomiser by inject()

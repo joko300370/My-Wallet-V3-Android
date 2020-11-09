@@ -8,14 +8,13 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
-class SelectTargetAccountSheet(host: SlidingModalBottomDialog.Host) : TransactionFlowSheet(host) {
+class SelectTargetAccountSheet : TransactionFlowSheet() {
 
     private val customiser: TransactionFlowCustomiser by inject()
 

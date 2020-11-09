@@ -8,7 +8,6 @@ import info.blockchain.balance.ExchangeRates
 import kotlinx.android.synthetic.main.dialog_tx_flow_confirm.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -19,9 +18,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
-class ConfirmTransactionSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class ConfirmTransactionSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_confirm
 
     private val stringUtils: StringUtils by inject()
