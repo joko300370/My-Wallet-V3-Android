@@ -50,6 +50,8 @@ class SwapActivityProviderImpl(
                 localFiat,
                 currencyPrefs.selectedFiatCurrency
             )
+        }.filter {
+            it.state.displayableState
         }
     }
 

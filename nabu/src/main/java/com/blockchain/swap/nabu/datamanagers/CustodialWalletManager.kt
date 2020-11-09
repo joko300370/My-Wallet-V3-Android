@@ -326,6 +326,9 @@ enum class SwapOrderState {
 
     val isPending: Boolean
         get() = pendingState.contains(this)
+
+    val displayableState: Boolean
+        get() = isPending || this == FINISHED
 }
 
 data class BuySellPairs(val pairs: List<BuySellPair>)
