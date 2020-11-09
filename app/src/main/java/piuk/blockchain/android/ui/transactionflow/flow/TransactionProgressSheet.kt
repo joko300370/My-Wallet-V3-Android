@@ -33,8 +33,7 @@ class TransactionProgressSheet(
                 analyticsHooks.onTransactionSuccess(newState)
                 dialogView.tx_progress_view.showTxSuccess(
                     customiser.transactionCompleteTitle(newState),
-                    customiser.transactionCompleteMessage(newState),
-                    activityContext = requireActivity()
+                    customiser.transactionCompleteMessage(newState)
                 )
             }
             TxExecutionStatus.ERROR -> {
