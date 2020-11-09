@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
@@ -11,6 +12,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 interface SwapActivityProvider {
     fun getSwapActivity(): Single<List<SwapTransactionItem>>
@@ -18,15 +20,20 @@ interface SwapActivityProvider {
 
 class SwapActivityProviderImpl(
     private val authenticator: Authenticator,
-    private val nabuService: NabuService
+    private val nabuService: NabuService,
+    private val currencyPrefs: CurrencyPrefs,
+    private val exchangeRates: ExchangeRateDataManager
 ) : SwapActivityProvider {
     override fun getSwapActivity(): Single<List<SwapTransactionItem>> = authenticator.authenticate { sessionToken ->
         nabuService.fetchSwapActivity(sessionToken)
     }.map { response ->
-        response.map {
+        response.mapNotNull {
             val pairSplit = it.pair.split("-")
-            val sendingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[0])!!
-            val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1])!!
+            val sendingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[0]) ?: return@mapNotNull null
+            val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1]) ?: return@mapNotNull null
+
+            val apiFiat = FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong())
+            val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
 
             SwapTransactionItem(
                 it.kind.depositTxHash ?: it.id,
@@ -40,8 +47,8 @@ class SwapActivityProviderImpl(
                 getFeeForAsset(sendingAsset, it.priceFunnel.networkFee),
                 sendingAsset,
                 receivingAsset,
-                FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong()),
-                it.fiatCurrency
+                localFiat,
+                currencyPrefs.selectedFiatCurrency
             )
         }
     }

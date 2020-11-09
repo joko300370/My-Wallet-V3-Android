@@ -154,7 +154,9 @@ val nabuModule = module {
         factory {
             SwapActivityProviderImpl(
                 nabuService = get(),
-                authenticator = get()
+                authenticator = get(),
+                currencyPrefs = get(),
+                exchangeRates = get()
             )
         }.bind(SwapActivityProvider::class)
 
