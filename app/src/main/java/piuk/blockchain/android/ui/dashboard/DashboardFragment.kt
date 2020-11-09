@@ -518,16 +518,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    override fun gotoSwap(account: SingleAccount) =
-        when (account) {
-            is CryptoNonCustodialAccount -> {
-                clearBottomSheet()
-                navigator().launchSwap(
-                    sourceAccount = account
-                )
-            }
-            else -> throw IllegalStateException("The Swap action is invalid for account: ${account.label}")
-        }.exhaustive
+    override fun gotoSwap(account: SingleAccount) {
+        require(account is CryptoAccount)
+
+        clearBottomSheet()
+        navigator().launchSwap(sourceAccount = account)
+    }
 
     override fun goToInterestDashboard() {
         navigator().startInterestDashboard()

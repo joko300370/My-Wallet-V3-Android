@@ -234,7 +234,9 @@ class AssetDetailsFlow(
     }
 
     override fun finishFlow() {
-        resetFlow()
+        model.process(ClearSheetDataIntent)
+        disposables.clear()
+        currentStep = AssetDetailsStep.ZERO
         super.finishFlow()
     }
 
@@ -300,15 +302,7 @@ class AssetDetailsFlow(
     }
 
     override fun onSheetClosed() {
-        if (currentStep == AssetDetailsStep.ZERO) {
-            finishFlow()
-        }
-    }
-
-    private fun resetFlow() {
-        model.process(ClearSheetDataIntent)
-        disposables.clear()
-        currentStep = AssetDetailsStep.ZERO
+        finishFlow()
     }
 }
 

@@ -140,9 +140,7 @@ class TransactionFlow(
     }
 
     override fun finishFlow() {
-        model.process(
-            TransactionIntent.ResetFlow
-        )
+        model.process(TransactionIntent.ResetFlow)
         super.finishFlow()
     }
 

@@ -137,6 +137,7 @@ open class CustodialTradingAccount(
                 if (isFunded) {
                     add(AssetAction.Sell)
                     add(AssetAction.Send)
+                    add(AssetAction.Swap)
                 }
             }
 
