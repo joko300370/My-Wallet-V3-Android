@@ -57,4 +57,8 @@ class TransactionProgressSheet : TransactionFlowSheet() {
         dialogView.layoutParams.height = (metrics.heightPixels - (48 * metrics.density)).toInt()
         dialogView.requestLayout()
     }
+
+    override fun newInstance(host: Host): TransactionFlowSheet = TransactionProgressSheet().apply {
+        transactionFlowHost = host
+    }
 }

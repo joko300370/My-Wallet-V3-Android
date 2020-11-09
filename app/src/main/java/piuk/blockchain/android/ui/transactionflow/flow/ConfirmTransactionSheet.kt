@@ -91,4 +91,8 @@ class ConfirmTransactionSheet : TransactionFlowSheet() {
         analyticsHooks.onConfirmationCtaClick(state)
         model.process(TransactionIntent.ExecuteTransaction)
     }
+
+    override fun newInstance(host: Host): TransactionFlowSheet = ConfirmTransactionSheet().apply {
+        transactionFlowHost = host
+    }
 }

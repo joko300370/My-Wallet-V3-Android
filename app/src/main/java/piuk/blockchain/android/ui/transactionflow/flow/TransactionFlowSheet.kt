@@ -10,6 +10,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.transactionInject
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import java.lang.IllegalStateException
 
 abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, TransactionIntent, TransactionState>() {
 
@@ -19,6 +20,12 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
         private set
 
     protected val analyticsHooks: TxFlowAnalytics by inject()
+
+    lateinit var transactionFlowHost: Host
+
+    override val host: Host
+        get() = if (this::transactionFlowHost.isInitialized) transactionFlowHost
+        else throw IllegalStateException("TxFlow host is not initialised")
 
     protected fun showErrorToast(@StringRes msgId: Int) {
         ToastCustom.makeText(
@@ -37,4 +44,6 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
     protected fun cacheState(newState: TransactionState) {
         state = newState
     }
+
+    abstract fun newInstance(host: Host): TransactionFlowSheet
 }

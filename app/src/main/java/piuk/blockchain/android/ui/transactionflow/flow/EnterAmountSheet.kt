@@ -254,4 +254,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
     }
+
+    override fun newInstance(host: Host): TransactionFlowSheet = EnterAmountSheet().apply {
+        transactionFlowHost = host
+    }
 }

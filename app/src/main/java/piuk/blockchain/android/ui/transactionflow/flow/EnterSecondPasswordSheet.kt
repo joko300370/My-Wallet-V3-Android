@@ -39,4 +39,8 @@ class EnterSecondPasswordSheet : TransactionFlowSheet() {
     private fun onCtaClick(view: View) {
         model.process(TransactionIntent.ValidatePassword(view.password_input.text.toString()))
     }
+
+    override fun newInstance(host: Host): TransactionFlowSheet = EnterSecondPasswordSheet().apply {
+        transactionFlowHost = host
+    }
 }
