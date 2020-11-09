@@ -313,6 +313,10 @@ abstract class TxEngine : KoinComponent {
     // Action to be executed once the transaction has been executed, it will have been validated before this is called, so the expectation
     // is that it will succeed.
     open fun doPostExecute(txResult: TxResult): Completable = Completable.complete()
+
+    // Action to be executed when confirmations have been built and we want to start checking for updates on them
+    open fun startConfirmationsUpdate(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(pendingTx)
 }
 
 class TransactionProcessor(
@@ -410,7 +414,10 @@ class TransactionProcessor(
         val pendingTx = getPendingTx()
         return engine.doBuildConfirmations(pendingTx).flatMap {
             engine.doValidateAll(it)
-        }.doOnSuccess { updatePendingTx(it) }.ignoreElement()
+        }.doOnSuccess { updatePendingTx(it) }
+            .flatMapCompletable {
+                engine.startConfirmationsUpdate(pendingTx).doOnSuccess { updatePendingTx(it) }.ignoreElement()
+            }
     }
 
     // Execute the transaction.

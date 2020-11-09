@@ -35,7 +35,7 @@ class SwapQuotesEngine(
             ).flatMapSingle {
                 quotesProvider.fetchQuote(direction = direction, pair = pair)
             }.startWith(quote)
-        }.takeUntil(stop).share().replay(1).refCount()
+        }.takeUntil(stop)
 
     val pricedQuote: Observable<PricedQuote> = Observables.combineLatest(quote, amount).map { (quote, amount) ->
         PricedQuote(PricesInterpolator(
@@ -44,7 +44,7 @@ class SwapQuotesEngine(
         ).getRate(amount), quote)
     }.doOnNext {
         latestQuote = it
-    }
+    }.share().replay(1).refCount()
 
     fun stop() {
         stop.onNext(Unit)

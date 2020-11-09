@@ -9,7 +9,6 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 
@@ -45,23 +44,6 @@ class TradingToTradingSwapTxEngine(
                 selectedFiat = userFiat
             )
         )
-
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return super.doBuildConfirmations(pendingTx).map {
-            val updatedList = it.confirmations.toMutableList()
-            updatedList.add(
-                TxConfirmationValue.NetworkFee(
-                    fee = pendingTx.fees,
-                    type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                    asset = sourceAccount.asset
-                )
-            )
-
-            it.copy(
-                confirmations = updatedList.toList()
-            )
-        }
-    }
 
     override val direction: SwapDirection
         get() = SwapDirection.INTERNAL

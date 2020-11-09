@@ -181,13 +181,16 @@ abstract class SwapEngineBase(
                             fee = pricedQuote.swapQuote.networkFee,
                             type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
                             asset = target.asset
+                        ),
+                        TxConfirmationValue.NetworkFee(
+                            fee = pendingTx.fees,
+                            type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
+                            asset = sourceAccount.asset
                         )
                     ),
                     minLimit = minLimit(pricedQuote.price)
                 )
             )
-        }.flatMap {
-            startQuotesFetchingIfNotStarted(it)
         }
     }
 
@@ -244,6 +247,9 @@ abstract class SwapEngineBase(
         quotesEngine.pricedQuote.doOnNext {
             refreshConfirmations(true)
         }.emptySubscribe()
+
+    override fun startConfirmationsUpdate(pendingTx: PendingTx): Single<PendingTx> =
+        startQuotesFetchingIfNotStarted(pendingTx)
 
     protected fun createOrder(pendingTx: PendingTx): Single<SwapOrder> =
         target.receiveAddress.flatMap {

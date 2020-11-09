@@ -10,7 +10,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
@@ -66,23 +65,6 @@ class OnChainSwapEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice().clearConfirmations()
-    }
-
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return super.doBuildConfirmations(pendingTx).map {
-            val updatedList = it.confirmations.toMutableList()
-            updatedList.add(
-                TxConfirmationValue.NetworkFee(
-                    fee = pendingTx.fees,
-                    type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                    asset = sourceAccount.asset
-                )
-            )
-
-            it.copy(
-                confirmations = updatedList.toList()
-            )
-        }
     }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
