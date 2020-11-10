@@ -415,8 +415,8 @@ class TransactionProcessor(
         return engine.doBuildConfirmations(pendingTx).flatMap {
             engine.doValidateAll(it)
         }.doOnSuccess { updatePendingTx(it) }
-            .flatMapCompletable {
-                engine.startConfirmationsUpdate(pendingTx).doOnSuccess { updatePendingTx(it) }.ignoreElement()
+            .flatMapCompletable { px ->
+                engine.startConfirmationsUpdate(px).doOnSuccess { updatePendingTx(it) }.ignoreElement()
             }
     }
 
