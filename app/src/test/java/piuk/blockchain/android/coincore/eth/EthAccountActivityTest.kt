@@ -44,7 +44,7 @@ class EthAccountActivityTest {
         spy(EthCryptoWalletAccount(
             payloadManager = payloadManager,
             label = "TestEthAccount",
-            address = "Test Address",
+            address = ETH_ADDRESS,
             ethDataManager = ethDataManager,
             fees = feeDataManager,
             exchangeRates = exchangeRates,
@@ -65,7 +65,74 @@ class EthAccountActivityTest {
     }
 
     @Test
-    fun fetchTransactionsEthereum() {
+    fun fetchTransactionsEthereumReplaceSendWithSwap() {
+        // Arrange
+        val latestBlock = EthLatestBlockNumber()
+        val transaction = EthTransaction(
+            hash = "hash",
+            from = ETH_ADDRESS,
+            to = "122345"
+        )
+
+        val ethModel: CombinedEthModel = mock()
+
+        whenever(ethDataManager.getLatestBlockNumber())
+            .thenReturn(Single.just(latestBlock))
+
+        whenever(ethDataManager.getEthTransactions())
+            .thenReturn(Single.just(listOf(transaction)))
+
+        whenever(ethDataManager.getEthResponseModel())
+            .thenReturn(ethModel)
+
+        val swapSummary = SwapTransactionItem(
+            "hash",
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroEth,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroBtc,
+            CryptoCurrency.ETHER,
+            CryptoCurrency.BTC,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
+        doReturn(false).`when`(subject).isErc20FeeTransaction(any())
+
+        subject.activity
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.size == 1 &&
+                    it[0].run {
+                        this is SwapActivitySummaryItem &&
+                            txId == swapSummary.txId &&
+                            direction == swapSummary.direction &&
+                            sendingAsset == swapSummary.sendingAsset &&
+                            receivingAsset == swapSummary.receivingAsset &&
+                            sendingAddress == swapSummary.sendingAddress &&
+                            receivingAddress == swapSummary.receivingAddress &&
+                            state == swapSummary.state &&
+                            fiatValue == swapSummary.fiatValue &&
+                            fiatCurrency == swapSummary.fiatCurrency
+                    }
+            }
+
+        verify(ethDataManager).getLatestBlockNumber()
+        verify(ethDataManager).getEthTransactions()
+    }
+
+    @Test
+    fun fetchTransactionsEthereumReceive() {
         // Arrange
         val latestBlock = EthLatestBlockNumber()
         val transaction: EthTransaction = mock()
@@ -105,26 +172,17 @@ class EthAccountActivityTest {
         whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
-        doReturn(true).`when`(subject).isErc20FeeTransaction(to)
+        doReturn(false).`when`(subject).isErc20FeeTransaction(to)
 
         subject.activity
             .test()
             .assertComplete()
             .assertNoErrors()
             .assertValue {
-                it.size == 2 &&
-                    it[1].run {
-                        this is SwapActivitySummaryItem &&
-                            txId == swapSummary.txId &&
-                            direction == swapSummary.direction &&
-                            sendingAsset == swapSummary.sendingAsset &&
-                            receivingAsset == swapSummary.receivingAsset &&
-                            sendingAddress == swapSummary.sendingAddress &&
-                            receivingAddress == swapSummary.receivingAddress &&
-                            state == swapSummary.state &&
-                            fiatValue == swapSummary.fiatValue &&
-                            fiatCurrency == swapSummary.fiatCurrency
-                    }
+                it.size == 1 &&
+                it[0].run {
+                    this is EthActivitySummaryItem
+                }
             }
 
         verify(ethDataManager).getLatestBlockNumber()
@@ -148,25 +206,8 @@ class EthAccountActivityTest {
 
         doReturn(true).`when`(subject).isErc20FeeTransaction(ethTransaction.to)
 
-        val swapSummary = SwapTransactionItem(
-            "123",
-            1L,
-            SwapDirection.ON_CHAIN,
-            "sendingAddress",
-            "receivingAddress",
-            SwapOrderState.FINISHED,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BTC,
-            FiatValue.zero("USD"),
-            "USD"
-        )
-
-        val summaryList = listOf(swapSummary)
         whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
-            .thenReturn(Single.just(summaryList))
+            .thenReturn(Single.just(emptyList()))
 
         subject.activity
             .test()
@@ -174,22 +215,10 @@ class EthAccountActivityTest {
             .assertComplete()
             .assertNoErrors()
             .assertValue {
-                it.size == 2
+                it.size == 1
             }
             .assertValue {
-                (it[0] as NonCustodialActivitySummaryItem).isFeeTransaction &&
-                    it[1].run {
-                        this is SwapActivitySummaryItem &&
-                            txId == swapSummary.txId &&
-                            direction == swapSummary.direction &&
-                            sendingAsset == swapSummary.sendingAsset &&
-                            receivingAsset == swapSummary.receivingAsset &&
-                            sendingAddress == swapSummary.sendingAddress &&
-                            receivingAddress == swapSummary.receivingAddress &&
-                            state == swapSummary.state &&
-                            fiatValue == swapSummary.fiatValue &&
-                            fiatCurrency == swapSummary.fiatCurrency
-                    }
+                (it[0] as NonCustodialActivitySummaryItem).isFeeTransaction
             }
 
         verify(ethDataManager).getEthTransactions()
@@ -211,25 +240,8 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthTransactions())
             .thenReturn(Single.just(listOf(ethTransaction)))
 
-        val swapSummary = SwapTransactionItem(
-            "123",
-            1L,
-            SwapDirection.ON_CHAIN,
-            "sendingAddress",
-            "receivingAddress",
-            SwapOrderState.FINISHED,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BTC,
-            FiatValue.zero("USD"),
-            "USD"
-        )
-
-        val summaryList = listOf(swapSummary)
         whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
-            .thenReturn(Single.just(summaryList))
+            .thenReturn(Single.just(emptyList()))
 
         subject.activity
             .test()
@@ -237,24 +249,16 @@ class EthAccountActivityTest {
             .assertComplete()
             .assertNoErrors()
             .assertValue {
-                it.size == 2
+                it.size == 1
             }
             .assertValue {
-                !(it[0] as NonCustodialActivitySummaryItem).isFeeTransaction &&
-                    it[1].run {
-                        this is SwapActivitySummaryItem &&
-                            txId == swapSummary.txId &&
-                            direction == swapSummary.direction &&
-                            sendingAsset == swapSummary.sendingAsset &&
-                            receivingAsset == swapSummary.receivingAsset &&
-                            sendingAddress == swapSummary.sendingAddress &&
-                            receivingAddress == swapSummary.receivingAddress &&
-                            state == swapSummary.state &&
-                            fiatValue == swapSummary.fiatValue &&
-                            fiatCurrency == swapSummary.fiatCurrency
-                    }
+                !(it[0] as NonCustodialActivitySummaryItem).isFeeTransaction
             }
 
         verify(ethDataManager).getEthTransactions()
+    }
+
+    companion object {
+        private const val ETH_ADDRESS = "test_address"
     }
 }

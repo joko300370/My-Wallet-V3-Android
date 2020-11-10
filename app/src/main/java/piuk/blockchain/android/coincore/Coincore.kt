@@ -123,28 +123,26 @@ class Coincore internal constructor(
     ): Maybe<SingleAccount> =
         accountGroup.map {
             it.accounts
-        }
-            .flattenAsObservable { it }
-            .flatMapSingle { a ->
-                a.receiveAddress
-                    .map { it as CryptoAddress }
-                    .onErrorReturn { NullCryptoAddress }
-                    .map { ca ->
-                        if (ca.address.equals(address, true)) {
-                            a
-                        } else {
-                            NullCryptoAccount()
-                        }
+        }.flattenAsObservable { it }
+        .flatMapSingle { a ->
+            a.receiveAddress
+                .map { it as CryptoAddress }
+                .onErrorReturn { NullCryptoAddress }
+                .map { ca ->
+                    if (ca.address.equals(address, true)) {
+                        a
+                    } else {
+                        NullCryptoAccount()
                     }
-            }
-            .filter { it != NullCryptoAccount() }
-            .toList()
-            .flatMapMaybe {
-                if (it.isEmpty())
-                    Maybe.empty<SingleAccount>()
-                else
-                    Maybe.just(it.first())
-            }
+                }
+        }.filter { it != NullCryptoAccount() }
+        .toList()
+        .flatMapMaybe {
+            if (it.isEmpty())
+                Maybe.empty<SingleAccount>()
+            else
+                Maybe.just(it.first())
+        }
 
     fun createTransactionProcessor(
         source: SingleAccount,

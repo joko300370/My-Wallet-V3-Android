@@ -68,15 +68,16 @@ class BtcAccountActivityTest {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
     }
 
+    // For NC accounts, Swaps are mapped into the activity stream if there is a matching SENT
+    // on-chain event. Otherwise they are not.
     @Test
-    fun fetchTransactionsOnAccount() {
-
+    fun fetchTransactionsOnAccountReceive() {
         val summary = TransactionSummary().apply {
             confirmations = 3
             transactionType = TransactionSummary.TransactionType.RECEIVED
             fee = BigInteger.ONE
             total = BigInteger.TEN
-            hash = "hash"
+            hash = TX_HASH_RECEIVE
             inputsMap = HashMap()
             outputsMap = HashMap()
             time = 1000000L
@@ -85,7 +86,7 @@ class BtcAccountActivityTest {
         val transactionSummaries = listOf(summary)
 
         val swapSummary = SwapTransactionItem(
-            "123",
+            TX_HASH_SWAP,
             1L,
             SwapDirection.ON_CHAIN,
             "sendingAddress",
@@ -114,26 +115,141 @@ class BtcAccountActivityTest {
             .assertNoErrors()
             .assertValueAt(0) {
                 val btcItem = it[0]
-                val swapItem = it[1]
 
-                it.size == 2 &&
+                it.size == 1 &&
                     btcItem is BtcActivitySummaryItem &&
                     btcItem.txId == summary.hash &&
                     btcItem.confirmations == summary.confirmations &&
-                    btcItem.transactionType == summary.transactionType &&
-
-                    swapItem is SwapActivitySummaryItem &&
-                    swapItem.txId == swapSummary.txId &&
-                    swapItem.direction == swapSummary.direction &&
-                    swapItem.sendingAsset == swapSummary.sendingAsset &&
-                    swapItem.receivingAsset == swapSummary.receivingAsset &&
-                    swapItem.sendingAddress == swapSummary.sendingAddress &&
-                    swapItem.receivingAddress == swapSummary.receivingAddress &&
-                    swapItem.state == swapSummary.state &&
-                    swapItem.fiatValue == swapSummary.fiatValue &&
-                    swapItem.fiatCurrency == swapSummary.fiatCurrency
+                    btcItem.transactionType == summary.transactionType
             }
 
         verify(payloadDataManager).getAccountTransactions(any(), any(), any())
+    }
+
+    @Test
+    fun fetchTransactionsOnAccountSendMatch() {
+
+        val summary = TransactionSummary().apply {
+            confirmations = 3
+            transactionType = TransactionSummary.TransactionType.SENT
+            fee = BigInteger.ONE
+            total = BigInteger.TEN
+            hash = TX_HASH_SEND_MATCH
+            inputsMap = HashMap()
+            outputsMap = HashMap()
+            time = 1000000L
+        }
+
+        val transactionSummaries = listOf(summary)
+
+        val swapSummary = SwapTransactionItem(
+            TX_HASH_SWAP,
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroEth,
+            CryptoValue.ZeroEth,
+            CryptoCurrency.BTC,
+            CryptoCurrency.ETHER,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+
+        whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
+            .thenReturn(Single.just(transactionSummaries))
+        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
+        subject.activity
+            .test()
+            .assertValueCount(1)
+            .assertComplete()
+            .assertNoErrors()
+            .assertValueAt(0) {
+                val swapItem = it[0]
+
+                it.size == 1 &&
+                swapItem is SwapActivitySummaryItem &&
+                swapItem.txId == swapSummary.txId &&
+                swapItem.direction == swapSummary.direction &&
+                swapItem.sendingAsset == swapSummary.sendingAsset &&
+                swapItem.receivingAsset == swapSummary.receivingAsset &&
+                swapItem.sendingAddress == swapSummary.sendingAddress &&
+                swapItem.receivingAddress == swapSummary.receivingAddress &&
+                swapItem.state == swapSummary.state &&
+                swapItem.fiatValue == swapSummary.fiatValue &&
+                swapItem.fiatCurrency == swapSummary.fiatCurrency
+            }
+
+        verify(payloadDataManager).getAccountTransactions(any(), any(), any())
+    }
+
+    @Test
+    fun fetchTransactionsOnAccountSendNoMatch() {
+
+        val summary = TransactionSummary().apply {
+            confirmations = 3
+            transactionType = TransactionSummary.TransactionType.SENT
+            fee = BigInteger.ONE
+            total = BigInteger.TEN
+            hash = TX_HASH_SEND_NO_MATCH
+            inputsMap = HashMap()
+            outputsMap = HashMap()
+            time = 1000000L
+        }
+
+        val transactionSummaries = listOf(summary)
+
+        val swapSummary = SwapTransactionItem(
+            TX_HASH_SWAP,
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroEth,
+            CryptoValue.ZeroEth,
+            CryptoCurrency.BTC,
+            CryptoCurrency.ETHER,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+
+        whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
+            .thenReturn(Single.just(transactionSummaries))
+        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
+        subject.activity
+            .test()
+            .assertValueCount(1)
+            .assertComplete()
+            .assertNoErrors()
+            .assertValueAt(0) {
+                val btcItem = it[0]
+
+                it.size == 1 &&
+                btcItem is BtcActivitySummaryItem &&
+                btcItem.txId == summary.hash &&
+                btcItem.confirmations == summary.confirmations &&
+                btcItem.transactionType == summary.transactionType
+            }
+
+        verify(payloadDataManager).getAccountTransactions(any(), any(), any())
+    }
+
+    companion object {
+        private const val TX_HASH_SEND_MATCH = "0x12345678890"
+        private const val TX_HASH_SEND_NO_MATCH = "0x0987654321"
+        private const val TX_HASH_RECEIVE = "0x12345678890"
+        private const val TX_HASH_SWAP = "12345678890"
     }
 }

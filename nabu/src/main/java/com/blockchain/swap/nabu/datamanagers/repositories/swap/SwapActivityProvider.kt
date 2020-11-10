@@ -24,7 +24,8 @@ class SwapActivityProviderImpl(
     private val currencyPrefs: CurrencyPrefs,
     private val exchangeRates: ExchangeRateDataManager
 ) : SwapActivityProvider {
-    override fun getSwapActivity(): Single<List<SwapTransactionItem>> = authenticator.authenticate { sessionToken ->
+    override fun getSwapActivity(): Single<List<SwapTransactionItem>> =
+    authenticator.authenticate { sessionToken ->
         nabuService.fetchSwapActivity(sessionToken)
     }.map { response ->
         response.mapNotNull {
@@ -34,8 +35,7 @@ class SwapActivityProviderImpl(
 
             val apiFiat = FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong())
             val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-
-            SwapTransactionItem(
+                SwapTransactionItem(
                 it.kind.depositTxHash ?: it.id,
                 it.createdAt.fromIso8601ToUtc()!!.time,
                 it.kind.direction.mapToDirection(),

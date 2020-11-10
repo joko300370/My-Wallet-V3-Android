@@ -68,14 +68,14 @@ class XlmAccountActivityTest {
     }
 
     @Test
-    fun getXlmTransactionList() {
+    fun getXlmTransactionListReceived() {
         // Arrange
         val output = BigInteger.valueOf(1000000L)
         val xlmTransaction = XlmTransaction(
             "2018-10-11T12:54:15Z",
             output.stroops(),
             100.stroops(),
-            "hash",
+            TX_HASH_RECEIVE,
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
         )
@@ -84,7 +84,7 @@ class XlmAccountActivityTest {
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
         val swapSummary = SwapTransactionItem(
-            "123",
+            TX_HASH_SWAP,
             1L,
             SwapDirection.ON_CHAIN,
             "sendingAddress",
@@ -110,18 +110,8 @@ class XlmAccountActivityTest {
             .assertNoErrors()
             .assertValueAt(0) {
                 val xlmItem = it[0]
-                val swapItem = it[1]
-                it.size == 2 &&
-                    swapItem is SwapActivitySummaryItem &&
-                    swapItem.txId == swapSummary.txId &&
-                    swapItem.direction == swapSummary.direction &&
-                    swapItem.sendingAsset == swapSummary.sendingAsset &&
-                    swapItem.receivingAsset == swapSummary.receivingAsset &&
-                    swapItem.sendingAddress == swapSummary.sendingAddress &&
-                    swapItem.receivingAddress == swapSummary.receivingAddress &&
-                    swapItem.state == swapSummary.state &&
-                    swapItem.fiatValue == swapSummary.fiatValue &&
-                    swapItem.fiatCurrency == swapSummary.fiatCurrency &&
+
+                it.size == 1 &&
                     xlmItem is NonCustodialActivitySummaryItem &&
                     CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
                     xlmTransaction.hash == xlmItem.txId &&
@@ -139,10 +129,144 @@ class XlmAccountActivityTest {
         verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
     }
 
+    @Test
+    fun getXlmTransactionListSendNoMatch() {
+        // Arrange
+        val value = 1000000.toBigInteger()
+        val fee = 100.toBigInteger()
+        val total = value + fee
+
+        val xlmTransaction = XlmTransaction(
+            "2018-10-11T12:54:15Z",
+            value.unaryMinus().stroops(),
+            fee.stroops(),
+            TX_HASH_SEND_NO_MATCH,
+            HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
+            HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
+        )
+
+        whenever(xlmDataManager.getTransactionList())
+            .thenReturn(Single.just(listOf(xlmTransaction)))
+
+        val swapSummary = SwapTransactionItem(
+            TX_HASH_SWAP,
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroXlm,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroBtc,
+            CryptoCurrency.XLM,
+            CryptoCurrency.BTC,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections))
+            .thenReturn(Single.just(summaryList))
+
+        // Act
+        subject.activity.test()
+            .assertValueCount(1)
+            .assertComplete()
+            .assertNoErrors()
+            .assertValueAt(0) {
+                val xlmItem = it[0]
+
+                it.size == 1 &&
+                xlmItem is NonCustodialActivitySummaryItem &&
+                CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
+                xlmTransaction.hash == xlmItem.txId &&
+                TransactionSummary.TransactionType.SENT == xlmItem.transactionType &&
+                1 == xlmItem.confirmations &&
+                !xlmItem.isFeeTransaction &&
+                total == xlmItem.value.toBigInteger() &&
+                mapOf(
+                    HORIZON_ACCOUNT_ID_2 to
+                        CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)
+                ) == xlmItem.inputsMap &&
+                mapOf(
+                    HORIZON_ACCOUNT_ID_1 to
+                        CryptoValue.fromMinor(CryptoCurrency.XLM, total)
+                ) == xlmItem.outputsMap
+            }
+
+        verify(xlmDataManager).getTransactionList()
+        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
+    }
+
+    @Test
+    fun getXlmTransactionListSendMatch() {
+        // Arrange
+        val output = BigInteger.valueOf(-1000000L)
+        val xlmTransaction = XlmTransaction(
+            "2018-10-11T12:54:15Z",
+            output.stroops(),
+            100.stroops(),
+            TX_HASH_SEND_MATCH,
+            HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
+            HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
+        )
+
+        whenever(xlmDataManager.getTransactionList())
+            .thenReturn(Single.just(listOf(xlmTransaction)))
+
+        val swapSummary = SwapTransactionItem(
+            TX_HASH_SWAP,
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroXlm,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroBtc,
+            CryptoCurrency.XLM,
+            CryptoCurrency.BTC,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections))
+            .thenReturn(Single.just(summaryList))
+
+        // Act
+        subject.activity.test()
+            .assertValueCount(1)
+            .assertComplete()
+            .assertNoErrors()
+            .assertValueAt(0) {
+                val swapItem = it[0]
+                it.size == 1 &&
+                swapItem is SwapActivitySummaryItem &&
+                swapItem.txId == swapSummary.txId &&
+                swapItem.direction == swapSummary.direction &&
+                swapItem.sendingAsset == swapSummary.sendingAsset &&
+                swapItem.receivingAsset == swapSummary.receivingAsset &&
+                swapItem.sendingAddress == swapSummary.sendingAddress &&
+                swapItem.receivingAddress == swapSummary.receivingAddress &&
+                swapItem.state == swapSummary.state &&
+                swapItem.fiatValue == swapSummary.fiatValue &&
+                swapItem.fiatCurrency == swapSummary.fiatCurrency
+            }
+
+        verify(xlmDataManager).getTransactionList()
+        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
+    }
+
     companion object {
         private const val HORIZON_ACCOUNT_ID_1 =
             "GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR"
         private const val HORIZON_ACCOUNT_ID_2 =
             "GC7GSOOQCBBWNUOB6DIWNVM7537UKQ353H6LCU3DB54NUTVFR2T6OHF4"
+
+        private const val TX_HASH_SEND_MATCH = "12345678890"
+        private const val TX_HASH_SEND_NO_MATCH = "0987654321"
+        private const val TX_HASH_RECEIVE = "12345678890"
+        private const val TX_HASH_SWAP = "12345678890"
     }
 }
