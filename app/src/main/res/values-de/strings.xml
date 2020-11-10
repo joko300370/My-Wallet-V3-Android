@@ -691,7 +691,9 @@
     <string name="fee_options_custom_warning">Nur für fortgeschrittene Benutzer</string>
     <string name="fee_options_fee_too_low">Niedrige Gebühr nicht empfohlen</string>
     <string name="fee_options_fee_too_high">Unnötig hohe Gebühr</string>
-
+    <string name="fee_options_advanced_warning">Diese Funktion wird nur fortgeschrittenen Benutzern empfohlen.
+ Wenn Sie eine benutzerdefinierte Gebühr wählen, riskieren Sie eine Überzahlung oder Ihre Transaktion wird nie bestätigt. 
+</string>
     <string name="fee_options_sat_byte_hint">saß / b</string>
     <string name="fee_options_sat_byte_inline_hint">Normal: %1$s , Priorität: %2$s</string>
     <string name="dismiss">Entlassen</string>
@@ -1983,5 +1985,87 @@
     <string name="tx_view_locked_funds_1">Diese Gelder können sofort in eine Fiat-Geldbörse von %1$s verkauft werden. Sie können diese Gelder jedoch nicht für bis zu %2$s von Blockchain.com senden oder abheben</string>
     <string name="common_pending">Ausstehend</string>
     <string name="confirm_status_msg_insufficient_funds">Sie haben nicht genügend Guthaben auf diesem Konto, um diese Transaktion abzuwickeln</string>
+    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
     <string name="confirm_status_msg_option_invalid">Bitte stellen Sie sicher, dass Sie unseren Bedingungen zugestimmt haben.</string>
+    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="common_free">Kostenlos</string>
+    <string name="two_fa_new_request">Neuer Code wird angefordert …</string>
+    <string name="transfer_funds_title">Von importierter Adresse übertragen?</string>
+    <string name="transfer_funds_description">Importierte Adressen werden nicht von Ihrer Sicherungsphrase gesichert. Um diese Mittel zu sichern, empfehlen wir, diese Guthaben an Ihre nicht depotführende Blockchain.com-Wallet zu senden.
+    </string>
+    <string name="two_factor_resend_sms">SMS erneut senden (%1$d)</string>
+    <string name="two_factor_retries_exceeded">Wiederholungsversuche überschritten, bitte warten Sie 60 Sekunden, bevor Sie es erneut versuchen</string>
+    <string name="fee_options_label">%1$s (%2$s)</string>
+    <string name="fee_options_sat_byte_min_error">Mindestens 1 Sat/Byte erforderlich</string>
+    <string name="fee_options_invalid_amount">Ungültige Gebühr</string>
+    <string name="sell_announcement_title">Verkaufen Sie Ihre Kryptos gegen Bargeld</string>
+    <string name="sell_announcement_description">Verkaufen Sie direkt aus Ihren Trading Wallets an Ihre Cash Wallet.</string>
+    <string name="sell_announcement_action">Jetzt verkaufen</string>
+    <string name="generic_limit">Limits</string>
+    <string name="select_account_sheet_empty">Sie haben keine geeigneten Wallets, um diese Aktion durchzuführen.</string>
+    <string name="activity_details_swap_for">Für</string>
+    <string name="swap_enter_amount_min_swap">Mindest-Swap von %1$s erforderlich</string>
+    <string name="too_many_pending_orders_error_message">Ihre %1$s hat zu viele aktive Swaps. Bitte wählen Sie eine andere Wallet aus.</string>
+    <string name="swap_confirmation_title">Tauschen %1$s</string>
+    <string name="swap_confirmation_cta_button">%1$s gegen %2$s tauschen</string>
+    <string name="swap_confirmation_disclaimer">Die von Ihnen gesendeten und empfangenen Beträge können sich aufgrund der Marktaktivität geringfügig ändern. Sobald ein Auftrag beginnt, können wir ihn nicht mehr stoppen.</string>
+    <string name="swap_confirmation_progress_message">Wir schließen Ihren Swap jetzt ab.</string>
+    <string name="swap_confirmation_success_message">Ihr %1$s ist jetzt in Ihrer Wallet verfügbar.</string>
+    <string name="swap_progress_title">%1$s gegen %2$s tauschen</string>
+    <string name="swap_progress_complete_title">Vollständig tauschen</string>
+    <string name="swap_enter_amount_title">Tauschen %1$s</string>
+    <string name="swap_enter_amount_source">Tauschen: %1$s</string>
+    <string name="swap_enter_amount_target">Erhalten: %1$s</string>
+    <string name="swap_enter_amount_max">Maximum tauschen</string>
+    <string name="swap_enter_amount_silver_limit">Tippen Sie hier, um Ihr Profil hochzustufen und diese Menge zu tauschen.</string>
+    <string name="swap_enter_amount_over_limit">Sie können heute bis zu %1$s tauschen.</string>
+    <string name="swap_select_target_subtitle">Bestätigen Sie die Wallet, aus der Sie Swaps tätigen wollen und wählen Sie die Wallet, in die Sie welche erhalten wollen.</string>
+    <string name="swap_select_target_title">Neuer Swap</string>
+    <string name="tx_confirmation_network_fee">%1$s Netzwerkgebühr</string>
+    <string name="tx_confirmation_fee_learn_more_1">Netzwerk </string>
+    <string name="tx_confirmation_fee_learn_more_2">Gebühren werden vom %1$s Netzwerk festgelegt. </string>
+    <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Erfahren Sie mehr über Gebühren</annotation>.</string>
+    <string name="tx_confirmation_free_fee_learn_more_1">Netzwerkgebühren bei der Benutzung</string>
+    <string name="tx_confirmation_free_fee_learn_more_2"> Trading Wallets </string>
+    <string name="tx_confirmation_free_fee_learn_more_3">sind KOSTENLOS! <annotation link="send_tx_fees">Erfahren Sie mehr über Gebühren</annotation>.</string>
+    <string name="interest_item_issue_region">In Ihrer Region nicht verfügbar</string>
+    <string name="interest_item_issue_kyc">Sie brauchen eine Gold-Verifikation, um mit dem Erwirtschaften von Zinsen anzufangen.</string>
+    <string name="interest_item_issue_other">Derzeit nicht verfügbar, bitte überprüfen Sie es später erneut</string>
+    <string name="swap_header_title">Tauschen Sie Ihre Kryptos</string>
+    <string name="swap_header_label">Tauschen Sie Ihre Kryptos sofort in jede Währung um, die wir für Ihre Wallet anbieten.</string>
+    <string name="swap_kyc_title">Bestätigen Sie Ihren Ausweis. Tauschen Sie noch heute.</string>
+    <string name="swap_kyc_desc">Bestätigen Sie Ihre Identität, um jederzeit Kryptos zu tauschen. Beantragen und tauschen Sie innerhalb von ein paar Minuten.</string>
+    <string name="swap_kyc_cta">Jetzt beantragen</string>
+    <string name="swap_kyc_1_title">Wählen Sie Ihr Land aus</string>
+    <string name="swap_kyc_1_label">Blockchain.com muss in Übereinstimmung mit lokalen Gesetzen Ihr aktuelles Land wissen.</string>
+    <string name="swap_kyc_2_title">Bestätigen Sie Ihre Identität</string>
+    <string name="swap_kyc_2_label">Wir müssen sicherstellen, dass Sie es wirklich sind, um Betrug durch Hochladen eines Ausweises zu verhindern.</string>
+    <string name="swap_kyc_3_title">Swaps starten</string>
+    <string name="swap_kyc_3_label">Kommen Sie nach der Bestätigung wieder zu Swap zurück und wechseln Sie Ihre Kryptos.</string>
+    <string name="swap_cta">Neuer Swap</string>
+    <string name="swap_account_select">Swap</string>
+    <string name="swap_account_select_subtitle">Aus welcher Wallet möchten Sie tauschen?</string>
+    <string name="select_target_account_for_swap">In welche Wallet möchten Sie etwas erhalten?</string>
+    <string name="swap_low_fees">Niedrige Gebühren</string>
+    <string name="swap_kyc_upsell_title">Sie sind nahe an Ihrem Swap-Limit. Machen Sie ein Upgrade, um größere Mengen zu tauschen.</string>
+    <string name="swap_kyc_upsell_desc">Bestätigen Sie Ihre Identität, um die Anzahl der Swaps pro Tag, die Sie machen können, zu erhöhen.</string>
+    <string name="swap_kyc_upsell_1_title">Laden Sie Ihren Ausweis hoch</string>
+    <string name="swap_kyc_upsell_1_desc">Wir müssen sicherstellen, dass Sie es wirklich sind, um Betrug durch Hochladen eines Ausweises zu verhindern.</string>
+    <string name="swap_kyc_upsell_2_title">Laden Sie ein Selfie hoch</string>
+    <string name="swap_kyc_upsell_2_desc">Das dient der Sicherstellung, dass Sie ein Mensch sind. Keine Roboter erlaubt.</string>
+    <string name="swap_kyc_upsell_3_title">Tauschen Sie bis zu $ 25.000 pro Tag</string>
+    <string name="swap_kyc_upsell_3_desc">Kommen Sie nach der Bestätigung wieder zu Swap zurück und wechseln Sie Ihre Kryptos.</string>
+    <string name="trending_label">Im Trend</string>
+    <string name="trending_swap">Swap %1$s</string>
+    <string name="trending_empty">Versehen Sie Ihre Trading-Wallets mit Geldmitteln, um gefragte Swaps mit niedrigeren Gebühren zu sehen.</string>
+    <string name="trending_receive">Erhalten Sie %1$s</string>
+    <string name="show_more_accounts">Mehr anzeigen</string>
+    <string name="select_a_wallet">Wählen Sie eine Wallet</string>
+    <string name="pending_swap_info_message">Sie haben einen ausstehenden Swap. Sobald das geklärt ist, können Sie einen neuen Swap machen.</string>
+    <string name="deposit_fee">Netzwerkgebühr</string>
+    <string name="current_unit_price">%1$s = %2$s</string>
+    <string name="exchange_rate">Wechselkurs</string>
+    <string name="in_progress">In Bearbeitung</string>
+    <string name="swap_direction">%1$s-&gt;%2$s</string>
 </resources>

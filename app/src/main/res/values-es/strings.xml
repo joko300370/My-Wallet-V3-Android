@@ -691,7 +691,9 @@
   <string name="fee_options_custom_warning">Solo usuarios avanzados</string>
   <string name="fee_options_fee_too_low">Tarifa baja no recomendada</string>
   <string name="fee_options_fee_too_high">Tarifa innecesariamente alta</string>
-
+  <string name="fee_options_advanced_warning">Esta característica se recomienda solo para usuarios avanzados. 
+ Al elegir una tarifa personalizada, corre el riesgo de pagar en exceso o de que su transacción nunca se confirme. 
+</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , Prioridad: %2$s</string>
   <string name="dismiss">Descartar</string>
@@ -1983,5 +1985,86 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
   <string name="tx_view_locked_funds_1">Estos fondos estarán disponibles para venderse en una billetera Fiat %1$s inmediatamente, pero no podrá enviar ni retirar estos fondos de Blockchain.com por hasta %2$s</string>
   <string name="common_pending">Pendiente</string>
   <string name="confirm_status_msg_insufficient_funds">No tiene fondos suficientes en esta cuenta para procesar esta transacción</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Asegúrese de haber aceptado nuestros Términos.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Gratis</string>
+  <string name="two_fa_new_request">Solicitando nuevo código…</string>
+  <string name="transfer_funds_title">¿Transferir desde dirección importada?</string>
+  <string name="transfer_funds_description">Las direcciones importadas no están respaldadas por su Frase de recuperación. Para asegurar estos fondos, recomendamos transferir estos saldos a un monedero blockchain.com sin custodia.</string>
+  <string name="two_factor_resend_sms">Reenviar SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Reintentos excedidos, espere 60 segundos antes de intentarlo de nuevo</string>
+  <string name="fee_options_label">%1$s (%2$s)</string>
+  <string name="fee_options_sat_byte_min_error">Se requiere un mínimo de 1 sat/byte</string>
+  <string name="fee_options_invalid_amount">Tarifa no válida</string>
+  <string name="sell_announcement_title">Venda sus criptomonedas por dinero en efectivo</string>
+  <string name="sell_announcement_description">Venda directamente desde sus monederos comerciales a su monedero de efectivo.</string>
+  <string name="sell_announcement_action">Vende ahora</string>
+  <string name="generic_limit">Limites</string>
+  <string name="select_account_sheet_empty">No dispone de monederos aptos para realizar esta acción.</string>
+  <string name="activity_details_swap_for">Por</string>
+  <string name="swap_enter_amount_min_swap">Se requiere un intercambio mínimo de %1$s</string>
+  <string name="too_many_pending_orders_error_message">Su monedero %1$s tiene demasiados intercambios en curso. Seleccione un monedero diferente.</string>
+  <string name="swap_confirmation_title">Intercambio %1$s</string>
+  <string name="swap_confirmation_cta_button">Intercambio %1$s por %2$s</string>
+  <string name="swap_confirmation_disclaimer">Las cantidades que envíe y reciba pueden variar ligeramente debido a la actividad del mercado. Una vez se inicia un pedido, no podemos detenerlo</string>
+  <string name="swap_confirmation_progress_message">Estamos completando su intercambio.</string>
+  <string name="swap_confirmation_success_message">Ahora tiene %1$s disponible en su monedero.</string>
+  <string name="swap_progress_title">Cambiando %1$s por %2$s</string>
+  <string name="swap_progress_complete_title">Intercambio completado</string>
+  <string name="swap_enter_amount_title">Intercambio %1$s</string>
+  <string name="swap_enter_amount_source">Intercambiar: %1$s</string>
+  <string name="swap_enter_amount_target">Recibir: %1$s</string>
+  <string name="swap_enter_amount_max">Intercambio máximo</string>
+  <string name="swap_enter_amount_silver_limit">Pulse aquí para mejorar su perfil e intercambiar esta cantidad.</string>
+  <string name="swap_enter_amount_over_limit">Puede intercambiar hasta %1$s hoy.</string>
+  <string name="swap_select_target_subtitle">Confirme el monedero desde el que desea intercambiar y elija el monedero donde desea recibirlo.</string>
+  <string name="swap_select_target_title">Nuevo intercambio</string>
+  <string name="tx_confirmation_network_fee">Tarifa de red %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_1">Red</string>
+  <string name="tx_confirmation_fee_learn_more_2">las tarifas las establece la red %1$s.</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Más información sobre las tarifas</annotation>.</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Tarifas de red al usar</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Monederos comerciales</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">¡GRATIS! <annotation link="send_tx_fees">Más información sobre las tarifas</annotation>.</string>
+  <string name="interest_item_issue_region">No disponible en su región</string>
+  <string name="interest_item_issue_kyc">Necesita verificar el nivel Oro para poder ganar intereses</string>
+  <string name="interest_item_issue_other">Actualmente no disponible. Vuelva a comprobarlo más tarde.</string>
+  <string name="swap_header_title">Intercambie sus criptomonedas</string>
+  <string name="swap_header_label">Intercambie al momento criptomonedas a cualquier otra moneda de las que ofrecemos para su monedero.</string>
+  <string name="swap_kyc_title">Verifique su ID. Intercambie hoy.</string>
+  <string name="swap_kyc_desc">Verifique su identidad para intercambiar criptomonedas en cualquier momento. Solicite e intercambie en minutos.</string>
+  <string name="swap_kyc_cta">Solicitar ahora</string>
+  <string name="swap_kyc_1_title">Seleccione su país</string>
+  <string name="swap_kyc_1_label">Blockchain.com necesita conocer su país actual de acuerdo con las leyes locales.</string>
+  <string name="swap_kyc_2_title">Verifique su identidad</string>
+  <string name="swap_kyc_2_label">Debe subir una ID para asegurarnos de que realmente sea usted y evitar fraudes.</string>
+  <string name="swap_kyc_3_title">Comenzar intercambio</string>
+  <string name="swap_kyc_3_label">Una vez verificado, vuelva a Intercambio y cambie su criptomoneda.</string>
+  <string name="swap_cta">Nuevo intercambio</string>
+  <string name="swap_account_select">Intercambio</string>
+  <string name="swap_account_select_subtitle">¿Desde qué monedero desea intercambiar?</string>
+  <string name="select_target_account_for_swap">¿En qué monedero desea recibirlo?</string>
+  <string name="swap_low_fees">Bajas comisiones</string>
+  <string name="swap_kyc_upsell_title">Casi ha alcanzado el límite de intercambios. Mejore la versión para intercambiar cantidades más grandes.</string>
+  <string name="swap_kyc_upsell_desc">Verifique su identidad para aumentar el máximo de intercambios al día.</string>
+  <string name="swap_kyc_upsell_1_title">Suba su ID</string>
+  <string name="swap_kyc_upsell_1_desc">Debe subir una ID para asegurarnos de que realmente sea usted y evitar fraudes.</string>
+  <string name="swap_kyc_upsell_2_title">Suba un selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Queremos asegurarnos de que es un ser humano. No se permiten robots.</string>
+  <string name="swap_kyc_upsell_3_title">Intercambie hasta 25 000 $ al día</string>
+  <string name="swap_kyc_upsell_3_desc">Una vez verificado, vuelva a Intercambio y cambie su criptomoneda.</string>
+  <string name="trending_label">Tendencias</string>
+  <string name="trending_swap">Intercambio %1$s</string>
+  <string name="trending_empty">Financie sus monederos comerciales para ver los intercambios en tendencia con tarifas más bajas.</string>
+  <string name="trending_receive">Recibir %1$s</string>
+  <string name="show_more_accounts">Mostrar más</string>
+  <string name="select_a_wallet">Seleccione un monedero</string>
+  <string name="pending_swap_info_message">Tiene un intercambio pendiente. Una vez que este se realice, podrá crear un nuevo intercambio.</string>
+  <string name="deposit_fee">Tarifa de red</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Tipo de cambio</string>
+  <string name="in_progress">En curso</string>
+  <string name="swap_direction">%1$s-&gt;%2$s</string>
 </resources>
