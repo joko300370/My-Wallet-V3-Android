@@ -31,7 +31,6 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import timber.log.Timber
-
 class EnterTargetAddressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
 
@@ -292,8 +291,10 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
         }
     }
 
-    private fun onCtaClick() =
+    private fun onCtaClick() {
+        analyticsHooks.onEnterAddressCtaClick(state)
         model.process(TransactionIntent.TargetSelected)
+    }
 
     companion object {
         private const val NONCUSTODIAL_INPUT = 0

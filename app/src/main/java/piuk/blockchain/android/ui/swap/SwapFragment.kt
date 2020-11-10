@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
@@ -38,6 +39,7 @@ import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -60,6 +62,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private val walletManager: CustodialWalletManager by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val walletPrefs: WalletStatus by inject()
+    private val analytics: Analytics by inject()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -71,6 +74,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         }
 
         swap_cta.apply {
+            analytics.logEvent(SwapAnalyticsEvents.NewSwapClicked)
             setOnClickListener {
                 TransactionFlow(
                     action = AssetAction.Swap
@@ -92,6 +96,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     override fun verificationCtaClicked() {
+        analytics.logEvent(SwapAnalyticsEvents.SwapSilverLimitSheetCta)
         walletPrefs.setSeenSwapPromo()
         KycNavHostActivity.start(requireActivity(), CampaignType.Swap)
     }
@@ -159,6 +164,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private fun showKycUpsellIfEligible(limits: SwapLimits) {
         val usedUpLimitPercent = (limits.maxLimit / limits.maxOrder).toFloat() * 100
         if (usedUpLimitPercent >= KYC_UPSELL_PERCENTAGE && !walletPrefs.hasSeenSwapPromo) {
+            analytics.logEvent(SwapAnalyticsEvents.SwapSilverLimitSheet)
             val fragment = KycBenefitsBottomSheet.newInstance(
                 KycBenefitsBottomSheet.BenefitsDetails(
                     title = getString(R.string.swap_kyc_upsell_title),
@@ -181,6 +187,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     private fun onTrendingPairClicked(): (TrendingPair) -> Unit = { pair ->
+        analytics.logEvent(SwapAnalyticsEvents.TrendingPairClicked)
         TransactionFlow(
             sourceAccount = pair.sourceAccount,
             target = pair.destinationAccount,
@@ -210,6 +217,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             getString(R.string.swap_kyc_desc),
             R.drawable.ic_swap_blue_circle,
             ButtonOptions(visible = true, text = getString(R.string.swap_kyc_cta)) {
+                analytics.logEvent(SwapAnalyticsEvents.VerifyNowClicked)
                 KycNavHostActivity.start(requireActivity(), CampaignType.Swap)
             },
             ButtonOptions(visible = false),

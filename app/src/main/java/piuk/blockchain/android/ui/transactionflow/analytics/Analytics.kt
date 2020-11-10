@@ -31,7 +31,14 @@ class TxFlowAnalytics(
             AssetAction.Sell ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
                     analytics.logEvent(SellAnalyticsEvent.CancelTransaction)
-            else -> { }
+            AssetAction.Swap ->
+                if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
+                    analytics.logEvent(SwapAnalyticsEvents.CancelTransaction)
+            AssetAction.Deposit ->
+                if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
+                    analytics.logEvent(DepositAnalyticsEvent.CancelTransaction)
+            else -> {
+            }
         }
     }
 
@@ -39,7 +46,22 @@ class TxFlowAnalytics(
         when (state.action) {
             AssetAction.Send -> triggerSendScreenEvent(state.currentStep)
             AssetAction.Sell -> triggerSellScreenEvent(state.currentStep)
-            else -> { }
+            AssetAction.Swap -> triggerSwapScreenEvent(state.currentStep)
+            AssetAction.Deposit -> triggerDepositScreenEvent(state.currentStep)
+            else -> {
+            }
+        }
+    }
+
+    private fun triggerSwapScreenEvent(step: TransactionStep) {
+        when (step) {
+            TransactionStep.SELECT_SOURCE -> analytics.logEvent(SwapAnalyticsEvents.FromPickerSeen)
+            TransactionStep.SELECT_TARGET_ACCOUNT -> analytics.logEvent(SwapAnalyticsEvents.ToPickerSeen)
+            TransactionStep.ENTER_ADDRESS -> analytics.logEvent(SwapAnalyticsEvents.SwapTargetAddressSheet)
+            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(SwapAnalyticsEvents.SwapEnterAmount)
+            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(SwapAnalyticsEvents.SwapConfirmSeen)
+            else -> {
+            }
         }
     }
 
@@ -48,33 +70,58 @@ class TxFlowAnalytics(
             TransactionStep.ENTER_ADDRESS -> analytics.logEvent(SendAnalyticsEvent.EnterAddressDisplayed)
             TransactionStep.ENTER_AMOUNT -> analytics.logEvent(SendAnalyticsEvent.EnterAmountDisplayed)
             TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(SendAnalyticsEvent.ConfirmationsDisplayed)
-            else -> { }
+            else -> {
+            }
+        }
+    }
+
+    private fun triggerDepositScreenEvent(step: TransactionStep) {
+        when (step) {
+            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(DepositAnalyticsEvent.EnterAmountSeen)
+            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(DepositAnalyticsEvent.ConfirmationsSeen)
+            else -> {
+            }
         }
     }
 
     private fun triggerSellScreenEvent(step: TransactionStep) {
         when (step) {
             TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(SellAnalyticsEvent.ConfirmationsDisplayed)
-            else -> { }
+            else -> {
+            }
         }
     }
 
-    fun onStepBackClicked(state: TransactionState) { }
+    fun onStepBackClicked(state: TransactionState) {}
 
     // Enter address sheet
-    fun onManualAddressEntered(state: TransactionState) { }
+    fun onManualAddressEntered(state: TransactionState) {}
 
     fun onScanQrClicked(state: TransactionState) {
         when (state.action) {
             AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.QrCodeScanned)
-            else -> {}
+            else -> {
+            }
         }
     }
 
     fun onAccountSelected(account: SingleAccount, state: TransactionState) {
         when (state.action) {
             AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.EnterAddressCtaClick)
-            else -> {}
+            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.FromAccountSelected)
+            else -> {
+            }
+        }
+    }
+
+    fun onEnterAddressCtaClick(state: TransactionState) {
+        when (state.action) {
+            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.SwapConfirmPair(
+                source = state.asset,
+                target = state.selectedTarget.toCategory()
+            ))
+            else -> {
+            }
         }
     }
 
@@ -82,11 +129,12 @@ class TxFlowAnalytics(
     fun onMaxClicked(state: TransactionState) {
         when (state.action) {
             AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.SendMaxClicked)
-            else -> {}
+            else -> {
+            }
         }
     }
 
-    fun onCryptoToggle(inputType: CurrencyType, state: TransactionState) { }
+    fun onCryptoToggle(inputType: CurrencyType, state: TransactionState) {}
 
     fun onEnterAmountCtaClick(state: TransactionState) {
         when (state.action) {
@@ -94,7 +142,15 @@ class TxFlowAnalytics(
                 analytics.logEvent(SendAnalyticsEvent.EnterAmountCtaClick)
             AssetAction.Sell ->
                 analytics.logEvent(SellAnalyticsEvent.EnterAmountCtaClick(state.asset))
-            else -> {}
+            AssetAction.Deposit ->
+                analytics.logEvent(DepositAnalyticsEvent.EnterAmountCtaClick(state.asset))
+            AssetAction.Swap ->
+                analytics.logEvent(SwapAnalyticsEvents.EnterAmountCtaClick(
+                    source = state.asset,
+                    target = state.selectedTarget.toCategory()
+                ))
+            else -> {
+            }
         }
     }
 
@@ -111,10 +167,18 @@ class TxFlowAnalytics(
                     )
                 )
             AssetAction.Deposit ->
-                analytics.logEvent(DepositAnalyticsEvent.ConfirmTransaction)
+                analytics.logEvent(DepositAnalyticsEvent.ConfirmationsCtaClick(
+                    state.asset
+                ))
             AssetAction.Sell ->
                 analytics.logEvent(SellAnalyticsEvent.ConfirmTransaction)
-            else -> {}
+            AssetAction.Swap ->
+                analytics.logEvent(SwapAnalyticsEvents.SwapConfirmCta(
+                    source = state.asset,
+                    target = state.selectedTarget.toCategory()
+                ))
+            else -> {
+            }
         }
     }
 
@@ -128,7 +192,13 @@ class TxFlowAnalytics(
                     )
                 )
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionSuccess)
-            else -> {}
+            AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionSuccess(state.asset))
+            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionSuccess(
+                source = state.asset,
+                target = state.selectedTarget.toCategory()
+            ))
+            else -> {
+            }
         }
     }
 
@@ -136,7 +206,13 @@ class TxFlowAnalytics(
         when (state.action) {
             AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.TransactionFailed)
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionFailed)
-            else -> {}
+            AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionFailed(state.asset))
+            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionFailed(
+                source = state.asset,
+                target = state.selectedTarget.toCategory()
+            ))
+            else -> {
+            }
         }
     }
 
