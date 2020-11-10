@@ -28,6 +28,7 @@ import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.math.RoundingMode
 
@@ -110,6 +111,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 analyticsHooks.onStepBackClicked(state)
                 model.process(TransactionIntent.InvalidateTransaction)
             }
+
+            amount_sheet_use_max.gone()
         }
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
@@ -244,6 +247,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
             )
         }
         showKeyboard()
+        amount_sheet_use_max.visible()
     }
 
     private fun showKeyboard() {
