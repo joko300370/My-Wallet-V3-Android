@@ -415,8 +415,8 @@ class TransactionProcessor(
         return engine.doBuildConfirmations(pendingTx).flatMap {
             engine.doValidateAll(it)
         }.doOnSuccess { updatePendingTx(it) }
-            .flatMapCompletable {
-                engine.startConfirmationsUpdate(pendingTx).doOnSuccess { updatePendingTx(it) }.ignoreElement()
+            .flatMapCompletable { px ->
+                engine.startConfirmationsUpdate(px).doOnSuccess { updatePendingTx(it) }.ignoreElement()
             }
     }
 
@@ -445,7 +445,7 @@ class TransactionProcessor(
     fun targetExchangeRate(): Observable<ExchangeRate> =
         engine.targetExchangeRate()
 
-    // Called back my the engine if it has received an external signal and the existing confirmation set
+    // Called back by the engine if it has received an external signal and the existing confirmation set
     // requires a refresh
     override fun refreshConfirmations(revalidate: Boolean): Completable {
         val pendingTx = getPendingTx()

@@ -11,6 +11,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionInteractor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
+import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
@@ -115,6 +116,11 @@ val transactionModule = module {
                 addressFactory = payloadScope.get(),
                 swapRepository = payloadScope.get()
             )
+        }
+
+        // hack. find a better way to handle flow navigation (Rx Activity result)
+        scoped {
+            ActiveTransactionFlow()
         }
 
         scoped {

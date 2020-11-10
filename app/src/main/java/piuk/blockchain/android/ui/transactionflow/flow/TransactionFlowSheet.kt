@@ -14,11 +14,17 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, TransactionIntent, TransactionState>() {
 
     override val model: TransactionModel by transactionInject()
+    private val activeTransactionFlow: ActiveTransactionFlow by transactionInject()
 
     protected var state: TransactionState = TransactionState()
         private set
 
     protected val analyticsHooks: TxFlowAnalytics by inject()
+
+    lateinit var transactionFlowHost: Host
+
+    override val host: Host
+        get() = activeTransactionFlow.getFlow()
 
     protected fun showErrorToast(@StringRes msgId: Int) {
         ToastCustom.makeText(

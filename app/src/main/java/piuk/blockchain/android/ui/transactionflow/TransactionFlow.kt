@@ -22,6 +22,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
+import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.ConfirmTransactionSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterSecondPasswordSheet
@@ -83,6 +84,7 @@ class TransactionFlow(
     private var currentStep: TransactionStep = TransactionStep.ZERO
 
     private val analyticsHooks: TxFlowAnalytics by inject()
+    private val activeTransactionFlow: ActiveTransactionFlow by transactionInject()
 
     override fun startFlow(
         fragmentManager: FragmentManager,
@@ -100,6 +102,9 @@ class TransactionFlow(
                 onError = { Timber.e("Transaction state is broken: $it") }
             )
         }
+
+        // Persist the flow
+        activeTransactionFlow.setFlow(this)
 
         disposables += sourceAccount.requireSecondPassword()
             .observeOn(uiScheduler)
