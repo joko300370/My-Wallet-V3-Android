@@ -15,14 +15,14 @@
     <item>tolfte ordet</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ Sträng / xlm_memo_text</item>
+    <item>\@ Sträng / xlm_memo_id</item>
+    <item>\@ Sträng / xlm_memo_hash</item>
+    <item>\@ Sträng / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ Sträng / xlm_memo_text</item>
+    <item>\@ Sträng / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importerad adress</item>
@@ -691,6 +691,9 @@
   <string name="fee_options_custom_warning">Endast avancerade användare</string>
   <string name="fee_options_fee_too_low">Låg avgift rekommenderas inte</string>
   <string name="fee_options_fee_too_high">Onödigt hög avgift</string>
+  <string name="fee_options_advanced_warning">Den här funktionen rekommenderas endast för avancerade användare. 
+ Genom att välja en anpassad avgift riskerar du att betala för mycket eller att din transaktion aldrig bekräftas. 
+</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Vanlig: %1$s , Prioritet: %2$s</string>
   <string name="dismiss">Avfärda</string>
@@ -1121,7 +1124,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Vi skickade en verifieringslänk till</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicka på den och gå tillbaka hit för att fortsätta med din transaktion.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öppna e-post</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-post bekräftad!</string>
   <string name="buy_sell_verified_email_message">Vår partner %1$s kommer att behandla din bitcoin-transaktion. Genom att klicka på Agree och \'Fortsätt\' skapar du ett konto med %1$s .</string>
   <string name="buy_sell_identification_verification">Identifiera verifiering</string>
@@ -1228,7 +1230,7 @@
   <string name="kyc_email_title">Verifiera din epost</string>
   <string name="kyc_email_message">Vi måste verifiera din e-postadress som ett extra lager av säkerhet.</string>
   <string name="kyc_email_hint_focused">Din email</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ Sträng / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fel vid sparande av e-post, försök igen</string>
   <string name="kyc_email_send_verification">Skicka epost</string>
   <string name="kyc_email_validation_header">Kolla din inkorg.</string>
@@ -1253,7 +1255,7 @@
   <string name="kyc_onfido_splash_verification_error">Fel vid verifiering av ID, försök igen</string>
   <string name="kyc_veriff_splash_country_supported_header">Stöds mitt land?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Inte alla länder stöds just nu. Kontrollera vår uppdaterade <annotation link="country_list"> lista över länder </annotation> innan du fortsätter.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ Sträng / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
   <string name="kyc_veriff_splash_header">Låt oss bekräfta att det är du</string>
   <string name="kyc_veriff_splash_subtitle">Du behöver 1 av ID-typerna nedan för att fortsätta.</string>
@@ -1275,11 +1277,11 @@
   <string name="kyc_complete_device_verified">Enheten har verifierats</string>
   <string name="kyc_complete_id_uploaded">ID laddat upp</string>
   <string name="kyc_complete_video_uploaded">Video laddad upp</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ Sträng / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Vårt supportteam för Blockchain har skrivit hjälpguider som förklarar varför vi måste verifiera din identitet.</string>
   <string name="kyc_help_dialog_read_now">Läs nu</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ Sträng / CONTACT_SUPPORT</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitetsverifiering</string>
   <string name="kyc_settings_status_none">Unverified</string>
@@ -1291,7 +1293,7 @@
   <string name="kyc_settings_gold_level_in_review">Guldnivå - Granskning</string>
   <string name="kyc_settings_gold_level_approved">Guldnivå - Godkänd</string>
   <string name="kyc_settings_silver_level_approved">Silvernivå - Godkänd</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ Sträng / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fel vid hämtning av KYC-status</string>
   <string name="kyc_status_title_in_progress">Verifiering pågår</string>
   <string name="kyc_status_title_approved">Kontot godkänd</string>
@@ -1315,10 +1317,10 @@
   <string name="kyc_drop_off_card_description">Plocka upp var du slutade och slutför din identitetsverifiering.</string>
   <string name="kyc_drop_off_card_button">Fortsätt verifieringen</string>
   <string name="kyc_documents_needed">Dokument behövs</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ Sträng / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Vi hade några problem med dokumenten du har levererat. Försök att ladda upp dokumenten igen för att fortsätta med verifieringen.</string>
   <string name="kyc_resubmission_card_button">Ladda upp dokument</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ Sträng / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Vi kan inte verifiera din identitet och behöver att du laddar upp de nödvändiga dokumenten.</string>
   <string name="kyc_resubmission_splash_description_2">De viktigaste orsakerna till att detta händer:</string>
   <string name="kyc_resubmission_splash_description_3">De nödvändiga fotona saknas.</string>
@@ -1462,7 +1464,9 @@
   <string name="simple_buy_amount_to_send">Belopp att skicka</string>
   <string name="simple_buy_pending_buy_sheet_title">Väntande %1s Köp</string>
   <string name="recipient_name_must_match_eur">Ditt mottagarnamn ovan måste matcha kontoinnehavarens namn på ditt bankkonto för att din överföring ska lyckas. Din överföring kan avvisas om det inte finns en matchning.</string>
-  <string name="recipient_name_must_match_gbp">Ditt mottagarnamn ovan måste matcha kontoinnehavarens namn på ditt bankkonto för att din överföring ska lyckas. Din överföring kan avvisas om det inte finns en matchning.\n\nGenom att sätta in pengar till detta konto, godkänner du <annotation link="modular_terms_and_conditions"> Villkor för Modulr </annotation> , vår bankpartner.</string>
+  <string name="recipient_name_must_match_gbp">Ditt mottagarnamn ovan måste matcha kontoinnehavarens namn på ditt bankkonto för att din överföring ska lyckas. Din överföring kan avvisas om det inte finns en matchning. 
+
+ Genom att sätta in pengar till detta konto, godkänner du <annotation link="modular_terms_and_conditions"> Villkor för Modulr </annotation> , vår bankpartner.</string>
   <string name="recipient_name_must_match">Skicka bara pengar från ett bankkonto i ditt namn. Om inte, kan din insättning försenas eller avvisas.</string>
   <string name="simple_buy_no_currencies_available_title">Inga valutor tillgängliga</string>
   <string name="simple_buy_no_currencies_available">Tyvärr finns det för närvarande inga valutor som du kan handla med :(</string>
@@ -1836,7 +1840,7 @@
   <string name="send_enter_unexpected_error">Ett oväntat fel har uppstått. Var god försök igen.</string>
   <string name="send_enter_insufficient_gas">Du har inte tillräckligt med ETH för att behandla denna transaktion.</string>
   <string name="send_select_a_wallet_title">eller Välj en plånbok</string>
-  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %2$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
+  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %1$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
   <string name="purchase_funds_note">Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Läs mer. </annotation>
@@ -1987,5 +1991,88 @@
   <string name="tx_view_locked_funds_1">Dessa medel kommer att kunna säljas till en %1$s Fiat-plånbok omedelbart, men du kommer inte att kunna skicka eller ta ut dessa medel från Blockchain.com för upp till %2$s</string>
   <string name="common_pending">I väntan på</string>
   <string name="confirm_status_msg_insufficient_funds">Du har inte tillräckligt med pengar på det här kontot för att behandla transaktionen</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Se till att du har godkänt våra villkor.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Fri</string>
+  <string name="two_fa_new_request">Begär ny kod…</string>
+  <string name="transfer_funds_title">Överför från importerad adress?</string>
+  <string name="transfer_funds_description">Importerade adresser säkerhetskopieras inte av din Backup-fras. För att säkra dessa medel, vi
+ rekommenderar att du överför dessa saldon till din Blockchain.com-plånbok utan vårdnad.
+</string>
+  <string name="two_factor_resend_sms">Skicka SMS igen (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Överskridna försök, vänta 60 sekunder innan du försöker igen</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Minst 1 sat / byte krävs</string>
+  <string name="fee_options_invalid_amount">Ogiltig avgift</string>
+  <string name="sell_announcement_title">Sälj din krypto för kontanter</string>
+  <string name="sell_announcement_description">Sälj direkt från dina handelsplånböcker till din kontantplånbok.</string>
+  <string name="sell_announcement_action">Sälj nu</string>
+  <string name="generic_limit">Gränser</string>
+  <string name="select_account_sheet_empty">Du har inga kvalificerade plånböcker för att utföra den här åtgärden.</string>
+  <string name="activity_details_swap_for">För</string>
+  <string name="swap_enter_amount_min_swap">Minsta byte på %1$s krävs</string>
+  <string name="too_many_pending_orders_error_message">Din %1$s plånbok har för många byten pågår. Välj en annan plånbok.</string>
+  <string name="swap_confirmation_title">Byt %1$s</string>
+  <string name="swap_confirmation_cta_button">Byt %1$s mot %2$s</string>
+  <string name="swap_confirmation_disclaimer">Beloppen du skickar och tar emot kan förändras något på grund av marknadsaktivitet. När en beställning startar kan vi inte stoppa den.</string>
+  <string name="swap_confirmation_progress_message">Vi slutför ditt byte nu.</string>
+  <string name="swap_confirmation_success_message">Dina %1$s är nu tillgängliga i din plånbok.</string>
+  <string name="swap_progress_title">Byt ut %1$s mot %2$s</string>
+  <string name="swap_progress_complete_title">Byt komplett</string>
+  <string name="swap_enter_amount_title">Byt %1$s</string>
+  <string name="swap_enter_amount_source">Byt: %1$s</string>
+  <string name="swap_enter_amount_target">Få: %1$s</string>
+  <string name="swap_enter_amount_max">Byt max</string>
+  <string name="swap_enter_amount_silver_limit">Klicka här för att uppgradera din profil och byta ut detta belopp.</string>
+  <string name="swap_enter_amount_over_limit">Du kan byta upp till %1$s idag.</string>
+  <string name="swap_select_target_subtitle">Bekräfta plånboken du vill byta från och välj plånboken du vill ta emot i.</string>
+  <string name="swap_select_target_title">Ny byte</string>
+  <string name="tx_confirmation_network_fee">%1$s nätverksavgift</string>
+  <string name="tx_confirmation_fee_learn_more_1">Nätverk</string>
+  <string name="tx_confirmation_fee_learn_more_2">avgifterna bestäms av %1$s nätverk.</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Läs mer om avgifter </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Nätverksavgifter vid användning</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Handelsplånböcker</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">är gratis! <annotation link="send_tx_fees"> Läs mer om avgifter </annotation> .</string>
+  <string name="interest_item_issue_region">Ej tillgängligt i din region</string>
+  <string name="interest_item_issue_kyc">Du måste vara guldverifierad för att börja tjäna intresse</string>
+  <string name="interest_item_issue_other">För närvarande inte tillgänglig. Kontrollera igen senare</string>
+  <string name="swap_header_title">Byt din krypto</string>
+  <string name="swap_header_label">Byt omedelbart ut din krypto till valutor vi erbjuder för din plånbok.</string>
+  <string name="swap_kyc_title">Verifiera ditt ID. Byt idag.</string>
+  <string name="swap_kyc_desc">Verifiera din identitet för att byta krypto när som helst. Applicera och byt på några minuter.</string>
+  <string name="swap_kyc_cta">Ansök nu</string>
+  <string name="swap_kyc_1_title">Välj ditt land</string>
+  <string name="swap_kyc_1_label">Blockchain.com måste känna till ditt nuvarande land i enlighet med lokala lagar.</string>
+  <string name="swap_kyc_2_title">Verifiera din identitet</string>
+  <string name="swap_kyc_2_label">Vi måste se till att det verkligen är du som förhindrar bedrägerier genom att ladda upp ett ID.</string>
+  <string name="swap_kyc_3_title">Börja byta</string>
+  <string name="swap_kyc_3_label">När du har verifierat, kom tillbaka till Byt och byt ut din krypto.</string>
+  <string name="swap_cta">Ny byte</string>
+  <string name="swap_account_select">Byta</string>
+  <string name="swap_account_select_subtitle">Vilken plånbok vill du byta från?</string>
+  <string name="select_target_account_for_swap">Vilken plånbok vill du ta emot?</string>
+  <string name="swap_low_fees">Låga avgifter</string>
+  <string name="swap_kyc_upsell_title">Du är nära din swapgräns. Uppgradera till byt större belopp.</string>
+  <string name="swap_kyc_upsell_desc">Verifiera din identitet för att öka hur mycket du kan byta varje dag.</string>
+  <string name="swap_kyc_upsell_1_title">Ladda upp ditt ID</string>
+  <string name="swap_kyc_upsell_1_desc">Vi måste se till att det verkligen är du som förhindrar bedrägerier genom att ladda upp ett ID.</string>
+  <string name="swap_kyc_upsell_2_title">Ladda upp en Selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Detta är för att du ska vara en människa. Inga robotar tillåtna.</string>
+  <string name="swap_kyc_upsell_3_title">Byt upp till $ 25 000 per dag</string>
+  <string name="swap_kyc_upsell_3_desc">När du har verifierat, kom tillbaka till Byt och byt ut din krypto.</string>
+  <string name="trending_label">Trender</string>
+  <string name="trending_swap">Byt %1$s</string>
+  <string name="trending_empty">Finansiera dina handelsplånböcker för att se Trending Swaps med lägre avgifter.</string>
+  <string name="trending_receive">Få %1$s</string>
+  <string name="show_more_accounts">Visa mer</string>
+  <string name="select_a_wallet">Välj en plånbok</string>
+  <string name="pending_swap_info_message">Du har 1 swap väntande. När det har rensats kan du göra ett nytt byte.</string>
+  <string name="deposit_fee">Nätverksavgift</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Växlingskurs</string>
+  <string name="in_progress">Pågående</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

@@ -1123,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Мы отправили ссылку для подтверждения</string>
   <string name="buy_sell_unverified_email_verify_message2">Нажмите на нее и вернитесь сюда, чтобы продолжить транзакцию.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Открыть электронную почту</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email подтвержден!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обработает вашу биткойн-транзакцию. Нажав «Согласен» и «Продолжить», вы создадите учетную запись с %1$s .</string>
   <string name="buy_sell_identification_verification">Определить подтверждение</string>

@@ -25,7 +25,7 @@
     <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
-    <item quantity="one">%d імпортна адреса</item>
+    <item quantity="one">1 імпортна адреса</item>
     <item quantity="few"></item>
     <item quantity="many"></item>
     <item quantity="other">%d імпортованих адрес</item>
@@ -693,6 +693,9 @@
   <string name="fee_options_custom_warning">Лише для просунутих користувачів</string>
   <string name="fee_options_fee_too_low">Низька плата не рекомендується</string>
   <string name="fee_options_fee_too_high">Непомітно висока плата</string>
+  <string name="fee_options_advanced_warning">Ця функція рекомендується лише для досвідчених користувачів. 
+ Вибравши спеціальну плату, ви ризикуєте переплатити або транзакцію ніколи не підтвердити. 
+</string>
   <string name="fee_options_sat_byte_hint">сб / б</string>
   <string name="fee_options_sat_byte_inline_hint">Регулярно: %1$s , пріоритет: %2$s</string>
   <string name="dismiss">Відхилити</string>
@@ -1123,7 +1126,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Ми надіслали посилання для підтвердження до</string>
   <string name="buy_sell_unverified_email_verify_message2">Клацніть по ньому та поверніться сюди, щоб продовжити транзакцію.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Відкрити електронну пошту</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Підтверджено електронною поштою!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обробить вашу біткойн-транзакцію. Натиснувши «Погодитися» та «Продовжити», ви створите обліковий запис за допомогою %1$s .</string>
   <string name="buy_sell_identification_verification">Визначте верифікацію</string>
@@ -1840,7 +1842,7 @@
   <string name="send_enter_unexpected_error">Виникла несподівана помилка. Будь ласка спробуйте ще раз.</string>
   <string name="send_enter_insufficient_gas">У вас недостатньо ETH для обробки цієї транзакції.</string>
   <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
-  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %2$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
+  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
   <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Докладніше. </annotation>
@@ -1995,5 +1997,88 @@
   <string name="tx_view_locked_funds_1">Ці кошти можна буде негайно продати у %1$s гаманця Fiat, але ви не зможете надіслати або вивести ці кошти з Blockchain.com до %2$s</string>
   <string name="common_pending">В очікуванні</string>
   <string name="confirm_status_msg_insufficient_funds">У вас недостатньо коштів на цьому рахунку для обробки цієї транзакції</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Будь ласка, переконайтеся, що ви погодились з нашими Умовами.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Безкоштовно</string>
+  <string name="two_fa_new_request">Запит нового коду…</string>
+  <string name="transfer_funds_title">Перенести з імпортованої адреси?</string>
+  <string name="transfer_funds_description">Імпортні адреси не створюються за допомогою резервної фрази. Щоб забезпечити ці кошти, ми
+ рекомендуємо перекласти ці залишки на свій Гаманець, що не є кастовим, на Blockchain.com.
+</string>
+  <string name="two_factor_resend_sms">Повторно надіслати SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Перевищено спроби, зачекайте 60 секунд, перш ніж повторити спробу</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Потрібно мінімум 1 сат / байт</string>
+  <string name="fee_options_invalid_amount">Недійсний збір</string>
+  <string name="sell_announcement_title">Продайте свою криптовалюту за готівку</string>
+  <string name="sell_announcement_description">Продайте безпосередньо зі своїх торгових гаманців на свій готівковий гаманець.</string>
+  <string name="sell_announcement_action">Продайте зараз</string>
+  <string name="generic_limit">Межі</string>
+  <string name="select_account_sheet_empty">У вас немає відповідних гаманців, щоб виконати цю дію.</string>
+  <string name="activity_details_swap_for">Для</string>
+  <string name="swap_enter_amount_min_swap">Потрібний мінімальний обмін %1$s</string>
+  <string name="too_many_pending_orders_error_message">У вашому %1$s гаманці триває забагато обмінів. Виберіть інший гаманець.</string>
+  <string name="swap_confirmation_title">Поміняти місцями %1$s</string>
+  <string name="swap_confirmation_cta_button">Поміняйте %1$s на %2$s</string>
+  <string name="swap_confirmation_disclaimer">Суми, які ви надсилаєте та отримуєте, можуть дещо змінитися внаслідок ринкової діяльності. Щойно замовлення починається, ми не можемо зупинити його.</string>
+  <string name="swap_confirmation_progress_message">Зараз ми завершуємо ваш обмін.</string>
+  <string name="swap_confirmation_success_message">Ваш %1$s тепер доступний у вашому гаманці.</string>
+  <string name="swap_progress_title">Обмін %1$s на %2$s</string>
+  <string name="swap_progress_complete_title">Підкачка завершена</string>
+  <string name="swap_enter_amount_title">Поміняти місцями %1$s</string>
+  <string name="swap_enter_amount_source">Поміняти місцями: %1$s</string>
+  <string name="swap_enter_amount_target">Отримати: %1$s</string>
+  <string name="swap_enter_amount_max">Поміняти місцями Макс</string>
+  <string name="swap_enter_amount_silver_limit">Натисніть тут, щоб оновити свій профіль і поміняти цю суму.</string>
+  <string name="swap_enter_amount_over_limit">Сьогодні ви можете поміняти місцями до %1$s .</string>
+  <string name="swap_select_target_subtitle">Підтвердьте гаманець, з якого ви хочете здійснити обмін, і виберіть гаманець, в який ви хочете отримати.</string>
+  <string name="swap_select_target_title">Новий своп</string>
+  <string name="tx_confirmation_network_fee">%1$s Мережна комісія</string>
+  <string name="tx_confirmation_fee_learn_more_1">Мережа</string>
+  <string name="tx_confirmation_fee_learn_more_2">комісії встановлюються мережею %1$s .</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Докладніше про збори </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Плата за мережу при використанні</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Торгові гаманці</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">БЕЗКОШТОВНО! <annotation link="send_tx_fees"> Докладніше про збори </annotation> .</string>
+  <string name="interest_item_issue_region">Недоступно у вашому регіоні</string>
+  <string name="interest_item_issue_kyc">Щоб почати заробляти відсотки, вам потрібно пройти перевірку золота</string>
+  <string name="interest_item_issue_other">Наразі недоступний, перевірте ще раз пізніше</string>
+  <string name="swap_header_title">Поміняйте місцями свою криптографію</string>
+  <string name="swap_header_label">Миттєво обміняйте свою криптовалюту на будь-яку валюту, яку ми пропонуємо для вашого гаманця.</string>
+  <string name="swap_kyc_title">Підтвердьте свій ідентифікатор. Поміняти місцями сьогодні.</string>
+  <string name="swap_kyc_desc">Підтвердьте свою особу для обміну криптовалютами в будь-який час. Подайте заявку та поміняйтеся місцями за лічені хвилини.</string>
+  <string name="swap_kyc_cta">Подати зараз</string>
+  <string name="swap_kyc_1_title">Виберіть свою країну</string>
+  <string name="swap_kyc_1_label">Blockchain.com повинен знати вашу поточну країну відповідно до місцевого законодавства.</string>
+  <string name="swap_kyc_2_title">Підтвердьте свою особу</string>
+  <string name="swap_kyc_2_label">Нам потрібно переконатись, що це насправді ви, щоб запобігти шахрайству, завантаживши посвідчення особи.</string>
+  <string name="swap_kyc_3_title">Почніть обмін</string>
+  <string name="swap_kyc_3_label">Після перевірки поверніться до Swap та обміняй свою криптографію.</string>
+  <string name="swap_cta">Новий своп</string>
+  <string name="swap_account_select">Поміняти місцями</string>
+  <string name="swap_account_select_subtitle">Який гаманець ви хочете поміняти?</string>
+  <string name="select_target_account_for_swap">В який гаманець ви хочете отримати?</string>
+  <string name="swap_low_fees">Низькі збори</string>
+  <string name="swap_kyc_upsell_title">Ви близько до свого обмеження обміну. Оновіть, щоб поміняти місцями більші суми.</string>
+  <string name="swap_kyc_upsell_desc">Підтвердьте свою особу, щоб збільшити, скільки ви можете поміняти місцями щодня.</string>
+  <string name="swap_kyc_upsell_1_title">Завантажте свій посвідчення особи</string>
+  <string name="swap_kyc_upsell_1_desc">Нам потрібно переконатись, що це насправді ви, щоб запобігти шахрайству, завантаживши посвідчення особи.</string>
+  <string name="swap_kyc_upsell_2_title">Завантажте селфі</string>
+  <string name="swap_kyc_upsell_2_desc">Це для того, щоб переконатися, що ти людина. Роботи не допускаються.</string>
+  <string name="swap_kyc_upsell_3_title">Поміняйте місцями до 25 000 доларів на день</string>
+  <string name="swap_kyc_upsell_3_desc">Після перевірки поверніться до Swap та обміняй свою криптографію.</string>
+  <string name="trending_label">Популярні</string>
+  <string name="trending_swap">Поміняти місцями %1$s</string>
+  <string name="trending_empty">Поповніть свої торгові гаманці, щоб побачити модні суапи з нижчими комісіями.</string>
+  <string name="trending_receive">Отримати %1$s</string>
+  <string name="show_more_accounts">Показати більше</string>
+  <string name="select_a_wallet">Виберіть гаманець</string>
+  <string name="pending_swap_info_message">У вас є 1 обмін на розгляді. Як тільки це проясниться, ви можете зробити новий обмін.</string>
+  <string name="deposit_fee">Плата за мережу</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Обмінний курс</string>
+  <string name="in_progress">В процесі</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

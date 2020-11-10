@@ -691,6 +691,9 @@
   <string name="fee_options_custom_warning">Alleen geavanceerde gebruikers</string>
   <string name="fee_options_fee_too_low">Lage vergoeding niet aanbevolen</string>
   <string name="fee_options_fee_too_high">Onnodig hoge vergoeding</string>
+  <string name="fee_options_advanced_warning">Deze functie wordt alleen aanbevolen voor gevorderde gebruikers. 
+ Door een aangepaste vergoeding te kiezen, riskeert u te veel betalen of wordt uw transactie nooit bevestigd. 
+</string>
   <string name="fee_options_sat_byte_hint">zat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Normaal: %1$s , prioriteit: %2$s</string>
   <string name="dismiss">Afwijzen</string>
@@ -1121,7 +1124,6 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>
@@ -1462,7 +1464,9 @@
   <string name="simple_buy_amount_to_send">Hoeveelheid om te versturen</string>
   <string name="simple_buy_pending_buy_sheet_title">In afwachting van %1s kopen</string>
   <string name="recipient_name_must_match_eur">Uw naam van de ontvanger hierboven moet overeenkomen met de naam van de rekeninghouder op uw bankrekening om uw overboeking te laten slagen. Uw overboeking kan worden afgewezen als er geen overeenkomst is.</string>
-  <string name="recipient_name_must_match_gbp">Uw naam van de ontvanger hierboven moet overeenkomen met de naam van de rekeninghouder op uw bankrekening om uw overboeking te laten slagen. Uw overboeking kan worden afgewezen als er geen overeenkomst is.\n\nDoor geld op deze rekening te storten, gaat u akkoord met <annotation link="modular_terms_and_conditions"> Algemene voorwaarden van Modulr </annotation> , onze bankpartner.</string>
+  <string name="recipient_name_must_match_gbp">Uw naam van de ontvanger hierboven moet overeenkomen met de naam van de rekeninghouder op uw bankrekening om uw overboeking te laten slagen. Uw overboeking kan worden afgewezen als er geen overeenkomst is. 
+
+ Door geld op deze rekening te storten, gaat u akkoord met <annotation link="modular_terms_and_conditions"> Algemene voorwaarden van Modulr </annotation> , onze bankpartner.</string>
   <string name="recipient_name_must_match">Maak alleen geld over van een bankrekening op uw naam. Zo niet, dan kan uw aanbetaling worden vertraagd of geweigerd.</string>
   <string name="simple_buy_no_currencies_available_title">Geen valuta beschikbaar</string>
   <string name="simple_buy_no_currencies_available">Helaas zijn er momenteel geen valuta\'s die u kunt verhandelen :(</string>
@@ -1504,7 +1508,7 @@
   <string name="tx_title_receive">Ontvang %1s</string>
   <string name="tx_title_sell">Verkoop %1s</string>
   <string name="tx_title_buy">Koop %1s</string>
-  <string name="tx_title_swap">Verwissel %1s → %2$s</string>
+  <string name="tx_title_swap">Verwissel %1$s → %2$s</string>
   <string name="tx_title_transfer">Breng %1s</string>
   <string name="tx_title_fee">Tarief %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Waarde bij verwisseling: \u0020</string>
@@ -1836,7 +1840,7 @@
   <string name="send_enter_unexpected_error">Er is een onverwachte fout opgetreden. Probeer het a.u.b. opnieuw.</string>
   <string name="send_enter_insufficient_gas">U heeft niet genoeg ETH om deze transactie te verwerken.</string>
   <string name="send_select_a_wallet_title">of Selecteer een portemonnee</string>
-  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %2$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
+  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %1$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
   <string name="purchase_funds_note">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Meer informatie. </annotation>
@@ -1987,5 +1991,88 @@
   <string name="tx_view_locked_funds_1">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot %2$s niet verzenden naar of opnemen van Blockchain.com.</string>
   <string name="common_pending">In afwachting</string>
   <string name="confirm_status_msg_insufficient_funds">U heeft onvoldoende saldo op deze rekening om deze transactie te verwerken</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Zorg ervoor dat u akkoord gaat met onze voorwaarden.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Vrij</string>
+  <string name="two_fa_new_request">Nieuwe code aanvragen…</string>
+  <string name="transfer_funds_title">Overzetten van geïmporteerd adres?</string>
+  <string name="transfer_funds_description">Van geïmporteerde adressen wordt geen back-up gemaakt door uw reservekopiezin. Om deze fondsen veilig te stellen, hebben we
+ raden aan om deze saldi over te boeken naar uw Blockchain.com niet-bewaarportefeuille.
+</string>
+  <string name="two_factor_resend_sms">Sms opnieuw verzenden (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Pogingen zijn overschreden. Wacht 60 seconden voordat u het opnieuw probeert</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Minimaal 1 sat / byte vereist</string>
+  <string name="fee_options_invalid_amount">Ongeldig tarief</string>
+  <string name="sell_announcement_title">Verkoop uw crypto voor contant geld</string>
+  <string name="sell_announcement_description">Verkoop rechtstreeks vanuit uw handelsportefeuilles naar uw geldportefeuille.</string>
+  <string name="sell_announcement_action">Nu verkopen</string>
+  <string name="generic_limit">Grenzen</string>
+  <string name="select_account_sheet_empty">U heeft geen geschikte wallets om deze actie uit te voeren.</string>
+  <string name="activity_details_swap_for">Voor</string>
+  <string name="swap_enter_amount_min_swap">Minimale omwisseling van %1$s vereist</string>
+  <string name="too_many_pending_orders_error_message">Uw %1$s portemonnee heeft te veel lopende swaps. Selecteer een andere portemonnee.</string>
+  <string name="swap_confirmation_title">Ruil %1$s</string>
+  <string name="swap_confirmation_cta_button">Ruil %1$s voor %2$s</string>
+  <string name="swap_confirmation_disclaimer">De bedragen die u verzendt en ontvangt, kunnen enigszins veranderen als gevolg van marktactiviteit. Zodra een bestelling is gestart, kunnen we deze niet meer stoppen.</string>
+  <string name="swap_confirmation_progress_message">We zijn uw ruil nu aan het afronden.</string>
+  <string name="swap_confirmation_success_message">Uw %1$s is nu beschikbaar in uw Wallet.</string>
+  <string name="swap_progress_title">%1$s ruilen voor %2$s</string>
+  <string name="swap_progress_complete_title">Swap voltooid</string>
+  <string name="swap_enter_amount_title">Ruil %1$s</string>
+  <string name="swap_enter_amount_source">Wisselen: %1$s</string>
+  <string name="swap_enter_amount_target">Ontvangen: %1$s</string>
+  <string name="swap_enter_amount_max">Max</string>
+  <string name="swap_enter_amount_silver_limit">Tik hier om uw profiel te upgraden en dit bedrag om te wisselen.</string>
+  <string name="swap_enter_amount_over_limit">U kunt vandaag tot %1$s ruilen.</string>
+  <string name="swap_select_target_subtitle">Bevestig de portefeuille waaruit u wilt wisselen en kies de portefeuille waarin u wilt ontvangen.</string>
+  <string name="swap_select_target_title">Nieuwe ruil</string>
+  <string name="tx_confirmation_network_fee">%1$s netwerkkosten</string>
+  <string name="tx_confirmation_fee_learn_more_1">Netwerk</string>
+  <string name="tx_confirmation_fee_learn_more_2">vergoedingen worden bepaald door het %1$s netwerk.</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Meer informatie over tarieven </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Netwerkkosten bij gebruik</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Handel in portefeuilles</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">zijn vrij! <annotation link="send_tx_fees"> Meer informatie over tarieven </annotation> .</string>
+  <string name="interest_item_issue_region">Niet beschikbaar in uw regio</string>
+  <string name="interest_item_issue_kyc">U moet Gold-geverifieerd zijn om rente te verdienen</string>
+  <string name="interest_item_issue_other">Momenteel niet beschikbaar. Controleer het later opnieuw</string>
+  <string name="swap_header_title">Verwissel je crypto</string>
+  <string name="swap_header_label">Wissel uw crypto onmiddellijk om in elke valuta die we voor uw portemonnee aanbieden.</string>
+  <string name="swap_kyc_title">Verifieer uw ID. Wissel vandaag nog.</string>
+  <string name="swap_kyc_desc">Verifieer uw identiteit om op elk moment crypto te wisselen. Binnen enkele minuten toepassen en wisselen.</string>
+  <string name="swap_kyc_cta">Nu toepassen</string>
+  <string name="swap_kyc_1_title">Kies je land</string>
+  <string name="swap_kyc_1_label">Blockchain.com moet uw huidige land kennen in overeenstemming met de lokale wetgeving.</string>
+  <string name="swap_kyc_2_title">Verifieer uw identiteit</string>
+  <string name="swap_kyc_2_label">We moeten ervoor zorgen dat u het echt bent om fraude te voorkomen door een ID te uploaden.</string>
+  <string name="swap_kyc_3_title">Begin met ruilen</string>
+  <string name="swap_kyc_3_label">Eenmaal geverifieerd, keert u terug naar Swap en ruilt u uw crypto in.</string>
+  <string name="swap_cta">Nieuwe ruil</string>
+  <string name="swap_account_select">Wissel</string>
+  <string name="swap_account_select_subtitle">Van welke portemonnee wil je wisselen?</string>
+  <string name="select_target_account_for_swap">In welke portemonnee wilt u ontvangen?</string>
+  <string name="swap_low_fees">Lage tarieven</string>
+  <string name="swap_kyc_upsell_title">U bent dicht bij uw ruillimiet. Upgrade om grotere bedragen te ruilen.</string>
+  <string name="swap_kyc_upsell_desc">Verifieer uw identiteit om te verhogen hoeveel u elke dag kunt ruilen.</string>
+  <string name="swap_kyc_upsell_1_title">Upload uw ID</string>
+  <string name="swap_kyc_upsell_1_desc">We moeten ervoor zorgen dat u het echt bent om fraude te voorkomen door een ID te uploaden.</string>
+  <string name="swap_kyc_upsell_2_title">Upload een selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Dit is om ervoor te zorgen dat je een mens bent. Geen robots toegestaan.</string>
+  <string name="swap_kyc_upsell_3_title">Ruil tot $ 25.000 per dag</string>
+  <string name="swap_kyc_upsell_3_desc">Eenmaal geverifieerd, keert u terug naar Swap en ruilt u uw crypto in.</string>
+  <string name="trending_label">Trending</string>
+  <string name="trending_swap">Ruil %1$s</string>
+  <string name="trending_empty">Financier uw handelsportefeuilles om trending swaps met lagere kosten te zien.</string>
+  <string name="trending_receive">Ontvang %1$s</string>
+  <string name="show_more_accounts">Laat meer zien</string>
+  <string name="select_a_wallet">Selecteer een portemonnee</string>
+  <string name="pending_swap_info_message">Je hebt 1 ruil in behandeling. Zodra dat is gewist, kunt u een nieuwe ruil maken.</string>
+  <string name="deposit_fee">Netwerkkosten</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Wisselkoers</string>
+  <string name="in_progress">Bezig</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

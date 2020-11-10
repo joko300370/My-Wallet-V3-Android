@@ -15,14 +15,14 @@
     <item>คำที่สิบสอง</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_hash</item>
+    <item>\@ สตริง / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d ที่อยู่ที่นำเข้า</item>
@@ -690,6 +690,9 @@
   <string name="fee_options_custom_warning">ผู้ใช้ขั้นสูงเท่านั้น</string>
   <string name="fee_options_fee_too_low">ค่าธรรมเนียมต่ำไม่แนะนำ</string>
   <string name="fee_options_fee_too_high">ค่าธรรมเนียมสูงโดยไม่จำเป็น</string>
+  <string name="fee_options_advanced_warning">คุณลักษณะนี้เหมาะสำหรับผู้ใช้ขั้นสูงเท่านั้น 
+ โดยการเลือกค่าธรรมเนียมที่กำหนดเองคุณจะเสี่ยงกับการจ่ายเงินมากเกินไปหรือการทำธุรกรรมของคุณไม่เคยได้รับการยืนยัน 
+</string>
   <string name="fee_options_sat_byte_hint">SAT / b</string>
   <string name="fee_options_sat_byte_inline_hint">ปกติ: %1$s , ลำดับความสำคัญ: %2$s</string>
   <string name="dismiss">ยกเลิก</string>
@@ -1120,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>
@@ -1227,7 +1229,7 @@
   <string name="kyc_email_title">ยืนยันอีเมลของคุณ</string>
   <string name="kyc_email_message">เราจำเป็นต้องยืนยันที่อยู่อีเมลของคุณเพื่อเพิ่มระดับความปลอดภัย</string>
   <string name="kyc_email_hint_focused">อีเมลของคุณ</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ สตริง / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">เกิดข้อผิดพลาดในการบันทึกอีเมลโปรดลองอีกครั้ง</string>
   <string name="kyc_email_send_verification">ส่งอีเมล</string>
   <string name="kyc_email_validation_header">ตรวจสอบกล่องจดหมายของคุณ.</string>
@@ -1252,7 +1254,7 @@
   <string name="kyc_onfido_splash_verification_error">เกิดข้อผิดพลาดในการยืนยัน ID โปรดลองอีกครั้ง</string>
   <string name="kyc_veriff_splash_country_supported_header">ประเทศของฉันรองรับหรือไม่</string>
   <string name="kyc_veriff_splash_country_supported_subheader">ไม่รองรับทุกประเทศในขณะนี้ ตรวจสอบ <annotation link="country_list"> รายการประเทศ </annotation> ก่อนดำเนินการต่อ</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ตรวจสอบเงินแล้ว</string>
   <string name="kyc_veriff_splash_header">มายืนยันกันเถอะ</string>
   <string name="kyc_veriff_splash_subtitle">คุณจะต้องมี 1 ประเภท ID ด้านล่างนี้เพื่อดำเนินการต่อ</string>
@@ -1274,11 +1276,11 @@
   <string name="kyc_complete_device_verified">ตรวจสอบอุปกรณ์แล้ว</string>
   <string name="kyc_complete_id_uploaded">อัปโหลด ID</string>
   <string name="kyc_complete_video_uploaded">วิดีโอที่อัปโหลด</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ สตริง / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ทีมสนับสนุน Blockchain ของเราได้เขียนคำแนะนำช่วยเหลืออธิบายว่าทำไมเราต้องยืนยันตัวตนของคุณ</string>
   <string name="kyc_help_dialog_read_now">อ่านตอนนี้</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ สตริง / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">การยืนยันตัวตน</string>
   <string name="kyc_settings_status_none">ไม่สอบ</string>
@@ -1290,7 +1292,7 @@
   <string name="kyc_settings_gold_level_in_review">ระดับทอง - อยู่ระหว่างการตรวจสอบ</string>
   <string name="kyc_settings_gold_level_approved">ระดับทอง - ได้รับการอนุมัติ</string>
   <string name="kyc_settings_silver_level_approved">ระดับเงิน - อนุมัติแล้ว</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ สตริง / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">เกิดข้อผิดพลาดในการดึงสถานะ KYC</string>
   <string name="kyc_status_title_in_progress">กำลังตรวจสอบความคืบหน้า</string>
   <string name="kyc_status_title_approved">บัญชีได้รับการอนุมัติ</string>
@@ -1314,10 +1316,10 @@
   <string name="kyc_drop_off_card_description">เลือกสถานที่ที่คุณค้างไว้และทำการยืนยันตัวตนให้เสร็จสมบูรณ์</string>
   <string name="kyc_drop_off_card_button">ทำการตรวจสอบต่อ</string>
   <string name="kyc_documents_needed">เอกสารที่จำเป็น</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">เรามีปัญหากับเอกสารที่คุณให้มา โปรดลองอัปโหลดเอกสารอีกครั้งเพื่อดำเนินการยืนยันต่อ</string>
   <string name="kyc_resubmission_card_button">อัพโหลดเอกสาร</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ สตริง / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">เราไม่สามารถยืนยันตัวตนของคุณและต้องการให้คุณอัปโหลดเอกสารที่จำเป็นอีกครั้ง</string>
   <string name="kyc_resubmission_splash_description_2">สาเหตุหลักที่ทำให้สิ่งนี้เกิดขึ้น:</string>
   <string name="kyc_resubmission_splash_description_3">ภาพถ่ายที่ต้องการหายไป</string>
@@ -1569,7 +1571,7 @@
   <string name="card_error_subtitle">โปรดย้อนกลับและลองอีกครั้ง</string>
   <string name="card_expiry_date">ประสบการณ์: %1s</string>
   <string name="card_buying">ซื้อ %1s</string>
-  <string name="card_in_progress" formatted="false">%1s ซื้อ</string>
+  <string name="card_in_progress" formatted="false">%1s ซื้อ %1s</string>
   <string name="we_will_notify_order_complete">เราจะแจ้งให้คุณทราบเมื่อการสั่งซื้อของคุณเสร็จสมบูรณ์</string>
   <string name="completing_card_buy">เรากำลังทำการสั่งซื้อของคุณให้เสร็จสิ้นในตอนนี้</string>
   <string name="card_purchased">ซื้อแล้ว %1s</string>
@@ -1839,7 +1841,7 @@
   <string name="send_enter_unexpected_error">ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น. กรุณาลองอีกครั้ง.</string>
   <string name="send_enter_insufficient_gas">คุณมี ETH ไม่เพียงพอที่จะดำเนินธุรกรรมนี้</string>
   <string name="send_select_a_wallet_title">หรือเลือกกระเป๋าเงิน</string>
-  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %2$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
+  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
   <string name="purchase_funds_note">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> เรียนรู้เพิ่มเติม </annotation>
@@ -1988,5 +1990,90 @@
   <string name="tx_view_locked_funds_1">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้ถึง %2$s</string>
   <string name="common_pending">รอดำเนินการ</string>
   <string name="confirm_status_msg_insufficient_funds">คุณมีเงินไม่เพียงพอในบัญชีนี้ที่จะดำเนินธุรกรรมนี้</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ สตริง / send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">โปรดตรวจสอบว่าคุณได้ยอมรับข้อกำหนดของเราแล้ว</string>
+  <string name="confirm_status_msg_invoice_expired">\@ สตริง / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ สตริง / send_enter_un ไม่คาดคิด_error</string>
+  <string name="common_free">ฟรี</string>
+  <string name="two_fa_new_request">กำลังขอรหัสใหม่…</string>
+  <string name="transfer_funds_title">โอนจากที่อยู่ที่นำเข้า?</string>
+  <string name="transfer_funds_description">ที่อยู่ที่นำเข้าจะไม่สำรองข้อมูลโดย Backup Phrase ของคุณ เพื่อรักษาความปลอดภัยของเงินเหล่านี้เรา
+ ขอแนะนำให้โอนยอดคงเหลือเหล่านี้ไปยังกระเป๋าเงินที่ไม่ได้รับการคุ้มครอง Blockchain.com ของคุณ
+</string>
+  <string name="two_factor_resend_sms">ส่ง SMS อีกครั้ง (%1$d)</string>
+  <string name="two_factor_retries_exceeded">ลองใหม่เกินแล้วโปรดรอ 60 วินาทีแล้วลองอีกครั้ง</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">ขั้นต่ำ 1 sat / byte ที่ต้องการ</string>
+  <string name="fee_options_invalid_amount">ค่าธรรมเนียมไม่ถูกต้อง</string>
+  <string name="sell_announcement_title">ขาย Crypto ของคุณเป็นเงินสด</string>
+  <string name="sell_announcement_description">ขายโดยตรงจาก Trading Wallets ของคุณไปยัง Cash Wallet ของคุณ</string>
+  <string name="sell_announcement_action">ขายเลย</string>
+  <string name="generic_limit">ขีด จำกัด</string>
+  <string name="select_account_sheet_empty">คุณไม่มีกระเป๋าสตางค์ที่มีสิทธิ์ดำเนินการนี้</string>
+  <string name="activity_details_swap_for">สำหรับ</string>
+  <string name="swap_enter_amount_min_swap">ต้องมีการแลกเปลี่ยนขั้นต่ำของ %1$s</string>
+  <string name="too_many_pending_orders_error_message">%1$s Wallet %1$s มีสวอปที่อยู่ระหว่างดำเนินการมากเกินไป โปรดเลือกกระเป๋าเงินอื่น</string>
+  <string name="swap_confirmation_title">สลับ %1$s</string>
+  <string name="swap_confirmation_cta_button">สลับ %1$s สำหรับ %2$s</string>
+  <string name="swap_confirmation_disclaimer">จำนวนเงินที่คุณส่งและรับอาจเปลี่ยนแปลงเล็กน้อยเนื่องจากกิจกรรมทางการตลาด เมื่อคำสั่งซื้อเริ่มขึ้นเราไม่สามารถหยุดยั้งได้</string>
+  <string name="swap_confirmation_progress_message">เรากำลังดำเนินการแลกเปลี่ยนของคุณให้เสร็จสิ้นในขณะนี้</string>
+  <string name="swap_confirmation_success_message">ขณะนี้ %1$s ของคุณอยู่ใน Wallet ของคุณแล้ว</string>
+  <string name="swap_progress_title">สลับ %1$s สำหรับ %2$s</string>
+  <string name="swap_progress_complete_title">Swap เสร็จสมบูรณ์</string>
+  <string name="swap_enter_amount_title">สลับ %1$s</string>
+  <string name="swap_enter_amount_source">แลกเปลี่ยน: %1$s</string>
+  <string name="swap_enter_amount_target">รับ: %1$s</string>
+  <string name="swap_enter_amount_max">Swap Max</string>
+  <string name="swap_enter_amount_silver_limit">แตะที่นี่เพื่ออัปเกรดโปรไฟล์ของคุณและแลกเปลี่ยนเงินจำนวนนี้</string>
+  <string name="swap_enter_amount_over_limit">คุณสามารถเปลี่ยนได้ถึง %1$s วันนี้</string>
+  <string name="swap_select_target_subtitle">ยืนยันกระเป๋าเงินที่คุณต้องการสลับจากและเลือกกระเป๋าเงินที่คุณต้องการรับเข้า</string>
+  <string name="swap_select_target_title">Swap ใหม่</string>
+  <string name="tx_confirmation_network_fee">ค่าธรรมเนียมเครือข่าย %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_1">เครือข่าย</string>
+  <string name="tx_confirmation_fee_learn_more_2">ค่าธรรมเนียมถูกกำหนดโดยเครือข่าย %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_3">
+    <annotation link="send_tx_fees"> เรียนรู้เพิ่มเติมเกี่ยวกับค่าธรรมเนียม </annotation>
+  </string>
+  <string name="tx_confirmation_free_fee_learn_more_1">ค่าธรรมเนียมเครือข่ายเมื่อใช้</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">ซื้อขายกระเป๋าสตางค์</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">ฟรี! <annotation link="send_tx_fees"> เรียนรู้เพิ่มเติมเกี่ยวกับค่าธรรมเนียม </annotation></string>
+  <string name="interest_item_issue_region">ไม่มีให้บริการในภูมิภาคของคุณ</string>
+  <string name="interest_item_issue_kyc">คุณต้องได้รับการยืนยันระดับ Gold เพื่อเริ่มรับดอกเบี้ย</string>
+  <string name="interest_item_issue_other">ไม่สามารถใช้งานได้ในขณะนี้โปรดตรวจสอบอีกครั้งในภายหลัง</string>
+  <string name="swap_header_title">สลับ Crypto ของคุณ</string>
+  <string name="swap_header_label">แลกเปลี่ยน crypto ของคุณเป็นสกุลเงินที่เราเสนอให้กับกระเป๋าเงินของคุณทันที</string>
+  <string name="swap_kyc_title">ยืนยันรหัสของคุณ สลับวันนี้</string>
+  <string name="swap_kyc_desc">ยืนยันตัวตนของคุณเป็น Swap crypto ได้ตลอดเวลา ใช้และสลับในไม่กี่นาที</string>
+  <string name="swap_kyc_cta">สมัครตอนนี้</string>
+  <string name="swap_kyc_1_title">เลือกประเทศของคุณ</string>
+  <string name="swap_kyc_1_label">Blockchain.com จำเป็นต้องทราบประเทศปัจจุบันของคุณตามกฎหมายท้องถิ่น</string>
+  <string name="swap_kyc_2_title">ยืนยันตัวตนของคุณ</string>
+  <string name="swap_kyc_2_label">เราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆเพื่อป้องกันการฉ้อโกงโดยการอัปโหลด ID</string>
+  <string name="swap_kyc_3_title">เริ่มการสลับ</string>
+  <string name="swap_kyc_3_label">เมื่อตรวจสอบแล้วให้กลับมาที่ Swap และแลกเปลี่ยน crypto ของคุณ</string>
+  <string name="swap_cta">Swap ใหม่</string>
+  <string name="swap_account_select">สลับ</string>
+  <string name="swap_account_select_subtitle">คุณต้องการเปลี่ยนจากกระเป๋าเงินใด</string>
+  <string name="select_target_account_for_swap">คุณต้องการรับเข้ากระเป๋าเงินใด</string>
+  <string name="swap_low_fees">ค่าธรรมเนียมต่ำ</string>
+  <string name="swap_kyc_upsell_title">คุณใกล้ถึงขีด จำกัด Swap ของคุณแล้ว อัปเกรดเป็น Swap จำนวนมากขึ้น</string>
+  <string name="swap_kyc_upsell_desc">ยืนยันตัวตนของคุณเพื่อเพิ่มจำนวนที่คุณสามารถสลับได้ทุกวัน</string>
+  <string name="swap_kyc_upsell_1_title">อัปโหลด ID ของคุณ</string>
+  <string name="swap_kyc_upsell_1_desc">เราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆเพื่อป้องกันการฉ้อโกงโดยการอัปโหลด ID</string>
+  <string name="swap_kyc_upsell_2_title">อัปโหลด Selfie</string>
+  <string name="swap_kyc_upsell_2_desc">เพื่อให้แน่ใจว่าคุณเป็นมนุษย์ ไม่อนุญาตให้ใช้โรบ็อต</string>
+  <string name="swap_kyc_upsell_3_title">แลกเปลี่ยนได้มากถึง $ 25,000 ต่อวัน</string>
+  <string name="swap_kyc_upsell_3_desc">เมื่อตรวจสอบแล้วให้กลับมาที่ Swap และแลกเปลี่ยน crypto ของคุณ</string>
+  <string name="trending_label">แนวโน้ม</string>
+  <string name="trending_swap">สลับ %1$s</string>
+  <string name="trending_empty">ฝากเงินเข้ากระเป๋าซื้อขายของคุณเพื่อดูแนวโน้ม Swaps ที่มีค่าธรรมเนียมต่ำ</string>
+  <string name="trending_receive">รับ %1$s</string>
+  <string name="show_more_accounts">แสดงมากขึ้น</string>
+  <string name="select_a_wallet">เลือกกระเป๋าเงิน</string>
+  <string name="pending_swap_info_message">คุณมีการแลกเปลี่ยน 1 รายการที่รอดำเนินการ เมื่อเคลียร์เรียบร้อยแล้วคุณสามารถทำการสลับใหม่ได้</string>
+  <string name="deposit_fee">ค่าธรรมเนียมเครือข่าย</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">อัตราแลกเปลี่ยน</string>
+  <string name="in_progress">กำลังดำเนินการ</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

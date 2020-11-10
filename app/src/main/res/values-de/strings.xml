@@ -1122,7 +1122,6 @@
     <string name="buy_sell_unverified_email_verify_message1">Wir haben einen Bestätigungslink an gesendet</string>
     <string name="buy_sell_unverified_email_verify_message2">Klicken Sie darauf und kehren Sie hierher zurück, um mit Ihrer Transaktion fortzufahren.</string>
     <string name="buy_sell_unverified_email_verify_open_email">Öffnen Sie die E-Mail</string>
-    <string name="coinify">Coinify</string>
     <string name="buy_sell_verified_email_title">Email überprüft!</string>
     <string name="buy_sell_verified_email_message">Unser Partner %1$s wird Ihre Bitcoin-Transaktion abwickeln. Wenn Sie auf Zustimmen und dann auf Weiter klicken, erstellen Sie ein Konto mit %1$s .</string>
     <string name="buy_sell_identification_verification">Identifizieren Sie die Überprüfung</string>

@@ -690,6 +690,9 @@
   <string name="fee_options_custom_warning">Pengguna lanjutan sahaja</string>
   <string name="fee_options_fee_too_low">Bayaran yang rendah tidak digalakkan</string>
   <string name="fee_options_fee_too_high">Bayaran yang tidak perlu</string>
+  <string name="fee_options_advanced_warning">Ciri ini disyorkan untuk pengguna canggih sahaja. 
+ Dengan memilih yuran adat, anda berisiko melebihkan atau transaksi anda tidak disahkan. 
+</string>
   <string name="fee_options_sat_byte_hint">duduk / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , Keutamaan: %2$s</string>
   <string name="dismiss">Buangkan</string>
@@ -1120,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami menghantar pautan pengesahan kepada</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk meneruskan transaksi anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka E-mel</string>
-  <string name="coinify">Mencukupi</string>
   <string name="buy_sell_verified_email_title">E-mel Disahkan!</string>
   <string name="buy_sell_verified_email_message">Rakan kongsi kami %1$s akan memproses transaksi bitcoin anda. Dengan mengklik Setuju dan \'Teruskan\', anda akan membuat akaun dengan %1$s .</string>
   <string name="buy_sell_identification_verification">Kenal pasti pengesahan</string>
@@ -1505,7 +1507,7 @@
   <string name="tx_title_receive">Terima %1s</string>
   <string name="tx_title_sell">Jual %1s</string>
   <string name="tx_title_buy">Beli %1s</string>
-  <string name="tx_title_swap">Tukar %1s → %2$s</string>
+  <string name="tx_title_swap">Tukar %1$s → %2$s</string>
   <string name="tx_title_transfer">Pindahkan %1s</string>
   <string name="tx_title_fee">Yuran %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Nilai apabila ditukar: \u0020</string>
@@ -1712,7 +1714,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Wang Tunai Deposit</string>
   <string name="fiat_funds_no_kyc_step_2_description">Pindahkan wang tunai dari bank anda dan aktifkan baki tunai anda.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Beli Crypto dengan Wang Tunai</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Gunakan dompet tunai anda sebagai kaedah pembayaran untuk membeli BTC, ETH, XLM &amp; banyak lagi.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Gunakan dompet tunai anda sebagai kaedah pembayaran untuk membeli BTC, ETH, XLM &amp; banyak lagi.</string>
   <string name="fiat_funds_no_kyc_positive_action">Sahkan Identiti Saya</string>
   <string name="fiat_funds_no_kyc_negative_action">Bukan sekarang</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1837,7 +1839,7 @@
   <string name="send_enter_unexpected_error">Ralat tidak dijangka telah berlaku. Sila cuba lagi.</string>
   <string name="send_enter_insufficient_gas">Anda tidak mempunyai ETH yang mencukupi untuk memproses transaksi ini.</string>
   <string name="send_select_a_wallet_title">atau Pilih Dompet</string>
-  <string name="send_internal_transfer_message">Pada masa ini, anda hanya dapat memindahkan %1$s dari Dompet Perdagangan %2$s ke Dompet Vault anda. Setelah %1$s berada di Vault Wallet anda, anda boleh memindahkan ke alamat luaran.</string>
+  <string name="send_internal_transfer_message">Pada masa ini, anda hanya dapat memindahkan %1$s dari Dompet Perdagangan %1$s ke Dompet Vault anda. Setelah %1$s berada di Vault Wallet anda, anda boleh memindahkan ke alamat luaran.</string>
   <string name="purchase_funds_note">Jumlah akhir anda mungkin berubah kerana aktiviti pasaran.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ketahui lebih lanjut. </annotation>
@@ -1986,5 +1988,88 @@
   <string name="tx_view_locked_funds_1">Dana ini akan tersedia untuk dijual ke dompet Fiat %1$s dengan segera, tetapi anda tidak akan dapat mengirim atau mengeluarkan dana ini dari Blockchain.com hingga %2$s</string>
   <string name="common_pending">Yang belum selesai</string>
   <string name="confirm_status_msg_insufficient_funds">Anda tidak mempunyai dana dalam akaun ini untuk memproses transaksi ini</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Pastikan anda telah bersetuju dengan Syarat kami.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Percuma</string>
+  <string name="two_fa_new_request">Meminta kod baru…</string>
+  <string name="transfer_funds_title">Pindahkan Dari Alamat yang Diimport?</string>
+  <string name="transfer_funds_description">Alamat yang diimport tidak disandarkan oleh Frasa Sandaran anda. Untuk mendapatkan dana ini, kami
+ cadangkan pindahkan baki ini ke Wallet bukan penjaga Blockchain.com anda.
+</string>
+  <string name="two_factor_resend_sms">Hantar semula SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Melebihi percubaan, tunggu 60 saat sebelum mencuba lagi</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Minimum 1 sat / bait diperlukan</string>
+  <string name="fee_options_invalid_amount">Bayaran tidak sah</string>
+  <string name="sell_announcement_title">Jual Crypto Anda dengan Wang Tunai</string>
+  <string name="sell_announcement_description">Jual terus dari Dompet Dagangan anda ke Dompet Tunai anda.</string>
+  <string name="sell_announcement_action">Jual sekarang</string>
+  <string name="generic_limit">Had</string>
+  <string name="select_account_sheet_empty">Anda tidak mempunyai Wallet yang layak untuk melakukan tindakan ini.</string>
+  <string name="activity_details_swap_for">Untuk</string>
+  <string name="swap_enter_amount_min_swap">Diperlukan pertukaran minimum %1$s</string>
+  <string name="too_many_pending_orders_error_message">%1$s Wallet anda mempunyai terlalu banyak pertukaran dalam proses. Sila pilih dompet lain.</string>
+  <string name="swap_confirmation_title">Tukar %1$s</string>
+  <string name="swap_confirmation_cta_button">Tukar %1$s untuk %2$s</string>
+  <string name="swap_confirmation_disclaimer">Jumlah yang anda hantar dan terima mungkin sedikit berubah kerana aktiviti pasaran. Setelah pesanan bermula, kami tidak dapat menghentikannya.</string>
+  <string name="swap_confirmation_progress_message">Kami menyelesaikan pertukaran anda sekarang.</string>
+  <string name="swap_confirmation_success_message">%1$s kini tersedia di Wallet anda.</string>
+  <string name="swap_progress_title">Menukar %1$s untuk %2$s</string>
+  <string name="swap_progress_complete_title">Tukar Lengkap</string>
+  <string name="swap_enter_amount_title">Tukar %1$s</string>
+  <string name="swap_enter_amount_source">Tukar: %1$s</string>
+  <string name="swap_enter_amount_target">Terima: %1$s</string>
+  <string name="swap_enter_amount_max">Tukar Maks</string>
+  <string name="swap_enter_amount_silver_limit">Ketik di sini untuk menaik taraf profil anda dan tukar jumlah ini.</string>
+  <string name="swap_enter_amount_over_limit">Anda boleh menukar hingga %1$s hari ini.</string>
+  <string name="swap_select_target_subtitle">Sahkan dompet yang ingin anda Tukar dan pilih dompet yang ingin anda terima.</string>
+  <string name="swap_select_target_title">Pertukaran Baru</string>
+  <string name="tx_confirmation_network_fee">Bayaran Rangkaian %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_1">Rangkaian</string>
+  <string name="tx_confirmation_fee_learn_more_2">yuran ditetapkan oleh rangkaian %1$s .</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Ketahui lebih lanjut mengenai yuran </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Bayaran rangkaian semasa menggunakan</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Dompet Dagangan</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">adalah PERCUMA! <annotation link="send_tx_fees"> Ketahui lebih lanjut mengenai yuran </annotation> .</string>
+  <string name="interest_item_issue_region">Tidak terdapat di wilayah anda</string>
+  <string name="interest_item_issue_kyc">Anda perlu disahkan Emas untuk memulakan Perolehan Minat</string>
+  <string name="interest_item_issue_other">Tidak tersedia, sila periksa lagi kemudian</string>
+  <string name="swap_header_title">Tukar Crypto Anda</string>
+  <string name="swap_header_label">Tukar kripto anda dengan segera ke dalam mata wang yang kami tawarkan untuk dompet anda.</string>
+  <string name="swap_kyc_title">Sahkan Id Anda. Tukar Hari Ini.</string>
+  <string name="swap_kyc_desc">Sahkan identiti anda untuk Tukar crypto pada bila-bila masa. Sapukan dan Tukar dalam beberapa minit.</string>
+  <string name="swap_kyc_cta">Mohon sekarang</string>
+  <string name="swap_kyc_1_title">Pilih Negara Anda</string>
+  <string name="swap_kyc_1_label">Blockchain.com perlu mengetahui negara semasa anda sesuai dengan undang-undang tempatan.</string>
+  <string name="swap_kyc_2_title">Sahkan Identiti Anda</string>
+  <string name="swap_kyc_2_label">Kami perlu memastikan bahawa anda betul-betul mencegah penipuan dengan memuat naik ID.</string>
+  <string name="swap_kyc_3_title">Mula Bertukar</string>
+  <string name="swap_kyc_3_label">Setelah disahkan, kembali ke Tukar dan tukar kripto anda.</string>
+  <string name="swap_cta">Pertukaran Baru</string>
+  <string name="swap_account_select">Tukar</string>
+  <string name="swap_account_select_subtitle">Dompet mana yang anda mahu Tukar?</string>
+  <string name="select_target_account_for_swap">Dompet mana yang anda mahu terima?</string>
+  <string name="swap_low_fees">Bayaran Rendah</string>
+  <string name="swap_kyc_upsell_title">Anda hampir dengan had pertukaran anda. Tingkatkan ke Tukar Jumlah Lebih Besar.</string>
+  <string name="swap_kyc_upsell_desc">Sahkan identiti anda untuk menambah jumlah yang anda boleh Tukar setiap hari.</string>
+  <string name="swap_kyc_upsell_1_title">Muat naik ID Anda</string>
+  <string name="swap_kyc_upsell_1_desc">Kami perlu memastikan bahawa anda betul-betul mencegah penipuan dengan memuat naik ID.</string>
+  <string name="swap_kyc_upsell_2_title">Muat naik Selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Ini untuk memastikan anda seorang manusia. Robot tidak dibenarkan.</string>
+  <string name="swap_kyc_upsell_3_title">Tukar sehingga $ 25,000 Sehari</string>
+  <string name="swap_kyc_upsell_3_desc">Setelah disahkan, kembali ke Tukar dan tukar kripto anda.</string>
+  <string name="trending_label">Trend</string>
+  <string name="trending_swap">Tukar %1$s</string>
+  <string name="trending_empty">Dana Dompet Dagangan anda untuk melihat Trending Swap dengan bayaran yang lebih rendah.</string>
+  <string name="trending_receive">Terima %1$s</string>
+  <string name="show_more_accounts">Tunjukkan lagi</string>
+  <string name="select_a_wallet">Pilih Dompet</string>
+  <string name="pending_swap_info_message">Anda mempunyai 1 pertukaran belum selesai. Setelah itu selesai, anda boleh membuat pertukaran baru.</string>
+  <string name="deposit_fee">Bayaran Rangkaian</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Kadar pertukaran</string>
+  <string name="in_progress">Dalam Kemajuan</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

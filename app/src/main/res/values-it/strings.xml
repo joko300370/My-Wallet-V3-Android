@@ -691,6 +691,9 @@
   <string name="fee_options_custom_warning">Solo utenti esperti</string>
   <string name="fee_options_fee_too_low">Tariffa bassa non consigliata</string>
   <string name="fee_options_fee_too_high">Commissione inutilmente elevata</string>
+  <string name="fee_options_advanced_warning">Questa funzione è consigliata solo per utenti esperti. 
+ Scegliendo una commissione personalizzata, rischi di pagare in eccesso o la tua transazione non verrà mai confermata. 
+</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regolare: %1$s , Priorità: %2$s</string>
   <string name="dismiss">Respingere</string>
@@ -1121,7 +1124,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Abbiamo inviato un link di verifica a</string>
   <string name="buy_sell_unverified_email_verify_message2">Fare clic e tornare qui per continuare con la transazione.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Apri email</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email verificata!</string>
   <string name="buy_sell_verified_email_message">Il nostro partner %1$s elaborerà la tua transazione bitcoin. Facendo clic su Accetto e \"Continua\", creerai un account con %1$s .</string>
   <string name="buy_sell_identification_verification">Identificare la verifica</string>
@@ -1540,6 +1542,7 @@
   <string name="estimated_amount">Est. Quantità</string>
   <string name="buying_fee">Commissione d\'acquisto</string>
   <string name="purchase_bank_note">Una volta ricevuti i tuoi fondi, inizieremo il tuo ordine di acquisto di %1$s . Tieni presente che l\'importo finale potrebbe cambiare in due attività di mercato Potrebbero essere applicate commissioni.</string>
+  <string name="purchase_card_note">Addebiteremo il tuo metodo di pagamento in 2 giorni lavorativi. L\'importo finale potrebbe variare a causa dell\'attività di mercato.</string>
   <string name="complete_payment">Pagamento completo</string>
   <string name="card_payment">Pagamento con carta</string>
   <string name="buy_now">Acquista ora</string>
@@ -1586,6 +1589,7 @@
   <string name="billing_address_state">Stato</string>
   <string name="billing_address_country">Nazione</string>
   <string name="currency_not_supported_title">La tua valuta non è supportata</string>
+  <string name="currency_not_supported">Al momento non supportiamo l\'acquisto di criptovalute con %1s</string>
   <string name="activity_no_activity_title">Non hai attività</string>
   <string name="activity_no_activity_text">Tutte le tue transazioni verranno visualizzate qui.</string>
   <string name="activity_custodial_pending_value">Trasferimento bancario</string>
@@ -1711,7 +1715,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Deposito in contanti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Trasferisci contanti dalla tua banca e attiva i tuoi saldi di cassa.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Acquista Crypto con contanti</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Usa il tuo portafoglio in contanti come metodo di pagamento per acquistare BTC, ETH, XLM e altro.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Usa il tuo portafoglio in contanti come metodo di pagamento per acquistare BTC, ETH, XLM e altro.</string>
   <string name="fiat_funds_no_kyc_positive_action">Verifica la mia identità</string>
   <string name="fiat_funds_no_kyc_negative_action">Non adesso</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1836,7 +1840,7 @@
   <string name="send_enter_unexpected_error">Si è verificato un errore imprevisto. Per favore riprova.</string>
   <string name="send_enter_insufficient_gas">Non hai abbastanza ETH per elaborare questa transazione.</string>
   <string name="send_select_a_wallet_title">o Seleziona un portafoglio</string>
-  <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %2$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
+  <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %1$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
   <string name="purchase_funds_note">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ulteriori informazioni. </annotation>
@@ -1987,5 +1991,88 @@
   <string name="tx_view_locked_funds_1">Questi fondi saranno immediatamente disponibili per la vendita in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com fino a %2$s</string>
   <string name="common_pending">in sospeso</string>
   <string name="confirm_status_msg_insufficient_funds">Non hai fondi sufficienti in questo account per elaborare questa transazione</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Assicurati di aver accettato i nostri Termini.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Gratuito</string>
+  <string name="two_fa_new_request">Richiesta nuovo codice…</string>
+  <string name="transfer_funds_title">Trasferimento da indirizzo importato?</string>
+  <string name="transfer_funds_description">Gli indirizzi importati non vengono sottoposti a backup dalla frase di backup. Per garantire questi fondi, noi
+ consiglia di trasferire questi saldi sul tuo portafoglio non custodito Blockchain.com.
+</string>
+  <string name="two_factor_resend_sms">Invia di nuovo SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Tentativi superati, attendere 60 secondi prima di riprovare</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Richiesto minimo 1 sat / byte</string>
+  <string name="fee_options_invalid_amount">Tassa non valida</string>
+  <string name="sell_announcement_title">Vendi la tua crittografia in contanti</string>
+  <string name="sell_announcement_description">Vendi direttamente dai tuoi portafogli di trading al tuo portafoglio di contanti.</string>
+  <string name="sell_announcement_action">Vendi adesso</string>
+  <string name="generic_limit">Limiti</string>
+  <string name="select_account_sheet_empty">Non hai portafogli idonei per eseguire questa azione.</string>
+  <string name="activity_details_swap_for">Per</string>
+  <string name="swap_enter_amount_min_swap">È richiesto uno scambio minimo di %1$s</string>
+  <string name="too_many_pending_orders_error_message">Il tuo portafoglio %1$s ha troppi scambi in corso. Seleziona un altro portafoglio.</string>
+  <string name="swap_confirmation_title">Scambia %1$s</string>
+  <string name="swap_confirmation_cta_button">Scambia %1$s con %2$s</string>
+  <string name="swap_confirmation_disclaimer">Gli importi inviati e ricevuti possono variare leggermente a causa dell\'attività di mercato. Una volta avviato un ordine, non siamo in grado di interromperlo.</string>
+  <string name="swap_confirmation_progress_message">Stiamo completando il tuo scambio ora.</string>
+  <string name="swap_confirmation_success_message">Il tuo %1$s è ora disponibile nel tuo portafoglio.</string>
+  <string name="swap_progress_title">Scambio di %1$s con %2$s</string>
+  <string name="swap_progress_complete_title">Swap completato</string>
+  <string name="swap_enter_amount_title">Scambia %1$s</string>
+  <string name="swap_enter_amount_source">Scambia: %1$s</string>
+  <string name="swap_enter_amount_target">Ricevi: %1$s</string>
+  <string name="swap_enter_amount_max">Swap Max</string>
+  <string name="swap_enter_amount_silver_limit">Tocca qui per aggiornare il tuo profilo e scambiare questo importo.</string>
+  <string name="swap_enter_amount_over_limit">Puoi scambiare fino a %1$s oggi.</string>
+  <string name="swap_select_target_subtitle">Conferma il portafoglio da cui desideri effettuare lo scambio e scegli il portafoglio in cui desideri ricevere.</string>
+  <string name="swap_select_target_title">Nuovo scambio</string>
+  <string name="tx_confirmation_network_fee">%1$s tariffa di rete</string>
+  <string name="tx_confirmation_fee_learn_more_1">Rete</string>
+  <string name="tx_confirmation_fee_learn_more_2">le tariffe sono impostate dalla rete %1$s .</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Ulteriori informazioni sulle commissioni </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Commissioni di rete durante l\'utilizzo</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Portafogli di trading</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">sono liberi! <annotation link="send_tx_fees"> Ulteriori informazioni sulle commissioni </annotation> .</string>
+  <string name="interest_item_issue_region">Non disponibile nella tua regione</string>
+  <string name="interest_item_issue_kyc">Devi essere verificato per l\'oro per iniziare a guadagnare interessi</string>
+  <string name="interest_item_issue_other">Attualmente non disponibile, ricontrolla più tardi</string>
+  <string name="swap_header_title">Scambia la tua crittografia</string>
+  <string name="swap_header_label">Scambia istantaneamente la tua crittografia in qualsiasi valuta che offriamo per il tuo portafoglio.</string>
+  <string name="swap_kyc_title">Verifica il tuo ID. Scambia oggi.</string>
+  <string name="swap_kyc_desc">Verifica la tua identità per scambiare criptovalute in qualsiasi momento. Applica e scambia in pochi minuti.</string>
+  <string name="swap_kyc_cta">Applica ora</string>
+  <string name="swap_kyc_1_title">Seleziona il tuo paese</string>
+  <string name="swap_kyc_1_label">Blockchain.com deve conoscere il tuo paese attuale in conformità con le leggi locali.</string>
+  <string name="swap_kyc_2_title">verifica la tua identità</string>
+  <string name="swap_kyc_2_label">Dobbiamo assicurarci che sia davvero tu a prevenire le frodi caricando un ID.</string>
+  <string name="swap_kyc_3_title">Inizia a scambiare</string>
+  <string name="swap_kyc_3_label">Una volta verificato, torna su Swap e scambia la tua crittografia.</string>
+  <string name="swap_cta">Nuovo scambio</string>
+  <string name="swap_account_select">Scambiare</string>
+  <string name="swap_account_select_subtitle">Da quale portafoglio vuoi scambiare?</string>
+  <string name="select_target_account_for_swap">In quale portafoglio vuoi ricevere?</string>
+  <string name="swap_low_fees">Commissioni basse</string>
+  <string name="swap_kyc_upsell_title">Sei vicino al tuo limite di swap. Esegui l\'upgrade per scambiare importi maggiori.</string>
+  <string name="swap_kyc_upsell_desc">Verifica la tua identità per aumentare quanto puoi scambiare ogni giorno.</string>
+  <string name="swap_kyc_upsell_1_title">Carica il tuo ID</string>
+  <string name="swap_kyc_upsell_1_desc">Dobbiamo assicurarci che sia davvero tu a prevenire le frodi caricando un ID.</string>
+  <string name="swap_kyc_upsell_2_title">Carica un selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Questo per assicurarti che tu sia un essere umano. I robot non sono ammessi.</string>
+  <string name="swap_kyc_upsell_3_title">Scambia fino a $ 25.000 al giorno</string>
+  <string name="swap_kyc_upsell_3_desc">Una volta verificato, torna su Swap e scambia la tua crittografia.</string>
+  <string name="trending_label">Di tendenza</string>
+  <string name="trending_swap">Scambia %1$s</string>
+  <string name="trending_empty">Finanzia i tuoi portafogli di trading per vedere gli swap di tendenza con commissioni inferiori.</string>
+  <string name="trending_receive">Ricevi %1$s</string>
+  <string name="show_more_accounts">Mostra di più</string>
+  <string name="select_a_wallet">Seleziona un portafoglio</string>
+  <string name="pending_swap_info_message">Hai 1 scambio in sospeso. Una volta cancellato, puoi fare un nuovo scambio.</string>
+  <string name="deposit_fee">Commissione di rete</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Tasso di cambio</string>
+  <string name="in_progress">In corso</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

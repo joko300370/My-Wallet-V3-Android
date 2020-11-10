@@ -15,14 +15,14 @@
     <item>열두 번째 단어</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ 문자열 / xlm_memo_text</item>
+    <item>\@ 문자열 / xlm_memo_id</item>
+    <item>\@ 문자열 / xlm_memo_hash</item>
+    <item>\@ 문자열 / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ 문자열 / xlm_memo_text</item>
+    <item>\@ 문자열 / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">가져온 주소 %d</item>
@@ -690,6 +690,9 @@
   <string name="fee_options_custom_warning">고급 사용자 만</string>
   <string name="fee_options_fee_too_low">낮은 수수료는 권장하지 않습니다</string>
   <string name="fee_options_fee_too_high">불필요하게 높은 수수료</string>
+  <string name="fee_options_advanced_warning">이 기능은 고급 사용자에게만 권장됩니다. 
+ 맞춤 수수료를 선택하면 초과 지불 또는 거래가 확인되지 않을 위험이 있습니다. 
+</string>
   <string name="fee_options_sat_byte_hint">토 / b</string>
   <string name="fee_options_sat_byte_inline_hint">일반 : %1$s , 우선 순위 : %2$s</string>
   <string name="dismiss">간단히 처리해 버리다</string>
@@ -1120,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">에 확인 링크를 보냈습니다.</string>
   <string name="buy_sell_unverified_email_verify_message2">거래를 계속하려면 여기를 클릭하고 여기로 돌아갑니다.</string>
   <string name="buy_sell_unverified_email_verify_open_email">이메일 열기</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">이메일 확인 됨!</string>
   <string name="buy_sell_verified_email_message">파트너 %1$s 비트 코인 거래를 처리합니다. 동의 및 \'계속\'을 클릭하면 %1$s 계정을 생성합니다.</string>
   <string name="buy_sell_identification_verification">확인 식별</string>
@@ -1227,7 +1229,7 @@
   <string name="kyc_email_title">이메일 확인</string>
   <string name="kyc_email_message">추가 보안 계층으로 이메일 주소를 확인해야합니다.</string>
   <string name="kyc_email_hint_focused">귀하의 이메일</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ 문자열 / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">이메일 저장 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_email_send_verification">이메일을 보내</string>
   <string name="kyc_email_validation_header">받은 편지함을 확인.</string>
@@ -1252,7 +1254,7 @@
   <string name="kyc_onfido_splash_verification_error">ID 확인 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="kyc_veriff_splash_country_supported_header">우리나라가 지원 되나요?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">현재 모든 국가가 지원되는 것은 아닙니다. 계속하기 전에 최신 <annotation link="country_list"> 국가 목록 </annotation> 을 확인하십시오.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ 문자열 / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">은색 검증</string>
   <string name="kyc_veriff_splash_header">당신인지 확인합시다</string>
   <string name="kyc_veriff_splash_subtitle">계속하려면 아래의 ID 유형 중 하나가 필요합니다.</string>
@@ -1278,7 +1280,7 @@
   <string name="kyc_help_dialog_need_some_help_body">당사의 블록 체인 지원 팀은 신원 확인이 필요한 이유를 설명하는 도움말 가이드를 작성했습니다.</string>
   <string name="kyc_help_dialog_read_now">지금 읽어라</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ 문자열 / 연락처 _support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">신원 확인</string>
   <string name="kyc_settings_status_none">미확인</string>
@@ -1290,7 +1292,7 @@
   <string name="kyc_settings_gold_level_in_review">골드 레벨-검토 중</string>
   <string name="kyc_settings_gold_level_approved">골드 레벨-승인</string>
   <string name="kyc_settings_silver_level_approved">실버 레벨-승인</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ 문자열 / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYC 상태를 가져 오는 중 오류가 발생했습니다.</string>
   <string name="kyc_status_title_in_progress">확인 진행 중</string>
   <string name="kyc_status_title_approved">계정 승인</string>
@@ -1314,10 +1316,10 @@
   <string name="kyc_drop_off_card_description">중단 한 곳을 찾아 신원 확인을 완료합니다.</string>
   <string name="kyc_drop_off_card_button">확인 계속</string>
   <string name="kyc_documents_needed">필요한 서류</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ 문자열 / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">제공하신 문서에 문제가있었습니다. 확인을 계속하려면 문서를 다시 업로드하십시오.</string>
   <string name="kyc_resubmission_card_button">문서 업로드</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ 문자열 / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">신원을 확인할 수 없으므로 필요한 문서를 다시 업로드해야합니다.</string>
   <string name="kyc_resubmission_splash_description_2">이것이 일어나는 주된 이유 :</string>
   <string name="kyc_resubmission_splash_description_3">필요한 사진이 없습니다.</string>
@@ -1505,7 +1507,7 @@
   <string name="tx_title_receive">%1s 받기</string>
   <string name="tx_title_sell">%1s 판매</string>
   <string name="tx_title_buy">%1s 구매</string>
-  <string name="tx_title_swap">%1s → %2$s 교환</string>
+  <string name="tx_title_swap">%1$s → %2$s 교환</string>
   <string name="tx_title_transfer">이체 %1s</string>
   <string name="tx_title_fee">수수료 %1s</string>
   <string name="transaction_detail_value_at_time_swapped">스왑시 값 : \u0020</string>
@@ -1712,7 +1714,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">예금 현금</string>
   <string name="fiat_funds_no_kyc_step_2_description">은행에서 현금을 송금하고 현금 잔고를 활성화하십시오.</string>
   <string name="fiat_funds_no_kyc_step_3_title">현금으로 암호 화폐 구매</string>
-  <string name="fiat_funds_no_kyc_step_3_description">현금 지갑을 결제 수단으로 사용하여 BTC, ETH, XLM 등을 구매하십시오.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">현금 지갑을 결제 수단으로 사용하여 BTC, ETH, XLM 등을 구매하십시오.</string>
   <string name="fiat_funds_no_kyc_positive_action">내 신원 확인</string>
   <string name="fiat_funds_no_kyc_negative_action">지금은 아님</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1837,7 +1839,7 @@
   <string name="send_enter_unexpected_error">예상치 못한 오류가 발생했습니다. 다시 시도하십시오.</string>
   <string name="send_enter_insufficient_gas">이 거래를 처리하기에 충분한 ETH가 없습니다.</string>
   <string name="send_select_a_wallet_title">또는 지갑 선택</string>
-  <string name="send_internal_transfer_message">현재는 %1$s 트레이드 월렛에서 Vault 월렛으로 %2$s 만 이체 할 수 있습니다. %1$s 이 Vault 지갑에 있으면 외부 주소로 이체 할 수 있습니다.</string>
+  <string name="send_internal_transfer_message">현재는 %1$s 트레이드 월렛에서 Vault 월렛으로 %1$s 만 이체 할 수 있습니다. %1$s 이 Vault 지갑에 있으면 외부 주소로 이체 할 수 있습니다.</string>
   <string name="purchase_funds_note">최종 금액은 시장 활동으로 인해 변경 될 수 있습니다.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> 자세히 알아보기. </annotation>
@@ -1986,5 +1988,88 @@
   <string name="tx_view_locked_funds_1">이 자금은 즉시 %1$s 피아트 지갑으로 판매 할 수 있지만 Blockchain.com에서 최대 %2$s 까지이 자금을 보내거나 인출 할 수 없습니다.</string>
   <string name="common_pending">보류 중</string>
   <string name="confirm_status_msg_insufficient_funds">이 거래를 처리하기에이 계정의 자금이 충분하지 않습니다.</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">약관에 동의했는지 확인하십시오.</string>
+  <string name="confirm_status_msg_invoice_expired">\@ 문자열 / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">비어 있는</string>
+  <string name="two_fa_new_request">새 코드 요청 중…</string>
+  <string name="transfer_funds_title">가져온 주소에서 전송 하시겠습니까?</string>
+  <string name="transfer_funds_description">가져온 주소는 백업 문구에 의해 백업되지 않습니다. 이러한 자금을 확보하기 위해
+ 이러한 잔액을 Blockchain.com 비 양육권 지갑으로 이체하는 것이 좋습니다.
+</string>
+  <string name="two_factor_resend_sms">SMS 재전송 (%1$d)</string>
+  <string name="two_factor_retries_exceeded">재 시도를 초과했습니다. 60 초 후에 다시 시도하십시오.</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">최소 1 sat / byte 필요</string>
+  <string name="fee_options_invalid_amount">잘못된 수수료</string>
+  <string name="sell_announcement_title">현금으로 암호 화폐 판매</string>
+  <string name="sell_announcement_description">거래 지갑에서 현금 지갑으로 직접 판매하세요.</string>
+  <string name="sell_announcement_action">지금 판매</string>
+  <string name="generic_limit">제한</string>
+  <string name="select_account_sheet_empty">이 작업을 수행 할 수있는 적격 월렛이 없습니다.</string>
+  <string name="activity_details_swap_for">에 대한</string>
+  <string name="swap_enter_amount_min_swap">%1$s 최소 교체 필요</string>
+  <string name="too_many_pending_orders_error_message">%1$s 월렛에 진행중인 스왑이 너무 많습니다. 다른 지갑을 선택하세요.</string>
+  <string name="swap_confirmation_title">%1$s 교체</string>
+  <string name="swap_confirmation_cta_button">%1$s 를 %2$s</string>
+  <string name="swap_confirmation_disclaimer">귀하가 보내고받는 금액은 시장 활동으로 인해 약간 변경 될 수 있습니다. 주문이 시작된 후에는 중지 할 수 없습니다.</string>
+  <string name="swap_confirmation_progress_message">지금 스왑을 완료하고 있습니다.</string>
+  <string name="swap_confirmation_success_message">이제 %1$s 월렛에서 사용할 수 있습니다.</string>
+  <string name="swap_progress_title">%1$s 를 %2$s</string>
+  <string name="swap_progress_complete_title">스왑 완료</string>
+  <string name="swap_enter_amount_title">%1$s 교체</string>
+  <string name="swap_enter_amount_source">스왑 : %1$s</string>
+  <string name="swap_enter_amount_target">받기 : %1$s</string>
+  <string name="swap_enter_amount_max">최대 스왑</string>
+  <string name="swap_enter_amount_silver_limit">프로필을 업그레이드하고이 금액을 바꾸려면 여기를 누르십시오.</string>
+  <string name="swap_enter_amount_over_limit">오늘 최대 %1$s 까지 바꿀 수 있습니다.</string>
+  <string name="swap_select_target_subtitle">교환 할 지갑을 확인하고받을 지갑을 선택하세요.</string>
+  <string name="swap_select_target_title">새로운 스왑</string>
+  <string name="tx_confirmation_network_fee">%1$s 네트워크 수수료</string>
+  <string name="tx_confirmation_fee_learn_more_1">회로망</string>
+  <string name="tx_confirmation_fee_learn_more_2">수수료는 %1$s 네트워크에서 설정합니다.</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> 수수료에 대해 자세히 알아보십시오 </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">사용시 네트워크 요금</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">거래 지갑</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">무료! <annotation link="send_tx_fees"> 수수료에 대해 자세히 알아보십시오 </annotation> .</string>
+  <string name="interest_item_issue_region">해당 지역에서 사용할 수 없음</string>
+  <string name="interest_item_issue_kyc">이자 적립을 시작하려면 골드 인증을 받아야합니다.</string>
+  <string name="interest_item_issue_other">현재 사용할 수 없습니다. 나중에 다시 확인하세요.</string>
+  <string name="swap_header_title">암호 화폐 교환</string>
+  <string name="swap_header_label">귀하의 암호 화폐를 당사가 귀하의 지갑에 제공하는 모든 통화로 즉시 교환하십시오.</string>
+  <string name="swap_kyc_title">귀하의 ID를 확인하십시오. 오늘 교환하십시오.</string>
+  <string name="swap_kyc_desc">언제든지 암호 화폐를 교환하려면 신원을 확인하십시오. 몇 분 안에 적용하고 교체하십시오.</string>
+  <string name="swap_kyc_cta">지금 신청하세요</string>
+  <string name="swap_kyc_1_title">당신의 나라를 선택하세요</string>
+  <string name="swap_kyc_1_label">Blockchain.com은 현지 법률에 따라 현재 국가를 알아야합니다.</string>
+  <string name="swap_kyc_2_title">신원 확인</string>
+  <string name="swap_kyc_2_label">신분증을 업로드하여 사기를 방지하는 것이 본인인지 확인해야합니다.</string>
+  <string name="swap_kyc_3_title">스와핑 시작</string>
+  <string name="swap_kyc_3_label">확인되면 스왑으로 돌아와 암호 화폐를 교환하세요.</string>
+  <string name="swap_cta">새로운 스왑</string>
+  <string name="swap_account_select">교환</string>
+  <string name="swap_account_select_subtitle">어떤 지갑에서 스왑을 원하십니까?</string>
+  <string name="select_target_account_for_swap">어떤 지갑으로 받으시겠습니까?</string>
+  <string name="swap_low_fees">낮은 수수료</string>
+  <string name="swap_kyc_upsell_title">스왑 한도에 가깝습니다. 더 큰 금액을 교체하려면 업그레이드하십시오.</string>
+  <string name="swap_kyc_upsell_desc">매일 스왑 할 수있는 양을 늘리려면 신원을 확인하세요.</string>
+  <string name="swap_kyc_upsell_1_title">아이디 업로드</string>
+  <string name="swap_kyc_upsell_1_desc">신분증을 업로드하여 사기를 방지하는 것이 본인인지 확인해야합니다.</string>
+  <string name="swap_kyc_upsell_2_title">셀카 업로드</string>
+  <string name="swap_kyc_upsell_2_desc">이것은 당신이 인간임을 확인하기위한 것입니다. 로봇은 허용되지 않습니다.</string>
+  <string name="swap_kyc_upsell_3_title">하루 최대 $ 25,000 스왑</string>
+  <string name="swap_kyc_upsell_3_desc">확인되면 스왑으로 돌아와 암호 화폐를 교환하세요.</string>
+  <string name="trending_label">인기</string>
+  <string name="trending_swap">%1$s 교체</string>
+  <string name="trending_empty">더 낮은 수수료로 트 렌딩 스왑을 보려면 거래 지갑에 자금을 지원하십시오.</string>
+  <string name="trending_receive">%1$s 받기</string>
+  <string name="show_more_accounts">자세히보기</string>
+  <string name="select_a_wallet">지갑 선택</string>
+  <string name="pending_swap_info_message">대기중인 스왑이 1 개 있습니다. 그것이 지워지면 새로운 스왑을 할 수 있습니다.</string>
+  <string name="deposit_fee">네트워크 수수료</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">환율</string>
+  <string name="in_progress">진행 중</string>
+  <string name="swap_direction">%1$s &gt; %2$s</string>
 </resources>

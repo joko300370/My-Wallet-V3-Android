@@ -1121,7 +1121,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Adresine bir doğrulama bağlantısı gönderdik</string>
   <string name="buy_sell_unverified_email_verify_message2">Tıklayın ve işleminize devam etmek için buraya geri dönün.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-postayı Aç</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-posta Doğrulandı!</string>
   <string name="buy_sell_verified_email_message">%1$s ortağımız bitcoin işleminizi gerçekleştirecek. Kabul Et ve \'Devam Et\'i tıklayarak %1$s ile bir hesap oluşturacaksınız.</string>
   <string name="buy_sell_identification_verification">Doğrulamayı tanımlayın</string>

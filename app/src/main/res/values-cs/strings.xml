@@ -693,6 +693,9 @@
   <string name="fee_options_custom_warning">Pouze pro pokročilé</string>
   <string name="fee_options_fee_too_low">Nízký poplatek se nedoporučuje</string>
   <string name="fee_options_fee_too_high">Zbytečně vysoký poplatek</string>
+  <string name="fee_options_advanced_warning">Tato funkce je doporučena pouze pro pokročilé uživatele. 
+ Výběrem vlastního poplatku riskujete přeplatek nebo vaše transakce nebude nikdy potvrzena. 
+</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Pravidelné: %1$s , priorita: %2$s</string>
   <string name="dismiss">Zavrhnout</string>
@@ -1123,7 +1126,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>
@@ -1464,7 +1466,7 @@
   <string name="simple_buy_amount_to_send">Částka k odeslání</string>
   <string name="simple_buy_pending_buy_sheet_title">Čeká se na nákup %1s</string>
   <string name="recipient_name_must_match_eur">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.</string>
-  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.\n\nVložením prostředků na tento účet <annotation link="modular_terms_and_conditions"> souhlas s  smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
+  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.\n\nVložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera</string>
   <string name="recipient_name_must_match">Prostředky zasílejte pouze z vašeho bankovního účtu. Pokud ne, váš vklad může být zpožděn nebo odmítnut.</string>
   <string name="simple_buy_no_currencies_available_title">K dispozici nejsou žádné měny</string>
   <string name="simple_buy_no_currencies_available">Bohužel v současné době neexistují žádné měny, se kterými můžete obchodovat :(</string>
@@ -1570,7 +1572,7 @@
   <string name="card_error_subtitle">Vraťte se a zkuste to znovu.</string>
   <string name="card_expiry_date">Exp: %1s</string>
   <string name="card_buying">Nákup %1s</string>
-  <string name="card_in_progress" formatted="false">%1s nákup</string>
+  <string name="card_in_progress" formatted="false">%1$s nákup</string>
   <string name="we_will_notify_order_complete">Až bude vaše objednávka dokončena, upozorníme vás.</string>
   <string name="completing_card_buy">Dokončujeme váš nákup.</string>
   <string name="card_purchased">Zakoupeno: %1s</string>
@@ -1666,7 +1668,7 @@
   <string name="bank_transfer">Bankovní převod</string>
   <string name="instantly_buy_crypto_with_card">Okamžitě si zakupte kryptografii s jakýmkoli Visa nebo Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Pošlete peníze přímo z vaší banky do vaší peněženky Blockchain. Jakmile obdržíme manuální převod, použijte tuto hotovost na zakoupení krypto.</string>
-  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.></string>
+  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
   <string name="add_bank_with_currency">Přidejte banku %1s</string>
   <string name="deposit_currency">Vložte %1s</string>
   <string name="currency_bank_transfer">Bankovní převod</string>
@@ -1713,7 +1715,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Vklad hotovosti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Převeďte hotovost z banky a aktivujte své hotovostní zůstatky.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koupit kryptografii za hotovost</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.</string>
   <string name="fiat_funds_no_kyc_positive_action">Ověřte moji identitu</string>
   <string name="fiat_funds_no_kyc_negative_action">Teď ne</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1993,5 +1995,88 @@
   <string name="tx_view_locked_funds_1">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete moci tyto prostředky odesílat ani vybírat z Blockchain.com až do %2$s</string>
   <string name="common_pending">čekající</string>
   <string name="confirm_status_msg_insufficient_funds">Na tomto účtu nemáte dostatek prostředků ke zpracování této transakce</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Ujistěte se, že jste souhlasili s našimi podmínkami.</string>
+  <string name="confirm_status_msg_invoice_expired">\@ řetězec / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ řetězec / send_enter_unexpected_error</string>
+  <string name="common_free">Volný, uvolnit</string>
+  <string name="two_fa_new_request">Žádám nový kód…</string>
+  <string name="transfer_funds_title">Převést z importované adresy?</string>
+  <string name="transfer_funds_description">Importované adresy nejsou zálohovány vaší záložní frází. Abychom zajistili tyto prostředky, my
+ doporučujeme převést tyto zůstatky do vaší peněženky bez úschovy na Blockchain.com.
+</string>
+  <string name="two_factor_resend_sms">Znovu odeslat SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Byl překročen pokus, počkejte prosím 60 sekund a zkuste to znovu</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">Je vyžadován minimálně 1 sat / byte</string>
+  <string name="fee_options_invalid_amount">Neplatný poplatek</string>
+  <string name="sell_announcement_title">Prodejte své krypto za hotovost</string>
+  <string name="sell_announcement_description">Prodávejte přímo ze svých obchodních peněženek do své peněžní peněženky.</string>
+  <string name="sell_announcement_action">Prodejte hned</string>
+  <string name="generic_limit">Limity</string>
+  <string name="select_account_sheet_empty">K provedení této akce nemáte žádné způsobilé peněženky.</string>
+  <string name="activity_details_swap_for">Pro</string>
+  <string name="swap_enter_amount_min_swap">%1$s vyžadován minimální swap %1$s</string>
+  <string name="too_many_pending_orders_error_message">Ve vaší peněžence %1$s probíhá příliš mnoho swapů. Vyberte jinou peněženku.</string>
+  <string name="swap_confirmation_title">Zaměnit %1$s</string>
+  <string name="swap_confirmation_cta_button">Zaměňte %1$s za %2$s</string>
+  <string name="swap_confirmation_disclaimer">Částky, které odesíláte a přijímáte, se mohou mírně změnit v důsledku aktivity trhu. Jakmile začne objednávka, nemůžeme ji zastavit.</string>
+  <string name="swap_confirmation_progress_message">Dokončujeme vaši výměnu.</string>
+  <string name="swap_confirmation_success_message">Vaše %1$s je nyní k dispozici ve vaší peněžence.</string>
+  <string name="swap_progress_title">Zaměňujte %1$s za %2$s</string>
+  <string name="swap_progress_complete_title">Výměna dokončena</string>
+  <string name="swap_enter_amount_title">Zaměnit %1$s</string>
+  <string name="swap_enter_amount_source">Prohodit: %1$s</string>
+  <string name="swap_enter_amount_target">Příjem: %1$s</string>
+  <string name="swap_enter_amount_max">Zaměnit Max</string>
+  <string name="swap_enter_amount_silver_limit">Klepnutím sem upgradujete svůj profil a vyměníte tuto částku.</string>
+  <string name="swap_enter_amount_over_limit">Dnes můžete vyměnit až %1$s .</string>
+  <string name="swap_select_target_subtitle">Potvrďte peněženku, ze které chcete vyměnit, a vyberte peněženku, do které chcete přijímat.</string>
+  <string name="swap_select_target_title">Nový swap</string>
+  <string name="tx_confirmation_network_fee">%1$s poplatek za síť</string>
+  <string name="tx_confirmation_fee_learn_more_1">Síť</string>
+  <string name="tx_confirmation_fee_learn_more_2">poplatky jsou stanoveny sítí %1$s .</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees"> Další informace o poplatcích </annotation> .</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Síťové poplatky při používání</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">Obchodní peněženky</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">jsou volní! <annotation link="send_tx_fees"> Další informace o poplatcích </annotation> .</string>
+  <string name="interest_item_issue_region">Není k dispozici ve vaší oblasti</string>
+  <string name="interest_item_issue_kyc">Abyste mohli vydělávat úroky, musíte mít ověřené zlato</string>
+  <string name="interest_item_issue_other">Aktuálně není k dispozici, zkontrolujte to znovu později</string>
+  <string name="swap_header_title">Vyměňte své krypto</string>
+  <string name="swap_header_label">Okamžitě vyměňte své kryptoměny do jakékoli měny, kterou pro vaši peněženku nabízíme.</string>
+  <string name="swap_kyc_title">Ověřte své ID. Zaměnit dnes.</string>
+  <string name="swap_kyc_desc">Kdykoli můžete ověřit svoji totožnost a zaměnit krypto. Aplikujte a vyměňte během několika minut.</string>
+  <string name="swap_kyc_cta">Podat žádost hned</string>
+  <string name="swap_kyc_1_title">Vyberte vaší zemi</string>
+  <string name="swap_kyc_1_label">Blockchain.com potřebuje znát vaši aktuální zemi v souladu s místními zákony.</string>
+  <string name="swap_kyc_2_title">potvrďte vaši identitu</string>
+  <string name="swap_kyc_2_label">Musíme se ujistit, že jste to opravdu vy, abyste zabránili podvodům nahráním ID.</string>
+  <string name="swap_kyc_3_title">Začněte vyměňovat</string>
+  <string name="swap_kyc_3_label">Po ověření se vraťte zpět do Swapu a vyměňte si kryptoměnu.</string>
+  <string name="swap_cta">Nový swap</string>
+  <string name="swap_account_select">Zaměnit</string>
+  <string name="swap_account_select_subtitle">Ze které peněženky chcete vyměnit?</string>
+  <string name="select_target_account_for_swap">Do které peněženky chcete dostávat?</string>
+  <string name="swap_low_fees">Nízké poplatky</string>
+  <string name="swap_kyc_upsell_title">Jste blízko svého limitu swapu. Upgradujte a vyměňte větší částky.</string>
+  <string name="swap_kyc_upsell_desc">Ověřte svou identitu a zvyšte, kolik můžete každý den vyměnit.</string>
+  <string name="swap_kyc_upsell_1_title">Nahrajte své ID</string>
+  <string name="swap_kyc_upsell_1_desc">Musíme se ujistit, že jste to opravdu vy, abyste zabránili podvodům nahráním ID.</string>
+  <string name="swap_kyc_upsell_2_title">Nahrajte selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Tím se ujistíte, že jste člověk. Roboti nejsou povoleni.</string>
+  <string name="swap_kyc_upsell_3_title">Zaměňte až 25 000 $ denně</string>
+  <string name="swap_kyc_upsell_3_desc">Po ověření se vraťte zpět do Swapu a vyměňte si kryptoměnu.</string>
+  <string name="trending_label">Trendy</string>
+  <string name="trending_swap">Zaměnit %1$s</string>
+  <string name="trending_empty">Financujte své obchodní peněženky, abyste viděli Trendy swapy s nižšími poplatky.</string>
+  <string name="trending_receive">Získejte %1$s</string>
+  <string name="show_more_accounts">Zobrazit více</string>
+  <string name="select_a_wallet">Vyberte peněženku</string>
+  <string name="pending_swap_info_message">Čeká vás 1 výměna. Jakmile to zmizí, můžete provést nový swap.</string>
+  <string name="deposit_fee">Síťový poplatek</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Směnný kurz</string>
+  <string name="in_progress">Probíhá</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>
