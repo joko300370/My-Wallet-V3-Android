@@ -43,6 +43,4 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
     protected fun cacheState(newState: TransactionState) {
         state = newState
     }
-
-    abstract fun newInstance(host: Host): TransactionFlowSheet
 }

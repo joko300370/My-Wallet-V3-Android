@@ -48,8 +48,4 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
             }
         }
     }
-
-    override fun newInstance(host: Host): TransactionFlowSheet = SelectTargetAccountSheet().apply {
-        transactionFlowHost = host
-    }
 }

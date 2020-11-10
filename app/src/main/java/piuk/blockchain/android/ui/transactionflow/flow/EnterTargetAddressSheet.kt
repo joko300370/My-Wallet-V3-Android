@@ -295,10 +295,6 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
     private fun onCtaClick() =
         model.process(TransactionIntent.TargetSelected)
 
-    override fun newInstance(host: Host): TransactionFlowSheet = EnterTargetAddressSheet().apply {
-        transactionFlowHost = host
-    }
-
     companion object {
         private const val NONCUSTODIAL_INPUT = 0
         private const val CUSTODIAL_INPUT = 1
