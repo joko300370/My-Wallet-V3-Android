@@ -49,6 +49,7 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
+import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
@@ -415,7 +416,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         override fun startSell() {
-            navigator().startSell()
+            navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_SELL)
         }
 
         override fun startInterestDashboard() {

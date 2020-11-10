@@ -12,6 +12,7 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.sell.BuySellFragment
 
 interface HomeScreenFragment {
     fun navigator(): HomeNavigator
@@ -25,6 +26,7 @@ interface HomeNavigator {
         sourceAccount: CryptoAccount? = null,
         targetAccount: CryptoAccount? = null
     )
+
     fun launchKyc(campaignType: CampaignType)
     fun launchKycIntro()
     fun launchThePitLinking(linkId: String = "")
@@ -35,6 +37,7 @@ interface HomeNavigator {
     fun launchSetupFingerprintLogin()
     fun launchTransfer()
     fun launchIntroTour()
+    fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
 
     fun gotoActivityFor(account: BlockchainAccount?)
     fun goToWithdraw(currency: String)
@@ -42,7 +45,6 @@ interface HomeNavigator {
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
-    fun startSell()
     fun startInterestDashboard()
 }
 
