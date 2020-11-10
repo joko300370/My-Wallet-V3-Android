@@ -25,7 +25,7 @@ import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
@@ -652,7 +652,7 @@ class LiveCustodialWalletManager(
         }
 
     override fun createSwapOrder(
-        direction: SwapDirection,
+        direction: TransferDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String?
@@ -691,7 +691,7 @@ class LiveCustodialWalletManager(
 
     override fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
+        directions: List<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
 

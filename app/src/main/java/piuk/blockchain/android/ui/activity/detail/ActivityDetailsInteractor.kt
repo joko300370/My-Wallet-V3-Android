@@ -4,7 +4,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -145,16 +145,16 @@ class ActivityDetailsInteractor(
 
     private fun buildReceivingLabel(item: SwapActivitySummaryItem): Single<To> {
         return when (item.direction) {
-            SwapDirection.ON_CHAIN -> coincore.findAccountByAddress(item.receivingAsset, item.receivingAddress!!)
+            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(item.receivingAsset, item.receivingAddress!!)
                 .toSingle().map {
                     To(it.label)
                 }
-            SwapDirection.INTERNAL,
-            SwapDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial).toSingle()
+            TransferDirection.INTERNAL,
+            TransferDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial).toSingle()
                 .map {
                     To(it.selectFirstAccount().label)
                 }
-            SwapDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
+            TransferDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
         }
     }
 

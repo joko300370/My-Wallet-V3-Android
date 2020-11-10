@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
@@ -27,7 +27,7 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
-import piuk.blockchain.android.coincore.impl.txEngine.SwapQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
@@ -50,9 +50,9 @@ abstract class SwapEngineBase(
     private val kycTierService: TierService
 ) : TxEngine() {
 
-    protected abstract val direction: SwapDirection
+    protected abstract val direction: TransferDirection
 
-    protected lateinit var quotesEngine: SwapQuotesEngine
+    protected lateinit var quotesEngine: TransferQuotesEngine
     private lateinit var minApiLimit: Money
 
     override fun start(
@@ -62,7 +62,7 @@ abstract class SwapEngineBase(
         refreshTrigger: RefreshTrigger
     ) {
         super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
-        quotesEngine = SwapQuotesEngine(quotesProvider, direction, pair)
+        quotesEngine = TransferQuotesEngine(quotesProvider, direction, pair)
     }
 
     val target: CryptoAccount
@@ -178,7 +178,7 @@ abstract class SwapEngineBase(
                         TxConfirmationValue.From(from = sourceAccount.label),
                         TxConfirmationValue.To(to = txTarget.label),
                         TxConfirmationValue.NetworkFee(
-                            fee = pricedQuote.swapQuote.networkFee,
+                            fee = pricedQuote.transferQuote.networkFee,
                             type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
                             asset = target.asset
                         ),
@@ -197,8 +197,8 @@ abstract class SwapEngineBase(
     private fun minLimit(price: Money): Money {
         val minAmountToPayFees = minAmountToPayNetworkFees(
             price,
-            quotesEngine.getLatestQuote().swapQuote.networkFee,
-            quotesEngine.getLatestQuote().swapQuote.staticFee
+            quotesEngine.getLatestQuote().transferQuote.networkFee,
+            quotesEngine.getLatestQuote().transferQuote.staticFee
         )
 
         return minApiLimit.plus(minAmountToPayFees).withUserDpRounding(RoundingMode.CEILING)
@@ -211,7 +211,7 @@ abstract class SwapEngineBase(
             ).apply {
                 addOrReplaceOption(
                     TxConfirmationValue.NetworkFee(
-                        fee = quotesEngine.getLatestQuote().swapQuote.networkFee,
+                        fee = quotesEngine.getLatestQuote().transferQuote.networkFee,
                         type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
                         asset = target.asset
                     )
@@ -255,7 +255,7 @@ abstract class SwapEngineBase(
         target.receiveAddress.flatMap {
             walletManager.createSwapOrder(
                 direction = direction,
-                quoteId = quotesEngine.getLatestQuote().swapQuote.id,
+                quoteId = quotesEngine.getLatestQuote().transferQuote.id,
                 volume = pendingTx.amount,
                 destinationAddress = if (direction.requiresDestinationAddress()) it.address else null
             )
@@ -272,8 +272,8 @@ abstract class SwapEngineBase(
         disposeQuotesFetching(pendingTx)
     }
 
-    private fun SwapDirection.requiresDestinationAddress() =
-        this == SwapDirection.ON_CHAIN || this == SwapDirection.TO_USERKEY
+    private fun TransferDirection.requiresDestinationAddress() =
+        this == TransferDirection.ON_CHAIN || this == TransferDirection.TO_USERKEY
 
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money, staticFee: Money): Money =
         CryptoValue.fromMajor(

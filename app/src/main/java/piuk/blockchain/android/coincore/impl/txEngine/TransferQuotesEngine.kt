@@ -1,32 +1,32 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.SwapQuote
+import com.blockchain.swap.nabu.datamanagers.TransferQuote
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.impl.PricesInterpolator
+import java.math.BigInteger
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
-class SwapQuotesEngine(
+class TransferQuotesEngine(
     private val quotesProvider: QuotesProvider,
-    private val direction: SwapDirection,
-    private val pair: CurrencyPair.CryptoCurrencyPair
+    private val direction: TransferDirection,
+    private val pair: CurrencyPair
 ) {
     private lateinit var latestQuote: PricedQuote
 
     private val stop = PublishSubject.create<Unit>()
 
-    private val amount = BehaviorSubject.createDefault<Money>(CryptoValue.zero(pair.source))
+    private val amount = BehaviorSubject.createDefault<Money>(pair.toSourceMoney(BigInteger.ZERO))
 
-    private val quote: Observable<SwapQuote> =
+    private val quote: Observable<TransferQuote> =
         quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
             Observable.interval(
                 quote.creationDate.diffInSeconds(quote.expirationDate),
@@ -55,6 +55,6 @@ class SwapQuotesEngine(
     fun updateAmount(newAmount: Money) = amount.onNext(newAmount)
 }
 
-data class PricedQuote(val price: Money, val swapQuote: SwapQuote)
+data class PricedQuote(val price: Money, val transferQuote: TransferQuote)
 
 private fun Date.diffInSeconds(other: Date): Long = (this.time - other.time).absoluteValue / 100

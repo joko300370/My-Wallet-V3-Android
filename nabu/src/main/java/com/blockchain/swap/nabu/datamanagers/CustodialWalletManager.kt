@@ -22,6 +22,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Date
 
@@ -168,7 +169,7 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(direction: SwapDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
+    fun createSwapOrder(direction: TransferDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
             Single<SwapOrder>
 
     fun createPendingDeposit(
@@ -185,7 +186,7 @@ interface CustodialWalletManager {
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
+        directions: List<TransferDirection>
     ): Single<List<SwapTransactionItem>>
 
     fun updateSwapOrder(
@@ -351,7 +352,7 @@ data class CustodialQuote(
     val rate: FiatValue
 )
 
-enum class SwapDirection {
+enum class TransferDirection {
     ON_CHAIN, // from non-custodial to non-custodial
     FROM_USERKEY, // from non-custodial to custodial
     TO_USERKEY, // from custodial to non-custodial - not in use currently
@@ -474,7 +475,7 @@ enum class Partner {
     UNKNOWN
 }
 
-data class SwapQuote(
+data class TransferQuote(
     val id: String = "",
     val prices: List<PriceTier> = emptyList(),
     val expirationDate: Date = Date(),
@@ -487,6 +488,27 @@ data class SwapQuote(
 sealed class CurrencyPair(val rawValue: String) {
     data class CryptoCurrencyPair(val source: CryptoCurrency, val destination: CryptoCurrency) :
         CurrencyPair("${source.networkTicker}-${destination.networkTicker}")
+
+    data class CryptoToFiatCurrencyPair(val source: CryptoCurrency, val destination: String) :
+        CurrencyPair("${source.networkTicker}-${destination}")
+
+    fun toSourceMoney(value: BigInteger): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMinor(source, value)
+            is CryptoToFiatCurrencyPair -> CryptoValue.fromMinor(source, value)
+        }
+
+    fun toDestinationMoney(value: BigInteger): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMinor(source, value)
+            is CryptoToFiatCurrencyPair -> FiatValue.fromMinor(destination, value.toLong())
+        }
+
+    fun toDestinationMoney(value: BigDecimal): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMajor(source, value)
+            is CryptoToFiatCurrencyPair -> FiatValue.fromMajor(destination, value)
+        }
 }
 
 data class PriceTier(

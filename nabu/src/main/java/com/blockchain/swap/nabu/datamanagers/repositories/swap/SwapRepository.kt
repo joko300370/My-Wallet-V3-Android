@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.rx.TimedCacheRequest
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.SwapPair
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
@@ -27,7 +27,7 @@ class SwapRepository(pairsProvider: SwapPairsProvider, activityProvider: SwapAct
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
+        directions: List<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapActivityCache.getCachedSingle().map { list ->
             list.filter {

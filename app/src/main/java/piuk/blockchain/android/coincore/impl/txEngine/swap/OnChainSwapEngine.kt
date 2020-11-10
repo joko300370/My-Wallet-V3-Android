@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
@@ -23,7 +23,7 @@ class OnChainSwapEngine(
     private val quotesProvider: QuotesProvider,
     walletManager: CustodialWalletManager,
     tiersService: TierService,
-    override val direction: SwapDirection,
+    override val direction: TransferDirection,
     private val engine: OnChainTxEngineBase,
     private val environmentConfig: EnvironmentConfig,
     private val custodialWalletManager: CustodialWalletManager
@@ -54,8 +54,8 @@ class OnChainSwapEngine(
             sourceAccount = sourceAccount,
             txTarget = makeExternalAssetAddress(
                 asset = sourceAccount.asset,
-                address = pricedQuote.swapQuote.sampleDepositAddress,
-                label = pricedQuote.swapQuote.sampleDepositAddress,
+                address = pricedQuote.transferQuote.sampleDepositAddress,
+                label = pricedQuote.transferQuote.sampleDepositAddress,
                 environmentConfig = environmentConfig,
                 postTransactions = { Completable.complete() }
             ),

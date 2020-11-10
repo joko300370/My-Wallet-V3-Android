@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore
 
 import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
@@ -76,7 +76,7 @@ data class SwapActivitySummaryItem(
     val sendingAddress: String?,
     val receivingAddress: String?,
     val state: SwapOrderState,
-    val direction: SwapDirection,
+    val direction: TransferDirection,
     val receivingValue: Money,
     val networkFee: CryptoValue,
     val sendingAsset: CryptoCurrency,
