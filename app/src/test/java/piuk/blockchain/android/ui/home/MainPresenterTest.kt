@@ -117,7 +117,7 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap(any(), any())
+        verify(view, never()).tryTolaunchSwap(any(), any())
         verify(view, never()).launchSwapIntro()
         verify(view).launchPendingVerificationScreen(CampaignType.Swap)
     }
@@ -132,7 +132,7 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view).launchSwap(null, null)
+        verify(view).tryTolaunchSwap(null, null)
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view, never()).launchSwapIntro()
     }
@@ -148,7 +148,7 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view).launchSwap(
+        verify(view).tryTolaunchSwap(
             null, null
         )
         verify(view, never()).launchKyc(CampaignType.Swap)
@@ -167,7 +167,7 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap(any(), any())
+        verify(view, never()).tryTolaunchSwap(any(), any())
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view).launchSwapIntro()
     }
