@@ -80,7 +80,7 @@ open class CustodialSellTxEngine(
                                     pair.fiatCurrency == fiatTarget.fiatCurrency
                         }
                     }.flatMap { pair ->
-                        quotesEngine.pricedQuote.firstOrError().map { it ->
+                        quotesEngine.pricedQuote.firstOrError().map {
                             PendingTx(
                                 amount = FiatValue.zero(fiatTarget.fiatCurrency),
                                 available = CryptoValue.zero(sourceAccount.asset),

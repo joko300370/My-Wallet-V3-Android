@@ -1,12 +1,12 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.rx.TimedCacheRequest
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapPair
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
-class SwapRepository(pairsProvider: SwapPairsProvider, activityProvider: SwapActivityProvider) {
+class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: SwapActivityProvider) {
 
     private val swapPairsCache = TimedCacheRequest(
         cacheLifetimeSeconds = LONG_CACHE,
@@ -22,8 +22,8 @@ class SwapRepository(pairsProvider: SwapPairsProvider, activityProvider: SwapAct
         }
     )
 
-    fun getSwapAvailablePairs(): Single<List<SwapPair>> =
-        swapPairsCache.getCachedSingle()
+    fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
+        swapPairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,

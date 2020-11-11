@@ -163,7 +163,8 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = target,
                     engine = CustodialSellTxEngine(
-                        walletManager = walletManager
+                        walletManager = walletManager,
+                        quotesProvider = quotesProvider
                     )
                 )
             )

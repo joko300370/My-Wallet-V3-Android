@@ -704,6 +704,9 @@ class LiveCustodialWalletManager(
             )
         }
 
+    override fun isFiatCurrencySupported(destination: String): Boolean =
+        SUPPORTED_FUNDS_CURRENCIES.contains(destination)
+
     override fun createPendingDeposit(
         crypto: CryptoCurrency,
         address: String,

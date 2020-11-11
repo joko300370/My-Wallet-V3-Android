@@ -193,6 +193,8 @@ interface CustodialWalletManager {
         id: String,
         success: Boolean
     ): Completable
+
+     fun isFiatCurrencySupported(destination: String): Boolean
 }
 
 data class InterestActivityItem(
@@ -535,9 +537,4 @@ data class SwapOrder(
     val createdAt: Date,
     val inputMoney: Money,
     val outputMoney: Money
-)
-
-data class SwapPair(
-    val source: CryptoCurrency,
-    val destination: CryptoCurrency
 )
