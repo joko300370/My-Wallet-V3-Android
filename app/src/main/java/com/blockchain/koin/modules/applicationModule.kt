@@ -513,9 +513,7 @@ val applicationModule = module {
 
         factory {
             SwapTypeSwitcher(
-                walletPrefs = get(),
-                newSwapFeatureFlag = get(newSwapFeatureFlag),
-                prefs = get()
+                newSwapFeatureFlag = get(newSwapFeatureFlag)
             )
         }
 

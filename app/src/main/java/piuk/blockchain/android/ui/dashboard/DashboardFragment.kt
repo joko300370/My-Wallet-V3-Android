@@ -385,7 +385,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap() = navigator().launchSwap()
+        override fun startSwap() = navigator().tryTolaunchSwap()
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -523,7 +523,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         require(account is CryptoAccount)
 
         clearBottomSheet()
-        navigator().launchSwap(sourceAccount = account)
+        navigator().tryTolaunchSwap(sourceAccount = account)
     }
 
     override fun goToInterestDashboard() {

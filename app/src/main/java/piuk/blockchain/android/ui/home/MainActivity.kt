@@ -129,7 +129,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
-                        launchSwap()
+                        tryTolaunchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
@@ -468,7 +468,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         KycNavHostActivity.startForResult(this, campaignType, KYC_STARTED)
     }
 
-    override fun launchSwap(
+    override fun tryTolaunchSwap(
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
@@ -479,9 +479,23 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     if (it) {
                         startSwapFlow(sourceAccount, targetAccount)
                     } else {
+                        presenter.startSwapOrKyc(sourceAccount, targetAccount)
+                    }
+                }
+            )
+    }
+
+    override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        startSwapFlow(sourceAccount, targetAccount)
+                    } else {
                         HomebrewNavHostActivity.start(
-                            this,
-                            presenter.defaultCurrency,
+                            context = this,
+                            defaultCurrency = presenter.defaultCurrency,
                             toCryptoCurrency = targetAccount?.asset,
                             fromCryptoCurrency = sourceAccount?.asset
                         )
