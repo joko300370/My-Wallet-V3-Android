@@ -12,6 +12,7 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.TreeMap
 
+@Deprecated("Switch to coincore")
 class TransactionHelper(
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager

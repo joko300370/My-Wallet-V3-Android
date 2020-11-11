@@ -46,6 +46,9 @@ class ActivitiesModel(
     initialState,
     mainScheduler
 ) {
+
+    private var fetchSubscription: Disposable? = null
+
     override fun performAction(
         previousState: ActivitiesState,
         intent: ActivitiesIntent
@@ -53,8 +56,11 @@ class ActivitiesModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is AccountSelectedIntent ->
-                interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
+            is AccountSelectedIntent -> {
+
+                fetchSubscription?.dispose()
+
+                fetchSubscription = interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
                     .subscribeBy(
                         onNext = {
                             process(ActivityListUpdatedIntent(it))
@@ -64,6 +70,9 @@ class ActivitiesModel(
                         },
                         onError = { process(ActivityListUpdatedErrorIntent) }
                     )
+
+                fetchSubscription
+            }
             is SelectDefaultAccountIntent ->
                 interactor.getDefaultAccount()
                     .subscribeBy(
