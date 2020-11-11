@@ -61,6 +61,7 @@ class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
                     } ?: ctx.getString(R.string.fee_options_sat_byte_min_error)
                 }
                 ValidationState.INVALID_AMOUNT -> ctx.getString(R.string.fee_options_invalid_amount)
+                ValidationState.HAS_TX_IN_FLIGHT -> ctx.getString(R.string.send_error_tx_in_flight)
                 else -> ctx.getString(R.string.confirm_status_msg_unexpected_error)
             }
     }
