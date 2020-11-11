@@ -1,14 +1,15 @@
 package com.blockchain.swap.nabu.datamanagers.repositories
 
 import com.blockchain.swap.nabu.Authenticator
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.PriceTier
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.SwapQuote
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.service.NabuService
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import java.util.Date
 
@@ -33,9 +34,12 @@ class QuotesProvider(
                             price = CryptoValue.fromMinor(pair.destination, price.price.toBigInteger())
                         )
                     },
-                    networkFee = if (direction.hasZeroNetworkFee()) CryptoValue.zero(pair.destination)
-                    else CryptoValue.fromMinor(
-                        pair.destination,
+                    networkFee = CryptoValue.fromMinor(
+                        if (pair.destination.hasFeature(CryptoCurrency.IS_ERC20)) {
+                            CryptoCurrency.ETHER
+                        } else {
+                            pair.destination
+                        },
                         it.networkFee.toBigInteger()
                     ),
                     staticFee = CryptoValue.fromMinor(pair.source, it.staticFee.toBigInteger()),
@@ -45,7 +49,4 @@ class QuotesProvider(
                 )
             }
         }
-
-    private fun SwapDirection.hasZeroNetworkFee(): Boolean =
-        this == SwapDirection.FROM_USERKEY || this == SwapDirection.INTERNAL
 }
