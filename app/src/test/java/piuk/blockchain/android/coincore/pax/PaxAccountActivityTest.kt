@@ -22,7 +22,6 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.pax.PaxCryptoWalletAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -130,7 +129,7 @@ class PaxAccountActivityTest {
             .assertComplete()
             .assertNoErrors()
             .assertValue {
-                it.size == 2 && it[0].run {
+                it.size == 1 && it[0].run {
                     this is Erc20ActivitySummaryItem &&
                     cryptoCurrency == CryptoCurrency.PAX &&
                     !doubleSpend &&
@@ -145,17 +144,6 @@ class PaxAccountActivityTest {
                         CryptoValue.fromMinor(CryptoCurrency.PAX, 10000.toBigInteger()) &&
                     outputsMap["0x2ca28ffadd20474ffe2705580279a1e67cd10a29"] ==
                         CryptoValue.fromMinor(CryptoCurrency.PAX, 10000.toBigInteger())
-                } && it[1].run {
-                    this is SwapActivitySummaryItem &&
-                    txId == swapSummary.txId &&
-                    direction == swapSummary.direction &&
-                    sendingAsset == swapSummary.sendingAsset &&
-                    receivingAsset == swapSummary.receivingAsset &&
-                    sendingAddress == swapSummary.sendingAddress &&
-                    receivingAddress == swapSummary.receivingAddress &&
-                    state == swapSummary.state &&
-                    fiatValue == swapSummary.fiatValue &&
-                    fiatCurrency == swapSummary.fiatCurrency
                 }
             }
 

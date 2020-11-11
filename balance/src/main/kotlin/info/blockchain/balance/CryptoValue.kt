@@ -71,10 +71,6 @@ data class CryptoValue(
         fun bitcoinFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
 
-        @Deprecated("Historical method", ReplaceWith("satoshi.satoshiCash()"))
-        fun bitcoinCashFromSatoshis(satoshi: Long) =
-            CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
-
         @Deprecated("Historical method", ReplaceWith("stroop.stroops()"))
         fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
 

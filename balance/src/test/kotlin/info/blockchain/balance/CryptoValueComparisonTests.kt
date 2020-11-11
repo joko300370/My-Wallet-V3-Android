@@ -58,8 +58,8 @@ class CryptoValueComparisonTests {
 
     @Test
     fun `can compare different currencies with equals`() {
-        val a = CryptoValue.bitcoinCashFromSatoshis(3)
-        val b = CryptoValue.bitcoinFromSatoshis(3)
+        val a = 3.satoshiCash()
+        val b = 3.satoshi()
         (a == b) `should be` false
     }
 }

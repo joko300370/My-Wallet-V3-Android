@@ -133,7 +133,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
-                        startBuySellFragment()
+                        launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
                     }
                     ITEM_TRANSFER -> {
@@ -604,15 +604,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(transferFragment)
     }
 
-    private fun startBuySellFragment(
-        viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY
-    ) {
-        setCurrentTabItem(ITEM_BUY_SELL)
-
-        val buySellFragment = BuySellFragment.newInstance(viewType)
-        replaceContentFragment(buySellFragment)
-    }
-
     private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
         if (sourceAccount == null && destinationAccount == null) {
             setCurrentTabItem(ITEM_SWAP)
@@ -672,10 +663,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 cryptoCurrency = cryptoCurrency
             )
         )
-    }
-
-    override fun startSell() {
-        startBuySellFragment(BuySellFragment.BuySellViewType.TYPE_SELL)
     }
 
     override fun startInterestDashboard() {
@@ -832,6 +819,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
 
         tour_guide.start(this, tourSteps)
+    }
+
+    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
+        setCurrentTabItem(ITEM_BUY_SELL)
+
+        val buySellFragment = BuySellFragment.newInstance(viewType)
+        replaceContentFragment(buySellFragment)
     }
 
     override fun onTourFinished() {

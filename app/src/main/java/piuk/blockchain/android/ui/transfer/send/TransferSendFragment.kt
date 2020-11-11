@@ -10,7 +10,7 @@ import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.AccountListFilterFn
@@ -40,7 +40,7 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
             R.string.transfer_wallet_buy_crypto
         ) {
             analytics.logEvent(TransferAnalyticsEvent.NoBalanceCtaClicked)
-            startActivity(SimpleBuyActivity.newInstance(requireContext()))
+            (activity as? HomeNavigator)?.launchSimpleBuySell()
         }
 
         initialiseAccountSelectorWithHeader(

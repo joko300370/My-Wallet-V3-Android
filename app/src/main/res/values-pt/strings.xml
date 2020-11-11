@@ -691,6 +691,9 @@
   <string name="fee_options_custom_warning">Somente usuários avançados</string>
   <string name="fee_options_fee_too_low">Taxa baixa não recomendada</string>
   <string name="fee_options_fee_too_high">Taxa desnecessariamente alta</string>
+  <string name="fee_options_advanced_warning">Esse recurso é recomendado apenas para usuários avançados. 
+ Ao escolher uma taxa personalizada, você corre o risco de pagar a mais ou de sua transação nunca ser confirmada. 
+</string>
   <string name="fee_options_sat_byte_hint">sat / b</string>
   <string name="fee_options_sat_byte_inline_hint">Regular: %1$s , Prioridade: %2$s</string>
   <string name="dismiss">Dispensar</string>
@@ -1987,5 +1990,88 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
   <string name="tx_view_locked_funds_1">Esses fundos estarão disponíveis imediatamente para venda numa carteira Fiat %1$s, mas não poderá enviar ou retirar esses fundos do Blockchain.com durante até %2$s.</string>
   <string name="common_pending">Pendente</string>
   <string name="confirm_status_msg_insufficient_funds">Não tem fundos suficientes nesta conta para processar esta transação.</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Certifique-se de concordar com os nossos Termos.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Gratuito</string>
+  <string name="two_fa_new_request">A pedir novo código...</string>
+  <string name="transfer_funds_title">Transferir do endereço importado?</string>
+  <string name="transfer_funds_description">Os endereços importados não são copiados pela sua Frase de Cópia de Segurança. Para assegurar estes fundos, nós
+        recomendamos a transferência destes saldos para a sua Wallet não custodial Blockchain.com.
+    </string>
+  <string name="two_factor_resend_sms">Reenviar SMS (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Número de tentativas excedido. Aguarde 60 segundos antes de tentar novamente</string>
+  <string name="fee_options_label">%1$s (%2$s)</string>
+  <string name="fee_options_sat_byte_min_error">Mínimo 1 sat/byte necessário</string>
+  <string name="fee_options_invalid_amount">Taxa inválida</string>
+  <string name="sell_announcement_title">Venda crypto por dinheiro</string>
+  <string name="sell_announcement_description">Venda diretamente das suas Carteiras de Negociação para a sua Carteira de Dinheiro.</string>
+  <string name="sell_announcement_action">Vender agora</string>
+  <string name="generic_limit">Limites</string>
+  <string name="select_account_sheet_empty">Não tem Wallets elegíveis para realizar esta ação.</string>
+  <string name="activity_details_swap_for">Para</string>
+  <string name="swap_enter_amount_min_swap">Troca mínima de %1$s necessária</string>
+  <string name="too_many_pending_orders_error_message">A sua Wallet %1$s tem demasiadas trocas em curso. Selecione uma carteira diferente.</string>
+  <string name="swap_confirmation_title">Trocar %1$s</string>
+  <string name="swap_confirmation_cta_button">Trocar %1$s por %2$s</string>
+  <string name="swap_confirmation_disclaimer">Os valores que envia e recebe podem mudar um pouco devido à atividade do mercado. Quando um pedido começa, não poderemos pará-lo.</string>
+  <string name="swap_confirmation_progress_message">Estamos a concluir a sua troca neste momento.</string>
+  <string name="swap_confirmation_success_message">O seu %1$s está agora disponível na sua Wallet.</string>
+  <string name="swap_progress_title">A trocar %1$s por %2$s</string>
+  <string name="swap_progress_complete_title">Troca concluída</string>
+  <string name="swap_enter_amount_title">Trocar %1$s</string>
+  <string name="swap_enter_amount_source">Trocar: %1$s</string>
+  <string name="swap_enter_amount_target">Receber: %1$s</string>
+  <string name="swap_enter_amount_max">Máximo de Troca</string>
+  <string name="swap_enter_amount_silver_limit">Toque aqui para atualizar o seu perfil e trocar este valor.</string>
+  <string name="swap_enter_amount_over_limit">Pode trocar até %1$s hoje.</string>
+  <string name="swap_select_target_subtitle">Confirme a carteira da qual deseja Trocar e escolha a carteira na qual deseja Receber.</string>
+  <string name="swap_select_target_title">Nova Troca</string>
+  <string name="tx_confirmation_network_fee">%1$s Taxa de rede</string>
+  <string name="tx_confirmation_fee_learn_more_1">Rede </string>
+  <string name="tx_confirmation_fee_learn_more_2">as taxas são estabelecidas pela rede %1$s. </string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Saiba mais sobre taxas</annotation>.</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">Taxas de rede ao utilizar</string>
+  <string name="tx_confirmation_free_fee_learn_more_2"> Carteiras de Negociação </string>
+  <string name="tx_confirmation_free_fee_learn_more_3">são GRATUITAS! <annotation link="send_tx_fees">Saiba mais sobre taxas</annotation>.</string>
+  <string name="interest_item_issue_region">Não está disponível na sua região</string>
+  <string name="interest_item_issue_kyc">Precisa de verificação Gold para começar a ganhar juros</string>
+  <string name="interest_item_issue_other">Atualmente indisponível, verifique novamente mais tarde</string>
+  <string name="swap_header_title">Troque as suas crypto</string>
+  <string name="swap_header_label">Troque instantaneamente as suas crypto por qualquer moeda que oferecemos para a sua carteira.</string>
+  <string name="swap_kyc_title">Verifique a sua identidade. Troque ainda hoje.</string>
+  <string name="swap_kyc_desc">Verifique a sua identidade para trocar crypto a qualquer momento. Inscreva-se e troque em minutos.</string>
+  <string name="swap_kyc_cta">Inscreva-se agora</string>
+  <string name="swap_kyc_1_title">Selecione o seu país</string>
+  <string name="swap_kyc_1_label">Blockchain.com precisa conhecer seu país atual, de acordo com as leis locais.</string>
+  <string name="swap_kyc_2_title">Verifique a sua identidade</string>
+  <string name="swap_kyc_2_label">Temos de confirmar a sua identidade para evitar fraudes. Carregue um ID.</string>
+  <string name="swap_kyc_3_title">Comece a Trocar</string>
+  <string name="swap_kyc_3_label">Depois de verificado, volte a Trocar e troque as suas crypto.</string>
+  <string name="swap_cta">Nova Troca</string>
+  <string name="swap_account_select">Trocar</string>
+  <string name="swap_account_select_subtitle">De qual carteira deseja Trocar?</string>
+  <string name="select_target_account_for_swap">Em que carteira deseja Receber?</string>
+  <string name="swap_low_fees">Taxas baixas</string>
+  <string name="swap_kyc_upsell_title">Está perto do seu limite de troca. Atualize para trocar valores maiores.</string>
+  <string name="swap_kyc_upsell_desc">Verifique a sua identidade para aumentar o quanto pode Trocar diariamente.</string>
+  <string name="swap_kyc_upsell_1_title">Carregue o seu ID</string>
+  <string name="swap_kyc_upsell_1_desc">Temos de confirmar a sua identidade para evitar fraudes. Carregue um ID.</string>
+  <string name="swap_kyc_upsell_2_title">Carregar uma selfie</string>
+  <string name="swap_kyc_upsell_2_desc">Isto é para garantir que é um ser humano. Não são permitidos robôs.</string>
+  <string name="swap_kyc_upsell_3_title">Troque até $25,000 por dia</string>
+  <string name="swap_kyc_upsell_3_desc">Depois de verificado, volte a Trocar e troque as suas crypto.</string>
+  <string name="trending_label">Tendências</string>
+  <string name="trending_swap">Trocar %1$s</string>
+  <string name="trending_empty">Financie as suas Carteiras de Negociação para ver as Tendências de Trocas com taxas mais baixas.</string>
+  <string name="trending_receive">Receber %1$s</string>
+  <string name="show_more_accounts">Mostrar mais</string>
+  <string name="select_a_wallet">Selecione uma Wallet</string>
+  <string name="pending_swap_info_message">Tem 1 troca pendente. Depois de este ser eliminado, pode fazer uma nova troca.</string>
+  <string name="deposit_fee">Taxa de rede</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Taxa de câmbio</string>
+  <string name="in_progress">Em progresso</string>
+  <string name="swap_direction">%1$s-&gt;%2$s</string>
 </resources>

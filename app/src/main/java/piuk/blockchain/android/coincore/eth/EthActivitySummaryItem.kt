@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.util.Locale
 
 internal class EthActivitySummaryItem(
     private val ethDataManager: EthDataManager,
@@ -23,7 +24,7 @@ internal class EthActivitySummaryItem(
     override val cryptoCurrency: CryptoCurrency = CryptoCurrency.ETHER
 
     override val transactionType: TransactionSummary.TransactionType by unsafeLazy {
-        val ethAddress = account.address.toLowerCase()
+        val ethAddress = account.address.toLowerCase(Locale.ROOT)
         when {
             ethAddress == ethTransaction.to && ethAddress == ethTransaction.from ->
                 TransactionSummary.TransactionType.TRANSFERRED

@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
@@ -166,6 +167,13 @@ open class CustodialTradingAccount(
             }
         }.toList()
     }
+
+    // No need to reconcile sends and swaps in custodial accounts, the BE deals with this
+    // Return a list containing both supplied list
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> = activity + swaps
 
     companion object {
         private val displayedStates = setOf(

@@ -691,6 +691,9 @@
   <string name="fee_options_custom_warning">Yalnızca ileri düzey kullanıcılar</string>
   <string name="fee_options_fee_too_low">Düşük ücret önerilmez</string>
   <string name="fee_options_fee_too_high">Gereksiz yere yüksek ücret</string>
+  <string name="fee_options_advanced_warning">Bu özellik yalnızca ileri düzey kullanıcılar için önerilir. 
+ Özel bir ücret seçerek fazla ödeme yapma veya işleminizin asla onaylanma riskiyle karşı karşıya kalırsınız. 
+</string>
   <string name="fee_options_sat_byte_hint">doymuş / b</string>
   <string name="fee_options_sat_byte_inline_hint">Normal: %1$s , Öncelik: %2$s</string>
   <string name="dismiss">Reddet</string>
@@ -1985,5 +1988,89 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="tx_view_locked_funds_1">Bu fonlar hemen %1$s Fiat cüzdanına satılabilecek, ancak bu fonları Blockchain.com\'dan %2$s kadar gönderemeyecek veya çekemeyeceksiniz.</string>
   <string name="common_pending">Bekliyor</string>
   <string name="confirm_status_msg_insufficient_funds">Bu hesapta bu işlemi gerçekleştirmek için yeterli paranız yok</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Lütfen Şartlarımızı kabul ettiğinizden emin olun.</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">Ücretsiz</string>
+  <string name="two_fa_new_request">Yeni kod isteniyor...</string>
+  <string name="transfer_funds_title">İçe Aktarılan Adresten Transfer Yapılsın mı?</string>
+  <string name="transfer_funds_description">İçe aktarılan adresler Yedekleme İfadeniz tarafından yedeklenmez. Bu fonları güvence altına almak için 
+ bu bakiyeleri yedeklemenize eklemek için aktarmanızı öneririz.
+    </string>
+  <string name="two_factor_resend_sms">SMS\'i yeniden gönder (%1$d)</string>
+  <string name="two_factor_retries_exceeded">Yeniden denemeler aşıldı, lütfen tekrar denemeden önce 60 saniye bekleyin</string>
+  <string name="fee_options_label">%1$s (%2$s)</string>
+  <string name="fee_options_sat_byte_min_error">En az 1 sat/byte gerekli</string>
+  <string name="fee_options_invalid_amount">Geçersiz ücret</string>
+  <string name="sell_announcement_title">Kriptonuzu Nakit Karşılığında Satın</string>
+  <string name="sell_announcement_description">Doğrudan İşlem Cüzdanlarınızdan Nakit Cüzdanınıza satış yapın.</string>
+  <string name="sell_announcement_action">Hemen sat</string>
+  <string name="generic_limit">Limitler</string>
+  <string name="select_account_sheet_empty">Bu eylemi gerçekleştirmek için uygun Cüzdanınız yok.</string>
+  <string name="activity_details_swap_for">İçin</string>
+  <string name="swap_enter_amount_min_swap">Minimum %1$s takas gerekli</string>
+  <string name="too_many_pending_orders_error_message">%1$s Cüzdanınızda işlemde olan çok fazla takas var. Lütfen farklı bir cüzdan seçin.</string>
+  <string name="swap_confirmation_title">%1$s Takas Et</string>
+  <string name="swap_confirmation_cta_button">%2$s için %1$s takas et</string>
+  <string name="swap_confirmation_disclaimer">Gönderdiğiniz ve aldığınız miktar piyasa faaliyeti nedeniyle biraz değişiklik gösteebilir. Emre ait işlem başladığında durdurulamaz.</string>
+  <string name="swap_confirmation_progress_message">Şimdi takas işleminizi tamamlıyoruz.</string>
+  <string name="swap_confirmation_success_message">%1$s artık Cüzdanınızda kullanılabilir.</string>
+  <string name="swap_progress_title">%2$s için %1$s takas ediliyor</string>
+  <string name="swap_progress_complete_title">Takas Tamamlandı</string>
+  <string name="swap_enter_amount_title">%1$s Takas Et</string>
+  <string name="swap_enter_amount_source">Takas et: %1$s</string>
+  <string name="swap_enter_amount_target">Alınan: %1$s</string>
+  <string name="swap_enter_amount_max">Maks. Takas</string>
+  <string name="swap_enter_amount_silver_limit">Profilinizi yükseltmek ve bu miktarı takas etmek için buraya dokunun.</string>
+  <string name="swap_enter_amount_over_limit">Bugün en fazla %1$s tutara kadar takas yapabilirsiniz.</string>
+  <string name="swap_select_target_subtitle">Takas yapmak istediğiniz cüzdanı onaylayın ve paranın gelmesini Istediğiniz cüzdanı seçin.</string>
+  <string name="swap_select_target_title">Yeni Takas</string>
+  <string name="tx_confirmation_network_fee">%1$s Ağ Ücreti</string>
+  <string name="tx_confirmation_fee_learn_more_1">Ağ </string>
+  <string name="tx_confirmation_fee_learn_more_2">ücretleri, %1$s tarafından belirlenmektedir. </string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Ücretler hakkında daha fazla bilgi alın</annotation>.</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">İşlem yaptığınız Cüzdanları kullanırken</string>
+  <string name="tx_confirmation_free_fee_learn_more_2"> ağ ücretleri </string>
+  <string name="tx_confirmation_free_fee_learn_more_3">ÜCRETSİZ! <annotation link="send_tx_fees">Ücretler hakkında daha fazla bilgi alın</annotation>.</string>
+  <string name="interest_item_issue_region">Bölgenizde kullanılamıyor</string>
+  <string name="interest_item_issue_kyc">Faiz Kazanmak için hesap doğrulama seviyenizini Gold olması gerekmektedir</string>
+  <string name="interest_item_issue_other">Şimdilik kullanılamıyor, lütfen daha sonra tekrar deneyin</string>
+  <string name="swap_header_title">Kriptonuzu Takas Edin</string>
+  <string name="swap_header_label">Kriptonuzu cüzdanınızda sunduğumuz para birimlerinden birisiyle anında takas edin.</string>
+  <string name="swap_kyc_title">Kimliğinizi Doğrulayın. Bugün Takas Yapmaya Başlayın</string>
+  <string name="swap_kyc_desc">İstediğiniz zaman kripto takas etmek için kimliğinizi doğrulayın. Dakikalar içinde başvurun ve takas yapmaya başlayın.</string>
+  <string name="swap_kyc_cta">Hemen Başvur</string>
+  <string name="swap_kyc_1_title">Ülkenizi Seçin</string>
+  <string name="swap_kyc_1_label">Yerel yasalar uyarınca Blockchain.com, hangi ülkede ikamet ettiğiniz bilgisine sahip olmalıdır.</string>
+  <string name="swap_kyc_2_title">Kimliğinizi Doğrulayın</string>
+  <string name="swap_kyc_2_label">Dolandırıcılık vakalarını önlemek için, bir kimlik belgesi yüklemeniz yoluyla kimlik doğrulaması yapmamanız gerekmektedir.</string>
+  <string name="swap_kyc_3_title">Takas Yapmaya Başlayın</string>
+  <string name="swap_kyc_3_label">Kimliğiniz doğrulandıktan sonra Takas kısmına geri dönerek kripto takasına başlayabilirsiniz.</string>
+  <string name="swap_cta">Yeni Takas</string>
+  <string name="swap_account_select">Takas</string>
+  <string name="swap_account_select_subtitle">Hangi cüzdandan takas yapmak istiyorsunuz?</string>
+  <string name="select_target_account_for_swap">Gelen tutarı hangi cüzdana almak istiyorsunuz?</string>
+  <string name="swap_low_fees">Düşük İşlem Ücretleri</string>
+  <string name="swap_kyc_upsell_title">Takas Limitinize Yaklaştınız. Daha Büyük Tutarlarda Takas Yapabilmek İçin Hesabınızı Yükseltin.</string>
+  <string name="swap_kyc_upsell_desc">Yapabileceğiniz günlük Takas miktarını artırmak için kimliğinizi doğrulayın.
+</string>
+  <string name="swap_kyc_upsell_1_title">Kimlik belgenizi yükleyin</string>
+  <string name="swap_kyc_upsell_1_desc">Dolandırıcılık vakalarını önlemek için, bir kimlik belgesi yüklemeniz yoluyla kimlik doğrulaması yapmamanız gerekmektedir.</string>
+  <string name="swap_kyc_upsell_2_title">Selfie Yükleyin</string>
+  <string name="swap_kyc_upsell_2_desc">İnsan olduğunuzdan emin olmak istiyoruz. Robot hesaplara karşı bir önlem.</string>
+  <string name="swap_kyc_upsell_3_title">25.000 USD tutara kadar Takas yapın</string>
+  <string name="swap_kyc_upsell_3_desc">Kimliğiniz doğrulandıktan sonra Takas kısmına geri dönerek kripto takasına başlayabilirsiniz.</string>
+  <string name="trending_label">Trendde</string>
+  <string name="trending_swap">%1$s Takas Et</string>
+  <string name="trending_empty">Daha düşük ücretlerle Trenddeki Takasları görmek için İşlem Cüzdanlarınıza para yatırın.</string>
+  <string name="trending_receive">%1$s Al</string>
+  <string name="show_more_accounts">Daha fazlasını göster</string>
+  <string name="select_a_wallet">Bir Cüzdan Seçin</string>
+  <string name="pending_swap_info_message">Bekleyen 1 takasınız var. Bu işlem tamamlandığında, yeni bir takas yapabilirsiniz.</string>
+  <string name="deposit_fee">Ağ Ücreti</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">Takas Oranı</string>
+  <string name="in_progress">Devam Ediyor</string>
+  <string name="swap_direction">%1$s-&gt;%2$s</string>
 </resources>

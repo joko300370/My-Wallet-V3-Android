@@ -10,6 +10,7 @@ import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
+import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -19,6 +20,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
+import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.SwapActivitySummaryItem
@@ -57,12 +59,12 @@ abstract class CryptoAccountBase : CryptoAccount {
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
 
-    private fun swapItemToSummary(item: SwapTransactionItem): ActivitySummaryItem {
+    private fun swapItemToSummary(item: SwapTransactionItem): SwapActivitySummaryItem {
         val sendingAccount = this
         return with(item) {
             SwapActivitySummaryItem(
                 exchangeRates,
-                txId,
+                normaliseTxId(txId),
                 timeStampMs,
                 sendingValue,
                 sendingAccount,
@@ -80,19 +82,27 @@ abstract class CryptoAccountBase : CryptoAccount {
         }
     }
 
+    private fun normaliseTxId(txId: String): String =
+        txId.replace("-", "")
+
     fun appendSwapActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
         directions: List<TransferDirection>,
         activityList: List<ActivitySummaryItem>
-    ) =
-        custodialWalletManager.getSwapActivityForAsset(asset, directions).map { swapItems ->
+    ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
+        .map { swapItems ->
             swapItems.map {
                 swapItemToSummary(it)
             }
         }.map { swapActivity ->
-            activityList + swapActivity
+            reconcileSwaps(swapActivity, activityList)
         }
+
+    protected abstract fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem>
 }
 
 // To handle Send to PIT
@@ -132,6 +142,13 @@ internal class CryptoExchangeAccount(
         get() = Single.just(emptyList())
 
     override val actions: AvailableActions = emptySet()
+
+    // No activity on exchange accounts, so just return the activity list
+    // unmodified - they should both be empty anyway
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> = activity
 }
 
 abstract class CryptoNonCustodialAccount(
@@ -174,6 +191,24 @@ abstract class CryptoNonCustodialAccount(
 
     override val isArchived: Boolean
         get() = false
+
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> {
+        val activityList = activity.toMutableList()
+        swaps.forEach { swap ->
+            val hit = activityList.find {
+                it.txId.contains(swap.txId, true)
+            } as? NonCustodialActivitySummaryItem
+
+            if (hit?.transactionType == TransactionSummary.TransactionType.SENT) {
+                activityList.remove(hit)
+                activityList.add(swap)
+            }
+        }
+        return activityList.toList()
+    }
 }
 
 // Currently only one custodial account is supported for each asset,
