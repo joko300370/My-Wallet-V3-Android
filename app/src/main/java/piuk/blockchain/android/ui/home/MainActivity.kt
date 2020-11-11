@@ -68,7 +68,6 @@ import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
@@ -479,12 +478,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     if (it) {
                         startSwapFlow(sourceAccount, targetAccount)
                     } else {
-                        HomebrewNavHostActivity.start(
-                            this,
-                            presenter.defaultCurrency,
-                            toCryptoCurrency = targetAccount?.asset,
-                            fromCryptoCurrency = sourceAccount?.asset
-                        )
+                        presenter.startSwapOrKyc(sourceAccount, targetAccount)
                     }
                 }
             )

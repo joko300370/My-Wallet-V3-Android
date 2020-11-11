@@ -21,9 +21,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
-import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
@@ -34,6 +32,8 @@ import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
 import piuk.blockchain.android.scan.QrScanError
+import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
@@ -342,13 +342,19 @@ class MainPresenter internal constructor(
                         targetAccount = target
                     )
                 } else {
-                    if (nabuUser.kycState == KycState.Rejected ||
+                    if (
+                        nabuUser.kycState == KycState.Rejected ||
                         nabuUser.kycState == KycState.UnderReview ||
-                        prefs.swapIntroCompleted
+                        nabuUser.kycState == KycState.Pending
                     )
                         view?.launchPendingVerificationScreen(CampaignType.Swap)
-                    else
-                        view?.launchSwapIntro()
+                    else if (nabuUser.kycState == KycState.None) {
+                        if (!prefs.swapIntroCompleted) {
+                            view?.launchSwapIntro()
+                        } else {
+                            view?.launchKyc(CampaignType.Swap)
+                        }
+                    }
                 }
             })
     }
