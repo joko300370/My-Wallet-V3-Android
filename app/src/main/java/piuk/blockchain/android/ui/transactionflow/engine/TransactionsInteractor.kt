@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -81,14 +82,24 @@ class TransactionInteractor(
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
-        if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else coincore.getTransactionTargets(sourceAccount, action).zipWith(swapRepository.getSwapAvailablePairs())
+        if (action != AssetAction.Swap && action != AssetAction.Sell) coincore.getTransactionTargets(sourceAccount,
+            action)
+        else if (action == AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
+            .zipWith(swapRepository.getSwapAvailablePairs())
             .map { (accountList, pairs) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->
                         pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
                     }
-            }
+            }.map { it.map { account -> account as SingleAccount } }
+        else coincore.getTransactionTargets(sourceAccount, action)
+            .zipWith(swapRepository.getSellAvailablePairs())
+            .map { (accountList, pairs) ->
+                accountList.filterIsInstance(FiatAccount::class.java)
+                    .filter { account ->
+                        pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
+                    }
+            }.map { it.map { account -> account as SingleAccount } }
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
@@ -126,6 +137,9 @@ class TransactionInteractor(
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
+    pairs.any { it.source == this.asset }
+
+private fun CryptoAccount.isAvailableToSellFrom(pairs: List<CurrencyPair.CryptoToFiatCurrencyPair>): Boolean =
     pairs.any { it.source == this.asset }
 
 private val Throwable.isUnexpectedContractError

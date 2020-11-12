@@ -25,6 +25,11 @@ class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: Swap
     fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
         swapPairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
 
+    fun getSellAvailablePairs(): Single<List<CurrencyPair.CryptoToFiatCurrencyPair>> =
+        swapPairsCache.getCachedSingle().map {
+            it.filterIsInstance<CurrencyPair.CryptoToFiatCurrencyPair>()
+        }
+
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: List<TransferDirection>

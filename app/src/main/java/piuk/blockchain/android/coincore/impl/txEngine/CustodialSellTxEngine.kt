@@ -14,6 +14,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
@@ -96,6 +97,14 @@ open class CustodialSellTxEngine(
                         maxApiFiatAmount = it.maxLimit as FiatValue
                     }
             }
+
+    override fun userExchangeRate(): Observable<ExchangeRate> = quotesEngine.pricedQuote.map {
+        ExchangeRate.CryptoToFiat(
+            from = sourceAccount.asset,
+            to = userFiat,
+            _rate = it.price.toBigDecimal()
+        )
+    }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         return sourceAccount.accountBalance

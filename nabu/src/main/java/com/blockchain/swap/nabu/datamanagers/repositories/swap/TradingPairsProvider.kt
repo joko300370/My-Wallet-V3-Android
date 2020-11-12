@@ -25,8 +25,13 @@ class TradingPairsProviderImpl(
             val destination = CryptoCurrency.fromNetworkTicker(parts[1])
             if (destination != null)
                 return@mapNotNull CurrencyPair.CryptoCurrencyPair(source, destination)
-
-            null
+            else
+                return@mapNotNull CurrencyPair.CryptoToFiatCurrencyPair(source, parts[1])
         }
+    }.map {
+        it.toMutableList().apply {
+            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.BTC, "EUR"))
+            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.ETHER, "EUR"))
+        }.toList()
     }
 }
