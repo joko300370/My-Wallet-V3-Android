@@ -151,7 +151,7 @@ class XlmAccountActivityTest {
         val swapSummary = SwapTransactionItem(
             TX_HASH_SWAP,
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
             SwapOrderState.FINISHED,
@@ -217,7 +217,7 @@ class XlmAccountActivityTest {
         val swapSummary = SwapTransactionItem(
             TX_HASH_SWAP,
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
             SwapOrderState.FINISHED,

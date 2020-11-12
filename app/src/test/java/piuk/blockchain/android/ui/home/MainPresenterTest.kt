@@ -13,6 +13,7 @@ import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.swap.nabu.models.nabu.KycState
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -62,6 +63,12 @@ class MainPresenterTest {
 
     private val userTierZero: NabuUser = mock {
         on { tiers } `it returns` TierLevels(0, 0, 0)
+        on { kycState } `it returns` KycState.None
+    }
+
+    private val userTierZeroWithStatePending: NabuUser = mock {
+        on { tiers } `it returns` TierLevels(0, 0, 0)
+        on { kycState } `it returns` KycState.Pending
     }
 
     private val userTierOne: NabuUser = mock {
@@ -117,9 +124,9 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap(any(), any())
+        verify(view, never()).tryTolaunchSwap(any(), any())
         verify(view, never()).launchSwapIntro()
-        verify(view).launchPendingVerificationScreen(CampaignType.Swap)
+        verify(view).launchKyc(CampaignType.Swap)
     }
 
     @Test
@@ -167,8 +174,25 @@ class MainPresenterTest {
         subject.startSwapOrKyc(null, null)
 
         // Assert
-        verify(view, never()).launchSwap(any(), any())
+        verify(view, never()).tryTolaunchSwap(any(), any())
         verify(view, never()).launchKyc(CampaignType.Swap)
         verify(view).launchSwapIntro()
+    }
+
+    @Test
+    fun `should go to pending screen if tier is 0 and is pending for tier 1`() {
+        // Arrange
+        whenever(prefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(prefs.swapIntroCompleted).thenReturn(false)
+        whenever(nabuDatamanager.getUser(any())).thenReturn(Single.just(userTierZeroWithStatePending))
+
+        // Act
+        subject.onViewReady()
+        subject.startSwapOrKyc(null, null)
+
+        // Assert
+        verify(view, never()).tryTolaunchSwap(any(), any())
+        verify(view, never()).launchKyc(CampaignType.Swap)
+        verify(view).launchPendingVerificationScreen(CampaignType.Swap)
     }
 }

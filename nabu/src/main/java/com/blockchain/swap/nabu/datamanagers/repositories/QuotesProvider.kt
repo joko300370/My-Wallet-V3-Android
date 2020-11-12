@@ -9,6 +9,10 @@ import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.service.NabuService
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
+import java.math.BigInteger
 import java.util.Date
 
 class QuotesProvider(
@@ -32,12 +36,23 @@ class QuotesProvider(
                             price = pair.toDestinationMoney(price.price.toBigInteger())
                         )
                     },
-                    networkFee = pair.toDestinationMoney(it.networkFee.toBigInteger()),
                     staticFee = pair.toSourceMoney(it.staticFee.toBigInteger()),
+                    networkFee = networkFee(it.networkFee.toBigInteger(), pair),
                     sampleDepositAddress = it.sampleDepositAddress,
                     expirationDate = it.expiresAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
                     creationDate = it.createdAt.fromIso8601ToUtc()?.toLocalTime() ?: Date()
                 )
+            }
+        }
+
+    private fun networkFee(networkFee: BigInteger, pair: CurrencyPair): Money =
+        when (pair) {
+            is CurrencyPair.CryptoToFiatCurrencyPair -> pair.toDestinationMoney(networkFee)
+            is CurrencyPair.CryptoCurrencyPair -> {
+                if (pair.destination.hasFeature(CryptoCurrency.IS_ERC20)) {
+                    CryptoValue.fromMinor(CryptoCurrency.ETHER, networkFee)
+                } else
+                    pair.toDestinationMoney(networkFee)
             }
         }
 }

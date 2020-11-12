@@ -25,42 +25,44 @@ class SwapActivityProviderImpl(
     private val exchangeRates: ExchangeRateDataManager
 ) : SwapActivityProvider {
     override fun getSwapActivity(): Single<List<SwapTransactionItem>> =
-    authenticator.authenticate { sessionToken ->
-        nabuService.fetchSwapActivity(sessionToken)
-    }.map { response ->
-        response.mapNotNull {
-            val pairSplit = it.pair.split("-")
-            val sendingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[0]) ?: return@mapNotNull null
-            val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1]) ?: return@mapNotNull null
+        authenticator.authenticate { sessionToken ->
+            nabuService.fetchSwapActivity(sessionToken)
+        }.map { response ->
+            response.mapNotNull {
+                val pairSplit = it.pair.split("-")
+                val sendingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[0]) ?: return@mapNotNull null
+                val receivingAsset = CryptoCurrency.fromNetworkTicker(pairSplit[1]) ?: return@mapNotNull null
 
-            val apiFiat = FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong())
-            val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+                val apiFiat = FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong())
+                val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
                 SwapTransactionItem(
-                it.kind.depositTxHash ?: it.id,
-                it.createdAt.fromIso8601ToUtc()!!.time,
-                it.kind.direction.mapToDirection(),
-                it.kind.depositAddress,
-                it.kind.withdrawalAddress,
-                it.state.toSwapState(),
-                CryptoValue.fromMinor(sendingAsset, it.priceFunnel.inputMoney.toBigInteger()),
-                CryptoValue.fromMinor(receivingAsset, it.priceFunnel.outputMoney.toBigInteger()),
-                getFeeForAsset(sendingAsset, it.priceFunnel.networkFee),
-                sendingAsset,
-                receivingAsset,
-                localFiat,
-                currencyPrefs.selectedFiatCurrency
-            )
-        }.filter {
-            it.state.displayableState
+                    it.kind.depositTxHash ?: it.id,
+                    it.createdAt.fromIso8601ToUtc()!!.time,
+                    it.kind.direction.mapToDirection(),
+                    it.kind.depositAddress,
+                    it.kind.withdrawalAddress,
+                    it.state.toSwapState(),
+                    CryptoValue.fromMinor(sendingAsset, it.priceFunnel.inputMoney.toBigInteger()),
+                    CryptoValue.fromMinor(receivingAsset, it.priceFunnel.outputMoney.toBigInteger()),
+                    getFeeForAsset(receivingAsset, it.priceFunnel.networkFee),
+                    sendingAsset,
+                    receivingAsset,
+                    localFiat,
+                    currencyPrefs.selectedFiatCurrency
+                )
+            }.filter {
+                it.state.displayableState
+            }
         }
-    }
 
-    private fun getFeeForAsset(sendingAsset: CryptoCurrency, networkFee: String): CryptoValue =
-        if (sendingAsset.hasFeature(CryptoCurrency.IS_ERC20) || sendingAsset == CryptoCurrency.ETHER) {
-            CryptoValue.fromMinor(CryptoCurrency.ETHER, networkFee.toBigInteger())
-        } else {
-            CryptoValue.fromMinor(sendingAsset, networkFee.toBigInteger())
-        }
+    private fun getFeeForAsset(receivingAsset: CryptoCurrency, networkFee: String): CryptoValue =
+        CryptoValue.fromMinor(
+            if (receivingAsset.hasFeature(CryptoCurrency.IS_ERC20)) {
+                CryptoCurrency.ETHER
+            } else {
+                receivingAsset
+            }, networkFee.toBigInteger()
+        )
 
     private fun String.mapToDirection(): TransferDirection =
         when (this) {
@@ -81,7 +83,7 @@ data class SwapTransactionItem(
     val state: SwapOrderState,
     val sendingValue: Money,
     val receivingValue: Money,
-    val networkFee: CryptoValue,
+    val withdrawalNetworkFee: CryptoValue,
     val sendingAsset: CryptoCurrency,
     val receivingAsset: CryptoCurrency,
     val fiatValue: FiatValue,

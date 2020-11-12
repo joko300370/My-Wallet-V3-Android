@@ -13,6 +13,7 @@ import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetFilter
@@ -133,11 +134,15 @@ class ActivityDetailsInteractor(
             Amount(item.sendingValue)
         )
 
-        return buildReceivingLabel(item).map {
+        return Singles.zip(
+            item.depositNetworkFee,
+            buildReceivingLabel(item)
+        ) { depositFee: Money, toItem: To ->
             list.apply {
-                add(it)
+                add(SwapFee(depositFee))
+                add(toItem)
                 add(SwapReceiveAmount(item.receivingValue))
-                add(Fee(item.networkFee))
+                add(SwapFee(item.withdrawalNetworkFee))
             }
             list.toList()
         }

@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import java.math.BigInteger
 
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
@@ -73,7 +74,8 @@ abstract class CryptoAccountBase : CryptoAccount {
                 state,
                 direction,
                 receivingValue,
-                networkFee,
+                Single.just(CryptoValue(sendingAsset, BigInteger.ZERO)),
+                withdrawalNetworkFee,
                 asset,
                 receivingAsset,
                 fiatValue,
@@ -85,7 +87,7 @@ abstract class CryptoAccountBase : CryptoAccount {
     private fun normaliseTxId(txId: String): String =
         txId.replace("-", "")
 
-    fun appendSwapActivity(
+    protected fun appendSwapActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
         directions: List<TransferDirection>,
@@ -187,7 +189,10 @@ abstract class CryptoNonCustodialAccount(
 
     abstract fun createTxEngine(): TxEngine
 
-    val nonCustodialSwapDirections = listOf(TransferDirection.ON_CHAIN, TransferDirection.FROM_USERKEY)
+    protected val nonCustodialSwapDirections = listOf(
+        TransferDirection.ON_CHAIN,
+        TransferDirection.FROM_USERKEY
+    )
 
     override val isArchived: Boolean
         get() = false
@@ -204,7 +209,10 @@ abstract class CryptoNonCustodialAccount(
 
             if (hit?.transactionType == TransactionSummary.TransactionType.SENT) {
                 activityList.remove(hit)
-                activityList.add(swap)
+                val updatedSwap = swap.copy(
+                    depositNetworkFee = hit.fee.first(CryptoValue(hit.cryptoCurrency, BigInteger.ZERO))
+                )
+                activityList.add(updatedSwap)
             }
         }
         return activityList.toList()

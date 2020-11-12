@@ -11,10 +11,10 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
-import com.blockchain.swap.nabu.datamanagers.SwapPair
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -276,5 +276,5 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     )
 }
 
-private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
+private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
     pairs.any { it.source == this.asset }

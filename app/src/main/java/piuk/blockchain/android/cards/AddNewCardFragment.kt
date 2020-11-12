@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -90,7 +91,7 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
             CardStatus.ACTIVE)).subscribeBy(onSuccess = {
             availableCards = it
         })
-
+        activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
         card_number.displayCardTypeIcon(false)
         activity.setupToolbar(R.string.add_card_title)
         analytics.logEvent(SimpleBuyAnalytics.ADD_CARD)
