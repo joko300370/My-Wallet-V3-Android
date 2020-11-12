@@ -97,24 +97,24 @@ class SwapTrendingPairsProvider : TrendingPairsProvider, KoinComponent {
 
     override fun getTrendingPairs(): Single<List<TrendingPair>> =
         Singles.zip(
-            coincore[CryptoCurrency.BTC].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.ETHER].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.PAX].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.BCH].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.XLM].accountGroup(AssetFilter.Custodial).toSingle()
+            coincore[CryptoCurrency.BTC].accountGroup(AssetFilter.NonCustodial).toSingle(),
+            coincore[CryptoCurrency.ETHER].accountGroup(AssetFilter.NonCustodial).toSingle(),
+            coincore[CryptoCurrency.PAX].accountGroup(AssetFilter.NonCustodial).toSingle(),
+            coincore[CryptoCurrency.BCH].accountGroup(AssetFilter.NonCustodial).toSingle(),
+            coincore[CryptoCurrency.XLM].accountGroup(AssetFilter.NonCustodial).toSingle()
         ) { btcGroup, ethGroup, paxGroup, bchGroup, xlmGroup ->
-            val btcCustodialAccount = btcGroup.selectFirstAccount()
-            val ethCustodialAccount = ethGroup.selectFirstAccount()
-            val paxCustodialAccount = paxGroup.selectFirstAccount()
-            val bchCustodialAccount = bchGroup.selectFirstAccount()
-            val xlmCustodialAccount = xlmGroup.selectFirstAccount()
+            val btcNonCustodialAccount = btcGroup.selectFirstAccount()
+            val ethNonCustodialAccount = ethGroup.selectFirstAccount()
+            val paxNonCustodialAccount = paxGroup.selectFirstAccount()
+            val bchNonCustodialAccount = bchGroup.selectFirstAccount()
+            val xlmNonCustodialAccount = xlmGroup.selectFirstAccount()
 
             listOf(
-                TrendingPair(btcCustodialAccount, ethCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, paxCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, xlmCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, bchCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(ethCustodialAccount, paxCustodialAccount, ethCustodialAccount.isFunded)
+                TrendingPair(btcNonCustodialAccount, ethNonCustodialAccount, btcNonCustodialAccount.isFunded),
+                TrendingPair(btcNonCustodialAccount, paxNonCustodialAccount, btcNonCustodialAccount.isFunded),
+                TrendingPair(btcNonCustodialAccount, xlmNonCustodialAccount, btcNonCustodialAccount.isFunded),
+                TrendingPair(btcNonCustodialAccount, bchNonCustodialAccount, btcNonCustodialAccount.isFunded),
+                TrendingPair(ethNonCustodialAccount, paxNonCustodialAccount, ethNonCustodialAccount.isFunded)
             )
         }.onErrorReturn {
             emptyList()

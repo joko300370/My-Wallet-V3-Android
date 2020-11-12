@@ -87,6 +87,8 @@ class TransactionInteractor(
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->
                         pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
+                    }.filter { account ->
+                        account is NonCustodialAccount
                     }
             }
 
@@ -98,7 +100,11 @@ class TransactionInteractor(
                         (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false &&
                         account.isFunded && !account.isArchived
             }
-        }.map { it.map { account -> account as CryptoAccount } }
+        }.map {
+            it.map { account -> account as CryptoAccount }.filter { account ->
+                account is NonCustodialAccount
+            }
+        }
     }
 
     fun verifyAndExecute(secondPassword: String): Completable =
