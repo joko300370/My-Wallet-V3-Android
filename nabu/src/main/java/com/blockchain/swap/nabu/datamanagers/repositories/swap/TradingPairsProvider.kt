@@ -13,8 +13,7 @@ interface TradingPairsProvider {
 
 class TradingPairsProviderImpl(
     private val authenticator: Authenticator,
-    private val nabuService: NabuService,
-    private val custodialWalletManager: LiveCustodialWalletManager
+    private val nabuService: NabuService
 ) : TradingPairsProvider {
     override fun getAvailablePairs(): Single<List<CurrencyPair>> = authenticator.authenticate { sessionToken ->
         nabuService.getSwapAvailablePairs(sessionToken)
@@ -27,8 +26,6 @@ class TradingPairsProviderImpl(
             if (destination != null)
                 return@mapNotNull CurrencyPair.CryptoCurrencyPair(source, destination)
 
-            if (custodialWalletManager.isFiatCurrencySupported(parts[1]))
-                return@mapNotNull CurrencyPair.CryptoToFiatCurrencyPair(source, parts[1])
             null
         }
     }

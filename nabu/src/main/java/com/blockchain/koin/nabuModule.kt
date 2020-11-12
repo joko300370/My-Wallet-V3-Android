@@ -147,8 +147,7 @@ val nabuModule = module {
         factory {
             TradingPairsProviderImpl(
                 nabuService = get(),
-                authenticator = get(),
-                custodialWalletManager = get()
+                authenticator = get()
             )
         }.bind(TradingPairsProvider::class)
 
