@@ -118,12 +118,11 @@ val nabuModule = module {
         }.bind(CustodialWalletManager::class)
 
         factory {
-            /*NabuCachedEligibilityProvider(
+            NabuCachedEligibilityProvider(
                 nabuService = get(),
                 authenticator = get(),
                 currencyPrefs = get()
-            )*/
-            MockedEligibilityProvider(false)
+            )
         }.bind(EligibilityProvider::class)
 
         factory {

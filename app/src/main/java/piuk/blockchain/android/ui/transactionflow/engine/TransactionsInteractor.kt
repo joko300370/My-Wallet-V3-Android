@@ -84,7 +84,8 @@ class TransactionInteractor(
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
         if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else Singles.zip(coincore.getTransactionTargets(sourceAccount, action),
+        else Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, action),
             swapRepository.getSwapAvailablePairs(),
             eligibilityProvider.isEligibleForSimpleBuy()
         )
