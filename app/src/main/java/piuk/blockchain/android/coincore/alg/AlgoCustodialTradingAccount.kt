@@ -22,5 +22,5 @@ class AlgoCustodialTradingAccount(
     environmentConfig = environmentConfig
 ) {
     override val actions: AvailableActions =
-        setOf(AssetAction.ViewActivity, AssetAction.Sell, AssetAction.Swap, AssetAction.Receive)
+        setOf(AssetAction.ViewActivity, AssetAction.Sell, AssetAction.Swap)
 }
