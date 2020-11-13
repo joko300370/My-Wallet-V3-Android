@@ -138,7 +138,7 @@ open class CustodialTradingAccount(
                 if (isFunded) {
                     add(AssetAction.Sell)
                     add(AssetAction.Send)
-                    add(AssetAction.Swap)
+                    /* todo add(AssetAction.Swap) when we re-enable swap for custodial*/
                 }
             }
 

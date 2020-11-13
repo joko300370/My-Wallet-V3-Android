@@ -7,6 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
+import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -98,6 +99,8 @@ class Coincore internal constructor(
                             it.asset != sourceAccount.asset &&
                             it !is FiatAccount &&
                             it !is InterestAccount &&
+                            // fixme special case we should remove once receive is implemented
+                            it !is AlgoCryptoWalletAccount &&
                             if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
@@ -124,25 +127,25 @@ class Coincore internal constructor(
         accountGroup.map {
             it.accounts
         }.flattenAsObservable { it }
-        .flatMapSingle { a ->
-            a.receiveAddress
-                .map { it as CryptoAddress }
-                .onErrorReturn { NullCryptoAddress }
-                .map { ca ->
-                    if (ca.address.equals(address, true)) {
-                        a
-                    } else {
-                        NullCryptoAccount()
+            .flatMapSingle { a ->
+                a.receiveAddress
+                    .map { it as CryptoAddress }
+                    .onErrorReturn { NullCryptoAddress }
+                    .map { ca ->
+                        if (ca.address.equals(address, true)) {
+                            a
+                        } else {
+                            NullCryptoAccount()
+                        }
                     }
-                }
-        }.filter { it != NullCryptoAccount() }
-        .toList()
-        .flatMapMaybe {
-            if (it.isEmpty())
-                Maybe.empty<SingleAccount>()
-            else
-                Maybe.just(it.first())
-        }
+            }.filter { it != NullCryptoAccount() }
+            .toList()
+            .flatMapMaybe {
+                if (it.isEmpty())
+                    Maybe.empty<SingleAccount>()
+                else
+                    Maybe.just(it.first())
+            }
 
     fun createTransactionProcessor(
         source: SingleAccount,
