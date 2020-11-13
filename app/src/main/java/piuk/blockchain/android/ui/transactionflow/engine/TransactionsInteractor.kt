@@ -19,7 +19,6 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
-import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -82,7 +81,8 @@ class TransactionInteractor(
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
         if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else coincore.getTransactionTargets(sourceAccount, action).zipWith(swapRepository.getSwapAvailablePairs())
+        else coincore.getTransactionTargets(sourceAccount, action)
+            .zipWith(swapRepository.getSwapAvailablePairs())
             .map { (accountList, pairs) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->
@@ -96,13 +96,13 @@ class TransactionInteractor(
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
         return coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
             accountGroup.accounts.filter { account ->
-                (account is TradingAccount || account is NonCustodialAccount) &&
-                        (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false &&
-                        account.isFunded && !account.isArchived
+                (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
             }
         }.map {
             it.map { account -> account as CryptoAccount }.filter { account ->
                 account is NonCustodialAccount
+            }.filter { account ->
+                account.actions.contains(AssetAction.Swap)
             }
         }
     }
