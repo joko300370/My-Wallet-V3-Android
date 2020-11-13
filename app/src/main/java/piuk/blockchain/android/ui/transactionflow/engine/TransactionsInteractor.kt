@@ -89,6 +89,8 @@ class TransactionInteractor(
                         pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
                     }.filter { account ->
                         account is NonCustodialAccount
+                    }.filter { account ->
+                        account.actions.contains(AssetAction.Receive)
                     }
             }
 
@@ -103,6 +105,8 @@ class TransactionInteractor(
         }.map {
             it.map { account -> account as CryptoAccount }.filter { account ->
                 account is NonCustodialAccount
+            }.filter { account ->
+                account.actions.contains(AssetAction.Swap)
             }
         }
     }
