@@ -42,6 +42,7 @@ class XlmAssetUriParseTest {
     private val tiersService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
+    private val eligibilityProvider: WalletStatus = mock()
 
     private val subject = XlmAsset(
         payloadManager,

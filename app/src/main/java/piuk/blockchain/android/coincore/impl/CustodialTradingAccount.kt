@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Product
 import com.blockchain.swap.nabu.datamanagers.SwapDirection
@@ -12,6 +13,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
@@ -35,10 +37,12 @@ open class CustodialTradingAccount(
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
     private val environmentConfig: EnvironmentConfig,
+    private val eligibilityProvider: EligibilityProvider,
     override val isArchived: Boolean = false
 ) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
+    private val isEligibleForSimpleBuy = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
@@ -75,6 +79,11 @@ open class CustodialTradingAccount(
             .doOnComplete { nabuAccountExists.set(false) }
             .doOnSuccess { nabuAccountExists.set(true) }
             .toSingle(CryptoValue.zero(asset))
+            .zipWith(eligibilityProvider.isEligibleForSimpleBuy().doOnSuccess {
+                isEligibleForSimpleBuy.set(it)
+            }).map { (balance, _) ->
+                balance
+            }
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading total balance: $it")
                 CryptoValue.zero(asset)
@@ -138,7 +147,8 @@ open class CustodialTradingAccount(
                 if (isFunded) {
                     add(AssetAction.Sell)
                     add(AssetAction.Send)
-                    /* todo add(AssetAction.Swap) when we re-enable swap for custodial*/
+                    if (isEligibleForSimpleBuy.get())
+                        add(AssetAction.Swap)
                 }
             }
 

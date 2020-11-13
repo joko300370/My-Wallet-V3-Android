@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.sell
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
@@ -17,6 +18,7 @@ class BuySellFlowNavigator(
     private val simpleBuyModel: SimpleBuyModel,
     private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
+    private val eligibilityProvider: EligibilityProvider,
     private val tierService: TierService,
     private val sellFeatureFlag: FeatureFlag
 ) {
@@ -36,7 +38,7 @@ class BuySellFlowNavigator(
             else Completable.complete()
             val isGoldButNotEligible = tierService.tiers()
                 .zipWith(
-                    custodialWalletManager.isEligibleForSimpleBuy(currencyPrefs.selectedFiatCurrency)
+                    eligibilityProvider.isEligibleForSimpleBuy(forceRefresh = true)
                 ) { tier, eligible ->
                     tier.isApprovedFor(KycTierLevel.GOLD) && !eligible
                 }

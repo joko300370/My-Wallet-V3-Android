@@ -9,6 +9,7 @@ import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.sunriver.isValidXlmQr
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -41,7 +42,8 @@ internal class XlmAsset(
     crashLogger: CrashLogger,
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -52,7 +54,8 @@ internal class XlmAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset: CryptoCurrency

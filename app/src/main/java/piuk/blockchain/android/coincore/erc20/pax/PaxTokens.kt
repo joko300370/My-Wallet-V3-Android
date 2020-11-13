@@ -5,6 +5,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -41,7 +42,8 @@ internal class PaxAsset(
     crashLogger: CrashLogger,
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : Erc20TokensBase(
     payloadManager,
     paxAccount,
@@ -54,7 +56,8 @@ internal class PaxAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset = CryptoCurrency.PAX

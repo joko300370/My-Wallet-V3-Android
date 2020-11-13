@@ -235,15 +235,6 @@ class LiveCustodialWalletManager(
             response.address
         }
 
-    override fun isEligibleForSimpleBuy(fiatCurrency: String): Single<Boolean> =
-        authenticator.authenticate {
-            nabuService.isEligibleForSimpleBuy(it, fiatCurrency, PAYMENT_METHODS)
-        }.map {
-            it.simpleBuyTradingEligible
-        }.onErrorReturn {
-            false
-        }
-
     override fun isCurrencySupportedForSimpleBuy(fiatCurrency: String): Single<Boolean> =
         nabuService.getSupportedCurrencies(fiatCurrency).map {
             it.pairs.firstOrNull { it.pair.split("-")[1] == fiatCurrency } != null
@@ -786,7 +777,6 @@ class LiveCustodialWalletManager(
     }
 
     companion object {
-        private const val PAYMENT_METHODS = "BANK_ACCOUNT,PAYMENT_CARD"
 
         private val SUPPORTED_FUNDS_CURRENCIES = listOf(
             "GBP", "EUR", "USD"

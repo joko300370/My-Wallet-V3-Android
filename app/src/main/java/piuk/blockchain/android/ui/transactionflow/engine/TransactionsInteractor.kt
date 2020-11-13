@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.SwapPair
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import info.blockchain.balance.CryptoCurrency
@@ -8,6 +9,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
@@ -29,7 +31,8 @@ import timber.log.Timber
 class TransactionInteractor(
     private val coincore: Coincore,
     private val addressFactory: AddressFactory,
-    private val swapRepository: SwapRepository
+    private val swapRepository: SwapRepository,
+    private val eligibilityProvider: EligibilityProvider
 ) {
     private var transactionProcessor: TransactionProcessor? = null
 
@@ -81,14 +84,16 @@ class TransactionInteractor(
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
         if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else coincore.getTransactionTargets(sourceAccount, action)
-            .zipWith(swapRepository.getSwapAvailablePairs())
-            .map { (accountList, pairs) ->
+        else Singles.zip(coincore.getTransactionTargets(sourceAccount, action),
+            swapRepository.getSwapAvailablePairs(),
+            eligibilityProvider.isEligibleForSimpleBuy()
+        )
+            .map { (accountList, pairs, eligible) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->
                         pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
                     }.filter { account ->
-                        account is NonCustodialAccount
+                        eligible or (account is NonCustodialAccount)
                     }
             }
 
@@ -100,8 +105,6 @@ class TransactionInteractor(
             }
         }.map {
             it.map { account -> account as CryptoAccount }.filter { account ->
-                account is NonCustodialAccount
-            }.filter { account ->
                 account.actions.contains(AssetAction.Swap)
             }
         }

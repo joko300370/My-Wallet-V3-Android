@@ -170,8 +170,8 @@ abstract class CryptoNonCustodialAccount(
                 AssetAction.Swap
             ).apply {
                 if (!isFunded || isArchived) {
-                    remove(AssetAction.Swap)
                     remove(AssetAction.Send)
+                    remove(AssetAction.Swap)
                 }
             }
 

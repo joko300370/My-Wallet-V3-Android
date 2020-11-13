@@ -15,6 +15,7 @@ import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.sellFeatureFlag
@@ -523,7 +524,8 @@ val applicationModule = module {
                 tierService = get(),
                 custodialWalletManager = get(),
                 appUtil = get(),
-                coincore = get()
+                coincore = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -588,7 +590,8 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 currencyPrefs = get(),
                 sellFeatureFlag = get(sellFeatureFlag),
-                tierService = get()
+                tierService = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -808,7 +811,10 @@ val applicationModule = module {
     }.bind(MobileNoticeRemoteConfig::class)
 
     factory {
-        SwapTrendingPairsProvider()
+        SwapTrendingPairsProvider(
+            coincore = payloadScope.get(),
+            eligibilityProvider = payloadScope.get()
+        )
     }.bind(TrendingPairsProvider::class)
 
     factory { DateUtil(get()) }

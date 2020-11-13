@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.alg
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
@@ -13,14 +14,18 @@ class AlgoCustodialTradingAccount(
     label: String,
     exchangeRates: ExchangeRateDataManager,
     custodialWalletManager: CustodialWalletManager,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    eligibilityProvider: EligibilityProvider
 ) : CustodialTradingAccount(
     asset = cryptoCurrency,
     label = label,
     exchangeRates = exchangeRates,
     custodialWalletManager = custodialWalletManager,
-    environmentConfig = environmentConfig
+    environmentConfig = environmentConfig,
+    eligibilityProvider = eligibilityProvider
 ) {
     override val actions: AvailableActions =
-        setOf(AssetAction.ViewActivity, AssetAction.Sell, AssetAction.Swap)
+        super.actions.toMutableSet().apply {
+            remove(AssetAction.Send)
+        }
 }

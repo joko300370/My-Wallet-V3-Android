@@ -9,6 +9,7 @@ import com.blockchain.swap.nabu.datamanagers.OrderOutput
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.WithdrawLocksRepository
@@ -34,6 +35,7 @@ class SimpleBuyInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
+    private val eligibilityProvider: EligibilityProvider,
     private val coincore: Coincore
 ) {
 
@@ -111,7 +113,7 @@ class SimpleBuyInteractor(
             .flatMap {
                 when {
                     it.isApprovedFor(KycTierLevel.GOLD) ->
-                        custodialWalletManager.isEligibleForSimpleBuy(fiatCurrency).map { eligible ->
+                        eligibilityProvider.isEligibleForSimpleBuy(forceRefresh = true).map { eligible ->
                             if (eligible) {
                                 SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)
                             } else {
@@ -140,8 +142,7 @@ class SimpleBuyInteractor(
 
         return tierService.tiers().flatMap {
             when {
-                it.isApprovedFor(KycTierLevel.GOLD) -> custodialWalletManager.isEligibleForSimpleBuy(
-                    fiatCurrency)
+                it.isApprovedFor(KycTierLevel.GOLD) -> eligibilityProvider.isEligibleForSimpleBuy(forceRefresh = true)
                     .map { eligible ->
                         if (eligible) {
                             SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)
