@@ -27,7 +27,6 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 import java.math.RoundingMode
@@ -78,7 +77,9 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
             amount_sheet_use_max.text = customiser.enterAmountMaxButton(newState)
-            amount_sheet_use_max.goneIf { customiser.shouldDisableInput(state.errorState) }
+            if (customiser.shouldDisableInput(state.errorState)) {
+                amount_sheet_use_max.gone()
+            }
             updatePendingTxDetails(newState)
 
             customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {
@@ -202,13 +203,15 @@ class EnterAmountSheet : TransactionFlowSheet() {
     }
 
     private fun onUseMaxClick() {
-        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat)
+        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat &&
+            state.maxSpendable is CryptoValue
+        ) {
             dialogView.amount_sheet_input.configuration =
                 dialogView.amount_sheet_input.configuration.copy(
                     input = CurrencyType.Crypto,
                     output = CurrencyType.Crypto
                 )
-
+        }
         dialogView.amount_sheet_input.showValue(
             state.maxSpendable
         )
@@ -225,15 +228,14 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
     private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
         if (input == CurrencyType.Crypto || newState.amount.isPositive) {
-            newState.pendingTx?.selectedFiat?.let {
-                configuration = FiatCryptoViewConfiguration(
-                    input = CurrencyType.Crypto,
-                    output = CurrencyType.Crypto,
-                    fiatCurrency = it,
-                    cryptoCurrency = newState.sendingAccount.asset,
-                    predefinedAmount = newState.amount
-                )
-            }
+            val selectedFiat = newState.pendingTx?.selectedFiat ?: return
+            configuration = FiatCryptoViewConfiguration(
+                input = CurrencyType.Crypto,
+                output = CurrencyType.Crypto,
+                fiatCurrency = selectedFiat,
+                cryptoCurrency = newState.sendingAccount.asset,
+                predefinedAmount = newState.amount
+            )
         } else {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             val fiatRate = newState.fiatRate ?: return
@@ -247,7 +249,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
             )
         }
         showKeyboard()
-        amount_sheet_use_max.visible()
+        dialogView.amount_sheet_use_max.visible()
     }
 
     private fun showKeyboard() {

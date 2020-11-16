@@ -103,7 +103,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             is AccountGroup -> account.accounts.filterIsInstance<CryptoAccount>()
                 .firstOrNull()?.asset
             else -> null
-        } ?: throw IllegalStateException("Unsupported account type")
+        } ?: throw IllegalStateException("Unsupported account type ${account::class.java}")
 }
 
 class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
