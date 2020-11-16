@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -46,7 +47,8 @@ internal class BchAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -57,7 +59,8 @@ internal class BchAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentSettings
+    environmentSettings,
+    eligibilityProvider
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH

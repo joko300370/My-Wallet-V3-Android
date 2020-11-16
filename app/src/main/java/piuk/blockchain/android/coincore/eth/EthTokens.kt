@@ -5,6 +5,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -40,7 +41,8 @@ internal class EthAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -51,7 +53,8 @@ internal class EthAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset: CryptoCurrency

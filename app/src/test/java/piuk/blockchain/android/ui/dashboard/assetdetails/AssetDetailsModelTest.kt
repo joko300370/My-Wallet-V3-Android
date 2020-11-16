@@ -30,7 +30,8 @@ class AssetDetailsModelTest {
             crashLogger = mock(),
             tiersService = mock(),
             environmentConfig = mock(),
-            walletPreferences = mock()
+            walletPreferences = mock(),
+            eligibilityProvider = mock()
         )
     )
     private val interactor: AssetDetailsInteractor = mock()

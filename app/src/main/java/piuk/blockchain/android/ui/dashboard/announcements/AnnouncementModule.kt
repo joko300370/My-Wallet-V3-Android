@@ -226,9 +226,8 @@ val dashboardAnnouncementsModule = module {
         factory {
             SellIntroAnnouncement(
                 dismissRecorder = get(),
-                custodialWalletManager = get(),
+                eligibilityProvider = get(),
                 sellFeatureFlag = get(sellFeatureFlag),
-                currencyPrefs = get(),
                 coincore = get(),
                 analytics = get()
             )

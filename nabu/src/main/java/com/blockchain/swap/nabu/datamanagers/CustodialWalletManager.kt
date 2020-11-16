@@ -98,8 +98,6 @@ interface CustodialWalletManager {
 
     fun getCustodialAccountAddress(cryptoCurrency: CryptoCurrency): Single<String>
 
-    fun isEligibleForSimpleBuy(fiatCurrency: String): Single<Boolean>
-
     fun isCurrencySupportedForSimpleBuy(
         fiatCurrency: String
     ): Single<Boolean>

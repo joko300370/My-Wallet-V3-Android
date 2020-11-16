@@ -1,9 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
@@ -19,11 +18,10 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 class SellIntroAnnouncementTest {
 
     private val dismissRecorder: DismissRecorder = mock()
-    private val custodialWalletManager: CustodialWalletManager = mock()
     private val sellFeatureFlag: FeatureFlag = mock()
-    private val currencyPrefs: CurrencyPrefs = mock()
     private val coincore: Coincore = mock()
     private val analytics: Analytics = mock()
+    private val eligibilityProvider: EligibilityProvider = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
 
     private lateinit var subject: SellIntroAnnouncement
@@ -36,9 +34,8 @@ class SellIntroAnnouncementTest {
         subject =
             SellIntroAnnouncement(
                 dismissRecorder = dismissRecorder,
-                custodialWalletManager = custodialWalletManager,
+                eligibilityProvider = eligibilityProvider,
                 sellFeatureFlag = sellFeatureFlag,
-                currencyPrefs = currencyPrefs,
                 coincore = coincore,
                 analytics = analytics
             )
@@ -58,9 +55,9 @@ class SellIntroAnnouncementTest {
     @Test
     fun `should show, when not already shown`() {
         whenever(dismissEntry.isDismissed).thenReturn(false)
-        whenever(custodialWalletManager.isEligibleForSimpleBuy(any())).thenReturn(Single.just(true))
+        whenever(eligibilityProvider.isEligibleForSimpleBuy(any(), any())).thenReturn(Single.just(true))
         whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("GBP")
+        whenever(eligibilityProvider.defCurrency).thenReturn("GBP")
 
         val account: BtcCryptoWalletAccount = mock()
         whenever(account.isFunded).thenReturn(true)

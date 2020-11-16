@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
@@ -42,7 +43,8 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     private val tiersService: TierService,
-    protected val environmentConfig: EnvironmentConfig
+    protected val environmentConfig: EnvironmentConfig,
+    private val eligibilityProvider: EligibilityProvider
 ) : CryptoAsset {
 
     private val accounts = mutableListOf<SingleAccount>()
@@ -110,7 +112,8 @@ internal abstract class CryptoAssetBase(
                 label = labels.getDefaultCustodialWalletLabel(asset),
                 exchangeRates = exchangeRates,
                 custodialWalletManager = custodialManager,
-                environmentConfig = environmentConfig
+                environmentConfig = environmentConfig,
+                eligibilityProvider = eligibilityProvider
             ))
         )
 
@@ -169,17 +172,17 @@ internal abstract class CryptoAssetBase(
 
     private fun getInterestTargets(): Maybe<SingleAccountList> =
         tiersService.tiers().flatMapMaybe { tier ->
-        if (tier.isApprovedFor(KycTierLevel.GOLD)) {
-            val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
-            if (interestAccounts.isNotEmpty()) {
-                Maybe.just(interestAccounts)
+            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
+                val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
+                if (interestAccounts.isNotEmpty()) {
+                    Maybe.just(interestAccounts)
+                } else {
+                    Maybe.empty()
+                }
             } else {
                 Maybe.empty()
             }
-        } else {
-            Maybe.empty()
         }
-    }
 
     private fun getCustodialTargets(): Maybe<SingleAccountList> =
         accountGroup(AssetFilter.Custodial)
