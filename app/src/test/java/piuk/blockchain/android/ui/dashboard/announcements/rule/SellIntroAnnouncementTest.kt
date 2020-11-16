@@ -1,9 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
@@ -20,9 +18,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 class SellIntroAnnouncementTest {
 
     private val dismissRecorder: DismissRecorder = mock()
-    private val custodialWalletManager: CustodialWalletManager = mock()
     private val sellFeatureFlag: FeatureFlag = mock()
-    private val currencyPrefs: CurrencyPrefs = mock()
     private val coincore: Coincore = mock()
     private val analytics: Analytics = mock()
     private val eligibilityProvider: EligibilityProvider = mock()
@@ -61,7 +57,7 @@ class SellIntroAnnouncementTest {
         whenever(dismissEntry.isDismissed).thenReturn(false)
         whenever(eligibilityProvider.isEligibleForSimpleBuy(any(), any())).thenReturn(Single.just(true))
         whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("GBP")
+        whenever(eligibilityProvider.defCurrency).thenReturn("GBP")
 
         val account: BtcCryptoWalletAccount = mock()
         whenever(account.isFunded).thenReturn(true)
