@@ -1,14 +1,12 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -16,22 +14,15 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
-import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
-import java.lang.IllegalStateException
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -40,67 +31,16 @@ private const val USER_TIER = "USER_TIER"
 private val PendingTx.userTier: KycTiers
     get() = (this.engineState[USER_TIER] as KycTiers)
 
-const val QUOTE_SUB = "quote_sub"
-private val PendingTx.quoteSub: Disposable?
-    get() = (this.engineState[QUOTE_SUB] as? Disposable)
-
 abstract class SwapEngineBase(
-    private val quotesProvider: QuotesProvider,
+    quotesProvider: QuotesProvider,
     private val walletManager: CustodialWalletManager,
-    private val kycTierService: TierService
-) : TxEngine() {
+    kycTierService: TierService
+) : QuotedEngine(quotesProvider, kycTierService, walletManager) {
 
-    protected abstract val direction: TransferDirection
-
-    protected lateinit var quotesEngine: TransferQuotesEngine
     private lateinit var minApiLimit: Money
-
-    override fun start(
-        sourceAccount: CryptoAccount,
-        txTarget: TransactionTarget,
-        exchangeRates: ExchangeRateDataManager,
-        refreshTrigger: RefreshTrigger
-    ) {
-        super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
-        quotesEngine = TransferQuotesEngine(quotesProvider, direction, pair)
-    }
 
     val target: CryptoAccount
         get() = txTarget as CryptoAccount
-
-    protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
-        Singles.zip(
-            kycTierService.tiers(),
-            walletManager.getSwapLimits(userFiat)
-        ) { tier, limits ->
-
-            val exchangeRate = ExchangeRate.CryptoToFiat(
-                sourceAccount.asset,
-                userFiat,
-                exchangeRates.getLastPrice(sourceAccount.asset, userFiat).toBigDecimal()
-            )
-
-            minApiLimit = exchangeRate.inverse()
-                .convert(limits.minLimit) as CryptoValue
-
-            pendingTx.copy(
-                minLimit = minLimit(pricedQuote.price),
-                maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue).withUserDpRounding(
-                    RoundingMode.FLOOR),
-                engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
-            )
-        }
-
-    protected fun Single<PendingTx>.handlePendingOrdersError(pendingTx: PendingTx): Single<PendingTx> =
-        this.onErrorResumeNext {
-            if (it is NabuApiException && it.getErrorCode() == NabuErrorCodes.PendingOrdersLimitReached) {
-                Single.just(
-                    pendingTx.copy(
-                        validationState = ValidationState.PENDING_ORDERS_LIMIT_REACHED
-                    )
-                )
-            } else Single.error(it)
-        }
 
     override fun targetExchangeRate(): Observable<ExchangeRate> =
         quotesEngine.pricedQuote.map {
@@ -110,6 +50,29 @@ abstract class SwapEngineBase(
                 rate = it.price.toBigDecimal()
             )
         }
+
+    override fun onLimitsForTierFetched(
+        tier: KycTiers,
+        limits: TransferLimits,
+        pendingTx: PendingTx,
+        pricedQuote: PricedQuote
+    ): PendingTx {
+        val exchangeRate = ExchangeRate.CryptoToFiat(
+            sourceAccount.asset,
+            userFiat,
+            exchangeRates.getLastPrice(sourceAccount.asset, userFiat).toBigDecimal()
+        )
+
+        minApiLimit = exchangeRate.inverse()
+            .convert(limits.minLimit) as CryptoValue
+
+        return pendingTx.copy(
+            minLimit = minLimit(pricedQuote.price),
+            maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue).withUserDpRounding(
+                RoundingMode.FLOOR),
+            engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
+        )
+    }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
@@ -140,30 +103,8 @@ abstract class SwapEngineBase(
             TxValidationFailure(ValidationState.OVER_SILVER_TIER_LIMIT)
         }
 
-    private fun Money.withUserDpRounding(roundingMode: RoundingMode): CryptoValue =
-        (this as? CryptoValue)?.let {
-            CryptoValue.fromMajor(it.currency, it.toBigDecimal().setScale(pair.source.userDp, roundingMode))
-        } ?: throw IllegalStateException("Method only support cryptovalues")
-
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
-
-    protected fun Single<PendingTx>.updateQuotePrice(): Single<PendingTx> =
-        doOnSuccess {
-            quotesEngine.updateAmount(it.amount)
-        }
-
-    protected fun Single<PendingTx>.clearConfirmations(): Single<PendingTx> =
-        map {
-            it.quoteSub?.dispose()
-            it.copy(
-                confirmations = emptyList(),
-                engineState = it.engineState.toMutableMap().apply { remove(QUOTE_SUB) }.toMap()
-            )
-        }
-
-    private val pair: CurrencyPair.CryptoCurrencyPair
-        get() = CurrencyPair.CryptoCurrencyPair(sourceAccount.asset, target.asset)
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().flatMap { pricedQuote ->
@@ -230,27 +171,6 @@ abstract class SwapEngineBase(
         }
     }
 
-    private fun startQuotesFetchingIfNotStarted(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            if (pendingTx.quoteSub == null) {
-                pendingTx.copy(
-                    engineState = pendingTx.engineState.copyAndPut(
-                        QUOTE_SUB, startQuotesFetching()
-                    )
-                )
-            } else {
-                pendingTx
-            }
-        )
-
-    private fun startQuotesFetching(): Disposable =
-        quotesEngine.pricedQuote.doOnNext {
-            refreshConfirmations(true)
-        }.emptySubscribe()
-
-    override fun startConfirmationsUpdate(pendingTx: PendingTx): Single<PendingTx> =
-        startQuotesFetchingIfNotStarted(pendingTx)
-
     protected fun createOrder(pendingTx: PendingTx): Single<SwapOrder> =
         target.receiveAddress.flatMap {
             walletManager.createSwapOrder(
@@ -263,22 +183,13 @@ abstract class SwapEngineBase(
             disposeQuotesFetching(pendingTx)
         }
 
-    private fun disposeQuotesFetching(pendingTx: PendingTx) {
-        pendingTx.quoteSub?.dispose()
-        quotesEngine.stop()
-    }
-
-    override fun stop(pendingTx: PendingTx) {
-        disposeQuotesFetching(pendingTx)
-    }
-
     private fun TransferDirection.requiresDestinationAddress() =
         this == TransferDirection.ON_CHAIN || this == TransferDirection.TO_USERKEY
 
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money, staticFee: Money): Money =
         CryptoValue.fromMajor(
-            pair.source,
-            (networkFee.toBigDecimal().divide(price.toBigDecimal(), pair.source.dp, RoundingMode.HALF_UP)).plus(
+            sourceAccount.asset,
+            (networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAccount.asset.dp, RoundingMode.HALF_UP)).plus(
                 staticFee.toBigDecimal())
         )
 }

@@ -2,12 +2,11 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.PriceTier
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
-import java.util.*
+import java.util.Currency
 
 class PricesInterpolator(
     private val interpolator: Interpolator = LinearInterpolator(),

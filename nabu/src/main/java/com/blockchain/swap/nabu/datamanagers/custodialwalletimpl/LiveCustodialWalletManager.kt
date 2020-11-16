@@ -26,7 +26,7 @@ import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapLimits
+import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
 import com.blockchain.swap.nabu.datamanagers.TransactionState
@@ -671,16 +671,16 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getSwapLimits(currency: String): Single<SwapLimits> =
+    override fun getSwapLimits(currency: String): Single<TransferLimits> =
         authenticator.authenticate {
             nabuService.getSwapLimits(
                 it,
                 currency
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
-                    SwapLimits(currency)
+                    TransferLimits(currency)
                 } else {
-                    SwapLimits(
+                    TransferLimits(
                         minLimit = FiatValue.fromMinor(currency, response.minOrder?.toLong() ?: 0L),
                         maxOrder = FiatValue.fromMinor(currency, response.maxOrder?.toLong() ?: 0L),
                         maxLimit = FiatValue.fromMinor(currency, response.maxPossibleOrder?.toLong() ?: 0L)

@@ -169,8 +169,12 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(direction: TransferDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
-            Single<SwapOrder>
+    fun createSwapOrder(
+        direction: TransferDirection,
+        quoteId: String,
+        volume: Money,
+        destinationAddress: String? = null
+    ): Single<SwapOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -180,7 +184,7 @@ interface CustodialWalletManager {
         product: Product
     ): Completable
 
-    fun getSwapLimits(currency: String): Single<SwapLimits>
+    fun getSwapLimits(currency: String): Single<TransferLimits>
 
     fun getSwapTrades(): Single<List<SwapOrder>>
 
@@ -194,7 +198,7 @@ interface CustodialWalletManager {
         success: Boolean
     ): Completable
 
-     fun isFiatCurrencySupported(destination: String): Boolean
+    fun isFiatCurrencySupported(destination: String): Boolean
 }
 
 data class InterestActivityItem(
@@ -492,7 +496,7 @@ sealed class CurrencyPair(val rawValue: String) {
         CurrencyPair("${source.networkTicker}-${destination.networkTicker}")
 
     data class CryptoToFiatCurrencyPair(val source: CryptoCurrency, val destination: String) :
-        CurrencyPair("${source.networkTicker}-${destination}")
+        CurrencyPair("${source.networkTicker}-$destination")
 
     fun toSourceMoney(value: BigInteger): Money =
         when (this) {
@@ -518,7 +522,7 @@ data class PriceTier(
     val price: Money
 )
 
-data class SwapLimits(
+data class TransferLimits(
     val minLimit: FiatValue,
     val maxOrder: FiatValue,
     val maxLimit: FiatValue

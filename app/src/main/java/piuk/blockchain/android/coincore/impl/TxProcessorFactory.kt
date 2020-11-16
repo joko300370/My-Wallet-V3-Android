@@ -16,7 +16,7 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
@@ -164,7 +164,8 @@ class TxProcessorFactory(
                     txTarget = target,
                     engine = CustodialSellTxEngine(
                         walletManager = walletManager,
-                        quotesProvider = quotesProvider
+                        quotesProvider = quotesProvider,
+                        kycTierService = kycTierService
                     )
                 )
             )

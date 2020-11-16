@@ -13,7 +13,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapLimits
+import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -112,7 +112,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 trendingPairsProvider.getTrendingPairs(),
                 walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() }
-            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: SwapLimits, orders: List<SwapOrder> ->
+            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: TransferLimits, orders: List<SwapOrder> ->
                 SwapComposite(
                     tiers,
                     pairs,
@@ -161,7 +161,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     })
     }
 
-    private fun showKycUpsellIfEligible(limits: SwapLimits) {
+    private fun showKycUpsellIfEligible(limits: TransferLimits) {
         val usedUpLimitPercent = (limits.maxLimit / limits.maxOrder).toFloat() * 100
         if (usedUpLimitPercent >= KYC_UPSELL_PERCENTAGE && !walletPrefs.hasSeenSwapPromo) {
             analytics.logEvent(SwapAnalyticsEvents.SwapSilverLimitSheet)
@@ -271,7 +271,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private data class SwapComposite(
         val tiers: KycTiers,
         val pairs: List<TrendingPair>,
-        val limits: SwapLimits,
+        val limits: TransferLimits,
         val orders: List<SwapOrder>
     )
 }

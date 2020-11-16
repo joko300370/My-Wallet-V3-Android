@@ -155,7 +155,8 @@ class ActivityDetailsInteractor(
                     To(it.label)
                 }
             TransferDirection.INTERNAL,
-            TransferDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial).toSingle()
+            TransferDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial)
+                .toSingle()
                 .map {
                     To(it.selectFirstAccount().label)
                 }
