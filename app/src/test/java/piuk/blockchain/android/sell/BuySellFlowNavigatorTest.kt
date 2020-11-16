@@ -3,6 +3,7 @@ package piuk.blockchain.android.sell
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -26,16 +27,17 @@ class BuySellFlowNavigatorTest {
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val sellFeatureFlag: FeatureFlag = mock()
     private val tierService: TierService = mock()
+    private val eligibilityProvider: EligibilityProvider = mock()
     private lateinit var subject: BuySellFlowNavigator
 
     @Before
     fun setUp() {
         subject = BuySellFlowNavigator(
-            simpleBuyModel, currencyPrefs, custodialWalletManager, tierService, sellFeatureFlag
+            simpleBuyModel, currencyPrefs, custodialWalletManager, eligibilityProvider, tierService, sellFeatureFlag
         )
         whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(tierService.tiers()).thenReturn(Single.just(KycTiers.default()))
-        whenever(custodialWalletManager.isEligibleForSimpleBuy(any())).thenReturn(Single.just(true))
+        whenever(eligibilityProvider.isEligibleForSimpleBuy(any(), any())).thenReturn(Single.just(true))
     }
 
     @Test
