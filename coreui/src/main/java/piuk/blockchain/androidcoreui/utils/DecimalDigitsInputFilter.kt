@@ -12,11 +12,11 @@ class DecimalDigitsInputFilter(
     private val prefixOrSuffix: String = ""
 ) : InputFilter {
 
-    private val decimal = DecimalFormatSymbols(Locale.getDefault()).decimalSeparator.toString()
-    private val thousands = DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString()
+    private val decimalSeparator = DecimalFormatSymbols(Locale.getDefault()).decimalSeparator.toString()
 
     private val mPattern =
-        Pattern.compile("^(([0-9]{0,3})*($thousands[0-9]{3})*(\\$decimal[0-9]{0,$digitsAfterZero})?|\\$decimal[0-9]+)$")
+        Pattern.compile("-?[0-9]{0," + digitsBeforeZero + "}+((\\$decimalSeparator[0-9]{0," +
+                digitsAfterZero + "})?)||(\\$decimalSeparator)?")
 
     override fun filter(
         source: CharSequence,
