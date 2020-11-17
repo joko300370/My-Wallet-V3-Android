@@ -37,8 +37,7 @@ open class CustodialTradingAccount(
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
     private val environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider,
-    override val isArchived: Boolean = false
+    private val eligibilityProvider: EligibilityProvider
 ) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
@@ -144,7 +143,7 @@ open class CustodialTradingAccount(
             mutableSetOf(
                 AssetAction.ViewActivity
             ).apply {
-                if (isFunded) {
+                if (isFunded && !isArchived) {
                     add(AssetAction.Sell)
                     add(AssetAction.Send)
                     if (isEligibleForSimpleBuy.get())

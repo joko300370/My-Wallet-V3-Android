@@ -10,6 +10,7 @@ import com.blockchain.logging.DigitalTrust
 
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.utils.extensions.isValidPin
 
 interface AccessState {
 
@@ -42,11 +43,8 @@ interface AccessState {
 
     companion object {
         const val LOGOUT_ACTION = "info.blockchain.wallet.LOGOUT"
-        const val PIN_LENGTH = 4
     }
 }
-
-fun String.isValidPin(): Boolean = (this != "0000" && this.length == AccessState.PIN_LENGTH)
 
 internal class AccessStateImpl(
     val context: Context,

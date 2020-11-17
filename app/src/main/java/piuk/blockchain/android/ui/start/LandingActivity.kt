@@ -65,7 +65,7 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
     private fun showFundRecoveryWarning() =
         showAlert(AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
-            .setMessage(R.string.recover_funds_warning_message)
+            .setMessage(R.string.recover_funds_warning_message_1)
             .setPositiveButton(R.string.dialog_continue) { _, _ -> startRecoverFundsActivity() }
             .setNegativeButton(android.R.string.cancel) { _, _ -> clearAlert() }
             .create()

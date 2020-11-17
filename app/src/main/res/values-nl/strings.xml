@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Veld mag niet leeg zijn.</string>
   <string name="settings_error_updating">Fout bij updaten van instellingen, probeer het opnieuw</string>
   <string name="request_camera_permission">Cameratoegang is vereist.</string>
-  <string name="request_camera_permission_title">Toegang tot de camera</string>
-  <string name="request_location_permission">Locatietoegang is vereist.</string>
-  <string name="request_write_storage_permission">Externe opslag schrijven is vereist.</string>
-  <string name="request_write_and_camera_storage_permission_description">Schrijf externe opslag 
- en camera zijn vereist om KYC-documenten te uploaden. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Schrijf opslag en camera 
- rechten 
-</string>
   <string name="not_specified">niet gespecificeerd</string>
   <string name="update_failed">Kan niet updaten.</string>
   <string name="verify_mobile">Verifieer mobiel</string>

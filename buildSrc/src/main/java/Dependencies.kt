@@ -75,7 +75,7 @@ object Versions {
     const val protobuf = "3.0.1"
     const val findbugs = "3.0.2"
     const val guava = "28.0-android"
-    const val dexter = "5.0.0"
+    const val dexter = "6.2.1"
 
     // Custom Views
     const val charts = "3.1.0"

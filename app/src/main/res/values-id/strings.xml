@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">Bidang tidak boleh kosong.</string>
   <string name="settings_error_updating">Kesalahan memperbarui pengaturan, silakan coba lagi</string>
   <string name="request_camera_permission">Diperlukan akses kamera.</string>
-  <string name="request_camera_permission_title">Akses kamera</string>
-  <string name="request_location_permission">Diperlukan akses lokasi.</string>
-  <string name="request_write_storage_permission">Diperlukan penyimpanan eksternal tulis.</string>
-  <string name="request_write_and_camera_storage_permission_description">Tulis penyimpanan eksternal 
- dan kamera diperlukan untuk mengunggah dokumen KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Penyimpanan tulis dan kamera 
- izin 
-</string>
   <string name="not_specified">tidak ditentukan</string>
   <string name="update_failed">Gagal memperbarui.</string>
   <string name="verify_mobile">Verifikasi Seluler</string>

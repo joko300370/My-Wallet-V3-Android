@@ -254,7 +254,6 @@
     <string name="disable">Desativar</string>
 
     <string name="request_camera_permission">O acesso à câmera é necessário.</string>
-    <string name="request_location_permission">Acesso à sua Localização é necessário.</string>
     <string name="not_specified">não especificado</string>
     <string name="update_failed">Erro ao atualizar.</string>
     <string name="verify_mobile">Verificar Dispositivo Móvel</string>
@@ -303,7 +302,6 @@
     <string name="disable_2fa_first">Por favor, desabilite primeiro a verificação em 2 etapas via SMS, nas configurações de segurança.</string>
     <string name="settings_field_cant_be_empty">O campo não pode estar vazio.</string>
     <string name="settings_error_updating">Erro ao atualizar configurações. Por favor, tente novamente.</string>
-    <string name="request_write_storage_permission">Armazenamento externo de gravação é necessário.</string>
     <string name="verify_sms_failed">Código inválido. Por favor, tente novamente.</string>
     <string name="enable_fingerprint">Desbloqueio por Impressão Digital</string>
 

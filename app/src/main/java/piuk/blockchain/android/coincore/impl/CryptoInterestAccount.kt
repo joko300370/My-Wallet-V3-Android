@@ -30,8 +30,7 @@ internal class CryptoInterestAccount(
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager,
-    private val environmentConfig: EnvironmentConfig,
-    override val isArchived: Boolean = false
+    private val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase(), InterestAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)

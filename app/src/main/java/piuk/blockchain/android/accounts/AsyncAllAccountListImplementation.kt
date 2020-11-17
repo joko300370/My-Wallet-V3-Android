@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.Single
 
+@Deprecated("Only used in old swap")
 internal class AsyncAllAccountListImplementation(
     private val cryptoAccountsMap: Map<CryptoCurrency, AccountList>
 ) : AsyncAllAccountList {

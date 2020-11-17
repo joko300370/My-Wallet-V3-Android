@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">フィールドを空にすることはできません。</string>
   <string name="settings_error_updating">設定の更新中にエラーが発生しました。もう一度お試しください</string>
   <string name="request_camera_permission">カメラへのアクセスが必要です。</string>
-  <string name="request_camera_permission_title">カメラへのアクセス</string>
-  <string name="request_location_permission">ロケーションへのアクセスが必要です。</string>
-  <string name="request_write_storage_permission">外部ストレージの書き込みが必要です。</string>
-  <string name="request_write_and_camera_storage_permission_description">外部ストレージを書き込む
- KYCドキュメントをアップロードするにはカメラが必要です。 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">ストレージとカメラを書き込む
-許可
-</string>
   <string name="not_specified">指定されていない</string>
   <string name="update_failed">更新に失敗しました。</string>
   <string name="verify_mobile">モバイルを確認</string>

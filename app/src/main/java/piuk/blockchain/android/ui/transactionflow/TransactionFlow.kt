@@ -36,8 +36,7 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 
     private var fragmentManager: FragmentManager? = null
     private var host: FlowHost? = null
-    private var bottomSheetTag: String =
-        SHEET_FRAGMENT_TAG
+    private var bottomSheetTag: String = SHEET_FRAGMENT_TAG
 
     interface FlowHost {
         fun onFlowFinished()
@@ -90,7 +89,6 @@ class TransactionFlow(
         fragmentManager: FragmentManager,
         host: FlowHost
     ) {
-
         super.startFlow(fragmentManager, host)
         // Create the send scope
         openScope()

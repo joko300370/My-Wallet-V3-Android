@@ -169,8 +169,8 @@
     </string>
     <string name="wallet_id">Wallet ID</string>
     <string name="recover_funds">Recover Funds</string>
-    <string name="recover_funds_warning_message">You should always pair or login if you have access
-        to your Wallet ID and password. Recovering your funds will create a new Wallet ID. Would you
+    <string name="recover_funds_warning_message_1">You should always pair or login if you have access
+        to your Wallet ID and password. Recovering your funds may create a new Wallet ID. Would you
         like to continue?
     </string>
     <string name="recover_funds_instructions">Enter your 12 backup words with spaces to recover your
@@ -504,15 +504,6 @@
     <string name="settings_error_updating">Error updating settings, please try again</string>
     <string name="request_camera_permission">Camera access is required.</string>
 
-    <string name="request_camera_permission_title">Camera access</string>
-    <string name="request_location_permission">Location access is required.</string>
-    <string name="request_write_storage_permission">Write external storage is required.</string>
-    <string name="request_write_and_camera_storage_permission_description">Write external storage
-        and camera are required to upload KYC documents.
-    </string>
-    <string name="request_write_and_camera_storage_permission_title">Write storage and camera
-        permissions
-    </string>
     <string name="not_specified">not specified</string>
     <string name="update_failed">Failed to update.</string>
     <string name="verify_mobile">Verify Mobile</string>
@@ -913,11 +904,6 @@
     <string name="confirm_currency_message">Please select which currency’s QR code you are scanning.</string>
 
     <string name="testnet_warning">Warning! This is the testnet3 blockchain.</string>
-
-    <!-- TESTNET -->
-    <!--    <string name="buy_sell">Buy &amp; Sell</string>-->
-
-    <!--    <string name="buy_sell_create_account">Create Account</string>-->
 
     <!-- SUNRIVER -->
     <string name="sunriver_invalid_url_message">Your XLM has already been claimed.</string>
@@ -2116,7 +2102,15 @@
     <string name="receive">Receive</string>
     <string name="in_progress">In-Progress</string>
     <string name="swap_direction">%1$s->%2$s</string>
+
+    <string name="scan_qr">Scan a QR Code</string>
+    <string name="qr_activity_hint_any_asset">Scan a CryptoCurrency address or a BitPay invoice</string>
+    <string name="qr_activity_hint_asset_address">Be sure to only scan a %1$s QR Code</string>
+    <string name="qr_activity_hint_bitpay">Scan a BitPay invoice</string>
+    <string name="qr_activity_hint_import_wallet">Scan a wallet private key</string>
+    <string name="qr_activity_hint_pairing_code">Scan a web pairing QR code</string>
+    <string name="qr_activity_hint_new_web_login">Log in to web</string>
+
     <string name="security_locked_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
-    <!-- Fee options -->
 
 </resources>

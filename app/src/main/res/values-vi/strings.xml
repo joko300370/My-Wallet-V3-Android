@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">Trường không thể để trống.</string>
   <string name="settings_error_updating">Lỗi cập nhật cài đặt, vui lòng thử lại</string>
   <string name="request_camera_permission">Cần có quyền truy cập máy ảnh.</string>
-  <string name="request_camera_permission_title">Truy cập máy ảnh</string>
-  <string name="request_location_permission">Yêu cầu truy cập vị trí.</string>
-  <string name="request_write_storage_permission">Viết lưu trữ bên ngoài là cần thiết.</string>
-  <string name="request_write_and_camera_storage_permission_description">Viết bộ nhớ ngoài 
- và máy ảnh được yêu cầu để tải lên các tài liệu KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Viết lưu trữ và máy ảnh 
- quyền 
-</string>
   <string name="not_specified">không được chỉ định</string>
   <string name="update_failed">Không thể cập nhật.</string>
   <string name="verify_mobile">Xác minh di động</string>

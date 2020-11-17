@@ -48,7 +48,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
-import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.account.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
@@ -63,6 +63,7 @@ import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
+import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
@@ -78,7 +79,8 @@ import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.zxing.CaptureActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
@@ -97,8 +99,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     DialogFlow.FlowHost {
 
     override val presenter: MainPresenter by scopedInject()
+    private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
     private val compositeDisposable = CompositeDisposable()
+
     override val view: MainView = this
 
     var drawerOpen = false
@@ -242,13 +246,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 true
             }
             R.id.action_qr_main -> {
-                val fragment = currentFragment::class.simpleName ?: "unknown"
-                QrScanHandler.requestScanPermissions(
-                    activity = this,
-                    rootView = parent_constraint_layout
-                ) {
-                    QrScanHandler.startQrScanActivity(this, appUtil)
-                }
+                QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
                 analytics.logEvent(SendAnalytics.QRButtonClicked)
                 true
             }
@@ -261,8 +259,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         // We create a lambda so we handle the result after the view is attached to the presenter (onResume)
         activityResultAction = {
             when (requestCode) {
-                QrScanHandler.SCAN_URI_RESULT -> {
-                    val scanData = data?.getStringExtra(CaptureActivity.SCAN_RESULT)
+                QrScanActivity.SCAN_URI_RESULT -> {
+                    val scanData = data.getRawScanData()
                     if (resultCode == RESULT_OK && scanData != null) {
                         presenter.processScanResult(scanData)
                     }
@@ -552,7 +550,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             disambiguateSendScan(targets)
         } else {
             val targetAddress = targets.first()
-            QrScanHandler.selectSourceAccount(this, targetAddress)
+            qrProcessor.selectSourceAccount(this, targetAddress)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { sourceAccount ->
@@ -588,7 +586,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     @SuppressLint("CheckResult")
     private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
-        QrScanHandler.disambiguateScan(this, targets)
+        qrProcessor.disambiguateScan(this, targets)
             .subscribeBy(
                 onSuccess = {
                     startTransactionFlowWithTarget(listOf(it))

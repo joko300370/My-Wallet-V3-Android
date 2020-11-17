@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.bch.BchCryptoWalletAccount
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -53,7 +52,6 @@ class AccountPresenter internal constructor(
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
     private val metadataManager: MetadataManager,
-    private val appUtil: AppUtil,
     private val privateKeyFactory: PrivateKeyFactory,
     private val environmentSettings: EnvironmentConfig,
     private val analytics: Analytics,
@@ -220,17 +218,6 @@ class AccountPresenter internal constructor(
     }
 
     /**
-     * Checks status of camera and updates UI appropriately
-     */
-    internal fun onScanButtonClicked() {
-        if (!appUtil.isCameraOpen) {
-            view.startScanForResult()
-        } else {
-            view.showToast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
-        }
-    }
-
-    /**
      * Imports BIP38 address and prompts user to rename address if successful
      *
      * @param data The address to be imported
@@ -271,39 +258,16 @@ class AccountPresenter internal constructor(
                     view.showBip38PasswordDialog(data)
                 }
             } else {
-                // Watch-only address scanned
-                importWatchOnlyAddress(data)
+                if (FormatsUtil.isValidBitcoinAddress(data)) {
+                    view.showWatchOnlyUnsupportedMsg()
+                } else {
+                    view.showToast(R.string.privkey_error, ToastCustom.TYPE_ERROR)
+                }
             }
         } catch (e: Exception) {
             Timber.e(e)
             view.showToast(R.string.privkey_error, ToastCustom.TYPE_ERROR)
         }
-    }
-
-    private fun importWatchOnlyAddress(address: String) {
-        val addressCopy = correctAddressFormatting(address)
-
-        if (!FormatsUtil.isValidBitcoinAddress(addressCopy)) {
-            view.showToast(R.string.invalid_bitcoin_address, ToastCustom.TYPE_ERROR)
-        } else if (payloadDataManager.wallet!!.legacyAddressStringList.contains(addressCopy)) {
-            view.showToast(R.string.address_already_in_wallet, ToastCustom.TYPE_ERROR)
-        } else {
-            view.showWatchOnlyWarningDialog(addressCopy)
-        }
-    }
-
-    private fun correctAddressFormatting(address: String): String {
-        var addressCopy = address
-        // Check for poorly formed BIP21 URIs
-        if (addressCopy.startsWith("bitcoin://") && addressCopy.length > 10) {
-            addressCopy = "bitcoin:" + addressCopy.substring(10)
-        }
-
-        if (FormatsUtil.isBitcoinUri(addressCopy)) {
-            addressCopy = FormatsUtil.getBitcoinAddress(addressCopy)
-        }
-
-        return addressCopy
     }
 
     @SuppressLint("VisibleForTests", "CheckResult")
@@ -322,7 +286,7 @@ class AccountPresenter internal constructor(
     @Suppress("MemberVisibilityCanBePrivate")
     @VisibleForTesting
     internal fun handlePrivateKey(key: ECKey?, secondPassword: String?) {
-        if (key != null && key.hasPrivKey()) {
+        if (key?.hasPrivKey() == true) {
             // A private key to an existing address has been scanned
             compositeDisposable += payloadDataManager.setKeyForLegacyAddress(key, secondPassword)
                 .doOnError { Timber.e(it) }

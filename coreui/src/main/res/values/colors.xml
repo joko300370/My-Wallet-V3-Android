@@ -19,10 +19,8 @@
     <color name="toast_info_text">@color/green_800</color>
 
     <!-- ZXing -->
-    <color name="barcode_viewfinder_laser">@color/red_600</color>
-    <color name="barcode_viewfinder_mask">@color/grey_fade_400</color>
-    <color name="barcode_possible_result_points">@color/blue_600</color>
-    <color name="barcode_result_view">@color/black</color>
+    <color name="qr_viewfinder_reticle_outline">@color/white</color>
+    <color name="qr_viewfinder_bg">@color/grey_fade_900</color>
 
     <color name="primary_navy_dark">@color/blue_900</color>
     <color name="primary_blue_light">@color/blue_200</color>

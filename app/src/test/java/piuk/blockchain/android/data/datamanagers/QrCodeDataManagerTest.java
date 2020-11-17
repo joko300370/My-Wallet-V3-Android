@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import io.reactivex.observers.TestObserver;
 import piuk.blockchain.android.BlockchainTestApplication;
-import piuk.blockchain.android.BuildConfig;
+import piuk.blockchain.android.scan.QrCodeDataManager;
 import piuk.blockchain.android.testutils.RxTest;
 
 import static junit.framework.Assert.assertNotNull;
