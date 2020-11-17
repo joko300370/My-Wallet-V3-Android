@@ -12,6 +12,8 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import org.koin.core.KoinComponent
@@ -20,6 +22,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
+import piuk.blockchain.androidcoreui.utils.extensions.afterMeasured
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
@@ -70,8 +73,17 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     val cryptoCurrency: CryptoCurrency
         get() = configuration.cryptoCurrency ?: throw IllegalStateException("Cryptocurrency not set")
 
+    private val compositeDisposable = CompositeDisposable()
+
     init {
         inflate(context, R.layout.enter_fiat_crypto_layout, this)
+
+        compositeDisposable += enter_amount.textSize.subscribe { textSize ->
+            if (enter_amount.text.toString() == enter_amount.configuration.prefixOrSuffix) {
+                placeFakeHint(textSize, enter_amount.configuration.isPrefix)
+            } else
+                fake_hint.gone()
+        }
 
         enter_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(s: Editable?) {
@@ -89,6 +101,17 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                     predefinedAmount = getLastEnteredAmount(configuration)
                 )
             inputToggleSubject.onNext(configuration.input)
+        }
+    }
+
+    private fun placeFakeHint(textSize: Int, hasPrefix: Boolean) {
+        fake_hint.visible()
+        fake_hint.afterMeasured {
+            it.translationX =
+                if (hasPrefix) (enter_amount.width / 2f + textSize / 2f) +
+                        resources.getDimensionPixelOffset(R.dimen.smallest_margin) else
+                    enter_amount.width / 2f - textSize / 2f - it.width -
+                            resources.getDimensionPixelOffset(R.dimen.smallest_margin)
         }
     }
 
@@ -114,8 +137,10 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             val fiatSymbol = Currency.getInstance(newValue.fiatCurrency).getSymbol(Locale.getDefault())
             val cryptoSymbol = cryptoCurrency.displayTicker
             currency_swap.visibleIf { newValue.canSwap }
+
             if (newValue.input == CurrencyType.Fiat) {
                 updateFilters(fiatSymbol)
+                fake_hint.text = FiatValue.zero(newValue.fiatCurrency).toStringWithoutSymbol()
                 enter_amount.configuration = Configuration(
                     prefixOrSuffix = fiatSymbol,
                     isPrefix = true,
@@ -125,6 +150,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 )
             } else {
                 updateFilters(cryptoSymbol)
+                fake_hint.text = newValue.cryptoCurrency?.let { CryptoValue.zero(it).toStringWithoutSymbol() }
                 enter_amount.configuration = Configuration(
                     prefixOrSuffix = cryptoSymbol,
                     isPrefix = false,
@@ -245,7 +271,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
             )
         } else {
-
             val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
                 CryptoValue.fromMajor(cryptoCurrency, amount)
             } ?: CryptoValue.zero(cryptoCurrency)
@@ -261,6 +286,11 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     fun fixExchange(it: Money) {
         exchange_amount.text = it.toStringWithSymbol()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        compositeDisposable.clear()
     }
 }
 
