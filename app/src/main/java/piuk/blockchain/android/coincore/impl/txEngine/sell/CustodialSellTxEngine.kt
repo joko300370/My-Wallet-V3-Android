@@ -22,9 +22,6 @@ open class CustodialSellTxEngine(
     private val kycTierService: TierService
 ) : SellTxEngine(walletManager, kycTierService, quotesProvider) {
 
-    private val cryptoCurrency: CryptoCurrency
-        get() = sourceAccount.asset
-
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
 
