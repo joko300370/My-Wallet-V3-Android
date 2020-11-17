@@ -4,7 +4,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -16,10 +15,10 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 
-open class CustodialSellTxEngine(
+class CustodialSellTxEngine(
     private val walletManager: CustodialWalletManager,
-    private val quotesProvider: QuotesProvider,
-    private val kycTierService: TierService
+    quotesProvider: QuotesProvider,
+    kycTierService: TierService
 ) : SellTxEngine(walletManager, kycTierService, quotesProvider) {
 
     override val direction: TransferDirection
