@@ -24,8 +24,8 @@ class AlgoCustodialTradingAccount(
     environmentConfig = environmentConfig,
     eligibilityProvider = eligibilityProvider
 ) {
-    override val actions: AvailableActions =
-        super.actions.toMutableSet().apply {
-            remove(AssetAction.Send)
-        }
+    override val actions: AvailableActions
+        get() = super.actions.toMutableSet().apply {
+                remove(AssetAction.Send)
+            }.toSet()
 }
