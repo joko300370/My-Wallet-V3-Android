@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.stx
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -32,7 +33,8 @@ internal class StxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -43,7 +45,8 @@ internal class StxAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset: CryptoCurrency
@@ -56,8 +59,8 @@ internal class StxAsset(
         Single.fromCallable {
             listOf(getStxAccount() as SingleAccount)
         }
-        .doOnError { Timber.e(it) }
-        .onErrorReturn { emptyList() }
+            .doOnError { Timber.e(it) }
+            .onErrorReturn { emptyList() }
 
     private fun getStxAccount(): CryptoAccount {
         val stxAccount = payloadManager.stxAccount

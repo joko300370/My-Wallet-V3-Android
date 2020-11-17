@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.transactionflow.engine
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -21,6 +22,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
+import java.lang.IllegalStateException
 import java.util.Stack
 
 enum class TransactionStep(val addToBackStack: Boolean = false) {
@@ -95,9 +97,20 @@ data class TransactionState(
         get() = availableTargets.size
 
     val maxSpendable: Money
-        get() = pendingTx?.let {
-            Money.min(it.available, it.maxLimit ?: it.available)
-        } ?: CryptoValue.zero(asset)
+        get() {
+            return pendingTx?.let {
+                val available = availableToAmountCurrency(it.available, amount)
+                Money.min(available,
+                    it.maxLimit ?: available)
+            } ?: CryptoValue.zero(asset)
+        }
+
+    private fun availableToAmountCurrency(available: Money, amount: Money): Money =
+        when (amount) {
+            is FiatValue -> fiatRate?.convert(available) ?: FiatValue.zero(amount.currencyCode)
+            is CryptoValue -> available
+            else -> throw IllegalStateException("Unknown money type")
+        }
 }
 
 class TransactionModel(

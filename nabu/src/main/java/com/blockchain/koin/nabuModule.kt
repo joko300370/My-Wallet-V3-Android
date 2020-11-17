@@ -13,7 +13,9 @@ import com.blockchain.swap.nabu.datamanagers.BalanceProviderImpl
 import com.blockchain.swap.nabu.datamanagers.BalancesProvider
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
+import com.blockchain.swap.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.datamanagers.NabuDataManagerImpl
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
@@ -113,6 +115,14 @@ val nabuModule = module {
                 swapRepository = get()
             )
         }.bind(CustodialWalletManager::class)
+
+        factory {
+            NabuCachedEligibilityProvider(
+                nabuService = get(),
+                authenticator = get(),
+                currencyPrefs = get()
+            )
+        }.bind(EligibilityProvider::class)
 
         factory {
             InterestLimitsProviderImpl(

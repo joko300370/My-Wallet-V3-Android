@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.koin.scopedInject
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -17,7 +17,6 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_trending_pair_row.view.*
 import kotlinx.android.synthetic.main.view_trending_pairs.view.*
 import kotlinx.android.synthetic.main.view_trending_pairs.view.trending_title
-import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
@@ -92,32 +91,37 @@ interface TrendingPairsProvider {
     fun getTrendingPairs(): Single<List<TrendingPair>>
 }
 
-class SwapTrendingPairsProvider : TrendingPairsProvider, KoinComponent {
-    private val coincore: Coincore by scopedInject()
+class SwapTrendingPairsProvider(
+    private val coincore: Coincore,
+    private val eligibilityProvider: EligibilityProvider
+) : TrendingPairsProvider {
 
     override fun getTrendingPairs(): Single<List<TrendingPair>> =
-        Singles.zip(
-            coincore[CryptoCurrency.BTC].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.ETHER].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.PAX].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.BCH].accountGroup(AssetFilter.Custodial).toSingle(),
-            coincore[CryptoCurrency.XLM].accountGroup(AssetFilter.Custodial).toSingle()
-        ) { btcGroup, ethGroup, paxGroup, bchGroup, xlmGroup ->
-            val btcCustodialAccount = btcGroup.selectFirstAccount()
-            val ethCustodialAccount = ethGroup.selectFirstAccount()
-            val paxCustodialAccount = paxGroup.selectFirstAccount()
-            val bchCustodialAccount = bchGroup.selectFirstAccount()
-            val xlmCustodialAccount = xlmGroup.selectFirstAccount()
+        eligibilityProvider.isEligibleForSimpleBuy().flatMap {
+            val filter = if (it) AssetFilter.Custodial else AssetFilter.NonCustodial
+            Singles.zip(
+                coincore[CryptoCurrency.BTC].accountGroup(filter).toSingle(),
+                coincore[CryptoCurrency.ETHER].accountGroup(filter).toSingle(),
+                coincore[CryptoCurrency.PAX].accountGroup(filter).toSingle(),
+                coincore[CryptoCurrency.BCH].accountGroup(filter).toSingle(),
+                coincore[CryptoCurrency.XLM].accountGroup(filter).toSingle()
+            ) { btcGroup, ethGroup, paxGroup, bchGroup, xlmGroup ->
+                val btcAccount = btcGroup.selectFirstAccount()
+                val ethAccount = ethGroup.selectFirstAccount()
+                val paxAccount = paxGroup.selectFirstAccount()
+                val bchAccount = bchGroup.selectFirstAccount()
+                val xlmAccount = xlmGroup.selectFirstAccount()
 
-            listOf(
-                TrendingPair(btcCustodialAccount, ethCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, paxCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, xlmCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(btcCustodialAccount, bchCustodialAccount, btcCustodialAccount.isFunded),
-                TrendingPair(ethCustodialAccount, paxCustodialAccount, ethCustodialAccount.isFunded)
-            )
-        }.onErrorReturn {
-            emptyList()
+                listOf(
+                    TrendingPair(btcAccount, ethAccount, btcAccount.isFunded),
+                    TrendingPair(btcAccount, paxAccount, btcAccount.isFunded),
+                    TrendingPair(btcAccount, xlmAccount, btcAccount.isFunded),
+                    TrendingPair(btcAccount, bchAccount, btcAccount.isFunded),
+                    TrendingPair(ethAccount, paxAccount, ethAccount.isFunded)
+                )
+            }.onErrorReturn {
+                emptyList()
+            }
         }
 }
 

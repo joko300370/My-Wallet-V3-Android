@@ -5,6 +5,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -63,6 +64,8 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+
         card_name.addTextChangedListener(textWatcher)
         card_number.addTextChangedListener(textWatcher)
         cvv.addTextChangedListener(textWatcher)
@@ -80,6 +83,8 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
                         year = expiry_date.year.toInt(),
                         cvv = cvv.text.toString()
                     ))
+                    activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
                     navigator.navigateToBillingDetails()
                     analytics.logEvent(SimpleBuyAnalytics.CARD_INFO_SET)
                 }

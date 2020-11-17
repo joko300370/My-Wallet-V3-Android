@@ -16,6 +16,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
@@ -59,6 +60,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private val tierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
+    private val eligibilityProvider: EligibilityProvider by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val compositeDisposable = CompositeDisposable()
@@ -76,7 +78,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun loadSellDetails() {
         compositeDisposable += tierService.tiers()
-            .zipWith(custodialWalletManager.isEligibleForSimpleBuy(currencyPrefs.selectedFiatCurrency))
+            .zipWith(eligibilityProvider.isEligibleForSimpleBuy(forceRefresh = true))
             .subscribeOn(Schedulers.io())
             .doOnSubscribe {
                 sell_empty.gone()

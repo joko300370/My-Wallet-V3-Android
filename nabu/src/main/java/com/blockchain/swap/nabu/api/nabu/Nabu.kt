@@ -245,7 +245,7 @@ internal interface Nabu {
     fun isEligibleForSimpleBuy(
         @Header("authorization") authorization: String,
         @Query("fiatCurrency") fiatCurrency: String,
-        @Query("methods") methods: String
+        @Query("methods") methods: String = "BANK_ACCOUNT,PAYMENT_CARD"
     ): Single<SimpleBuyEligibility>
 
     @POST(NABU_SIMPLE_BUY_ORDERS)

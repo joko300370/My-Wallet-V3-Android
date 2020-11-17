@@ -15,7 +15,7 @@
             android:id="@+id/billing_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/blue_800">
+            android:background="@color/grey_800">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/country_selector"
@@ -145,8 +145,8 @@
             android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginTop="@dimen/small_margin"
             android:layout_marginEnd="@dimen/standard_margin"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
 
             <com.google.android.material.textfield.TextInputLayout
