@@ -150,7 +150,7 @@ open class CustodialTradingAccount(
                     if (isEligibleForSimpleBuy.get())
                         add(AssetAction.Swap)
                 }
-            }
+            }.toSet()
 
     private fun orderToSummary(buyOrder: BuySellOrder): ActivitySummaryItem =
         CustodialTradingActivitySummaryItem(
