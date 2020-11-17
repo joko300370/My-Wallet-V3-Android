@@ -169,12 +169,14 @@ private class XlmMemoItemViewHolder(
                 timer = Timer()
                 timer.schedule(object : TimerTask() {
                     override fun run() {
-                        if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
-                            model.process(
-                                TransactionIntent.ModifyTxOption(item.copy(text = text.toString())))
-                        } else {
-                            model.process(TransactionIntent.ModifyTxOption(
-                                item.copy(id = text.toString().toLong())))
+                        if (text?.isNotEmpty() == true) {
+                            if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
+                                model.process(
+                                    TransactionIntent.ModifyTxOption(item.copy(text = text.toString())))
+                            } else {
+                                model.process(TransactionIntent.ModifyTxOption(
+                                    item.copy(id = text.toString().toLong())))
+                            }
                         }
                     }
                 }, savingDelay)
