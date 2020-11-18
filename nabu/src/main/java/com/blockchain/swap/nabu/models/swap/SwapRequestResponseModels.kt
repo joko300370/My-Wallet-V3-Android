@@ -18,7 +18,7 @@ class QuoteResponse(
     val expiresAt: String
 )
 
-data class SwapOrderResponse(
+data class CustodialOrderResponse(
     val id: String,
     val state: String,
     val quote: OrderQuote,

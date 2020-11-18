@@ -513,6 +513,19 @@ sealed class CurrencyPair(val rawValue: String) {
             is CryptoCurrencyPair -> CryptoValue.fromMajor(source, value)
             is CryptoToFiatCurrencyPair -> FiatValue.fromMajor(destination, value)
         }
+
+    companion object {
+        fun fromRawPair(rawValue: String, supportedFiatCurrencies: List<String>): CurrencyPair? {
+            val parts = rawValue.split("-")
+            val source: CryptoCurrency = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return null
+            val destinationCryptoCurrency: CryptoCurrency? = CryptoCurrency.fromNetworkTicker(parts[1])
+            if (destinationCryptoCurrency != null)
+                return CryptoCurrencyPair(source, destinationCryptoCurrency)
+            if (supportedFiatCurrencies.contains(parts[1]))
+                return CryptoToFiatCurrencyPair(source, parts[1])
+            return null
+        }
+    }
 }
 
 data class PriceTier(

@@ -60,7 +60,7 @@ import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.TransactionResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
-import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
 import com.blockchain.swap.nabu.service.NabuService
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -658,7 +658,7 @@ class LiveCustodialWalletManager(
                     destinationAddress = destinationAddress
                 )
             ).map {
-                it.toSwapOrder() ?: throw java.lang.IllegalStateException("Invalid order created")
+                it.toCustodialOrder() ?: throw IllegalStateException("Invalid order created")
             }
         }
 
@@ -761,7 +761,7 @@ class LiveCustodialWalletManager(
             }
         }
 
-    private fun SwapOrderResponse.toSwapOrder(): CustodialOrder? {
+    private fun CustodialOrderResponse.toSwapOrder(): CustodialOrder? {
         return CustodialOrder(
             id = this.id,
             state = this.state.toSwapState(),
@@ -777,6 +777,21 @@ class LiveCustodialWalletManager(
                     this.pair.toCryptoCurrencyPair()?.destination?.networkTicker.toString()
                 ) ?: return null, this.priceFunnel.outputMoney.toBigInteger()
             )
+        )
+    }
+
+    private fun CustodialOrderResponse.toCustodialOrder(): CustodialOrder? {
+        return CustodialOrder(
+            id = this.id,
+            state = this.state.toSwapState(),
+            depositAddress = this.kind.depositAddress,
+            createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
+            inputMoney = CurrencyPair.fromRawPair(pair, SUPPORTED_FUNDS_CURRENCIES)?.let {
+                it.toSourceMoney(priceFunnel.inputMoney.toBigInteger())
+            } ?: return null,
+            outputMoney = CurrencyPair.fromRawPair(pair, SUPPORTED_FUNDS_CURRENCIES)?.let {
+                it.toDestinationMoney(priceFunnel.outputMoney.toBigInteger())
+            } ?: return null
         )
     }
 
@@ -804,17 +819,17 @@ private fun String.toTransactionState(): TransactionState =
 
 fun String.toSwapState(): CustodialOrderState =
     when (this) {
-        SwapOrderResponse.CREATED -> CustodialOrderState.CREATED
-        SwapOrderResponse.PENDING_CONFIRMATION -> CustodialOrderState.PENDING_CONFIRMATION
-        SwapOrderResponse.PENDING_EXECUTION -> CustodialOrderState.PENDING_EXECUTION
-        SwapOrderResponse.PENDING_DEPOSIT -> CustodialOrderState.PENDING_DEPOSIT
-        SwapOrderResponse.PENDING_LEDGER -> CustodialOrderState.PENDING_LEDGER
-        SwapOrderResponse.FINISH_DEPOSIT -> CustodialOrderState.FINISH_DEPOSIT
-        SwapOrderResponse.PENDING_WITHDRAWAL -> CustodialOrderState.PENDING_WITHDRAWAL
-        SwapOrderResponse.EXPIRED -> CustodialOrderState.EXPIRED
-        SwapOrderResponse.FINISHED -> CustodialOrderState.FINISHED
-        SwapOrderResponse.CANCELED -> CustodialOrderState.CANCELED
-        SwapOrderResponse.FAILED -> CustodialOrderState.FAILED
+        CustodialOrderResponse.CREATED -> CustodialOrderState.CREATED
+        CustodialOrderResponse.PENDING_CONFIRMATION -> CustodialOrderState.PENDING_CONFIRMATION
+        CustodialOrderResponse.PENDING_EXECUTION -> CustodialOrderState.PENDING_EXECUTION
+        CustodialOrderResponse.PENDING_DEPOSIT -> CustodialOrderState.PENDING_DEPOSIT
+        CustodialOrderResponse.PENDING_LEDGER -> CustodialOrderState.PENDING_LEDGER
+        CustodialOrderResponse.FINISH_DEPOSIT -> CustodialOrderState.FINISH_DEPOSIT
+        CustodialOrderResponse.PENDING_WITHDRAWAL -> CustodialOrderState.PENDING_WITHDRAWAL
+        CustodialOrderResponse.EXPIRED -> CustodialOrderState.EXPIRED
+        CustodialOrderResponse.FINISHED -> CustodialOrderState.FINISHED
+        CustodialOrderResponse.CANCELED -> CustodialOrderState.CANCELED
+        CustodialOrderResponse.FAILED -> CustodialOrderState.FAILED
         else -> CustodialOrderState.UNKNOWN
     }
 

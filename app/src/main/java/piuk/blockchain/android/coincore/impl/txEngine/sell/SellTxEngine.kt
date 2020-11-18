@@ -78,12 +78,11 @@ abstract class SellTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
-            val latestQuoteExchangeRate =
-                ExchangeRate.CryptoToFiat(
-                    from = sourceAccount.asset,
-                    to = userFiat,
-                    _rate = pricedQuote.price.toBigDecimal()
-                )
+            val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
+                from = sourceAccount.asset,
+                to = userFiat,
+                _rate = pricedQuote.price.toBigDecimal()
+            )
             pendingTx.copy(
                 confirmations = listOf(
                     TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price,
@@ -104,12 +103,11 @@ abstract class SellTxEngine(
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
-            val latestQuoteExchangeRate =
-                ExchangeRate.CryptoToFiat(
-                    from = sourceAccount.asset,
-                    to = userFiat,
-                    _rate = pricedQuote.price.toBigDecimal()
-                )
+            val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
+                from = sourceAccount.asset,
+                to = userFiat,
+                _rate = pricedQuote.price.toBigDecimal()
+            )
             pendingTx.apply {
                 addOrReplaceOption(
                     TxConfirmationValue.ExchangePriceConfirmation(
