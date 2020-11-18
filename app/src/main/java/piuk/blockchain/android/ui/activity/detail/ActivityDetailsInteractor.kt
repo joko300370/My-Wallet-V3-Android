@@ -4,6 +4,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -12,18 +13,22 @@ import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
+import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
+import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
 import piuk.blockchain.android.util.StringUtils
 import java.text.ParseException
 import java.util.Date
@@ -43,9 +48,13 @@ class ActivityDetailsInteractor(
         val list = mutableListOf(
             TransactionId(summaryItem.txId),
             Created(Date(summaryItem.timeStampMs)),
-            if (summaryItem.type == OrderType.BUY) BuyPurchaseAmount(summaryItem.fundedFiat) else
+            if (summaryItem.type == OrderType.BUY)
+                BuyPurchaseAmount(summaryItem.fundedFiat)
+            else
                 SellPurchaseAmount(summaryItem.fundedFiat),
-            if (summaryItem.type == OrderType.BUY) BuyCryptoWallet(summaryItem.cryptoCurrency) else
+            if (summaryItem.type == OrderType.BUY)
+                BuyCryptoWallet(summaryItem.cryptoCurrency)
+            else
                 SellCryptoWallet(summaryItem.fundedFiat.currencyCode),
             BuyFee(summaryItem.fee)
         )
@@ -55,8 +64,7 @@ class ActivityDetailsInteractor(
                 summaryItem.paymentMethodId
             )
                 .map { paymentMethod ->
-                    addPaymentDetailsToList(list, paymentMethod,
-                        summaryItem)
+                    addPaymentDetailsToList(list, paymentMethod, summaryItem)
 
                     list.toList()
                 }.onErrorReturn {
@@ -116,6 +124,45 @@ class ActivityDetailsInteractor(
         }
     }
 
+    fun loadSwapItems(
+        item: SwapActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> {
+        val list = mutableListOf(
+            TransactionId(item.txId),
+            Created(Date(item.timeStampMs)),
+            From(item.sendingAccount.label),
+            Amount(item.sendingValue)
+        )
+
+        return Singles.zip(
+            item.depositNetworkFee,
+            buildReceivingLabel(item)
+        ) { depositFee: Money, toItem: To ->
+            list.apply {
+                add(SwapFee(depositFee))
+                add(toItem)
+                add(SwapReceiveAmount(item.receivingValue))
+                add(SwapFee(item.withdrawalNetworkFee))
+            }
+            list.toList()
+        }
+    }
+
+    private fun buildReceivingLabel(item: SwapActivitySummaryItem): Single<To> {
+        return when (item.direction) {
+            SwapDirection.ON_CHAIN -> coincore.findAccountByAddress(item.receivingAsset, item.receivingAddress!!)
+                .toSingle().map {
+                    To(it.label)
+                }
+            SwapDirection.INTERNAL,
+            SwapDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial).toSingle()
+                .map {
+                    To(it.selectFirstAccount().label)
+                }
+            SwapDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
+        }
+    }
+
     private fun addPaymentDetailsToList(
         list: MutableList<ActivityDetailsType>,
         paymentMethod: PaymentMethod.Card?,
@@ -148,6 +195,12 @@ class ActivityDetailsInteractor(
     ): CustodialInterestActivitySummaryItem? =
         assetActivityRepository.findCachedItem(cryptoCurrency,
             txHash) as? CustodialInterestActivitySummaryItem
+
+    fun getSwapActivityDetails(
+        cryptoCurrency: CryptoCurrency,
+        txHash: String
+    ): SwapActivitySummaryItem? =
+        assetActivityRepository.findCachedSwapItem(cryptoCurrency, txHash)
 
     fun getFiatActivityDetails(
         currency: String,
@@ -376,31 +429,26 @@ class ActivityDetailsInteractor(
 
     private fun addSingleOrMultipleFromAddresses(
         it: TransactionInOutDetails?
-    ) = when {
-        it == null -> {
-            From(null)
+    ) = From(
+        when {
+            it == null -> null
+            it.inputs.size == 1 -> it.inputs[0].address
+            else -> it.inputs.toJoinedString()
         }
-        it.inputs.size == 1 -> {
-            From(it.inputs[0].address)
-        }
-        else -> {
-            From(it.inputs.joinToString("\n"))
-        }
-    }
+    )
 
     private fun addSingleOrMultipleToAddresses(
         it: TransactionInOutDetails?
-    ) = when {
-        it == null -> {
-            To(null)
+    ) = To(
+        when {
+            it == null -> null
+            it.outputs.size == 1 -> it.outputs[0].address
+            else -> it.outputs.toJoinedString()
         }
-        it.outputs.size == 1 -> {
-            To(it.outputs[0].address)
-        }
-        else -> {
-            To(it.outputs.joinToString("\n"))
-        }
-    }
+    )
+
+    private fun List<TransactionDetailModel>.toJoinedString(): String =
+        this.map { o -> o.address }.joinToString("\n")
 
     private fun checkIfShouldAddDescription(
         item: NonCustodialActivitySummaryItem

@@ -5,7 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Partner
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -187,9 +187,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         }
     }
 
-    data class QuoteUpdated(private val quote: Quote) : SimpleBuyIntent() {
+    data class QuoteUpdated(private val custodialQuote: CustodialQuote) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
-            return oldState.copy(quote = quote)
+            return oldState.copy(custodialQuote = custodialQuote)
         }
     }
 
@@ -285,7 +285,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     }
 
     class OrderCreated(
-        private val buyOrder: BuySellOrder
+        private val buyOrder: BuySellOrder,
+        private val showInAppRating: Boolean = false
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(orderState = buyOrder.state,
@@ -295,8 +296,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 orderValue = buyOrder.orderValue as CryptoValue,
                 orderExchangePrice = buyOrder.price,
                 paymentSucceeded = buyOrder.state == OrderState.FINISHED,
-                isLoading = false
+                isLoading = false,
+                showRating = showInAppRating
             )
+    }
+
+    object AppRatingShown : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(showRating = false)
     }
 
     class UpdateSelectedPaymentMethod(

@@ -4,6 +4,7 @@ import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
@@ -11,6 +12,7 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.sell.BuySellFragment
 
 interface HomeScreenFragment {
     fun navigator(): HomeNavigator
@@ -20,11 +22,14 @@ interface HomeScreenFragment {
 interface HomeNavigator {
     fun gotoDashboard()
 
-    fun launchSwapOrKyc(targetCurrency: CryptoCurrency? = null, fromCryptoCurrency: CryptoCurrency? = null)
+    fun tryTolaunchSwap(
+        sourceAccount: CryptoAccount? = null,
+        targetAccount: CryptoAccount? = null
+    )
+
     fun launchSwap(
-        defCurrency: String,
-        fromCryptoCurrency: CryptoCurrency? = null,
-        toCryptoCurrency: CryptoCurrency? = null
+        sourceAccount: CryptoAccount? = null,
+        targetAccount: CryptoAccount? = null
     )
 
     fun launchKyc(campaignType: CampaignType)
@@ -37,6 +42,7 @@ interface HomeNavigator {
     fun launchSetupFingerprintLogin()
     fun launchTransfer()
     fun launchIntroTour()
+    fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
 
     fun gotoActivityFor(account: BlockchainAccount?)
     fun goToWithdraw(currency: String)

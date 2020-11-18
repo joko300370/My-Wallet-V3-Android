@@ -9,9 +9,9 @@ import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -25,10 +25,11 @@ class InterestDepositTxEngine(
     override fun start(
         sourceAccount: CryptoAccount,
         txTarget: TransactionTarget,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        refreshTrigger: RefreshTrigger
     ) {
-        super.start(sourceAccount, txTarget, exchangeRates)
-        onChainTxEngine.start(sourceAccount, txTarget, exchangeRates)
+        super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
+        onChainTxEngine.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -52,26 +53,32 @@ class InterestDepositTxEngine(
         termsChecked: Boolean = false,
         agreementChecked: Boolean = false
     ): PendingTx =
-        pendingTx.removeOption(TxOption.DESCRIPTION)
+        pendingTx.removeOption(TxConfirmation.DESCRIPTION)
+            .removeOption(TxConfirmation.MEMO)
+            .removeOption(TxConfirmation.FEE_SELECTION)
             .addOrReplaceOption(
-                TxOptionValue.TxBooleanOption<Unit>(
-                    option = TxOption.AGREEMENT_INTEREST_T_AND_C,
+                TxConfirmationValue.NetworkFee(pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
+                    sourceAccount.asset))
+            .addOrReplaceOption(
+                TxConfirmationValue.TxBooleanConfirmation<Unit>(
+                    confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
                     value = termsChecked
                 )
             )
             .addOrReplaceOption(
-                TxOptionValue.TxBooleanOption(
-                    option = TxOption.AGREEMENT_INTEREST_TRANSFER,
+                TxConfirmationValue.TxBooleanConfirmation(
+                    confirmation = TxConfirmation.AGREEMENT_INTEREST_TRANSFER,
                     data = pendingTx.amount,
                     value = agreementChecked
                 )
             )
 
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
-        if (newOption.option in setOf(TxOption.AGREEMENT_INTEREST_T_AND_C, TxOption.AGREEMENT_INTEREST_TRANSFER)) {
-            Single.just(pendingTx.addOrReplaceOption(newOption))
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation.confirmation in setOf(TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
+                TxConfirmation.AGREEMENT_INTEREST_TRANSFER)) {
+            Single.just(pendingTx.addOrReplaceOption(newConfirmation))
         } else {
-            onChainTxEngine.doOptionUpdateRequest(pendingTx, newOption)
+            onChainTxEngine.doOptionUpdateRequest(pendingTx, newConfirmation)
                 .map { pTx ->
                     modifyEngineConfirmations(
                         pendingTx = pTx,
@@ -108,13 +115,13 @@ class InterestDepositTxEngine(
     }
 
     private fun getTermsOptionValue(pendingTx: PendingTx): Boolean =
-        pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
-            TxOption.AGREEMENT_INTEREST_T_AND_C
+        pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Unit>>(
+            TxConfirmation.AGREEMENT_INTEREST_T_AND_C
         )?.value ?: false
 
     private fun getAgreementOptionValue(pendingTx: PendingTx): Boolean =
-        pendingTx.getOption<TxOptionValue.TxBooleanOption<Money>>(
-            TxOption.AGREEMENT_INTEREST_TRANSFER
+        pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Money>>(
+            TxConfirmation.AGREEMENT_INTEREST_TRANSFER
         )?.value ?: false
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =

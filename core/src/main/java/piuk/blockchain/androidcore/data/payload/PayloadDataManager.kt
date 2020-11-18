@@ -29,7 +29,6 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.utils.RefreshUpdater
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger

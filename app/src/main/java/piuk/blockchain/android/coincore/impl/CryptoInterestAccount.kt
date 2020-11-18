@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -16,6 +17,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -28,7 +30,8 @@ internal class CryptoInterestAccount(
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    override val isArchived: Boolean = false
 ) : CryptoAccountBase(), InterestAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
@@ -67,28 +70,26 @@ internal class CryptoInterestAccount(
         get() = custodialWalletManager.getInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
-            )
-            .doOnSuccess { hasFunds.set(it.isPositive) }
+            ).doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
-            )
-            .map { it as Money }
+            ).map { it as Money }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance // TODO This will need updating when we support transfer out of an interest account
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)
+            .onErrorReturn { emptyList() }
             .mapList { interestActivityToSummary(it) }
             .filterActivityStates()
             .doOnSuccess {
                 setHasTransactions(it.isNotEmpty())
             }
-            .onErrorReturn { emptyList() }
 
     private fun interestActivityToSummary(item: InterestActivityItem): ActivitySummaryItem =
         CustodialInterestActivitySummaryItem(
@@ -113,11 +114,16 @@ internal class CryptoInterestAccount(
         }.toList()
     }
 
-    fun isInterestEnabled() =
-        custodialWalletManager.getInterestEnabledForAsset(asset)
-            .map {
-                nabuAccountExists.set(it)
-            }
+    // No swaps on interest accounts, so just return the activity list unmodified
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> = activity
+
+    fun isInterestSupported() = custodialWalletManager.getInterestAvailabilityForAsset(asset)
+        .map {
+            nabuAccountExists.set(it)
+        }
 
     val isConfigured: Boolean
         get() = nabuAccountExists.get()
@@ -125,10 +131,8 @@ internal class CryptoInterestAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val isDefault: Boolean =
-        false // Default is, presently, only ever a non-custodial account.
+    override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
-    // TODO: Where is this called?
     override val sourceState: Single<TxSourceState>
         get() = Single.just(
             if (nabuAccountExists.get()) {
@@ -137,12 +141,18 @@ internal class CryptoInterestAccount(
                 TxSourceState.NOT_SUPPORTED
             }
         )
-    override val actions: AvailableActions =
-        if (asset.hasFeature(CryptoCurrency.IS_ERC20) || asset == CryptoCurrency.ETHER) {
-            setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
-        } else {
-            setOf(AssetAction.Summary, AssetAction.ViewActivity)
+
+    override val isEnabled: Single<Boolean>
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (enabled, _) ->
+            enabled
         }
+
+    override val disabledReason: Single<DisabledReason>
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (_, reason) ->
+            reason
+        }
+
+    override val actions: AvailableActions = setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
 
     companion object {
         private val displayedStates = setOf(

@@ -6,13 +6,19 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionInteractor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
+import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.FeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapReceiveFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
@@ -43,6 +49,18 @@ val transactionModule = module {
     }.bind(TxOptionsFormatter::class)
 
     factory {
+        SwapExchangeRateFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
+        SwapReceiveFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
         FromPropertyFormatter(
             resources = get<Context>().resources
         )
@@ -55,13 +73,19 @@ val transactionModule = module {
     }.bind(TxOptionsFormatter::class)
 
     factory {
-        FeePropertyFormatter(
+        ToPropertyFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)
 
     factory {
-        ToPropertyFormatter(
+        SwapSourcePropertyFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
+        SwapDestinationPropertyFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)
@@ -72,20 +96,40 @@ val transactionModule = module {
         )
     }
 
+    factory {
+        TxFlowAnalytics(
+            analytics = get()
+        )
+    }
+
+    factory {
+        TxFlowErrorReporting(
+            crashLogger = get()
+        )
+    }
+
     scope(transactionFlowScope) {
 
         scoped {
             TransactionInteractor(
                 coincore = payloadScope.get(),
-                addressFactory = payloadScope.get()
+                addressFactory = payloadScope.get(),
+                swapRepository = payloadScope.get(),
+                eligibilityProvider = payloadScope.get()
             )
+        }
+
+        // hack. find a better way to handle flow navigation (Rx Activity result)
+        scoped {
+            ActiveTransactionFlow()
         }
 
         scoped {
             TransactionModel(
                 initialState = TransactionState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                errorLogger = get()
             )
         }
     }

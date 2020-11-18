@@ -15,7 +15,7 @@ import info.blockchain.balance.Money
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_agreement_transfer.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
@@ -29,7 +29,7 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
     private val selectedCurrency: String
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        (items[position] as? TxOptionValue.TxBooleanOption<*>)?.data?.let {
+        (items[position] as? TxConfirmationValue.TxBooleanConfirmation<*>)?.data?.let {
             it is Money
         } ?: false
 
@@ -45,7 +45,7 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as AgreementTextItemViewHolder).bind(
-        items[position] as TxOptionValue.TxBooleanOption<Money>,
+        items[position] as TxConfirmationValue.TxBooleanConfirmation<Money>,
         model
     )
 }
@@ -60,7 +60,7 @@ private class AgreementTextItemViewHolder(
         get() = itemView
 
     fun bind(
-        item: TxOptionValue.TxBooleanOption<Money>,
+        item: TxConfirmationValue.TxBooleanConfirmation<Money>,
         model: TransactionModel
     ) {
         itemView.apply {

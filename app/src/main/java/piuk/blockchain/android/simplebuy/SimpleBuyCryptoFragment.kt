@@ -318,7 +318,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun clearError() {
-        input_amount.hideError()
+        input_amount.hideLabels()
     }
 
     private fun showErrorState(errorState: ErrorState) {

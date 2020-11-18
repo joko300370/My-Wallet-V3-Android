@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -22,7 +23,13 @@ interface BlockchainAccount {
 
     val isFunded: Boolean
 
+    val isArchived: Boolean
+
     val hasTransactions: Boolean
+
+    val isEnabled: Single<Boolean>
+
+    val disabledReason: Single<DisabledReason>
 
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
 }
@@ -34,6 +41,7 @@ interface SingleAccount : BlockchainAccount, TransactionTarget {
     // Available balance, not including uncleared and locked, that may be used for transactions
     val actionableBalance: Single<Money>
 
+    // Is this account currently able to operate as a transaction source
     val sourceState: Single<TxSourceState>
 }
 
@@ -65,10 +73,22 @@ interface FiatAccount : SingleAccount {
     val fiatCurrency: String
     override val pendingBalance: Single<Money>
         get() = Single.just(FiatValue.zero(fiatCurrency))
+
+    override val isArchived: Boolean
+        get() = false
 }
 
 interface AccountGroup : BlockchainAccount {
     val accounts: SingleAccountList
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val isArchived: Boolean
+        get() = false
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 
     fun includes(account: BlockchainAccount): Boolean
 }
@@ -90,6 +110,9 @@ class NullCryptoAccount(
         get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
+        get() = false
+
+    override val isArchived: Boolean
         get() = false
 
     override val asset: CryptoCurrency
@@ -119,6 +142,12 @@ class NullCryptoAccount(
         exchangeRates: ExchangeRates
     ): Single<Money> =
         Single.just(FiatValue.zero(fiatCurrency))
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 }
 
 object NullFiatAccount : FiatAccount {
@@ -128,6 +157,9 @@ object NullFiatAccount : FiatAccount {
         get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
+        get() = false
+
+    override val isArchived: Boolean
         get() = false
 
     override val sourceState: Single<TxSourceState>
@@ -147,6 +179,12 @@ object NullFiatAccount : FiatAccount {
     override val actions: AvailableActions = emptySet()
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
 
     override fun fiatBalance(
         fiatCurrency: String,

@@ -12,13 +12,13 @@ import androidx.annotation.StringRes
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDirections
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -26,6 +26,7 @@ import com.blockchain.swap.nabu.models.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import com.blockchain.ui.urllinks.URL_LEARN_MORE_REJECTED
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -33,11 +34,16 @@ import kotlinx.android.synthetic.main.fragment_kyc_tier_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -49,12 +55,14 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
-    KycTierSplashView {
+    KycTierSplashView, DialogFlow.FlowHost {
 
     private val presenter: KycTierSplashPresenter by scopedInject()
-    private val startSwap: StartSwap by inject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val currencyPrefs: CurrencyPrefs by inject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -210,7 +218,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 R.string.annual_swap_limit else R.string.annual_swap_and_buy_limit
             limits?.dailyFiat != null -> if (tier.state.ordinal == SILVER_TIER_INDEX)
                 R.string.daily_swap_limit else R.string.daily_swap_and_buy_limit
-            else -> 0
+            else -> R.string.generic_limit
         }
     }
 
@@ -239,8 +247,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 .throttledClicks()
                 .subscribeBy(
                     onNext = {
-                        startSwap.startSwapActivity(activity!!)
-                        activity!!.finish()
+                        startSwap()
                     },
                     onError = { Timber.e(it) }
                 )
@@ -258,6 +265,31 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                     onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_CONTACT_SUPPORT))) },
                     onError = { Timber.e(it) }
                 )
+    }
+
+    private fun startSwap() {
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        TransactionFlow(
+                            action = AssetAction.Swap
+                        ).apply {
+                            startFlow(
+                                fragmentManager = childFragmentManager,
+                                host = this@KycTierSplashFragment
+                            )
+                        }
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            context!!,
+                            currencyPrefs.selectedFiatCurrency
+                        )
+                        activity?.finish()
+                    }
+                }
+            )
     }
 
     override fun onPause() {
@@ -290,5 +322,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     companion object {
         private const val SILVER_TIER_INDEX = 1
+    }
+
+    override fun onFlowFinished() {
     }
 }

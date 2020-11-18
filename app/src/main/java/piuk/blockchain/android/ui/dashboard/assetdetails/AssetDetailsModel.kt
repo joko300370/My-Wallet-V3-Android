@@ -10,7 +10,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
 
 data class AssetDetailsState(

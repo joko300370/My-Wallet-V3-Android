@@ -1,11 +1,16 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
+import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -15,13 +20,16 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
+import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.SingleAccountList
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import java.math.BigInteger
 
 internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
@@ -45,6 +53,58 @@ abstract class CryptoAccountBase : CryptoAccount {
 
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
+
+    override val isEnabled: Single<Boolean>
+        get() = Single.just(true)
+
+    override val disabledReason: Single<DisabledReason>
+        get() = Single.just(DisabledReason.NONE)
+
+    private fun swapItemToSummary(item: SwapTransactionItem): SwapActivitySummaryItem {
+        val sendingAccount = this
+        return with(item) {
+            SwapActivitySummaryItem(
+                exchangeRates,
+                normaliseTxId(txId),
+                timeStampMs,
+                sendingValue,
+                sendingAccount,
+                sendingAddress,
+                receivingAddress,
+                state,
+                direction,
+                receivingValue,
+                Single.just(CryptoValue(sendingAsset, BigInteger.ZERO)),
+                withdrawalNetworkFee,
+                asset,
+                receivingAsset,
+                fiatValue,
+                fiatCurrency
+            )
+        }
+    }
+
+    private fun normaliseTxId(txId: String): String =
+        txId.replace("-", "")
+
+    fun appendSwapActivity(
+        custodialWalletManager: CustodialWalletManager,
+        asset: CryptoCurrency,
+        directions: List<SwapDirection>,
+        activityList: List<ActivitySummaryItem>
+    ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
+        .map { swapItems ->
+            swapItems.map {
+                swapItemToSummary(it)
+            }
+        }.map { swapActivity ->
+            reconcileSwaps(swapActivity, activityList)
+        }
+
+    protected abstract fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem>
 }
 
 // To handle Send to PIT
@@ -53,6 +113,7 @@ internal class CryptoExchangeAccount(
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager,
+    override val isArchived: Boolean = false,
     val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase() {
 
@@ -83,6 +144,13 @@ internal class CryptoExchangeAccount(
         get() = Single.just(emptyList())
 
     override val actions: AvailableActions = emptySet()
+
+    // No activity on exchange accounts, so just return the activity list
+    // unmodified - they should both be empty anyway
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> = activity
 }
 
 abstract class CryptoNonCustodialAccount(
@@ -97,13 +165,13 @@ abstract class CryptoNonCustodialAccount(
         get() =
             mutableSetOf(
                 AssetAction.ViewActivity,
-                AssetAction.NewSend,
+                AssetAction.Send,
                 AssetAction.Receive,
                 AssetAction.Swap
             ).apply {
-                if (!isFunded) {
+                if (!isFunded || isArchived) {
+                    remove(AssetAction.Send)
                     remove(AssetAction.Swap)
-                    remove(AssetAction.NewSend)
                 }
             }
 
@@ -120,6 +188,32 @@ abstract class CryptoNonCustodialAccount(
         Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
     abstract fun createTxEngine(): TxEngine
+
+    val nonCustodialSwapDirections = listOf(SwapDirection.ON_CHAIN, SwapDirection.FROM_USERKEY)
+
+    override val isArchived: Boolean
+        get() = false
+
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> {
+        val activityList = activity.toMutableList()
+        swaps.forEach { swap ->
+            val hit = activityList.find {
+                it.txId.contains(swap.txId, true)
+            } as? NonCustodialActivitySummaryItem
+
+            if (hit?.transactionType == TransactionSummary.TransactionType.SENT) {
+                activityList.remove(hit)
+                val updatedSwap = swap.copy(
+                    depositNetworkFee = hit.fee.first(CryptoValue(hit.cryptoCurrency, BigInteger.ZERO))
+                )
+                activityList.add(updatedSwap)
+            }
+        }
+        return activityList.toList()
+    }
 }
 
 // Currently only one custodial account is supported for each asset,

@@ -10,7 +10,9 @@ interface NabuUserReporter {
     fun reportUser(nabuUser: NabuUser)
 }
 
-class AnalyticsNabuUserReporterImpl(private val userAnalytics: UserAnalytics) : NabuUserReporter {
+class AnalyticsNabuUserReporterImpl(
+    private val userAnalytics: UserAnalytics
+) : NabuUserReporter {
     override fun reportUserId(userId: String) {
         userAnalytics.logUserId(userId)
     }

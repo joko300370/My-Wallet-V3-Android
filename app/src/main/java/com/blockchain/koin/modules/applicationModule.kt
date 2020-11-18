@@ -3,7 +3,6 @@ package com.blockchain.koin.modules
 import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.AsyncAllAccountList
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
 import com.blockchain.koin.cardPaymentsFeatureFlag
@@ -13,8 +12,10 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.sellFeatureFlag
@@ -23,13 +24,13 @@ import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.xlm
+import com.blockchain.logging.DigitalTrust
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
-import com.blockchain.ui.CurrentContextAccess
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
@@ -53,9 +54,9 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
-import piuk.blockchain.android.ui.account.TransferFundsDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
+import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.simplebuy.EURPaymentAccountMapper
 import piuk.blockchain.android.simplebuy.GBPPaymentAccountMapper
@@ -72,6 +73,7 @@ import piuk.blockchain.android.thepit.PitLinkingImpl
 import piuk.blockchain.android.thepit.ThePitDeepLinkParser
 import piuk.blockchain.android.ui.account.AccountEditPresenter
 import piuk.blockchain.android.ui.account.AccountPresenter
+import piuk.blockchain.android.ui.account.ConfirmPaymentPresenter
 import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
 import piuk.blockchain.android.ui.airdrops.AirdropCentrePresenter
 import piuk.blockchain.android.ui.auth.FirebaseMobileNoticeRemoteConfig
@@ -79,11 +81,12 @@ import piuk.blockchain.android.ui.auth.MobileNoticeRemoteConfig
 import piuk.blockchain.android.ui.auth.PinEntryPresenter
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedPresenter
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingPresenter
-import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferPresenter
 import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
+import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
+import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
@@ -107,7 +110,7 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
-import piuk.blockchain.android.ui.swap.SwapStarter
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
@@ -118,9 +121,11 @@ import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
+import piuk.blockchain.android.util.CurrentContextAccess
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.ResourceDefaultLabels
+import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.android.withdraw.mvi.WithdrawInteractor
@@ -128,7 +133,6 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.erc20.UsdtAccount
@@ -152,6 +156,8 @@ val applicationModule = module {
         )
     }
 
+    factory { RootUtil() }
+
     single {
         CoinsWebSocketService(
             applicationContext = get()
@@ -163,6 +169,13 @@ val applicationModule = module {
     single { CurrentContextAccess() }
 
     single { LifecycleInterestedComponent() }
+
+    single {
+        SiftDigitalTrust(
+            accountId = BuildConfig.SIFT_ACCOUNT_ID,
+            beaconKey = BuildConfig.SIFT_BEACON_KEY
+        )
+    }.bind(DigitalTrust::class)
 
     scope(payloadScopeQualifier) {
         factory {
@@ -332,24 +345,6 @@ val applicationModule = module {
         }
 
         factory {
-            ChartsDataManager(
-                historicPriceApi = get(),
-                rxBus = get()
-            )
-        }
-
-        factory {
-            ConfirmFundsTransferPresenter(
-                walletAccountHelper = get(),
-                fundsDataManager = get(),
-                payloadDataManager = get(),
-                stringUtils = get(),
-                exchangeRates = get(),
-                currencyPrefs = get()
-            )
-        }
-
-        factory {
             UpgradeWalletPresenter(
                 prefs = get(),
                 appUtil = get(),
@@ -377,7 +372,8 @@ val applicationModule = module {
                 appUtil = get(),
                 accessState = get(),
                 prngFixer = get(),
-                analytics = get()
+                analytics = get(),
+                walletPrefs = get()
             )
         }
 
@@ -451,23 +447,23 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 metadataManager = get(),
-                fundsDataManager = get(),
-                prefs = get(),
                 appUtil = get(),
                 privateKeyFactory = get(),
                 environmentSettings = get(),
                 analytics = get(),
-                coinsWebSocketStrategy = get()
+                coinsWebSocketStrategy = get(),
+                coincore = get(),
+                sendDataManager = get(),
+                feeDataManager = get(),
+                exchangeRates = get(),
+                environmentConfig = get(),
+                walletPreferences = get(),
+                custodialWalletManager = get()
             )
         }
 
         factory {
-            TransferFundsDataManager(
-                payloadDataManager = get(),
-                sendDataManager = get(),
-                dynamicFeeCache = get(),
-                coinSelectionRemoteConfig = get()
-            )
+            ConfirmPaymentPresenter()
         }
 
         factory {
@@ -517,12 +513,19 @@ val applicationModule = module {
         }
 
         factory {
+            SwapTypeSwitcher(
+                newSwapFeatureFlag = get(newSwapFeatureFlag)
+            )
+        }
+
+        factory {
             SimpleBuyInteractor(
                 withdrawLocksRepository = get(),
                 tierService = get(),
                 custodialWalletManager = get(),
                 appUtil = get(),
-                coincore = get()
+                coincore = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -531,6 +534,7 @@ val applicationModule = module {
                 interactor = get(),
                 scheduler = AndroidSchedulers.mainThread(),
                 initialState = SimpleBuyState(),
+                ratingPrefs = get(),
                 prefs = get(),
                 gson = get(),
                 cardActivators = listOf(
@@ -586,7 +590,8 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 currencyPrefs = get(),
                 sellFeatureFlag = get(sellFeatureFlag),
-                tierService = get()
+                tierService = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -727,7 +732,6 @@ val applicationModule = module {
 
         factory {
             BackupWalletCompletedPresenter(
-                transferFundsDataManager = get(),
                 walletStatus = get()
             )
         }
@@ -807,8 +811,11 @@ val applicationModule = module {
     }.bind(MobileNoticeRemoteConfig::class)
 
     factory {
-        SwapStarter(prefs = get())
-    }.bind(StartSwap::class)
+        SwapTrendingPairsProvider(
+            coincore = payloadScope.get(),
+            eligibilityProvider = payloadScope.get()
+        )
+    }.bind(TrendingPairsProvider::class)
 
     factory { DateUtil(get()) }
 

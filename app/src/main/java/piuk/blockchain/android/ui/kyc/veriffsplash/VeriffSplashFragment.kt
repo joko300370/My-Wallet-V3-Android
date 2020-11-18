@@ -2,33 +2,47 @@ package piuk.blockchain.android.ui.kyc.veriffsplash
 
 import android.Manifest
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.blockchain.activities.StartSwap
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
+import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_GOLD_UNAVAILABLE_SUPPORT
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_KYC_SUPPORTED_COUNTRIES_LIST
 import com.blockchain.veriff.VeriffApplicantAndToken
 import com.blockchain.veriff.VeriffLauncher
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.fragment_kyc_veriff_splash.*
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
@@ -36,28 +50,24 @@ import piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT
 import piuk.blockchain.androidcoreui.ui.base.UiState.EMPTY
 import piuk.blockchain.androidcoreui.ui.base.UiState.FAILURE
 import piuk.blockchain.androidcoreui.ui.base.UiState.LOADING
-import com.blockchain.ui.dialog.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
-import kotlinx.android.synthetic.main.fragment_kyc_veriff_splash.*
-import piuk.blockchain.android.R
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
-import java.lang.IllegalStateException
+import timber.log.Timber
 
 class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresenter>(),
-    VeriffSplashView {
+    VeriffSplashView, DialogFlow.FlowHost {
 
     private val presenter: VeriffSplashPresenter by scopedInject()
-    private val swapStarter: StartSwap by inject()
     private val stringUtils: StringUtils by inject()
+    private val currencyPrefs: CurrencyPrefs by inject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     override val countryCode by unsafeLazy {
         VeriffSplashFragmentArgs.fromBundle(arguments ?: Bundle()).countryCode
@@ -169,8 +179,28 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     override fun continueToSwap() {
         val activity = requireActivity()
-        swapStarter.startSwapActivity(activity)
-        activity.finish()
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        TransactionFlow(
+                            action = AssetAction.Swap
+                        ).apply {
+                            startFlow(
+                                fragmentManager = childFragmentManager,
+                                host = this@VeriffSplashFragment
+                            )
+                        }
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            activity,
+                            currencyPrefs.selectedFiatCurrency
+                        )
+                        activity.finish()
+                    }
+                }
+            )
     }
 
     override fun createPresenter(): VeriffSplashPresenter = presenter
@@ -227,6 +257,9 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private fun showEmptyState() {
         throw IllegalStateException("UiState == EMPTY. This should never happen")
+    }
+
+    override fun onFlowFinished() {
     }
 
     companion object {

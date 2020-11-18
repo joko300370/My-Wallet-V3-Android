@@ -5,25 +5,25 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import kotlinx.android.synthetic.main.dialog_tx_flow_password.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import timber.log.Timber
 
-class EnterSecondPasswordSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class EnterSecondPasswordSheet : TransactionFlowSheet() {
 
     override val layoutResource: Int = R.layout.dialog_tx_flow_password
 
     override fun render(newState: TransactionState) {
         require(newState.currentStep == TransactionStep.ENTER_PASSWORD)
 
-        if (!newState.nextEnabled && newState.secondPassword.isEmpty()) {
-            Toast.makeText(requireContext(), "Incorrect password", Toast.LENGTH_SHORT).show()
+        if (newState.errorState == TransactionErrorState.INVALID_PASSWORD) {
+            Toast.makeText(requireContext(), getString(R.string.invalid_password), Toast.LENGTH_SHORT).show()
         }
-        Timber.d("!SEND!> Rendering! EnterSecondPasswordSheet")
+
+        Timber.d("!TRANSACTION!> Rendering! EnterSecondPasswordSheet")
+        cacheState(newState)
     }
 
     override fun initControls(view: View) {

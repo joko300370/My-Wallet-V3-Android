@@ -13,7 +13,7 @@ import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
@@ -21,7 +21,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.util.Date
 
 class CustodialTradingActivityItemDelegate<in T>(
-    private val onItemClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit // crypto, txID, type
+    private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
@@ -46,7 +46,7 @@ private class CustodialTradingActivityItemViewHolder(
 
     internal fun bind(
         tx: CustodialTradingActivitySummaryItem,
-        onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
+        onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {
             icon.setIcon(tx.status, tx.type)
@@ -70,7 +70,7 @@ private class CustodialTradingActivityItemViewHolder(
                     context.getString(R.string.activity_custodial_pending_value)
             }
             setOnClickListener {
-                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.CUSTODIAL_TRADING)
+                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.CUSTODIAL_TRADING)
             }
         }
     }

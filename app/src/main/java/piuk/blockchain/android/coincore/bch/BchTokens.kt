@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -22,8 +23,8 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -40,13 +41,14 @@ internal class BchAsset(
     private val feeDataManager: FeeDataManager,
     private val sendDataManager: SendDataManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -57,7 +59,8 @@ internal class BchAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentSettings
+    environmentSettings,
+    eligibilityProvider
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -72,16 +75,19 @@ internal class BchAsset(
             with(bchDataManager) {
                 getAccountMetadataList()
                     .mapIndexed { i, a ->
-                        BchCryptoWalletAccount(
+                        BchCryptoWalletAccount.createBchAccount(
                             payloadManager = payloadManager,
                             jsonAccount = a,
                             bchManager = bchDataManager,
+                            addressIndex = i,
                             isDefault = i == getDefaultAccountPosition(),
                             exchangeRates = exchangeRates,
                             networkParams = environmentSettings.bitcoinCashNetworkParameters,
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.isArchived
                         )
                     }
             }
@@ -89,8 +95,9 @@ internal class BchAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address.removePrefix(BCH_URL_PREFIX))) {
-                BchAddress(address, address)
+            val normalisedAddress = address.removePrefix(BCH_URL_PREFIX)
+            if (isValidAddress(normalisedAddress)) {
+                BchAddress(normalisedAddress, address)
             } else {
                 null
             }

@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_list_info_row.view.*
@@ -24,6 +25,8 @@ import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.SellCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.SellPurchaseAmount
+import piuk.blockchain.android.ui.activity.detail.SwapFee
+import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
@@ -63,38 +66,40 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
     }
 
     private fun getHeaderForType(infoType: ActivityDetailsType): String =
-        parent.context.getString(
-            when (infoType) {
-                is Created -> R.string.activity_details_created
-                is Amount -> R.string.activity_details_amount
-                is Fee -> R.string.activity_details_fee
-                is Value -> R.string.activity_details_value
-                is HistoricValue -> {
-                    when (infoType.transactionType) {
-                        TransactionSummary.TransactionType.SENT,
-                        TransactionSummary.TransactionType.SELL ->
-                            R.string.activity_details_historic_sent
-                        TransactionSummary.TransactionType.RECEIVED,
-                        TransactionSummary.TransactionType.BUY ->
-                            R.string.activity_details_historic_received
-                        TransactionSummary.TransactionType.TRANSFERRED,
-                        TransactionSummary.TransactionType.SWAP
-                        -> R.string.activity_details_historic_transferred
-                        else -> R.string.empty
-                    }
+        when (infoType) {
+            is Created -> parent.context.getString(R.string.activity_details_created)
+            is Amount -> parent.context.getString(R.string.activity_details_amount)
+            is Fee -> parent.context.getString(R.string.activity_details_fee)
+            is Value -> parent.context.getString(R.string.activity_details_value)
+            is HistoricValue -> {
+                when (infoType.transactionType) {
+                    TransactionSummary.TransactionType.SENT,
+                    TransactionSummary.TransactionType.SELL ->
+                        parent.context.getString(R.string.activity_details_historic_sent)
+                    TransactionSummary.TransactionType.RECEIVED,
+                    TransactionSummary.TransactionType.BUY ->
+                        parent.context.getString(R.string.activity_details_historic_received)
+                    TransactionSummary.TransactionType.TRANSFERRED,
+                    TransactionSummary.TransactionType.SWAP
+                    -> parent.context.getString(R.string.activity_details_historic_transferred)
+                    else -> parent.context.getString(R.string.empty)
                 }
-                is To -> R.string.activity_details_to
-                is From -> R.string.activity_details_from
-                is FeeForTransaction -> R.string.activity_details_transaction_fee
-                is BuyFee -> R.string.activity_details_buy_fees
-                is BuyPurchaseAmount -> R.string.activity_details_buy_purchase_amount
-                is SellPurchaseAmount -> R.string.common_total
-                is TransactionId -> R.string.activity_details_buy_tx_id
-                is BuyCryptoWallet,
-                is SellCryptoWallet -> R.string.activity_details_buy_sending_to
-                is BuyPaymentMethod -> R.string.activity_details_buy_payment_method
-                else -> R.string.empty
-            })
+            }
+            is To -> parent.context.getString(R.string.activity_details_to)
+            is From -> parent.context.getString(R.string.activity_details_from)
+            is FeeForTransaction -> parent.context.getString(R.string.activity_details_transaction_fee)
+            is BuyFee -> parent.context.getString(R.string.activity_details_buy_fees)
+            is BuyPurchaseAmount -> parent.context.getString(R.string.activity_details_buy_purchase_amount)
+            is SellPurchaseAmount -> parent.context.getString(R.string.common_total)
+            is TransactionId -> parent.context.getString(R.string.activity_details_buy_tx_id)
+            is BuyCryptoWallet,
+            is SellCryptoWallet -> parent.context.getString(R.string.activity_details_buy_sending_to)
+            is BuyPaymentMethod -> parent.context.getString(R.string.activity_details_buy_payment_method)
+            is SwapReceiveAmount -> parent.context.getString(R.string.activity_details_swap_for)
+            is SwapFee -> parent.context.getString(R.string.tx_confirmation_network_fee,
+                (infoType.feeValue as CryptoValue).currency.displayTicker)
+            else -> parent.context.getString(R.string.empty)
+        }
 
     private fun getValueForType(infoType: ActivityDetailsType): String =
         when (infoType) {
@@ -133,7 +138,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                         parent.context.getString(R.string.checkout_bank_transfer_label)
                     }
                     infoType.paymentDetails.endDigits != null &&
-                            infoType.paymentDetails.label != null -> {
+                        infoType.paymentDetails.label != null -> {
                         parent.context.getString(R.string.common_hyphenated_strings,
                             infoType.paymentDetails.label,
                             infoType.paymentDetails.endDigits)
@@ -146,6 +151,8 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                     }
                 }
             }
+            is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
+            is SwapFee -> infoType.feeValue.toStringWithSymbol()
             else -> ""
         }
 }

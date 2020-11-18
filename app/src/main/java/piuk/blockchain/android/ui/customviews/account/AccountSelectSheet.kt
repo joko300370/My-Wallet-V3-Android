@@ -6,13 +6,16 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.dialog_account_selector_sheet.*
 import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class AccountSelectSheet(
     override val host: Host
@@ -38,6 +41,8 @@ class AccountSelectSheet(
             .map { it.filter { a -> a.hasTransactions } }
 
     private var sheetTitle: Int = R.string.select_account_sheet_title
+    private var sheetSubtitle: Int = R.string.empty
+    private var statusDecorator: StatusDecorator = { DefaultCellDecorator() }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         analytics.logEvent(activityShown(account.label))
@@ -50,17 +55,19 @@ class AccountSelectSheet(
     }
 
     private fun doOnEmptyList() {
-        dismiss()
+        account_list_empty.visible()
     }
 
     override fun initControls(view: View) {
-        with(view.account_list) {
+        with(view) {
 
-            onAccountSelected = ::doOnAccountSelected
-            onEmptyList = ::doOnEmptyList
-            onLoadError = ::doOnLoadError
+            account_list.onAccountSelected = ::doOnAccountSelected
+            account_list.onEmptyList = ::doOnEmptyList
+            account_list.onLoadError = ::doOnLoadError
 
-            view.account_list_title.text = getString(sheetTitle)
+            account_list_title.text = getString(sheetTitle)
+            account_list_subtitle.text = getString(sheetSubtitle)
+            account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
 
             if (host is SelectAndBackHost) {
                 showBackArrow(view)
@@ -68,7 +75,7 @@ class AccountSelectSheet(
                 view.account_list_back.gone()
             }
 
-            initialise(accountList)
+            account_list.initialise(accountList, statusDecorator)
         }
     }
 
@@ -95,6 +102,20 @@ class AccountSelectSheet(
             AccountSelectSheet(host).apply {
                 this.accountList = accountList
                 this.sheetTitle = sheetTitle
+            }
+
+        fun newInstance(
+            host: Host,
+            accountList: Single<List<BlockchainAccount>>,
+            @StringRes sheetTitle: Int,
+            @StringRes sheetSubtitle: Int,
+            statusDecorator: StatusDecorator
+        ): AccountSelectSheet =
+            AccountSelectSheet(host).apply {
+                this.accountList = accountList
+                this.sheetTitle = sheetTitle
+                this.sheetSubtitle = sheetSubtitle
+                this.statusDecorator = statusDecorator
             }
     }
 }

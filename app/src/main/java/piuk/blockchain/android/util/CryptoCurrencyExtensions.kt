@@ -1,6 +1,7 @@
 package piuk.blockchain.android.util
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.widget.ImageView
 import androidx.annotation.ColorInt
@@ -9,6 +10,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.R
@@ -134,7 +136,8 @@ fun CryptoCurrency.assetFilter() =
 
 fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency, context: Context) {
     setBackgroundResource(R.drawable.bkgd_tx_circle)
-    background.setTint(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
+    ViewCompat.setBackgroundTintList(this,
+        ColorStateList.valueOf(ContextCompat.getColor(context, cryptoCurrency.assetTint())))
     setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))
 }
 

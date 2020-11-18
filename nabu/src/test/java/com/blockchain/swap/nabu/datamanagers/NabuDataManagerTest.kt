@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.datamanagers
 
+import com.blockchain.logging.DigitalTrust
 import com.blockchain.swap.nabu.getEmptySessionToken
 import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
 import com.blockchain.swap.nabu.models.nabu.NabuStateResponse
@@ -39,6 +40,7 @@ class NabuDataManagerTest {
     private val payloadDataManager: PayloadDataManager = mock()
     private val userReporter: NabuUserReporter = mock()
     private val walletReporter: WalletReporter = mock()
+    private val digitalTrust: DigitalTrust = mock()
     private val prefs: PersistentPrefs = mock()
     private val appVersion = "6.23.2"
     private val deviceId = "DEVICE_ID"
@@ -63,6 +65,7 @@ class NabuDataManagerTest {
             settingsDataManager,
             userReporter,
             walletReporter,
+            digitalTrust,
             payloadDataManager,
             prefs
         )
@@ -202,7 +205,7 @@ class NabuDataManagerTest {
     fun getUser() {
         // Arrange
         val userObject: NabuUser = mock()
-        val offlineToken = NabuOfflineTokenResponse("1", "")
+        val offlineToken = NabuOfflineTokenResponse(USER_ID, "")
         val sessionToken = getEmptySessionToken()
         whenever(nabuTokenStore.requiresRefresh()).thenReturn(false)
         whenever(nabuTokenStore.getAccessToken())
@@ -218,7 +221,8 @@ class NabuDataManagerTest {
         verify(nabuService).getUser(sessionToken)
         verify(walletReporter).reportWalletGuid(payloadDataManager.guid)
         verify(userReporter).reportUser(userObject)
-        verify(userReporter).reportUserId("1")
+        verify(userReporter).reportUserId(USER_ID)
+        verify(digitalTrust).setUserId(USER_ID)
     }
 
     @Test
@@ -440,5 +444,9 @@ class NabuDataManagerTest {
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         verify(nabuService).registerCampaign(sessionToken, campaignRequest, "campaign")
+    }
+
+    companion object {
+        private const val USER_ID = "1"
     }
 }

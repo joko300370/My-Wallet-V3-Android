@@ -32,7 +32,7 @@
         android:padding="@dimen/tiny_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount"
-        tools:background="@drawable/bkgd_status_received"
+        tools:background="@drawable/bkgd_green_100_rounded"
         tools:text="Completed" />
 
     <View

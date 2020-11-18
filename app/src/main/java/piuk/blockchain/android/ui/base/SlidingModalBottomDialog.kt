@@ -32,10 +32,11 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
 
         val view = View.inflate(context, layoutResource, null)
         dlg.setContentView(view)
+        dlg.setCanceledOnTouchOutside(false)
 
         val bottomSheetBehavior = BottomSheetBehavior.from(view.parent as View)
 
-        bottomSheetBehavior.setBottomSheetCallback(object :
+        bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(view: View, i: Int) {
                 when (i) {

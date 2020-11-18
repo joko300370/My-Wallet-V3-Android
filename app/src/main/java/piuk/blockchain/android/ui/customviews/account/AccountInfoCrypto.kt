@@ -12,7 +12,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
-import kotlinx.android.synthetic.main.view_account_crypto_overview.view.container
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.CellDecorator

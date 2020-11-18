@@ -3,7 +3,9 @@ package piuk.blockchain.android.coincore.erc20.usdt
 import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -19,11 +21,11 @@ import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
-import piuk.blockchain.androidcore.data.charts.PriceSeries
-import piuk.blockchain.androidcore.data.charts.TimeSpan
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
+import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -33,13 +35,15 @@ internal class UsdtAsset(
     feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     crashLogger: CrashLogger,
     pitLinking: PitLinking,
     tierService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : Erc20TokensBase(
     payloadManager,
     usdtAccount,
@@ -52,7 +56,8 @@ internal class UsdtAsset(
     pitLinking,
     crashLogger,
     tierService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
     override val asset: CryptoCurrency = CryptoCurrency.USDT
 
@@ -69,7 +74,9 @@ internal class UsdtAsset(
             usdtAddress,
             erc20Account,
             feeDataManager,
-            exchangeRates
+            exchangeRates,
+            walletPreferences,
+            custodialManager
         )
     }
 

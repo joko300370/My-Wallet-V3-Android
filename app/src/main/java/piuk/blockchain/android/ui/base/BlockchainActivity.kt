@@ -9,12 +9,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.appcompat.app.AlertDialog
 import android.view.MotionEvent
 import android.view.WindowManager
-import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.ui.ActivityIndicator
 import com.blockchain.ui.dialog.MaterialProgressDialog
-import com.blockchain.ui.password.SecondPasswordHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -37,8 +35,6 @@ abstract class BlockchainActivity : ToolBarActivity() {
 
     val analytics: Analytics by inject()
     val appUtil: AppUtil by inject()
-
-    protected val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     protected abstract val alwaysDisableScreenshots: Boolean
 

@@ -108,21 +108,26 @@ class AssetDetailsFlow(
                 AssetDetailsStep.ASSET_ACTIONS -> AssetActionsSheet.newInstance()
                 AssetDetailsStep.SELECT_ACCOUNT -> AccountSelectSheet.newInstance(
                     this,
-                    filterNonCustodialAccounts(localState.hostAction == AssetAction.Receive),
+                    filterNonCustodialAccounts(localState.hostAction),
                     when (localState.hostAction) {
                         AssetAction.Deposit -> R.string.select_deposit_source_title
-                        AssetAction.NewSend -> R.string.select_send_sheet_title
+                        AssetAction.Send -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
                     })
             }
         )
     }
 
-    private fun filterNonCustodialAccounts(showUnFunded: Boolean): Single<List<BlockchainAccount>> =
+    private fun filterNonCustodialAccounts(
+        action: AssetAction?
+    ): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
             .map {
-                it.filter { a -> showUnFunded || a.isFunded }
+                it.filter { a ->
+                    (action == AssetAction.Receive || a.isFunded) && (a.actions.contains(action)) ||
+                        action == AssetAction.Deposit
+                }
             }
 
     private fun handleHostAction(
@@ -138,7 +143,7 @@ class AssetDetailsFlow(
                     }
                 )
             }
-            AssetAction.NewSend -> {
+            AssetAction.Send -> {
                 selectAccountOrPerformAction(
                     state = newState,
                     singleAccountAction = {
@@ -229,7 +234,9 @@ class AssetDetailsFlow(
     }
 
     override fun finishFlow() {
-        resetFlow()
+        model.process(ClearSheetDataIntent)
+        disposables.clear()
+        currentStep = AssetDetailsStep.ZERO
         super.finishFlow()
     }
 
@@ -237,7 +244,7 @@ class AssetDetailsFlow(
         val singleAccount = account as SingleAccount
         when (localState.hostAction) {
             AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
-            AssetAction.NewSend -> launchNewSend(singleAccount)
+            AssetAction.Send -> launchNewSend(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
@@ -271,7 +278,7 @@ class AssetDetailsFlow(
     }
 
     private fun launchNewSend(account: SingleAccount) {
-        assetFlowHost.launchNewSendFor(account, AssetAction.NewSend)
+        assetFlowHost.launchNewSendFor(account, AssetAction.Send)
         finishFlow()
     }
 
@@ -295,15 +302,7 @@ class AssetDetailsFlow(
     }
 
     override fun onSheetClosed() {
-        if (currentStep == AssetDetailsStep.ZERO) {
-            finishFlow()
-        }
-    }
-
-    private fun resetFlow() {
-        model.process(ClearSheetDataIntent)
-        disposables.clear()
-        currentStep = AssetDetailsStep.ZERO
+        finishFlow()
     }
 }
 

@@ -9,7 +9,6 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -17,7 +16,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
 
@@ -59,6 +58,7 @@ class AssetDetailsInteractor(
     private sealed class Details {
         object NoDetails : Details()
         class DetailsItem(
+            val isEnabled: Boolean,
             val account: BlockchainAccount,
             val balance: Money,
             val pendingBalance: Money,
@@ -68,8 +68,13 @@ class AssetDetailsInteractor(
 
     private fun Maybe<AccountGroup>.mapDetails(): Single<Details> =
         this.flatMap { grp ->
-            grp.accountBalance.zipWith(grp.pendingBalance).toMaybe().map { (accBalance, pendingBalance) ->
+            Singles.zip(
+                grp.accountBalance,
+                grp.pendingBalance,
+                grp.isEnabled
+            ).toMaybe().map { (accBalance, pendingBalance, enabled) ->
                 Details.DetailsItem(
+                    isEnabled = enabled,
                     account = grp,
                     balance = accBalance,
                     pendingBalance = pendingBalance,
@@ -81,32 +86,29 @@ class AssetDetailsInteractor(
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
             asset.exchangeRate(),
-            asset.accountGroup(AssetFilter.All).mapDetails(),
             asset.accountGroup(AssetFilter.NonCustodial).mapDetails(),
             asset.accountGroup(AssetFilter.Custodial).mapDetails(),
             asset.accountGroup(AssetFilter.Interest).mapDetails(),
             asset.interestRate(),
             interestFeatureFlag.enabled
-        ) { fiatRate, total, nonCustodial, custodial, interest, interestRate, interestEnabled ->
+        ) { fiatRate, nonCustodial, custodial, interest, interestRate, interestEnabled ->
             makeAssetDisplayMap(
-                fiatRate, total, nonCustodial, custodial, interest, interestRate, interestEnabled
+                fiatRate, nonCustodial, custodial, interest, interestRate, interestEnabled
             )
         }
     }
 
     private fun makeAssetDisplayMap(
         fiatRate: ExchangeRate,
-        total: Details,
         nonCustodial: Details,
         custodial: Details,
         interest: Details,
         interestRate: Double,
         interestEnabled: Boolean
     ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
-        addToDisplayMap(this, AssetFilter.All, total, fiatRate)
         addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
         addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
-        if (interestEnabled) {
+        if (interestEnabled && (interest as? Details.DetailsItem)?.isEnabled == true) {
             addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
         }
     }

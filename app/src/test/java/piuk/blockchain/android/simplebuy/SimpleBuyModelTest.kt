@@ -1,6 +1,7 @@
 package piuk.blockchain.android.simplebuy
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.BuySellLimits
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
@@ -47,6 +48,11 @@ class SimpleBuyModelTest {
         on { simpleBuyState() } `it returns` gson.toJson(defaultState)
     }
 
+    private val ratingPrefs: RatingPrefs = mock {
+        on { hasSeenRatingDialog } `it returns` true
+        on { preRatingActionCompletedTimes } `it returns` 0
+    }
+
     @get:Rule
     val rx = rxInit {
         ioTrampoline()
@@ -64,7 +70,8 @@ class SimpleBuyModelTest {
                 interactor = interactor,
                 cardActivators = listOf(
                     mock()
-                )
+                ),
+                ratingPrefs = ratingPrefs
             )
     }
 

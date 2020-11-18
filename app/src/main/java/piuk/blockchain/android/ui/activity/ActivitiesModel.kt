@@ -18,10 +18,11 @@ enum class ActivitiesSheet {
     BANK_ORDER_CANCEL
 }
 
-enum class CryptoAccountType {
+enum class CryptoActivityType {
     NON_CUSTODIAL,
     CUSTODIAL_TRADING,
     CUSTODIAL_INTEREST,
+    SWAP,
     UNKNOWN
 }
 
@@ -34,7 +35,7 @@ data class ActivitiesState(
     val selectedTxId: String = "",
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val selectedFiatCurrency: String? = null,
-    val accountType: CryptoAccountType = CryptoAccountType.UNKNOWN
+    val activityType: CryptoActivityType = CryptoActivityType.UNKNOWN
 ) : MviState
 
 class ActivitiesModel(
@@ -45,6 +46,9 @@ class ActivitiesModel(
     initialState,
     mainScheduler
 ) {
+
+    private var fetchSubscription: Disposable? = null
+
     override fun performAction(
         previousState: ActivitiesState,
         intent: ActivitiesIntent
@@ -52,8 +56,11 @@ class ActivitiesModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is AccountSelectedIntent ->
-                interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
+            is AccountSelectedIntent -> {
+
+                fetchSubscription?.dispose()
+
+                fetchSubscription = interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
                     .subscribeBy(
                         onNext = {
                             process(ActivityListUpdatedIntent(it))
@@ -63,6 +70,9 @@ class ActivitiesModel(
                         },
                         onError = { process(ActivityListUpdatedErrorIntent) }
                     )
+
+                fetchSubscription
+            }
             is SelectDefaultAccountIntent ->
                 interactor.getDefaultAccount()
                     .subscribeBy(

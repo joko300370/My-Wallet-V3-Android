@@ -151,23 +151,7 @@ class XlmDataManager internal constructor(
         Single.fromCallable {
             horizonProxy.getTransactionList(accountReference.accountId)
                 .map(accountReference.accountId, horizonProxy)
-        }.ensureUrlUpdated().subscribeOn(Schedulers.io())
-
-    /**
-     * See also [getOperationFee]
-     */
-    fun getTransactionFee(hash: String): Single<CryptoValue> =
-        Single.fromCallable { horizonProxy.getTransaction(hash) }.ensureUrlUpdated()
-            .map { CryptoValue.lumensFromStroop(it.feeCharged.toBigInteger()) }
-            .subscribeOn(Schedulers.io())
-
-    /**
-     * See also [getTransactionFee]
-     */
-    fun getOperationFee(transactionHash: String): Single<CryptoValue> =
-        Single.fromCallable { horizonProxy.getTransaction(transactionHash) }
-            .map { CryptoValue.lumensFromStroop((it.feeCharged / it.operationCount).toBigInteger()) }
-            .subscribeOn(Schedulers.io())
+        }.ensureUrlUpdated()
 
     fun getTransactionList(): Single<List<XlmTransaction>> =
         defaultAccount().flatMap { getTransactionList(it) }

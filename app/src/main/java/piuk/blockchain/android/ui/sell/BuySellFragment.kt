@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.sell
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,6 +27,7 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.home.HomeScreenFragment
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -38,6 +40,11 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val buySellFlowNavigator: BuySellFlowNavigator
         get() = payloadScope.get()
+
+    private val showView: BuySellViewType by unsafeLazy {
+        arguments?.getSerializable(VIEW_TYPE) as? BuySellViewType
+            ?: BuySellViewType.TYPE_BUY
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -120,6 +127,13 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             childFragmentManager
         )
 
+        when (showView) {
+            BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
+                BuySellViewType.TYPE_BUY.ordinal, true)
+            BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
+                BuySellViewType.TYPE_SELL.ordinal, true)
+        }
+
         pager.visible()
         not_eligible_icon.gone()
         not_eligible_title.gone()
@@ -136,7 +150,18 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     }
 
     companion object {
-        fun newInstance() = BuySellFragment()
+        private const val VIEW_TYPE = "VIEW_TYPE"
+
+        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) = BuySellFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(VIEW_TYPE, viewType)
+            }
+        }
+    }
+
+    enum class BuySellViewType {
+        TYPE_BUY,
+        TYPE_SELL
     }
 
     override fun onSheetClosed() {
@@ -162,6 +187,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onBackPressed(): Boolean = false
 }
 
+@SuppressLint("WrongConstant")
 class ViewPagerAdapter(
     private val titlesList: List<String>,
     private val sellEnabled: Boolean,

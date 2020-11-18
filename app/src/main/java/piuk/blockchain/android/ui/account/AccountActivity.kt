@@ -1,21 +1,16 @@
 package piuk.blockchain.android.ui.account
 
-import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
-import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
-import android.widget.CheckBox
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
@@ -26,18 +21,20 @@ import com.google.zxing.BarcodeFormat
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.activity_accounts.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
-import piuk.blockchain.android.ui.account.AccountPresenter.Companion.KEY_WARN_TRANSFER_ALL
 import piuk.blockchain.android.ui.account.adapter.AccountAdapter
 import piuk.blockchain.android.ui.account.adapter.AccountHeadersListener
-import piuk.blockchain.android.ui.backup.transfer.ConfirmFundsTransferDialogFragment
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.ui.zxing.Intents
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -55,14 +52,13 @@ import java.util.Locale
 
 class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     AccountView,
-    AccountHeadersListener {
+    AccountHeadersListener, DialogFlow.FlowHost {
 
     override val locale: Locale = Locale.getDefault()
 
     private val rxBus: RxBus by inject()
     private val accountPresenter: AccountPresenter by scopedInject()
 
-    private var transferFundsMenuItem: MenuItem? = null
     private val accountsAdapter: AccountAdapter by unsafeLazy {
         AccountAdapter(this)
     }
@@ -94,23 +90,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         onViewReady()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_account, menu)
-        transferFundsMenuItem = menu.findItem(R.id.action_transfer_funds)
-        // Auto popup
-        presenter.checkTransferableLegacyFunds(isAutoPopup = true, showWarningDialog = true)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         android.R.id.home -> consume { onBackPressed() }
-        R.id.action_transfer_funds -> consume {
-            showProgressDialog(R.string.please_wait)
-            // Not auto popup
-            presenter.checkTransferableLegacyFunds(isAutoPopup = false, showWarningDialog = true)
-        }
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -243,15 +224,6 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
 
     override fun onResume() {
         super.onResume()
-
-        compositeDisposable += event.subscribe {
-            onViewReady()
-            // Check if we need to hide/show the transfer funds icon in the Toolbar
-            presenter.checkTransferableLegacyFunds(
-                isAutoPopup = false,
-                showWarningDialog = false
-            )
-        }
         onViewReady()
     }
 
@@ -336,48 +308,32 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         presenter.updateLegacyAddress(legacy)
     }
 
-    override fun onShowTransferableLegacyFundsWarning(isAutoPopup: Boolean) {
-        val checkBox = CheckBox(this)
-        checkBox.isChecked = false
-        checkBox.setText(R.string.dont_ask_again)
-
-        val builder = AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.transfer_funds)
-            .setMessage(getString(R.string.transfer_recommend) + "\n")
-            .setPositiveButton(R.string.transfer) { _, _ ->
-                transferSpendableFunds()
-                if (checkBox.isChecked) {
-                    prefs.setValue(KEY_WARN_TRANSFER_ALL, false)
-                }
+    override fun showTransferFunds(sendingAccount: CryptoAccount, defaultAccount: SingleAccount) {
+        AlertDialog.Builder(this, R.style.AlertDialogStyle)
+            .setTitle(R.string.transfer_funds_title)
+            .setMessage(getString(R.string.transfer_funds_description) + "\n")
+            .setPositiveButton(R.string.transfer_all) { _, _ ->
+                launchFlow(sendingAccount, defaultAccount)
             }
             .setNegativeButton(R.string.not_now) { _, _ ->
-                if (checkBox.isChecked) {
-                    prefs.setValue(KEY_WARN_TRANSFER_ALL, false)
-                }
-            }
+            }.show()
+    }
 
-        if (isAutoPopup) {
-            builder.setView(ViewUtils.getAlertDialogPaddedView(this, checkBox))
-        }
-
-        val alertDialog = builder.create()
-        if (!isFinishing) {
-            alertDialog.show()
-        }
-
-        alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).apply {
-            setTextColor(ContextCompat.getColor(this@AccountActivity, R.color.primary_grey_dark))
+    private fun launchFlow(sourceAccount: CryptoAccount, targetAccount: SingleAccount) {
+        TransactionFlow(
+            sourceAccount = sourceAccount,
+            action = AssetAction.Send,
+            target = targetAccount
+        ).apply {
+            startFlow(
+                fragmentManager = supportFragmentManager,
+                host = this@AccountActivity
+            )
         }
     }
 
-    @SuppressLint("CommitTransaction")
-    private fun transferSpendableFunds() {
-        ConfirmFundsTransferDialogFragment.newInstance()
-            .show(supportFragmentManager, ConfirmFundsTransferDialogFragment.TAG)
-    }
-
-    override fun onSetTransferLegacyFundsMenuItemVisible(visible: Boolean) {
-        transferFundsMenuItem?.isVisible = visible
+    override fun onFlowFinished() {
+        // do nothing
     }
 
     override fun showProgressDialog(@StringRes message: Int) {

@@ -1,26 +1,17 @@
 package piuk.blockchain.android.simplebuy
 
-import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.method.LinkMovementMethod
-import android.text.style.ForegroundColorSpan
-import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.eventWithPaymentMethod
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Quote
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_checkout.*
 import org.koin.android.ext.android.inject
@@ -30,13 +21,11 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
-import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
@@ -110,8 +99,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             else -> ""
         }
 
-        showLockedFunds(newState.withdrawalLockPeriod.secondsToDays())
-
         if (newState.errorState != null) {
             showErrorState(newState.errorState)
             return
@@ -146,42 +133,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
     }
 
-    private fun showLockedFunds(days: Long) {
-        val intro = getString(R.string.purchase_card_note_2)
-        val bold =
-            resources.getQuantityString(R.plurals.lock_days, days.toInt(), days.toInt())
-        val map = mapOf(
-            "learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED)
-        )
-        val boldAndLinked = stringUtils.getStringWithMappedLinks(
-            R.string.common_linked_learn_more,
-            map,
-            requireActivity()
-        )
-
-        val sb = SpannableStringBuilder()
-        sb.append(intro)
-            .append(bold)
-            .append(boldAndLinked)
-            .setSpan(StyleSpan(Typeface.BOLD), intro.length,
-                intro.length + bold.length + boldAndLinked.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        sb.setSpan(ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.blue_600)),
-            intro.length + bold.length, intro.length + bold.length + boldAndLinked.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        purchase_note_1.apply {
-            if (days > 0) {
-                visible()
-                movementMethod = LinkMovementMethod.getInstance()
-                setText(sb, TextView.BufferType.SPANNABLE)
-            } else gone()
-        }
-    }
-
     private fun showAmountForMethod(newState: SimpleBuyState) {
         amount.text = if (newState.selectedPaymentMethod?.isBank() == true) {
             if (newState.orderState == OrderState.PENDING_CONFIRMATION) {
-                newState.quote?.estimatedAmount()
+                newState.custodialQuote?.estimatedAmount()
             } else {
                 newState.orderValue?.toStringWithSymbol()
             }
@@ -202,7 +157,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             newState.orderState == OrderState.FINISHED -> {
                 status.text = getString(R.string.order_complete)
                 status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_received)
+                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
                 status.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.green_600))
             }
@@ -216,7 +171,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         listOf(
             if (state.selectedPaymentMethod?.isBank() == true) {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
-                    "${state.quote?.rate?.toStringWithSymbol()} / " +
+                    "${state.custodialQuote?.rate?.toStringWithSymbol()} / " +
                             "${state.selectedCryptoCurrency?.displayTicker}")
             } else {
                 CheckoutItem(getString(R.string.morph_exchange_rate),
@@ -238,7 +193,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             )
         )
 
-    private fun Quote.estimatedAmount(): String =
+    private fun CustodialQuote.estimatedAmount(): String =
         getString(R.string.approximately_symbol, estimatedAmount.toStringWithSymbol())
 
     private fun isPendingOrAwaitingFunds(orderState: OrderState) =

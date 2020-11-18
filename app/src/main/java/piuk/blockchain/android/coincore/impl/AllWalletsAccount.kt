@@ -11,7 +11,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccountList
-import timber.log.Timber
 
 class AllWalletsAccount(
     override val accounts: SingleAccountList,
@@ -51,13 +50,11 @@ class AllWalletsAccount(
 
     private fun allActivities(): Single<ActivitySummaryList> =
         allAccounts().flattenAsObservable { it }
-            .flatMapSingle {
-                it.activity.onErrorReturn {
-                    emptyList()
-                }
+            .flatMapSingle { account ->
+                account.activity
+                    .onErrorResumeNext { Single.just(emptyList()) }
             }
             .reduce { a, l -> a + l }
-            .doOnError { e -> Timber.e(e) }
             .toSingle(emptyList())
             .map { it.sorted() }
 }

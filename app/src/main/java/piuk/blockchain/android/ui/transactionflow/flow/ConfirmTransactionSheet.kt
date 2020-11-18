@@ -8,19 +8,17 @@ import info.blockchain.balance.ExchangeRates
 import kotlinx.android.synthetic.main.dialog_tx_flow_confirm.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
-class ConfirmTransactionSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
+class ConfirmTransactionSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_confirm
 
     private val stringUtils: StringUtils by inject()
@@ -34,6 +32,7 @@ class ConfirmTransactionSheet(
             model = model,
             stringUtils = stringUtils,
             activityContext = requireActivity(),
+            analytics = analyticsHooks,
             mapper = mapper,
             selectedCurrency = prefs.selectedFiatCurrency,
             exchangeRates = exchangeRates
@@ -46,9 +45,10 @@ class ConfirmTransactionSheet(
 
         // We _should_ always have a pending Tx when we get here
         newState.pendingTx?.let {
-            listAdapter.items = newState.pendingTx.options.toList()
+            listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
             dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
+            dialogView.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
         }
 
         with(dialogView) {
@@ -56,7 +56,13 @@ class ConfirmTransactionSheet(
             confirm_sheet_title.text = customiser.confirmTitle(newState)
             confirm_cta_button.isEnabled = newState.nextEnabled
             confirm_sheet_back.visibleIf { newState.canGoBack }
+
+            if (customiser.confirmDisclaimerVisibility(newState.action)) {
+                confirm_disclaimer.visible()
+                confirm_disclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
+            }
         }
+        cacheState(newState)
     }
 
     override fun initControls(view: View) {
@@ -74,6 +80,7 @@ class ConfirmTransactionSheet(
         }
 
         view.confirm_sheet_back.setOnClickListener {
+            analyticsHooks.onStepBackClicked(state)
             model.process(TransactionIntent.ReturnToPreviousStep)
         }
 
@@ -81,6 +88,7 @@ class ConfirmTransactionSheet(
     }
 
     private fun onCtaClick() {
+        analyticsHooks.onConfirmationCtaClick(state)
         model.process(TransactionIntent.ExecuteTransaction)
     }
 }

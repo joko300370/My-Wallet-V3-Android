@@ -9,14 +9,14 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
 
 // Transfer from a custodial trading account to an onChain non-custodial account
-open class TradingToOnChainTxEngine(
+class TradingToOnChainTxEngine(
     private val isNoteSupported: Boolean,
     private val walletManager: CustodialWalletManager
 ) : TxEngine() {
@@ -53,13 +53,13 @@ open class TradingToOnChainTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(options = listOf(
-                TxOptionValue.From(from = sourceAccount.label),
-                TxOptionValue.To(to = txTarget.label),
-                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees)
+            pendingTx.copy(confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees)
             ).apply {
                 if (isNoteSupported) {
-                    toMutableList().add(TxOptionValue.Description())
+                    toMutableList().add(TxConfirmationValue.Description())
                 }
             }))
 

@@ -1,10 +1,12 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.api.data.FeeOptions
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.Payment
@@ -16,16 +18,19 @@ import io.reactivex.rxkotlin.Singles
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Transaction
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransferError
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
 import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
@@ -39,9 +44,13 @@ import timber.log.Timber
 import java.math.BigInteger
 
 private const val STATE_UTXO = "btc_utxo"
+private const val FEE_OPTIONS = "fee_options"
 
 private val PendingTx.utxoBundle: SpendableUnspentOutputs
     get() = (this.engineState[STATE_UTXO] as? SpendableUnspentOutputs) ?: SpendableUnspentOutputs()
+
+private val PendingTx.feeOptions: FeeOptions
+    get() = (this.engineState[FEE_OPTIONS] as? FeeOptions) ?: FeeOptions()
 
 private class BtcPreparedTx(
     val btcTx: Transaction
@@ -57,11 +66,13 @@ class BtcOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val feeDataManager: FeeDataManager,
     private val btcNetworkParams: NetworkParameters,
-    private val walletPreferences: WalletStatus,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
-), BitPayClientEngine {
+    requireSecondPassword,
+    walletPreferences
+), BitPayClientEngine, KoinComponent {
+
     override fun assertInputsValid() {
         require(sourceAccount is BtcCryptoWalletAccount)
         require(txTarget is CryptoAddress)
@@ -69,9 +80,8 @@ class BtcOnChainTxEngine(
         require(asset == CryptoCurrency.BTC)
     }
 
-    private val btcTarget: CryptoAddress by unsafeLazy {
-        txTarget as CryptoAddress
-    }
+    private val btcTarget: CryptoAddress
+        get() = txTarget as CryptoAddress
 
     private val btcSource: BtcCryptoWalletAccount by unsafeLazy {
         sourceAccount as BtcCryptoWalletAccount
@@ -91,8 +101,7 @@ class BtcOnChainTxEngine(
                 amount = CryptoValue.ZeroBtc,
                 available = CryptoValue.ZeroBtc,
                 fees = CryptoValue.ZeroBtc,
-                feeLevel = mapSavedFeeToFeeLevel(
-                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BTC)),
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.BTC)),
                 selectedFiat = userFiat
             )
         )
@@ -101,14 +110,19 @@ class BtcOnChainTxEngine(
         Singles.zip(
             getDynamicFeePerKb(pendingTx),
             getUnspentApiResponse(sourceAddress)
-        ).map { (feePerKb, coins) ->
+        ).map { (optionsAndFeePerKb, coins) ->
             updatePendingTxFromAmount(
                 amount as CryptoValue,
                 pendingTx,
-                feePerKb,
+                optionsAndFeePerKb.second,
+                optionsAndFeePerKb.first,
                 coins
             )
-        }
+        }.onErrorReturnItem(
+            pendingTx.copy(
+                validationState = ValidationState.INSUFFICIENT_FUNDS
+            )
+        )
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
         if (btcDataManager.getAddressBalance(address) > CryptoValue.ZeroBtc) {
@@ -117,25 +131,24 @@ class BtcOnChainTxEngine(
                 // a problem:
                 .map { utxo ->
                     if (utxo.unspentOutputs.isEmpty()) {
-                        Timber.e("No BTC UTXOs found for non-zero balance!")
-                        throw IllegalStateException("No BTC UTXOs found for non-zero balance")
+                        throw fatalError(IllegalStateException("No BTC UTXOs found for non-zero balance"))
                     } else {
                         utxo
                     }
                 }
                 .singleOrError()
         } else {
-            Single.error(Throwable("No funds"))
+            Single.error(Throwable("No BTC funds"))
         }
 
-    private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<CryptoValue> =
+    private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<Pair<FeeOptions, CryptoValue>> =
         feeDataManager.btcFeeOptions
             .map { feeOptions ->
                 when (pendingTx.feeLevel) {
-                    FeeLevel.Regular -> feeToCrypto(feeOptions.regularFee)
-                    FeeLevel.None -> CryptoValue.ZeroBtc
-                    FeeLevel.Priority -> feeToCrypto(feeOptions.priorityFee)
-                    FeeLevel.Custom -> TODO() // feeToCrypto(view!!.getCustomFeeValue())
+                    FeeLevel.None -> Pair(feeOptions, CryptoValue.ZeroBtc)
+                    FeeLevel.Regular -> Pair(feeOptions, feeToCrypto(feeOptions.regularFee))
+                    FeeLevel.Priority -> Pair(feeOptions, feeToCrypto(feeOptions.priorityFee))
+                    FeeLevel.Custom -> Pair(feeOptions, feeToCrypto(pendingTx.customFeeAmount))
                 }
             }.singleOrError()
 
@@ -146,6 +159,7 @@ class BtcOnChainTxEngine(
         amount: CryptoValue,
         pendingTx: PendingTx,
         feePerKb: CryptoValue,
+        feeOptions: FeeOptions,
         coins: UnspentOutputs
     ): PendingTx {
         val sweepBundle = sendDataManager.getMaximumAvailable(
@@ -168,28 +182,19 @@ class BtcOnChainTxEngine(
             amount = amount,
             available = CryptoValue.fromMinor(CryptoCurrency.BTC, maxAvailable),
             fees = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
-            engineState = mapOf(
-                STATE_UTXO to utxoBundle
-            )
+            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, utxoBundle).copyAndPut(FEE_OPTIONS, feeOptions)
         )
     }
 
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
-        if (newOption is TxOptionValue.FeeSelection) {
-            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
-            // will need updating as well as the fees:
-            if (newOption.selectedLevel != pendingTx.feeLevel) {
-                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BTC,
-                    newOption.selectedLevel.mapFeeLevelToSavedValue())
-                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
-                    .flatMap { pTx -> doValidateAmount(pTx) }
-                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation is TxConfirmationValue.FeeSelection) {
+            if (newConfirmation.hasOptionChanged(pendingTx.feeLevel, pendingTx.customFeeAmount)) {
+                updateFeeSelection(CryptoCurrency.BTC, pendingTx, newConfirmation)
             } else {
-                // The option hasn't changed, revert to our known settings
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
         } else {
-            super.doOptionUpdateRequest(pendingTx, newOption)
+            super.doOptionUpdateRequest(pendingTx, newConfirmation)
         }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
@@ -200,33 +205,42 @@ class BtcOnChainTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
             pendingTx.copy(
-                options = mutableListOf(
-                    TxOptionValue.From(from = sourceAccount.label),
-                    TxOptionValue.To(to = txTarget.label),
+                confirmations = mutableListOf(
+                    TxConfirmationValue.From(from = sourceAccount.label),
+                    TxConfirmationValue.To(to = txTarget.label),
                     makeFeeSelectionOption(pendingTx),
-                    TxOptionValue.FeedTotal(
+                    TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
                         exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
-                    TxOptionValue.Description()
+                    TxConfirmationValue.Description()
                 ).apply {
                     if (isLargeTransaction(pendingTx)) {
-                        add(TxOptionValue.TxBooleanOption<Unit>(TxOption.LARGE_TRANSACTION_WARNING))
+                        add(TxConfirmationValue.TxBooleanConfirmation<Unit>(TxConfirmation.LARGE_TRANSACTION_WARNING))
                     }
                 }.toList()
             )
         )
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
-        TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
+            feeDetails = getFeeState(pendingTx, pendingTx.feeOptions),
+            customFeeAmount = pendingTx.customFeeAmount,
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(
-                FeeLevel.Regular, FeeLevel.Priority
-            )
+                FeeLevel.Regular, FeeLevel.Priority, FeeLevel.Custom
+            ),
+            feeInfo = buildFeeInfo(pendingTx),
+            asset = sourceAccount.asset
+        )
+
+    private fun buildFeeInfo(pendingTx: PendingTx): TxConfirmationValue.FeeSelection.FeeInfo =
+        TxConfirmationValue.FeeSelection.FeeInfo(
+            regularFee = pendingTx.feeOptions.regularFee,
+            priorityFee = pendingTx.feeOptions.priorityFee
         )
 
     // Returns true if bitcoin transaction is large by checking against 3 criteria:
@@ -242,10 +256,9 @@ class BtcOnChainTxEngine(
         )
 
         val relativeFee = 100.toBigDecimal() * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
-
         return fiatValue.toBigDecimal() > LARGE_TX_FEE.toBigDecimal() &&
-                txSize > LARGE_TX_SIZE &&
-                relativeFee > LARGE_TX_PERCENTAGE
+            txSize > LARGE_TX_SIZE &&
+            relativeFee > LARGE_TX_PERCENTAGE
     }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
@@ -253,6 +266,7 @@ class BtcOnChainTxEngine(
             .then { validateAmounts(pendingTx) }
             .then { validateSufficientFunds(pendingTx) }
             .then { validateOptions(pendingTx) }
+            .logValidityFailure()
             .updateTxValidity(pendingTx)
 
     private fun validateAddress(): Completable =
@@ -269,7 +283,7 @@ class BtcOnChainTxEngine(
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
 
-            if (amount > 2_100_000_000_000_000L.toBigInteger()) {
+            if (amount > maxBTCAmount.toBigInteger()) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
 
@@ -293,10 +307,18 @@ class BtcOnChainTxEngine(
         Completable.fromCallable {
             // If the large_fee warning is present, make sure it's ack'd.
             // If it's not, then there's nothing to do
-            if (pendingTx.getOption<TxOptionValue.TxBooleanOption<Unit>>(
-                    TxOption.LARGE_TRANSACTION_WARNING)?.value == false
+            if (pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Unit>>(
+                    TxConfirmation.LARGE_TRANSACTION_WARNING)?.value == false
             ) {
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
+            }
+
+            if (pendingTx.feeLevel == FeeLevel.Custom) {
+                when {
+                    pendingTx.customFeeAmount == -1L -> throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    pendingTx.customFeeAmount < MINIMUM_CUSTOM_FEE -> throw TxValidationFailure(
+                        ValidationState.UNDER_MIN_LIMIT)
+                }
             }
         }
 
@@ -334,13 +356,11 @@ class BtcOnChainTxEngine(
         }
 
     override fun doOnTransactionSuccess(pendingTx: PendingTx) {
-        // logPaymentSentEvent(true, CryptoCurrency.BTC, pendingTransaction.bigIntAmount)
         incrementBtcReceiveAddress(pendingTx)
     }
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
-        // logPaymentSentEvent(false, CryptoCurrency.BTC, pendingTransaction.bigIntAmount)
     }
 
     private fun getBtcKeys(pendingTx: PendingTx, secondPassword: String): Single<List<ECKey>> {
@@ -356,12 +376,13 @@ class BtcOnChainTxEngine(
                 )
             )
         } else {
+            val password = if (btcDataManager.isDoubleEncrypted) secondPassword else null
             return Single.just(
                 listOf(
                     btcDataManager.getAddressECKey(
                         legacyAddress = btcSource.internalAccount as LegacyAddress,
-                        secondPassword = secondPassword
-                    ) ?: throw TransferError("Private key not found for legacy BTC address")
+                        secondPassword = password
+                    ) ?: throw fatalError(TransferError("Private key not found for legacy BTC address"))
                 )
             )
         }
@@ -412,6 +433,17 @@ class BtcOnChainTxEngine(
         const val LARGE_TX_FEE = 0.5
         const val LARGE_TX_SIZE = 1024
         val LARGE_TX_PERCENTAGE = 1.0.toBigDecimal()
+    }
+
+    // TEMP diagnostics - TODO Remove this once we're stable
+    private val crashLogger: CrashLogger by inject()
+
+    private fun Completable.logValidityFailure(): Completable =
+        this.doOnError { crashLogger.logException(it) }
+
+    private fun fatalError(e: Throwable): Throwable {
+        crashLogger.logException(e)
+        return e
     }
 }
 

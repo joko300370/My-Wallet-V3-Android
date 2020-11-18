@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.fees.FeeType
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.Memo
 import com.blockchain.sunriver.SendDetails
 import com.blockchain.sunriver.XlmDataManager
@@ -13,33 +14,58 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 
+private const val STATE_MEMO = "XLM_MEMO"
+
+private val PendingTx.memo: TxConfirmationValue.Memo
+    get() = (this.engineState[STATE_MEMO] as? TxConfirmationValue.Memo)
+        ?: throw IllegalStateException("XLM memo option null")
+
+private fun PendingTx.setMemo(memo: TxConfirmationValue.Memo): PendingTx =
+    this.copy(
+        engineState = engineState.copyAndPut(STATE_MEMO, memo)
+    )
+
 class XlmOnChainTxEngine(
     private val xlmDataManager: XlmDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
     private val walletOptionsDataManager: WalletOptionsDataManager,
-    requireSecondPassword: Boolean
-) : OnChainTxEngineBase(requireSecondPassword) {
+    requireSecondPassword: Boolean,
+    walletPreferences: WalletStatus
+) : OnChainTxEngineBase(requireSecondPassword, walletPreferences) {
 
-    private val targetXlmAddress: XlmAddress by lazy {
-        txTarget as XlmAddress
-    }
+    private val targetXlmAddress: XlmAddress
+        get() = txTarget as XlmAddress
 
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)
         require((txTarget as CryptoAddress).asset == CryptoCurrency.XLM)
         require(asset == CryptoCurrency.XLM)
+    }
+
+    override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
+        return super.restart(txTarget, pendingTx).map { px ->
+            targetXlmAddress.memo?.let {
+                px.setMemo(TxConfirmationValue.Memo(
+                    text = it,
+                    isRequired = isMemoRequired(),
+                    id = null
+                ))
+            }
+        }
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -49,7 +75,14 @@ class XlmOnChainTxEngine(
                 available = CryptoValue.ZeroXlm,
                 fees = CryptoValue.ZeroXlm,
                 feeLevel = FeeLevel.Regular,
-                selectedFiat = userFiat
+                selectedFiat = userFiat,
+                engineState = hashMapOf()
+            ).setMemo(
+                TxConfirmationValue.Memo(
+                    text = targetXlmAddress.memo,
+                    isRequired = isMemoRequired(),
+                    id = null
+                )
             )
         )
 
@@ -99,37 +132,47 @@ class XlmOnChainTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
             pendingTx.copy(
-                options = listOf(
-                    TxOptionValue.From(from = sourceAccount.label),
-                    TxOptionValue.To(to = txTarget.label),
-                    TxOptionValue.Fee(fee = pendingTx.fees,
-                        exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
-                    TxOptionValue.FeedTotal(
+                confirmations = listOf(
+                    TxConfirmationValue.From(from = sourceAccount.label),
+                    TxConfirmationValue.To(to = txTarget.label),
+                    makeFeeSelectionOption(pendingTx),
+                    TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
                         exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
-                    TxOptionValue.Memo(
-                        text = targetXlmAddress.memo,
-                        isRequired = isMemoRequired(),
-                        id = null
-                    )
+                    pendingTx.memo
                 )
             )
         )
 
-    private fun String.containsMemo() = contains(":")
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> {
+        return super.doOptionUpdateRequest(pendingTx, newConfirmation).flatMap { tx ->
+            (newConfirmation as? TxConfirmationValue.Memo)?.let {
+                Single.just(tx.setMemo(newConfirmation))
+            } ?: Single.just(tx)
+        }
+    }
+
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
+            feeDetails = FeeDetails(pendingTx.fees),
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(FeeLevel.Regular),
+            asset = sourceAccount.asset
+        )
 
     private fun isMemoRequired(): Boolean =
         walletOptionsDataManager.isXlmAddressExchange(targetXlmAddress.address)
 
-    private fun isMemoValid(memoOption: TxOptionValue.Memo): Boolean {
+    private fun isMemoValid(memoConfirmation: TxConfirmationValue.Memo): Boolean {
         return if (!isMemoRequired()) {
             true
         } else {
-            !memoOption.text.isNullOrEmpty() && memoOption.text.length in 1..28 ||
-                    memoOption.id != null
+            !memoConfirmation.text.isNullOrEmpty() && memoConfirmation.text.length in 1..28 ||
+                    memoConfirmation.id != null
         }
     }
 
@@ -175,10 +218,9 @@ class XlmOnChainTxEngine(
         }.ignoreElement()
 
     private fun getMemoOption(pendingTx: PendingTx) =
-        pendingTx.getOption<TxOptionValue.Memo>(TxOption.MEMO) ?: throw IllegalStateException(
-            "XLM memo option null")
+        pendingTx.memo
 
-    private fun TxOptionValue.Memo.toXlmMemo(): Memo =
+    private fun TxConfirmationValue.Memo.toXlmMemo(): Memo =
         if (!this.text.isNullOrEmpty()) {
             Memo(this.text, Memo.MEMO_TYPE_TEXT)
         } else if (this.id != null) {

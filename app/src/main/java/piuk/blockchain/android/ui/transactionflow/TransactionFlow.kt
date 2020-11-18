@@ -9,20 +9,26 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
+import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.ConfirmTransactionSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterAmountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterSecondPasswordSheet
 import piuk.blockchain.android.ui.transactionflow.flow.EnterTargetAddressSheet
+import piuk.blockchain.android.ui.transactionflow.flow.SelectSourceAccountSheet
+import piuk.blockchain.android.ui.transactionflow.flow.SelectTargetAccountSheet
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionProgressSheet
 import timber.log.Timber
 
@@ -72,15 +78,19 @@ class TransactionFlow(
     private val target: TransactionTarget = NullCryptoAccount(),
     private val action: AssetAction,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
-) : DialogFlow() {
+) : DialogFlow(), KoinComponent {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
     private var currentStep: TransactionStep = TransactionStep.ZERO
+
+    private val analyticsHooks: TxFlowAnalytics by inject()
+    private val activeTransactionFlow: ActiveTransactionFlow by transactionInject()
 
     override fun startFlow(
         fragmentManager: FragmentManager,
         host: FlowHost
     ) {
+
         super.startFlow(fragmentManager, host)
         // Create the send scope
         openScope()
@@ -93,25 +103,39 @@ class TransactionFlow(
             )
         }
 
+        // Persist the flow
+        activeTransactionFlow.setFlow(this)
+
         disposables += sourceAccount.requireSecondPassword()
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = { passwordRequired ->
-                    if (target !is NullCryptoAccount &&
-                        sourceAccount !is NullCryptoAccount
-                    ) {
-                        model.process(
-                            TransactionIntent.InitialiseWithSourceAndTargetAccount(
-                                action, sourceAccount, target, passwordRequired
+                    when {
+                        target !is NullCryptoAccount && sourceAccount !is NullCryptoAccount -> {
+                            if (action == AssetAction.Swap) {
+                                model.process(
+                                    TransactionIntent.InitialiseWithSourceAndPreferredTarget(
+                                        action, sourceAccount, target, passwordRequired
+                                    )
+                                )
+                            } else {
+                                model.process(
+                                    TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                                        action, sourceAccount, target, passwordRequired
+                                    )
+                                )
+                            }
+                        }
+                        sourceAccount !is NullCryptoAccount -> {
+                            model.process(
+                                TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
                             )
-                        )
-                    } else if (sourceAccount !is NullCryptoAccount) {
-                        model.process(
-                            TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
-                        )
-                    } else {
-                        throw IllegalStateException(
-                            "Transaction flow initialised without at least one target")
+                        }
+                        else -> {
+                            model.process(
+                                TransactionIntent.InitialiseWithNoSourceOrTargetAccount(action, passwordRequired)
+                            )
+                        }
                     }
                 },
                 onError = {
@@ -121,9 +145,7 @@ class TransactionFlow(
     }
 
     override fun finishFlow() {
-        currentStep = TransactionStep.ZERO
-        disposables.clear()
-        closeScope()
+        model.process(TransactionIntent.ResetFlow)
         super.finishFlow()
     }
 
@@ -134,6 +156,7 @@ class TransactionFlow(
             } else {
                 currentStep = newState.currentStep
                 showFlowStep(currentStep)
+                analyticsHooks.onStepChanged(newState)
             }
         }
     }
@@ -142,21 +165,20 @@ class TransactionFlow(
         replaceBottomSheet(
             when (step) {
                 TransactionStep.ZERO -> null
-                TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet(
-                    this
-                )
-                TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet(
-                    this
-                )
-                TransactionStep.ENTER_AMOUNT -> EnterAmountSheet(
-                    this
-                )
-                TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet(
-                    this
-                )
-                TransactionStep.IN_PROGRESS -> TransactionProgressSheet(
-                    this
-                )
+                TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet()
+                TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet()
+                TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet()
+                TransactionStep.ENTER_AMOUNT -> EnterAmountSheet()
+                TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet()
+                TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet()
+                TransactionStep.IN_PROGRESS -> TransactionProgressSheet()
+                TransactionStep.CLOSED -> {
+                    currentStep = TransactionStep.ZERO
+                    disposables.clear()
+                    model.destroy()
+                    closeScope()
+                    null
+                }
             }
         )
     }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
@@ -28,7 +29,7 @@ abstract class AccountSelectorFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = inflater.inflate(R.layout.fragment_transfer_account_selector, container, false)
+    ): View = inflater.inflate(R.layout.fragment_transfer_account_selector, container, false)
 
     protected abstract val filterFn: AccountListFilterFn
 
@@ -37,6 +38,7 @@ abstract class AccountSelectorFragment : Fragment() {
 
         account_selector_account_list.onLoadError = ::doOnLoadError
         account_selector_account_list.onEmptyList = ::doOnEmptyList
+        account_selector_account_list.onListLoaded = ::doOnListLoaded
     }
 
     fun initialiseAccountSelector(
@@ -87,9 +89,16 @@ abstract class AccountSelectorFragment : Fragment() {
         }
     }
 
-    private fun doOnEmptyList() {
+    @CallSuper
+    protected open fun doOnEmptyList() {
         account_selector_account_list.gone()
         account_selector_empty_view.visible()
+    }
+
+    @CallSuper
+    protected open fun doOnListLoaded() {
+        account_selector_account_list.visible()
+        account_selector_empty_view.gone()
     }
 
     private fun doOnLoadError(t: Throwable) {

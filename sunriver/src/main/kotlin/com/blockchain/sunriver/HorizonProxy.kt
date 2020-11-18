@@ -169,7 +169,7 @@ internal class HorizonProxy {
                 timeout,
                 perOperationFee
             )
-        val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
+        val fee = CryptoValue.fromMinor(CryptoCurrency.XLM, transaction.fee.toBigInteger())
         val total = amount + fee
         val minBalance = minBalance(minReserve, account.subentryCount)
         if (account.balance < total + minBalance) {

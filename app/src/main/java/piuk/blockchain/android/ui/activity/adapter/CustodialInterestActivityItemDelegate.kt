@@ -18,7 +18,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
@@ -31,7 +31,7 @@ import java.util.Date
 class CustodialInterestActivityItemDelegate<in T>(
     private val disposables: CompositeDisposable,
     private val currencyPrefs: CurrencyPrefs,
-    private val onItemClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit // crypto, txID, type
+    private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
@@ -60,7 +60,7 @@ private class CustodialInterestActivityItemViewHolder(
         tx: CustodialInterestActivitySummaryItem,
         disposables: CompositeDisposable,
         selectedFiatCurrency: String,
-        onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
+        onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {
             icon.setIcon(tx.isPending(), tx.type)
@@ -90,7 +90,7 @@ private class CustodialInterestActivityItemViewHolder(
             setTextColours(tx.status)
 
             setOnClickListener {
-                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.CUSTODIAL_INTEREST)
+                onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.CUSTODIAL_INTEREST)
             }
         }
     }

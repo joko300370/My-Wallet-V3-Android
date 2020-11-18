@@ -71,10 +71,6 @@ data class CryptoValue(
         fun bitcoinFromSatoshis(satoshi: Long) =
             CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
 
-        @Deprecated("Historical method", ReplaceWith("satoshi.satoshiCash()"))
-        fun bitcoinCashFromSatoshis(satoshi: Long) =
-            CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
-
         @Deprecated("Historical method", ReplaceWith("stroop.stroops()"))
         fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
 
@@ -116,6 +112,11 @@ data class CryptoValue(
     override fun compare(other: Money): Int {
         require(other is CryptoValue)
         return amount.compareTo(other.amount)
+    }
+
+    override fun division(other: Money): Money {
+        require(other is CryptoValue)
+        return CryptoValue(currency, amount / other.amount)
     }
 
     override fun ensureComparable(operation: String, other: Money) {

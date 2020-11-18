@@ -4,6 +4,7 @@ import android.app.Activity
 import info.blockchain.balance.ExchangeRates
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
 import piuk.blockchain.android.util.StringUtils
@@ -12,6 +13,7 @@ class ConfirmTransactionDelegateAdapter(
     stringUtils: StringUtils,
     activityContext: Activity,
     model: TransactionModel,
+    analytics: TxFlowAnalytics,
     mapper: TxConfirmReadOnlyMapper,
     exchangeRates: ExchangeRates,
     selectedCurrency: String
@@ -25,9 +27,10 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(model, exchangeRates, selectedCurrency))
             addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
-            addAdapterDelegate(InvoiceCountdownTimerDelegate(model, compositeDisposable))
+            addAdapterDelegate(InvoiceCountdownTimerDelegate())
             addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
-            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, activityContext, stringUtils))
+            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, activityContext, stringUtils))
+            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(activityContext, stringUtils))
         }
     }
 }

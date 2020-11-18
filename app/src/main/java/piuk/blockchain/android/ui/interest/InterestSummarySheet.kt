@@ -12,6 +12,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_interest_details_sheet.view.*
@@ -25,6 +26,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
+import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -94,26 +96,19 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             }
         }
 
-        val compositeData = CompositeInterestDetails()
-        disposables += custodialWalletManager.getInterestAccountDetails(cryptoCurrency)
-            .flatMap { details ->
-                compositeData.totalInterest = details.totalInterest
-                compositeData.pendingInterest = details.pendingInterest
-                compositeData.balance = details.balance
-
-                custodialWalletManager.getInterestLimits(cryptoCurrency).toSingle().flatMap { limits ->
-                    val lockDurationInSeconds = limits.interestLockUpDuration
-                    val lockupDurationDays =
-                        lockDurationInSeconds / SECONDS_TO_DAYS // seconds -> days conversion
-                    compositeData.lockupDuration = lockupDurationDays
-
-                    custodialWalletManager.getInterestAccountRates(cryptoCurrency).map { interestRate ->
-                        compositeData.interestRate = interestRate
-
-                        compositeData
-                    }
-                }
-            }.observeOn(AndroidSchedulers.mainThread())
+        disposables += Singles.zip(
+            custodialWalletManager.getInterestAccountDetails(cryptoCurrency),
+            custodialWalletManager.getInterestLimits(cryptoCurrency).toSingle(),
+            custodialWalletManager.getInterestAccountRates(cryptoCurrency)
+        ) { details, limits, interestRate ->
+            CompositeInterestDetails(
+                totalInterest = details.totalInterest,
+                pendingInterest = details.pendingInterest,
+                balance = details.balance,
+                lockupDuration = limits.interestLockUpDuration.secondsToDays(),
+                interestRate = interestRate
+            )
+        }.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
                     compositeToView(it, view)
@@ -128,8 +123,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
         val itemList = mutableListOf<InterestSummaryInfoItem>()
         itemList.apply {
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_total),
-                composite.totalInterest?.let { it.toStringWithSymbol() }
-                    ?: getString(R.string.interest_summary_total_fail)))
+                composite.totalInterest.toStringWithSymbol()))
 
             // TODO this will be returned by the API sometime soon, for now show 1st of next month
             val calendar = Calendar.getInstance()
@@ -141,25 +135,18 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
                 formattedDate))
 
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_accrued),
-                composite.pendingInterest?.let {
-                    it.toStringWithSymbol()
-                } ?: getString(R.string.interest_summary_accrued_fail)))
+                composite.pendingInterest.toStringWithSymbol()))
 
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_hold_period),
-                composite.lockupDuration?.let {
-                    getString(R.string.interest_summary_hold_period_days, it)
-                } ?: getString(R.string.interest_summary_hold_period_fail)))
+                getString(R.string.interest_summary_hold_period_days, composite.lockupDuration)))
 
-            add(InterestSummaryInfoItem(getString(R.string.interest_summary_rate),
-                composite.interestRate?.let { "$it%" } ?: getString(
-                    R.string.interest_summary_rate_fail)))
+            add(InterestSummaryInfoItem(getString(R.string.interest_summary_rate), "${composite.interestRate}%"))
         }
 
-        composite.balance?.let {
+        composite.balance.run {
             view.apply {
-                interest_details_crypto_value.text = it.toStringWithSymbol()
-                interest_details_fiat_value.text =
-                    it.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+                interest_details_crypto_value.text = toStringWithSymbol()
+                interest_details_fiat_value.text = toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
                         .toStringWithSymbol()
             }
         }
@@ -168,7 +155,6 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
     }
 
     companion object {
-        private const val SECONDS_TO_DAYS = 86400.0
         fun newInstance(
             singleAccount: SingleAccount,
             selectedAsset: CryptoCurrency
@@ -185,12 +171,11 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
     )
 
     private data class CompositeInterestDetails(
-        var balance: CryptoValue? = null,
-        var totalInterest: CryptoValue? = null,
-        var pendingInterest: CryptoValue? = null,
-        var accruedInterest: CryptoValue? = null,
+        val balance: CryptoValue,
+        val totalInterest: CryptoValue,
+        val pendingInterest: CryptoValue,
         var nextInterestPayment: Date? = null,
-        var lockupDuration: Double? = null,
-        var interestRate: Double? = null
+        val lockupDuration: Int,
+        val interestRate: Double
     )
 }

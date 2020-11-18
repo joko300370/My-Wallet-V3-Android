@@ -7,6 +7,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.view_intro_header.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class IntroHeaderView @JvmOverloads constructor(
     context: Context,
@@ -40,5 +41,9 @@ class IntroHeaderView @JvmOverloads constructor(
         intro_header_title.text = context.getString(title)
         intro_header_label.text = context.getString(label)
         intro_header_icon.setImageDrawable(context.getDrawable(icon))
+    }
+
+    fun toggleBottomSeparator(visible: Boolean) {
+        intro_header_separator.visibleIf { visible }
     }
 }

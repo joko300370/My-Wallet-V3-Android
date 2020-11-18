@@ -5,6 +5,8 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.AddressAnalytics
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.WalletAnalytics
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.BitcoinCashWallet
@@ -22,14 +24,21 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.bch.BchCryptoWalletAccount
+import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.AddressType
@@ -44,13 +53,18 @@ class AccountPresenter internal constructor(
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
     private val metadataManager: MetadataManager,
-    private val fundsDataManager: TransferFundsDataManager,
-    private val prefs: PersistentPrefs,
     private val appUtil: AppUtil,
     private val privateKeyFactory: PrivateKeyFactory,
     private val environmentSettings: EnvironmentConfig,
     private val analytics: Analytics,
-    private val coinsWebSocketStrategy: CoinsWebSocketStrategy
+    private val coinsWebSocketStrategy: CoinsWebSocketStrategy,
+    private val coincore: Coincore,
+    private val sendDataManager: SendDataManager,
+    private val feeDataManager: FeeDataManager,
+    private val exchangeRates: ExchangeRateDataManager,
+    private val environmentConfig: EnvironmentConfig,
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : BasePresenter<AccountView>() {
 
     internal var doubleEncryptionPassword: String? = null
@@ -74,43 +88,7 @@ class AccountPresenter internal constructor(
             view.hideCurrencyHeader()
         }
         view.updateAccountList(getDisplayList())
-        if (cryptoCurrency == CryptoCurrency.BCH) {
-            view.onSetTransferLegacyFundsMenuItemVisible(false)
-        } else {
-            checkTransferableLegacyFunds(false, false)
-        }
     }
-
-    /**
-     * Silently check if there are any spendable legacy funds that need to be sent to default
-     * account. Prompt user when done calculating.
-     */
-    @SuppressLint("CheckResult")
-    internal fun checkTransferableLegacyFunds(isAutoPopup: Boolean, showWarningDialog: Boolean) {
-        compositeDisposable += fundsDataManager.transferableFundTransactionListForDefaultAccount
-            .doAfterTerminate { view.dismissProgressDialog() }
-            .doOnError { Timber.e(it) }
-            .subscribeBy(
-                onNext = { (pendingList, _, _) ->
-                        if (payloadDataManager.wallet!!.isUpgraded && pendingList.isNotEmpty()) {
-                            view.onSetTransferLegacyFundsMenuItemVisible(true)
-
-                            if ((prefs.isTransferAllWarningEnabled || !isAutoPopup) && showWarningDialog) {
-                                view.onShowTransferableLegacyFundsWarning(isAutoPopup)
-                            }
-                        } else {
-                            view.onSetTransferLegacyFundsMenuItemVisible(false)
-                        }
-                    },
-                onError = {
-                    Timber.e(it)
-                    view.onSetTransferLegacyFundsMenuItemVisible(false)
-                }
-            )
-    }
-
-    private val PersistentPrefs.isTransferAllWarningEnabled
-        get() = getValue(KEY_WARN_TRANSFER_ALL, true)
 
     /**
      * Derive new Account from seed
@@ -182,9 +160,63 @@ class AccountPresenter internal constructor(
                     analytics.logEvent(AddressAnalytics.ImportBTCAddress)
                     coinsWebSocketStrategy.subscribeToExtraBtcAddress(address.address)
                     onViewReady()
+                    createCoincoreAddress(address)
                 },
                 { view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR) }
             )
+    }
+
+    internal fun createCoincoreAddress(legacyAddress: LegacyAddress) {
+        compositeDisposable += coincore[cryptoCurrency].defaultAccount().subscribeBy { defaultAccount ->
+            when (cryptoCurrency) {
+                CryptoCurrency.BTC -> loadBtcAccount(legacyAddress, defaultAccount)
+                CryptoCurrency.BCH -> loadBchAccount(legacyAddress, defaultAccount)
+                else -> throw IllegalStateException("Non BTC/BCH not supported when adding addresses")
+            }
+        }
+    }
+
+    private fun loadBtcAccount(legacyAddress: LegacyAddress, defaultAccount: SingleAccount) {
+        val sendingAccount = BtcCryptoWalletAccount.createLegacyAccount(
+            legacyAccount = legacyAddress,
+            payloadManager = payloadDataManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            exchangeRates = exchangeRates,
+            networkParameters = environmentConfig.bitcoinNetworkParameters,
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager,
+            isArchived = false
+        )
+
+        checkBalanceForTransfer(sendingAccount, defaultAccount)
+    }
+
+    private fun loadBchAccount(legacyAddress: LegacyAddress, defaultAccount: SingleAccount) {
+        val sendingAccount = BchCryptoWalletAccount.createImportBchAccount(
+            payloadManager = payloadDataManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            exchangeRates = exchangeRates,
+            label = legacyAddress.label,
+            address = legacyAddress.address,
+            bchManager = bchDataManager,
+            networkParams = environmentConfig.bitcoinCashNetworkParameters,
+            jsonAccount = GenericMetadataAccount(legacyAddress.label, false),
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager,
+            isArchived = false
+        )
+
+        checkBalanceForTransfer(sendingAccount, defaultAccount)
+    }
+
+    internal fun checkBalanceForTransfer(sendingAccount: CryptoAccount, defaultAccount: SingleAccount) {
+        compositeDisposable += sendingAccount.actionableBalance.subscribeBy {
+            if (it.isPositive) {
+                view.showTransferFunds(sendingAccount, defaultAccount)
+            }
+        }
     }
 
     /**
@@ -318,12 +350,8 @@ class AccountPresenter internal constructor(
         return when (cryptoCurrency) {
             CryptoCurrency.BTC -> getBtcDisplayList()
             CryptoCurrency.BCH -> getBchDisplayList()
-            CryptoCurrency.ETHER -> throw IllegalStateException("Ether not a supported cryptocurrency on this page")
-            CryptoCurrency.XLM -> throw IllegalStateException("Xlm not a supported cryptocurrency on this page")
-            CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            else -> throw IllegalStateException(
+                "${cryptoCurrency.networkTicker} not a supported cryptocurrency on this page")
         }
     }
 
@@ -362,10 +390,6 @@ class AccountPresenter internal constructor(
         accountsAndImportedList.add(AccountItem(AccountItem.TYPE_IMPORT_ADDRESS_BUTTON))
 
         for (legacyAddress in getLegacyAddresses()) {
-            if (legacyAddress.isWatchOnly) {
-                continue
-            }
-
             var label: String? = legacyAddress.label
             val address: String = legacyAddress.address ?: ""
             val balance = getBtcAddressBalance(address)
@@ -500,7 +524,6 @@ class AccountPresenter internal constructor(
         }
 
     companion object {
-        internal const val KEY_WARN_TRANSFER_ALL = "WARN_TRANSFER_ALL"
         internal const val ADDRESS_LABEL_MAX_LENGTH = 17
     }
 }

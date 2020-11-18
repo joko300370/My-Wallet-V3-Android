@@ -2,8 +2,10 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.BuySellOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -11,15 +13,17 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -32,10 +36,13 @@ open class CustodialTradingAccount(
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    private val eligibilityProvider: EligibilityProvider,
+    override val isArchived: Boolean = false
 ) : CryptoAccountBase(), TradingAccount {
 
     private val nabuAccountExists = AtomicBoolean(false)
+    private val isEligibleForSimpleBuy = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
@@ -72,6 +79,11 @@ open class CustodialTradingAccount(
             .doOnComplete { nabuAccountExists.set(false) }
             .doOnSuccess { nabuAccountExists.set(true) }
             .toSingle(CryptoValue.zero(asset))
+            .zipWith(eligibilityProvider.isEligibleForSimpleBuy().doOnSuccess {
+                isEligibleForSimpleBuy.set(it)
+            }).map { (balance, _) ->
+                balance
+            }
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading total balance: $it")
                 CryptoValue.zero(asset)
@@ -100,6 +112,9 @@ open class CustodialTradingAccount(
         get() = custodialWalletManager.getAllOrdersFor(asset)
             .mapList { orderToSummary(it) }
             .filterActivityStates()
+            .flatMap {
+                appendSwapActivity(custodialWalletManager, asset, custodialSwapDirections, it)
+            }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
@@ -131,9 +146,11 @@ open class CustodialTradingAccount(
             ).apply {
                 if (isFunded) {
                     add(AssetAction.Sell)
-                    add(AssetAction.NewSend)
+                    add(AssetAction.Send)
+                    if (isEligibleForSimpleBuy.get())
+                        add(AssetAction.Swap)
                 }
-            }
+            }.toSet()
 
     private fun orderToSummary(buyOrder: BuySellOrder): ActivitySummaryItem =
         CustodialTradingActivitySummaryItem(
@@ -161,11 +178,20 @@ open class CustodialTradingAccount(
         }.toList()
     }
 
+    // No need to reconcile sends and swaps in custodial accounts, the BE deals with this
+    // Return a list containing both supplied list
+    override fun reconcileSwaps(
+        swaps: List<SwapActivitySummaryItem>,
+        activity: List<ActivitySummaryItem>
+    ): List<ActivitySummaryItem> = activity + swaps
+
     companion object {
         private val displayedStates = setOf(
             OrderState.FINISHED,
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION
         )
+
+        private val custodialSwapDirections = listOf(SwapDirection.INTERNAL)
     }
 }

@@ -6,9 +6,9 @@ import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.priorityFee
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.ui.swap.homebrew.exchange.ExchangeModel
-import piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation.ExchangeConfirmationPresenter
-import piuk.blockchain.android.ui.swap.homebrew.exchange.history.TradeHistoryPresenter
+import piuk.blockchain.android.ui.swapold.exchange.ExchangeModel
+import piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationPresenter
+import piuk.blockchain.android.ui.swapold.exchange.history.TradeHistoryPresenter
 
 val morphUiModule = module {
 

@@ -122,6 +122,8 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         updateCurrencyUi(selectedCurrency)
     }
 
+    fun getCurrentlySelectedCurrency(): CryptoCurrency = selectedCurrency
+
     fun hide(cryptoCurrency: CryptoCurrency) {
         textView(cryptoCurrency)?.gone()
     }

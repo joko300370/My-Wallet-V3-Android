@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">受け取る</string>
   <string name="toolbar_cmd_activity">アクティビティ</string>
   <string name="toolbar_cmd_view_activity">アクティビティを表示</string>
-  <string name="common_swap">スワップ</string>
+  <string name="toolbar_cmd_swap">スワップ</string>
   <string name="cancel">キャンセル</string>
   <string name="btn_ok">OK</string>
-  <string name="common_yes">はい</string>
-  <string name="common_no">番号</string>
+  <string name="yes">はい</string>
+  <string name="no">番号</string>
   <string name="polite_no">結構です</string>
   <string name="done">完了</string>
   <string name="btn_close">閉じる</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">継続する</string>
   <string name="btn_forgot_password">パスワードをお忘れですか？\"</string>
   <string name="SEND">送る</string>
-  <string name="common_total">合計</string>
+  <string name="total">合計</string>
   <string name="max_available">支出可能な合計残高を使用：</string>
   <string name="bitpay_remaining_time">残り時間</string>
   <string name="bitpay_invoice_expired">期限切れのBitPay請求書</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">選択したパスワードは弱すぎて資金を確保できません。強く
 別のものを選択することをお勧めします。新しいパスワードを定義しますか？ 
 </string>
-  <string name="common_from">から</string>
-  <string name="common_to">に</string>
+  <string name="from">から</string>
+  <string name="to">に</string>
   <string name="confirm_details">支払いを確認</string>
   <string name="fee">費用</string>
   <string name="exit_confirm">もう一度戻るボタンを押して終了します</string>
@@ -349,6 +349,17 @@
 ビットコインアドレス%1$s QRコードをスキャンしてください。 
 </string>
   <string name="invalid_private_key">秘密鍵が無効です</string>
+  <string name="watch_only_import_warning">使用できないアドレスをインポートしようとしています。 
+アドレス（または公開鍵スクリプト） 
+対応する秘密鍵なしでウォレットに保存されます。この
+秘密鍵を別の場所に保存している場合にのみ、資金を使用できることを意味します。もし、あんたが
+行う
+秘密鍵が保存されていないため、ビットコインを
+支出不可
+住所。 
+
+これらのオプションは、上級ユーザーのみにお勧めします。継続する？ 
+</string>
   <string name="scan_private_key">秘密鍵をスキャンする</string>
   <string name="private_key_successfully_imported">秘密鍵が正常にインポートされました。</string>
   <string name="private_key_not_matching_address">注：スキャンされた秘密キーは
@@ -627,7 +638,7 @@
 ランチャーのアイコンで、ビットコインの受信をさらに高速化します。 
 </string>
   <string name="shortcut_settings_enable">ランチャーのショートカット</string>
-  <string name="common_confirm">確認</string>
+  <string name="confirm">確認</string>
   <string name="swipe_receive_hint">スワイプして受信</string>
   <string name="swipe_receive_preference_summary">左にスワイプすると受信アドレスが表示されます
  PIN画面により、資金の受け取りがさらに速くなります。 
@@ -815,7 +826,7 @@
 市場活動のため。注文が開始されると、停止することはできません
 </string>
   <string name="send_to">に送る</string>
-  <string name="common_receive">受け取る</string>
+  <string name="receive">受け取る</string>
   <string name="fees">料金</string>
   <string name="value">値</string>
   <string name="status">状態</string>
@@ -894,7 +905,7 @@
   <string name="swap_intro_title">スワップ</string>
   <string name="swap_intro_title_page_one">スワップへようこそ！</string>
   <string name="swap_intro_title_page_two">リアルタイム為替レート</string>
-  <string name="swap_intro_title_page_three">100％オンチェーン</string>
+  <string name="swap_intro_title_page_three">100％%オンチェーン</string>
   <string name="swap_intro_title_page_four">あなたはキーをコントロールします</string>
   <string name="swap_intro_title_page_five">より良いリスク管理</string>
   <string name="swap_intro_description_page_one">ウォレットを離れることなく、ある暗号を別の暗号と交換する最も簡単な方法。</string>
@@ -1112,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">確認リンクを送信しました</string>
   <string name="buy_sell_unverified_email_verify_message2">それをクリックしてここに戻り、取引を続行します。</string>
   <string name="buy_sell_unverified_email_verify_open_email">メールを開く</string>
-
   <string name="buy_sell_verified_email_title">メール確認済み！</string>
   <string name="buy_sell_verified_email_message">パートナー%1$sがビットコイントランザクションを処理します。同意して「続行」をクリックすると、 %1$sアカウントが作成されます。</string>
   <string name="buy_sell_identification_verification">確認を識別する</string>
@@ -1494,10 +1504,10 @@
   <string name="tx_sold">売れた</string>
   <string name="linked_cards">リンクされたカード</string>
   <string name="tx_title_send">%1s送信</string>
-  <string name="tx_title_receive">%1sを受け取る</string>
+  <string name="tx_title_receive" formatted="false">%1sを受け取り%1s</string>
   <string name="tx_title_sell">%1s売る</string>
   <string name="tx_title_buy">%1s購入</string>
-  <string name="tx_title_swap">%1sスワップ</string>
+  <string name="tx_title_swap">%1$s → %2$sスワップ</string>
   <string name="tx_title_transfer">%1s転送</string>
   <string name="tx_title_fee">料金%1s</string>
   <string name="transaction_detail_value_at_time_swapped">交換時の値： \u0020</string>
@@ -1508,7 +1518,7 @@
   <string name="simple_buy_add_card_card_body">クレジットカードまたはデビットカードをブロックチェーンウォレットに追加して、注文を完了します。</string>
   <string name="simple_buy_add_card_card_cta">カードを追加</string>
   <string name="kyc_settings_accounts_limit">アカウント制限</string>
-  <string name="annual_swap_and_buy_limit">年間のスワップと購入の制限</string>
+  <string name="annual_swap_and_buy_limit">年間の交換および購入制限</string>
   <string name="daily_swap_and_buy_limit">毎日の交換および購入制限</string>
   <string name="simple_buy_own_crypto">わずか数分で暗号を所有する</string>
   <string name="simple_buy_verify_your_identity">本人確認と暗号化の購入</string>
@@ -1531,6 +1541,7 @@
   <string name="estimated_amount">EST（東部基準時。量</string>
   <string name="buying_fee">購入手数料</string>
   <string name="purchase_bank_note">資金を受け取り次第、 %1$s購入注文を開始します。注意してください、あなたの最終的な量は当然の市場活動に変わるかもしれません。手数料がかかる場合があります。</string>
+  <string name="purchase_card_note">お支払い方法は2営業日以内に引き落とされます。あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
   <string name="complete_payment">完全な支払い</string>
   <string name="card_payment">カード決済</string>
   <string name="buy_now">今買う</string>
@@ -1577,7 +1588,7 @@
   <string name="billing_address_state">状態</string>
   <string name="billing_address_country">国</string>
   <string name="currency_not_supported_title">あなたの通貨はサポートされていません</string>
-  <string name="currency_not_supported_1">現在、 %1s暗号の購入はサポートされていません</string>
+  <string name="currency_not_supported">現在、 %1s暗号の購入はサポートされていません</string>
   <string name="activity_no_activity_title">アクティビティがありません</string>
   <string name="activity_no_activity_text">すべての取引がここに表示されます。</string>
   <string name="activity_custodial_pending_value">銀行振込</string>
@@ -1641,4 +1652,424 @@
   <string name="activity_details_historic_received">受け取ったときの値</string>
   <string name="activity_details_historic_transferred">転送時の値</string>
   <string name="activity_details_historic_value_load_fail">過去の価値情報を読み込めませんでした</string>
+  <string name="received_usdt">テザーを受け取った</string>
+  <string name="watch_only_not_supported">使用できないアドレス（アドレスまたは公開鍵スクリプト）のインポート
+対応する秘密鍵がない場合）はサポートされていません。もう一度お試しください
+アドレスと秘密鍵。 
+</string>
+  <string name="linked_banks">リンクされた銀行</string>
+  <string name="tx_title_deposit">%1s入金</string>
+  <string name="tx_title_withdraw">%1s撤回</string>
+  <string name="usdt_to_field_helper_no_dropdown_1">TETHER / ETHアドレスを入力してください</string>
+  <string name="usdt_to_field_helper_1">TETHER / ETHアドレスを入力または選択</string>
+  <string name="usdt_invalid_address_1">TETHERアドレスが無効です</string>
+  <string name="usdt_wallet_name">テザーウォレット</string>
+  <string name="bank_transfer">銀行振込</string>
+  <string name="instantly_buy_crypto_with_card">VisaまたはMastercardで暗号化を即座に購入します。</string>
+  <string name="send_funds_directly_from_your_bank">銀行から直接ブロックチェーンウォレットに資金を送金します。手動送金を受け取ったら、その現金を使用して暗号を購入します。</string>
+  <string name="by_depositing_funds_terms_and_conds">この口座に資金を入金することにより、銀行パートナーである<annotation link="modular_terms_and_conditions">利用規約</annotation>に同意したことになります。</string>
+  <string name="add_bank_with_currency">%1s銀行を追加</string>
+  <string name="deposit_currency">%1s入金</string>
+  <string name="currency_bank_transfer">銀行振込</string>
+  <string name="link_transfer_instructions">%1sを個人銀行からBlockchain.comに送金してください。これにより、銀行口座が安全にリンクされます。</string>
+  <string name="payment">支払い</string>
+  <string name="buy_now_1">%1s購入</string>
+  <string name="simple_buy_transfer_details_error">転送の詳細の読み込み中に問題が発生しました。 
+
+後でもう一度やり直してください。</string>
+  <string name="algo_default_account_label">マイアルゴランドウォレット</string>
+  <string name="usdt_default_account_label">テザーウォレット</string>
+  <string name="add_bank_title">%1s銀行を追加</string>
+  <string name="order_error_subtitle">心配しないで。あなたのお金は安全です。もう一度お試しいただくか、サポートチームにお問い合わせください。</string>
+  <string name="currency_not_supported_1">現在、 %1s暗号の購入はサポートされていません</string>
+  <string name="checkout_funds_label">資金</string>
+  <string name="checkout_funds_transfer_label">%1sウォレット</string>
+  <string name="transfer_wallets_empty_title">送信する暗号はありません</string>
+  <string name="transfer_wallets_empty_details">ウォレットが空のようです。クリプトの購入をお手伝いします</string>
+  <string name="transfer_wallets_load_error">ウォレットの読み込み中にエラーが発生しました。しばらくしてからもう一度お試しください</string>
+  <string name="remove_bank">銀行を削除</string>
+  <string name="pounds">ポンド</string>
+  <string name="euros">ユーロ</string>
+  <string name="deposit_cash">預金</string>
+  <string name="send_me_instructions">指示を送ってください</string>
+  <string name="bank_transfer_only">銀行振込のみ</string>
+  <string name="bank_transfer_only_subtitle">お名前の銀行口座からのみ送金してください。そうでない場合、あなたの預金は遅延または拒否される可能性があります。</string>
+  <string name="processing_time">処理時間</string>
+  <string name="processing_time_subtitle_eur">資金は、受け取り次第、EURウォレットに入金されます。 SEPAでの転送には通常、1営業日ほどかかります。</string>
+  <string name="processing_time_subtitle_gbp">資金は、受け取り次第、GBPウォレットに入金されます。 UK Faster Payments Networkでは、これには数時間かかる場合があります。</string>
+  <string name="deposit_limits">デポジット制限</string>
+  <string name="deposit_limits_subtitle">1日の引き出し限度額を超えて入金すると、一度にすべての資金を引き出すことができなくなりますのでご注意ください。</string>
+  <string name="unable_to_load_bank_details">銀行預金の詳細を読み込めませんでした。</string>
+  <string name="most_popular">最も人気のある</string>
+  <string name="fiat_funds_detail_deposit_title">預り金</string>
+  <string name="fiat_funds_detail_withdraw_title">引き出す</string>
+  <string name="fiat_funds_detail_deposit_details">銀行から現金を追加</string>
+  <string name="fiat_funds_detail_activity_title">アクティビティ</string>
+  <string name="fiat_funds_detail_activity_details">すべてのトランザクションを表示</string>
+  <string name="fiat_funds_no_kyc_announcement_title">ウォレットに現金を保管してください</string>
+  <string name="fiat_funds_no_kyc_announcement_description">ウォレットに現金を入金し、暗号を購入するには、本人確認を行ってください。</string>
+  <string name="fiat_funds_no_kyc_sheet_description">ウォレットに現金を入金するには、本人確認を行ってください。暗号を売買します。いつでも引き出すことができます。</string>
+  <string name="fiat_funds_no_kyc_step_1_title">本人確認</string>
+  <string name="fiat_funds_no_kyc_step_1_description">IDをアップロードして詐欺行為を防止するのが本人であることを確認する必要があります。</string>
+  <string name="fiat_funds_no_kyc_step_2_title">預金</string>
+  <string name="fiat_funds_no_kyc_step_2_description">あなたの銀行から現金を転送し、あなたの現金残高を有効にします。</string>
+  <string name="fiat_funds_no_kyc_step_3_title">現金で暗号を購入する</string>
+  <string name="fiat_funds_no_kyc_step_3_description">キャッシュウォレットを支払い方法として使用して、BTC、ETH、XLMなどを購入します。</string>
+  <string name="fiat_funds_no_kyc_positive_action">本人確認</string>
+  <string name="fiat_funds_no_kyc_negative_action">今はやめろ</string>
+  <string name="fiat_funds_no_kyc_step_1_label">1</string>
+  <string name="fiat_funds_no_kyc_step_2_label">2</string>
+  <string name="fiat_funds_no_kyc_step_3_label">３</string>
+  <string name="fiat_funds_kyc_announcement_title">銀行をリンクして暗号を購入する</string>
+  <string name="fiat_funds_kyc_announcement_description">Blockchain.comウォレットに現金を入れます。いつでも入出金できます。</string>
+  <string name="fiat_funds_kyc_announcement_action">銀行をリンク</string>
+  <string name="transfer_wallet_buy_crypto">Cryptoを購入する</string>
+  <string name="transfer_send_crypto">暗号を送る</string>
+  <string name="transfer_second_pswd_title">2番目のパスワード</string>
+  <string name="transfer_second_pswd_desc">2番目のパスワードを入力してください。送信を続行できます。</string>
+  <string name="transfer_second_pswd_hint">2番目のパスワード</string>
+  <string name="algorand_announcement_title">アルゴランドにこんにちは！</string>
+  <string name="algorand_announcement_description">ALGOを購入して財布に入れます。販売と撤退はすぐに来ています。</string>
+  <string name="algorand_announcement_action">Algorandを購入する</string>
+  <string name="currency_wallet">%1sウォレット</string>
+  <string name="tether_announcement_title">テザーにこんにちは！</string>
+  <string name="tether_announcement_description">USDTは世界最大のStablecoinです。アプリから購入して交換します。完全な送信および受信機能はWebウォレットで使用できます。</string>
+  <string name="tether_announcement_action">今すぐテザーを購入</string>
+  <string name="dashboard_asset_item_label_title">ご注意ください。</string>
+  <string name="algorand_asset_label">トレードウォレットからALGOを引き出す機能は現在使用できませんが、近日提供予定です。</string>
+  <string name="usdt_asset_label">完全な送信および受信機能はWebウォレットで使用できます。</string>
+  <string name="send_state_no_funds">資金なし</string>
+  <string name="send_state_not_supported">このアカウントではサポートされていない送信</string>
+  <string name="send_state_not_enough_gas">ETH残高が少なく、ネットワーク料金を支払うことができない</string>
+  <string name="send_state_send_in_flight">保留中のトランザクションがあるため、使用できません。</string>
+  <string name="common_send">送る</string>
+  <string name="common_receive">受け取る</string>
+  <string name="common_swap">スワップ</string>
+  <string name="common_from">から</string>
+  <string name="common_to">に</string>
+  <string name="common_yes">はい</string>
+  <string name="common_no">番号</string>
+  <string name="common_ok">OK</string>
+  <string name="common_cancel">キャンセル</string>
+  <string name="common_total">合計</string>
+  <string name="common_deposit">預り金</string>
+  <string name="common_transfer">転送</string>
+  <string name="common_error">何かが間違っていました。もう一度やり直してください</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">確認</string>
+  <string name="toolbar_cmd_transfer">転送</string>
+  <string name="notification_2fa_summary">2FA通知</string>
+  <string name="notification_2fa_description">2要素認証に関連する通知</string>
+  <string name="notification_payments_summary">支払い通知</string>
+  <string name="notification_payments_description">支払いに関する通知</string>
+  <string name="enable_cloud_backup">クラウドバックアップを有効にする</string>
+  <string name="enable_cloud_backup_summary">暗号化されたバックアップをGoogleドライブアカウントに保存し、 
+可能な場合は。これにより、このデバイスを紛失した場合にウォレットを復元できます。 
+</string>
+  <string name="tx_title_interest">獲得した%1$s利息</string>
+  <string name="dashboard_asset_actions_send_dsc">%1$sを任意のウォレットに転送</string>
+  <string name="dashboard_asset_actions_receive_dsc">%1$sアドレスを受け入れるか共有します</string>
+  <string name="dashboard_asset_actions_swap_dsc">%1$sを別の暗号と交換</string>
+  <string name="dashboard_asset_actions_deposit_dsc">インタレストウォレットに%1$sを追加します</string>
+  <string name="dashboard_asset_actions_summary_title">インタレストサマリー</string>
+  <string name="dashboard_asset_actions_summary_dsc">%1$s未払い利息を表示</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">金利の詳細を読み込めませんでした</string>
+  <string name="asset_details_chart_load_failed_toast">グラフの詳細を読み込めませんでした。もう一度お試しください</string>
+  <string name="asset_details_load_failed_toast">ウォレットの詳細を読み込めませんでした。もう一度お試しください</string>
+  <string name="asset_details_exchange_load_failed_toast">レート情報を交換できませんでした。もう一度お試しください</string>
+  <string name="dashboard_asset_actions_tx_in_progress">すでにトランザクションが進行中です。完了するまでお待ちください</string>
+  <string name="cloud_backup_card_title">クラウドバックアップの紹介</string>
+  <string name="cloud_backup_card_body">これで、ウォレットをクラウドに安全にバックアップできます。ウォレット設定でバックアップをオプトアウトできます。</string>
+  <string name="cloud_backup_card_cta">もっと詳しく知る</string>
+  <string name="basic_transfer_lock_warn" formatted="false">引き出し可能な残高は%1sです。残りの残高%2sは7日以内に引き出すことができます。</string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">詳細</annotation> 。</string>
+  <string name="basic_transfer_error_insufficient_funds_title">残高不足</string>
+  <string name="basic_transfer_error_insufficient_funds">この取引を完了するにはアカウントの資金が不足しています。</string>
+  <string name="basic_transfer_error_locked_funds">あなたの暗号は7日以内に撤回できるようになります。 <annotation link="balance_lock">詳細</annotation> 。</string>
+  <string name="erc20_need_more_eth_error_body_1">%1$sを送信するにはETHが必要です</string>
+  <string name="purchase_card_note_1">あなたの最終的な量は、市場活動のために変わるかもしれません。最初の7日間の保留期間が資金に適用されます。</string>
+  <string name="select_deposit_source_title">からの転送</string>
+  <string name="activity_state_cleared">クリア</string>
+  <string name="activity_state_rejected">拒否されました</string>
+  <string name="activity_state_refunded">払い戻し</string>
+  <string name="activity_details_label_manual_review">手動レビュー</string>
+  <string name="activity_details_label_processing">処理</string>
+  <string name="activity_details_title_deposit">預り金</string>
+  <string name="activity_details_title_interest_earned">獲得した利息</string>
+  <string name="activity_details_title_withdraw">出金</string>
+  <string name="transfer_receive_crypto">暗号を受け取る</string>
+  <string name="send_select_target_title">先</string>
+  <string name="send_enter_amount_from">差出人： %1$s</string>
+  <string name="send_enter_amount_to">宛先： %1$s</string>
+  <string name="send_enter_amount_title">%1$s送信</string>
+  <string name="send_enter_amount_available">利用可能</string>
+  <string name="send_enter_amount_max">マックスを送る</string>
+  <string name="send_enter_amount_deposit_max">最大転送</string>
+  <string name="send_enter_amount_min_deposit">%1$s最小転送が必要です</string>
+  <string name="send_confirmation_title">%1$s送信</string>
+  <string name="send_confirmation_fee">料金-通常</string>
+  <string name="send_confirmation_regular_estimation">（ETA 60分）</string>
+  <string name="send_confirmation_fee_loading">読み込んでいます…</string>
+  <string name="send_confirmation_fee_error">読み込みエラー</string>
+  <string name="send_confirmation_add_note_hint">メモを追加</string>
+  <string name="send_confirmation_add_note_success">メモを追加しました</string>
+  <string name="send_confirmation_cta_button">%1$s送信</string>
+  <string name="send_confirmation_deposit_cta_button">転送を確認</string>
+  <string name="send_confirmation_interest_tos_pp"><annotation link="interest_tos">利用規約</annotation>および<annotation link="interest_pp">プライバシーポリシー</annotation>を読んだうえで内容に同意します。</string>
+  <string name="send_confirmation_interest_holding_period_1">これを受け入れると、移管に同意したことになります</string>
+  <string name="send_confirmation_interest_holding_period_2">（ %1$s ）ビットコインウォレットからインタレストアカウントへ。最初の7日間の保留期間が資金に適用されます。</string>
+  <string name="send_confirmation_progress_title">%1$s転送しています</string>
+  <string name="send_confirmation_progress_message">現在%1$s転送しています。</string>
+  <string name="send_confirmation_success_title">%1$s転送しました</string>
+  <string name="send_confirmation_success_message">%1$sは正常に転送されました。</string>
+  <string name="send_progress_sending_title">%1$s送信しています</string>
+  <string name="send_progress_sending_subtitle">現在、トランザクションを送信しています。</string>
+  <string name="send_progress_complete_title">%1$s送信しました</string>
+  <string name="send_progress_complete_subtitle">%1$sを送信しました。</string>
+  <string name="send_progress_error_title">おっとっと！何かが間違っていました。</string>
+  <string name="send_progress_error_subtitle">心配しないで。あなたのお金は安全です。もう一度試すか、サポートチームにお問い合わせください。</string>
+  <string name="send_enter_asset_address_hint">%1sアドレス</string>
+  <string name="send_warn_internal_send_only">内部送信のみ</string>
+  <string name="send_scan_qr_code">QRコードをスキャン</string>
+  <string name="send_error_not_valid_asset_address">有効な%1sアドレスではありません</string>
+  <string name="send_error_address_is_eth_contract">住所はユーザーの住所ではありません</string>
+  <string name="send_enter_amount_error_insufficient_funds">ウォレットに%1$sが足りません。</string>
+  <string name="send_enter_amount_error_invalid_amount">0.00000001 %1$s以上を送信します。</string>
+  <string name="send_enter_invalid_password">パスワードが正しくありません。</string>
+  <string name="send_enter_unexpected_error">予期しないエラーが発生しました。もう一度やり直してください。</string>
+  <string name="send_enter_insufficient_gas">このトランザクションを処理するのに十分なETHがありません。</string>
+  <string name="send_select_a_wallet_title">またはウォレットを選択</string>
+  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%1$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
+  <string name="purchase_funds_note">あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link">詳細。 </annotation>
+  </string>
+  <string name="interest_announcement_title">今日、あなたのクリプトに興味を持ってください！</string>
+  <string name="interest_announcement_description">暗号を移管し、BTC、ETHなどで利息の獲得を開始します。</string>
+  <string name="interest_announcement_action">もっと詳しく知る</string>
+  <string name="purchase_card_note_2">あなたの暗号は内で撤回するために利用可能になります</string>
+  <string name="purchase_card_note_2_1">7日。</string>
+  <string name="buy_any_crypto">Cryptoを購入する</string>
+  <string name="select_send_sheet_title">から送る</string>
+  <string name="select_send_source_title">から送る</string>
+  <string name="currency_funds_wallet">%1sウォレット</string>
+  <string name="transfer_receive_empty_title">ウォレットを読み込めません</string>
+  <string name="transfer_receive_empty_details">インターネット接続に問題があるようです。確認してもう一度お試しください</string>
+  <string name="transfer_receive_empty_cta">タップして更新</string>
+  <string name="us_dollars">米ドル</string>
+  <string name="fiat_funds_detail_withdraw_details">あなたの銀行への引き出し</string>
+  <string name="withdraw_currency">%1$s</string>
+  <string name="withdraw_title">引き出す</string>
+  <string name="withdraw_to">に引き出す</string>
+  <string name="add_a_bank">銀行を追加</string>
+  <string name="transfer_send_crypto_title">暗号を送る</string>
+  <string name="transfer_send_crypto_label">送信元のウォレットを選択します。</string>
+  <string name="transfer_receive_crypto_title">暗号を受け取る</string>
+  <string name="transfer_receive_crypto_label">暗号を受け取るウォレットを選択します。</string>
+  <string name="withdraw_amount">%1$s</string>
+  <string name="withdrawal_amount">%1$s引き出し</string>
+  <string name="withdrawing_amount">%1$s引き出しています</string>
+  <string name="withdrawing_amount_message">現在、出金を完了しています。</string>
+  <string name="withdrawal_success_message">成功しました！現在、 %1$sウォレットから現金を引き出しています。資金は1〜3営業日で銀行に入金されます。</string>
+  <string name="sell_enter_amount_max">マックスを売る</string>
+  <string name="sell_enter_amount_min_error">%1$s分</string>
+  <string name="sell_enter_amount_max_error">最大%1$s</string>
+  <string name="send_enter_amount_min_send">%1$s送金が必要です</string>
+  <string name="sell_confirmation_cta_button">%1$s売る</string>
+  <string name="sell_confirmation_progress_title">%1$s販売</string>
+  <string name="sell_confirmation_progress_message">現在、販売を完了しています。</string>
+  <string name="sell_confirmation_success_message">あなたの現金が%1$sウォレットで利用できるようになりました。</string>
+  <string name="send_state_locked_funds">資金は7日以内に利用可能になります</string>
+  <string name="sell_progress_complete_title">%1$s販売済み</string>
+  <string name="earn_interest">利益を得る</string>
+  <string name="interest_summary_total">総利息</string>
+  <string name="interest_summary_total_fail">総利息を読み込めません</string>
+  <string name="interest_summary_next_payment">次の利払い</string>
+  <string name="interest_summary_accrued">今月の未収利息</string>
+  <string name="interest_summary_accrued_fail">経過利息を読み込めません</string>
+  <string name="interest_summary_hold_period">最初の保留期間</string>
+  <string name="interest_summary_hold_period_days">%1$d日</string>
+  <string name="interest_summary_hold_period_fail">保持期間の詳細を読み込めません</string>
+  <string name="interest_summary_rate">金利</string>
+  <string name="interest_summary_rate_fail">金利を読み込めません</string>
+  <string name="interest_dashboard_title">利子勘定</string>
+  <string name="interest_dashboard_item_balance_title">%1$s残高</string>
+  <string name="interest_dashboard_item_accrued_title">総利息</string>
+  <string name="interest_dashboard_item_action_earn">利益を得る</string>
+  <string name="interest_dashboard_item_action_view">見る</string>
+  <string name="interest_dashboard_item_rate_1">まで稼ぐ</string>
+  <string name="interest_dashboard_item_rate_2">毎年%1$s</string>
+  <string name="interest_dashboard_verify_title">あなたの暗号に興味を得る</string>
+  <string name="interest_dashboard_verify_label">クリプトをインタレストアカウントに転送すると、即座に最大12 \％を獲得できます。</string>
+  <string name="interest_dashboard_verify_point_one_title">本人確認</string>
+  <string name="interest_dashboard_verify_point_one_label">IDの盗難や詐欺を防ぐために、IDをアップロードして本人であることを確認する必要があります。</string>
+  <string name="interest_dashboard_verify_point_two_title">Cryptoを購入する</string>
+  <string name="interest_dashboard_verify_point_two_label">銀行、デビット、またはクレジットカードを使用して、暗号通貨の購入に資金を供給します。</string>
+  <string name="interest_dashboard_verify_point_three_title">利益を得る</string>
+  <string name="interest_dashboard_verify_point_three_label">あなたの金利口座に転送し、毎月の金利支払いを取得します。</string>
+  <string name="interest_summary_disclaimer_label">Webウォレットを使用して資金を引き出す</string>
+  <string name="buy">購入</string>
+  <string name="sell">売る</string>
+  <string name="buy_and_sell">売買</string>
+  <string name="buy_with_cash">現金またはカードで購入。</string>
+  <string name="select_crypto_you_want">購入する暗号を選択します。</string>
+  <string name="sell_intro_kyc_title_1">本人確認</string>
+  <string name="sell_intro_kyc_subtitle_1">個人情報の盗難や詐欺を防ぐには、IDをアップロードして、本人であることを確認する必要があります。</string>
+  <string name="sell_intro_kyc_title_2">Cryptoを購入する</string>
+  <string name="sell_intro_kyc_subtitle_2">銀行、デビット、またはクレジットカードを使用して、暗号通貨の購入に資金を供給します。</string>
+  <string name="sell_intro_kyc_title_3">いつでも売る</string>
+  <string name="sell_intro_kyc_subtitle_3">即座にあなたのクリプトを現金で売ります。現金を財布に入れておくか、リンクされた銀行に引き出します。</string>
+  <string name="sell_crypto">暗号を売る</string>
+  <string name="sell_crypto_subtitle">身元を確認して、暗号化を現金で販売します。</string>
+  <string name="sell_for_cash">現金で暗号を売る</string>
+  <string name="select_wallet_to_sell">販売するウォレットを選択してください。</string>
+  <string name="common_to_coloned">に：</string>
+  <string name="common_from_coloned">から：</string>
+  <string name="common_sell">売る</string>
+  <string name="sell_quote_price">%1$s価格</string>
+  <string name="convert_your_crypto_to_cash">暗号を現金に変換する</string>
+  <string name="scan_mismatch_transaction_target">スキャンされたコードは%1$s QRコードではありません。</string>
+  <string name="scan_failed">QRコードを認識できません。もう一度お試しください。</string>
+  <string name="could_not_save_card">カードを保存できませんでした。サポートにお問い合わせください。</string>
+  <string name="could_not_activate_card">カードを有効化できませんでした。サポートにお問い合わせください。</string>
+  <string name="card_still_pending">私たちは2分間待機しましたが、カードプロバイダーから更新を受け取りませんでした。カードは後で承認される場合があります。ご不明な点がございましたら、サポートまでお問い合わせください。</string>
+  <string name="card_link_failed">カードをリンクできませんでした。再試行するか、エラーが発生したと思われる場合はサポートにお問い合わせください。</string>
+  <string name="tx_view_locked_funds">これらの資金は、すぐに%1$sフィアットウォレットに売り込むことができますが、最大7日間、Blockchain.comからこれらの資金を送金または引き出しすることはできません。</string>
+  <string name="unable_to_verify_id">IDを確認できません</string>
+  <string name="unable_to_verify_id_description">本人確認ができませんでした。これにはいくつかの理由が考えられます。</string>
+  <string name="invalid_id">無効なID</string>
+  <string name="invalid_id_description">アップロードされた画像またはドキュメントは要件を満たしていません。</string>
+  <string name="information_missmatch">情報の不一致</string>
+  <string name="information_missmatch_description">すべての情報は、法的文書に記載されているとおりに正確に記載する必要があります。注：ニックネームは使用しないでください。</string>
+  <string name="blocked_by_local_laws">現地の法律によりブロックされています</string>
+  <string name="blocked_by_local_laws_description">Blockchain.comでは、あらゆる地域の法律を遵守するよう努めています。現在、お客様の所在地に基づいて、デジタル通貨の購入または販売を許可することはできません。</string>
+  <string name="error_contact_support">これが間違いだと思われる場合や、アカウントを手動で確認したい場合は、サポートにお問い合わせください。</string>
+  <string name="common_empty_title">ウォレットを読み込めません</string>
+  <string name="common_empty_details">インターネット接続に問題があるようです。確認してもう一度お試しください</string>
+  <string name="common_empty_cta">タップして更新</string>
+  <string name="email_request_subject_usdt_1">テザー支払いリクエスト</string>
+  <string name="email_request_body_usdt_1">USDTをテザーアドレス%1$s送信してください。</string>
+  <string name="send_error_tx_in_flight">トランザクションはすでに進行中です</string>
+  <string name="send_error_tx_option_invalid">エラーが発生しました</string>
+  <string name="send_to_exchange_xlm_title">取引所に送信しますか？</string>
+  <string name="send_to_exchange_xlm_blurb">資金の損失を防ぐためにメモを追加してください。</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link">バランス要件の詳細をご覧ください。 </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">メモを追加（最大28文字）</string>
+  <string name="send_confirm_memo_id_hint">IDを追加</string>
+  <string name="send_invalid_option_dsc_memo">無効な説明/メモ</string>
+  <string name="interest_error_title">インタレストの詳細を読み込めません</string>
+  <string name="interest_error_desc">インタレストアカウントの詳細の読み込み中にエラーが発生しました。 
+インターネット接続を確認してもう一度お試しいただくか、問題が解決しない場合はサポートにお問い合わせください。</string>
+  <string name="sell_is_coming_soon">近日発売の売買</string>
+  <string name="sell_is_coming_soon_description">現在、お住まいの地域での暗号の売買はサポートされていません。更新がありましたらお知らせします。</string>
+  <string name="error_scan_failed_general">スキャンに失敗しました。もう一度やり直してください。</string>
+  <string name="error_scan_failed_bitpay">BitPayの請求書を取得できません。有効期限はありますか？</string>
+  <string name="backup_before_send_later_cta">バックアップなしで続行</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">残りをバックアップせずに%1$d送信があります</item>
+  </plurals>
+  <string name="backup_before_send_now_label">送信する前にバックアップする必要があります</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d日。</item>
+  </plurals>
+  <string name="card_info_title">仮想カードは受け入れられません</string>
+  <string name="card_info_description">現時点では、仮想クレジットカードとデビットカードを使用した暗号の購入はサポートされていません。物理的なカードの番号、日付、セキュリティコードを使用する必要があります。</string>
+  <string name="send_confirmation_tx_fee">取引手数料</string>
+  <string name="send_confirmation_insufficient_fee">優先手数料の資金が足りない場合は、送金金額を調整してください。</string>
+  <string name="send_confirmation_fee_learn_more">ネットワーク料金についての<annotation link="send_tx_fees">詳細</annotation> 。</string>
+  <string name="send_state_locked_funds_1">保留中のトランザクションがあります。</string>
+  <string name="sell_info_title">他のウォレットから販売したいですか？</string>
+  <string name="sell_info_blurb_1">あなたの財布からあなたのに暗号を送る</string>
+  <string name="sell_info_blurb_2">トレーディングウォレット。</string>
+  <string name="sell_info_blurb_3">その送信が完了したら、その暗号を現金で販売します。</string>
+  <string name="sell_info_action">今すぐ送信→</string>
+  <string name="tx_view_locked_funds_1">これらの資金はすぐに%1$sフィアットウォレットに販売できるようになりますが、Blockchain.comから最大%2$sまでこれらの資金を送金または引き出すことはできません。</string>
+  <string name="common_pending">保留中</string>
+  <string name="confirm_status_msg_insufficient_funds">この取引を処理するには、このアカウントに十分な資金がありません</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_option_invalid">利用規約に同意したことを確認してください。</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="common_free">自由</string>
+  <string name="two_fa_new_request">新しいコードをリクエストしています…</string>
+  <string name="transfer_funds_title">インポートしたアドレスから転送しますか？</string>
+  <string name="transfer_funds_description">インポートされたアドレスは、バックアップフレーズによってバックアップされません。これらの資金を確保するために、
+これらの残高をBlockchain.comの非管理ウォレットに転送することをお勧めします。
+</string>
+  <string name="two_factor_resend_sms">SMSを再送信します（%1$d）</string>
+  <string name="two_factor_retries_exceeded">再試行を超えた場合は、60秒待ってから再試行してください</string>
+  <string name="fee_options_label">%1$s （ %2$s ）</string>
+  <string name="fee_options_sat_byte_min_error">最小1sat /バイトが必要</string>
+  <string name="fee_options_invalid_amount">無効な料金</string>
+  <string name="sell_announcement_title">暗号を現金で売る</string>
+  <string name="sell_announcement_description">トレーディングウォレットからキャッシュウォレットに直接販売します。</string>
+  <string name="sell_announcement_action">今すぐ売る</string>
+  <string name="generic_limit">制限</string>
+  <string name="select_account_sheet_empty">このアクションを実行するのに適格なウォレットがありません。</string>
+  <string name="activity_details_swap_for">ために</string>
+  <string name="swap_enter_amount_min_swap">必要な%1$s最小スワップ</string>
+  <string name="too_many_pending_orders_error_message">%1$sウォレットには、進行中のスワップが多すぎます。別のウォレットを選択してください。</string>
+  <string name="swap_confirmation_title">スワップ%1$s</string>
+  <string name="swap_confirmation_cta_button">%1$sを%2$s交換します</string>
+  <string name="swap_confirmation_disclaimer">市場の動きにより、送受信する金額が若干変動する場合があります。注文が開始されると、停止することはできません。</string>
+  <string name="swap_confirmation_progress_message">現在、スワップを完了しています。</string>
+  <string name="swap_confirmation_success_message">%1$sがウォレットで利用できるようになりました。</string>
+  <string name="swap_progress_title">%1$sを%2$s交換する</string>
+  <string name="swap_progress_complete_title">スワップ完了</string>
+  <string name="swap_enter_amount_title">スワップ%1$s</string>
+  <string name="swap_enter_amount_source">スワップ： %1$s</string>
+  <string name="swap_enter_amount_target">受信： %1$s</string>
+  <string name="swap_enter_amount_max">スワップマックス</string>
+  <string name="swap_enter_amount_silver_limit">ここをクリックしてプロファイルをアップグレードし、この金額を交換してください。</string>
+  <string name="swap_enter_amount_over_limit">今日は最大%1$sまで交換できます。</string>
+  <string name="swap_select_target_subtitle">スワップ元のウォレットを確認し、受け取り先のウォレットを選択します。</string>
+  <string name="swap_select_target_title">新しいスワップ</string>
+  <string name="tx_confirmation_network_fee">%1$sネットワーク料金</string>
+  <string name="tx_confirmation_fee_learn_more_1">通信網</string>
+  <string name="tx_confirmation_fee_learn_more_2">料金は%1$sネットワークによって設定されます。</string>
+  <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">料金の詳細</annotation> 。</string>
+  <string name="tx_confirmation_free_fee_learn_more_1">使用時のネットワーク料金</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">トレーディングウォレット</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">は無料です！ <annotation link="send_tx_fees">料金の詳細</annotation> 。</string>
+  <string name="interest_item_issue_region">お住まいの地域ではご利用いただけません</string>
+  <string name="interest_item_issue_kyc">利息の獲得を開始するには、ゴールドの確認を受ける必要があります</string>
+  <string name="interest_item_issue_other">現在利用できません。後でもう一度確認してください</string>
+  <string name="swap_header_title">あなたの暗号を交換してください</string>
+  <string name="swap_header_label">私たちがあなたの財布に提供する任意の通貨にあなたの暗号を即座に交換します。</string>
+  <string name="swap_kyc_title">IDを確認してください。今日交換してください。</string>
+  <string name="swap_kyc_desc">いつでも暗号を交換するためにあなたの身元を確認してください。数分で適用して交換します。</string>
+  <string name="swap_kyc_cta">今すぐ申し込む</string>
+  <string name="swap_kyc_1_title">あなたの国を選択</string>
+  <string name="swap_kyc_1_label">Blockchain.comは、現地の法律に従って現在の国を知る必要があります。</string>
+  <string name="swap_kyc_2_title">本人確認</string>
+  <string name="swap_kyc_2_label">IDをアップロードして詐欺を防止するのはあなた自身であることを確認する必要があります。</string>
+  <string name="swap_kyc_3_title">スワッピングを開始します</string>
+  <string name="swap_kyc_3_label">確認したら、スワップに戻って暗号を交換します。</string>
+  <string name="swap_cta">新しいスワップ</string>
+  <string name="swap_account_select">スワップ</string>
+  <string name="swap_account_select_subtitle">どのウォレットからスワップしますか？</string>
+  <string name="select_target_account_for_swap">どの財布に入れたいですか？</string>
+  <string name="swap_low_fees">低料金</string>
+  <string name="swap_kyc_upsell_title">スワップ制限に近づいています。より多くの量を交換するようにアップグレードします。</string>
+  <string name="swap_kyc_upsell_desc">本人確認を行って、毎日交換できる量を増やしてください。</string>
+  <string name="swap_kyc_upsell_1_title">IDをアップロードする</string>
+  <string name="swap_kyc_upsell_1_desc">IDをアップロードして詐欺を防止するのはあなた自身であることを確認する必要があります。</string>
+  <string name="swap_kyc_upsell_2_title">自撮り写真をアップロードする</string>
+  <string name="swap_kyc_upsell_2_desc">これはあなたが人間であることを保証するためです。ロボット禁止。</string>
+  <string name="swap_kyc_upsell_3_title">1日最大$ 25,000を交換</string>
+  <string name="swap_kyc_upsell_3_desc">確認したら、スワップに戻って暗号を交換します。</string>
+  <string name="trending_label">トレンド</string>
+  <string name="trending_swap">スワップ%1$s</string>
+  <string name="trending_empty">トレーディングウォレットに資金を提供して、より低い手数料でトレンドスワップを確認します。</string>
+  <string name="trending_receive">%1$sを受け取る</string>
+  <string name="show_more_accounts">もっと見せる</string>
+  <string name="select_a_wallet">ウォレットを選択する</string>
+  <string name="pending_swap_info_message">保留中のスワップが1つあります。それがクリアされたら、新しいスワップを作成できます。</string>
+  <string name="deposit_fee">ネットワーク料金</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">為替レート</string>
+  <string name="in_progress">進行中</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.alg.AlgoAddress
 import piuk.blockchain.android.coincore.bch.BchAddress
 import piuk.blockchain.android.coincore.btc.BtcAddress
 import piuk.blockchain.android.coincore.erc20.Erc20Address
@@ -59,6 +60,10 @@ internal fun makeExternalAssetAddress(
                 onTxCompleted = postTransactions
             )
         }
-        CryptoCurrency.ALGO,
+        CryptoCurrency.ALGO -> {
+            AlgoAddress(
+                address = address
+            )
+        }
         CryptoCurrency.STX -> throw IllegalArgumentException("External Address not not supported for asset: $asset")
     }.exhaustive

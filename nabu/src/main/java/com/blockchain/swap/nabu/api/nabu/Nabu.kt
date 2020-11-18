@@ -6,9 +6,10 @@ import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.interest.InterestActivityResponse
 import com.blockchain.swap.nabu.models.interest.InterestAddressResponse
+import com.blockchain.swap.nabu.models.interest.InterestEligibilityFullResponse
 import com.blockchain.swap.nabu.models.interest.InterestEnabledResponse
 import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestResponse
+import com.blockchain.swap.nabu.models.interest.InterestRateResponse
 import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
@@ -50,6 +51,12 @@ import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckResponse
 import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
+import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.swap.QuoteResponse
+import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
+import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
@@ -238,7 +245,7 @@ internal interface Nabu {
     fun isEligibleForSimpleBuy(
         @Header("authorization") authorization: String,
         @Query("fiatCurrency") fiatCurrency: String,
-        @Query("methods") methods: String
+        @Query("methods") methods: String = "BANK_ACCOUNT,PAYMENT_CARD"
     ): Single<SimpleBuyEligibility>
 
     @POST(NABU_SIMPLE_BUY_ORDERS)
@@ -266,6 +273,19 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Body depositRequestBody: DepositRequestBody
     ): Completable
+
+    @POST("$NABU_UDPATE_ORDER/{id}")
+    fun updateOrder(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: UpdateSwapOrderBody
+    ): Completable
+
+    @GET(NABU_SWAP_ORDER)
+    fun getSwapOrders(@Header("authorization") authorization: String): Single<List<SwapOrderResponse>>
+
+    @GET(NABU_SWAP_PAIRS)
+    fun getSwapAvailablePairs(@Header("authorization") authorization: String): Single<List<String>>
 
     @GET(NABU_SIMPLE_BUY_ORDERS)
     fun getOrders(
@@ -368,7 +388,7 @@ internal interface Nabu {
     fun getInterestRates(
         @Header("authorization") authorization: String,
         @Query("ccy") currency: String
-    ): Single<Response<InterestResponse>>
+    ): Single<Response<InterestRateResponse>>
 
     @GET(NABU_INTEREST_ACCOUNT_BALANCE)
     fun getInterestAccountDetails(
@@ -380,23 +400,53 @@ internal interface Nabu {
     fun getInterestAddress(
         @Header("authorization") authorization: String,
         @Query("ccy") currency: String
-    ): Single<Response<InterestAddressResponse>>
+    ): Single<InterestAddressResponse>
 
     @GET(NABU_INTEREST_ACTIVITY)
     fun getInterestActivity(
         @Header("authorization") authorization: String,
         @Query("product") product: String,
         @Query("currency") currency: String
-    ): Single<Response<InterestActivityResponse>>
+    ): Single<InterestActivityResponse>
 
     @GET(NABU_INTEREST_LIMITS)
     fun getInterestLimits(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String
-    ): Single<Response<InterestLimitsFullResponse>>
+    ): Single<InterestLimitsFullResponse>
 
     @GET(NABU_INTEREST_ENABLED)
     fun getInterestEnabled(
         @Header("authorization") authorization: String
-    ): Single<Response<InterestEnabledResponse>>
+    ): Single<InterestEnabledResponse>
+
+    @GET(NABU_INTEREST_ELIGIBILITY)
+    fun getInterestEligibility(
+        @Header("authorization") authorization: String
+    ): Single<InterestEligibilityFullResponse>
+
+    @POST(NABU_QUOTES)
+    fun fetchQuote(
+        @Header("authorization") authorization: String,
+        @Body quoteRequest: QuoteRequest
+    ): Single<QuoteResponse>
+
+    @POST(NABU_SWAP_ORDER)
+    fun createSwapOrder(
+        @Header("authorization") authorization: String,
+        @Body order: CreateOrderRequest
+    ): Single<SwapOrderResponse>
+
+    @GET(NABU_SWAP_LIMITS)
+    fun fetchSwapLimits(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String,
+        @Query("minor") useMinor: Boolean = true
+    ): Single<SwapLimitsResponse>
+
+    @GET(NABU_SWAP_ACTIVITY)
+    fun fetchSwapActivity(
+        @Header("authorization") authorization: String,
+        @Header("limit") limit: Int = 50
+    ): Single<List<SwapOrderResponse>>
 }

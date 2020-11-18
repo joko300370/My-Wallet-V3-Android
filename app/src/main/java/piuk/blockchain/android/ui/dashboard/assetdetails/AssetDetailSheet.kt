@@ -33,8 +33,8 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
-import piuk.blockchain.androidcore.data.charts.PriceSeries
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -67,8 +67,11 @@ class AssetDetailSheet :
     }
 
     private val detailsAdapter by lazy {
-        AssetDetailAdapter(::onAccountSelected,
-            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token) {
+        AssetDetailAdapter(
+            ::onAccountSelected,
+            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
+            token
+        ) {
             PendingBalanceAccountDecorator(it.account)
         }
     }

@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
+import piuk.blockchain.android.coincore.SwapActivitySummaryItem
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -65,6 +66,11 @@ class AssetActivityRepository(
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
         }
 
+    fun findCachedSwapItem(cryptoCurrency: CryptoCurrency, txHash: String): SwapActivitySummaryItem? =
+        transactionCache.filterIsInstance<SwapActivitySummaryItem>().find {
+            it.sendingAsset == cryptoCurrency && it.txId == txHash
+        }
+
     fun findCachedItem(currency: String, txHash: String): FiatActivitySummaryItem? =
         transactionCache.filterIsInstance<FiatActivitySummaryItem>().find {
             it.currency == currency && it.txId == txHash
@@ -86,7 +92,6 @@ class AssetActivityRepository(
     override fun getFromNetwork(): Maybe<ActivitySummaryList> =
         coincore.allWallets()
             .flatMap { it.activity }
-            .toMaybe()
             .doOnSuccess { activityList ->
                 // on error of activity returns onSuccess with empty list
                 if (activityList.isNotEmpty()) {
@@ -101,7 +106,7 @@ class AssetActivityRepository(
                 } else {
                     list
                 }
-            }
+            }.toMaybe()
 
     override fun getFromCache(): Maybe<ActivitySummaryList> {
         return if (transactionCache.isNotEmpty()) {

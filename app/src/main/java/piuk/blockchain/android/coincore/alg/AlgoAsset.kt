@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.alg
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -16,8 +17,8 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
@@ -25,13 +26,14 @@ internal class AlgoAsset(
     payloadManager: PayloadDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    private val eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -42,7 +44,8 @@ internal class AlgoAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset: CryptoCurrency
@@ -71,7 +74,8 @@ internal class AlgoAsset(
                 labels.getDefaultCustodialWalletLabel(asset),
                 exchangeRates,
                 custodialManager,
-                environmentConfig
+                environmentConfig,
+                eligibilityProvider
             ))
         )
 

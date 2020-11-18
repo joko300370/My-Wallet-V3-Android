@@ -5,16 +5,25 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
-import com.blockchain.activities.StartSwap
 import com.blockchain.extensions.px
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.models.nabu.KycTierState
 import com.blockchain.ui.dialog.MaterialProgressDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -33,11 +42,13 @@ import kotlinx.android.synthetic.main.activity_kyc_status.text_view_verification
 import kotlinx.android.synthetic.main.activity_kyc_status.text_view_verification_subtitle as textViewSubtitle
 import kotlinx.android.synthetic.main.activity_kyc_status.toolbar_kyc as toolBar
 
-class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView {
+class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView, DialogFlow.FlowHost {
 
     private val presenter: KycStatusPresenter by scopedInject()
-    private val swapStarter: StartSwap by inject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
+    private val currencyPrefs: CurrencyPrefs by inject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
     private var progressDialog: MaterialProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,8 +71,32 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
     }
 
     override fun startExchange() {
-        swapStarter.startSwapActivity(this)
-        finish()
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        startSwapFlow()
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            context = this,
+                            defaultCurrency = currencyPrefs.selectedFiatCurrency
+                        )
+                        finish()
+                    }
+                }
+            )
+    }
+
+    private fun startSwapFlow() {
+        TransactionFlow(
+            action = AssetAction.Swap
+        ).apply {
+            startFlow(
+                fragmentManager = supportFragmentManager,
+                host = this@KycStatusActivity
+            )
+        }
     }
 
     override fun renderUi(kycState: KycTierState) {
@@ -200,5 +235,8 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
                 .apply { putExtra(EXTRA_CAMPAIGN_TYPE, campaignType) }
                 .run { context.startActivity(this) }
         }
+    }
+
+    override fun onFlowFinished() {
     }
 }

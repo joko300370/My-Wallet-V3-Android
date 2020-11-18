@@ -3,9 +3,11 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
@@ -13,8 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 
@@ -33,13 +35,15 @@ class XlmAssetUriParseTest {
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val custodialManager: CustodialWalletManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
-    private val historicRates: ChartsDataManager = mock()
+    private val historicRates: ExchangeRateService = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
     private val tiersService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
+    private val walletPreferences: WalletStatus = mock()
+    private val eligibilityProvider: EligibilityProvider = mock()
 
     private val subject = XlmAsset(
         payloadManager,
@@ -54,7 +58,9 @@ class XlmAssetUriParseTest {
         pitLinking,
         crashLogger,
         tiersService,
-        environmentConfig
+        environmentConfig,
+        walletPreferences,
+        eligibilityProvider
     )
 
     @Test

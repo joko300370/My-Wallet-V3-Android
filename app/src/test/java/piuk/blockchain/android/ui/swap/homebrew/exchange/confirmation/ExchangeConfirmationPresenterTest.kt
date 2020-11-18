@@ -3,22 +3,22 @@ package piuk.blockchain.android.ui.swap.homebrew.exchange.confirmation
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.datamanagers.TransactionExecutorWithoutFees
 import com.blockchain.logging.SwapDiagnostics
+import com.blockchain.morph.to
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.payload.PayloadDecrypt
+import com.blockchain.sunriver.Memo
+import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.SendException
+import com.blockchain.sunriver.SendFundsResult
 import com.blockchain.swap.common.exchange.mvi.ExchangeViewState
 import com.blockchain.swap.nabu.service.Fix
 import com.blockchain.swap.nabu.service.Quote
 import com.blockchain.swap.nabu.service.TradeExecutionService
 import com.blockchain.swap.nabu.service.TradeTransaction
-import com.blockchain.morph.to
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.usd
-import com.blockchain.sunriver.Memo
-import com.blockchain.sunriver.SendDetails
-import com.blockchain.sunriver.SendException
-import com.blockchain.sunriver.SendFundsResult
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -39,6 +39,8 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationPresenter
+import piuk.blockchain.android.ui.swapold.exchange.confirmation.ExchangeConfirmationView
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.math.BigDecimal
 import java.util.Locale
@@ -67,7 +69,6 @@ class ExchangeConfirmationPresenterTest {
             payloadDecrypt,
             mock {
                 on { getString(any()) } `it returns` ""
-                on { getFormattedString(any(), any()) } `it returns` ""
             },
             analytics,
             diagnostics

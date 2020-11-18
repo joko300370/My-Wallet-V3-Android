@@ -28,14 +28,13 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/kyc_benefits_intro_title"
         style="@style/Text.Semibold.20"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/fiat_funds_no_kyc_announcement_title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/kyc_benefits_default_symbol" />
 

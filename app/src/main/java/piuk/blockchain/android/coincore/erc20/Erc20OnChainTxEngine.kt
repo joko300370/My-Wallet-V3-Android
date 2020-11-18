@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -12,8 +13,8 @@ import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -29,9 +30,11 @@ import java.math.BigInteger
 open class Erc20OnChainTxEngine(
     private val erc20Account: Erc20Account,
     private val feeManager: FeeDataManager,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
+    requireSecondPassword,
+    walletPreferences
 ) {
     private val ethDataManager: EthDataManager =
         erc20Account.ethDataManager
@@ -42,36 +45,53 @@ open class Erc20OnChainTxEngine(
                 amount = CryptoValue.zero(asset),
                 available = CryptoValue.zero(asset),
                 fees = CryptoValue.ZeroEth,
-                feeLevel = FeeLevel.Regular,
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(erc20Account.cryptoCurrency)),
                 selectedFiat = userFiat
             )
         )
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(options = listOf(
-                TxOptionValue.From(from = sourceAccount.label),
-                TxOptionValue.To(to = txTarget.label),
-                TxOptionValue.Fee(fee = pendingTx.fees, exchange = pendingTx.fees.toFiat(exchangeRates, userFiat)),
-                TxOptionValue.FeedTotal(
+            pendingTx.copy(confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                makeFeeSelectionOption(pendingTx),
+                TxConfirmationValue.FeedTotal(
                     amount = pendingTx.amount,
                     fee = pendingTx.fees,
                     exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
                     exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                 ),
-                TxOptionValue.Description()
+                TxConfirmationValue.Description()
             )))
 
-    private fun absoluteFee(): Single<CryptoValue> =
+    private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
                 CryptoCurrency.ETHER,
                 Convert.toWei(
-                    BigDecimal.valueOf(it.gasLimitContract * it.regularFee),
+                    BigDecimal.valueOf(it.gasLimitContract * it.mapFeeLevel(feeLevel)),
                     Convert.Unit.GWEI
                 )
             )
         }
+
+    private fun FeeOptions.mapFeeLevel(feeLevel: FeeLevel) =
+        when (feeLevel) {
+            FeeLevel.None -> 0L
+            FeeLevel.Regular -> regularFee
+            FeeLevel.Priority,
+            FeeLevel.Custom -> priorityFee
+        }
+
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
+            feeDetails = getFeeState(pendingTx),
+            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeLevel,
+            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+            asset = CryptoCurrency.ETHER
+        )
 
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()
@@ -79,10 +99,9 @@ open class Erc20OnChainTxEngine(
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
         require(amount.currency == asset)
-
         return Singles.zip(
             sourceAccount.actionableBalance.map { it as CryptoValue },
-            absoluteFee()
+            absoluteFee(pendingTx.feeLevel)
         ) { available, fee ->
             pendingTx.copy(
                 amount = amount,
@@ -91,6 +110,17 @@ open class Erc20OnChainTxEngine(
             )
         }
     }
+
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation is TxConfirmationValue.FeeSelection) {
+            if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
+                updateFeeSelection(erc20Account.cryptoCurrency, pendingTx, newConfirmation)
+            } else {
+                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
+            }
+        } else {
+            super.doOptionUpdateRequest(pendingTx, newConfirmation)
+        }
 
     // In an ideal world, we'd get this via a CryptoAccount object.
     // However accessing one for Eth here would break the abstractions, so:
@@ -150,7 +180,7 @@ open class Erc20OnChainTxEngine(
     private fun validateSufficientGas(pendingTx: PendingTx): Completable =
         Singles.zip(
             getEthAccountBalance(),
-            absoluteFee()
+            absoluteFee(pendingTx.feeLevel)
         ) { balance, fee ->
             if (fee > balance) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_GAS)
@@ -177,7 +207,7 @@ open class Erc20OnChainTxEngine(
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
-                pendingTx.getOption<TxOptionValue.Description>(TxOption.DESCRIPTION)?.let { notes ->
+                pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
                     ethDataManager.updateErc20TransactionNotes(hash, notes.text)
                 }?.toSingle {
                     hash
@@ -197,16 +227,16 @@ open class Erc20OnChainTxEngine(
                 nonce = nonce,
                 to = tgt.address,
                 contractAddress = erc20Account.contractAddress,
-                gasPriceWei = fees.gasPrice,
+                gasPriceWei = fees.gasPrice(pendingTx.feeLevel),
                 gasLimitGwei = fees.gasLimitGwei,
                 amount = pendingTx.amount.toBigInteger()
             )
         }
     }
 
-    private val FeeOptions.gasPrice: BigInteger
-        get() = Convert.toWei(
-            BigDecimal.valueOf(regularFee),
+    private fun FeeOptions.gasPrice(feeLevel: FeeLevel): BigInteger =
+        Convert.toWei(
+            BigDecimal.valueOf(this.mapFeeLevel(feeLevel)),
             Convert.Unit.GWEI
         ).toBigInteger()
 

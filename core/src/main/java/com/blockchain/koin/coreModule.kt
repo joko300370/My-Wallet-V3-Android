@@ -21,6 +21,7 @@ import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -36,7 +37,6 @@ import info.blockchain.wallet.util.PrivateKeyFactory
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.access.AccessStateImpl
@@ -89,8 +89,6 @@ val coreModule = module {
     factory { AuthService(get(), get()) }
 
     factory { PrivateKeyFactory() }
-
-    factory { RootUtil() }
 
     scope(payloadScopeQualifier) {
 
@@ -217,7 +215,12 @@ val coreModule = module {
         )
     }
 
-    factory { ExchangeRateService(get()) }
+    factory {
+        ExchangeRateService(
+            priceApi = get(),
+            rxBus = get()
+        )
+    }
 
     factory {
         DeviceIdGeneratorImpl(
@@ -246,6 +249,7 @@ val coreModule = module {
         .bind(SecurityPrefs::class)
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
+        .bind(RatingPrefs::class)
         .bind(WalletStatus::class)
         .bind(EncryptedPrefs::class)
 
@@ -271,7 +275,8 @@ val coreModule = module {
             context = get(),
             prefs = get(),
             rxBus = get(),
-            crashLogger = get()
+            crashLogger = get(),
+            trust = get()
         )
     }.bind(AccessState::class)
 

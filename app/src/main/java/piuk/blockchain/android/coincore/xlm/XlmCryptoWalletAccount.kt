@@ -1,7 +1,9 @@
 package piuk.blockchain.android.coincore.xlm
 
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -25,7 +27,9 @@ internal class XlmCryptoWalletAccount(
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
-    private val walletOptionsDataManager: WalletOptionsDataManager
+    private val walletOptionsDataManager: WalletOptionsDataManager,
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
@@ -54,21 +58,24 @@ internal class XlmCryptoWalletAccount(
 
     override val activity: Single<ActivitySummaryList>
         get() = xlmManager.getTransactionList()
+            .onErrorResumeNext { Single.just(emptyList()) }
             .mapList {
                 XlmActivitySummaryItem(
                     it,
                     exchangeRates,
                     account = this
                 ) as ActivitySummaryItem
-            }
-            .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }.flatMap {
+                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =
         XlmOnChainTxEngine(
             xlmDataManager = xlmManager,
             xlmFeesFetcher = xlmFeesFetcher,
             walletOptionsDataManager = walletOptionsDataManager,
-            requireSecondPassword = payloadDataManager.isDoubleEncrypted
+            requireSecondPassword = payloadDataManager.isDoubleEncrypted,
+            walletPreferences = walletPreferences
         )
 
     constructor(
@@ -77,7 +84,9 @@ internal class XlmCryptoWalletAccount(
         xlmManager: XlmDataManager,
         exchangeRates: ExchangeRateDataManager,
         xlmFeesFetcher: XlmFeesFetcher,
-        walletOptionsDataManager: WalletOptionsDataManager
+        walletOptionsDataManager: WalletOptionsDataManager,
+        walletPreferences: WalletStatus,
+        custodialWalletManager: CustodialWalletManager
     ) : this(
         payloadManager = payloadManager,
         label = account.label,
@@ -85,6 +94,8 @@ internal class XlmCryptoWalletAccount(
         xlmManager = xlmManager,
         exchangeRates = exchangeRates,
         xlmFeesFetcher = xlmFeesFetcher,
-        walletOptionsDataManager = walletOptionsDataManager
+        walletOptionsDataManager = walletOptionsDataManager,
+        walletPreferences = walletPreferences,
+        custodialWalletManager = custodialWalletManager
     )
 }

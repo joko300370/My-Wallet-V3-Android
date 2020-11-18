@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderInput
 import com.blockchain.swap.nabu.datamanagers.OrderOutput
-import com.blockchain.swap.nabu.datamanagers.Quote
 import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -16,7 +16,7 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -147,13 +147,13 @@ class CustodialSellTxEngine(
         }
     }
 
-    private fun updateOptionFromQuote(quote: Quote, pendingTx: PendingTx): PendingTx {
+    private fun updateOptionFromQuote(quote: CustodialQuote, pendingTx: PendingTx): PendingTx {
 
         val options = listOf(
-            TxOptionValue.ExchangePriceOption(quote.rate, sourceAccount.asset),
-            TxOptionValue.From(sourceAccount.label),
-            TxOptionValue.To(fiatTarget.label),
-            TxOptionValue.Total(if (pendingTx.amount is FiatValue) pendingTx.amount else
+            TxConfirmationValue.ExchangePriceConfirmation(quote.rate, sourceAccount.asset),
+            TxConfirmationValue.From(sourceAccount.label),
+            TxConfirmationValue.To(fiatTarget.label),
+            TxConfirmationValue.Total(if (pendingTx.amount is FiatValue) pendingTx.amount else
                 FiatValue.fromMajor(userFiat,
                     pendingTx.amount.toBigDecimal().times(quote.rate.toBigDecimal()))
             )
@@ -168,7 +168,7 @@ class CustodialSellTxEngine(
         )
 
         return pendingTx.copy(
-            options = options,
+            confirmations = options,
             amount = if (pendingTx.amount is CryptoValue) pendingTx.amount else
                 exchangeRate.convert(pendingTx.amount),
             minLimit = if (pendingTx.minLimit is CryptoValue) pendingTx.minLimit else

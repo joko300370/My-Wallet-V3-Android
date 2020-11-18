@@ -15,14 +15,14 @@
     <item>คำที่สิบสอง</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_hash</item>
+    <item>\@ สตริง / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ สตริง / xlm_memo_text</item>
+    <item>\@ สตริง / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d ที่อยู่ที่นำเข้า</item>
@@ -45,11 +45,11 @@
   <string name="toolbar_cmd_receive_crypto">รับ</string>
   <string name="toolbar_cmd_activity">กิจกรรม</string>
   <string name="toolbar_cmd_view_activity">ดูกิจกรรม</string>
-  <string name="common_swap">แลกเปลี่ยน</string>
+  <string name="toolbar_cmd_swap">แลกเปลี่ยน</string>
   <string name="cancel">ยกเลิก</string>
   <string name="btn_ok">ตกลง</string>
-  <string name="common_yes">ใช่</string>
-  <string name="common_no">ไม่</string>
+  <string name="yes">ใช่</string>
+  <string name="no">ไม่</string>
   <string name="polite_no">ไม่เป็นไรขอบคุณ</string>
   <string name="done">เสร็จสิ้น</string>
   <string name="btn_close">ปิด</string>
@@ -161,7 +161,7 @@
   <string name="btn_continue">ต่อ</string>
   <string name="btn_forgot_password">ลืมรหัสผ่าน?\"</string>
   <string name="SEND">ส่ง</string>
-  <string name="common_total">รวม</string>
+  <string name="total">รวม</string>
   <string name="max_available">ใช้ยอดดุลที่ใช้จ่ายได้ทั้งหมด:</string>
   <string name="bitpay_remaining_time">เวลาที่เหลือ</string>
   <string name="bitpay_invoice_expired">ใบแจ้งหนี้ BitPay หมดอายุแล้ว</string>
@@ -187,8 +187,8 @@
   <string name="weak_password">รหัสผ่านที่เลือกนั้นอ่อนแอเกินไปที่จะทำให้เงินของคุณปลอดภัย พวกเราอย่างยิ่ง 
  แนะนำให้คุณเลือกอันอื่น คุณต้องการกำหนดรหัสผ่านใหม่หรือไม่ 
 </string>
-  <string name="common_from">จาก</string>
-  <string name="common_to">ถึง</string>
+  <string name="from">จาก</string>
+  <string name="to">ถึง</string>
   <string name="confirm_details">ยืนยันการชำระเงิน</string>
   <string name="fee">ค่าธรรมเนียม</string>
   <string name="exit_confirm">กดปุ่มย้อนกลับอีกครั้งเพื่อออก</string>
@@ -349,6 +349,17 @@
  ที่อยู่ Bitcoin %1$s กรุณาสแกนรหัส QR 
 </string>
   <string name="invalid_private_key">รหัสส่วนตัวไม่ถูกต้อง</string>
+  <string name="watch_only_import_warning">คุณกำลังจะนำเข้าที่อยู่ที่ไม่สามารถใช้จ่ายได้ 
+ ที่อยู่ (หรือสคริปต์กุญแจสาธารณะ) 
+ เก็บไว้ในกระเป๋าโดยไม่มีรหัสส่วนตัวที่เกี่ยวข้อง นี้ 
+ หมายความว่าสามารถใช้เงินได้เฉพาะเมื่อคุณมีรหัสส่วนตัวที่เก็บไว้ที่อื่น ถ้าคุณ 
+ ทำ 
+ ไม่มีคีย์ส่วนตัวที่เก็บไว้อย่าสั่งให้ใครส่ง bitcoin ให้คุณ 
+ ไม่ใช่ spendable 
+ ที่อยู่ 
+
+ แนะนำให้ใช้ตัวเลือกเหล่านี้สำหรับผู้ใช้ขั้นสูงเท่านั้น ต่อหรือไม่? 
+</string>
   <string name="scan_private_key">สแกนรหัสส่วนตัว</string>
   <string name="private_key_successfully_imported">นำเข้ากุญแจส่วนตัวสำเร็จแล้ว</string>
   <string name="private_key_not_matching_address">หมายเหตุ: รหัสส่วนตัวที่สแกนไม่ได้ 
@@ -627,7 +638,7 @@
  ไอคอนในตัวเรียกใช้งานทำให้การรับ bitcoin เร็วยิ่งขึ้น 
 </string>
   <string name="shortcut_settings_enable">ทางลัดของตัวเรียกใช้</string>
-  <string name="common_confirm">ยืนยัน</string>
+  <string name="confirm">ยืนยัน</string>
   <string name="swipe_receive_hint">ปัดเพื่อรับ</string>
   <string name="swipe_receive_preference_summary">เปิดเผยที่อยู่ที่รับเมื่อคุณปัดไปทางซ้าย 
  หน้าจอ PIN ทำให้การรับเงินเร็วขึ้น 
@@ -815,7 +826,7 @@
  เนื่องจากกิจกรรมการตลาด เมื่อคำสั่งเริ่มต้นเราไม่สามารถหยุดได้ 
 </string>
   <string name="send_to">ส่งถึง</string>
-  <string name="common_receive">รับ</string>
+  <string name="receive">รับ</string>
   <string name="fees">ค่าเล่าเรียน</string>
   <string name="value">ราคา</string>
   <string name="status">สถานะ</string>
@@ -1112,7 +1123,6 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>
@@ -1219,7 +1229,7 @@
   <string name="kyc_email_title">ยืนยันอีเมลของคุณ</string>
   <string name="kyc_email_message">เราจำเป็นต้องยืนยันที่อยู่อีเมลของคุณเพื่อเพิ่มระดับความปลอดภัย</string>
   <string name="kyc_email_hint_focused">อีเมลของคุณ</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ สตริง / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">เกิดข้อผิดพลาดในการบันทึกอีเมลโปรดลองอีกครั้ง</string>
   <string name="kyc_email_send_verification">ส่งอีเมล</string>
   <string name="kyc_email_validation_header">ตรวจสอบกล่องจดหมายของคุณ.</string>
@@ -1244,7 +1254,7 @@
   <string name="kyc_onfido_splash_verification_error">เกิดข้อผิดพลาดในการยืนยัน ID โปรดลองอีกครั้ง</string>
   <string name="kyc_veriff_splash_country_supported_header">ประเทศของฉันรองรับหรือไม่</string>
   <string name="kyc_veriff_splash_country_supported_subheader">ไม่รองรับทุกประเทศในขณะนี้ ตรวจสอบ <annotation link="country_list"> รายการประเทศ </annotation> ก่อนดำเนินการต่อ</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ตรวจสอบเงินแล้ว</string>
   <string name="kyc_veriff_splash_header">มายืนยันกันเถอะ</string>
   <string name="kyc_veriff_splash_subtitle">คุณจะต้องมี 1 ประเภท ID ด้านล่างนี้เพื่อดำเนินการต่อ</string>
@@ -1266,11 +1276,11 @@
   <string name="kyc_complete_device_verified">ตรวจสอบอุปกรณ์แล้ว</string>
   <string name="kyc_complete_id_uploaded">อัปโหลด ID</string>
   <string name="kyc_complete_video_uploaded">วิดีโอที่อัปโหลด</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ สตริง / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ทีมสนับสนุน Blockchain ของเราได้เขียนคำแนะนำช่วยเหลืออธิบายว่าทำไมเราต้องยืนยันตัวตนของคุณ</string>
   <string name="kyc_help_dialog_read_now">อ่านตอนนี้</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ สตริง / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">การยืนยันตัวตน</string>
   <string name="kyc_settings_status_none">ไม่สอบ</string>
@@ -1282,7 +1292,7 @@
   <string name="kyc_settings_gold_level_in_review">ระดับทอง - อยู่ระหว่างการตรวจสอบ</string>
   <string name="kyc_settings_gold_level_approved">ระดับทอง - ได้รับการอนุมัติ</string>
   <string name="kyc_settings_silver_level_approved">ระดับเงิน - อนุมัติแล้ว</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ สตริง / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">เกิดข้อผิดพลาดในการดึงสถานะ KYC</string>
   <string name="kyc_status_title_in_progress">กำลังตรวจสอบความคืบหน้า</string>
   <string name="kyc_status_title_approved">บัญชีได้รับการอนุมัติ</string>
@@ -1306,10 +1316,10 @@
   <string name="kyc_drop_off_card_description">เลือกสถานที่ที่คุณค้างไว้และทำการยืนยันตัวตนให้เสร็จสมบูรณ์</string>
   <string name="kyc_drop_off_card_button">ทำการตรวจสอบต่อ</string>
   <string name="kyc_documents_needed">เอกสารที่จำเป็น</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ สตริง / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">เรามีปัญหากับเอกสารที่คุณให้มา โปรดลองอัปโหลดเอกสารอีกครั้งเพื่อดำเนินการยืนยันต่อ</string>
   <string name="kyc_resubmission_card_button">อัพโหลดเอกสาร</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ สตริง / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">เราไม่สามารถยืนยันตัวตนของคุณและต้องการให้คุณอัปโหลดเอกสารที่จำเป็นอีกครั้ง</string>
   <string name="kyc_resubmission_splash_description_2">สาเหตุหลักที่ทำให้สิ่งนี้เกิดขึ้น:</string>
   <string name="kyc_resubmission_splash_description_3">ภาพถ่ายที่ต้องการหายไป</string>
@@ -1497,7 +1507,7 @@
   <string name="tx_title_receive">รับ %1s</string>
   <string name="tx_title_sell">ขาย %1s</string>
   <string name="tx_title_buy">ซื้อ %1s</string>
-  <string name="tx_title_swap">สลับ %1s</string>
+  <string name="tx_title_swap">สลับ %1s → %2$s</string>
   <string name="tx_title_transfer">โอน %1s</string>
   <string name="tx_title_fee">ค่าธรรมเนียม %1s</string>
   <string name="transaction_detail_value_at_time_swapped">ค่าเมื่อสลับ: \u0020</string>
@@ -1505,7 +1515,7 @@
   <string name="transaction_detail_value_at_time_sold">มูลค่าเมื่อขาย: \u0020</string>
   <string name="activities_title">กิจกรรม</string>
   <string name="simple_buy_add_card_card_title">คุณได้รับอนุมัติให้ซื้อ Crypto</string>
-  <string name="simple_buy_add_card_card_body">ทำใบสั่งซื้อให้สมบูรณ์โดยการเพิ่มบัตรเครดิตหรือบัตรเดบิตของคุณลงใน Blockchain Wallet</string>
+  <string name="simple_buy_add_card_card_body">ทำใบสั่งซื้อให้สมบูรณ์โดยการเพิ่มบัตรเครดิตหรือบัตรเดบิตของคุณไปยัง Blockchain Wallet</string>
   <string name="simple_buy_add_card_card_cta">เพิ่มบัตร</string>
   <string name="kyc_settings_accounts_limit">ขีด จำกัด บัญชี</string>
   <string name="annual_swap_and_buy_limit">ข้อ จำกัด การแลกเปลี่ยนและซื้อประจำปี</string>
@@ -1513,7 +1523,7 @@
   <string name="simple_buy_own_crypto">Crypto ของตัวเองในไม่กี่นาที</string>
   <string name="simple_buy_verify_your_identity">ยืนยันตัวตนของคุณและซื้อ crypto</string>
   <string name="simple_buy_skip">ข้าม</string>
-  <string name="simple_buy_currency_selection_header">สกุลเงินท้องถิ่นของคุณเพื่อจัดเก็บเงินในสกุลเงินนั้นเป็นเงินใน Blockchain Wallet ของคุณ</string>
+  <string name="simple_buy_currency_selection_header">สกุลเงินท้องถิ่นของคุณเพื่อเก็บเงินในสกุลเงินนั้นเป็นเงินใน Blockchain Wallet ของคุณ</string>
   <string name="payment_methods">วิธีการชำระเงิน</string>
   <string name="payment_method">วิธีการชำระเงิน</string>
   <string name="simple_buy_select_currency">เลือกสกุลเงินของคุณ</string>
@@ -1531,6 +1541,7 @@
   <string name="estimated_amount">Est จำนวน</string>
   <string name="buying_fee">ค่าธรรมเนียมการซื้อ</string>
   <string name="purchase_bank_note">เมื่อเราได้รับเงินของคุณแล้วเราจะเริ่มสั่งซื้อ %1$s หมายเหตุจำนวนเงินสุดท้ายของคุณอาจเปลี่ยนเป็นกิจกรรมการตลาดที่ครบกำหนด อาจมีค่าธรรมเนียม</string>
+  <string name="purchase_card_note">เราจะหักวิธีการชำระเงินของคุณใน 2 วันทำการ จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมการตลาด</string>
   <string name="complete_payment">ชำระเงินให้เสร็จสมบูรณ์</string>
   <string name="card_payment">ชำระเงินด้วยบัตร</string>
   <string name="buy_now">ซื้อเลย</string>
@@ -1551,7 +1562,7 @@
   <string name="expiry_date">วันหมดอายุ</string>
   <string name="card_cvv">CVV2</string>
   <string name="card_not_supported">ไม่รองรับการ์ด</string>
-  <string name="privacy_protected_ssl">ป้องกันความเป็นส่วนตัวด้วยการเข้ารหัส SSL 256 บิต</string>
+  <string name="privacy_protected_ssl">ปกป้องความเป็นส่วนตัวด้วยการเข้ารหัส SSL 256 บิต</string>
   <string name="add_card_title">เพิ่มบัตร</string>
   <string name="add_card_address_title">ที่อยู่เรียกเก็บเงิน</string>
   <string name="linking_card_title">เชื่อมโยงการ์ดของคุณอย่างปลอดภัย</string>
@@ -1564,7 +1575,7 @@
   <string name="we_will_notify_order_complete">เราจะแจ้งให้คุณทราบเมื่อการสั่งซื้อของคุณเสร็จสมบูรณ์</string>
   <string name="completing_card_buy">เรากำลังทำการสั่งซื้อของคุณให้เสร็จสิ้นในตอนนี้</string>
   <string name="card_purchased">ซื้อแล้ว %1s</string>
-  <string name="card_purchased_available_now">ตอนนี้ %1s ของคุณพร้อมใช้งานใน Wallet แล้ว</string>
+  <string name="card_purchased_available_now">%1s ของคุณพร้อมใช้งานใน Wallet แล้ว</string>
   <string name="invalid_cvv">CVV ไม่ถูกต้อง</string>
   <string name="invalid_date">วันที่ไม่ถูกต้อง</string>
   <string name="invalid_card_number">เลขบัตรไม่ถูกต้อง</string>
@@ -1577,7 +1588,7 @@
   <string name="billing_address_state">สถานะ</string>
   <string name="billing_address_country">ประเทศ</string>
   <string name="currency_not_supported_title">สกุลเงินของคุณไม่รองรับ</string>
-  <string name="currency_not_supported_1">ขณะนี้เราไม่สนับสนุนการซื้อ crypto ด้วย %1s</string>
+  <string name="currency_not_supported">ขณะนี้เราไม่สนับสนุนการซื้อ crypto ด้วย %1s</string>
   <string name="activity_no_activity_title">คุณไม่มีกิจกรรม</string>
   <string name="activity_no_activity_text">ธุรกรรมทั้งหมดของคุณจะปรากฏที่นี่</string>
   <string name="activity_custodial_pending_value">โอนเงินผ่านธนาคาร</string>
@@ -1588,7 +1599,7 @@
   <string name="expired">ที่หมดอายุแล้ว</string>
   <string name="remove_card">ถอดการ์ด</string>
   <string name="save_my_card">บันทึกบัตรของฉัน</string>
-  <string name="custodial_activity_not_supported">รายละเอียดกิจกรรมการซื้อขาย Wallet Wallet ไม่ได้รับการสนับสนุนในรุ่นนี้</string>
+  <string name="custodial_activity_not_supported">ไม่รองรับรายละเอียดกิจกรรมการซื้อขาย Wallet Wallet ในรุ่นนี้</string>
   <string name="common_hyphenated_strings">%1$s - %2$s</string>
   <string name="common_spaced_strings">%1$s %2$s</string>
   <string name="server_unreachable_exit">ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้โปรดลองอีกครั้งในภายหลัง</string>
@@ -1641,4 +1652,428 @@
   <string name="activity_details_historic_received">ค่าเมื่อได้รับ</string>
   <string name="activity_details_historic_transferred">ค่าเมื่อโอน</string>
   <string name="activity_details_historic_value_load_fail">ไม่สามารถโหลดข้อมูลมูลค่าในอดีต</string>
+  <string name="received_usdt">รับ Tether</string>
+  <string name="watch_only_not_supported">การนำเข้าที่อยู่ที่ไม่มีค่าใช้จ่าย (ที่อยู่หรือสคริปต์กุญแจสาธารณะ 
+ ไม่สนับสนุนคีย์ส่วนตัวที่เกี่ยวข้อง) ไม่รองรับ กรุณาลองใหม่อีกครั้ง 
+ ที่อยู่และรหัสส่วนตัว 
+</string>
+  <string name="linked_banks">ธนาคารที่เชื่อมโยง</string>
+  <string name="tx_title_deposit">ฝาก %1s</string>
+  <string name="tx_title_withdraw">ถอน %1s</string>
+  <string name="usdt_to_field_helper_no_dropdown_1">ป้อนที่อยู่ TETHER / ETH</string>
+  <string name="usdt_to_field_helper_1">ป้อนที่อยู่ TETHER / ETH หรือเลือก</string>
+  <string name="usdt_invalid_address_1">ที่อยู่ TETHER ไม่ถูกต้อง</string>
+  <string name="usdt_wallet_name">My Tether Wallet</string>
+  <string name="bank_transfer">โอนเงินผ่านธนาคาร</string>
+  <string name="instantly_buy_crypto_with_card">ซื้อ crypto ทันทีด้วย Visa หรือ Mastercard</string>
+  <string name="send_funds_directly_from_your_bank">ส่งเงินโดยตรงจากธนาคารของคุณไปยัง Blockchain Wallet เมื่อเราได้รับการโอนด้วยตนเองให้ใช้เงินสดนั้นเพื่อซื้อ crypto</string>
+  <string name="by_depositing_funds_terms_and_conds">โดยการฝากเงินเข้าบัญชีคุณยอมรับ <annotation link="modular_terms_and_conditions"> ข้อกำหนดและเงื่อนไขของ Modulr </annotation> พันธมิตรธนาคารของเรา</string>
+  <string name="add_bank_with_currency">เพิ่มธนาคาร %1s</string>
+  <string name="deposit_currency">ฝาก %1s</string>
+  <string name="currency_bank_transfer">โอนเงินผ่านธนาคาร</string>
+  <string name="link_transfer_instructions">โปรดโอน %1s จากธนาคารส่วนตัวของคุณไปที่ Blockchain.com นี่จะเชื่อมโยงบัญชีธนาคารของคุณอย่างปลอดภัย</string>
+  <string name="payment">การชำระเงิน</string>
+  <string name="buy_now_1">ซื้อ %1s</string>
+  <string name="simple_buy_transfer_details_error">เกิดข้อผิดพลาดขณะโหลดรายละเอียดการโอน 
+
+ โปรดลองอีกครั้งในภายหลัง.</string>
+  <string name="algo_default_account_label">กระเป๋าเงิน Algorand ของฉัน</string>
+  <string name="usdt_default_account_label">My Tether Wallet</string>
+  <string name="add_bank_title">เพิ่มธนาคาร %1s</string>
+  <string name="order_error_subtitle">ไม่ต้องกังวล เงินของคุณปลอดภัย โปรดลองอีกครั้งหรือติดต่อทีมสนับสนุนของเราเพื่อขอความช่วยเหลือ</string>
+  <string name="currency_not_supported_1">ขณะนี้เราไม่สนับสนุนการซื้อ crypto ด้วย %1s</string>
+  <string name="checkout_funds_label">กองทุน</string>
+  <string name="checkout_funds_transfer_label">กระเป๋าเงิน %1s ของฉัน</string>
+  <string name="transfer_wallets_empty_title">ไม่มีการเข้ารหัสลับในการส่ง</string>
+  <string name="transfer_wallets_empty_details">ดูเหมือนว่ากระเป๋าเงินของคุณว่างเปล่าเราสามารถช่วยคุณซื้อ crypto ได้</string>
+  <string name="transfer_wallets_load_error">มีข้อผิดพลาดในการโหลดกระเป๋าของคุณโปรดลองอีกครั้งในภายหลัง</string>
+  <string name="remove_bank">ลบธนาคาร</string>
+  <string name="pounds">ปอนด์</string>
+  <string name="euros">ยูโร</string>
+  <string name="deposit_cash">ฝากเงินสด</string>
+  <string name="send_me_instructions">ส่งคำแนะนำ</string>
+  <string name="bank_transfer_only">โอนเงินทางธนาคารเท่านั้น</string>
+  <string name="bank_transfer_only_subtitle">ส่งเงินจากบัญชีธนาคารในชื่อของคุณเท่านั้น หากไม่มีการฝากอาจล่าช้าหรือถูกปฏิเสธ</string>
+  <string name="processing_time">ระยะเวลาดำเนินการ</string>
+  <string name="processing_time_subtitle_eur">เงินจะเข้าสู่กระเป๋าเงิน EUR ของคุณทันทีที่เราได้รับ การโอน SEPA มักใช้เวลาประมาณ 1 วันทำการในการเข้าถึงเรา</string>
+  <string name="processing_time_subtitle_gbp">เงินจะเข้าสู่กระเป๋าเงิน GBP ของคุณทันทีที่เราได้รับ ในเครือข่ายการชำระเงินที่รวดเร็วขึ้นของสหราชอาณาจักรอาจใช้เวลาสองสามชั่วโมง</string>
+  <string name="deposit_limits">ข้อ จำกัด การฝาก</string>
+  <string name="deposit_limits_subtitle">โปรดทราบว่าหากคุณฝากเงินเกินขีด จำกัด การถอนประจำวันของคุณคุณจะไม่สามารถถอนเงินทั้งหมดของคุณในครั้งเดียว</string>
+  <string name="unable_to_load_bank_details">เราไม่สามารถโหลดรายละเอียดเงินฝากธนาคารของเรา</string>
+  <string name="most_popular">เป็นที่นิยมมากที่สุด</string>
+  <string name="fiat_funds_detail_deposit_title">เงินฝาก</string>
+  <string name="fiat_funds_detail_withdraw_title">ถอน</string>
+  <string name="fiat_funds_detail_deposit_details">เพิ่มเงินสดจากธนาคารของคุณ</string>
+  <string name="fiat_funds_detail_activity_title">กิจกรรม</string>
+  <string name="fiat_funds_detail_activity_details">ดูธุรกรรมทั้งหมด</string>
+  <string name="fiat_funds_no_kyc_announcement_title">เก็บเงินสดไว้ในกระเป๋าเงินของคุณ</string>
+  <string name="fiat_funds_no_kyc_announcement_description">ยืนยันตัวตนของคุณเพื่อฝากเงินสดเข้ากระเป๋าเงินและซื้อ crypto</string>
+  <string name="fiat_funds_no_kyc_sheet_description">ยืนยันตัวตนของคุณเพื่อฝากเงินสดเข้ากระเป๋าเงินของคุณ ซื้อและขาย crypto ถอนได้ตลอดเวลา</string>
+  <string name="fiat_funds_no_kyc_step_1_title">ยืนยันตัวตนของคุณ</string>
+  <string name="fiat_funds_no_kyc_step_1_description">เราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นเรื่องจริงที่คุณจะต้องป้องกันการฉ้อโกงด้วยการอัปโหลด ID</string>
+  <string name="fiat_funds_no_kyc_step_2_title">ฝากเงินสด</string>
+  <string name="fiat_funds_no_kyc_step_2_description">โอนเงินสดจากธนาคารของคุณและเปิดใช้ยอดคงเหลือเงินสดของคุณ</string>
+  <string name="fiat_funds_no_kyc_step_3_title">ซื้อ Crypto ด้วยเงินสด</string>
+  <string name="fiat_funds_no_kyc_step_3_description">ใช้กระเป๋าเงินเงินสดของคุณเป็นวิธีการชำระเงินเพื่อซื้อ BTC ETH XLM และอื่น ๆ</string>
+  <string name="fiat_funds_no_kyc_positive_action">ยืนยันตัวตนของฉัน</string>
+  <string name="fiat_funds_no_kyc_negative_action">ไม่ใช่ตอนนี้</string>
+  <string name="fiat_funds_no_kyc_step_1_label">1</string>
+  <string name="fiat_funds_no_kyc_step_2_label">2</string>
+  <string name="fiat_funds_no_kyc_step_3_label">3</string>
+  <string name="fiat_funds_kyc_announcement_title">เชื่อมโยงธนาคารเพื่อซื้อ Crypto</string>
+  <string name="fiat_funds_kyc_announcement_description">ถือเงินสดในกระเป๋าเงิน Blockchain.com ของคุณ ฝากและถอนได้ตลอดเวลา</string>
+  <string name="fiat_funds_kyc_announcement_action">เชื่อมโยงธนาคาร</string>
+  <string name="transfer_wallet_buy_crypto">ซื้อ Crypto</string>
+  <string name="transfer_send_crypto">ส่ง crypto</string>
+  <string name="transfer_second_pswd_title">รหัสผ่านที่ 2</string>
+  <string name="transfer_second_pswd_desc">โปรดป้อนรหัสผ่านที่สองของคุณจากนั้นคุณจะสามารถส่งต่อได้</string>
+  <string name="transfer_second_pswd_hint">รหัสผ่านที่สอง</string>
+  <string name="algorand_announcement_title">ทักทายกับ Algorand!</string>
+  <string name="algorand_announcement_description">ซื้อและถือ ALGO ในกระเป๋าเงินของคุณ ขายและถอนกำลังจะมาเร็ว ๆ นี้</string>
+  <string name="algorand_announcement_action">ซื้อ Algorand</string>
+  <string name="currency_wallet">กระเป๋าเงิน %1s ของฉัน</string>
+  <string name="tether_announcement_title">ทักทายกับ Tether!</string>
+  <string name="tether_announcement_description">USDT เป็น Stablecoin ที่ใหญ่ที่สุดในโลก ซื้อและแลกเปลี่ยนจากแอปของคุณ ฟังก์ชั่นส่งและรับแบบเต็มมีอยู่ในเว็บกระเป๋าเงิน</string>
+  <string name="tether_announcement_action">ซื้อ Tether เลย</string>
+  <string name="dashboard_asset_item_label_title">โปรดทราบว่า</string>
+  <string name="algorand_asset_label">ฟังก์ชันการถอน ALGO จากกระเป๋าเงินซื้อขายของคุณยังไม่สามารถใช้งานได้ แต่จะมาเร็ว ๆ นี้</string>
+  <string name="usdt_asset_label">ฟังก์ชั่นส่งและรับแบบเต็มมีอยู่ในเว็บกระเป๋าเงิน</string>
+  <string name="send_state_no_funds">ไม่มีเงินทุน</string>
+  <string name="send_state_not_supported">บัญชีนี้ไม่รองรับการส่ง</string>
+  <string name="send_state_not_enough_gas">ETH ยอดคงเหลือต่ำไม่สามารถชำระค่าธรรมเนียมเครือข่ายได้</string>
+  <string name="send_state_send_in_flight">ไม่สามารถใช้งานได้เนื่องจากการทำธุรกรรมที่ค้างอยู่</string>
+  <string name="common_send">ส่ง</string>
+  <string name="common_receive">รับ</string>
+  <string name="common_swap">สลับ</string>
+  <string name="common_from">จาก</string>
+  <string name="common_to">ถึง</string>
+  <string name="common_yes">ใช่</string>
+  <string name="common_no">ไม่</string>
+  <string name="common_ok">ตกลง</string>
+  <string name="common_cancel">ยกเลิก</string>
+  <string name="common_total">รวม</string>
+  <string name="common_deposit">ฝาก</string>
+  <string name="common_transfer">โอน</string>
+  <string name="common_error">เกิดข้อผิดพลาดโปรดลองอีกครั้ง</string>
+  <string name="common_company_name">Blockchain.com</string>
+  <string name="common_confirm">ยืนยัน</string>
+  <string name="toolbar_cmd_transfer">โอน</string>
+  <string name="notification_2fa_summary">การแจ้งเตือน 2FA</string>
+  <string name="notification_2fa_description">การแจ้งเตือนที่เกี่ยวข้องกับการตรวจสอบสิทธิ์สองปัจจัย</string>
+  <string name="notification_payments_summary">การแจ้งเตือนการชำระเงิน</string>
+  <string name="notification_payments_description">การแจ้งเตือนที่เกี่ยวข้องกับการชำระเงิน</string>
+  <string name="enable_cloud_backup">เปิดใช้งานการสำรองข้อมูลบนคลาวด์</string>
+  <string name="enable_cloud_backup_summary">จัดเก็บข้อมูลสำรองที่เข้ารหัสไว้ในบัญชี Google Drive ของคุณ 
+ ถ้ามี วิธีนี้ช่วยให้คุณสามารถกู้คืนกระเป๋าเงินของคุณได้หากคุณทำอุปกรณ์นี้หาย 
+</string>
+  <string name="tx_title_interest">ดอกเบี้ยที่ได้รับ %1$s</string>
+  <string name="dashboard_asset_actions_send_dsc">โอน %1$s ไปยัง Wallet ใดก็ได้</string>
+  <string name="dashboard_asset_actions_receive_dsc">ยอมรับหรือแบ่งปันที่อยู่ %1$s</string>
+  <string name="dashboard_asset_actions_swap_dsc">แลกเปลี่ยน %1$s สำหรับ Crypto อื่น</string>
+  <string name="dashboard_asset_actions_deposit_dsc">เพิ่ม %1$s ในกระเป๋าเงินดอกเบี้ยของคุณ</string>
+  <string name="dashboard_asset_actions_summary_title">สรุปดอกเบี้ย</string>
+  <string name="dashboard_asset_actions_summary_dsc">ดูดอกเบี้ย %1$s เกิดขึ้นของคุณ</string>
+  <string name="dashboard_asset_actions_interest_dsc_failed">ไม่สามารถโหลดรายละเอียดดอกเบี้ย</string>
+  <string name="asset_details_chart_load_failed_toast">ไม่สามารถโหลดรายละเอียดแผนภูมิโปรดลองอีกครั้ง</string>
+  <string name="asset_details_load_failed_toast">ไม่สามารถโหลดรายละเอียดกระเป๋าเงินโปรดลองอีกครั้ง</string>
+  <string name="asset_details_exchange_load_failed_toast">ข้อมูลอัตราแลกเปลี่ยนล้มเหลวโปรดลองอีกครั้ง</string>
+  <string name="dashboard_asset_actions_tx_in_progress">มีธุรกรรมอยู่ระหว่างดำเนินการโปรดรอจนกว่าจะเสร็จสมบูรณ์</string>
+  <string name="cloud_backup_card_title">ขอแนะนำการสำรองข้อมูลบนคลาวด์</string>
+  <string name="cloud_backup_card_body">ตอนนี้คุณสามารถสำรองกระเป๋าเงินของคุณไปยังระบบคลาวด์ได้อย่างปลอดภัย คุณสามารถยกเลิกการสำรองข้อมูลได้ในการตั้งค่ากระเป๋าเงินของคุณ</string>
+  <string name="cloud_backup_card_cta">เรียนรู้เพิ่มเติม</string>
+  <string name="basic_transfer_lock_warn" formatted="false">ยอดคงเหลือที่คุณสามารถถอนได้คือ %1s ยอดคงเหลือ %2s จะสามารถถอนได้ภายใน 7 วัน</string>
+  <string name="basic_transfer_lock_learn_more">
+    <annotation link="balance_lock"> เรียนรู้เพิ่มเติม </annotation>
+  </string>
+  <string name="basic_transfer_error_insufficient_funds_title">เงินทุนไม่เพียงพอ</string>
+  <string name="basic_transfer_error_insufficient_funds">คุณมีเงินในบัญชีไม่เพียงพอสำหรับการทำธุรกรรมนี้</string>
+  <string name="basic_transfer_error_locked_funds">การเข้ารหัสลับของคุณจะสามารถถอนได้ภายใน 7 วัน <annotation link="balance_lock"> เรียนรู้เพิ่มเติม </annotation></string>
+  <string name="erc20_need_more_eth_error_body_1">คุณจะต้องใช้ ETH เพื่อส่ง %1$s</string>
+  <string name="purchase_card_note_1">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด ระยะเวลาการระงับเริ่มต้น 7 วันจะถูกนำไปใช้กับเงินของคุณ</string>
+  <string name="select_deposit_source_title">โอนจาก</string>
+  <string name="activity_state_cleared">เคลียร์แล้ว</string>
+  <string name="activity_state_rejected">ถูกปฏิเสธ</string>
+  <string name="activity_state_refunded">คืนเงินแล้ว</string>
+  <string name="activity_details_label_manual_review">การตรวจสอบด้วยตนเอง</string>
+  <string name="activity_details_label_processing">กำลังประมวลผล</string>
+  <string name="activity_details_title_deposit">ฝาก</string>
+  <string name="activity_details_title_interest_earned">ดอกเบี้ยที่ได้รับ</string>
+  <string name="activity_details_title_withdraw">การถอน</string>
+  <string name="transfer_receive_crypto">รับ crypto</string>
+  <string name="send_select_target_title">ปลายทาง</string>
+  <string name="send_enter_amount_from">จาก: %1$s</string>
+  <string name="send_enter_amount_to">ถึง: %1$s</string>
+  <string name="send_enter_amount_title">ส่ง %1$s</string>
+  <string name="send_enter_amount_available">มีจำหน่าย</string>
+  <string name="send_enter_amount_max">ส่งสูงสุด</string>
+  <string name="send_enter_amount_deposit_max">โอนสูงสุด</string>
+  <string name="send_enter_amount_min_deposit">ต้องโอนขั้นต่ำ %1$s</string>
+  <string name="send_confirmation_title">ส่ง %1$s</string>
+  <string name="send_confirmation_fee">ค่าธรรมเนียม - ปกติ</string>
+  <string name="send_confirmation_regular_estimation">(ETA 60 นาที)</string>
+  <string name="send_confirmation_fee_loading">กำลังโหลด ...</string>
+  <string name="send_confirmation_fee_error">เกิดข้อผิดพลาดในการโหลดค่าธรรมเนียม</string>
+  <string name="send_confirmation_add_note_hint">เพิ่มบันทึก</string>
+  <string name="send_confirmation_add_note_success">เพิ่มหมายเหตุเรียบร้อยแล้ว</string>
+  <string name="send_confirmation_cta_button">ส่ง %1$s</string>
+  <string name="send_confirmation_deposit_cta_button">ยืนยันการโอน</string>
+  <string name="send_confirmation_interest_tos_pp">ฉันได้อ่านและยอมรับ <annotation link="interest_tos"> ข้อกำหนดในการให้บริการ </annotation> &amp; <annotation link="interest_pp"> นโยบายความเป็นส่วนตัว </annotation></string>
+  <string name="send_confirmation_interest_holding_period_1">การยอมรับสิ่งนี้แสดงว่าคุณยินยอมที่จะโอน</string>
+  <string name="send_confirmation_interest_holding_period_2">( %1$s ) จาก Bitcoin Wallet ไปยังบัญชีดอกเบี้ยของคุณ ระยะเวลาการระงับเริ่มต้น 7 วันจะถูกนำไปใช้กับเงินของคุณ</string>
+  <string name="send_confirmation_progress_title">กำลังโอน %1$s</string>
+  <string name="send_confirmation_progress_message">เรากำลังโอน %1$s ตอนนี้</string>
+  <string name="send_confirmation_success_title">%1$s</string>
+  <string name="send_confirmation_success_message">โอน %1$s สำเร็จแล้ว</string>
+  <string name="send_progress_sending_title">กำลังส่ง %1$s</string>
+  <string name="send_progress_sending_subtitle">เรากำลังส่งธุรกรรมของคุณตอนนี้</string>
+  <string name="send_progress_complete_title">%1$s</string>
+  <string name="send_progress_complete_subtitle">ส่ง %1$s สำเร็จแล้ว</string>
+  <string name="send_progress_error_title">อ๊ะ! บางอย่างผิดพลาด.</string>
+  <string name="send_progress_error_subtitle">ไม่ต้องกังวล. เงินของคุณปลอดภัย โปรดลองอีกครั้งหรือติดต่อทีมสนับสนุนของเราเพื่อขอความช่วยเหลือ</string>
+  <string name="send_enter_asset_address_hint">%1s ที่อยู่</string>
+  <string name="send_warn_internal_send_only">ส่งภายในเท่านั้น</string>
+  <string name="send_scan_qr_code">สแกน QR Code</string>
+  <string name="send_error_not_valid_asset_address">ไม่ใช่ที่อยู่ %1s ที่ถูกต้อง</string>
+  <string name="send_error_address_is_eth_contract">ที่อยู่ไม่ใช่ที่อยู่ของผู้ใช้</string>
+  <string name="send_enter_amount_error_insufficient_funds">%1$s ในกระเป๋าเงินไม่เพียงพอ</string>
+  <string name="send_enter_amount_error_invalid_amount">ส่ง 0.00000001 %1$s ขึ้นไป</string>
+  <string name="send_enter_invalid_password">รหัสผ่านไม่ถูกต้อง.</string>
+  <string name="send_enter_unexpected_error">ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น. กรุณาลองอีกครั้ง.</string>
+  <string name="send_enter_insufficient_gas">คุณมี ETH ไม่เพียงพอที่จะดำเนินธุรกรรมนี้</string>
+  <string name="send_select_a_wallet_title">หรือเลือกกระเป๋าเงิน</string>
+  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
+  <string name="purchase_funds_note">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด</string>
+  <string name="common_linked_learn_more">
+    <annotation link="learn_more_link"> เรียนรู้เพิ่มเติม </annotation>
+  </string>
+  <string name="interest_announcement_title">รับความสนใจในการเข้ารหัสของคุณวันนี้!</string>
+  <string name="interest_announcement_description">โอน Crypto และเริ่มรับดอกเบี้ย BTC, ETH และอื่น ๆ อีกมากมาย</string>
+  <string name="interest_announcement_action">เรียนรู้เพิ่มเติม</string>
+  <string name="purchase_card_note_2">การเข้ารหัสลับของคุณจะสามารถถอนได้ภายใน</string>
+  <string name="purchase_card_note_2_1">7 วัน.</string>
+  <string name="buy_any_crypto">ซื้อ Crypto</string>
+  <string name="select_send_sheet_title">ส่งจาก</string>
+  <string name="select_send_source_title">ส่งจาก</string>
+  <string name="currency_funds_wallet">กระเป๋าเงิน %1s ของฉัน</string>
+  <string name="transfer_receive_empty_title">ไม่สามารถโหลดกระเป๋าสตางค์ของคุณ</string>
+  <string name="transfer_receive_empty_details">ดูเหมือนว่าจะมีปัญหากับการเชื่อมต่ออินเทอร์เน็ตของคุณ กรุณาตรวจสอบและลองอีกครั้ง</string>
+  <string name="transfer_receive_empty_cta">แตะเพื่อรีเฟรช</string>
+  <string name="us_dollars">ดอลลาร์สหรัฐ</string>
+  <string name="fiat_funds_detail_withdraw_details">ถอนเงินไปยังธนาคารของคุณ</string>
+  <string name="withdraw_currency">ถอน %1$s</string>
+  <string name="withdraw_title">ถอน</string>
+  <string name="withdraw_to">ถอนเป็น</string>
+  <string name="add_a_bank">เพิ่มธนาคาร</string>
+  <string name="transfer_send_crypto_title">ส่ง Crypto</string>
+  <string name="transfer_send_crypto_label">เลือกกระเป๋าเงินที่คุณต้องการส่ง</string>
+  <string name="transfer_receive_crypto_title">รับ Crypto</string>
+  <string name="transfer_receive_crypto_label">เลือก Wallet เพื่อรับ crypto</string>
+  <string name="withdraw_amount">ถอน %1$s</string>
+  <string name="withdrawal_amount">%1$s ถอน %1$s</string>
+  <string name="withdrawing_amount">กำลังถอน %1$s</string>
+  <string name="withdrawing_amount_message">เรากำลังดำเนินการถอนของคุณตอนนี้</string>
+  <string name="withdrawal_success_message">ความสำเร็จ! เรากำลังถอนเงินสดออกจาก %1$s Wallet %1$s ตอนนี้ เงินควรจะอยู่ในธนาคารของคุณภายใน 1-3 วันทำการ</string>
+  <string name="sell_enter_amount_max">ขาย Max</string>
+  <string name="sell_enter_amount_min_error">%1$s นาที</string>
+  <string name="sell_enter_amount_max_error">%1$s สูงสุด</string>
+  <string name="send_enter_amount_min_send">ต้องส่งขั้นต่ำ %1$s</string>
+  <string name="sell_confirmation_cta_button">ขาย %1$s</string>
+  <string name="sell_confirmation_progress_title">ขาย %1$s</string>
+  <string name="sell_confirmation_progress_message">เรากำลังดำเนินการขายของคุณให้เสร็จสิ้นในขณะนี้</string>
+  <string name="sell_confirmation_success_message">ตอนนี้เงินสดของคุณอยู่ในกระเป๋า %1$s</string>
+  <string name="send_state_locked_funds">เงินของคุณจะพร้อมใช้งานภายใน 7 วัน</string>
+  <string name="sell_progress_complete_title">%1$s ขายแล้ว</string>
+  <string name="earn_interest">รับดอกเบี้ย</string>
+  <string name="interest_summary_total">ดอกเบี้ยรวมที่ได้รับ</string>
+  <string name="interest_summary_total_fail">ไม่สามารถโหลดดอกเบี้ยทั้งหมด</string>
+  <string name="interest_summary_next_payment">การจ่ายดอกเบี้ยครั้งต่อไป</string>
+  <string name="interest_summary_accrued">ดอกเบี้ยคงค้างของเดือนนี้</string>
+  <string name="interest_summary_accrued_fail">ไม่สามารถโหลดดอกเบี้ยค้างรับ</string>
+  <string name="interest_summary_hold_period">ระยะเวลาการระงับเริ่มต้น</string>
+  <string name="interest_summary_hold_period_days">%1$d วัน</string>
+  <string name="interest_summary_hold_period_fail">ไม่สามารถโหลดรายละเอียดระยะเวลาการถือครอง</string>
+  <string name="interest_summary_rate">อัตราดอกเบี้ย</string>
+  <string name="interest_summary_rate_fail">ไม่สามารถโหลดอัตราดอกเบี้ย</string>
+  <string name="interest_dashboard_title">บัญชีดอกเบี้ย</string>
+  <string name="interest_dashboard_item_balance_title">%1$s ยอดคงเหลือ</string>
+  <string name="interest_dashboard_item_accrued_title">ดอกเบี้ยรวมที่ได้รับ</string>
+  <string name="interest_dashboard_item_action_earn">รับดอกเบี้ย</string>
+  <string name="interest_dashboard_item_action_view">ดู</string>
+  <string name="interest_dashboard_item_rate_1">รับสูงถึง</string>
+  <string name="interest_dashboard_item_rate_2">เป็นประจำทุกปีใน %1$s</string>
+  <string name="interest_dashboard_verify_title">รับความสนใจจาก Crypto ของคุณ</string>
+  <string name="interest_dashboard_verify_label">รับสูงถึง 12 \% ทันทีเมื่อคุณโอนเงินดิจิทัลไปยังบัญชีดอกเบี้ยของคุณ</string>
+  <string name="interest_dashboard_verify_point_one_title">ยืนยันตัวตนของคุณ</string>
+  <string name="interest_dashboard_verify_point_one_label">เพื่อป้องกันการขโมยข้อมูลประจำตัวหรือการฉ้อโกงเราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆโดยการอัปโหลด ID</string>
+  <string name="interest_dashboard_verify_point_two_title">ซื้อ Crypto</string>
+  <string name="interest_dashboard_verify_point_two_label">ใช้บัตรธนาคารบัตรเดบิตหรือบัตรเครดิตของคุณเพื่อใช้ในการซื้อ crypto</string>
+  <string name="interest_dashboard_verify_point_three_title">รับดอกเบี้ย</string>
+  <string name="interest_dashboard_verify_point_three_label">โอนไปยังบัญชีดอกเบี้ยของคุณและรับการชำระดอกเบี้ยรายเดือน</string>
+  <string name="interest_summary_disclaimer_label">ใช้ Web wallet เพื่อถอนเงินของคุณ</string>
+  <string name="buy">ซื้อ</string>
+  <string name="sell">ขาย</string>
+  <string name="buy_and_sell">ซื้อขาย</string>
+  <string name="buy_with_cash">ซื้อด้วยเงินสดหรือบัตร</string>
+  <string name="select_crypto_you_want">เลือก crypto ที่คุณต้องการซื้อ</string>
+  <string name="sell_intro_kyc_title_1">ยืนยันตัวตนของคุณ</string>
+  <string name="sell_intro_kyc_subtitle_1">เพื่อป้องกันการโจรกรรมข้อมูลส่วนบุคคลหรือการฉ้อโกงเราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆโดยการอัปโหลด ID</string>
+  <string name="sell_intro_kyc_title_2">ซื้อ Crypto</string>
+  <string name="sell_intro_kyc_subtitle_2">ใช้บัตรธนาคารเดบิตหรือบัตรเครดิตของคุณในการซื้อ crypto ใด ๆ</string>
+  <string name="sell_intro_kyc_title_3">ขายได้ตลอดเวลา</string>
+  <string name="sell_intro_kyc_subtitle_3">ขาย crypto ของคุณเป็นเงินสดทันที เก็บเงินสดไว้ในกระเป๋าเงินของคุณหรือถอนไปยังธนาคารที่เชื่อมโยง</string>
+  <string name="sell_crypto">ขาย Crypto</string>
+  <string name="sell_crypto_subtitle">ยืนยันตัวตนของคุณเพื่อขาย crypto เป็นเงินสด</string>
+  <string name="sell_for_cash">ขาย Crypto เป็นเงินสด</string>
+  <string name="select_wallet_to_sell">เลือกกระเป๋าเงินที่จะขายจาก</string>
+  <string name="common_to_coloned">ถึง:</string>
+  <string name="common_from_coloned">จาก:</string>
+  <string name="common_sell">ขาย</string>
+  <string name="sell_quote_price">%1$s ราคา</string>
+  <string name="convert_your_crypto_to_cash">แปลงเงินดิจิทัลของคุณเป็นเงินสด</string>
+  <string name="scan_mismatch_transaction_target">รหัสที่สแกนไม่ใช่รหัส QR %1$s</string>
+  <string name="scan_failed">ไม่รู้จักรหัส QR โปรดลองอีกครั้ง</string>
+  <string name="could_not_save_card">เราไม่สามารถบันทึกบัตรของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
+  <string name="could_not_activate_card">เราไม่สามารถเปิดใช้งานบัตรของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
+  <string name="card_still_pending">เรารอสองนาทีและไม่ได้รับการอัปเดตจากผู้ให้บริการบัตรของเรา บัตรของคุณอาจยังคงได้รับการอนุมัติในภายหลัง โปรดติดต่อฝ่ายสนับสนุนหากคุณมีคำถามใด ๆ</string>
+  <string name="card_link_failed">ลิงก์การ์ดไม่สำเร็จ โปรดลองอีกครั้งหรือติดต่อฝ่ายสนับสนุนหากคุณเชื่อว่าเกิดจากข้อผิดพลาด</string>
+  <string name="tx_view_locked_funds">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้นานถึง 7 วัน</string>
+  <string name="unable_to_verify_id">ไม่สามารถยืนยัน ID ของคุณ</string>
+  <string name="unable_to_verify_id_description">เราไม่สามารถยืนยันตัวตนของคุณได้ สิ่งนี้อาจเกิดขึ้นได้จากสาเหตุบางประการ</string>
+  <string name="invalid_id">ID ไม่ถูกต้อง</string>
+  <string name="invalid_id_description">รูปภาพหรือเอกสารที่อัพโหลดไม่ตรงกับข้อกำหนด</string>
+  <string name="information_missmatch">ข้อมูลไม่ตรงกัน</string>
+  <string name="information_missmatch_description">ข้อมูลทั้งหมดจะต้องปรากฏทุกประการตามที่ปรากฏในเอกสารทางกฎหมายของคุณ หมายเหตุ: โปรดอย่าใช้ชื่อเล่น</string>
+  <string name="blocked_by_local_laws">ถูกปิดกั้นโดยกฎหมายท้องถิ่น</string>
+  <string name="blocked_by_local_laws_description">ที่ Blockchain.com เรามุ่งมั่นที่จะปฏิบัติตามกฎหมายท้องถิ่นใด ๆ และทั้งหมด ตามตำแหน่งของคุณเราไม่สามารถอนุญาตให้ซื้อหรือขายสกุลเงินดิจิทัลได้ในขณะนี้</string>
+  <string name="error_contact_support">หากคุณคิดว่านี่เป็นความผิดพลาดหรือต้องการให้ตรวจสอบบัญชีของคุณด้วยตนเองโปรดติดต่อฝ่ายสนับสนุน</string>
+  <string name="common_empty_title">ไม่สามารถโหลดกระเป๋าสตางค์ของคุณ</string>
+  <string name="common_empty_details">ดูเหมือนว่าจะมีปัญหากับการเชื่อมต่ออินเทอร์เน็ตของคุณ กรุณาตรวจสอบและลองอีกครั้ง</string>
+  <string name="common_empty_cta">แตะเพื่อรีเฟรช</string>
+  <string name="email_request_subject_usdt_1">คำขอชำระเงิน Tether</string>
+  <string name="email_request_body_usdt_1">โปรดส่ง USDT ไปยังที่อยู่ Tether %1$s</string>
+  <string name="send_error_tx_in_flight">ธุรกรรมกำลังดำเนินการอยู่</string>
+  <string name="send_error_tx_option_invalid">เกิดข้อผิดพลาด</string>
+  <string name="send_to_exchange_xlm_title">ส่งไปแลกเปลี่ยน?</string>
+  <string name="send_to_exchange_xlm_blurb">เพิ่มบันทึกเพื่อหลีกเลี่ยงการสูญเสียเงินทุน</string>
+  <string name="send_to_exchange_xlm_link">
+    <annotation link="send_memo_link"> เรียนรู้เพิ่มเติมเกี่ยวกับข้อกำหนดยอดคงเหลือ </annotation>
+  </string>
+  <string name="send_confirm_memo_text_hint">เพิ่มบันทึก (สูงสุด 28 ตัวอักษร)</string>
+  <string name="send_confirm_memo_id_hint">เพิ่มรหัส</string>
+  <string name="send_invalid_option_dsc_memo">คำอธิบาย / บันทึกไม่ถูกต้อง</string>
+  <string name="interest_error_title">ไม่สามารถโหลดรายละเอียดดอกเบี้ย</string>
+  <string name="interest_error_desc">เกิดข้อผิดพลาดขณะโหลดรายละเอียดบัญชีดอกเบี้ย 
+ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณแล้วลองอีกครั้งหรือติดต่อฝ่ายสนับสนุนหากปัญหายังคงมีอยู่</string>
+  <string name="sell_is_coming_soon">ซื้อและขายเร็ว ๆ นี้</string>
+  <string name="sell_is_coming_soon_description">ปัจจุบันเราไม่สนับสนุนการซื้อหรือขาย crypto ในภูมิภาคของคุณ เราจะส่งข้อมูลอัปเดตให้คุณเมื่อเสร็จสิ้น</string>
+  <string name="error_scan_failed_general">การสแกนล้มเหลว กรุณาลองอีกครั้ง.</string>
+  <string name="error_scan_failed_bitpay">ไม่สามารถเรียกดูใบแจ้งหนี้ BitPay หมดอายุแล้วหรือยัง?</string>
+  <string name="backup_before_send_later_cta">ดำเนินการต่อโดยไม่ต้องสำรองข้อมูล</string>
+  <plurals name="backup_before_send_later_label">
+    <item quantity="other">คุณมี %1$d ส่งโดยไม่ต้องสำรองข้อมูลที่เหลือ</item>
+  </plurals>
+  <string name="backup_before_send_now_label">คุณต้องสำรองข้อมูลก่อนส่ง</string>
+  <plurals name="lock_days">
+    <item quantity="other">%d วัน</item>
+  </plurals>
+  <string name="card_info_title">ไม่ยอมรับการ์ดเสมือน</string>
+  <string name="card_info_description">ในขณะนี้เราไม่สนับสนุนการซื้อ crypto ด้วยบัตรเครดิตเสมือนและบัตรเดบิต คุณต้องใช้หมายเลขวันที่และรหัสความปลอดภัยของบัตรจริง</string>
+  <string name="send_confirmation_tx_fee">ค่าธรรมเนียมการทำธุรกรรม</string>
+  <string name="send_confirmation_insufficient_fee">เงินทุนไม่เพียงพอสำหรับค่าธรรมเนียมพิเศษโปรดปรับจำนวนเงินที่ส่งของคุณ</string>
+  <string name="send_confirmation_fee_learn_more"><annotation link="send_tx_fees"> เรียนรู้เพิ่มเติม </annotation> เกี่ยวกับค่าธรรมเนียมเครือข่าย</string>
+  <string name="send_state_locked_funds_1">คุณมีธุรกรรมที่รอดำเนินการ</string>
+  <string name="sell_info_title">ต้องการขายจากกระเป๋าเงินอื่น ๆ ของคุณหรือไม่?</string>
+  <string name="sell_info_blurb_1">ส่ง crypto จากกระเป๋าเงินของคุณไปยังของคุณ</string>
+  <string name="sell_info_blurb_2">ซื้อขายกระเป๋าสตางค์</string>
+  <string name="sell_info_blurb_3">เมื่อส่งเสร็จสิ้นให้ขาย crypto นั้นเป็นเงินสด</string>
+  <string name="sell_info_action">ส่งตอนนี้→</string>
+  <string name="tx_view_locked_funds_1">เงินเหล่านี้จะขายเข้ากระเป๋าเงิน Fiat %1$s ได้ทันที แต่คุณจะไม่สามารถส่งหรือถอนเงินเหล่านี้จาก Blockchain.com ได้ถึง %2$s</string>
+  <string name="common_pending">รอดำเนินการ</string>
+  <string name="confirm_status_msg_insufficient_funds">คุณมีเงินไม่เพียงพอในบัญชีนี้ที่จะดำเนินธุรกรรมนี้</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ สตริง / send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_option_invalid">โปรดตรวจสอบว่าคุณได้ยอมรับข้อกำหนดของเราแล้ว</string>
+  <string name="confirm_status_msg_invoice_expired">\@ สตริง / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ สตริง / send_enter_un ไม่คาดคิด_error</string>
+  <string name="common_free">ฟรี</string>
+  <string name="two_fa_new_request">กำลังขอรหัสใหม่…</string>
+  <string name="transfer_funds_title">โอนจากที่อยู่ที่นำเข้า?</string>
+  <string name="transfer_funds_description">ที่อยู่ที่นำเข้าจะไม่สำรองข้อมูลโดย Backup Phrase ของคุณ เพื่อรักษาความปลอดภัยของเงินเหล่านี้เรา
+ ขอแนะนำให้โอนยอดคงเหลือเหล่านี้ไปยังกระเป๋าเงินที่ไม่ได้รับการคุ้มครอง Blockchain.com ของคุณ
+</string>
+  <string name="two_factor_resend_sms">ส่ง SMS อีกครั้ง (%1$d)</string>
+  <string name="two_factor_retries_exceeded">ลองใหม่เกินแล้วโปรดรอ 60 วินาทีแล้วลองอีกครั้ง</string>
+  <string name="fee_options_label">%1$s ( %2$s )</string>
+  <string name="fee_options_sat_byte_min_error">ขั้นต่ำ 1 sat / byte ที่ต้องการ</string>
+  <string name="fee_options_invalid_amount">ค่าธรรมเนียมไม่ถูกต้อง</string>
+  <string name="sell_announcement_title">ขาย Crypto ของคุณเป็นเงินสด</string>
+  <string name="sell_announcement_description">ขายโดยตรงจาก Trading Wallets ของคุณไปยัง Cash Wallet ของคุณ</string>
+  <string name="sell_announcement_action">ขายเลย</string>
+  <string name="generic_limit">ขีด จำกัด</string>
+  <string name="select_account_sheet_empty">คุณไม่มีกระเป๋าสตางค์ที่มีสิทธิ์ดำเนินการนี้</string>
+  <string name="activity_details_swap_for">สำหรับ</string>
+  <string name="swap_enter_amount_min_swap">ต้องมีการแลกเปลี่ยนขั้นต่ำของ %1$s</string>
+  <string name="too_many_pending_orders_error_message">%1$s Wallet %1$s มีสวอปที่อยู่ระหว่างดำเนินการมากเกินไป โปรดเลือกกระเป๋าเงินอื่น</string>
+  <string name="swap_confirmation_title">สลับ %1$s</string>
+  <string name="swap_confirmation_cta_button">สลับ %1$s สำหรับ %2$s</string>
+  <string name="swap_confirmation_disclaimer">จำนวนเงินที่คุณส่งและรับอาจเปลี่ยนแปลงเล็กน้อยเนื่องจากกิจกรรมทางการตลาด เมื่อคำสั่งซื้อเริ่มขึ้นเราไม่สามารถหยุดยั้งได้</string>
+  <string name="swap_confirmation_progress_message">เรากำลังดำเนินการแลกเปลี่ยนของคุณให้เสร็จสิ้นในขณะนี้</string>
+  <string name="swap_confirmation_success_message">ขณะนี้ %1$s ของคุณอยู่ใน Wallet ของคุณแล้ว</string>
+  <string name="swap_progress_title">สลับ %1$s สำหรับ %2$s</string>
+  <string name="swap_progress_complete_title">Swap เสร็จสมบูรณ์</string>
+  <string name="swap_enter_amount_title">สลับ %1$s</string>
+  <string name="swap_enter_amount_source">แลกเปลี่ยน: %1$s</string>
+  <string name="swap_enter_amount_target">รับ: %1$s</string>
+  <string name="swap_enter_amount_max">Swap Max</string>
+  <string name="swap_enter_amount_silver_limit">แตะที่นี่เพื่ออัปเกรดโปรไฟล์ของคุณและแลกเปลี่ยนเงินจำนวนนี้</string>
+  <string name="swap_enter_amount_over_limit">คุณสามารถเปลี่ยนได้ถึง %1$s วันนี้</string>
+  <string name="swap_select_target_subtitle">ยืนยันกระเป๋าเงินที่คุณต้องการสลับจากและเลือกกระเป๋าเงินที่คุณต้องการรับเข้า</string>
+  <string name="swap_select_target_title">Swap ใหม่</string>
+  <string name="tx_confirmation_network_fee">ค่าธรรมเนียมเครือข่าย %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_1">เครือข่าย</string>
+  <string name="tx_confirmation_fee_learn_more_2">ค่าธรรมเนียมถูกกำหนดโดยเครือข่าย %1$s</string>
+  <string name="tx_confirmation_fee_learn_more_3">
+    <annotation link="send_tx_fees"> เรียนรู้เพิ่มเติมเกี่ยวกับค่าธรรมเนียม </annotation>
+  </string>
+  <string name="tx_confirmation_free_fee_learn_more_1">ค่าธรรมเนียมเครือข่ายเมื่อใช้</string>
+  <string name="tx_confirmation_free_fee_learn_more_2">ซื้อขายกระเป๋าสตางค์</string>
+  <string name="tx_confirmation_free_fee_learn_more_3">ฟรี! <annotation link="send_tx_fees"> เรียนรู้เพิ่มเติมเกี่ยวกับค่าธรรมเนียม </annotation></string>
+  <string name="interest_item_issue_region">ไม่มีให้บริการในภูมิภาคของคุณ</string>
+  <string name="interest_item_issue_kyc">คุณต้องได้รับการยืนยันระดับ Gold เพื่อเริ่มรับดอกเบี้ย</string>
+  <string name="interest_item_issue_other">ไม่สามารถใช้งานได้ในขณะนี้โปรดตรวจสอบอีกครั้งในภายหลัง</string>
+  <string name="swap_header_title">สลับ Crypto ของคุณ</string>
+  <string name="swap_header_label">แลกเปลี่ยน crypto ของคุณเป็นสกุลเงินที่เราเสนอให้กับกระเป๋าเงินของคุณทันที</string>
+  <string name="swap_kyc_title">ยืนยันรหัสของคุณ สลับวันนี้</string>
+  <string name="swap_kyc_desc">ยืนยันตัวตนของคุณเป็น Swap crypto ได้ตลอดเวลา ใช้และสลับในไม่กี่นาที</string>
+  <string name="swap_kyc_cta">สมัครตอนนี้</string>
+  <string name="swap_kyc_1_title">เลือกประเทศของคุณ</string>
+  <string name="swap_kyc_1_label">Blockchain.com จำเป็นต้องทราบประเทศปัจจุบันของคุณตามกฎหมายท้องถิ่น</string>
+  <string name="swap_kyc_2_title">ยืนยันตัวตนของคุณ</string>
+  <string name="swap_kyc_2_label">เราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆเพื่อป้องกันการฉ้อโกงโดยการอัปโหลด ID</string>
+  <string name="swap_kyc_3_title">เริ่มการสลับ</string>
+  <string name="swap_kyc_3_label">เมื่อตรวจสอบแล้วให้กลับมาที่ Swap และแลกเปลี่ยน crypto ของคุณ</string>
+  <string name="swap_cta">Swap ใหม่</string>
+  <string name="swap_account_select">สลับ</string>
+  <string name="swap_account_select_subtitle">คุณต้องการเปลี่ยนจากกระเป๋าเงินใด</string>
+  <string name="select_target_account_for_swap">คุณต้องการรับเข้ากระเป๋าเงินใด</string>
+  <string name="swap_low_fees">ค่าธรรมเนียมต่ำ</string>
+  <string name="swap_kyc_upsell_title">คุณใกล้ถึงขีด จำกัด Swap ของคุณแล้ว อัปเกรดเป็น Swap จำนวนมากขึ้น</string>
+  <string name="swap_kyc_upsell_desc">ยืนยันตัวตนของคุณเพื่อเพิ่มจำนวนที่คุณสามารถสลับได้ทุกวัน</string>
+  <string name="swap_kyc_upsell_1_title">อัปโหลด ID ของคุณ</string>
+  <string name="swap_kyc_upsell_1_desc">เราจำเป็นต้องตรวจสอบให้แน่ใจว่าเป็นคุณจริงๆเพื่อป้องกันการฉ้อโกงโดยการอัปโหลด ID</string>
+  <string name="swap_kyc_upsell_2_title">อัปโหลด Selfie</string>
+  <string name="swap_kyc_upsell_2_desc">เพื่อให้แน่ใจว่าคุณเป็นมนุษย์ ไม่อนุญาตให้ใช้โรบ็อต</string>
+  <string name="swap_kyc_upsell_3_title">แลกเปลี่ยนได้มากถึง $ 25,000 ต่อวัน</string>
+  <string name="swap_kyc_upsell_3_desc">เมื่อตรวจสอบแล้วให้กลับมาที่ Swap และแลกเปลี่ยน crypto ของคุณ</string>
+  <string name="trending_label">แนวโน้ม</string>
+  <string name="trending_swap">สลับ %1$s</string>
+  <string name="trending_empty">ฝากเงินเข้ากระเป๋าซื้อขายของคุณเพื่อดูแนวโน้ม Swaps ที่มีค่าธรรมเนียมต่ำ</string>
+  <string name="trending_receive">รับ %1$s</string>
+  <string name="show_more_accounts">แสดงมากขึ้น</string>
+  <string name="select_a_wallet">เลือกกระเป๋าเงิน</string>
+  <string name="pending_swap_info_message">คุณมีการแลกเปลี่ยน 1 รายการที่รอดำเนินการ เมื่อเคลียร์เรียบร้อยแล้วคุณสามารถทำการสลับใหม่ได้</string>
+  <string name="deposit_fee">ค่าธรรมเนียมเครือข่าย</string>
+  <string name="current_unit_price">%1$s = %2$s</string>
+  <string name="exchange_rate">อัตราแลกเปลี่ยน</string>
+  <string name="in_progress">กำลังดำเนินการ</string>
+  <string name="swap_direction">%1$s - &gt; %2$s</string>
 </resources>

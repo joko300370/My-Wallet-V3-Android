@@ -1,10 +1,12 @@
 package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.AttributeSet
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.verify_identity_benefits_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -61,5 +63,6 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
     }
 }
 
-data class VerifyIdentityBenefit(val title: String, val subtitle: String)
+@Parcelize
+data class VerifyIdentityBenefit(val title: String, val subtitle: String) : Parcelable
 data class ButtonOptions(val visible: Boolean, val text: String? = null, val cta: () -> Unit = {})

@@ -1,6 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.DigitalTrust
 import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
 import com.blockchain.swap.nabu.models.nabu.NabuApiException
 import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
@@ -142,6 +143,7 @@ internal class NabuDataManagerImpl(
     private val settingsDataManager: SettingsDataManager,
     private val userReporter: NabuUserReporter,
     private val walletReporter: WalletReporter,
+    private val trust: DigitalTrust,
     private val payloadDataManager: PayloadDataManager,
     private val prefs: PersistentPrefs
 ) : NabuDataManager {
@@ -168,9 +170,14 @@ internal class NabuDataManagerImpl(
             }
         }
 
-    override fun getAuthToken(jwt: String, currency: String?, action: String?): Single<NabuOfflineTokenResponse> =
+    override fun getAuthToken(
+        jwt: String,
+        currency: String?,
+        action: String?
+    ): Single<NabuOfflineTokenResponse> =
         nabuService.getAuthToken(jwt, currency, action).doOnSuccess {
             userReporter.reportUserId(it.userId)
+            trust.setUserId(it.userId)
         }
 
     @VisibleForTesting
@@ -211,6 +218,7 @@ internal class NabuDataManagerImpl(
         }.doOnSuccess {
             userReporter.reportUserId(offlineTokenResponse.userId)
             userReporter.reportUser(it)
+            trust.setUserId(offlineTokenResponse.userId)
             walletReporter.reportWalletGuid(guid)
         }
 

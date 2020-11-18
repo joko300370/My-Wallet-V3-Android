@@ -54,6 +54,12 @@ class PrefsUtil(
             BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
         }
 
+    override var newSwapEnabled: Boolean
+        get() = getValue(NEW_SWAP_ENABLED, false)
+        set(value) {
+            setValue(NEW_SWAP_ENABLED, value)
+        }
+
     override var devicePreIDVCheckFailed: Boolean
         get() = getValue(KEY_PRE_IDV_FAILED, false)
         set(value) = setValue(KEY_PRE_IDV_FAILED, value)
@@ -159,6 +165,14 @@ class PrefsUtil(
         get() = getValue(KEY_ADD_CARD_INFO, false)
         set(dismissed) = setValue(KEY_ADD_CARD_INFO, dismissed)
 
+    override var hasSeenRatingDialog: Boolean
+        get() = getValue(HAS_SEEN_RATING, false)
+        set(value) = setValue(HAS_SEEN_RATING, value)
+
+    override var preRatingActionCompletedTimes: Int
+        get() = getValue(PRE_RATING_ACTION_COMPLETED_TIMES, 0)
+        set(value) = setValue(PRE_RATING_ACTION_COMPLETED_TIMES, value)
+
     // From Onboarding
     override var swapIntroCompleted: Boolean
         get() = getValue(KEY_SWAP_INTRO_COMPLETED, false)
@@ -213,6 +227,25 @@ class PrefsUtil(
 
     override fun getFeeTypeForAsset(cryptoCurrency: CryptoCurrency): Int =
         getValue(NETWORK_FEE_PRIORITY_KEY + cryptoCurrency.networkTicker, -1)
+
+    override val hasSeenSwapPromo: Boolean
+        get() = getValue(SWAP_KYC_PROMO, false)
+
+    override fun setSeenSwapPromo() = setValue(SWAP_KYC_PROMO, true)
+
+    override val resendSmsRetries: Int
+        get() = getValue(TWO_FA_SMS_RETRIES, MAX_ALLOWED_RETRIES)
+
+    override fun setResendSmsRetries(retries: Int) {
+        setValue(TWO_FA_SMS_RETRIES, retries)
+    }
+
+    override val isNewUser: Boolean
+        get() = getValue(IS_NEW_USER, false)
+
+    override fun setNewUser() {
+        setValue(IS_NEW_USER, true)
+    }
 
     // Notification prefs
     override var arePushNotificationsEnabled: Boolean
@@ -289,7 +322,7 @@ class PrefsUtil(
 
     override fun hasBackup(): Boolean =
         backupEnabled &&
-            backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
+                backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
 
     @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
@@ -415,10 +448,16 @@ class PrefsUtil(
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
         private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
+        private const val SWAP_KYC_PROMO = "SWAP_KYC_PROMO"
+        private const val TWO_FA_SMS_RETRIES = "TWO_FA_SMS_RETRIES"
+        private const val IS_NEW_USER = "IS_NEW_USER"
+        private const val MAX_ALLOWED_RETRIES = 3
 
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_IS_DEVICE_ID_RANDOMISED = "random_device_id"
+
+        const val NEW_SWAP_ENABLED = "swap_v_2_enabled"
 
         private const val KEY_FIREBASE_TOKEN = "firebase_token"
         private const val KEY_PUSH_NOTIFICATION_ENABLED = "push_notification_enabled"
@@ -427,5 +466,9 @@ class PrefsUtil(
         private const val KEY_ENCRYPTED_GUID = "encrypted_guid"
         private const val KEY_ENCRYPTED_SHARED_KEY = "encrypted_shared_key"
         private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
+
+        // Rating
+        private const val HAS_SEEN_RATING = "has_seen_rating"
+        private const val PRE_RATING_ACTION_COMPLETED_TIMES = "pre_rating_action_completed_times"
     }
 }

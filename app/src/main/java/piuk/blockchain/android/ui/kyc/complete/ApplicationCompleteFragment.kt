@@ -27,7 +27,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
@@ -58,11 +58,14 @@ class ApplicationCompleteFragment : Fragment() {
         compositeDisposable +=
             button_done
                 .throttledClicks().zipWith(
-                    if (progressListener.campaignType == CampaignType.Swap) tierService.tiers().toObservable()
-                        .map { it.isApprovedFor(KycTierLevel.SILVER) || it.isApprovedFor(KycTierLevel.GOLD) }
-                        .onErrorReturn { false }
-                    else Observable.just(false))
-                .subscribeBy(
+                    if (progressListener.campaignType == CampaignType.Swap) {
+                        tierService.tiers().toObservable()
+                            .map { it.isApprovedFor(KycTierLevel.SILVER) || it.isApprovedFor(KycTierLevel.GOLD) }
+                            .onErrorReturn { false }
+                    } else {
+                        Observable.just(false)
+                    }
+                ).subscribeBy(
                     onNext = { (_, isTier1OrTier2Verified) ->
                         when (progressListener.campaignType) {
                             CampaignType.Swap -> {
@@ -80,6 +83,7 @@ class ApplicationCompleteFragment : Fragment() {
                                 activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE)
                                 activity?.finish()
                             }
+                            CampaignType.Interest -> activity?.finish()
                             else -> navigate(ApplicationCompleteFragmentDirections.actionTier2Complete())
                         }
                         analytics.logEvent(KYCAnalyticsEvents.VeriffInfoSubmitted)

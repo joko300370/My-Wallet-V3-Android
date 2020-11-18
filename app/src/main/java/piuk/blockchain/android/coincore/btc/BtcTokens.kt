@@ -4,10 +4,12 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -24,8 +26,8 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcore.data.charts.ChartsDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -38,14 +40,15 @@ internal class BtcAsset(
     private val feeDataManager: FeeDataManager,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
-    historicRates: ChartsDataManager,
+    historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -56,7 +59,8 @@ internal class BtcAsset(
     pitLinking,
     crashLogger,
     tiersService,
-    environmentConfig
+    environmentConfig,
+    eligibilityProvider
 ) {
 
     override val asset: CryptoCurrency
@@ -75,12 +79,15 @@ internal class BtcAsset(
                         BtcCryptoWalletAccount.createHdAccount(
                             jsonAccount = a,
                             payloadManager = payloadManager,
+                            hdAccountIndex = i,
                             sendDataManager = sendDataManager,
                             feeDataManager = feeDataManager,
                             isDefault = i == defaultIndex,
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.isArchived
                         )
                     )
                 }
@@ -94,7 +101,9 @@ internal class BtcAsset(
                             feeDataManager = feeDataManager,
                             exchangeRates = exchangeRates,
                             networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager,
+                            isArchived = a.tag == LegacyAddress.ARCHIVED_ADDRESS
                         )
                     )
                 }
@@ -104,9 +113,10 @@ internal class BtcAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            if (isValidAddress(address.removePrefix(BTC_URL_PREFIX))) {
+            val normalisedAddress = address.removePrefix(BTC_URL_PREFIX)
+            if (isValidAddress(normalisedAddress)) {
                 BtcAddress(
-                    address = address,
+                    address = normalisedAddress,
                     networkParams = environmentConfig.bitcoinNetworkParameters
                 )
             } else {

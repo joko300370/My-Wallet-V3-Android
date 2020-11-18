@@ -17,10 +17,11 @@ import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -43,19 +44,19 @@ class BchOnChainTxEngine(
     private val sendDataManager: SendDataManager,
     private val bchDataManager: BchDataManager,
     private val payloadDataManager: PayloadDataManager,
-    private val walletPreferences: WalletStatus,
+    walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
-    requireSecondPassword
+    requireSecondPassword,
+    walletPreferences
 ) {
 
     private val bchSource: BchCryptoWalletAccount by unsafeLazy {
         sourceAccount as BchCryptoWalletAccount
     }
 
-    private val bchTarget: CryptoAddress by unsafeLazy {
-        txTarget as CryptoAddress
-    }
+    private val bchTarget: CryptoAddress
+        get() = txTarget as CryptoAddress
 
     override fun assertInputsValid() {
         require(txTarget is CryptoAddress)
@@ -69,8 +70,7 @@ class BchOnChainTxEngine(
                 amount = CryptoValue.ZeroBch,
                 available = CryptoValue.ZeroBch,
                 fees = CryptoValue.ZeroBch,
-                feeLevel = mapSavedFeeToFeeLevel(
-                    walletPreferences.getFeeTypeForAsset(CryptoCurrency.BCH)),
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.BCH)),
                 selectedFiat = userFiat
             )
         )
@@ -84,7 +84,11 @@ class BchOnChainTxEngine(
             getDynamicFeePerKb(pendingTx)
         ) { coins, feePerKb ->
             updatePendingTx(amount, pendingTx, feePerKb, coins)
-        }
+        }.onErrorReturnItem(
+            pendingTx.copy(
+                validationState = ValidationState.INSUFFICIENT_FUNDS
+            )
+        )
     }
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
@@ -129,9 +133,7 @@ class BchOnChainTxEngine(
             amount = amount,
             available = CryptoValue.fromMinor(CryptoCurrency.BCH, maxAvailable),
             fees = CryptoValue.fromMinor(CryptoCurrency.BCH, unspentOutputs.absoluteFee),
-            engineState = mapOf(
-                STATE_UTXO to unspentOutputs
-            )
+            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, unspentOutputs)
         )
     }
 
@@ -154,28 +156,21 @@ class BchOnChainTxEngine(
             .then { validateSufficientFunds(pendingTx) }
             .updateTxValidity(pendingTx)
 
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newOption: TxOptionValue): Single<PendingTx> =
-        if (newOption is TxOptionValue.FeeSelection) {
-            // Need to run and validate amounts. And then build a fresh confirmation set, as the total
-            // will need updating as well as the fees:
-            if (newOption.selectedLevel != pendingTx.feeLevel) {
-                walletPreferences.setFeeTypeForAsset(CryptoCurrency.BCH,
-                    newOption.selectedLevel.mapFeeLevelToSavedValue())
-                doUpdateAmount(pendingTx.amount, pendingTx.copy(feeLevel = newOption.selectedLevel))
-                    .flatMap { pTx -> doValidateAmount(pTx) }
-                    .flatMap { pTx -> doBuildConfirmations(pTx) }
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation is TxConfirmationValue.FeeSelection) {
+            if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
+                updateFeeSelection(CryptoCurrency.BCH, pendingTx, newConfirmation)
             } else {
-                // The option hasn't changed, revert to our known settings
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
         } else {
-            super.doOptionUpdateRequest(pendingTx, newOption)
+            super.doOptionUpdateRequest(pendingTx, newConfirmation)
         }
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
             val amount = pendingTx.amount.toBigInteger()
-            if (amount < Payment.DUST || amount > 2_100_000_000_000_000L.toBigInteger() || amount <= BigInteger.ZERO) {
+            if (amount < Payment.DUST || amount > maxBCHAmount.toBigInteger() || amount <= BigInteger.ZERO) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -190,11 +185,11 @@ class BchOnChainTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
             pendingTx.copy(
-                options = listOf(
-                    TxOptionValue.From(from = sourceAccount.label),
-                    TxOptionValue.To(to = txTarget.label),
+                confirmations = listOf(
+                    TxConfirmationValue.From(from = sourceAccount.label),
+                    TxConfirmationValue.To(to = txTarget.label),
                     makeFeeSelectionOption(pendingTx),
-                    TxOptionValue.FeedTotal(
+                    TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
                         fee = pendingTx.fees,
                         exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
@@ -204,14 +199,15 @@ class BchOnChainTxEngine(
             )
         )
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
-        TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
+            feeDetails = getFeeState(pendingTx),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(
-                FeeLevel.Regular, FeeLevel.Priority
-            )
+                FeeLevel.Regular // BCH only has one fee level
+            ),
+            asset = sourceAccount.asset
         )
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =

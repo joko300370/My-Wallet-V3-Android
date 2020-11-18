@@ -33,7 +33,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -51,7 +52,8 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
-                walletPreferences = get()
+                walletPreferences = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -71,7 +73,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get(),
-                walletPreferences = get()
+                walletPreferences = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -89,7 +92,9 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -101,12 +106,14 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
+                walletPrefs = get(),
                 crashLogger = get(),
                 custodialManager = get(),
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -123,7 +130,9 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -138,7 +147,8 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -166,7 +176,9 @@ val coincoreModule = module {
                 labels = get(),
                 pitLinking = get(),
                 tierService = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
             )
         }
 
@@ -195,7 +207,11 @@ val coincoreModule = module {
                 bitPayManager = get(),
                 exchangeRates = get(),
                 walletManager = get(),
-                walletPrefs = get()
+                walletPrefs = get(),
+                quotesProvider = get(),
+                analytics = get(),
+                kycTierService = get(),
+                environmentConfig = get()
             )
         }
 

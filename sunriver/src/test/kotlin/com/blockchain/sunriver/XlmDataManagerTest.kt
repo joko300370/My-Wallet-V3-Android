@@ -448,29 +448,6 @@ class XlmDataManagerTransactionListTest {
             .testSingle() `should equal` getXlmList()
     }
 
-    @Test
-    fun `get transaction fee`() {
-        givenXlmDataManager(
-            givenTransaction("HASH" to mock {
-                on { feeCharged } `it returns` 99L
-            })
-        ).getTransactionFee("HASH")
-            .testSingle() `should equal` 99.stroops()
-    }
-
-    @Test
-    fun `get operation fee`() {
-        givenXlmDataManager(
-            givenTransaction("HASH_X" to
-                mock {
-                    on { feeCharged } `it returns` 4 * 125
-                    on { operationCount } `it returns` 4
-                }
-            )
-        ).getOperationFee("HASH_X")
-            .testSingle() `should equal` 125.stroops()
-    }
-
     private fun getXlmList(): List<XlmTransaction> = listOf(
         XlmTransaction(
             timeStamp = "createdAt",

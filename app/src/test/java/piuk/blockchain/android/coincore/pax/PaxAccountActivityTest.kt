@@ -2,11 +2,18 @@ package piuk.blockchain.android.coincore.pax
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -29,6 +36,8 @@ class PaxAccountActivityTest {
     private val ethDataManager: EthDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val walletPreferences: WalletStatus = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
     private val paxAccount: Erc20Account = mock()
 
@@ -39,7 +48,9 @@ class PaxAccountActivityTest {
             address = "Test Px Address",
             fees = mock(),
             erc20Account = paxAccount,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager
         )
 
     @get:Rule
@@ -67,6 +78,24 @@ class PaxAccountActivityTest {
             timestamp = 1557334297
         )
 
+        val swapSummary = SwapTransactionItem(
+            "123",
+            1L,
+            SwapDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            SwapOrderState.FINISHED,
+            CryptoValue.ZeroPax,
+            CryptoValue.ZeroBtc,
+            CryptoValue.ZeroBtc,
+            CryptoCurrency.PAX,
+            CryptoCurrency.BTC,
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+
         whenever(paxAccount.getTransactions()).thenReturn(Observable.just(listOf(erc20Transfer)))
 
         whenever(ethDataManager
@@ -90,6 +119,9 @@ class PaxAccountActivityTest {
                 }
             )
         )
+
+        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
 
         subject.activity
             .test()

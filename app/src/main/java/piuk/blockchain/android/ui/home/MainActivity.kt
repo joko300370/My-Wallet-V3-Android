@@ -33,6 +33,8 @@ import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -42,7 +44,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
@@ -61,8 +65,10 @@ import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
-import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.swap.SwapFragment
+import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
 import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
+import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
@@ -91,6 +97,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     DialogFlow.FlowHost {
 
     override val presenter: MainPresenter by scopedInject()
+    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
     override val view: MainView = this
 
     var drawerOpen = false
@@ -121,11 +129,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
-                        presenter.startSwapOrKyc(null, null)
+                        tryTolaunchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
-                        startBuySellFragment()
+                        launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
                     }
                     ITEM_TRANSFER -> {
@@ -348,7 +356,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         when (menuItem.itemId) {
             R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_backup -> launchBackupFunds()
-            R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
             R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
@@ -461,19 +468,40 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         KycNavHostActivity.startForResult(this, campaignType, KYC_STARTED)
     }
 
-    override fun launchSwap(
-        defCurrency: String,
-        fromCryptoCurrency: CryptoCurrency?,
-        toCryptoCurrency: CryptoCurrency?
+    override fun tryTolaunchSwap(
+        sourceAccount: CryptoAccount?,
+        targetAccount: CryptoAccount?
     ) {
-        HomebrewNavHostActivity.start(context = this,
-            defaultCurrency = defCurrency,
-            fromCryptoCurrency = fromCryptoCurrency,
-            toCryptoCurrency = toCryptoCurrency)
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        startSwapFlow(sourceAccount, targetAccount)
+                    } else {
+                        presenter.startSwapOrKyc(sourceAccount, targetAccount)
+                    }
+                }
+            )
     }
 
-    override fun launchSwapOrKyc(targetCurrency: CryptoCurrency?, fromCryptoCurrency: CryptoCurrency?) {
-        presenter.startSwapOrKyc(toCurrency = targetCurrency, fromCurrency = fromCryptoCurrency)
+    override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
+        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        startSwapFlow(sourceAccount, targetAccount)
+                    } else {
+                        HomebrewNavHostActivity.start(
+                            context = this,
+                            defaultCurrency = presenter.defaultCurrency,
+                            toCryptoCurrency = targetAccount?.asset,
+                            fromCryptoCurrency = sourceAccount?.asset
+                        )
+                    }
+                }
+            )
     }
 
     override fun getStartIntent(): Intent {
@@ -531,7 +559,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         TransactionFlow(
                             sourceAccount = sourceAccount,
                             target = targetAddress,
-                            action = AssetAction.NewSend
+                            action = AssetAction.Send
                         ).apply {
                             startFlow(
                                 fragmentManager = currentFragment.childFragmentManager,
@@ -590,11 +618,27 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(transferFragment)
     }
 
-    private fun startBuySellFragment() {
-        setCurrentTabItem(ITEM_BUY_SELL)
+    private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
+        if (sourceAccount == null && destinationAccount == null) {
+            setCurrentTabItem(ITEM_SWAP)
+            toolbar_general.title = getString(R.string.swap)
+            val swapFragment = SwapFragment.newInstance()
+            replaceContentFragment(swapFragment)
+        } else if (sourceAccount != null) {
+            val transactionFlow =
+                TransactionFlow(
+                    sourceAccount = sourceAccount,
+                    target = destinationAccount ?: NullCryptoAccount(),
+                    action = AssetAction.Swap
+                )
 
-        val buySellFragment = BuySellFragment.newInstance()
-        replaceContentFragment(buySellFragment)
+            transactionFlow.apply {
+                startFlow(
+                    fragmentManager = supportFragmentManager,
+                    host = this@MainActivity
+                )
+            }
+        }
     }
 
     override fun gotoDashboard() {
@@ -789,6 +833,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
 
         tour_guide.start(this, tourSteps)
+    }
+
+    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
+        setCurrentTabItem(ITEM_BUY_SELL)
+
+        val buySellFragment = BuySellFragment.newInstance(viewType)
+        replaceContentFragment(buySellFragment)
     }
 
     override fun onTourFinished() {

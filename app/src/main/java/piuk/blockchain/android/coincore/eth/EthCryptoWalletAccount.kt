@@ -1,5 +1,7 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -8,8 +10,8 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -23,7 +25,9 @@ internal class EthCryptoWalletAccount(
     internal val address: String,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
-    override val exchangeRates: ExchangeRateDataManager
+    private val walletPreferences: WalletStatus,
+    override val exchangeRates: ExchangeRateDataManager,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
 
     constructor(
@@ -31,14 +35,18 @@ internal class EthCryptoWalletAccount(
         ethDataManager: EthDataManager,
         fees: FeeDataManager,
         jsonAccount: EthereumAccount,
-        exchangeRates: ExchangeRateDataManager
+        walletPreferences: WalletStatus,
+        exchangeRates: ExchangeRateDataManager,
+        custodialWalletManager: CustodialWalletManager
     ) : this(
         payloadManager,
         jsonAccount.label,
         jsonAccount.address,
         ethDataManager,
         fees,
-        exchangeRates
+        walletPreferences,
+        exchangeRates,
+        custodialWalletManager
     )
 
     private val hasFunds = AtomicBoolean(false)
@@ -84,6 +92,9 @@ internal class EthCryptoWalletAccount(
                             ) as ActivitySummaryItem
                         }
                     }
+                    .flatMap {
+                        appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                    }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
@@ -109,6 +120,7 @@ internal class EthCryptoWalletAccount(
         EthOnChainTxEngine(
             ethDataManager = ethDataManager,
             feeManager = fees,
-            requireSecondPassword = ethDataManager.requireSecondPassword
+            requireSecondPassword = ethDataManager.requireSecondPassword,
+            walletPreferences = walletPreferences
         )
 }

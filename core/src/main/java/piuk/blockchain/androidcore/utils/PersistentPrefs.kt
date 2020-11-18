@@ -3,6 +3,7 @@ package piuk.blockchain.androidcore.utils
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -15,6 +16,7 @@ interface PersistentPrefs :
     SecurityPrefs,
     ThePitLinkingPrefs,
     SimpleBuyPrefs,
+    RatingPrefs,
     WalletStatus,
     EncryptedPrefs {
 
@@ -24,6 +26,8 @@ interface PersistentPrefs :
     var devicePreIDVCheckFailed: Boolean // Pre-IDV check has failed! Don't show 'gold' announce cards etc
 
     var pinId: String
+
+    var newSwapEnabled: Boolean
 
     fun getValue(name: String): String?
     fun getValue(name: String, defaultValue: String): String

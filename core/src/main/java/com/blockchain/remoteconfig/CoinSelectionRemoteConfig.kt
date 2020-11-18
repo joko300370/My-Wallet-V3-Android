@@ -2,7 +2,7 @@ package com.blockchain.remoteconfig
 
 import io.reactivex.Single
 
-@Deprecated("We now always use the 'new' algorithm")
+@Deprecated("We now always use the 'new' algorithm. Remove after swap upgrade")
 class CoinSelectionRemoteConfig(
     private val remoteConfiguration: RemoteConfiguration
 ) : FeatureFlag {

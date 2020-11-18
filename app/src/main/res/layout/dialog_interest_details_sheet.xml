@@ -124,7 +124,7 @@
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/very_small_margin"
-        android:background="@drawable/predefined_amount_text_background"
+        android:background="@drawable/info_text_background"
         android:gravity="center"
         android:text="@string/interest_summary_disclaimer_label"
         app:layout_constraintBottom_toTopOf="@id/interest_details_activity_cta"

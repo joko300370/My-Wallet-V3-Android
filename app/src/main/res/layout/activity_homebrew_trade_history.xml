@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".ui.swap.homebrew.exchange.history.TradeHistoryActivity">
+    tools:context=".ui.swapold.exchange.history.TradeHistoryActivity">
 
     <include
         android:id="@+id/toolbar_constraint"

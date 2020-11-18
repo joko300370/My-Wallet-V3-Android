@@ -138,7 +138,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.48" />
 
-    <piuk.blockchain.android.ui.swap.customviews.CurrencyTextView
+    <piuk.blockchain.android.ui.swapold.customviews.CurrencyTextView
         android:id="@+id/large_value"
         style="@style/ExchangeText.LargeValue"
         android:layout_width="match_parent"
@@ -223,7 +223,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guidelineKeyboard">
 
-        <piuk.blockchain.android.ui.swap.customviews.FloatKeyboardView
+        <piuk.blockchain.android.ui.swapold.customviews.FloatKeyboardView
             android:id="@+id/keyboard"
             android:layout_width="0dp"
             android:layout_height="0dp"

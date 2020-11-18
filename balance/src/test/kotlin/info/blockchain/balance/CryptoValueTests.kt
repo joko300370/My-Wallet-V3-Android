@@ -50,7 +50,7 @@ class CryptoValueTests {
 
     @Test
     fun `toBigDecimal BCH`() {
-        CryptoValue.bitcoinCashFromSatoshis(234L).toBigDecimal() `should equal` BigDecimal("0.00000234")
+        234L.satoshiCash().toBigDecimal() `should equal` BigDecimal("0.00000234")
     }
 
     @Test
@@ -142,7 +142,7 @@ class CryptoValueTests {
 
     @Test
     fun `amount of Cash when created from satoshis`() {
-        CryptoValue.bitcoinCashFromSatoshis(45678L).apply {
+        45678.satoshiCash().apply {
             currency `should equal` CryptoCurrency.BCH
             toBigInteger() `should equal` 45678.toBigInteger()
         }
@@ -150,7 +150,7 @@ class CryptoValueTests {
 
     @Test
     fun `amount of Cash when created from satoshis big integer`() {
-        CryptoValue.fromMinor(CryptoCurrency.BCH, 1234L.toBigInteger()).apply {
+        1234.satoshiCash().apply {
             currency `should equal` CryptoCurrency.BCH
             toBigInteger() `should equal` 1234.toBigInteger()
         }

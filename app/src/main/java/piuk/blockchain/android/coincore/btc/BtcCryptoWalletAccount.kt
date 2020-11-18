@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.serialization.JsonSerializableAccount
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -11,6 +12,8 @@ import io.reactivex.Single
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -29,6 +32,8 @@ internal class BtcCryptoWalletAccount(
     private val feeDataManager: FeeDataManager,
     override val label: String,
     private val address: String,
+    // Used to lookup the account in payloadDataManager to fetch receive address
+    private val hdAccountIndex: Int,
     override val isDefault: Boolean = false,
     override val exchangeRates: ExchangeRateDataManager,
     private val networkParameters: NetworkParameters,
@@ -38,7 +43,9 @@ internal class BtcCryptoWalletAccount(
     @Deprecated("Old send style address format")
     val internalAccount: JsonSerializableAccount,
     val isHDAccount: Boolean,
-    private val walletPreferences: WalletStatus
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager,
+    override val isArchived: Boolean
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -57,21 +64,23 @@ internal class BtcCryptoWalletAccount(
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = payloadDataManager.getNextReceiveAddress(
-            // TODO: Probably want the index of this address'
-            payloadDataManager.getAccount(payloadDataManager.defaultAccountIndex)
-        ).singleOrError()
-            .map {
-                BtcAddress(address = it, label = label, networkParams = networkParameters)
-            }
+        get() = if (!isHDAccount) {
+            Single.error(IllegalStateException("Cannot receive to Legacy Account"))
+        } else {
+            payloadDataManager.getNextReceiveAddress(
+                payloadDataManager.getAccount(hdAccountIndex)
+            ).singleOrError()
+                .map {
+                    BtcAddress(address = it, label = label, networkParams = networkParameters)
+                }
+        }
 
     override val activity: Single<ActivitySummaryList>
         get() = payloadDataManager.getAccountTransactions(
             address,
             transactionFetchCount,
             transactionFetchOffset
-        )
-            .onErrorReturn { emptyList() }
+        ).onErrorReturn { emptyList() }
             .mapList {
                 BtcActivitySummaryItem(
                     it,
@@ -79,7 +88,11 @@ internal class BtcCryptoWalletAccount(
                     exchangeRates,
                     this
                 ) as ActivitySummaryItem
-            }.doOnSuccess {
+            }
+            .flatMap {
+                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+            }
+            .doOnSuccess {
                 setHasTransactions(it.isNotEmpty())
             }
 
@@ -93,18 +106,31 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
+    override val actions: AvailableActions
+        get() = super.actions.run {
+            if (!isHDAccount) {
+                toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
+            } else {
+                this
+            }
+        }
+
     companion object {
         fun createHdAccount(
             jsonAccount: Account,
             payloadManager: PayloadDataManager,
+            hdAccountIndex: Int,
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
             isDefault: Boolean = false,
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
-            walletPreferences: WalletStatus
+            walletPreferences: WalletStatus,
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
+            hdAccountIndex = hdAccountIndex,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             label = jsonAccount.label,
@@ -114,7 +140,9 @@ internal class BtcCryptoWalletAccount(
             networkParameters = networkParameters,
             internalAccount = jsonAccount,
             isHDAccount = true,
-            walletPreferences = walletPreferences
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
 
         fun createLegacyAccount(
@@ -124,9 +152,12 @@ internal class BtcCryptoWalletAccount(
             feeDataManager: FeeDataManager,
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
-            walletPreferences: WalletStatus
+            walletPreferences: WalletStatus,
+            custodialWalletManager: CustodialWalletManager,
+            isArchived: Boolean
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
+            hdAccountIndex = LEGACY_ACCOUNT_NO_INDEX,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             label = legacyAccount.label ?: legacyAccount.address,
@@ -136,8 +167,11 @@ internal class BtcCryptoWalletAccount(
             networkParameters = networkParameters,
             internalAccount = legacyAccount,
             isHDAccount = false,
-            walletPreferences = walletPreferences
-
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager,
+            isArchived = isArchived
         )
+
+        private const val LEGACY_ACCOUNT_NO_INDEX = -1
     }
 }

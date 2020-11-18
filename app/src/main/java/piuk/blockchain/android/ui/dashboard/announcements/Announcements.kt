@@ -18,11 +18,9 @@ interface AnnouncementHost {
 
     fun showAnnouncementCard(card: AnnouncementCard)
     fun dismissAnnouncementCard()
-
+    fun startSwap()
     // Actions
     fun startKyc(campaignType: CampaignType)
-
-    fun startSwap(swapTarget: CryptoCurrency = CryptoCurrency.ETHER)
 
     fun startPitLinking()
     fun startFundsBackup()
@@ -37,6 +35,7 @@ interface AnnouncementHost {
     fun finishSimpleBuySignup()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency = CryptoCurrency.BTC)
     fun startInterestDashboard()
+    fun startSell()
 
     fun showFiatFundsKyc()
     fun showBankLinking()

@@ -12,7 +12,7 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.btc.BtcAsset
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 class AssetDetailsModelTest {
     private lateinit var model: AssetDetailsModel
@@ -30,7 +30,8 @@ class AssetDetailsModelTest {
             crashLogger = mock(),
             tiersService = mock(),
             environmentConfig = mock(),
-            walletPreferences = mock()
+            walletPreferences = mock(),
+            eligibilityProvider = mock()
         )
     )
     private val interactor: AssetDetailsInteractor = mock()

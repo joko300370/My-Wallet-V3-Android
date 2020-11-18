@@ -6,8 +6,8 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.androidcore.data.charts.PriceSeries
-import piuk.blockchain.androidcore.data.charts.TimeSpan
+import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 enum class AssetFilter {
     All,
@@ -18,7 +18,7 @@ enum class AssetFilter {
 
 enum class AssetAction {
     ViewActivity,
-    NewSend,
+    Send,
     Withdraw,
     Receive,
     Swap,

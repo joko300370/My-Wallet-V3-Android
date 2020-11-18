@@ -36,4 +36,7 @@ fun Date.toFormattedDate(): String {
 fun BigInteger.secondsToDays(): Long =
     ceil(this.toDouble() / SECONDS_OF_DAY).toLong()
 
+fun Int.secondsToDays(): Int =
+    ceil(this.toDouble() / SECONDS_OF_DAY).toInt()
+
 private const val SECONDS_OF_DAY: Long = 86400

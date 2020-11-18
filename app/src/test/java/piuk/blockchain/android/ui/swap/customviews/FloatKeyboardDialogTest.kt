@@ -4,6 +4,10 @@ import io.reactivex.Observable
 import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
+import piuk.blockchain.android.ui.swapold.customviews.FloatEntryViewState
+import piuk.blockchain.android.ui.swapold.customviews.FloatKeyboardDialog
+import piuk.blockchain.android.ui.swapold.customviews.FloatKeyboardIntent
+import piuk.blockchain.android.ui.swapold.customviews.Maximums
 import java.math.BigDecimal
 
 class FloatKeyboardDialogTest {
@@ -287,7 +291,7 @@ class FloatKeyboardDialogTest {
 
     @Test
     fun `only emits one state on setValue`() {
-        piuk.blockchain.android.ui.swap.customviews.FloatKeyboardDialog(
+        FloatKeyboardDialog(
             Observable.just(
                 setValue(
                     3,

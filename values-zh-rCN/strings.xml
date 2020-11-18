@@ -690,9 +690,6 @@
   <string name="fee_options_custom_warning">仅限高级用户</string>
   <string name="fee_options_fee_too_low">不推荐低费用</string>
   <string name="fee_options_fee_too_high">不必要的高额费用</string>
-  <string name="fee_options_advanced_warning">仅建议高级用户使用此功能。 
-通过选择自定义费用，您可能会面临多付或您的交易从未被确认的风险。 
-</string>
   <string name="fee_options_sat_byte_hint">坐/ b</string>
   <string name="fee_options_sat_byte_inline_hint">常规： %1$s ，优先级： %2$s</string>
   <string name="dismiss">解雇</string>
@@ -905,7 +902,7 @@
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">欢迎使用 Swap！</string>
   <string name="swap_intro_title_page_two">实时汇率</string>
-  <string name="swap_intro_title_page_three">100％链接</string>
+  <string name="swap_intro_title_page_three">100%％链接</string>
   <string name="swap_intro_title_page_four">掌控您的密钥</string>
   <string name="swap_intro_title_page_five">更好地管理风险</string>
   <string name="swap_intro_description_page_one">在不离开钱包的情况下将一种加密货币交换为另一种加密货币的最简单方法。</string>
@@ -1576,7 +1573,7 @@
   <string name="card_in_progress">%1s正在进行购买</string>
   <string name="we_will_notify_order_complete">您的订单完成后，我们会通知您。</string>
   <string name="completing_card_buy">我们现在完成您的购买。</string>
-  <string name="card_purchased" formatted="false">%1s购买%1s</string>
+  <string name="card_purchased" formatted="false">%1s购买</string>
   <string name="card_purchased_available_now">您的%1s现在可以在电子钱包中使用。</string>
   <string name="invalid_cvv">无效的CVV</string>
   <string name="invalid_date">失效日期</string>
@@ -1841,7 +1838,7 @@
   <string name="send_enter_unexpected_error">发生意外的错误。请再试一遍。</string>
   <string name="send_enter_insufficient_gas">您没有足够的ETH来处理此交易。</string>
   <string name="send_select_a_wallet_title">或选择一个钱包</string>
-  <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
+  <string name="send_internal_transfer_message">目前，您只能将%1$s从%2$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
   <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">了解更多信息。 </annotation>
@@ -1890,7 +1887,7 @@
   <string name="interest_summary_accrued">本月应计利息</string>
   <string name="interest_summary_accrued_fail">无法加载应计利息</string>
   <string name="interest_summary_hold_period">初始保留期</string>
-  <string name="interest_summary_hold_period_days">%1$f天</string>
+  <string name="interest_summary_hold_period_days">%1$d天</string>
   <string name="interest_summary_hold_period_fail">无法加载保留期详细信息</string>
   <string name="interest_summary_rate">利率</string>
   <string name="interest_summary_rate_fail">无法加载利率</string>
