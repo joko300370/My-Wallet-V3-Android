@@ -27,8 +27,8 @@ import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
-import com.blockchain.swap.nabu.datamanagers.SwapOrder
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
@@ -642,12 +642,12 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
-    override fun createSwapOrder(
+    override fun createCustodialOrder(
         direction: TransferDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String?
-    ): Single<SwapOrder> =
+    ): Single<CustodialOrder> =
         authenticator.authenticate { sessionToken ->
             nabuService.createSwapOrder(
                 sessionToken,
@@ -752,7 +752,7 @@ class LiveCustodialWalletManager(
             else -> CardStatus.UNKNOWN
         }
 
-    override fun getSwapTrades(): Single<List<SwapOrder>> =
+    override fun getSwapTrades(): Single<List<CustodialOrder>> =
         authenticator.authenticate { sessionToken ->
             nabuService.getSwapTrades(sessionToken)
         }.map { response ->
@@ -761,8 +761,8 @@ class LiveCustodialWalletManager(
             }
         }
 
-    private fun SwapOrderResponse.toSwapOrder(): SwapOrder? {
-        return SwapOrder(
+    private fun SwapOrderResponse.toSwapOrder(): CustodialOrder? {
+        return CustodialOrder(
             id = this.id,
             state = this.state.toSwapState(),
             depositAddress = this.kind.depositAddress,
@@ -802,20 +802,20 @@ private fun String.toTransactionState(): TransactionState =
         else -> TransactionState.UNKNOWN
     }
 
-fun String.toSwapState(): SwapOrderState =
+fun String.toSwapState(): CustodialOrderState =
     when (this) {
-        SwapOrderResponse.CREATED -> SwapOrderState.CREATED
-        SwapOrderResponse.PENDING_CONFIRMATION -> SwapOrderState.PENDING_CONFIRMATION
-        SwapOrderResponse.PENDING_EXECUTION -> SwapOrderState.PENDING_EXECUTION
-        SwapOrderResponse.PENDING_DEPOSIT -> SwapOrderState.PENDING_DEPOSIT
-        SwapOrderResponse.PENDING_LEDGER -> SwapOrderState.PENDING_LEDGER
-        SwapOrderResponse.FINISH_DEPOSIT -> SwapOrderState.FINISH_DEPOSIT
-        SwapOrderResponse.PENDING_WITHDRAWAL -> SwapOrderState.PENDING_WITHDRAWAL
-        SwapOrderResponse.EXPIRED -> SwapOrderState.EXPIRED
-        SwapOrderResponse.FINISHED -> SwapOrderState.FINISHED
-        SwapOrderResponse.CANCELED -> SwapOrderState.CANCELED
-        SwapOrderResponse.FAILED -> SwapOrderState.FAILED
-        else -> SwapOrderState.UNKNOWN
+        SwapOrderResponse.CREATED -> CustodialOrderState.CREATED
+        SwapOrderResponse.PENDING_CONFIRMATION -> CustodialOrderState.PENDING_CONFIRMATION
+        SwapOrderResponse.PENDING_EXECUTION -> CustodialOrderState.PENDING_EXECUTION
+        SwapOrderResponse.PENDING_DEPOSIT -> CustodialOrderState.PENDING_DEPOSIT
+        SwapOrderResponse.PENDING_LEDGER -> CustodialOrderState.PENDING_LEDGER
+        SwapOrderResponse.FINISH_DEPOSIT -> CustodialOrderState.FINISH_DEPOSIT
+        SwapOrderResponse.PENDING_WITHDRAWAL -> CustodialOrderState.PENDING_WITHDRAWAL
+        SwapOrderResponse.EXPIRED -> CustodialOrderState.EXPIRED
+        SwapOrderResponse.FINISHED -> CustodialOrderState.FINISHED
+        SwapOrderResponse.CANCELED -> CustodialOrderState.CANCELED
+        SwapOrderResponse.FAILED -> CustodialOrderState.FAILED
+        else -> CustodialOrderState.UNKNOWN
     }
 
 private fun String.toTransactionType(): TransactionType =

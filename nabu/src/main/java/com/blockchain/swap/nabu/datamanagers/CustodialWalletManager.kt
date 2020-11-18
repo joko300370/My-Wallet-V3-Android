@@ -167,12 +167,12 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(
+    fun createCustodialOrder(
         direction: TransferDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String? = null
-    ): Single<SwapOrder>
+    ): Single<CustodialOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -184,7 +184,7 @@ interface CustodialWalletManager {
 
     fun getSwapLimits(currency: String): Single<TransferLimits>
 
-    fun getSwapTrades(): Single<List<SwapOrder>>
+    fun getSwapTrades(): Single<List<CustodialOrder>>
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
@@ -305,7 +305,7 @@ enum class TransactionState {
     UNKNOWN
 }
 
-enum class SwapOrderState {
+enum class CustodialOrderState {
     CREATED,
     PENDING_CONFIRMATION,
     PENDING_LEDGER,
@@ -319,7 +319,7 @@ enum class SwapOrderState {
     FAILED,
     UNKNOWN;
 
-    private val pendingState: Set<SwapOrderState>
+    private val pendingState: Set<CustodialOrderState>
         get() = setOf(
             PENDING_EXECUTION,
             PENDING_CONFIRMATION,
@@ -532,9 +532,9 @@ data class TransferLimits(
     )
 }
 
-data class SwapOrder(
+data class CustodialOrder(
     val id: String,
-    val state: SwapOrderState,
+    val state: CustodialOrderState,
     val depositAddress: String?,
     val createdAt: Date,
     val inputMoney: Money,

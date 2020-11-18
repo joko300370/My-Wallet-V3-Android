@@ -5,7 +5,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
@@ -91,7 +91,7 @@ class EthAccountActivityTest {
             TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
@@ -158,7 +158,7 @@ class EthAccountActivityTest {
             TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,

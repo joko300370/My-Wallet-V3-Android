@@ -14,7 +14,7 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
-import com.blockchain.swap.nabu.datamanagers.SwapOrder
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -112,7 +112,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 trendingPairsProvider.getTrendingPairs(),
                 walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() }
-            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: TransferLimits, orders: List<SwapOrder> ->
+            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: TransferLimits, orders: List<CustodialOrder> ->
                 SwapComposite(
                     tiers,
                     pairs,
@@ -230,7 +230,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         swap_error.visible()
     }
 
-    private fun showSwapUi(orders: List<SwapOrder>) {
+    private fun showSwapUi(orders: List<CustodialOrder>) {
         val pendingOrders = orders.filter { it.state.isPending }
         val hasPendingOrder = pendingOrders.isNotEmpty()
         swap_loading_indicator.gone()
@@ -272,7 +272,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         val tiers: KycTiers,
         val pairs: List<TrendingPair>,
         val limits: TransferLimits,
-        val orders: List<SwapOrder>
+        val orders: List<CustodialOrder>
     )
 }
 

@@ -3,7 +3,7 @@ package com.blockchain.swap.nabu.datamanagers.repositories.swap
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.toSwapState
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.service.NabuService
@@ -80,7 +80,7 @@ data class SwapTransactionItem(
     val direction: TransferDirection,
     val sendingAddress: String?,
     val receivingAddress: String?,
-    val state: SwapOrderState,
+    val state: CustodialOrderState,
     val sendingValue: Money,
     val receivingValue: Money,
     val withdrawalNetworkFee: CryptoValue,

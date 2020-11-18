@@ -9,7 +9,7 @@ import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
@@ -89,7 +89,7 @@ class XlmAccountActivityTest {
             TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
@@ -154,7 +154,7 @@ class XlmAccountActivityTest {
             TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
@@ -220,7 +220,7 @@ class XlmAccountActivityTest {
             TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,

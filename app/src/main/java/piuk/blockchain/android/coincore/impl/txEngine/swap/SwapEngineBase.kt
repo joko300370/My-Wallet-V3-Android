@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrder
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -171,9 +171,9 @@ abstract class SwapEngineBase(
         }
     }
 
-    protected fun createOrder(pendingTx: PendingTx): Single<SwapOrder> =
+    protected fun createOrder(pendingTx: PendingTx): Single<CustodialOrder> =
         target.receiveAddress.flatMap {
-            walletManager.createSwapOrder(
+            walletManager.createCustodialOrder(
                 direction = direction,
                 quoteId = quotesEngine.getLatestQuote().transferQuote.id,
                 volume = pendingTx.amount,

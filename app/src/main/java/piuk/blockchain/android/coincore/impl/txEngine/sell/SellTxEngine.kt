@@ -12,6 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
@@ -71,6 +72,56 @@ abstract class SellTxEngine(
                 }
             } else {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
+            }
+        }
+    }
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
+        return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
+            val latestQuoteExchangeRate =
+                ExchangeRate.CryptoToFiat(
+                    from = sourceAccount.asset,
+                    to = userFiat,
+                    _rate = pricedQuote.price.toBigDecimal()
+                )
+            pendingTx.copy(
+                confirmations = listOf(
+                    TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price,
+                        sourceAccount.asset),
+                    TxConfirmationValue.From(sourceAccount.label),
+                    TxConfirmationValue.To(txTarget.label),
+                    TxConfirmationValue.NetworkFee(
+                        fee = pendingTx.fees,
+                        type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
+                        asset = sourceAccount.asset
+                    ),
+                    TxConfirmationValue.Total(total = pendingTx.amount,
+                        exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                    )
+                ))
+        }
+    }
+
+    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
+        return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
+            val latestQuoteExchangeRate =
+                ExchangeRate.CryptoToFiat(
+                    from = sourceAccount.asset,
+                    to = userFiat,
+                    _rate = pricedQuote.price.toBigDecimal()
+                )
+            pendingTx.apply {
+                addOrReplaceOption(
+                    TxConfirmationValue.ExchangePriceConfirmation(
+                        pricedQuote.price,
+                        sourceAccount.asset
+                    )
+                )
+                addOrReplaceOption(
+                    TxConfirmationValue.Total(total = pendingTx.amount,
+                        exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                    )
+                )
             }
         }
     }

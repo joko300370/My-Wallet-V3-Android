@@ -5,14 +5,12 @@ import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
 
 class CustodialSellTxEngine(
@@ -55,69 +53,20 @@ class CustodialSellTxEngine(
                     amount = amount,
                     available = available
                 )
-            }
+            }.updateQuotePrice().clearConfirmations()
     }
 
     override val requireSecondPassword: Boolean
         get() = false
 
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        val latestQuoteExchangeRate =
-            ExchangeRate.CryptoToFiat(
-                from = sourceAccount.asset,
-                to = userFiat,
-                _rate = quotesEngine.getLatestQuote().price.toBigDecimal()
-            )
-
-        return Single.just(
-            pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.ExchangePriceConfirmation(quotesEngine.getLatestQuote().price,
-                        sourceAccount.asset),
-                    TxConfirmationValue.From(sourceAccount.label),
-                    TxConfirmationValue.To(userFiat),
-                    TxConfirmationValue.Total(if (pendingTx.amount is FiatValue) pendingTx.amount else
-                        latestQuoteExchangeRate.convert(pendingTx.amount)
-                    )
-                ))
-        )
-    }
-
-    /*  private fun updateOptionFromQuote(quote: CustodialQuote, pendingTx: PendingTx): PendingTx {
-
-          val options = listOf(
-              TxConfirmationValue.ExchangePriceConfirmation(quote.rate, sourceAccount.asset),
-              TxConfirmationValue.From(sourceAccount.label),
-              TxConfirmationValue.To(fiatTarget.label),
-              TxConfirmationValue.Total(if (pendingTx.amount is FiatValue) pendingTx.amount else
-                  FiatValue.fromMajor(userFiat,
-                      pendingTx.amount.toBigDecimal().times(quote.rate.toBigDecimal()))
-              )
-          )
-
-          val exchangeRate = ExchangeRate.FiatToCrypto(
-              from = fiatTarget.fiatCurrency,
-              to = sourceAccount.asset,
-              rate = 1.toBigDecimal().divide(quote.rate.toBigDecimal(),
-                  sourceAccount.asset.dp, RoundingMode.HALF_UP
-              )
-          )
-
-          return pendingTx.copy(
-              confirmations = options,
-              minLimit = if (pendingTx.minLimit is CryptoValue) pendingTx.minLimit else
-                  exchangeRate.convert(pendingTx.minLimit ?: FiatValue.zero(fiatTarget.fiatCurrency)),
-              maxLimit = if (pendingTx.maxLimit is CryptoValue) pendingTx.maxLimit else
-                  exchangeRate.convert(pendingTx.maxLimit ?: FiatValue.zero(fiatTarget.fiatCurrency))
-          )
-      }*/
-
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        walletManager.createSwapOrder(
+        walletManager.createCustodialOrder(
             direction = direction,
             quoteId = quotesEngine.getLatestQuote().transferQuote.id,
             volume = pendingTx.amount
         ).map {
             TxResult.UnHashedTxResult(pendingTx.amount) as TxResult
+        }.doFinally {
+            disposeQuotesFetching(pendingTx)
         }
 }
