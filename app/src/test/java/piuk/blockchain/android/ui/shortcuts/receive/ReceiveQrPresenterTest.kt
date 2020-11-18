@@ -16,7 +16,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 

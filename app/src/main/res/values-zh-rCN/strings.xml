@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">字段不能为空。</string>
   <string name="settings_error_updating">更新设置时出错，请重试</string>
   <string name="request_camera_permission">需要访问相机。</string>
-  <string name="request_camera_permission_title">摄像头访问</string>
-  <string name="request_location_permission">需要位置访问权限。</string>
-  <string name="request_write_storage_permission">需要写入外部存储。</string>
-  <string name="request_write_and_camera_storage_permission_description">写外部存储
-和相机需要上传KYC文档。 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">写存储和相机
-权限
-</string>
   <string name="not_specified">未标明</string>
   <string name="update_failed">更新失败。</string>
   <string name="verify_mobile">验证手机</string>

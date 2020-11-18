@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Alan boş bırakılamaz.</string>
   <string name="settings_error_updating">Ayarlar güncellenirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="request_camera_permission">Kamera erişimi gerekiyor.</string>
-  <string name="request_camera_permission_title">Kamera erişimi</string>
-  <string name="request_location_permission">Konum erişimi gerekli.</string>
-  <string name="request_write_storage_permission">Yazma harici depolama alanı gereklidir.</string>
-  <string name="request_write_and_camera_storage_permission_description">Harici depolama alanı yazma 
- ve kamera KYC belgelerini yüklemek için gereklidir. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Depolama ve kamera yazma 
- izinler 
-</string>
   <string name="not_specified">belirtilmemiş</string>
   <string name="update_failed">Güncelleme başarısız oldu.</string>
   <string name="verify_mobile">Mobil\'i Doğrula</string>

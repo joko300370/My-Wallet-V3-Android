@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Fältet kan inte vara tomt.</string>
   <string name="settings_error_updating">Fel vid uppdatering av inställningar, försök igen</string>
   <string name="request_camera_permission">Kameratillgång krävs.</string>
-  <string name="request_camera_permission_title">Kameratillgång</string>
-  <string name="request_location_permission">Platsåtkomst krävs.</string>
-  <string name="request_write_storage_permission">Skriv extern lagring krävs.</string>
-  <string name="request_write_and_camera_storage_permission_description">Skriv extern lagring 
- och kamera krävs för att ladda upp KYC-dokument. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Skriv lagring och kamera 
- behörigheter 
-</string>
   <string name="not_specified">ej angivet</string>
   <string name="update_failed">Det gick inte att uppdatera.</string>
   <string name="verify_mobile">Verifiera mobil</string>

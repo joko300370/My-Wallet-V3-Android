@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.account
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Bitmap
 import android.view.View
 import androidx.annotation.VisibleForTesting
@@ -10,7 +9,6 @@ import com.blockchain.notifications.analytics.AddressAnalytics
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.WalletAnalytics
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
-import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -22,31 +20,22 @@ import info.blockchain.wallet.payload.data.archive
 import info.blockchain.wallet.payload.data.isArchived
 import info.blockchain.wallet.payload.data.unarchive
 import info.blockchain.wallet.payment.Payment
-import info.blockchain.wallet.util.DoubleEncryptionFactory
-import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
-import org.bitcoinj.core.Base58
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.crypto.BIP38PrivateKey
-import org.bitcoinj.params.BitcoinMainNetParams
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ADDRESS_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.ui.zxing.Contents
-import piuk.blockchain.android.ui.zxing.encode.QRCodeEncoder
+import piuk.blockchain.android.scan.QRCodeEncoder
 import piuk.blockchain.android.util.LabelUtil
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.events.PayloadSyncedEvent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -67,10 +56,8 @@ class AccountEditPresenter constructor(
     private val bchDataManager: BchDataManager,
     private val metadataManager: MetadataManager,
     private val sendDataManager: SendDataManager,
-    private val privateKeyFactory: PrivateKeyFactory,
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val dynamicFeeCache: DynamicFeeCache,
-    private val environmentSettings: EnvironmentConfig,
     private val analytics: Analytics,
     private val exchangeRates: ExchangeRateDataManager,
     private val coinSelectionRemoteConfig: CoinSelectionRemoteConfig
@@ -123,7 +110,6 @@ class AccountEditPresenter constructor(
             with(accountModel) {
                 label = account!!.label
                 labelHeader = stringUtils.getString(R.string.name)
-                scanPrivateKeyVisibility = View.GONE
                 xpubDescriptionVisibility = View.VISIBLE
                 xpubText = stringUtils.getString(R.string.extended_public_key)
                 transferFundsVisibility = View.GONE
@@ -153,7 +139,6 @@ class AccountEditPresenter constructor(
                     ::isArchivableBtc
                 )
 
-                scanPrivateKeyVisibility = View.GONE
                 archiveVisibility = View.VISIBLE
             }
 
@@ -186,7 +171,6 @@ class AccountEditPresenter constructor(
         with(accountModel) {
             label = bchAccount!!.label
             labelHeader = stringUtils.getString(R.string.name)
-            scanPrivateKeyVisibility = View.GONE
             xpubDescriptionVisibility = View.VISIBLE
             xpubText = stringUtils.getString(R.string.extended_public_key)
             transferFundsVisibility = View.GONE
@@ -231,12 +215,10 @@ class AccountEditPresenter constructor(
 
                 labelAlpha = 0.5f
                 xpubAlpha = 0.5f
-                xprivAlpha = 0.5f
                 defaultAlpha = 0.5f
                 transferFundsAlpha = 0.5f
                 labelClickable = false
                 xpubClickable = false
-                xprivClickable = false
                 defaultClickable = false
                 transferFundsClickable = false
             }
@@ -262,12 +244,10 @@ class AccountEditPresenter constructor(
                 archiveHeader = stringUtils.getString(R.string.archive)
                 labelAlpha = 1.0f
                 xpubAlpha = 1.0f
-                xprivAlpha = 1.0f
                 defaultAlpha = 1.0f
                 transferFundsAlpha = 1.0f
                 labelClickable = true
                 xpubClickable = true
-                xprivClickable = true
                 defaultClickable = true
                 transferFundsClickable = true
             }
@@ -531,17 +511,6 @@ class AccountEditPresenter constructor(
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun onClickScanXpriv(view: View) {
-        if (payloadDataManager.wallet!!.isDoubleEncryption) {
-            legacyAddress?.let {
-                getView().promptPrivateKey(it.address)
-            }
-        } else {
-            getView().startScanActivity()
-        }
-    }
-
-    @Suppress("UNUSED_PARAMETER")
     fun onClickShowXpub(view: View) {
         if (account != null || bchAccount != null) {
             getView().showXpubSharingWarning()
@@ -587,76 +556,6 @@ class AccountEditPresenter constructor(
         }
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    @Throws(Exception::class)
-    internal fun importAddressPrivateKey(
-        key: ECKey,
-        address: LegacyAddress,
-        matchesIntendedAddress: Boolean
-    ) {
-        setLegacyAddressKey(key, address)
-
-        compositeDisposable += payloadDataManager.syncPayloadWithServer()
-            .doOnError { Timber.e(it) }
-            .subscribe(
-                {
-                    view.setActivityResult(AppCompatActivity.RESULT_OK)
-                    accountModel.scanPrivateKeyVisibility = View.GONE
-                    accountModel.archiveVisibility = View.VISIBLE
-
-                    if (matchesIntendedAddress) {
-                        view.privateKeyImportSuccess()
-                    } else {
-                        view.privateKeyImportMismatch()
-                    }
-                },
-                { view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR) }
-            )
-    }
-
-    @Throws(Exception::class)
-    private fun setLegacyAddressKey(key: ECKey, address: LegacyAddress) {
-        // If double encrypted, save encrypted in payload
-        if (!payloadDataManager.wallet!!.isDoubleEncryption) {
-            address.setPrivateKeyFromBytes(key.privKeyBytes)
-        } else {
-            val encryptedKey = Base58.encode(key.privKeyBytes)
-            val encrypted2 = DoubleEncryptionFactory.encrypt(
-                encryptedKey,
-                payloadDataManager.wallet!!.sharedKey,
-                secondPassword,
-                payloadDataManager.wallet!!.options.pbkdf2Iterations
-            )
-            address.privateKey = encrypted2
-        }
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    @Throws(Exception::class)
-    internal fun importUnmatchedPrivateKey(key: ECKey) {
-        if (payloadDataManager.wallet!!.legacyAddressStringList.contains(
-                key.toAddress(environmentSettings.bitcoinNetworkParameters).toString()
-            )
-        ) {
-            // Wallet contains address associated with this private key, find & save it with scanned key
-            val foundAddressString = key.toAddress(BitcoinMainNetParams.get()).toString()
-            for (legacyAddress in payloadDataManager.wallet!!.legacyAddressList) {
-                if (legacyAddress.address == foundAddressString) {
-                    importAddressPrivateKey(key, legacyAddress, false)
-                    break
-                }
-            }
-        } else {
-            // Create new address and store
-            val legacyAddress = LegacyAddress.fromECKey(key)
-
-            setLegacyAddressKey(key, legacyAddress)
-            remoteSaveUnmatchedPrivateKey(legacyAddress)
-
-            view.privateKeyImportMismatch()
-        }
-    }
-
     internal fun showAddressDetails() {
         var heading: String? = null
         var note: String? = null
@@ -686,13 +585,7 @@ class AccountEditPresenter constructor(
         }
 
         val qrCodeDimension = 260
-        val qrCodeEncoder = QRCodeEncoder(
-            qrString,
-            null,
-            Contents.Type.TEXT,
-            BarcodeFormat.QR_CODE.toString(),
-            qrCodeDimension
-        )
+        val qrCodeEncoder = QRCodeEncoder(qrString!!, qrCodeDimension)
         try {
             bitmap = qrCodeEncoder.encodeAsBitmap()
         } catch (e: WriterException) {
@@ -701,20 +594,6 @@ class AccountEditPresenter constructor(
 
         view.showAddressDetails(heading, note, copy, bitmap, qrString)
         analytics.logEvent(WalletAnalytics.ShowXpub)
-    }
-
-    internal fun handleIncomingScanIntent(data: Intent) {
-        val scanData = data.getStringExtra(CaptureActivity.SCAN_RESULT)
-        val format = privateKeyFactory.getFormat(scanData)
-        if (format != null) {
-            if (format != PrivateKeyFactory.BIP38) {
-                importNonBIP38Address(format, scanData)
-            } else {
-                view.promptBIP38Password(scanData)
-            }
-        } else {
-            view.showToast(R.string.privkey_error, ToastCustom.TYPE_ERROR)
-        }
     }
 
     internal fun archiveAccount() {
@@ -751,77 +630,6 @@ class AccountEditPresenter constructor(
                         analytics.logEvent(WalletAnalytics.UnArchiveWallet)
                     else
                         analytics.logEvent(WalletAnalytics.ArchiveWallet)
-                },
-                { view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR) }
-            )
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    private fun importNonBIP38Address(format: String, data: String) {
-        view.showProgressDialog(R.string.please_wait)
-
-        try {
-            val key = privateKeyFactory.getKey(format, data)
-            if (key != null && key.hasPrivKey()) {
-                val keyAddress =
-                    key.toAddress(environmentSettings.bitcoinNetworkParameters).toString()
-                if (legacyAddress!!.address != keyAddress) {
-                    // Private key does not match this address - warn user but import nevertheless
-                    importUnmatchedPrivateKey(key)
-                } else {
-                    importAddressPrivateKey(key, legacyAddress!!, true)
-                }
-            } else {
-                view.showToast(R.string.invalid_private_key, ToastCustom.TYPE_ERROR)
-            }
-        } catch (e: Exception) {
-            view.showToast(R.string.no_private_key, ToastCustom.TYPE_ERROR)
-        }
-
-        view.dismissProgressDialog()
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal fun importBIP38Address(data: String, pw: String) {
-        view.showProgressDialog(R.string.please_wait)
-
-        try {
-            val bip38 =
-                BIP38PrivateKey.fromBase58(environmentSettings.bitcoinNetworkParameters, data)
-            val key = bip38.decrypt(pw)
-
-            if (key != null && key.hasPrivKey()) {
-                val keyAddress =
-                    key.toAddress(environmentSettings.bitcoinNetworkParameters).toString()
-                if (legacyAddress!!.address != keyAddress) {
-                    // Private key does not match this address - warn user but import nevertheless
-                    importUnmatchedPrivateKey(key)
-                } else {
-                    importAddressPrivateKey(key, legacyAddress!!, true)
-                }
-            } else {
-                view.showToast(R.string.invalid_private_key, ToastCustom.TYPE_ERROR)
-            }
-        } catch (e: Exception) {
-            view.showToast(R.string.bip38_error, ToastCustom.TYPE_ERROR)
-            Timber.e(e)
-        }
-
-        view.dismissProgressDialog()
-    }
-
-    private fun remoteSaveUnmatchedPrivateKey(legacyAddress: LegacyAddress) {
-        val addressCopy = ArrayList(payloadDataManager.legacyAddresses)
-        addressCopy.add(legacyAddress)
-        payloadDataManager.legacyAddresses = addressCopy
-
-        compositeDisposable += payloadDataManager.syncPayloadWithServer()
-            .doOnError { Timber.e(it) }
-            .subscribe(
-                {
-                    // Subscribe to new address only if successfully created
-                    view.sendBroadcast(PayloadSyncedEvent())
-                    view.setActivityResult(AppCompatActivity.RESULT_OK)
                 },
                 { view.showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR) }
             )

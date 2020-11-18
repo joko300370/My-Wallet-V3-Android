@@ -127,76 +127,6 @@
                     android:visibility="@{viewModel.accountModel.defaultAccountVisibility}" />
 
                 <LinearLayout
-                    android:id="@+id/privx_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:alpha="@{viewModel.accountModel.xprivAlpha}"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="@{viewModel.accountModel.xprivClickable}"
-                    android:minHeight="72dp"
-                    android:onClick="@{viewModel::onClickScanXpriv}"
-                    android:orientation="vertical"
-                    android:paddingBottom="4dp"
-                    android:visibility="@{viewModel.accountModel.scanPrivateKeyVisibility}">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        tools:ignore="UseCompoundDrawables">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:duplicateParentState="true"
-                            android:gravity="center_vertical"
-                            android:paddingLeft="16dp"
-                            android:text="@string/scan_private_key"
-                            android:textColor="@color/black"
-                            android:textSize="16sp" />
-
-                        <ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:duplicateParentState="true"
-                            android:gravity="center_vertical"
-                            android:minWidth="50dp"
-                            android:minHeight="50dp"
-                            android:paddingLeft="4dp"
-                            android:paddingTop="8dp"
-                            android:paddingRight="16dp"
-                            android:paddingBottom="8dp"
-                            android:tint="@color/black"
-                            app:srcCompat="@drawable/vector_material_qr" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="8dp"
-                        android:alpha="0.7"
-                        android:duplicateParentState="true"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:text="@string/watch_only_description"
-                        android:textColor="@color/black"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:background="@color/primary_grey_light"
-                    android:visibility="@{viewModel.accountModel.scanPrivateKeyVisibility}" />
-
-                <LinearLayout
                     android:id="@+id/xpub_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -240,7 +170,7 @@
                             android:paddingRight="16dp"
                             android:paddingBottom="8dp"
                             android:tint="@color/black"
-                            app:srcCompat="@drawable/vector_material_qr" />
+                            app:srcCompat="@drawable/ic_qr_scan" />
 
                     </LinearLayout>
 

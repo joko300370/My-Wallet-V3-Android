@@ -23,8 +23,6 @@ interface BlockchainAccount {
 
     val isFunded: Boolean
 
-    val isArchived: Boolean
-
     val hasTransactions: Boolean
 
     val isEnabled: Single<Boolean>
@@ -63,6 +61,9 @@ typealias SingleAccountList = List<SingleAccount>
 interface CryptoAccount : SingleAccount {
     val asset: CryptoCurrency
 
+    val isArchived: Boolean
+        get() = false
+
     override val pendingBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
 
@@ -73,9 +74,6 @@ interface FiatAccount : SingleAccount {
     val fiatCurrency: String
     override val pendingBalance: Single<Money>
         get() = Single.just(FiatValue.zero(fiatCurrency))
-
-    override val isArchived: Boolean
-        get() = false
 }
 
 interface AccountGroup : BlockchainAccount {
@@ -83,9 +81,6 @@ interface AccountGroup : BlockchainAccount {
 
     override val isEnabled: Single<Boolean>
         get() = Single.just(true)
-
-    override val isArchived: Boolean
-        get() = false
 
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
@@ -110,9 +105,6 @@ class NullCryptoAccount(
         get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
-        get() = false
-
-    override val isArchived: Boolean
         get() = false
 
     override val asset: CryptoCurrency
@@ -157,9 +149,6 @@ object NullFiatAccount : FiatAccount {
         get() = Single.just(NullAddress)
 
     override val isDefault: Boolean
-        get() = false
-
-    override val isArchived: Boolean
         get() = false
 
     override val sourceState: Single<TxSourceState>

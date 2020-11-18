@@ -28,10 +28,6 @@ public class AccountEditModel extends BaseObservable {
     private float defaultAlpha;
     private boolean defaultClickable;
 
-    private int scanPrivateKeyVisibility;
-    private float xprivAlpha;
-    private boolean xprivClickable;
-
     private String xpubText;
     private int xpubDescriptionVisibility;
     private float xpubAlpha;
@@ -167,36 +163,6 @@ public class AccountEditModel extends BaseObservable {
     void setDefaultClickable(boolean defaultClickable) {
         this.defaultClickable = defaultClickable;
         notifyPropertyChanged(BR.defaultClickable);
-    }
-
-    @Bindable
-    public int getScanPrivateKeyVisibility() {
-        return scanPrivateKeyVisibility;
-    }
-
-    void setScanPrivateKeyVisibility(@ViewUtils.Visibility int visibility) {
-        scanPrivateKeyVisibility = visibility;
-        notifyPropertyChanged(BR.scanPrivateKeyVisibility);
-    }
-
-    @Bindable
-    public float getXprivAlpha() {
-        return xprivAlpha;
-    }
-
-    void setXprivAlpha(@FloatRange(from = 0.0, to = 1.0) float xprivAlpha) {
-        this.xprivAlpha = xprivAlpha;
-        notifyPropertyChanged(BR.xprivAlpha);
-    }
-
-    @Bindable
-    public boolean getXprivClickable() {
-        return xprivClickable;
-    }
-
-    void setXprivClickable(boolean xprivClickable) {
-        this.xprivClickable = xprivClickable;
-        notifyPropertyChanged(BR.xprivClickable);
     }
 
     @Bindable

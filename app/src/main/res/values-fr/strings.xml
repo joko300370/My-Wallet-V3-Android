@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Le champ ne peut pas être vide.</string>
   <string name="settings_error_updating">Erreur lors de la mise à jour des paramètres, veuillez réessayer</string>
   <string name="request_camera_permission">L\'accès à la caméra est requis.</string>
-  <string name="request_camera_permission_title">Accès à la caméra</string>
-  <string name="request_location_permission">L\'accès à l\'emplacement est requis.</string>
-  <string name="request_write_storage_permission">Écrire un stockage externe est requis.</string>
-  <string name="request_write_and_camera_storage_permission_description">Écrire un stockage externe 
- et la caméra sont nécessaires pour télécharger les documents KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Stockage d\'écriture et caméra 
- autorisations 
-</string>
   <string name="not_specified">non précisé</string>
   <string name="update_failed">Échec de mise à jour.</string>
   <string name="verify_mobile">Vérifier mobile</string>

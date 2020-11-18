@@ -93,6 +93,7 @@ class MainPresenterTest {
             credentialsWiper = credentialsWiper,
             payloadDataManager = payloadDataManager,
             exchangeRateFactory = exchangeRateFactory,
+            qrProcessor = mock(),
             environmentSettings = environmentSettings,
             kycStatusHelper = kycStatusHelper,
             lockboxDataManager = lockboxDataManager,

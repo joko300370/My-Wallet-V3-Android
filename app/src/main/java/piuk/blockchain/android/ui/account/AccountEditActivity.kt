@@ -23,10 +23,7 @@ import info.blockchain.balance.CryptoCurrency
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -49,7 +46,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
 
     @Suppress("MemberVisibilityCanBePrivate")
     private val accountEditPresenter: AccountEditPresenter by scopedInject()
-    private val appUtil: AppUtil by inject()
     private val rxBus: RxBus by inject()
 
     private lateinit var binding: ActivityAccountEditBinding
@@ -125,43 +121,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
         rxBus.emitEvent(ActionEvent::class.java, event)
     }
 
-    override fun startScanActivity() {
-        QrScanHandler.requestScanPermissions(
-            activity = this,
-            rootView = binding.mainLayout
-        ) { startCameraIfAvailable() }
-    }
-
-    private fun startCameraIfAvailable() {
-        if (!appUtil.isCameraOpen) {
-            val intent = Intent(this, CaptureActivity::class.java)
-            startActivityForResult(intent, SCAN_PRIVX)
-        } else {
-            toast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
-        }
-    }
-
-    override fun promptPrivateKey(address: String) {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.privx_required)
-            .setMessage(getString(R.string.watch_only_spend_instructions, address))
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                secondPasswordHandler.validate(object :
-                    SecondPasswordHandler.ResultListener {
-                    override fun onNoSecondPassword() {
-                        startScanActivity()
-                    }
-
-                    override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                        presenter.secondPassword = validatedSecondPassword
-                        startScanActivity()
-                    }
-                })
-            }
-            .setNegativeButton(android.R.string.cancel, null).show()
-    }
-
     override fun showPaymentDetails(details: PaymentConfirmationDetails) {
         ConfirmPaymentDialog.newInstance(details, null, null, false,
             { presenter.submitPayment() })
@@ -193,45 +152,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
             .setCancelable(false)
             .setPositiveButton(R.string.common_yes) { _, _ -> presenter.archiveAccount() }
             .setNegativeButton(R.string.common_no, null)
-            .show()
-    }
-
-    override fun promptBIP38Password(data: String) {
-        val password = AppCompatEditText(this).apply {
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.app_name)
-            .setMessage(R.string.bip38_password_entry)
-            .setView(ViewUtils.getAlertDialogPaddedView(this, password))
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                presenter.importBIP38Address(data, password.getTextString())
-            }
-            .setNegativeButton(android.R.string.cancel, null).show()
-    }
-
-    override fun privateKeyImportMismatch() {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(getString(R.string.warning))
-            .setMessage(
-                getString(R.string.private_key_successfully_imported) + "\n\n" + getString(
-                    R.string.private_key_not_matching_address
-                )
-            )
-            .setPositiveButton(R.string.import_try_again) { _, _ ->
-                presenter.onClickScanXpriv(View(this))
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-    }
-
-    override fun privateKeyImportSuccess() {
-        AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.success)
-            .setMessage(R.string.private_key_successfully_imported)
-            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 
@@ -269,16 +189,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
             }
             .create()
             .show()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        data?.let {
-            if (requestCode == SCAN_PRIVX && resultCode == AppCompatActivity.RESULT_OK) {
-                presenter.handleIncomingScanIntent(data)
-            }
-        } ?: toast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
     }
 
     override fun showTransactionSuccess() {
@@ -325,7 +235,6 @@ class AccountEditActivity : BaseMvpActivity<AccountEditView, AccountEditPresente
         internal const val EXTRA_CRYPTOCURRENCY = "piuk.blockchain.android.EXTRA_CRYPTOCURRENCY"
 
         private const val ADDRESS_LABEL_MAX_LENGTH = 17
-        private const val SCAN_PRIVX = 302
 
         fun startForResult(
             activity: AppCompatActivity,

@@ -43,7 +43,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -67,7 +66,6 @@ class AccountPresenterTest {
     private val payloadDataManager: PayloadDataManager = mock()
     private val bchDataManager: BchDataManager = mock()
     private val metadataManager: MetadataManager = mock()
-    private val appUtil: AppUtil = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val privateKeyFactory = PrivateKeyFactory()
     private val coinsWebSocketStrategy: CoinsWebSocketStrategy = mock()
@@ -88,7 +86,6 @@ class AccountPresenterTest {
             payloadDataManager,
             bchDataManager,
             metadataManager,
-            appUtil,
             privateKeyFactory,
             environmentSettings,
             mock(),
@@ -248,28 +245,6 @@ class AccountPresenterTest {
     }
 
     @Test
-    fun onScanButtonClickedCameraInUse() {
-        // Arrange
-        whenever(appUtil.isCameraOpen).thenReturn(true)
-        // Act
-        subject.onScanButtonClicked()
-        // Assert
-        verify(activity).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verifyNoMoreInteractions(activity)
-    }
-
-    @Test
-    fun onScanButtonClickedCameraAvailable() {
-        // Arrange
-        whenever(appUtil.isCameraOpen).thenReturn(false)
-        // Act
-        subject.onScanButtonClicked()
-        // Assert
-        verify(activity).startScanForResult()
-        verifyNoMoreInteractions(activity)
-    }
-
-    @Test
     fun importBip38AddressWithValidPassword() {
         // Arrange
 
@@ -362,20 +337,6 @@ class AccountPresenterTest {
     }
 
     @Test
-    fun onAddressScannedWatchAddressAlreadyInWallet() {
-        // Arrange
-        val mockPayload = mock(Wallet::class.java, RETURNS_DEEP_STUBS)
-
-        whenever(mockPayload.legacyAddressStringList.contains(any<Any>())).thenReturn(true)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        // Act
-        subject.onAddressScanned("17UovdU9ZvepPe75igTQwxqNME1HbnvMB7")
-        // Assert
-        verify(activity).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verifyNoMoreInteractions(activity)
-    }
-
-    @Test
     fun onAddressScannedWatchAddressNotInWallet() {
         // Arrange
         val mockPayload = mock(Wallet::class.java, RETURNS_DEEP_STUBS)
@@ -385,7 +346,7 @@ class AccountPresenterTest {
         // Act
         subject.onAddressScanned("17UovdU9ZvepPe75igTQwxqNME1HbnvMB7")
         // Assert
-        verify(activity).showWatchOnlyWarningDialog("17UovdU9ZvepPe75igTQwxqNME1HbnvMB7")
+        verify(activity).showWatchOnlyUnsupportedMsg()
         verifyNoMoreInteractions(activity)
     }
 

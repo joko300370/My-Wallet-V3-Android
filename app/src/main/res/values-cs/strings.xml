@@ -432,15 +432,6 @@
   <string name="settings_field_cant_be_empty">Pole nemůže být prázdné.</string>
   <string name="settings_error_updating">Při aktualizaci nastavení došlo k chybě, zkuste to znovu</string>
   <string name="request_camera_permission">Je vyžadován přístup k fotoaparátu.</string>
-  <string name="request_camera_permission_title">Přístup z kamery</string>
-  <string name="request_location_permission">Je vyžadován přístup k poloze.</string>
-  <string name="request_write_storage_permission">Je nutné zapsat externí úložiště.</string>
-  <string name="request_write_and_camera_storage_permission_description">Zapište externí úložiště 
- a kamera jsou povinna nahrávat dokumenty KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Zapište úložiště a fotoaparát 
- oprávnění 
-</string>
   <string name="not_specified">nespecifikováno</string>
   <string name="update_failed">Aktualizace se nezdařila.</string>
   <string name="verify_mobile">Ověřte mobilní zařízení</string>
