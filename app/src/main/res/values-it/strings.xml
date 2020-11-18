@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Il campo non può essere vuoto.</string>
   <string name="settings_error_updating">Errore durante l\'aggiornamento delle impostazioni, riprova</string>
   <string name="request_camera_permission">È richiesto l\'accesso alla telecamera.</string>
-  <string name="request_camera_permission_title">Accesso alla telecamera</string>
-  <string name="request_location_permission">È richiesto l\'accesso alla posizione.</string>
-  <string name="request_write_storage_permission">Scrivere memoria esterna è necessario.</string>
-  <string name="request_write_and_camera_storage_permission_description">Scrivi memoria esterna 
- e la fotocamera è richiesta per caricare i documenti KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Scrivi memoria e fotocamera 
- permessi 
-</string>
   <string name="not_specified">non specificato</string>
   <string name="update_failed">Aggiornamento non riuscito.</string>
   <string name="verify_mobile">Verifica mobile</string>

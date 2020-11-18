@@ -12,6 +12,7 @@ interface AccountList {
     fun accounts(): Single<AccountReferenceList>
 }
 
+@Deprecated("Only used in old swap")
 interface AsyncAllAccountList {
     fun allAccounts(): Single<AccountReferenceList>
     operator fun get(cryptoCurrency: CryptoCurrency): Single<AccountList>

@@ -7,6 +7,7 @@ import androidx.annotation.LayoutRes
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.EditText
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
@@ -167,3 +168,14 @@ private class DebouncingOnClickListener(private val onClickListener: (View?) -> 
 
 fun View.setOnClickListenerDebounced(onClickListener: (View?) -> Unit) =
     this.setOnClickListener(DebouncingOnClickListener(onClickListener = onClickListener))
+
+fun View.afterMeasured(f: (View) -> Unit) {
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (measuredWidth > 0 && measuredHeight > 0) {
+                    viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    f(this@afterMeasured)
+                }
+            }
+        })
+}

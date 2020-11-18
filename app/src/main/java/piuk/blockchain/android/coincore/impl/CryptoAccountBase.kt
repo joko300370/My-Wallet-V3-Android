@@ -113,7 +113,6 @@ internal class CryptoExchangeAccount(
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager,
-    override val isArchived: Boolean = false,
     val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase() {
 

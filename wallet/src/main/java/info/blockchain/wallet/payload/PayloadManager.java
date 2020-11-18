@@ -68,7 +68,7 @@ public class PayloadManager {
     private static final int HD_WALLET_INDEX = 0;
 
     private WalletBase walletBaseBody;
-    private String password;
+    @Nonnull private String password;
 
     private final WalletApi walletApi;
 

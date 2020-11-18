@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">ต้องป้อนข้อมูลในฟิลด์</string>
   <string name="settings_error_updating">เกิดข้อผิดพลาดในการอัปเดตการตั้งค่าโปรดลองอีกครั้ง</string>
   <string name="request_camera_permission">ต้องมีการเข้าถึงกล้อง</string>
-  <string name="request_camera_permission_title">การเข้าถึงกล้อง</string>
-  <string name="request_location_permission">ต้องมีการเข้าถึงตำแหน่ง</string>
-  <string name="request_write_storage_permission">จำเป็นต้องใช้ที่เก็บข้อมูลภายนอก</string>
-  <string name="request_write_and_camera_storage_permission_description">เขียนที่เก็บข้อมูลภายนอก 
- และกล้องจะต้องอัปโหลดเอกสาร KYC 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">เขียนที่เก็บข้อมูลและกล้อง 
- สิทธิ์ 
-</string>
   <string name="not_specified">ไม่ได้ระบุ</string>
   <string name="update_failed">ไม่สามารถอัปเดต</string>
   <string name="verify_mobile">ยืนยันมือถือ</string>

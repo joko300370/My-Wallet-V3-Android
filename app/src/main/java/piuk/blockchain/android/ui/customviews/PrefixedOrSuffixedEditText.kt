@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
+import android.graphics.Rect
 import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
@@ -27,9 +28,13 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
         defStyle)
 
     private val imeActionsSubject: PublishSubject<ImeOptions> = PublishSubject.create()
+    private val textSizeSubject: PublishSubject<Int> = PublishSubject.create()
 
     val onImeAction: Observable<ImeOptions>
         get() = imeActionsSubject
+
+    val textSize: Observable<Int>
+        get() = textSizeSubject
 
     init {
         imeOptions = EditorInfo.IME_ACTION_NEXT
@@ -46,6 +51,9 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
                         setText(it)
                     }
                 }
+                val bounds = Rect()
+                paint.getTextBounds(text.toString(), 0, text?.length ?: 0, bounds)
+                textSizeSubject.onNext(bounds.width())
             }
         })
         setOnFocusChangeListener { _, hasFocus ->
@@ -106,7 +114,9 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
                 prefix = null
                 suffix = newValue.prefixOrSuffix
                 setText(newValue.initialText.plus(suffix))
-                Selection.setSelection(text, 0)
+                suffix?.let {
+                    Selection.setSelection(text, text.toString().length - it.length)
+                }
             }
             isEnabled = true
         }

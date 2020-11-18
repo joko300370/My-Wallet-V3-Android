@@ -674,7 +674,8 @@ class LiveCustodialWalletManager(
                     TransferLimits(
                         minLimit = FiatValue.fromMinor(currency, response.minOrder?.toLong() ?: 0L),
                         maxOrder = FiatValue.fromMinor(currency, response.maxOrder?.toLong() ?: 0L),
-                        maxLimit = FiatValue.fromMinor(currency, response.maxPossibleOrder?.toLong() ?: 0L)
+                        maxLimit = FiatValue.fromMinor(currency,
+                            response.maxPossibleOrder?.toLong() ?: 0L)
                     )
                 }
             }

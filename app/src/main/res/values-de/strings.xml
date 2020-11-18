@@ -430,15 +430,6 @@
     <string name="settings_field_cant_be_empty">Feld kann nicht leer sein.</string>
     <string name="settings_error_updating">Fehler beim Aktualisieren der Einstellungen, versuchen Sie es erneut</string>
     <string name="request_camera_permission">Kamerazugriff ist erforderlich.</string>
-    <string name="request_camera_permission_title">Kamerazugriff</string>
-    <string name="request_location_permission">Standortzugriff ist erforderlich.</string>
-    <string name="request_write_storage_permission">Externer Schreibspeicher ist erforderlich.</string>
-    <string name="request_write_and_camera_storage_permission_description">Externen Speicher schreiben
- und Kamera sind erforderlich, um KYC-Dokumente hochzuladen. 
-</string>
-    <string name="request_write_and_camera_storage_permission_title">Schreibspeicher und Kamera
- Berechtigungen 
-</string>
     <string name="not_specified">unbestimmt</string>
     <string name="update_failed">Aktualisierung fehlgeschlagen.</string>
     <string name="verify_mobile">Überprüfen Sie Mobile</string>

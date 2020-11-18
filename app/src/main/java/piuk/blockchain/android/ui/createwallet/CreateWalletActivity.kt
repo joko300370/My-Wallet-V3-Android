@@ -29,6 +29,8 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -48,6 +50,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         R.string.strength_normal,
         R.string.strength_strong
     )
+
     private val strengthColors = intArrayOf(
         R.drawable.progress_red,
         R.drawable.progress_orange,
@@ -55,12 +58,22 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         R.drawable.progress_green
     )
 
+    private val recoveryPhrase: String by unsafeLazy {
+        intent.getStringExtra(RECOVERY_PHRASE) ?: ""
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_wallet)
         applyConstraintSet.clone(mainConstraintLayout)
 
-        presenter.parseExtras(intent)
+        if (recoveryPhrase.isNotEmpty()) {
+            setupToolbar(toolbar_general, R.string.recover_funds)
+            command_next.setText(R.string.dialog_continue)
+        } else {
+            setupToolbar(toolbar_general, R.string.new_account_title)
+            command_next.setText(R.string.new_account_cta_text)
+        }
 
         tos.movementMethod = LinkMovementMethod.getInstance() // make link clickable
         command_next.isClickable = false
@@ -138,14 +151,6 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         return super.onOptionsItemSelected(item)
     }
 
-    override fun setTitleText(text: Int) {
-        setupToolbar(toolbar_general, text)
-    }
-
-    override fun setNextText(text: Int) {
-        command_next.setText(text)
-    }
-
     private fun hideEntropyContainer() {
         TransitionManager.beginDelayedTransition(mainConstraintLayout)
         applyConstraintSet.setVisibility(R.id.entropy_container, ConstraintSet.INVISIBLE)
@@ -195,11 +200,11 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         entropy_container.pass_strength_verdict.setText(strengthVerdicts[level])
     }
 
-    override fun showToast(message: Int, toastType: String) {
-        toast(message, toastType)
+    override fun showError(message: Int) {
+        toast(message, ToastCustom.TYPE_ERROR)
     }
 
-    override fun showWeakPasswordDialog(email: String, password: String) {
+    override fun warnWeakPassword(email: String, password: String) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.weak_password)
@@ -209,7 +214,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
                 wallet_pass.requestFocus()
             }
             .setNegativeButton(R.string.common_no) { _, _ ->
-                presenter.createOrRecoverWallet(email, password)
+                presenter.createOrRestoreWallet(email, password, recoveryPhrase)
             }.show()
     }
 
@@ -243,11 +248,14 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         val password1 = wallet_pass.text.toString()
         val password2 = wallet_pass_confirm.text.toString()
 
-        presenter.validateCredentials(email, password1, password2)
+        if (presenter.validateCredentials(email, password1, password2)) {
+            presenter.createOrRestoreWallet(email, password1, recoveryPhrase)
+        }
     }
 
     companion object {
-        @JvmStatic
+        const val RECOVERY_PHRASE = "RECOVERY_PHRASE"
+
         fun start(context: Context) {
             context.startActivity(Intent(context, CreateWalletActivity::class.java))
         }

@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">입력란은 비워 둘 수 없습니다.</string>
   <string name="settings_error_updating">설정을 업데이트하는 중 오류가 발생했습니다. 다시 시도하십시오</string>
   <string name="request_camera_permission">카메라 액세스가 필요합니다.</string>
-  <string name="request_camera_permission_title">카메라 액세스</string>
-  <string name="request_location_permission">위치 접근이 필요합니다.</string>
-  <string name="request_write_storage_permission">쓰기 외부 저장소가 필요합니다.</string>
-  <string name="request_write_and_camera_storage_permission_description">외부 저장소 쓰기 
- KYC 문서를 업로드하려면 카메라가 필요합니다. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">쓰기 저장 및 카메라 
- 권한 
-</string>
   <string name="not_specified">명시되지 않은</string>
   <string name="update_failed">업데이트하지 못했습니다.</string>
   <string name="verify_mobile">모바일 확인</string>

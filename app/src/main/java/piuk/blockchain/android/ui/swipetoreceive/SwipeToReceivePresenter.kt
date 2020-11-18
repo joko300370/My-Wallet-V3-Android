@@ -6,7 +6,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import kotlin.properties.Delegates

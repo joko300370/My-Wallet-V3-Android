@@ -18,17 +18,7 @@ interface AccountEditView : View {
 
     fun setActivityResult(resultCode: Int)
 
-    fun startScanActivity()
-
-    fun promptPrivateKey(address: String)
-
     fun promptArchive(title: String, message: String)
-
-    fun promptBIP38Password(data: String)
-
-    fun privateKeyImportMismatch()
-
-    fun privateKeyImportSuccess()
 
     fun showXpubSharingWarning()
 

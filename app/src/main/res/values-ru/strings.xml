@@ -432,15 +432,6 @@
   <string name="settings_field_cant_be_empty">Поле не может быть пустым.</string>
   <string name="settings_error_updating">Ошибка обновления настроек, попробуйте еще раз</string>
   <string name="request_camera_permission">Требуется доступ к камере.</string>
-  <string name="request_camera_permission_title">Доступ к камере</string>
-  <string name="request_location_permission">Доступ к местоположению не требуется.</string>
-  <string name="request_write_storage_permission">Запись на внешнее хранилище обязательна.</string>
-  <string name="request_write_and_camera_storage_permission_description">Написать внешнее хранилище 
- и камера требуется для загрузки документов KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Пишите память и камеру 
- разрешений 
-</string>
   <string name="not_specified">не указано</string>
   <string name="update_failed">Не удалось обновить.</string>
   <string name="verify_mobile">Проверить мобильный</string>

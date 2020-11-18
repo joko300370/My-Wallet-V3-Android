@@ -162,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/tiny_margin"
                 android:contentDescription="@string/send_scan_qr_code"
-                android:src="@drawable/icon_qr_inverse"
+                android:src="@drawable/ic_qr_scan_inverse"
                 app:layout_constraintBottom_toBottomOf="@id/address_entry"
                 app:layout_constraintEnd_toEndOf="@id/address_entry"
                 app:layout_constraintTop_toTopOf="@id/address_entry" />

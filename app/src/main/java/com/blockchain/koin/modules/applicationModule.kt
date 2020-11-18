@@ -35,8 +35,10 @@ import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.metadata.MetadataDerivation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.OkHttpClient
+import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
@@ -53,11 +55,12 @@ import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
+import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.EURPaymentAccountMapper
 import piuk.blockchain.android.simplebuy.GBPPaymentAccountMapper
 import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
@@ -132,6 +135,7 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawInteractor
 import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
+import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.PaxAccount
@@ -285,6 +289,7 @@ val applicationModule = module {
                 credentialsWiper = get(),
                 payloadDataManager = get(),
                 exchangeRateFactory = get(),
+                qrProcessor = get(),
                 environmentSettings = get(),
                 kycStatusHelper = get(),
                 lockboxDataManager = get(),
@@ -378,6 +383,17 @@ val applicationModule = module {
         }
 
         factory {
+            RecoverFundsPresenter(
+                payloadDataManager = get(),
+                prefs = get(),
+                metadataInteractor = get(),
+                metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get()),
+                moshi = get(),
+                analytics = get()
+            )
+        }
+
+        factory {
             BackupWalletStartingPresenter(
                 payloadDataManager = get()
             )
@@ -442,12 +458,17 @@ val applicationModule = module {
             )
         }
 
+        scoped {
+            QrScanResultProcessor(
+                bitPayDataManager = get()
+            )
+        }
+
         factory {
             AccountPresenter(
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 metadataManager = get(),
-                appUtil = get(),
                 privateKeyFactory = get(),
                 environmentSettings = get(),
                 analytics = get(),
@@ -644,10 +665,10 @@ val applicationModule = module {
                 /* kycStatusHelper = */ get(),
                 /* pitLinking = */ get(),
                 /* analytics = */ get(),
-                /*featureFlag = */get(pitFeatureFlag),
-                /*featureFlag = */get(cardPaymentsFeatureFlag),
-                /*featureFlag = */get(simpleBuyFundsFeatureFlag),
-                /*simpleBuyPrefs = */get()
+                /* featureFlag = */get(pitFeatureFlag),
+                /* featureFlag = */get(cardPaymentsFeatureFlag),
+                /* featureFlag = */get(simpleBuyFundsFeatureFlag),
+                /* simpleBuyPrefs = */get()
             )
         }
 
@@ -720,10 +741,8 @@ val applicationModule = module {
                 bchDataManager = get(),
                 metadataManager = get(),
                 sendDataManager = get(),
-                privateKeyFactory = get(),
                 swipeToReceiveHelper = get(),
                 dynamicFeeCache = get(),
-                environmentSettings = get(),
                 analytics = get(),
                 exchangeRates = get(),
                 coinSelectionRemoteConfig = get()
@@ -774,7 +793,15 @@ val applicationModule = module {
                 walletApi = get(),
                 addressGenerator = get(),
                 payloadDataManager = get(),
-                rxBus = get()
+                rxBus = get(),
+                walletCredentialsUpdater = get()
+            )
+        }
+
+        factory {
+            WalletCredentialsMetadataUpdater(
+                payloadDataManager = get(),
+                metadataRepository = get()
             )
         }
 
@@ -829,8 +856,6 @@ val applicationModule = module {
     single { DynamicFeeCache() }
 
     factory { CoinSelectionRemoteConfig(get()) }
-
-    factory { RecoverFundsPresenter() }
 
     single {
         ConnectionApi(retrofit = get(explorerRetrofit))

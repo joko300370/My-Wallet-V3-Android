@@ -14,7 +14,6 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
-import java.util.EmptyStackException
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
 
@@ -354,24 +353,23 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     // This fn pops the backstack, thus no need to update the backstack here
     object ReturnToPreviousStep : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState {
-            try {
-                val stack = oldState.stepsBackStack
-                val previousStep = stack.pop()
-                return oldState.copy(
-                    stepsBackStack = stack,
-                    currentStep = previousStep,
-                    errorState = TransactionErrorState.NONE
-                )
-            } catch (e: EmptyStackException) {
-                // if the stack is empty, throw
-                throw IllegalStateException("Cannot go back")
-            }
+            val stack = oldState.stepsBackStack
+            require(stack.isNotEmpty())
+
+            val previousStep = stack.pop()
+            return oldState.copy(
+                stepsBackStack = stack,
+                currentStep = previousStep,
+                errorState = TransactionErrorState.NONE
+            )
         }
     }
 
     object ShowMoreAccounts : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
-            oldState.copy(currentStep = TransactionStep.SELECT_TARGET_ACCOUNT).updateBackstack(oldState)
+            oldState.copy(
+                currentStep = TransactionStep.SELECT_TARGET_ACCOUNT
+            ).updateBackstack(oldState)
     }
 
     // Fired from when the confirm transaction sheet is created.

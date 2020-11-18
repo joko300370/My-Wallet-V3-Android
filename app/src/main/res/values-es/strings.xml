@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">El campo no puede estar vacío.</string>
   <string name="settings_error_updating">Error al actualizar la configuración. Vuelve a intentarlo.</string>
   <string name="request_camera_permission">Se requiere acceso a la cámara.</string>
-  <string name="request_camera_permission_title">Acceso a la cámara</string>
-  <string name="request_location_permission">Se requiere acceso a la ubicación.</string>
-  <string name="request_write_storage_permission">Se requiere almacenamiento externo de escritura.</string>
-  <string name="request_write_and_camera_storage_permission_description">Escribir almacenamiento externo 
- y la cámara son necesarias para cargar documentos KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Escribir almacenamiento y cámara 
- permisos 
-</string>
   <string name="not_specified">no especificado</string>
   <string name="update_failed">Error al actualizar</string>
   <string name="verify_mobile">Verificar móvil</string>

@@ -24,6 +24,7 @@ import timber.log.Timber
 private const val ArgumentTitle = "Title"
 private const val ResultId = "ResultId"
 
+@Deprecated("Only used in old swap")
 class AccountChooserBottomDialog : BottomSheetDialogFragment() {
 
     interface Callback {

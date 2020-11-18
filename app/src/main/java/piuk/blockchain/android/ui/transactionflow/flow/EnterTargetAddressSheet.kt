@@ -6,6 +6,7 @@ import android.text.Editable
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -18,11 +19,12 @@ import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -34,8 +36,8 @@ import timber.log.Timber
 class EnterTargetAddressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
 
-    private val appUtil: AppUtil by inject()
     private val customiser: TransactionFlowCustomiser by inject()
+    private val qrProcessor: QrScanResultProcessor by scopedInject()
 
     private val disposables = CompositeDisposable()
 
@@ -226,15 +228,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
 
     private fun onLaunchAddressScan() {
         analyticsHooks.onScanQrClicked(state)
-        QrScanHandler.requestScanPermissions(
-            activity = requireActivity(),
-            rootView = dialogView
-        ) {
-            QrScanHandler.startQrScanActivity(
-                this,
-                appUtil
-            )
-        }
+        QrScanActivity.start(this, QrExpected.ASSET_ADDRESS_QR(state.asset))
     }
 
     private fun addressEntered(address: String, asset: CryptoCurrency) {
@@ -244,7 +238,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
         when (requestCode) {
-            QrScanHandler.SCAN_URI_RESULT -> handleScanResult(resultCode, data)
+            QrScanActivity.SCAN_URI_RESULT -> handleScanResult(resultCode, data)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
 
@@ -259,10 +253,10 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
 
     private fun handleScanResult(resultCode: Int, data: Intent?) {
         Timber.d("Got QR scan result!")
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            data.getStringExtra(CaptureActivity.SCAN_RESULT)?.let { rawScan ->
-                disposables += QrScanHandler.processScan(rawScan, false)
-                    .flatMapMaybe { QrScanHandler.selectAssetTargetFromScan(state.asset, it) }
+        if (resultCode == Activity.RESULT_OK) {
+            data.getRawScanData()?.let { rawScan ->
+                disposables += qrProcessor.processScan(rawScan, false)
+                    .flatMapMaybe { qrProcessor.selectAssetTargetFromScan(state.asset, it) }
                     .subscribeBy(
                         onSuccess = {
                             // TODO update the selected target (address type) instead so the render method knows what to show  & hide

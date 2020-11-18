@@ -427,11 +427,17 @@
  najpierw ustawienia. 
 </string>
   <string name="disable_online_only">Zaloguj się do swojego portfela w przeglądarce internetowej, aby wyłączyć 
- 2FA. 
-</string>
-  <string name="settings_field_cant_be_empty">Pole nie może być puste.</string>
-  <string name="settings_error_updating">Błąd podczas aktualizacji ustawień, spróbuj ponownie</string>
-  <string name="request_camera_permission">Wymagany jest dostęp do kamery.</string>
+ 2FA.</string>
+
+    <string name="settings_field_cant_be_empty">Pole nie może być puste.</string>
+    <string name="settings_error_updating">Błąd podczas aktualizacji ustawień, spróbuj ponownie</string>
+    <string name="request_camera_permission">Wymagany jest dostęp do kamery.</string>
+    <string name="not_specified">nieokreślony</string>
+    <string name="update_failed">Nie udało się zaktualizować.</string>
+    <string name="verify_mobile">Verify Mobile</string>
+    <string name="select_country">Wybierz kraj</string>
+    <string name="search_country">Wyszukaj kraj</string>
+    <string name="verify_sms_summary">Wysłaliśmy na Twój telefon komórkowy wiadomość SMS z numerem</string>
   <string name="request_camera_permission_title">Dostęp do kamery</string>
   <string name="request_location_permission">Wymagany jest dostęp do lokalizacji.</string>
   <string name="request_write_storage_permission">Wymagane jest zapisanie pamięci zewnętrznej.</string>
@@ -439,16 +445,7 @@
  i kamera są wymagane do przesyłania dokumentów KYC. 
 </string>
   <string name="request_write_and_camera_storage_permission_title">Zapisz pamięć i aparat 
- uprawnienia 
-</string>
-  <string name="not_specified">nieokreślony</string>
-  <string name="update_failed">Nie udało się zaktualizować.</string>
-  <string name="verify_mobile">Verify Mobile</string>
-  <string name="select_country">Wybierz kraj</string>
-  <string name="search_country">Wyszukaj kraj</string>
-  <string name="verify_sms_summary">Wysłaliśmy na Twój telefon komórkowy wiadomość SMS z numerem 
- kod weryfikacyjny. Wpisz kod, aby zweryfikować swój numer telefonu komórkowego. 
-</string>
+ uprawnienia</string>
   <string name="verify_sms_failed">Niepoprawny kod, spróbuj ponownie</string>
   <string name="mobile_description">W telefonie komórkowym można włączyć dwa czynniki 
  uwierzytelnianie, które pomaga zabezpieczyć portfel przed nieautoryzowanym dostępem. 

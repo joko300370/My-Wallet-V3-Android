@@ -13,6 +13,7 @@ import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
+import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -32,6 +33,7 @@ class Prerequisites(
     private val walletApi: WalletApi,
     private val payloadDataManager: PayloadDataManager,
     private val addressGenerator: AddressGenerator,
+    private val walletCredentialsUpdater: WalletCredentialsMetadataUpdater,
     private val rxBus: RxBus
 ) {
 
@@ -40,6 +42,7 @@ class Prerequisites(
             .then { feesCompletable().logOnError(FEES_ERROR) }
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
             .then { coincore.init() } // Coincore signals the crash logger internally
+            .then { walletCredentialsUpdater.checkAndUpdate().logAndCompleteOnError(WALLET_CREDENTIALS) }
             .then { generateAndUpdateReceiveAddresses().logAndCompleteOnError(RECEIVE_ADDRESSES) }
             .doOnComplete {
                 rxBus.emitEvent(MetadataEvent::class.java, MetadataEvent.SETUP_COMPLETE)
@@ -103,5 +106,6 @@ class Prerequisites(
         private const val SIMPLE_BUY_SYNC = "simple_buy_sync"
         private const val COINCORE_INIT = "coincore_init"
         private const val RECEIVE_ADDRESSES = "receive_addresses"
+        private const val WALLET_CREDENTIALS = "wallet_credentials"
     }
 }

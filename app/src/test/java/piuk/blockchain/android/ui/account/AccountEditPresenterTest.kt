@@ -1,34 +1,28 @@
 package piuk.blockchain.android.ui.account
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
 import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.isNull
+import com.nhaarman.mockito_kotlin.isNotNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
-import info.blockchain.wallet.payload.data.Options
 import info.blockchain.wallet.payload.data.Wallet
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
-import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.any
 import org.apache.commons.lang3.tuple.Pair
-import org.bitcoinj.core.Address
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers
@@ -40,11 +34,11 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
+import piuk.blockchain.android.R
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_ACCOUNT_INDEX
 import piuk.blockchain.android.ui.account.AccountEditActivity.Companion.EXTRA_CRYPTOCURRENCY
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.ui.zxing.CaptureActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -55,8 +49,6 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.math.BigInteger
-import java.util.ArrayList
-import java.util.Arrays
 
 @Config(sdk = [23], application = BlockchainTestApplication::class)
 @RunWith(RobolectricTestRunner::class)
@@ -72,7 +64,6 @@ class AccountEditPresenterTest {
     private val accountEditModel: AccountEditModel = mock()
     private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
     private val sendDataManager: SendDataManager = mock()
-    private val privateKeyFactory: PrivateKeyFactory = mock()
     private val environmentSettings: EnvironmentConfig = mock()
     private val dynamicFeeCache: DynamicFeeCache = mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
     private val exchangeRates: ExchangeRateDataManager = mock()
@@ -89,10 +80,8 @@ class AccountEditPresenterTest {
             bchDataManager,
             metadataManager,
             sendDataManager,
-            privateKeyFactory,
             swipeToReceiveHelper,
             dynamicFeeCache,
-            environmentSettings,
             mock(),
             exchangeRates,
             coinSelectionRemoteConfig
@@ -102,6 +91,9 @@ class AccountEditPresenterTest {
 
         whenever(coinSelectionRemoteConfig.enabled).thenReturn(Single.just(true))
         whenever(environmentSettings.bitcoinNetworkParameters).thenReturn(BitcoinMainNetParams.get())
+
+        whenever(stringUtils.getString(R.string.address)).thenReturn(R_ADDRESS)
+        whenever(stringUtils.getString(R.string.copy_address)).thenReturn(R_COPY_ADDRESS)
     }
 
     @Test
@@ -136,7 +128,6 @@ class AccountEditPresenterTest {
         verify(view, atLeastOnce()).activityIntent
         verify(accountEditModel).label = anyString()
         verify(accountEditModel).labelHeader = "string resource"
-        verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
         verify(accountEditModel).xpubText = "string resource"
         verify(accountEditModel).transferFundsVisibility = anyInt()
     }
@@ -164,7 +155,6 @@ class AccountEditPresenterTest {
         verify(view, atLeastOnce()).activityIntent
         verify(accountEditModel).label = anyString()
         verify(accountEditModel).labelHeader = "string resource"
-        verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
         verify(accountEditModel).xpubText = "string resource"
         verify(accountEditModel).transferFundsVisibility = anyInt()
     }
@@ -481,36 +471,6 @@ class AccountEditPresenterTest {
     }
 
     @Test
-    fun onClickScanXpriv() {
-        // Arrange
-        subject.legacyAddress = LegacyAddress()
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(false)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        // Act
-        subject.onClickScanXpriv(mock())
-        // Assert
-        verify(view).startScanActivity()
-    }
-
-    @Test
-    fun onClickScanXprivDoubleEncrypted() {
-        // Arrange
-        val addr = "1Address"
-        subject.legacyAddress = LegacyAddress().apply {
-            address = addr
-        }
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(true)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-
-        // Act
-        subject.onClickScanXpriv(mock())
-        // Assert
-        verify(view).promptPrivateKey(addr)
-    }
-
-    @Test
     fun onClickShowXpubAccount() {
         // Arrange
         subject.account = Account()
@@ -523,16 +483,18 @@ class AccountEditPresenterTest {
     @Test
     fun onClickShowXpubLegacyAddress() {
         // Arrange
-        subject.legacyAddress = LegacyAddress()
+        subject.legacyAddress = mock {
+            on { address } doReturn LEGACY_BTC_ADDRESS
+        }
         // Act
         subject.onClickShowXpub(mock())
         // Assert
         verify(view).showAddressDetails(
-            isNull(),
-            isNull(),
-            isNull(),
-            isNull(),
-            isNull()
+            anyString(),
+            anyString(),
+            anyString(),
+            isNotNull(),
+            anyString()
         )
     }
 
@@ -550,101 +512,21 @@ class AccountEditPresenterTest {
     @Test
     fun showAddressDetails() {
         // Arrange
-        subject.legacyAddress = LegacyAddress()
+        subject.legacyAddress = mock {
+            on { address } doReturn LEGACY_BTC_ADDRESS
+        }
+
         // Act
         subject.showAddressDetails()
+
         // Assert
         verify(view).showAddressDetails(
-            isNull(),
-            isNull(),
-            isNull(),
-            isNull(),
-            isNull()
+            anyString(),
+            anyString(),
+            anyString(),
+            isNotNull(),
+            anyString()
         )
-    }
-
-    @Test
-    fun handleIncomingScanIntentInvalidData() {
-        // Arrange
-        val intent = Intent()
-        intent.putExtra(CaptureActivity.SCAN_RESULT, null as Array<String>?)
-        // Act
-        subject.handleIncomingScanIntent(intent)
-        // Assert
-
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-    }
-
-    @Test
-    fun handleIncomingScanIntentUnrecognisedKeyFormat() {
-        // Arrange
-        val intent = Intent().apply {
-            putExtra(
-                CaptureActivity.SCAN_RESULT,
-                "6PRJmkckxBct8jUwn6UcJbickdrnXBiPP9JkNW83g4VyFNsfEuxas39pS"
-            )
-        }
-        whenever(privateKeyFactory.getFormat(anyString())).thenReturn(null)
-        // Act
-        subject.handleIncomingScanIntent(intent)
-        // Assert
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-    }
-
-    @Test
-    fun handleIncomingScanIntentBip38() {
-        // Arrange
-        val intent = Intent().apply {
-            putExtra(
-                CaptureActivity.SCAN_RESULT,
-                "6PRJmkckxBct8jUwn6UcJbickdrnXBiPP9JkNW83g4VyFNsfEuxas39pSS"
-            )
-        }
-        whenever(privateKeyFactory.getFormat(anyString())).thenReturn(PrivateKeyFactory.BIP38)
-        // Act
-        subject.handleIncomingScanIntent(intent)
-        // Assert
-        verify(view).promptBIP38Password(anyString())
-    }
-
-    @Test
-    fun handleIncomingScanIntentNonBip38NoKey() {
-        // Arrange
-        val intent = Intent().apply {
-            putExtra(
-                CaptureActivity.SCAN_RESULT,
-                "L1FQxC7wmmRNNe2YFPNXscPq3kaheiA4T7SnTr7vYSBW7Jw1A7PD"
-            )
-        }
-        whenever(privateKeyFactory.getFormat(anyString())).thenReturn(PrivateKeyFactory.BASE58)
-        // Act
-        subject.handleIncomingScanIntent(intent)
-        // Assert
-        verify(view).showProgressDialog(anyInt())
-        verify(view).dismissProgressDialog()
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-    }
-
-    @Test
-    fun handleIncomingScanIntentNonBip38WithKey() {
-        // Arrange
-        val legacyAddress = LegacyAddress().apply { address = "" }
-        subject.legacyAddress = legacyAddress
-        val intent = Intent().apply {
-            putExtra(
-                CaptureActivity.SCAN_RESULT,
-                "L1FQxC7wmmRNNe2YFPNXscPq3kaheiA4T7SnTr7vYSBW7Jw1A7PD"
-            )
-        }
-        whenever(privateKeyFactory.getFormat(anyString())).thenReturn(PrivateKeyFactory.BASE58)
-        whenever(privateKeyFactory.getKey(anyString(), anyString())).thenReturn(ECKey())
-        // Act
-        subject.handleIncomingScanIntent(intent)
-        // Assert
-        verify(view).showProgressDialog(anyInt())
-        verify(view).dismissProgressDialog()
-
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
     }
 
     @Test
@@ -690,181 +572,11 @@ class AccountEditPresenterTest {
         verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
     }
 
-    @Test
-    fun importBIP38AddressError() {
-        // Arrange
+    companion object {
+        private const val VALID_BTC_ADDRESS = "6PRJmkckxBct8jUwn6UcJbickdrnXBiPP9JkNW83g4VyFNsfEuxas39pSS"
+        private const val LEGACY_BTC_ADDRESS = "L1FQxC7wmmRNNe2YFPNXscPq3kaheiA4T7SnTr7vYSBW7Jw1A7PD"
 
-        // Act
-        subject.importBIP38Address("", "")
-        // Assert
-        verify(view).showProgressDialog(anyInt())
-        verify(view).dismissProgressDialog()
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verify(view).dismissProgressDialog()
-    }
-
-    @Ignore("This test is failing because of https://github.com/robolectric/robolectric/issues/3839")
-    @Test
-    fun importBIP38AddressValidAddressEmptyKey() {
-        // Arrange
-
-        // Act
-        subject.importBIP38Address(
-            "6PRJmkckxBct8jUwn6UcJbickdrnXBiPP9JkNW83g4VyFNsfEuxas39pSS",
-            ""
-        )
-        // Assert
-        verify(view).showProgressDialog(anyInt())
-        verify(view).dismissProgressDialog()
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verify(view).dismissProgressDialog()
-    }
-
-    @Ignore("Cannot decrypt key in test VM")
-    @Test
-    fun importBIP38AddressValidAddressWithKey() {
-        // Arrange
-        val legacyAddress = LegacyAddress()
-        legacyAddress.address = ""
-        subject.legacyAddress = legacyAddress
-        // Act
-        subject.importBIP38Address(
-            "6PYX4iD7a39UeAsd7RQiwHFjgbRwJVLhfEHxcvTD4HPKxK1JSnkPZ7jben",
-            "password"
-        )
-        // Assert
-        verify(view).showProgressDialog(anyInt())
-        verify(view).dismissProgressDialog()
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verify(view).dismissProgressDialog()
-    }
-
-    @SuppressLint("VisibleForTests")
-    @Test
-    fun importAddressPrivateKeySuccessMatchesIntendedAddressNoDoubleEncryption() {
-        // Arrange
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(false)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val mockEcKey: ECKey = mock()
-        whenever(mockEcKey.privKeyBytes).thenReturn("privkey".toByteArray())
-        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        // Act
-        subject.importAddressPrivateKey(mockEcKey, LegacyAddress(), true)
-        // Assert
-        verify(view).setActivityResult(anyInt())
-        verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
-        verify(accountEditModel).archiveVisibility = anyInt()
-        verify(view).privateKeyImportSuccess()
-    }
-
-    @SuppressLint("VisibleForTests")
-    @Test
-    fun importAddressPrivateKeySuccessNoAddressMatchDoubleEncryption() {
-        // Arrange
-        subject.secondPassword = "password"
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(true)
-        val mockOptions: Options = mock()
-        whenever(mockOptions.pbkdf2Iterations).thenReturn(1)
-        whenever(mockPayload.options).thenReturn(mockOptions)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val mockEcKey: ECKey = mock()
-        whenever(mockEcKey.privKeyBytes).thenReturn("privkey".toByteArray())
-        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        // Act
-        subject.importAddressPrivateKey(mockEcKey, LegacyAddress(), false)
-        // Assert
-        verify(view).setActivityResult(anyInt())
-        verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
-        verify(accountEditModel).archiveVisibility = anyInt()
-        verify(view).privateKeyImportMismatch()
-    }
-
-    @SuppressLint("VisibleForTests")
-    @Test
-    fun importAddressPrivateKeyFailed() {
-        // Arrange
-        subject.secondPassword = "password"
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(true)
-        val mockOptions: Options = mock()
-        whenever(mockOptions.pbkdf2Iterations).thenReturn(1)
-        whenever(mockPayload.options).thenReturn(mockOptions)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val mockEcKey: ECKey = mock()
-        whenever(mockEcKey.privKeyBytes).thenReturn("privkey".toByteArray())
-        whenever(payloadDataManager.syncPayloadWithServer())
-            .thenReturn(Completable.error(Throwable()))
-        // Act
-        subject.importAddressPrivateKey(mockEcKey, LegacyAddress(), false)
-        // Assert
-
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-    }
-
-    @Test
-    fun importUnmatchedPrivateKeyFoundInPayloadSuccess() {
-        // Arrange
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(false)
-        val legacyStrings = Arrays.asList("addr0", "addr1", "addr2")
-        whenever(mockPayload.legacyAddressStringList).thenReturn(legacyStrings)
-        val legacyAddress = LegacyAddress()
-        legacyAddress.address = "addr0"
-        val legacyAddresses = listOf(legacyAddress)
-        whenever(mockPayload.legacyAddressList).thenReturn(legacyAddresses)
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val mockEcKey: ECKey = mock()
-        whenever(mockEcKey.privKeyBytes).thenReturn("privkey".toByteArray())
-        val mockAddress: Address = mock()
-        whenever(mockAddress.toString()).thenReturn("addr0")
-        whenever(mockEcKey.toAddress(any(NetworkParameters::class))).thenReturn(mockAddress)
-        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        // Act
-        subject.importUnmatchedPrivateKey(mockEcKey)
-        // Assert
-        verify(view).setActivityResult(anyInt())
-
-        verify(accountEditModel).scanPrivateKeyVisibility = anyInt()
-        verify(view).privateKeyImportMismatch()
-    }
-
-    @Test
-    fun importUnmatchedPrivateNotFoundInPayloadSuccess() {
-        // Arrange
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(false)
-        whenever(mockPayload.legacyAddressList).thenReturn(ArrayList())
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val ecKey = ECKey()
-        val mockAddress: Address = mock()
-        whenever(mockAddress.toString()).thenReturn("addr0")
-        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
-        // Act
-        subject.importUnmatchedPrivateKey(ecKey)
-        // Assert
-        verify(view).setActivityResult(anyInt())
-        verify(view).sendBroadcast(any())
-        verify(view).privateKeyImportMismatch()
-    }
-
-    @Test
-    fun importUnmatchedPrivateNotFoundInPayloadFailure() {
-        // Arrange
-        val mockPayload: Wallet = mock()
-        whenever(mockPayload.isDoubleEncryption).thenReturn(false)
-        whenever(mockPayload.legacyAddressList).thenReturn(ArrayList())
-        whenever(payloadDataManager.wallet).thenReturn(mockPayload)
-        val ecKey = ECKey()
-        val mockAddress: Address = mock()
-        whenever(mockAddress.toString()).thenReturn("addr0")
-        whenever(payloadDataManager.syncPayloadWithServer())
-            .thenReturn(Completable.error(Throwable()))
-        // Act
-        subject.importUnmatchedPrivateKey(ecKey)
-        // Assert
-        verify(view).showToast(anyInt(), eq(ToastCustom.TYPE_ERROR))
-        verify(view).privateKeyImportMismatch()
+        private const val R_ADDRESS = "address"
+        private const val R_COPY_ADDRESS = "copy address"
     }
 }
