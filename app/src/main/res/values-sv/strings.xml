@@ -1831,7 +1831,7 @@
   <string name="send_enter_unexpected_error">Ett oväntat fel har uppstått. Var god försök igen.</string>
   <string name="send_enter_insufficient_gas">Du har inte tillräckligt med ETH för att behandla denna transaktion.</string>
   <string name="send_select_a_wallet_title">eller Välj en plånbok</string>
-  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %1$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
+  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %2$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
   <string name="purchase_funds_note">Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Läs mer. </annotation>
