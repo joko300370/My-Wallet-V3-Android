@@ -1830,7 +1830,7 @@
   <string name="send_enter_unexpected_error">发生意外的错误。请再试一遍。</string>
   <string name="send_enter_insufficient_gas">您没有足够的ETH来处理此交易。</string>
   <string name="send_select_a_wallet_title">或选择一个钱包</string>
-  <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
+  <string name="send_internal_transfer_message">目前，您只能将%1$s从%2$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
   <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">了解更多信息。 </annotation>

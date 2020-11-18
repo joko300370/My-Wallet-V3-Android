@@ -1832,7 +1832,7 @@
   <string name="send_enter_unexpected_error">ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น. กรุณาลองอีกครั้ง.</string>
   <string name="send_enter_insufficient_gas">คุณมี ETH ไม่เพียงพอที่จะดำเนินธุรกรรมนี้</string>
   <string name="send_select_a_wallet_title">หรือเลือกกระเป๋าเงิน</string>
-  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
+  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %2$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
   <string name="purchase_funds_note">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> เรียนรู้เพิ่มเติม </annotation>
