@@ -2073,6 +2073,7 @@
     <string name="select_target_account_for_swap">Which wallet do you want to Receive into?</string>
 
     <string name="swap_low_fees">Low Fees</string>
+    <string name="swap_faster">Faster</string>
     <string name="swap_kyc_upsell_title">You’re Close to Your Swap Limit. Upgrade to Swap Larger Amounts.</string>
     <string name="swap_kyc_upsell_desc">Verify your identity to increase how much you can Swap every day.</string>
     <string name="swap_kyc_upsell_1_title">Upload Your ID</string>

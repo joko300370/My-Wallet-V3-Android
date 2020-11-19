@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/very_small_margin"
-        android:padding="@dimen/tiny_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount"
         tools:background="@drawable/bkgd_green_100_rounded"
