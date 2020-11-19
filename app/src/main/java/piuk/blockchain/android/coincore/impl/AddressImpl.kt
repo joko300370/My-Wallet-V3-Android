@@ -17,7 +17,7 @@ import java.lang.IllegalArgumentException
 internal fun makeExternalAssetAddress(
     asset: CryptoCurrency,
     address: String,
-    label: String,
+    label: String = address,
     environmentConfig: EnvironmentConfig,
     postTransactions: (TxResult) -> Completable = { Completable.complete() }
 ): CryptoAddress =

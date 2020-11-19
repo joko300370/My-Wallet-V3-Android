@@ -127,7 +127,6 @@ abstract class QuotedEngine(
             txTarget = makeExternalAssetAddress(
                 asset = sourceAccount.asset,
                 address = quote.transferQuote.sampleDepositAddress,
-                label = quote.transferQuote.sampleDepositAddress,
                 environmentConfig = environmentConfig
             ),
             exchangeRates = exchangeRates
@@ -139,7 +138,6 @@ abstract class QuotedEngine(
             txTarget = makeExternalAssetAddress(
                 asset = sourceAccount.asset,
                 address = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
-                label = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
                 environmentConfig = environmentConfig,
                 postTransactions = { Completable.complete() }
             ),
