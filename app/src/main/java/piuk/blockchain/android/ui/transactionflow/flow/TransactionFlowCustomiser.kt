@@ -399,8 +399,15 @@ class TransactionFlowCustomiserImpl(
                 resources.getString(R.string.sell_enter_amount_max_error, amount)
             }
             TransactionErrorState.OVER_SILVER_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_silver_limit)
-            TransactionErrorState.OVER_GOLD_TIER_LIMIT -> resources.getString(R.string.swap_enter_amount_over_limit,
-                state.pendingTx?.maxLimit?.toStringWithSymbol())
+            TransactionErrorState.OVER_GOLD_TIER_LIMIT -> {
+                val exchangeRate = state.fiatRate ?: return ""
+                val amount =
+                    input?.let {
+                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.FLOOR)
+                    } ?: state.pendingTx?.maxLimit?.toStringWithSymbol()
+
+                resources.getString(R.string.swap_enter_amount_over_limit, amount)
+            }
             TransactionErrorState.TRANSACTION_IN_FLIGHT -> resources.getString(R.string.send_error_tx_in_flight)
             TransactionErrorState.TX_OPTION_INVALID -> resources.getString(R.string.send_error_tx_option_invalid)
             TransactionErrorState.UNKNOWN_ERROR -> resources.getString(R.string.send_error_tx_option_invalid)

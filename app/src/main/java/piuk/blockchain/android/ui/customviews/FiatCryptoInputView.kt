@@ -187,10 +187,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun hideExchangeAmount() {
         exchange_amount.gone()
-        currency_swap.let {
-            it.isEnabled = false
-            it.alpha = .6f
-        }
     }
 
     fun hideLabels() {
@@ -201,10 +197,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun showExchangeAmount() {
         exchange_amount.visible()
-        currency_swap.let {
-            it.isEnabled = true
-            it.alpha = 1f
-        }
     }
 
     fun showValue(money: Money) {
