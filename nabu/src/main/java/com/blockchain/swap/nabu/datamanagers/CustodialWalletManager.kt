@@ -188,7 +188,7 @@ interface CustodialWalletManager {
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<TransferDirection>
+        directions: Set<TransferDirection>
     ): Single<List<SwapTransactionItem>>
 
     fun updateSwapOrder(

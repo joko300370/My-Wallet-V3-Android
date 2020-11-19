@@ -51,6 +51,13 @@ abstract class CryptoAccountBase : CryptoAccount {
         this.hasTransactions = hasTransactions
     }
 
+    protected val swapDirections: Set<TransferDirection>
+        get() = when (this) {
+            is CryptoNonCustodialAccount -> setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
+            is CustodialTradingAccount -> setOf(TransferDirection.INTERNAL)
+            else -> emptySet()
+        }
+
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
@@ -90,9 +97,8 @@ abstract class CryptoAccountBase : CryptoAccount {
     protected fun appendSwapActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
-        directions: List<TransferDirection>,
         activityList: List<ActivitySummaryItem>
-    ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
+    ) = custodialWalletManager.getSwapActivityForAsset(asset, swapDirections)
         .map { swapItems ->
             swapItems.map {
                 swapItemToSummary(it)
@@ -185,11 +191,6 @@ abstract class CryptoNonCustodialAccount(
         Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
     abstract fun createTxEngine(): TxEngine
-
-    protected val nonCustodialSwapDirections = listOf(
-        TransferDirection.ON_CHAIN,
-        TransferDirection.FROM_USERKEY
-    )
 
     override val isArchived: Boolean
         get() = false

@@ -5,7 +5,6 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -112,7 +111,7 @@ open class CustodialTradingAccount(
             .mapList { orderToSummary(it) }
             .filterActivityStates()
             .flatMap {
-                appendSwapActivity(custodialWalletManager, asset, custodialSwapDirections, it)
+                appendSwapActivity(custodialWalletManager, asset, it)
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
@@ -191,7 +190,5 @@ open class CustodialTradingAccount(
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION
         )
-
-        private val custodialSwapDirections = listOf(TransferDirection.INTERNAL)
     }
 }

@@ -100,7 +100,7 @@ class XlmAccountActivityTest {
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         )))
@@ -130,7 +130,7 @@ class XlmAccountActivityTest {
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         ))
@@ -172,7 +172,7 @@ class XlmAccountActivityTest {
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         )))
@@ -205,7 +205,7 @@ class XlmAccountActivityTest {
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         ))
@@ -244,7 +244,7 @@ class XlmAccountActivityTest {
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         )))
@@ -271,7 +271,7 @@ class XlmAccountActivityTest {
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, listOf(
+        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, setOf(
             TransferDirection.ON_CHAIN,
             TransferDirection.FROM_USERKEY
         ))
