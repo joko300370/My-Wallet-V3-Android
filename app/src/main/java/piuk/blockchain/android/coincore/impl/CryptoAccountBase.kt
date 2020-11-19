@@ -51,7 +51,7 @@ abstract class CryptoAccountBase : CryptoAccount {
         this.hasTransactions = hasTransactions
     }
 
-    protected val swapDirections: Set<TransferDirection>
+    private val swapDirections: Set<TransferDirection>
         get() = when (this) {
             is CryptoNonCustodialAccount -> setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
             is CustodialTradingAccount -> setOf(TransferDirection.INTERNAL)
