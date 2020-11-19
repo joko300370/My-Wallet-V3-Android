@@ -408,12 +408,7 @@ class AccountPresenterTest {
             when (it) {
                 CryptoCurrency.BTC -> assertTrue(it in displayable)
                 CryptoCurrency.BCH -> assertTrue(it in displayable)
-                CryptoCurrency.ETHER -> assertFalse(it in displayable)
-                CryptoCurrency.XLM -> assertFalse(it in displayable)
-                CryptoCurrency.PAX -> assertFalse(it in displayable)
-                CryptoCurrency.STX -> assertFalse(it in displayable)
-                CryptoCurrency.ALGO -> assertFalse(it in displayable)
-                CryptoCurrency.USDT -> assertFalse(it in displayable)
+                else -> assertFalse(it in displayable)
             }.exhaustive
         }
     }

@@ -1,11 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.InterestAnalytics
+import com.blockchain.remoteconfig.FeatureFlag
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
@@ -13,11 +11,12 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class InterestAvailableAnnouncement(
-    dismissRecorder: DismissRecorder
-) : AnnouncementRule(dismissRecorder), KoinComponent {
+class WDGLDAvailableAnnouncement(
+    dismissRecorder: DismissRecorder,
+    private val dgldFeatureFlag: FeatureFlag
+) : AnnouncementRule(dismissRecorder) {
 
-    private val analytics: Analytics by inject()
+    private var cta: (AnnouncementHost) -> Unit = {}
     override val dismissKey = DISMISS_KEY
 
     override fun shouldShow(): Single<Boolean> {
@@ -25,7 +24,11 @@ class InterestAvailableAnnouncement(
             return Single.just(false)
         }
 
-        return Single.just(true)
+        return dgldFeatureFlag.enabled.doOnSuccess {
+            cta = {
+                it.startSimpleBuy(CryptoCurrency.DGLD)
+            }
+        }
     }
 
     override fun show(host: AnnouncementHost) {
@@ -34,26 +37,25 @@ class InterestAvailableAnnouncement(
                 name = name,
                 dismissRule = DismissRule.CardOneTime,
                 dismissEntry = dismissEntry,
-                titleText = R.string.interest_announcement_title,
-                bodyText = R.string.interest_announcement_description,
-                iconImage = R.drawable.ic_interest_blue_circle,
-                ctaText = R.string.interest_announcement_action,
-                ctaFunction = {
-                    analytics.logEvent(InterestAnalytics.INTEREST_ANNOUNCEMENT_CTA)
-                    host.dismissAnnouncementCard()
-                    host.startInterestDashboard()
-                },
+                titleText = R.string.wdgld_available_card_title,
+                bodyText = R.string.wdgld_available_card_body,
+                ctaText = R.string.wdgld_available_card_cta,
+                iconImage = R.drawable.vector_dgld_colored,
                 dismissFunction = {
                     host.dismissAnnouncementCard()
+                },
+                ctaFunction = {
+                    host.dismissAnnouncementCard()
+                    host.startSimpleBuy()
                 }
             )
         )
     }
 
-    override val name = "interest_available"
+    override val name = "wdgld_available"
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        const val DISMISS_KEY = "InterestAvailableAnnouncement_DISMISSED"
+        const val DISMISS_KEY = "WDGLDAvailableAnnouncement_DISMISSED"
     }
 }

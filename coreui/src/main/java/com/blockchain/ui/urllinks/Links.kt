@@ -1,7 +1,5 @@
 package com.blockchain.ui.urllinks
 
-import info.blockchain.balance.CryptoCurrency
-
 const val URL_BLOCKCHAIN_SUPPORT_PORTAL =
     "https://support.blockchain.com/"
 
@@ -61,17 +59,3 @@ const val URL_XLM_MIN_BALANCE =
         "Why-do-Stellar-addresses-have-a-minimum-balance-requirement-"
 
 const val URL_TX_FEES = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
-
-fun makeBlockExplorerUrl(
-    cryptoCurrency: CryptoCurrency,
-    transactionHash: String
-) = when (cryptoCurrency) {
-    CryptoCurrency.BTC -> "https://www.blockchain.com/btc/tx/"
-    CryptoCurrency.BCH -> "https://www.blockchain.com/bch/tx/"
-    CryptoCurrency.XLM -> "https://stellarchain.io/tx/"
-    CryptoCurrency.ETHER,
-    CryptoCurrency.PAX,
-    CryptoCurrency.USDT -> "https://www.blockchain.com/eth/tx/"
-    CryptoCurrency.ALGO -> "https://algoexplorer.io/tx/"
-    CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-} + transactionHash

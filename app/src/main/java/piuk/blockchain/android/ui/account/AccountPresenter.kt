@@ -483,7 +483,8 @@ class AccountPresenter internal constructor(
             CryptoCurrency.XLM,
             CryptoCurrency.PAX,
             CryptoCurrency.ALGO,
-            CryptoCurrency.USDT -> false
+            CryptoCurrency.USDT,
+            CryptoCurrency.DGLD -> false
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
         }
 

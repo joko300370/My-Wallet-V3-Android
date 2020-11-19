@@ -25,6 +25,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
@@ -45,7 +46,8 @@ class DashboardInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics,
-    private val crashLogger: CrashLogger
+    private val crashLogger: CrashLogger,
+    private val assetOrdering: AssetOrderingConfig
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -54,15 +56,15 @@ class DashboardInteractor(
     // which is on the radar - then we can clean up the entire app init sequence.
     // But for now, we'll catch any pax init failure here, unless ETH has initialised OK. And when we
     // get a valid ETH balance, will try for a PX balance. Yeah, this is a nasty hack TODO: Fix this
-    fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter): Disposable {
+    fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter, state: DashboardState): Disposable {
         val cd = CompositeDisposable()
 
-        CryptoCurrency.activeCurrencies()
+        state.assetMapKeys
             .filter { !it.hasFeature(CryptoCurrency.IS_ERC20) }
             .forEach { asset ->
                 cd += refreshAssetBalance(asset, model, balanceFilter)
-                    .ifEthLoadedGetErc20Balance(model, balanceFilter, cd)
-                    .ifEthFailedThenErc20Failed(asset, model)
+                    .ifEthLoadedGetErc20Balance(model, balanceFilter, cd, state)
+                    .ifEthFailedThenErc20Failed(asset, model, state)
                     .emptySubscribe()
             }
 
@@ -70,6 +72,23 @@ class DashboardInteractor(
 
         return cd
     }
+
+    fun getAvailableAssets(model: DashboardModel): Disposable =
+        assetOrdering.getAssetOrdering().subscribeBy(
+            onSuccess = { assetOrder ->
+                val assets = coincore.cryptoAssets.map { enabledAssets ->
+                    (enabledAssets as CryptoAsset).asset
+                }
+
+                val sortedAssets = assets.sortedBy { assetOrder.indexOf(it) }
+
+                model.process(UpdateDashboardCurrencies(sortedAssets))
+                model.process(RefreshAllIntent)
+            },
+            onError = {
+                Timber.e("Error getting ordering - $it")
+            }
+        )
 
     private fun refreshAssetBalance(
         asset: CryptoCurrency,
@@ -102,24 +121,26 @@ class DashboardInteractor(
     private fun Single<CryptoValue>.ifEthLoadedGetErc20Balance(
         model: DashboardModel,
         balanceFilter: AssetFilter,
-        disposables: CompositeDisposable
+        disposables: CompositeDisposable,
+        state: DashboardState
     ) = this.doOnSuccess { value ->
         if (value.currency == CryptoCurrency.ETHER) {
-            disposables += refreshAssetBalance(CryptoCurrency.PAX, model, balanceFilter)
-                .emptySubscribe()
-            disposables += refreshAssetBalance(CryptoCurrency.USDT, model, balanceFilter)
-                .emptySubscribe()
+            state.erc20Assets.forEach {
+                disposables += refreshAssetBalance(it, model, balanceFilter)
+                    .emptySubscribe()
+            }
         }
     }
 
     private fun Single<CryptoValue>.ifEthFailedThenErc20Failed(
         asset: CryptoCurrency,
-        model: DashboardModel
+        model: DashboardModel,
+        state: DashboardState
     ) = this.doOnError {
         if (asset == CryptoCurrency.ETHER) {
-            // If we can't get ETH, then we can't get erc20 tokens... so...
-            model.process(BalanceUpdateError(CryptoCurrency.PAX))
-            model.process(BalanceUpdateError(CryptoCurrency.USDT))
+            state.erc20Assets.forEach {
+                model.process(BalanceUpdateError(it))
+            }
         }
     }
 

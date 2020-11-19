@@ -72,6 +72,8 @@ data class SimpleBuyAllBalancesResponse(
     val ALGO: SimpleBuyBalanceResponse? = null,
     @field:Json(name = "USDT")
     val USDT: SimpleBuyBalanceResponse? = null,
+    @field:Json(name = "WDGLD")
+    val WDGLD: SimpleBuyBalanceResponse? = null,
     @field:Json(name = "EUR")
     val EUR: SimpleBuyBalanceResponse? = null,
     @field:Json(name = "USD")
@@ -88,7 +90,8 @@ data class SimpleBuyAllBalancesResponse(
             CryptoCurrency.PAX -> PAX
             CryptoCurrency.ALGO -> ALGO
             CryptoCurrency.USDT -> USDT
-            else -> null
+            CryptoCurrency.DGLD -> WDGLD
+            CryptoCurrency.STX -> null
         }
     }
 

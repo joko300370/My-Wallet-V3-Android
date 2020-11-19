@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.data.ethereum
 
 import com.blockchain.logging.LastTxUpdater
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.EthAccountApi
@@ -226,12 +227,13 @@ class EthDataManager(
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.
      *
-     * @param defaultLabel The ETH address default label to be used if metadata entry doesn't exist
-     * @param defaultPaxLabel The default label for PAX
+     * @param labelsMap The list of ETH & ERC-20 address default labels to be used if metadata entry doesn't exist
      * @return An [Completable]
      */
-    fun initEthereumWallet(defaultLabel: String, defaultPaxLabel: String, defaultUsdtLabel: String): Completable =
-        fetchOrCreateEthereumWallet(defaultLabel, defaultPaxLabel, defaultUsdtLabel)
+    fun initEthereumWallet(
+        labelsMap: Map<CryptoCurrency, String>
+    ): Completable =
+        fetchOrCreateEthereumWallet(labelsMap)
             .flatMapCompletable { (wallet, needsSave) ->
                 ethDataStore.ethWallet = wallet
                 if (needsSave) {
@@ -327,7 +329,9 @@ class EthDataManager(
     }
 
     @Throws(Exception::class)
-    private fun fetchOrCreateEthereumWallet(defaultLabel: String, defaultPaxLabel: String, defaultUsdtLabel: String):
+    private fun fetchOrCreateEthereumWallet(
+        labelsMap: Map<CryptoCurrency, String>
+    ):
         Single<Pair<EthereumWallet, Boolean>> =
         metadataManager.fetchMetadata(EthereumWallet.METADATA_TYPE_EXTERNAL).defaultIfEmpty("")
             .map { metadata ->
@@ -339,15 +343,16 @@ class EthDataManager(
                 if (ethWallet?.account == null || !ethWallet.account.isCorrect) {
                     try {
                         val masterKey = payloadDataManager.masterKey
-                        ethWallet = EthereumWallet(masterKey, defaultLabel, defaultPaxLabel, defaultUsdtLabel)
+                        ethWallet =
+                            EthereumWallet(masterKey, labelsMap)
                         needsSave = true
                     } catch (e: HDWalletException) {
                         // Wallet private key unavailable. First decrypt with second password.
                         throw InvalidCredentialsException(e.message)
                     }
                 }
-                // AND-2011: Add erc20 token data if not present
-                if (ethWallet.updateErc20Tokens(defaultPaxLabel, defaultUsdtLabel)) {
+
+                if (ethWallet.updateErc20Tokens(labelsMap.filter { it.key.hasFeature(IS_ERC20) })) {
                     needsSave = true
                 }
 
@@ -367,11 +372,13 @@ class EthDataManager(
         )
 
     fun getErc20TokenData(currency: CryptoCurrency): Erc20TokenData {
-        when (currency) {
-            CryptoCurrency.PAX -> return getEthWallet()!!.getErc20TokenData(
+        return when (currency) {
+            CryptoCurrency.PAX -> getEthWallet()!!.getErc20TokenData(
                 Erc20TokenData.PAX_CONTRACT_NAME)
-            CryptoCurrency.USDT -> return getEthWallet()!!.getErc20TokenData(
+            CryptoCurrency.USDT -> getEthWallet()!!.getErc20TokenData(
                 Erc20TokenData.USDT_CONTRACT_NAME)
+            CryptoCurrency.DGLD -> getEthWallet()!!.getErc20TokenData(
+                Erc20TokenData.DGLD_CONTRACT_NAME)
             else -> throw IllegalArgumentException("Not an ERC20 token")
         }
     }
