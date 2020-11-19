@@ -161,18 +161,16 @@ abstract class CryptoNonCustodialAccount(
     override val isFunded: Boolean = true
 
     override val actions: AvailableActions
-        get() =
-            mutableSetOf(
-                AssetAction.ViewActivity,
-                AssetAction.Send,
-                AssetAction.Receive,
-                AssetAction.Swap
-            ).apply {
-                if (!isFunded || isArchived) {
-                    remove(AssetAction.Send)
-                    remove(AssetAction.Swap)
-                }
+        get() = mutableSetOf(
+            AssetAction.ViewActivity,
+            AssetAction.Receive
+        ).apply {
+            if (isFunded && !isArchived) {
+                add(AssetAction.Send)
+                add(AssetAction.Sell)
+                add(AssetAction.Swap)
             }
+        }
 
     override val sourceState: Single<TxSourceState>
         get() = actionableBalance.map {

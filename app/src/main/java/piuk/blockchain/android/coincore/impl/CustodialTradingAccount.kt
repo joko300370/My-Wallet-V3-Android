@@ -144,10 +144,11 @@ open class CustodialTradingAccount(
                 AssetAction.ViewActivity
             ).apply {
                 if (isFunded && !isArchived) {
-                    add(AssetAction.Sell)
                     add(AssetAction.Send)
-                    if (isEligibleForSimpleBuy.get())
+                    if (isEligibleForSimpleBuy.get()) {
+                        add(AssetAction.Sell)
                         add(AssetAction.Swap)
+                    }
                 }
             }.toSet()
 
