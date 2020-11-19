@@ -1,12 +1,12 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.rx.TimedCacheRequest
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
-import com.blockchain.swap.nabu.datamanagers.SwapPair
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
-class SwapRepository(pairsProvider: SwapPairsProvider, activityProvider: SwapActivityProvider) {
+class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: SwapActivityProvider) {
 
     private val swapPairsCache = TimedCacheRequest(
         cacheLifetimeSeconds = LONG_CACHE,
@@ -22,12 +22,17 @@ class SwapRepository(pairsProvider: SwapPairsProvider, activityProvider: SwapAct
         }
     )
 
-    fun getSwapAvailablePairs(): Single<List<SwapPair>> =
-        swapPairsCache.getCachedSingle()
+    fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
+        swapPairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
+
+    fun getSellAvailablePairs(): Single<List<CurrencyPair.CryptoToFiatCurrencyPair>> =
+        swapPairsCache.getCachedSingle().map {
+            it.filterIsInstance<CurrencyPair.CryptoToFiatCurrencyPair>()
+        }
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
+        directions: List<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapActivityCache.getCachedSingle().map { list ->
             list.filter {

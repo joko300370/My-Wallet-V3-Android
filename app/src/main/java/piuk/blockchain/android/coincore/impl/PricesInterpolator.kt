@@ -2,21 +2,22 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.PriceTier
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
+import java.util.Currency
 
 class PricesInterpolator(
     private val interpolator: Interpolator = LinearInterpolator(),
-    private val pair: CurrencyPair.CryptoCurrencyPair,
+    private val pair: CurrencyPair,
     list: List<PriceTier>
 ) {
     private val prices: List<PriceTier>
 
     init {
         prices = list.toMutableList().apply {
-            this.add(0, PriceTier(CryptoValue.zero(pair.source), CryptoValue.zero(pair.source)))
+            this.add(0, PriceTier(pair.toSourceMoney(BigInteger.ZERO), pair.toSourceMoney(BigInteger.ZERO)))
         }.toList()
     }
 
@@ -32,18 +33,20 @@ class PricesInterpolator(
                 if (index == 0) {
                     return nextTier.price
                 }
-
-                return CryptoValue.fromMajor(
-                    pair.destination,
+                return pair.toDestinationMoney(
                     interpolator.interpolate(
                         listOf(priceTier.volume.toBigDecimal(), nextTier.volume.toBigDecimal()),
                         listOf(priceTier.price.toBigDecimal(), nextTier.price.toBigDecimal()),
                         amount.toBigDecimal(),
-                        pair.destination.dp
+                        when (pair) {
+                            is CurrencyPair.CryptoCurrencyPair -> pair.destination.dp
+                            is CurrencyPair.CryptoToFiatCurrencyPair ->
+                                Currency.getInstance(pair.destination).defaultFractionDigits
+                        }
                     ))
             }
         }
-        return CryptoValue.zero(pair.destination)
+        return pair.toDestinationMoney(BigInteger.ZERO)
     }
 }
 

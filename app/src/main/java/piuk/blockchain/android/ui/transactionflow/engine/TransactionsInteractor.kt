@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.datamanagers.SwapPair
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -140,7 +140,7 @@ class TransactionInteractor(
     }
 }
 
-private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
+private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
     pairs.any { it.source == this.asset }
 
 private val Throwable.isUnexpectedContractError

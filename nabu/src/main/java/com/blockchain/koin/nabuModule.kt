@@ -43,8 +43,8 @@ import com.blockchain.swap.nabu.datamanagers.repositories.serialization.Interest
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestLimitsMapAdapter
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapPairsProvider
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapPairsProviderImpl
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProvider
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProviderImpl
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
@@ -155,11 +155,11 @@ val nabuModule = module {
         }.bind(BalancesProvider::class)
 
         factory {
-            SwapPairsProviderImpl(
+            TradingPairsProviderImpl(
                 nabuService = get(),
                 authenticator = get()
             )
-        }.bind(SwapPairsProvider::class)
+        }.bind(TradingPairsProvider::class)
 
         factory {
             SwapActivityProviderImpl(

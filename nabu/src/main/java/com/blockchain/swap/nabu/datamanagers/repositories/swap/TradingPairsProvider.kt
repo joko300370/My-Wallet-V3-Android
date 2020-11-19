@@ -1,0 +1,36 @@
+package com.blockchain.swap.nabu.datamanagers.repositories.swap
+
+import com.blockchain.swap.nabu.Authenticator
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.swap.nabu.service.NabuService
+import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
+
+interface TradingPairsProvider {
+    fun getAvailablePairs(): Single<List<CurrencyPair>>
+}
+
+class TradingPairsProviderImpl(
+    private val authenticator: Authenticator,
+    private val nabuService: NabuService
+) : TradingPairsProvider {
+    override fun getAvailablePairs(): Single<List<CurrencyPair>> = authenticator.authenticate { sessionToken ->
+        nabuService.getSwapAvailablePairs(sessionToken)
+    }.map { response ->
+        response.mapNotNull { pair ->
+            val parts = pair.split("-")
+            if (parts.size != 2) return@mapNotNull null
+            val source = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return@mapNotNull null
+            val destination = CryptoCurrency.fromNetworkTicker(parts[1])
+            if (destination != null)
+                return@mapNotNull CurrencyPair.CryptoCurrencyPair(source, destination)
+            else
+                return@mapNotNull CurrencyPair.CryptoToFiatCurrencyPair(source, parts[1])
+        }
+    }.map {
+        it.toMutableList().apply {
+            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.BTC, "EUR"))
+            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.ETHER, "EUR"))
+        }.toList()
+    }
+}

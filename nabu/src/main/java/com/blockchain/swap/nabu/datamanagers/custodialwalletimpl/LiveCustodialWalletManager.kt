@@ -25,10 +25,10 @@ import com.blockchain.swap.nabu.datamanagers.PartnerCredentials
 import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
-import com.blockchain.swap.nabu.datamanagers.SwapLimits
-import com.blockchain.swap.nabu.datamanagers.SwapOrder
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
+import com.blockchain.swap.nabu.datamanagers.TransferLimits
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
@@ -60,7 +60,7 @@ import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.models.simplebuy.TransactionResponse
 import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
 import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
-import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
 import com.blockchain.swap.nabu.service.NabuService
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -642,12 +642,12 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
-    override fun createSwapOrder(
-        direction: SwapDirection,
+    override fun createCustodialOrder(
+        direction: TransferDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String?
-    ): Single<SwapOrder> =
+    ): Single<CustodialOrder> =
         authenticator.authenticate { sessionToken ->
             nabuService.createSwapOrder(
                 sessionToken,
@@ -658,20 +658,20 @@ class LiveCustodialWalletManager(
                     destinationAddress = destinationAddress
                 )
             ).map {
-                it.toSwapOrder() ?: throw java.lang.IllegalStateException("Invalid order created")
+                it.toCustodialOrder() ?: throw IllegalStateException("Invalid order created")
             }
         }
 
-    override fun getSwapLimits(currency: String): Single<SwapLimits> =
+    override fun getSwapLimits(currency: String): Single<TransferLimits> =
         authenticator.authenticate {
             nabuService.getSwapLimits(
                 it,
                 currency
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
-                    SwapLimits(currency)
+                    TransferLimits(currency)
                 } else {
-                    SwapLimits(
+                    TransferLimits(
                         minLimit = FiatValue.fromMinor(currency, response.minOrder?.toLong() ?: 0L),
                         maxOrder = FiatValue.fromMinor(currency, response.maxOrder?.toLong() ?: 0L),
                         maxLimit = FiatValue.fromMinor(currency,
@@ -683,7 +683,7 @@ class LiveCustodialWalletManager(
 
     override fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
+        directions: List<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
 
@@ -695,6 +695,9 @@ class LiveCustodialWalletManager(
                 success = success
             )
         }
+
+    override fun isFiatCurrencySupported(destination: String): Boolean =
+        SUPPORTED_FUNDS_CURRENCIES.contains(destination)
 
     override fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -749,7 +752,7 @@ class LiveCustodialWalletManager(
             else -> CardStatus.UNKNOWN
         }
 
-    override fun getSwapTrades(): Single<List<SwapOrder>> =
+    override fun getSwapTrades(): Single<List<CustodialOrder>> =
         authenticator.authenticate { sessionToken ->
             nabuService.getSwapTrades(sessionToken)
         }.map { response ->
@@ -758,8 +761,8 @@ class LiveCustodialWalletManager(
             }
         }
 
-    private fun SwapOrderResponse.toSwapOrder(): SwapOrder? {
-        return SwapOrder(
+    private fun CustodialOrderResponse.toSwapOrder(): CustodialOrder? {
+        return CustodialOrder(
             id = this.id,
             state = this.state.toSwapState(),
             depositAddress = this.kind.depositAddress,
@@ -774,6 +777,21 @@ class LiveCustodialWalletManager(
                     this.pair.toCryptoCurrencyPair()?.destination?.networkTicker.toString()
                 ) ?: return null, this.priceFunnel.outputMoney.toBigInteger()
             )
+        )
+    }
+
+    private fun CustodialOrderResponse.toCustodialOrder(): CustodialOrder? {
+        return CustodialOrder(
+            id = this.id,
+            state = this.state.toSwapState(),
+            depositAddress = this.kind.depositAddress,
+            createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
+            inputMoney = CurrencyPair.fromRawPair(pair, SUPPORTED_FUNDS_CURRENCIES)?.let {
+                it.toSourceMoney(priceFunnel.inputMoney.toBigInteger())
+            } ?: return null,
+            outputMoney = CurrencyPair.fromRawPair(pair, SUPPORTED_FUNDS_CURRENCIES)?.let {
+                it.toDestinationMoney(priceFunnel.outputMoney.toBigInteger())
+            } ?: return null
         )
     }
 
@@ -799,20 +817,20 @@ private fun String.toTransactionState(): TransactionState =
         else -> TransactionState.UNKNOWN
     }
 
-fun String.toSwapState(): SwapOrderState =
+fun String.toSwapState(): CustodialOrderState =
     when (this) {
-        SwapOrderResponse.CREATED -> SwapOrderState.CREATED
-        SwapOrderResponse.PENDING_CONFIRMATION -> SwapOrderState.PENDING_CONFIRMATION
-        SwapOrderResponse.PENDING_EXECUTION -> SwapOrderState.PENDING_EXECUTION
-        SwapOrderResponse.PENDING_DEPOSIT -> SwapOrderState.PENDING_DEPOSIT
-        SwapOrderResponse.PENDING_LEDGER -> SwapOrderState.PENDING_LEDGER
-        SwapOrderResponse.FINISH_DEPOSIT -> SwapOrderState.FINISH_DEPOSIT
-        SwapOrderResponse.PENDING_WITHDRAWAL -> SwapOrderState.PENDING_WITHDRAWAL
-        SwapOrderResponse.EXPIRED -> SwapOrderState.EXPIRED
-        SwapOrderResponse.FINISHED -> SwapOrderState.FINISHED
-        SwapOrderResponse.CANCELED -> SwapOrderState.CANCELED
-        SwapOrderResponse.FAILED -> SwapOrderState.FAILED
-        else -> SwapOrderState.UNKNOWN
+        CustodialOrderResponse.CREATED -> CustodialOrderState.CREATED
+        CustodialOrderResponse.PENDING_CONFIRMATION -> CustodialOrderState.PENDING_CONFIRMATION
+        CustodialOrderResponse.PENDING_EXECUTION -> CustodialOrderState.PENDING_EXECUTION
+        CustodialOrderResponse.PENDING_DEPOSIT -> CustodialOrderState.PENDING_DEPOSIT
+        CustodialOrderResponse.PENDING_LEDGER -> CustodialOrderState.PENDING_LEDGER
+        CustodialOrderResponse.FINISH_DEPOSIT -> CustodialOrderState.FINISH_DEPOSIT
+        CustodialOrderResponse.PENDING_WITHDRAWAL -> CustodialOrderState.PENDING_WITHDRAWAL
+        CustodialOrderResponse.EXPIRED -> CustodialOrderState.EXPIRED
+        CustodialOrderResponse.FINISHED -> CustodialOrderState.FINISHED
+        CustodialOrderResponse.CANCELED -> CustodialOrderState.CANCELED
+        CustodialOrderResponse.FAILED -> CustodialOrderState.FAILED
+        else -> CustodialOrderState.UNKNOWN
     }
 
 private fun String.toTransactionType(): TransactionType =

@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
@@ -45,8 +45,8 @@ class TradingToTradingSwapTxEngine(
             )
         )
 
-    override val direction: SwapDirection
-        get() = SwapDirection.INTERNAL
+    override val direction: TransferDirection
+        get() = TransferDirection.INTERNAL
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createOrder(pendingTx).map {

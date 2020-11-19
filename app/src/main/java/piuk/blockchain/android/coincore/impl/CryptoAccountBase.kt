@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
@@ -87,10 +87,10 @@ abstract class CryptoAccountBase : CryptoAccount {
     private fun normaliseTxId(txId: String): String =
         txId.replace("-", "")
 
-    fun appendSwapActivity(
+    protected fun appendSwapActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
-        directions: List<SwapDirection>,
+        directions: List<TransferDirection>,
         activityList: List<ActivitySummaryItem>
     ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
         .map { swapItems ->
@@ -188,7 +188,10 @@ abstract class CryptoNonCustodialAccount(
 
     abstract fun createTxEngine(): TxEngine
 
-    val nonCustodialSwapDirections = listOf(SwapDirection.ON_CHAIN, SwapDirection.FROM_USERKEY)
+    protected val nonCustodialSwapDirections = listOf(
+        TransferDirection.ON_CHAIN,
+        TransferDirection.FROM_USERKEY
+    )
 
     override val isArchived: Boolean
         get() = false

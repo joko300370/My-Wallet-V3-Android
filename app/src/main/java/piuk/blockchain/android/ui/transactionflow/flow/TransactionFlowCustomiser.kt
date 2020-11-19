@@ -456,7 +456,8 @@ class TransactionFlowCustomiserImpl(
         state.action != AssetAction.Swap
 
     override fun defInputType(state: TransactionState): CurrencyType =
-        if (state.action == AssetAction.Swap) CurrencyType.Fiat else CurrencyType.Crypto
+        if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
+            CurrencyType.Fiat else CurrencyType.Crypto
 
     override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {

@@ -2,8 +2,8 @@ package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.Authenticator
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.toSwapState
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.service.NabuService
@@ -64,12 +64,12 @@ class SwapActivityProviderImpl(
             }, networkFee.toBigInteger()
         )
 
-    private fun String.mapToDirection(): SwapDirection =
+    private fun String.mapToDirection(): TransferDirection =
         when (this) {
-            "ON_CHAIN" -> SwapDirection.ON_CHAIN // from non-custodial to non-custodial
-            "FROM_USERKEY" -> SwapDirection.FROM_USERKEY // from non-custodial to custodial
-            "TO_USERKEY" -> SwapDirection.TO_USERKEY // from custodial to non-custodial - not in use currently
-            "INTERNAL" -> SwapDirection.INTERNAL // from custodial to custodial
+            "ON_CHAIN" -> TransferDirection.ON_CHAIN // from non-custodial to non-custodial
+            "FROM_USERKEY" -> TransferDirection.FROM_USERKEY // from non-custodial to custodial
+            "TO_USERKEY" -> TransferDirection.TO_USERKEY // from custodial to non-custodial - not in use currently
+            "INTERNAL" -> TransferDirection.INTERNAL // from custodial to custodial
             else -> throw IllegalStateException("Unknown direction to map $this")
         }
 }
@@ -77,10 +77,10 @@ class SwapActivityProviderImpl(
 data class SwapTransactionItem(
     val txId: String,
     val timeStampMs: Long,
-    val direction: SwapDirection,
+    val direction: TransferDirection,
     val sendingAddress: String?,
     val receivingAddress: String?,
-    val state: SwapOrderState,
+    val state: CustodialOrderState,
     val sendingValue: Money,
     val receivingValue: Money,
     val withdrawalNetworkFee: CryptoValue,

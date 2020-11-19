@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
@@ -16,7 +16,7 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
@@ -106,7 +106,7 @@ class TxProcessorFactory(
                         environmentConfig = environmentConfig,
                         custodialWalletManager = walletManager,
                         direction = if (target is CustodialTradingAccount)
-                            SwapDirection.FROM_USERKEY else SwapDirection.ON_CHAIN
+                            TransferDirection.FROM_USERKEY else TransferDirection.ON_CHAIN
                     )
                 )
             )
@@ -163,7 +163,9 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = target,
                     engine = CustodialSellTxEngine(
-                        walletManager = walletManager
+                        walletManager = walletManager,
+                        quotesProvider = quotesProvider,
+                        kycTierService = kycTierService
                     )
                 )
             )

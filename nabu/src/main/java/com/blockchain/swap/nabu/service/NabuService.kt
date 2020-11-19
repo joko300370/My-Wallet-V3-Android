@@ -40,7 +40,7 @@ import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.models.swap.QuoteResponse
 import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
-import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
 import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -246,7 +246,7 @@ class NabuService(retrofit: Retrofit) {
     internal fun createSwapOrder(
         sessionToken: NabuSessionTokenResponse,
         createOrderRequest: CreateOrderRequest
-    ): Single<SwapOrderResponse> = service.createSwapOrder(
+    ): Single<CustodialOrderResponse> = service.createSwapOrder(
         sessionToken.authHeader,
         createOrderRequest
     ).wrapErrorMessage()
@@ -269,7 +269,7 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun fetchSwapActivity(
         sessionToken: NabuSessionTokenResponse
-    ): Single<List<SwapOrderResponse>> =
+    ): Single<List<CustodialOrderResponse>> =
         service.fetchSwapActivity(sessionToken.authHeader).wrapErrorMessage()
 
     internal fun getSupportedCurrencies(
