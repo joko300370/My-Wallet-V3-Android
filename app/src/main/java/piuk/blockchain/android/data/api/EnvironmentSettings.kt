@@ -23,6 +23,7 @@ class EnvironmentSettings : EnvironmentConfig {
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
             CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            CryptoCurrency.DGLD -> TODO("STUB: DGLD NOT IMPLEMENTED")
         }
 
     override fun shouldShowDebugMenu(): Boolean = BuildConfig.FLAVOR != "envProd"

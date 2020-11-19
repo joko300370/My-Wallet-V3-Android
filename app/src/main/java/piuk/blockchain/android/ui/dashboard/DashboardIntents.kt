@@ -26,6 +26,29 @@ class FiatBalanceUpdate(
     }
 }
 
+class UpdateDashboardCurrencies(
+    private val assetList: List<CryptoCurrency>
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            assets = AssetMap(
+                assetList.associateBy(
+                    keySelector = { it },
+                    valueTransform = { CryptoAssetState(it) }
+                )
+            )
+        )
+    }
+}
+
+object GetAvailableAssets : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            assets = AssetMap(mapOf())
+        )
+    }
+}
+
 object RefreshAllIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
         return oldState.copy(assets = oldState.assets.reset())

@@ -5,6 +5,7 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.pitAnnouncementFeatureFlag
 import com.blockchain.koin.sellFeatureFlag
+import com.blockchain.koin.dgldFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -32,6 +33,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.WDGLDAvailableAnnouncement
 
 val dashboardAnnouncementsModule = module {
 
@@ -242,6 +244,13 @@ val dashboardAnnouncementsModule = module {
         factory {
             InterestAvailableAnnouncement(
                 dismissRecorder = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            WDGLDAvailableAnnouncement(
+                dismissRecorder = get(),
+                dgldFeatureFlag = get(dgldFeatureFlag)
             )
         }.bind(AnnouncementRule::class)
     }

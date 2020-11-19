@@ -89,10 +89,11 @@ class ExchangeRateService(private val priceApi: PriceApi, rxBus: RxBus) {
             CryptoCurrency.ETHER -> FIRST_ETH_ENTRY_TIME
             CryptoCurrency.BCH -> FIRST_BCH_ENTRY_TIME
             CryptoCurrency.XLM -> FIRST_XLM_ENTRY_TIME
-            CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> FIRST_ALGO_ENTRY_TIME
+            CryptoCurrency.PAX,
             CryptoCurrency.USDT -> FIRST_ETH_ENTRY_TIME
+            CryptoCurrency.DGLD -> FIRST_DGLD_ENTRY_TIME
         }
     }
 
@@ -112,5 +113,6 @@ class ExchangeRateService(private val priceApi: PriceApi, rxBus: RxBus) {
         const val FIRST_BCH_ENTRY_TIME = 1500854400L // 2017-07-24 00:00:00 UTC
         const val FIRST_XLM_ENTRY_TIME = 1409875200L // 2014-09-04 00:00:00 UTC
         const val FIRST_ALGO_ENTRY_TIME = 1560985200L // 2019-06-20 00:00:00 UTC
+        const val FIRST_DGLD_ENTRY_TIME = 1576108800L // 2019-12-12 00:00:00 UTC
     }
 }

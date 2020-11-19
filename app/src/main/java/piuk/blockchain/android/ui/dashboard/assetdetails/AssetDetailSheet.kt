@@ -33,6 +33,7 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
+import piuk.blockchain.android.util.getDecimalPlaces
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -399,18 +400,6 @@ class AssetDetailSheet :
             chart_price_periods.getTabAt(selection.ordinal)?.select()
         }
     }
-
-    private fun CryptoCurrency.getDecimalPlaces(): Int =
-        when (this) {
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BCH,
-            CryptoCurrency.PAX,
-            CryptoCurrency.ALGO,
-            CryptoCurrency.USDT -> 2
-            CryptoCurrency.XLM -> 4
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        }
 
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto"

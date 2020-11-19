@@ -24,6 +24,7 @@ class Coincore internal constructor(
     private val fiatAsset: Asset,
     private val crashLogger: CrashLogger
 ) {
+
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException(
             "Unknown CryptoCurrency ${ccy.networkTicker}"
@@ -43,9 +44,14 @@ class Coincore internal constructor(
             Timber.e("Coincore initialisation failed! $it")
         }
 
-    val fiatAssets: Asset = fiatAsset
-    val cryptoAssets: Iterable<Asset> = assetMap.values.filter { it.isEnabled }
-    val allAssets: Iterable<Asset> = listOf(fiatAsset) + cryptoAssets
+    val fiatAssets: Asset
+        get() = fiatAsset
+
+    val cryptoAssets: Iterable<Asset>
+        get() = assetMap.values.filter { it.isEnabled }
+
+    val allAssets: Iterable<Asset>
+        get() = listOf(fiatAsset) + cryptoAssets
 
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)

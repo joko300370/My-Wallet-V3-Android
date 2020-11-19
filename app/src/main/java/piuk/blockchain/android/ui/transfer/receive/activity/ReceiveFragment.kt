@@ -79,7 +79,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
     private val disposables = CompositeDisposable()
 
     private val receiveIntentHelper by unsafeLazy {
-        ReceiveIntentHelper(requireContext(), appUtil)
+        ReceiveIntentHelper(requireContext())
     }
 
     private val event by unsafeLazy {

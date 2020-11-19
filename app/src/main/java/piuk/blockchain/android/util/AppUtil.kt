@@ -2,7 +2,6 @@ package piuk.blockchain.android.util
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import com.blockchain.ui.ActivityIndicator
 import info.blockchain.wallet.payload.PayloadManagerWiper
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -28,9 +27,6 @@ class AppUtil(
     var sharedKey: String
         get() = prefs.getValue(PersistentPrefs.KEY_SHARED_KEY, "")
         set(sharedKey) = prefs.setValue(PersistentPrefs.KEY_SHARED_KEY, sharedKey)
-
-    val packageManager: PackageManager
-        get() = context.packageManager
 
     var activityIndicator: ActivityIndicator? = null
 

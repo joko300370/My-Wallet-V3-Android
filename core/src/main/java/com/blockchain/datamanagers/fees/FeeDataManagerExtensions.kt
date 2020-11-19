@@ -36,7 +36,8 @@ fun FeeDataManager.getFeeOptions(cryptoCurrency: CryptoCurrency): Single<out Net
             )
         }
         CryptoCurrency.PAX,
-        CryptoCurrency.USDT -> ethFeeOptions.map {
+        CryptoCurrency.USDT,
+        CryptoCurrency.DGLD -> ethFeeOptions.map {
             EthereumFees(
                 it.regularFee,
                 it.priorityFee,

@@ -61,14 +61,4 @@
         app:layout_constraintTop_toTopOf="@id/asset_subtitle"
         tools:text="1.638192 BTC" />
 
-    <ImageView
-        android:id="@+id/asset_account_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="21dp"
-        app:layout_constraintStart_toStartOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon"
-        app:srcCompat="@drawable/ic_account_badge_custodial" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

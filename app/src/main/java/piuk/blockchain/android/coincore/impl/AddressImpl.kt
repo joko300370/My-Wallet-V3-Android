@@ -12,7 +12,6 @@ import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.eth.EthAddress
 import piuk.blockchain.android.coincore.xlm.XlmAddress
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import java.lang.IllegalArgumentException
 
 internal fun makeExternalAssetAddress(
     asset: CryptoCurrency,
@@ -23,7 +22,8 @@ internal fun makeExternalAssetAddress(
 ): CryptoAddress =
     when (asset) {
         CryptoCurrency.PAX,
-        CryptoCurrency.USDT -> {
+        CryptoCurrency.USDT,
+        CryptoCurrency.DGLD -> {
             Erc20Address(
                 asset = asset,
                 address = address,

@@ -15,7 +15,6 @@ import com.blockchain.sunriver.fromStellarUri
 import info.blockchain.balance.CryptoCurrency
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BitcoinLinkGenerator
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
@@ -26,7 +25,7 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
 
-class ReceiveIntentHelper(private val context: Context, private val appUtil: AppUtil) {
+class ReceiveIntentHelper(private val context: Context) {
 
     internal fun getIntentDataList(
         uri: String,
@@ -48,7 +47,7 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
             }
 
             val dataList = ArrayList<SendPaymentCodeData>()
-            val packageManager = appUtil.packageManager
+            val packageManager = context.packageManager
             val mime = MimeTypeMap.getSingleton()
             val ext = file.name.substring(file.name.lastIndexOf(".") + 1)
             val type = mime.getMimeTypeFromExtension(ext)
@@ -64,6 +63,7 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
                 CryptoCurrency.STX -> TODO("STX is not fully supported yet")
                 CryptoCurrency.ALGO -> TODO("ALGO is not fully supported yet")
                 CryptoCurrency.USDT -> emailIntent.setupIntentForEmailUsdt(uri)
+                CryptoCurrency.DGLD -> emailIntent.setupIntentForEmailDgld(uri)
             }.exhaustive
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }
@@ -173,6 +173,14 @@ class ReceiveIntentHelper(private val context: Context, private val appUtil: App
     }
 
     private fun Intent.setupIntentForEmailUsdt(uri: String) {
+        val address = uri.removePrefix("ethereum:")
+        val body = String.format(context.getString(R.string.email_request_body_usdt_1), address)
+
+        putExtra(Intent.EXTRA_TEXT, body)
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_usdt_1))
+    }
+
+    private fun Intent.setupIntentForEmailDgld(uri: String) {
         val address = uri.removePrefix("ethereum:")
         val body = String.format(context.getString(R.string.email_request_body_usdt_1), address)
 

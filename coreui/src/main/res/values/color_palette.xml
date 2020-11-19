@@ -85,6 +85,7 @@
     <color name="ltc_bkgd">#26BFBBBB</color>
     <color name="xrp_bkgd">#26000000</color>
     <color name="algo_bkgd">#26000000</color>
+    <color name="dgld_bkgd">#26FFE738</color>
 
     <color name="btc">#FF9B22</color>
     <color name="bch">#8DC351</color>
@@ -95,6 +96,7 @@
     <color name="ltc">#BFBBBB</color>
     <color name="xrp">#000000</color>
     <color name="algo">#000000</color>
+    <color name="dgld">#FFE738</color>
 
 </resources>
 

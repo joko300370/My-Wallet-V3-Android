@@ -44,7 +44,8 @@ internal class AddressResolver(
             }
             CryptoCurrency.ETHER,
             CryptoCurrency.USDT,
-            CryptoCurrency.PAX -> getEthereumAddress(reference)
+            CryptoCurrency.PAX,
+            CryptoCurrency.DGLD -> getEthereumAddress(reference)
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
         }

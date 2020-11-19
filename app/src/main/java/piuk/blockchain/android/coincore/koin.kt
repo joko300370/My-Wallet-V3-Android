@@ -1,14 +1,17 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.koin.dgldAccount
 import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usdtAccount
+import com.blockchain.koin.dgldFeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoAsset
 import piuk.blockchain.android.coincore.bch.BchAsset
 import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.android.coincore.erc20.dgld.DgldAsset
 import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
@@ -183,6 +186,26 @@ val coincoreModule = module {
         }
 
         scoped {
+            DgldAsset(
+                payloadManager = get(),
+                dgldAccount = get(dgldAccount),
+                feeDataManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get(),
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get(),
+                tiersService = get(),
+                wDgldFeatureFlag = get(dgldFeatureFlag)
+            )
+        }
+
+        scoped {
             Coincore(
                 payloadManager = get(),
                 fiatAsset = get<FiatAsset>(),
@@ -194,7 +217,8 @@ val coincoreModule = module {
                     CryptoCurrency.PAX to get<PaxAsset>(),
                     CryptoCurrency.STX to get<StxAsset>(),
                     CryptoCurrency.ALGO to get<AlgoAsset>(),
-                    CryptoCurrency.USDT to get<UsdtAsset>()
+                    CryptoCurrency.USDT to get<UsdtAsset>(),
+                    CryptoCurrency.DGLD to get<DgldAsset>()
                 ),
                 txProcessorFactory = get(),
                 defaultLabels = get(),

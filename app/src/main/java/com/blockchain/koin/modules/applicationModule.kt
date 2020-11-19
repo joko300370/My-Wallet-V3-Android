@@ -6,6 +6,7 @@ import com.blockchain.accounts.AsyncAllAccountList
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
 import com.blockchain.koin.cardPaymentsFeatureFlag
+import com.blockchain.koin.dgldAccount
 import com.blockchain.koin.eth
 import com.blockchain.koin.eur
 import com.blockchain.koin.explorerRetrofit
@@ -90,6 +91,8 @@ import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
 import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
+import piuk.blockchain.android.ui.dashboard.AssetOrderingConfig
+import piuk.blockchain.android.ui.dashboard.AssetOrderingConfigImpl
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
 import piuk.blockchain.android.ui.dashboard.DashboardInteractor
 import piuk.blockchain.android.ui.dashboard.DashboardModel
@@ -137,6 +140,7 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
+import piuk.blockchain.androidcore.data.erc20.DgldAccount
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.PaxAccount
 import piuk.blockchain.androidcore.data.erc20.UsdtAccount
@@ -205,6 +209,14 @@ val applicationModule = module {
 
         factory(usdtAccount) {
             UsdtAccount(
+                ethDataManager = get(),
+                dataStore = get(),
+                environmentSettings = get()
+            )
+        }.bind(Erc20Account::class)
+
+        factory(dgldAccount) {
+            DgldAccount(
                 ethDataManager = get(),
                 dataStore = get(),
                 environmentSettings = get()
@@ -324,6 +336,7 @@ val applicationModule = module {
                 gson = get(),
                 paxAccount = get(paxAccount),
                 usdtAccount = get(usdtAccount),
+                dgldAccount = get(dgldAccount),
                 payloadDataManager = get(),
                 bchDataManager = get(),
                 rxBus = get(),
@@ -513,7 +526,8 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 simpleBuyPrefs = get(),
                 analytics = get(),
-                crashLogger = get()
+                crashLogger = get(),
+                assetOrdering = get()
             )
         }
 
@@ -872,4 +886,11 @@ val applicationModule = module {
     }
 
     factory { ResourceDefaultLabels(get()) }.bind(DefaultLabels::class)
+
+    factory {
+        AssetOrderingConfigImpl(
+            config = get(),
+            crashLogger = get()
+        )
+    }.bind(AssetOrderingConfig::class)
 }
