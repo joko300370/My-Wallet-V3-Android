@@ -1830,7 +1830,7 @@
   <string name="send_enter_unexpected_error">予期しないエラーが発生しました。もう一度やり直してください。</string>
   <string name="send_enter_insufficient_gas">このトランザクションを処理するのに十分なETHがありません。</string>
   <string name="send_select_a_wallet_title">またはウォレットを選択</string>
-  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%1$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
+  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%2$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
   <string name="purchase_funds_note">あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">詳細。 </annotation>
