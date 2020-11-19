@@ -96,7 +96,8 @@ internal class TransactionExecutorViaDataManagers(
                 )
             ).logAnalyticsError(analytics).map { it.hash!! }
             CryptoCurrency.PAX,
-            CryptoCurrency.USDT ->
+            CryptoCurrency.USDT,
+            CryptoCurrency.DGLD ->
                 sendErc20Transaction(fees as EthereumFees, destination, amount, amount.currency)
             CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
             CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
@@ -400,12 +401,7 @@ internal class TransactionExecutorViaDataManagers(
         when (currency) {
             CryptoCurrency.BTC -> sendDataManager.getUnspentBtcOutputs(address)
             CryptoCurrency.BCH -> sendDataManager.getUnspentBchOutputs(address)
-            CryptoCurrency.ETHER,
-            CryptoCurrency.XLM,
-            CryptoCurrency.PAX,
-            CryptoCurrency.STX,
-            CryptoCurrency.ALGO,
-            CryptoCurrency.USDT -> throw IllegalArgumentException(
+            else -> throw IllegalArgumentException(
                 "${currency.networkTicker} does not have unspent outputs")
         }.subscribeOn(Schedulers.io())
             .singleOrError()
@@ -434,12 +430,7 @@ internal class TransactionExecutorViaDataManagers(
             absoluteFee,
             amount.toBigInteger()
         )
-        CryptoCurrency.ETHER,
-        CryptoCurrency.XLM,
-        CryptoCurrency.PAX,
-        CryptoCurrency.STX,
-        CryptoCurrency.ALGO,
-        CryptoCurrency.USDT -> throw IllegalArgumentException(
+        else -> throw IllegalArgumentException(
             "${amount.currency.networkTicker} not supported by this method")
     }.subscribeOn(Schedulers.io())
         .singleOrError()

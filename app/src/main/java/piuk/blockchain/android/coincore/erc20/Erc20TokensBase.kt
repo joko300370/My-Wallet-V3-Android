@@ -43,5 +43,5 @@ internal abstract class Erc20TokensBase(
     environmentConfig,
     eligibilityProvider
 ) {
-    final override fun initToken(): Completable = erc20Account.fetchErc20Address().ignoreElements()
+    override fun initToken(): Completable = erc20Account.fetchErc20Address().ignoreElements()
 }

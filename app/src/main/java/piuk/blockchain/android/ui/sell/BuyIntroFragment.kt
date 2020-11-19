@@ -59,12 +59,15 @@ class BuyIntroFragment : Fragment() {
             custodialWalletManager.getSupportedBuySellCryptoCurrencies(
                 currencyPrefs.selectedFiatCurrency)
                 .flatMap { pairs ->
-                    Single.zip(pairs.pairs.map {
+                    val enabledPairs = pairs.pairs.filter {
+                        coinCore[it.cryptoCurrency].isEnabled
+                    }
+                    Single.zip(enabledPairs.map {
                         coinCore[it.cryptoCurrency].exchangeRate()
                     }) { t: Array<Any> ->
                         t.map {
                             it as ExchangeRate.CryptoToFiat
-                        } to pairs
+                        } to pairs.copy(pairs = enabledPairs)
                     }
                 }
                 .subscribeOn(Schedulers.io())

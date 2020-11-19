@@ -62,6 +62,7 @@ class CoinsWebSocketStrategy(
     private val appUtil: AppUtil,
     private val paxAccount: Erc20Account,
     private val usdtAccount: Erc20Account,
+    private val dgldAccount: Erc20Account,
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager
 ) {
@@ -264,6 +265,7 @@ class CoinsWebSocketStrategy(
             when (ethResponse.getTokenType()) {
                 CryptoCurrency.PAX -> triggerPaxNotificationAndUpdate(tokenTransaction, title)
                 CryptoCurrency.USDT -> triggerUsdtNotificationAndUpdate(tokenTransaction, title)
+                CryptoCurrency.DGLD -> triggerDgldNotificationAndUpdate(tokenTransaction, title)
                 else -> throw IllegalStateException("Unsupported ERC-20 token, have we added a new asset?")
             }
         }
@@ -285,6 +287,24 @@ class CoinsWebSocketStrategy(
         )
 
         updateUsdtTransactions()
+    }
+
+    private fun triggerDgldNotificationAndUpdate(
+        tokenTransaction: TokenTransfer,
+        title: String
+    ) {
+        val marquee = stringUtils.getString(R.string.received_dgld) + " " +
+            CryptoValue.fromMinor(CryptoCurrency.USDT, tokenTransaction.value)
+                .toStringWithSymbol()
+        val text =
+            marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) +
+                " " + tokenTransaction.from
+
+        messagesSocketHandler?.triggerNotification(
+            title, marquee, text
+        )
+
+        updateDgldTransactions()
     }
 
     private fun triggerPaxNotificationAndUpdate(
@@ -342,6 +362,13 @@ class CoinsWebSocketStrategy(
             .subscribe(
                 { messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent()) },
                 { throwable -> Timber.e(throwable, "downloadUsdtTransactions failed") })
+    }
+
+    private fun updateDgldTransactions() {
+        compositeDisposable += dgldAccount.fetchAddressCompletable()
+            .subscribe(
+                { messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent()) },
+                { throwable -> Timber.e(throwable, "downloadDgldTransactions failed") })
     }
 
     fun close() {

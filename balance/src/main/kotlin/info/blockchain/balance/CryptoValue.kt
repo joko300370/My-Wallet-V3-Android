@@ -50,6 +50,7 @@ data class CryptoValue(
         val ZeroPax = CryptoValue(CryptoCurrency.PAX, BigInteger.ZERO)
         val ZeroAlg = CryptoValue(CryptoCurrency.ALGO, BigInteger.ZERO)
         val ZeroUsdt = CryptoValue(CryptoCurrency.USDT, BigInteger.ZERO)
+        val ZeroDgld = CryptoValue(CryptoCurrency.DGLD, BigInteger.ZERO)
 
         fun zero(cryptoCurrency: CryptoCurrency) = when (cryptoCurrency) {
             CryptoCurrency.BTC -> ZeroBtc
@@ -60,6 +61,7 @@ data class CryptoValue(
             CryptoCurrency.STX -> ZeroStx
             CryptoCurrency.ALGO -> ZeroAlg
             CryptoCurrency.USDT -> ZeroUsdt
+            CryptoCurrency.DGLD -> ZeroDgld
         }
 
         // These calls are currently (mostly) only used in tests, where we have a second mechanism

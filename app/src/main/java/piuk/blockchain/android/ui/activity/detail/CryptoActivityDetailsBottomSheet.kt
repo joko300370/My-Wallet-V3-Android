@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.swap.nabu.datamanagers.InterestState
-import com.blockchain.ui.urllinks.makeBlockExplorerUrl
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,6 +25,7 @@ import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegat
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.util.makeBlockExplorerUrl
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CryptoActivityDetailsBottomSheet :
@@ -199,7 +199,7 @@ class CryptoActivityDetailsBottomSheet :
 
                 status.text = getString(when {
                     transactionType == TransactionSummary.TransactionType.SENT ||
-                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }
@@ -212,7 +212,7 @@ class CryptoActivityDetailsBottomSheet :
                         R.string.activity_details_label_pending
                     }
                     transactionType == TransactionSummary.TransactionType.BUY ||
-                            transactionType == TransactionSummary.TransactionType.SELL ->
+                        transactionType == TransactionSummary.TransactionType.SELL ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds
@@ -278,7 +278,7 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     private fun onActionItemClicked() {
-        val explorerUri = makeBlockExplorerUrl(arguments.cryptoCurrency, arguments.txId)
+        val explorerUri = arguments.cryptoCurrency.makeBlockExplorerUrl(arguments.txId)
         logAnalyticsForExplorer()
         Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(explorerUri)

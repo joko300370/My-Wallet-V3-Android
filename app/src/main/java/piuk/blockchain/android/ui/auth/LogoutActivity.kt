@@ -21,6 +21,7 @@ class LogoutActivity : AppCompatActivity() {
     private val ethDataManager: EthDataManager by scopedInject()
     private val paxAccount: Erc20Account by scopedInject(StringQualifier("paxAccount"))
     private val usdtAccount: Erc20Account by scopedInject(StringQualifier("usdtAccount"))
+    private val dgldAccount: Erc20Account by scopedInject(StringQualifier("dgldAccount"))
     private val bchDataManager: BchDataManager by scopedInject()
     private val walletOptionsState: WalletOptionsState by scopedInject()
     private val nabuDataManager: NabuDataManager by scopedInject()
@@ -51,6 +52,7 @@ class LogoutActivity : AppCompatActivity() {
         ethDataManager.clearEthAccountDetails()
         paxAccount.clear()
         usdtAccount.clear()
+        dgldAccount.clear()
         bchDataManager.clearBchAccountDetails()
         nabuDataManager.clearAccessToken()
 
