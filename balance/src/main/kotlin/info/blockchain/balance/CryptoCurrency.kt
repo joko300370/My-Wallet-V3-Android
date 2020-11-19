@@ -16,7 +16,7 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.MULTI_WALLET
+                CryptoCurrency.MULTI_WALLET
 
     ),
     ETHER(
@@ -36,7 +36,7 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.MULTI_WALLET
+                CryptoCurrency.MULTI_WALLET
     ),
     XLM(
         networkTicker = "XLM",

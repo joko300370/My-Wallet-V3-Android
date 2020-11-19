@@ -107,7 +107,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderSellError() {
         accounts_list.gone()
-        sell_info_group.gone()
         sell_empty.setDetails {
             loadSellDetails()
         }
@@ -117,7 +116,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderRejectedKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -148,7 +146,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderNonKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -214,8 +211,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     }
 
     private fun renderSellInfo() {
-        sell_info_group.visible()
-
         val sellInfoIntro = getString(R.string.sell_info_blurb_1)
         val sellInfoBold = getString(R.string.sell_info_blurb_2)
         val sellInfoEnd = getString(R.string.sell_info_blurb_3)
@@ -226,12 +221,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             .append(sellInfoEnd)
         sb.setSpan(StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        sell_info_blurb.setText(sb, TextView.BufferType.SPANNABLE)
-        sell_info_action.setOnClickListener {
-            analytics.logEvent(SellAnalytics.SellTabInfo)
-            host.onSellInfoClicked()
-        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)

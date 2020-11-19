@@ -20,7 +20,8 @@ class NonCustodialSellEngine(
     environmentConfig: EnvironmentConfig,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesProvider: QuotesProvider) : SellTxEngine(
+    quotesProvider: QuotesProvider
+) : SellTxEngine(
     walletManager, kycTierService, quotesProvider, environmentConfig
 ) {
     override val direction: TransferDirection
