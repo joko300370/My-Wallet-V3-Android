@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
@@ -18,13 +19,15 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.RoundingMode
 
 abstract class SellTxEngine(
-    walletManager: CustodialWalletManager,
+    private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesProvider: QuotesProvider
-) : QuotedEngine(quotesProvider, kycTierService, walletManager) {
+    quotesProvider: QuotesProvider,
+    environmentConfig: EnvironmentConfig
+) : QuotedEngine(quotesProvider, kycTierService, walletManager, environmentConfig) {
 
     val target: FiatAccount
         get() = txTarget as FiatAccount
@@ -123,6 +126,15 @@ abstract class SellTxEngine(
             }
         }
     }
+
+    protected fun createSellOrder(pendingTx: PendingTx): Single<CustodialOrder> =
+        walletManager.createCustodialOrder(
+            direction = direction,
+            quoteId = quotesEngine.getLatestQuote().transferQuote.id,
+            volume = pendingTx.amount
+        ).doFinally {
+            disposeQuotesFetching(pendingTx)
+        }
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)

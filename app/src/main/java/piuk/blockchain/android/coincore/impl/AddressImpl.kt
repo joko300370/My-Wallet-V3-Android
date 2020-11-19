@@ -19,7 +19,7 @@ internal fun makeExternalAssetAddress(
     address: String,
     label: String,
     environmentConfig: EnvironmentConfig,
-    postTransactions: (TxResult) -> Completable
+    postTransactions: (TxResult) -> Completable = { Completable.complete() }
 ): CryptoAddress =
     when (asset) {
         CryptoCurrency.PAX,

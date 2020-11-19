@@ -12,12 +12,14 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class CustodialSellTxEngine(
-    private val walletManager: CustodialWalletManager,
+    walletManager: CustodialWalletManager,
     quotesProvider: QuotesProvider,
-    kycTierService: TierService
-) : SellTxEngine(walletManager, kycTierService, quotesProvider) {
+    kycTierService: TierService,
+    environmentConfig: EnvironmentConfig
+) : SellTxEngine(walletManager, kycTierService, quotesProvider, environmentConfig) {
 
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
@@ -60,13 +62,7 @@ class CustodialSellTxEngine(
         get() = false
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        walletManager.createCustodialOrder(
-            direction = direction,
-            quoteId = quotesEngine.getLatestQuote().transferQuote.id,
-            volume = pendingTx.amount
-        ).map {
+        createSellOrder(pendingTx).map {
             TxResult.UnHashedTxResult(pendingTx.amount) as TxResult
-        }.doFinally {
-            disposeQuotesFetching(pendingTx)
         }
 }
