@@ -16,7 +16,7 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_activity_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -42,7 +42,7 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     override val layoutResource: Int
-        get() = R.layout.dialog_activity_details_sheet
+        get() = R.layout.dialog_sheet_activity_details
 
     override val model: ActivityDetailsModel by scopedInject()
 

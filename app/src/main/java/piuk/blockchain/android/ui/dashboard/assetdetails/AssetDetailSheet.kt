@@ -21,7 +21,7 @@ import com.google.android.material.tabs.TabLayout
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.data.PriceDatum
-import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_dashboard_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
@@ -82,7 +82,7 @@ class AssetDetailSheet :
     override val model: AssetDetailsModel by scopedInject()
 
     override val layoutResource: Int
-        get() = R.layout.dialog_dashboared_asset_details
+        get() = R.layout.dialog_sheet_dashboard_asset_details
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
