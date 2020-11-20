@@ -56,11 +56,11 @@ enum class TransactionErrorState {
     UNKNOWN_ERROR
 }
 
-enum class TxExecutionStatus {
-    NOT_STARTED,
-    IN_PROGRESS,
-    ERROR,
-    COMPLETED
+sealed class TxExecutionStatus {
+    object NotStarted : TxExecutionStatus()
+    object InProgress : TxExecutionStatus()
+    object Completed : TxExecutionStatus()
+    data class Error(val message: String) : TxExecutionStatus()
 }
 
 data class TransactionState(
@@ -76,7 +76,7 @@ data class TransactionState(
     val errorState: TransactionErrorState = TransactionErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val allowFiatInput: Boolean = false,
-    val executionStatus: TxExecutionStatus = TxExecutionStatus.NOT_STARTED,
+    val executionStatus: TxExecutionStatus = TxExecutionStatus.NotStarted,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
     val availableTargets: List<TransactionTarget> = emptyList(),
     val availableSources: List<CryptoAccount> = emptyList()

@@ -1,7 +1,12 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
+import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ASSET
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ERROR
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_SOURCE
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_TARGET
 
 sealed class SwapAnalyticsEvents(
     override val event: String,
@@ -37,20 +42,39 @@ sealed class SwapAnalyticsEvents(
     ) : SwapAnalyticsEvents("swap_checkout_confirm", params = constructMap(source, target))
 
     data class TransactionSuccess(
-        val source: CryptoCurrency,
+        val asset: CryptoCurrency,
+        val source: String,
         val target: String
-    ) : SwapAnalyticsEvents("swap_checkout_success", params = constructMap(source, target))
+    ) : SwapAnalyticsEvents("swap_checkout_success", params = constructMap(
+        asset = asset,
+        target = target,
+        source = source
+    ))
 
     data class TransactionFailed(
-        val source: CryptoCurrency,
-        val target: String
-    ) : SwapAnalyticsEvents("swap_checkout_error", params = constructMap(source, target))
+        val asset: CryptoCurrency,
+        val target: String?,
+        val source: String?,
+        val error: String
+    ) : SwapAnalyticsEvents("swap_checkout_error", params = constructMap(
+        asset = asset,
+        target = target,
+        source = source,
+        error = error
+    ))
 
     companion object {
         private fun constructMap(
-            source: CryptoCurrency,
-            target: String
+            asset: CryptoCurrency,
+            target: String?,
+            error: String? = null,
+            source: String? = null
         ): Map<String, String> =
-            mapOf("source" to source.networkTicker, "destination" to target)
+            mapOf(
+                PARAM_ASSET to asset.networkTicker,
+                PARAM_TARGET to target,
+                PARAM_SOURCE to source,
+                PARAM_ERROR to error
+            ).withoutNullValues()
     }
 }
