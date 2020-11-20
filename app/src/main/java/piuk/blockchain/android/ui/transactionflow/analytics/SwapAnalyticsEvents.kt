@@ -27,9 +27,9 @@ sealed class SwapAnalyticsEvents(
     object CancelTransaction : SwapAnalyticsEvents("swap_checkout_cancel")
 
     data class SwapConfirmPair(
-        val source: CryptoCurrency,
+        val asset: CryptoCurrency,
         val target: String
-    ) : SwapAnalyticsEvents("swap_pair_locked_confirm", params = constructMap(source, target))
+    ) : SwapAnalyticsEvents("swap_pair_locked_confirm", params = constructMap(asset = asset, target = target))
 
     data class EnterAmountCtaClick(
         val source: CryptoCurrency,

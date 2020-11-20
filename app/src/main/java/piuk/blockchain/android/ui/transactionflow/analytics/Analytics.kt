@@ -119,7 +119,7 @@ class TxFlowAnalytics(
     fun onEnterAddressCtaClick(state: TransactionState) {
         when (state.action) {
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.SwapConfirmPair(
-                source = state.asset,
+                asset = state.asset,
                 target = state.selectedTarget.toCategory()
             ))
             else -> {
