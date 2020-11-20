@@ -243,7 +243,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             action = AssetAction.Sell
         ).apply {
             startFlow(
-                fragmentManager = childFragmentManager,
+                fragmentManager = fragmentManager ?: return,
                 host = this@SellIntroFragment
             )
         }
