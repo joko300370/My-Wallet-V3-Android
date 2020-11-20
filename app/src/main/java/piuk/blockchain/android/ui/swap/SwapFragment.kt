@@ -105,6 +105,11 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         walletPrefs.setSeenSwapPromo()
     }
 
+    override fun onDestroyView() {
+        compositeDisposable.clear()
+        super.onDestroyView()
+    }
+
     private fun loadSwapOrKyc() {
         compositeDisposable +=
             Singles.zip(

@@ -24,11 +24,7 @@ class WDGLDAvailableAnnouncement(
             return Single.just(false)
         }
 
-        return dgldFeatureFlag.enabled.doOnSuccess {
-            cta = {
-                it.startSimpleBuy(CryptoCurrency.DGLD)
-            }
-        }
+        return dgldFeatureFlag.enabled
     }
 
     override fun show(host: AnnouncementHost) {
@@ -46,7 +42,7 @@ class WDGLDAvailableAnnouncement(
                 },
                 ctaFunction = {
                     host.dismissAnnouncementCard()
-                    host.startSimpleBuy()
+                    host.startSimpleBuy(CryptoCurrency.DGLD)
                 }
             )
         )
