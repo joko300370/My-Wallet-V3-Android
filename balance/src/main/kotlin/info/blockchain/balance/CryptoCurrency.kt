@@ -99,6 +99,9 @@ enum class CryptoCurrency(
         fun fromNetworkTicker(symbol: String?): CryptoCurrency? =
             values().firstOrNull { it.networkTicker.equals(symbol, ignoreCase = true) }
 
+        @Deprecated("Historical accessibility helper",
+            ReplaceWith("Coincore (cryptoAssets, fiatAssets, allAssets)")
+        )
         fun activeCurrencies(): List<CryptoCurrency> = values().filter {
             !it.hasFeature(STUB_ASSET)
         }
