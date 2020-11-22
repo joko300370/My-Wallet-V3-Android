@@ -119,11 +119,6 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         startSwap()
     }
 
-    override fun onDestroyView() {
-        compositeDisposable.clear()
-        super.onDestroyView()
-    }
-
     private fun loadSwapOrKyc() {
         compositeDisposable +=
             Singles.zip(
@@ -303,6 +298,3 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         super.onDestroyView()
     }
 }
-
-private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
-    pairs.any { it.source == this.asset }
