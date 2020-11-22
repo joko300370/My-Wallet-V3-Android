@@ -57,6 +57,9 @@ class AccountList @JvmOverloads constructor(
             VERTICAL,
             false
         )
+        addItemDecoration(
+            BlockchainListDividerDecor(context)
+        )
     }
 
     fun initialise(
@@ -67,10 +70,6 @@ class AccountList @JvmOverloads constructor(
         introView: IntroHeaderView? = null,
         shouldShowSelectionStatus: Boolean = false
     ) {
-
-        addItemDecoration(
-            BlockchainListDividerDecor(context)
-        )
 
         introView?.let {
             addItemDecoration(
@@ -213,7 +212,7 @@ private class CryptoSingleAccountViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    fun bind(
         selectableAccountItem: SelectableAccountItem,
         statusDecorator: StatusDecorator,
         onAccountClicked: (CryptoAccount) -> Unit
@@ -323,7 +322,7 @@ private class AllWalletsAccountViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    fun bind(
         selectableAccountItem: SelectableAccountItem,
         statusDecorator: StatusDecorator,
         onAccountClicked: (BlockchainAccount) -> Unit

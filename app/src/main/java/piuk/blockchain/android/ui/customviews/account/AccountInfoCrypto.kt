@@ -44,16 +44,12 @@ class AccountInfoCrypto @JvmOverloads constructor(
             .inflate(R.layout.view_account_crypto_overview, this, true)
     }
 
-    var account: CryptoAccount? = null
-        private set
-
     fun updateAccount(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
         disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
-        this.account = account
         updateView(account, onAccountClicked, disposables, cellDecorator)
     }
 

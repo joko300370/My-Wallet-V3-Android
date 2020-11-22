@@ -259,6 +259,11 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
+    }
+
     companion object {
         fun newInstance() = SellIntroFragment()
     }

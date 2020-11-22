@@ -58,12 +58,14 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 
     @UiThread
     protected fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment?) {
-        val oldSheet = fragmentManager?.findFragmentByTag(bottomSheetTag)
-
-        fragmentManager?.beginTransaction()?.run {
-            apply { oldSheet?.let { sheet -> remove(sheet) } }
-            apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
-            commitNow()
+        fragmentManager?.let {
+            if (it.isDestroyed || it.isStateSaved) return
+            val oldSheet = it.findFragmentByTag(bottomSheetTag)
+            it.beginTransaction().run {
+                apply { oldSheet?.let { sheet -> remove(sheet) } }
+                apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
+                commitNow()
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
+import android.app.Dialog
 import android.content.DialogInterface
+import android.os.Bundle
 import androidx.annotation.StringRes
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -21,10 +23,16 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
 
     protected val analyticsHooks: TxFlowAnalytics by inject()
 
-    lateinit var transactionFlowHost: Host
-
     override val host: Host
         get() = activeTransactionFlow.getFlow()
+
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        savedInstanceState?.let {
+            model.process(TransactionIntent.ResetFlow)
+        }
+    }
 
     protected fun showErrorToast(@StringRes msgId: Int) {
         ToastCustom.makeText(

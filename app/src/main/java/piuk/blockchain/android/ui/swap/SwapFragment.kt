@@ -297,6 +297,11 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         val limits: SwapLimits,
         val orders: List<SwapOrder>
     )
+
+    override fun onDestroyView() {
+        compositeDisposable.clear()
+        super.onDestroyView()
+    }
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
