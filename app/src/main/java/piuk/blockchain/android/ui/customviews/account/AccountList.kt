@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Single
@@ -157,7 +158,6 @@ private class AccountsDelegateAdapter(
                 CryptoAccountDelegate(
                     statusDecorator,
                     onAccountClicked,
-                    compositeDisposable,
                     showSelectionStatus
                 )
             )
@@ -183,7 +183,6 @@ private class AccountsDelegateAdapter(
 private class CryptoAccountDelegate<in T>(
     private val statusDecorator: StatusDecorator,
     private val onAccountClicked: (CryptoAccount) -> Unit,
-    private val compositeDisposable: CompositeDisposable,
     private val showSelectionStatus: Boolean
 ) : AdapterDelegate<T> {
 
@@ -191,8 +190,7 @@ private class CryptoAccountDelegate<in T>(
         (items[position] as SelectableAccountItem).account is CryptoAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        CryptoSingleAccountViewHolder(compositeDisposable,
-            showSelectionStatus,
+        CryptoSingleAccountViewHolder(showSelectionStatus,
             parent.inflate(R.layout.item_account_select_crypto))
 
     override fun onBindViewHolder(
@@ -207,7 +205,6 @@ private class CryptoAccountDelegate<in T>(
 }
 
 private class CryptoSingleAccountViewHolder(
-    private val compositeDisposable: CompositeDisposable,
     private val showSelectionStatus: Boolean,
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
@@ -226,7 +223,6 @@ private class CryptoSingleAccountViewHolder(
                 }
             }
             crypto_account.updateAccount(selectableAccountItem.account as CryptoAccount, onAccountClicked,
-                compositeDisposable,
                 statusDecorator(selectableAccountItem.account))
         }
     }

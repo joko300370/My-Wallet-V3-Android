@@ -38,6 +38,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
 
     init {
         LayoutInflater.from(context)
@@ -47,22 +48,21 @@ class AccountInfoCrypto @JvmOverloads constructor(
     fun updateAccount(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
-        updateView(account, onAccountClicked, disposables, cellDecorator)
+        compositeDisposable.clear()
+        updateView(account, onAccountClicked, cellDecorator)
     }
 
     private fun updateView(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
-        updateAccountDetails(account, onAccountClicked, disposables, cellDecorator)
+        updateAccountDetails(account, onAccountClicked, cellDecorator)
 
         when (account) {
-            is InterestAccount -> setInterestAccountDetails(account, disposables)
+            is InterestAccount -> setInterestAccountDetails(account)
             is TradingAccount -> asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
             is NonCustodialAccount -> asset_account_icon.gone()
             else -> asset_account_icon.gone()
@@ -70,12 +70,12 @@ class AccountInfoCrypto @JvmOverloads constructor(
     }
 
     private fun setInterestAccountDetails(
-        account: CryptoAccount,
-        disposables: CompositeDisposable
+        account: CryptoAccount
     ) {
         asset_account_icon.setImageResource(R.drawable.ic_account_badge_interest)
 
-        disposables += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
+        compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { asset_subtitle.text = resources.getString(R.string.empty) }
             .subscribeBy(
                 onSuccess = {
                     asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
@@ -92,7 +92,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private fun updateAccountDetails(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
         val crypto = account.asset
@@ -105,7 +104,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         wallet_balance_crypto.invisible()
         wallet_balance_fiat.invisible()
 
-        disposables += account.accountBalance
+        compositeDisposable += account.accountBalance
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { accountBalance ->
@@ -123,7 +122,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
                     Timber.e("Cannot get balance for ${account.label}")
                 }
             )
-        disposables += cellDecorator.view(container.context)
+        compositeDisposable += cellDecorator.view(container.context)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 container.addViewToBottomWithConstraints(
@@ -135,20 +134,28 @@ class AccountInfoCrypto @JvmOverloads constructor(
             }
 
         container.alpha = 1f
-
-        disposables += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
+        setOnClickListener { println("account clicked not setted") }
+        compositeDisposable += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { isEnabled ->
                     if (isEnabled) {
-                        setOnClickListener { onAccountClicked(account) }
+                        setOnClickListener {
+                            println("account clicked with assettt ${account.asset}")
+                            onAccountClicked(account)
+                        }
                         container.alpha = 1f
                     } else {
                         container.alpha = .6f
-                        setOnClickListener { }
+                        setOnClickListener { println("account clicked not setted") }
                     }
                 }
             )
 
         container.removePossibleBottomView()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        compositeDisposable.clear()
     }
 }
