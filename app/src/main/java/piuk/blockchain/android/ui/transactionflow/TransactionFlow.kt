@@ -149,38 +149,43 @@ class TransactionFlow(
         super.finishFlow()
     }
 
+
     private fun handleStateChange(newState: TransactionState) {
-        if (currentStep != newState.currentStep) {
-            if (newState.currentStep == TransactionStep.ZERO) {
+        if (currentStep == newState.currentStep)
+            return
+
+        when (newState.currentStep) {
+            TransactionStep.ZERO -> kotlin.run {
                 onTransactionComplete()
-            } else {
-                currentStep = newState.currentStep
-                showFlowStep(currentStep)
+            }
+            TransactionStep.CLOSED -> kotlin.run {
+                disposables.clear()
+                model.destroy()
+                closeScope()
+            }
+            else -> kotlin.run {
                 analyticsHooks.onStepChanged(newState)
             }
+        }
+        newState.currentStep.let {
+            showFlowStep(it)
+            currentStep = it
         }
     }
 
     private fun showFlowStep(step: TransactionStep) {
-        replaceBottomSheet(
-            when (step) {
-                TransactionStep.ZERO -> null
-                TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet()
-                TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet()
-                TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet()
-                TransactionStep.ENTER_AMOUNT -> EnterAmountSheet()
-                TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet()
-                TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet()
-                TransactionStep.IN_PROGRESS -> TransactionProgressSheet()
-                TransactionStep.CLOSED -> {
-                    currentStep = TransactionStep.ZERO
-                    disposables.clear()
-                    model.destroy()
-                    closeScope()
-                    null
-                }
-            }
-        )
+        val stepSheet = when (step) {
+            TransactionStep.ZERO,
+            TransactionStep.CLOSED -> null
+            TransactionStep.ENTER_PASSWORD -> EnterSecondPasswordSheet()
+            TransactionStep.SELECT_SOURCE -> SelectSourceAccountSheet()
+            TransactionStep.ENTER_ADDRESS -> EnterTargetAddressSheet()
+            TransactionStep.ENTER_AMOUNT -> EnterAmountSheet()
+            TransactionStep.SELECT_TARGET_ACCOUNT -> SelectTargetAccountSheet()
+            TransactionStep.CONFIRM_DETAIL -> ConfirmTransactionSheet()
+            TransactionStep.IN_PROGRESS -> TransactionProgressSheet()
+        }
+        replaceBottomSheet(stepSheet)
     }
 
     private fun openScope() =
