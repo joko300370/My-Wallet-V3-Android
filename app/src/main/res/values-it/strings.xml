@@ -1880,7 +1880,7 @@
   <string name="interest_summary_accrued">Interessi maturati questo mese</string>
   <string name="interest_summary_accrued_fail">Impossibile caricare gli interessi maturati</string>
   <string name="interest_summary_hold_period">Periodo di sospensione iniziale</string>
-  <string name="interest_summary_hold_period_days">%1$f giorni</string>
+  <string name="interest_summary_hold_period_days">%1$d giorni</string>
   <string name="interest_summary_hold_period_fail">Impossibile caricare i dettagli del periodo di attesa</string>
   <string name="interest_summary_rate">Tasso d\'interesse</string>
   <string name="interest_summary_rate_fail">Impossibile caricare il tasso di interesse</string>
