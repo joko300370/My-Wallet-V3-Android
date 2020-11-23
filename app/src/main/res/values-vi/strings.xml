@@ -151,7 +151,7 @@
   <string name="restoring_wallet">Khôi phục ví tiền.</string>
   <string name="password">Mật khẩu</string>
   <string name="email">Email của bạn</string>
-  <string name="you_agree_terms_of_service">Bằng cách tạo tài khoản, bạn đồng ý với <annotation link="terms"> Điều khoản dịch vụ </annotation> &amp; <annotation link="privacy"> Chính sách bảo mật </annotation> của Blockchain.</string>
+  <string name="you_agree_terms_of_service"><![CDATA[Bằng cách tạo tài khoản, bạn đồng ý với <annotation link=\"terms\"> Điều khoản dịch vụ </annotation> & <annotation link=\"privacy\"> Privacy <annotation link=\"privacy\"> Chính sách bảo mật </annotation> của Blockchain.]]></string>
   <string name="new_account_cta_text">Tiếp tục</string>
   <string name="new_account_title">Tạo một tài khoản</string>
   <string name="strength_weak">Yếu</string>
@@ -429,6 +429,15 @@
   <string name="settings_field_cant_be_empty">Trường không thể để trống.</string>
   <string name="settings_error_updating">Lỗi cập nhật cài đặt, vui lòng thử lại</string>
   <string name="request_camera_permission">Cần có quyền truy cập máy ảnh.</string>
+  <string name="request_camera_permission_title">Truy cập máy ảnh</string>
+  <string name="request_location_permission">Yêu cầu truy cập vị trí.</string>
+  <string name="request_write_storage_permission">Viết lưu trữ bên ngoài là cần thiết.</string>
+  <string name="request_write_and_camera_storage_permission_description">Viết bộ nhớ ngoài 
+ và máy ảnh được yêu cầu để tải lên các tài liệu KYC. 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">Viết lưu trữ và máy ảnh 
+ quyền 
+</string>
   <string name="not_specified">không được chỉ định</string>
   <string name="update_failed">Không thể cập nhật.</string>
   <string name="verify_mobile">Xác minh di động</string>
@@ -896,7 +905,7 @@
   <string name="swap_intro_title">Trao đổi</string>
   <string name="swap_intro_title_page_one">Chào mừng bạn đến với Trao đổi!</string>
   <string name="swap_intro_title_page_two">Tỷ giá theo thời gian thực</string>
-  <string name="swap_intro_title_page_three">100%% trên chuỗi</string>
+  <string name="swap_intro_title_page_three">100% trên chuỗi</string>
   <string name="swap_intro_title_page_four">Bạn kiểm soát khóa của mình</string>
   <string name="swap_intro_title_page_five">Quản lý rủi ro tốt hơn</string>
   <string name="swap_intro_description_page_one">Cách dễ nhất để chuyển đổi tiền kỹ thuật số sang một đơn vị tiền tệ khác mà không cần rời khỏi ví của bạn.</string>
@@ -1114,6 +1123,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Chúng tôi đã gửi một liên kết xác minh đến</string>
   <string name="buy_sell_unverified_email_verify_message2">Nhấn vào đó và trở lại đây để tiếp tục với giao dịch của bạn.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Mở email</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Đồng ý với Coinify <a href="ignored"> điều khoản và điều kiện </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email đã kích hoạt!</string>
   <string name="buy_sell_verified_email_message">Đối tác của chúng tôi %1$s sẽ xử lý giao dịch bitcoin của bạn. Bằng cách nhấp vào Đồng ý và \'Tiếp tục\', bạn sẽ tạo một tài khoản với %1$s .</string>
   <string name="buy_sell_identification_verification">Xác định xác minh</string>
@@ -1498,7 +1509,7 @@
   <string name="tx_title_receive">Nhận %1s</string>
   <string name="tx_title_sell">Bán %1s</string>
   <string name="tx_title_buy">Mua %1s</string>
-  <string name="tx_title_swap">Hoán đổi %1s → %2$s</string>
+  <string name="tx_title_swap">Hoán đổi %1s</string>
   <string name="tx_title_transfer">Chuyển %1s</string>
   <string name="tx_title_fee">Phí %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Giá trị khi hoán đổi: \u0020</string>
@@ -1705,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Gửi tiền mặt</string>
   <string name="fiat_funds_no_kyc_step_2_description">Chuyển tiền từ ngân hàng của bạn và kích hoạt số dư tiền mặt của bạn.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Mua tiền điện tử bằng tiền mặt</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Sử dụng ví tiền mặt của bạn làm phương thức thanh toán để mua BTC, ETH, XLM và hơn thế nữa.</string>
+  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Sử dụng ví tiền mặt của bạn làm phương thức thanh toán để mua BTC, ETH, XLM và hơn thế nữa.]]></string>
   <string name="fiat_funds_no_kyc_positive_action">Xác minh danh tính của tôi</string>
   <string name="fiat_funds_no_kyc_negative_action">Không phải bây giờ</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1830,7 +1841,7 @@
   <string name="send_enter_unexpected_error">Một lỗi không mong muốn đã xảy ra. Vui lòng thử lại.</string>
   <string name="send_enter_insufficient_gas">Bạn không có đủ ETH để xử lý giao dịch này.</string>
   <string name="send_select_a_wallet_title">hoặc Chọn một Ví</string>
-  <string name="send_internal_transfer_message">Tại thời điểm này, bạn chỉ có thể chuyển %1$s từ Ví thương mại %2$s sang Ví Vault của mình. Sau khi %1$s có trong Ví Vault, bạn có thể chuyển đến các địa chỉ bên ngoài.</string>
+  <string name="send_internal_transfer_message">Tại thời điểm này, bạn chỉ có thể chuyển %1$s từ Ví thương mại %1$s sang Ví Vault của mình. Sau khi %1$s có trong Ví Vault, bạn có thể chuyển đến các địa chỉ bên ngoài.</string>
   <string name="purchase_funds_note">Số tiền cuối cùng của bạn có thể thay đổi do hoạt động thị trường.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Tìm hiểu thêm. </annotation>
@@ -1879,7 +1890,7 @@
   <string name="interest_summary_accrued">Tiền lãi tích lũy trong tháng này</string>
   <string name="interest_summary_accrued_fail">Không thể tải lãi tích lũy</string>
   <string name="interest_summary_hold_period">Thời gian giữ ban đầu</string>
-  <string name="interest_summary_hold_period_days">%1$d Ngày</string>
+  <string name="interest_summary_hold_period_days">%1$f Ngày</string>
   <string name="interest_summary_hold_period_fail">Không thể tải chi tiết thời gian lưu giữ</string>
   <string name="interest_summary_rate">Lãi suất</string>
   <string name="interest_summary_rate_fail">Không thể tải lãi suất</string>
@@ -1979,17 +1990,17 @@
   <string name="tx_view_locked_funds_1">Các khoản tiền này sẽ có sẵn để bán vào ví Fiat %1$s ngay lập tức, nhưng bạn sẽ không thể gửi hoặc rút các khoản tiền này từ Blockchain.com với số tiền lên đến %2$s</string>
   <string name="common_pending">Đang chờ xử lý</string>
   <string name="confirm_status_msg_insufficient_funds">Bạn không có đủ tiền trong tài khoản này để xử lý giao dịch này</string>
-  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insuffnough_gas</string>
   <string name="confirm_status_msg_option_invalid">Hãy đảm bảo rằng bạn đã đồng ý với các Điều khoản của chúng tôi.</string>
-  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_uneosystem_error</string>
   <string name="common_free">Miễn phí</string>
   <string name="two_fa_new_request">Đang yêu cầu mã mới…</string>
   <string name="transfer_funds_title">Chuyển từ địa chỉ đã nhập?</string>
   <string name="transfer_funds_description">Các địa chỉ đã nhập không được sao lưu bằng Cụm từ sao lưu của bạn. Để đảm bảo những khoản tiền này, chúng tôi
  khuyên bạn nên chuyển những số dư này sang Ví không giám sát Blockchain.com của bạn.
 </string>
-  <string name="two_factor_resend_sms">Gửi lại SMS (%1$d)</string>
+  <string name="two_factor_resend_sms">Gửi lại SMS ( %1$d )</string>
   <string name="two_factor_retries_exceeded">Số lần thử lại vượt quá, vui lòng đợi 60 giây trước khi thử lại</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Yêu cầu tối thiểu 1 sat / byte</string>
@@ -2063,4 +2074,32 @@
   <string name="exchange_rate">Tỷ giá</string>
   <string name="in_progress">Trong tiến trình</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Để bảo mật cho bạn, các giao dịch mua thẻ lần đầu tiên phải tuân theo khoảng thời gian giữ %1$s ngày trước khi bạn có thể gửi hoặc rút tiền điện tử đã mua của mình. Chúng tôi sẽ thông báo cho bạn khi lệnh giữ được dỡ bỏ. 
+
+ Trong thời gian chờ đợi, bạn có thể bán thành Tiền mặt, hoán đổi và giao dịch trong Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Bạn phải luôn ghép nối hoặc đăng nhập nếu bạn có quyền truy cập
+ vào ID và mật khẩu Wallet của bạn. Việc khôi phục tiền của bạn có thể tạo ID Wallet mới. Bạn sẽ
+ muốn tiếp tục?
+</string>
+  <string name="received_dgld">Đã nhận Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Vui lòng gửi wDGLD đến địa chỉ Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Giao dịch wDGLD ngay</string>
+  <string name="wdgld_available_card_body">Được bọc vàng kỹ thuật số (wDGLD) trong phiên bản mã hóa ERC-20 của DGLD, kết hợp mã thông báo được hỗ trợ bằng vàng với sức mạnh và tính linh hoạt của Ethereum.</string>
+  <string name="wdgld_available_card_cta">Giao dịch wDGLD ngay bây giờ</string>
+  <string name="dgld_default_account_label">Ví DGLD được bọc của tôi</string>
+  <string name="swap_faster">Nhanh hơn</string>
+  <string name="swap_trading_sheet_title">Nhanh hơn. Giá rẻ hơn. Tốt hơn
+ Hoán đổi tiền điện tử với Ví giao dịch của bạn.</string>
+  <string name="swap_trading_sheet_subtitle">Nhận phí thấp hơn và tăng gấp đôi tốc độ giao dịch khi bạn Hoán đổi tiền điện tử của mình từ bất kỳ Ví giao dịch nào.</string>
+  <string name="swap_trading_fees_title">Hoán đổi giống nhau, Phí thấp hơn</string>
+  <string name="swap_trading_fees_subtitle">Bạn không phải trả phí mạng bằng cách hoán đổi tiền điện tử ngoài chuỗi</string>
+  <string name="swap_trading_speed_title">Hoán đổi trong vài giây</string>
+  <string name="swap_trading_speed_subtitle">Tốc độ tăng lên có nghĩa là giao dịch Hoán đổi của bạn sẽ hoàn thành trong vài giây chứ không phải vài phút</string>
+  <string name="scan_qr">Quét mã QR</string>
+  <string name="qr_activity_hint_any_asset">Quét địa chỉ CryptoCurrency hoặc hóa đơn BitPay</string>
+  <string name="qr_activity_hint_asset_address">Đảm bảo chỉ quét Mã QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Quét hóa đơn BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Quét khóa cá nhân của ví</string>
+  <string name="qr_activity_hint_pairing_code">Quét mã QR ghép nối web</string>
+  <string name="qr_activity_hint_new_web_login">Đăng nhập vào web</string>
 </resources>

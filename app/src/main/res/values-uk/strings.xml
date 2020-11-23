@@ -15,14 +15,14 @@
     <item>дванадцяте слово</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ string / xlm_memo_text</item>
+    <item>\@ string / xlm_memo_id</item>
+    <item>\@ string / xlm_memo_hash</item>
+    <item>\@ string / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ string / xlm_memo_text</item>
+    <item>\@ string / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 імпортна адреса</item>
@@ -432,6 +432,15 @@
   <string name="settings_field_cant_be_empty">Поле не може бути порожнім.</string>
   <string name="settings_error_updating">Помилка оновлення налаштувань. Повторіть спробу</string>
   <string name="request_camera_permission">Потрібен доступ до камери.</string>
+  <string name="request_camera_permission_title">Доступ до камери</string>
+  <string name="request_location_permission">Потрібен доступ до місцезнаходження.</string>
+  <string name="request_write_storage_permission">Потрібно записати зовнішнє сховище.</string>
+  <string name="request_write_and_camera_storage_permission_description">Пишіть зовнішнє сховище 
+ та камера потрібна для завантаження документів KYC. 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">Напишіть сховище та камеру 
+ дозволи 
+</string>
   <string name="not_specified">не визначено</string>
   <string name="update_failed">Не вдалося оновити.</string>
   <string name="verify_mobile">Підтвердити мобільний телефон</string>
@@ -899,7 +908,7 @@
   <string name="swap_intro_title">Зміна</string>
   <string name="swap_intro_title_page_one">Ласкаво просимо в Swap!</string>
   <string name="swap_intro_title_page_two">Курси валют у режимі реального часу</string>
-  <string name="swap_intro_title_page_three">100%% від мережі</string>
+  <string name="swap_intro_title_page_three">100% від мережі</string>
   <string name="swap_intro_title_page_four">Ви керуєте своїм ключем</string>
   <string name="swap_intro_title_page_five">Управління ризиком краще</string>
   <string name="swap_intro_description_page_one">Найпростіший спосіб обміняти одну криптовалюту на іншу, не залишаючи гаманець.</string>
@@ -1117,6 +1126,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Ми надіслали посилання для підтвердження до</string>
   <string name="buy_sell_unverified_email_verify_message2">Клацніть по ньому та поверніться сюди, щоб продовжити транзакцію.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Відкрити електронну пошту</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Погодьтеся, щоб Coinify <a href="ignored"> положення та умови </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Підтверджено електронною поштою!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обробить вашу біткойн-транзакцію. Натиснувши «Погодитися» та «Продовжити», ви створите обліковий запис за допомогою %1$s .</string>
   <string name="buy_sell_identification_verification">Визначте верифікацію</string>
@@ -1223,7 +1234,7 @@
   <string name="kyc_email_title">Підтвердьте свою електронну пошту</string>
   <string name="kyc_email_message">Нам потрібно підтвердити вашу електронну адресу як додатковий рівень безпеки.</string>
   <string name="kyc_email_hint_focused">Твій емейл</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Помилка збереження електронної пошти. Повторіть спробу</string>
   <string name="kyc_email_send_verification">Відправити лист</string>
   <string name="kyc_email_validation_header">Перевірити свою поштову скриньку.</string>
@@ -1248,7 +1259,7 @@
   <string name="kyc_onfido_splash_verification_error">Помилка підтвердження ідентифікатора. Повторіть спробу</string>
   <string name="kyc_veriff_splash_country_supported_header">Чи підтримується моя країна?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Наразі підтримують не всі країни. Перегляньте наш оновлений <annotation link="country_list"> список країн </annotation> перш ніж продовжувати.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">СЕРВІР ПЕРЕВІРЕНО</string>
   <string name="kyc_veriff_splash_header">Давайте підтвердимо, що це ти</string>
   <string name="kyc_veriff_splash_subtitle">Щоб продовжити, вам знадобиться 1 із типів ідентифікаторів нижче.</string>
@@ -1270,11 +1281,11 @@
   <string name="kyc_complete_device_verified">Пристрій перевірено</string>
   <string name="kyc_complete_id_uploaded">Ідентифікатор завантажено</string>
   <string name="kyc_complete_video_uploaded">Відео завантажено</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Наша команда служби підтримки Blockchain написала довідники з поясненням, чому нам потрібно підтвердити вашу особу.</string>
   <string name="kyc_help_dialog_read_now">Читайте зараз</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Підтвердження особи</string>
   <string name="kyc_settings_status_none">Неперевірений</string>
@@ -1286,7 +1297,7 @@
   <string name="kyc_settings_gold_level_in_review">Рівень золота - в огляді</string>
   <string name="kyc_settings_gold_level_approved">Рівень золота - затверджено</string>
   <string name="kyc_settings_silver_level_approved">Рівень срібла - затверджено</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Помилка під час отримання статусу KYC</string>
   <string name="kyc_status_title_in_progress">Перевірка триває</string>
   <string name="kyc_status_title_approved">Рахунок затверджено</string>
@@ -1310,10 +1321,10 @@
   <string name="kyc_drop_off_card_description">Виберіть місце, де ви зупинилися, і завершіть підтвердження особи.</string>
   <string name="kyc_drop_off_card_button">Продовжуйте перевірку</string>
   <string name="kyc_documents_needed">Необхідні документи</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">У нас були деякі проблеми з наданими вами документами. Спробуйте знову завантажити документи, щоб продовжити перевірку.</string>
   <string name="kyc_resubmission_card_button">Завантажити документи</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Ми не можемо підтвердити вашу особу, і вам потрібно перезавантажити необхідні документи.</string>
   <string name="kyc_resubmission_splash_description_2">Основні причини цього:</string>
   <string name="kyc_resubmission_splash_description_3">Потрібні фотографії відсутні.</string>
@@ -1501,7 +1512,7 @@
   <string name="tx_title_receive">Отримайте %1s</string>
   <string name="tx_title_sell">Продаємо %1s</string>
   <string name="tx_title_buy">Купуйте %1s</string>
-  <string name="tx_title_swap">Поміняйте %1s → %2$s</string>
+  <string name="tx_title_swap">Поміняйте %1s</string>
   <string name="tx_title_transfer">Передача %1s</string>
   <string name="tx_title_fee">Плата %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Значення при свопінгу: \u0020</string>
@@ -1708,7 +1719,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Депозит готівкою</string>
   <string name="fiat_funds_no_kyc_step_2_description">Перерахуйте готівку з вашого банку та ввімкніть свої залишки.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Купуйте криптовалюту з готівкою</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Використовуйте свій готівковий гаманець як спосіб оплати, щоб придбати BTC, ETH, XLM та інші.</string>
+  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Використовуйте свій готівковий гаманець як спосіб оплати, щоб придбати BTC, ETH, XLM та інші.]]></string>
   <string name="fiat_funds_no_kyc_positive_action">Підтвердити мою особу</string>
   <string name="fiat_funds_no_kyc_negative_action">Не зараз</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1833,7 +1844,7 @@
   <string name="send_enter_unexpected_error">Виникла несподівана помилка. Будь ласка спробуйте ще раз.</string>
   <string name="send_enter_insufficient_gas">У вас недостатньо ETH для обробки цієї транзакції.</string>
   <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
-  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %2$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
+  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
   <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Докладніше. </annotation>
@@ -1882,7 +1893,7 @@
   <string name="interest_summary_accrued">Нараховані відсотки цього місяця</string>
   <string name="interest_summary_accrued_fail">Неможливо завантажити нараховані відсотки</string>
   <string name="interest_summary_hold_period">Початковий період утримання</string>
-  <string name="interest_summary_hold_period_days">%1$d днів</string>
+  <string name="interest_summary_hold_period_days">%1$f днів</string>
   <string name="interest_summary_hold_period_fail">Не вдається завантажити деталі періоду витримки</string>
   <string name="interest_summary_rate">Процентна ставка</string>
   <string name="interest_summary_rate_fail">Неможливо завантажити процентну ставку</string>
@@ -1988,17 +1999,17 @@
   <string name="tx_view_locked_funds_1">Ці кошти можна буде негайно продати у %1$s гаманця Fiat, але ви не зможете надіслати або вивести ці кошти з Blockchain.com до %2$s</string>
   <string name="common_pending">В очікуванні</string>
   <string name="confirm_status_msg_insufficient_funds">У вас недостатньо коштів на цьому рахунку для обробки цієї транзакції</string>
-  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Будь ласка, переконайтеся, що ви погодились з нашими Умовами.</string>
-  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
   <string name="common_free">Безкоштовно</string>
   <string name="two_fa_new_request">Запит нового коду…</string>
   <string name="transfer_funds_title">Перенести з імпортованої адреси?</string>
   <string name="transfer_funds_description">Імпортні адреси не створюються за допомогою резервної фрази. Щоб забезпечити ці кошти, ми
  рекомендуємо перекласти ці залишки на свій Гаманець, що не є кастовим, на Blockchain.com.
 </string>
-  <string name="two_factor_resend_sms">Повторно надіслати SMS (%1$d)</string>
+  <string name="two_factor_resend_sms">Повторно надіслати SMS ( %1$d )</string>
   <string name="two_factor_retries_exceeded">Перевищено спроби, зачекайте 60 секунд, перш ніж повторити спробу</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Потрібно мінімум 1 сат / байт</string>
@@ -2072,4 +2083,32 @@
   <string name="exchange_rate">Обмінний курс</string>
   <string name="in_progress">В процесі</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">З міркувань безпеки для перших покупок на картці передбачається %1$s денний термін зберігання, перш ніж ви зможете надіслати або вивести придбану криптовалюту. Ми повідомимо вас, коли затримання буде знято. 
+
+ Тим часом ви можете продавати готівкою, обмінюватися та торгувати на Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Ви завжди повинні створювати пари або входити, якщо у вас є доступ
+ на ваш ідентифікатор гаманця та пароль. Повернення коштів може створити новий ідентифікатор гаманця. Міг би ти
+ хотіли б продовжувати?
+</string>
+  <string name="received_dgld">Отримано загорнуте DGLD</string>
+  <string name="email_request_body_dgld">Будь ласка, надішліть wDGLD на адресу Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Торгуйте wDGLD зараз</string>
+  <string name="wdgld_available_card_body">Обгорнуте цифрове золото (wDGLD) в токенизованій версії DGLD, що поєднує ERC-20, поєднуючи токен із підтримкою золота з потужністю та гнучкістю Ethereum.</string>
+  <string name="wdgld_available_card_cta">Торгуйте wDGLD зараз</string>
+  <string name="dgld_default_account_label">Мій гаманець із загорнутим DGLD</string>
+  <string name="swap_faster">Швидше</string>
+  <string name="swap_trading_sheet_title">Швидше. Дешевше. Краще
+ Поміняйте криптовалюту на свій торговий гаманець.</string>
+  <string name="swap_trading_sheet_subtitle">Отримайте нижчі комісії та подвойте швидкість транзакції, коли заміните свою криптовалюту з будь-якого торгового гаманця.</string>
+  <string name="swap_trading_fees_title">Той самий своп, нижча плата</string>
+  <string name="swap_trading_fees_subtitle">Ви платите нульову комісію за мережу, помінявши криптовалюту поза мережею</string>
+  <string name="swap_trading_speed_title">Поміняти місцями за секунди</string>
+  <string name="swap_trading_speed_subtitle">Збільшена швидкість означає, що ваша торгівля свопом очищається за секунди, а не за хвилини</string>
+  <string name="scan_qr">Відскануйте QR-код</string>
+  <string name="qr_activity_hint_any_asset">Відскануйте адресу CryptoCurrency або рахунок-фактуру BitPay</string>
+  <string name="qr_activity_hint_asset_address">Обов’язково скануйте лише QR-код %1$s</string>
+  <string name="qr_activity_hint_bitpay">Відскануйте рахунок-фактуру BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Відскануйте приватний ключ гаманця</string>
+  <string name="qr_activity_hint_pairing_code">Відскануйте QR-код веб-сполучення</string>
+  <string name="qr_activity_hint_new_web_login">Увійдіть в Інтернет</string>
 </resources>

@@ -15,14 +15,14 @@
     <item>dodicesima parola</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ String / xlm_memo_text</item>
+    <item>\@ String / xlm_memo_id</item>
+    <item>\@ String / xlm_memo_hash</item>
+    <item>\@ String / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ String / xlm_memo_text</item>
+    <item>\@ String / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 indirizzo importato</item>
@@ -430,6 +430,15 @@
   <string name="settings_field_cant_be_empty">Il campo non può essere vuoto.</string>
   <string name="settings_error_updating">Errore durante l\'aggiornamento delle impostazioni, riprova</string>
   <string name="request_camera_permission">È richiesto l\'accesso alla telecamera.</string>
+  <string name="request_camera_permission_title">Accesso alla telecamera</string>
+  <string name="request_location_permission">È richiesto l\'accesso alla posizione.</string>
+  <string name="request_write_storage_permission">Scrivere memoria esterna è necessario.</string>
+  <string name="request_write_and_camera_storage_permission_description">Scrivi memoria esterna 
+ e la fotocamera è richiesta per caricare i documenti KYC. 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">Scrivi memoria e fotocamera 
+ permessi 
+</string>
   <string name="not_specified">non specificato</string>
   <string name="update_failed">Aggiornamento non riuscito.</string>
   <string name="verify_mobile">Verifica mobile</string>
@@ -897,7 +906,7 @@
   <string name="swap_intro_title">Scambiare</string>
   <string name="swap_intro_title_page_one">Benvenuto in Swap!</string>
   <string name="swap_intro_title_page_two">Tassi di cambio in tempo reale</string>
-  <string name="swap_intro_title_page_three">100%% su catena</string>
+  <string name="swap_intro_title_page_three">100% su catena</string>
   <string name="swap_intro_title_page_four">Tu controlli la tua chiave</string>
   <string name="swap_intro_title_page_five">Gestisci il rischio meglio</string>
   <string name="swap_intro_description_page_one">Il modo più semplice per scambiare una criptovaluta con un\'altra senza lasciare il tuo portafoglio.</string>
@@ -1115,6 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Abbiamo inviato un link di verifica a</string>
   <string name="buy_sell_unverified_email_verify_message2">Fare clic e tornare qui per continuare con la transazione.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Apri email</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Accetta di monetizzare <a href="ignored"> termini e condizioni </a></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email verificata!</string>
   <string name="buy_sell_verified_email_message">Il nostro partner %1$s elaborerà la tua transazione bitcoin. Facendo clic su Accetto e \"Continua\", creerai un account con %1$s .</string>
   <string name="buy_sell_identification_verification">Identificare la verifica</string>
@@ -1221,7 +1232,7 @@
   <string name="kyc_email_title">Verifica la tua email</string>
   <string name="kyc_email_message">Dobbiamo verificare il tuo indirizzo email come ulteriore livello di sicurezza.</string>
   <string name="kyc_email_hint_focused">La tua email</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ String / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Errore durante il salvataggio dell\'email, riprova</string>
   <string name="kyc_email_send_verification">Invia una email</string>
   <string name="kyc_email_validation_header">Controlla la tua casella di posta.</string>
@@ -1246,7 +1257,7 @@
   <string name="kyc_onfido_splash_verification_error">Errore durante la verifica dell\'ID, riprova</string>
   <string name="kyc_veriff_splash_country_supported_header">Il mio paese è supportato?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Al momento non tutti i paesi sono supportati. Controlla il nostro <annotation link="country_list"> aggiornato dei paesi </annotation> prima di procedere.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ String / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">VERIFICATO ARGENTO</string>
   <string name="kyc_veriff_splash_header">Confermiamo che sei tu</string>
   <string name="kyc_veriff_splash_subtitle">Per continuare, avrai bisogno di 1 dei tipi di ID seguenti.</string>
@@ -1268,11 +1279,11 @@
   <string name="kyc_complete_device_verified">Dispositivo verificato</string>
   <string name="kyc_complete_id_uploaded">ID caricato</string>
   <string name="kyc_complete_video_uploaded">Video caricato</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ String / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Il nostro team di supporto Blockchain ha scritto Guide di aiuto che spiegano perché dobbiamo verificare la tua identità.</string>
   <string name="kyc_help_dialog_read_now">Leggi ora</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ String / CONTACT_SUPPORT</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Verifica dell\'identità</string>
   <string name="kyc_settings_status_none">Non verificato</string>
@@ -1284,7 +1295,7 @@
   <string name="kyc_settings_gold_level_in_review">Livello oro - In revisione</string>
   <string name="kyc_settings_gold_level_approved">Livello oro - Approvato</string>
   <string name="kyc_settings_silver_level_approved">Livello d\'argento - Approvato</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ String / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Errore durante il recupero dello stato KYC</string>
   <string name="kyc_status_title_in_progress">Verifica in corso</string>
   <string name="kyc_status_title_approved">Account approvato</string>
@@ -1308,10 +1319,10 @@
   <string name="kyc_drop_off_card_description">Riprendi da dove eri rimasto e completa la verifica dell\'identità.</string>
   <string name="kyc_drop_off_card_button">Continua la verifica</string>
   <string name="kyc_documents_needed">Documenti necessari</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ String / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Abbiamo riscontrato alcuni problemi con i documenti che hai fornito. Prova a caricare nuovamente i documenti per continuare con la verifica.</string>
   <string name="kyc_resubmission_card_button">Carica documenti</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ String / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Non siamo in grado di verificare la tua identità e dobbiamo caricare nuovamente i documenti richiesti.</string>
   <string name="kyc_resubmission_splash_description_2">Principali ragioni perché ciò accada:</string>
   <string name="kyc_resubmission_splash_description_3">Mancano le foto richieste.</string>
@@ -1499,7 +1510,7 @@
   <string name="tx_title_receive">Ricevi %1s</string>
   <string name="tx_title_sell">Vendi %1s</string>
   <string name="tx_title_buy">Acquista %1s</string>
-  <string name="tx_title_swap">Scambia %1s → %2$s</string>
+  <string name="tx_title_swap">Scambia %1s</string>
   <string name="tx_title_transfer">Trasferimento %1s</string>
   <string name="tx_title_fee">Commissione %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Valore quando scambiato: \u0020</string>
@@ -1706,7 +1717,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Deposito in contanti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Trasferisci contanti dalla tua banca e attiva i tuoi saldi di cassa.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Acquista Crypto con contanti</string>
-  <string name="fiat_funds_no_kyc_step_3_description">Usa il tuo portafoglio in contanti come metodo di pagamento per acquistare BTC, ETH, XLM e altro.</string>
+  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Usa il tuo portafoglio in contanti come metodo di pagamento per acquistare BTC, ETH, XLM e altro.]]></string>
   <string name="fiat_funds_no_kyc_positive_action">Verifica la mia identità</string>
   <string name="fiat_funds_no_kyc_negative_action">Non adesso</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1831,7 +1842,7 @@
   <string name="send_enter_unexpected_error">Si è verificato un errore imprevisto. Per favore riprova.</string>
   <string name="send_enter_insufficient_gas">Non hai abbastanza ETH per elaborare questa transazione.</string>
   <string name="send_select_a_wallet_title">o Seleziona un portafoglio</string>
-  <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %2$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
+  <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %1$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
   <string name="purchase_funds_note">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ulteriori informazioni. </annotation>
@@ -1880,7 +1891,7 @@
   <string name="interest_summary_accrued">Interessi maturati questo mese</string>
   <string name="interest_summary_accrued_fail">Impossibile caricare gli interessi maturati</string>
   <string name="interest_summary_hold_period">Periodo di sospensione iniziale</string>
-  <string name="interest_summary_hold_period_days">%1$d giorni</string>
+  <string name="interest_summary_hold_period_days">%1$f giorni</string>
   <string name="interest_summary_hold_period_fail">Impossibile caricare i dettagli del periodo di attesa</string>
   <string name="interest_summary_rate">Tasso d\'interesse</string>
   <string name="interest_summary_rate_fail">Impossibile caricare il tasso di interesse</string>
@@ -1982,17 +1993,17 @@
   <string name="tx_view_locked_funds_1">Questi fondi saranno immediatamente disponibili per la vendita in un portafoglio Fiat %1$s , ma non potrai inviare o prelevare questi fondi da Blockchain.com fino a %2$s</string>
   <string name="common_pending">in sospeso</string>
   <string name="confirm_status_msg_insufficient_funds">Non hai fondi sufficienti in questo account per elaborare questa transazione</string>
-  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Assicurati di aver accettato i nostri Termini.</string>
-  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
   <string name="common_free">Gratuito</string>
-  <string name="two_fa_new_request">Richiesta nuovo codice…</string>
+  <string name="two_fa_new_request">Richiesta nuovo codice ...</string>
   <string name="transfer_funds_title">Trasferimento da indirizzo importato?</string>
   <string name="transfer_funds_description">Gli indirizzi importati non vengono sottoposti a backup dalla frase di backup. Per garantire questi fondi, noi
  consiglia di trasferire questi saldi sul tuo portafoglio non custodito Blockchain.com.
 </string>
-  <string name="two_factor_resend_sms">Invia di nuovo SMS (%1$d)</string>
+  <string name="two_factor_resend_sms">Invia di nuovo SMS ( %1$d )</string>
   <string name="two_factor_retries_exceeded">Tentativi superati, attendere 60 secondi prima di riprovare</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Richiesto minimo 1 sat / byte</string>
@@ -2066,4 +2077,32 @@
   <string name="exchange_rate">Tasso di cambio</string>
   <string name="in_progress">In corso</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata. 
+
+ Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Dovresti sempre eseguire l\'accoppiamento o il login se hai accesso
+ al tuo ID Wallet e password. Il recupero dei tuoi fondi potrebbe creare un nuovo ID Wallet. Vorresti
+ piace continuare?
+</string>
+  <string name="received_dgld">Ricevuto Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Invia wDGLD all\'indirizzo Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Fai trading con wDGLD ora</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) in una versione tokenizzata ERC-20 di DGLD, che combina un token sostenuto dall\'oro con la potenza e la flessibilità di Ethereum.</string>
+  <string name="wdgld_available_card_cta">Fai trading con wDGLD adesso</string>
+  <string name="dgld_default_account_label">Il mio portafoglio DGLD avvolto</string>
+  <string name="swap_faster">Più veloce</string>
+  <string name="swap_trading_sheet_title">Più veloce. Più economico. Meglio
+ Scambia Crypto con il tuo portafoglio di trading.</string>
+  <string name="swap_trading_sheet_subtitle">Ottieni commissioni inferiori e raddoppia la velocità di transazione quando scambi la tua crittografia da qualsiasi Trading Wallet.</string>
+  <string name="swap_trading_fees_title">Stesso scambio, commissioni inferiori</string>
+  <string name="swap_trading_fees_subtitle">Paghi zero commissioni di rete scambiando criptovalute fuori catena</string>
+  <string name="swap_trading_speed_title">Scambia in pochi secondi</string>
+  <string name="swap_trading_speed_subtitle">Una maggiore velocità significa che il tuo scambio di scambio si cancella in pochi secondi, non minuti</string>
+  <string name="scan_qr">Scansiona un codice QR</string>
+  <string name="qr_activity_hint_any_asset">Scansiona un indirizzo CryptoCurrency o una fattura BitPay</string>
+  <string name="qr_activity_hint_asset_address">Assicurati di scansionare solo un codice QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Scansiona una fattura BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Scansiona una chiave privata del portafoglio</string>
+  <string name="qr_activity_hint_pairing_code">Scansiona un codice QR di accoppiamento web</string>
+  <string name="qr_activity_hint_new_web_login">Accedi al web</string>
 </resources>

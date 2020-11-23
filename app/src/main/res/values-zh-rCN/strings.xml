@@ -15,14 +15,14 @@
     <item>第十二字</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ string / xlm_memo_text</item>
+    <item>\@ string / xlm_memo_id</item>
+    <item>\@ string / xlm_memo_hash</item>
+    <item>\@ string / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ string / xlm_memo_text</item>
+    <item>\@ string / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d导入的地址</item>
@@ -429,6 +429,15 @@
   <string name="settings_field_cant_be_empty">字段不能为空。</string>
   <string name="settings_error_updating">更新设置时出错，请重试</string>
   <string name="request_camera_permission">需要访问相机。</string>
+  <string name="request_camera_permission_title">摄像头访问</string>
+  <string name="request_location_permission">需要位置访问权限。</string>
+  <string name="request_write_storage_permission">需要写入外部存储。</string>
+  <string name="request_write_and_camera_storage_permission_description">写外部存储
+和相机需要上传KYC文档。 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">写存储和相机
+权限
+</string>
   <string name="not_specified">未标明</string>
   <string name="update_failed">更新失败。</string>
   <string name="verify_mobile">验证手机</string>
@@ -896,7 +905,7 @@
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">欢迎使用 Swap！</string>
   <string name="swap_intro_title_page_two">实时汇率</string>
-  <string name="swap_intro_title_page_three">100%％链接</string>
+  <string name="swap_intro_title_page_three">100％链接</string>
   <string name="swap_intro_title_page_four">掌控您的密钥</string>
   <string name="swap_intro_title_page_five">更好地管理风险</string>
   <string name="swap_intro_description_page_one">在不离开钱包的情况下将一种加密货币交换为另一种加密货币的最简单方法。</string>
@@ -1114,6 +1123,8 @@
   <string name="buy_sell_unverified_email_verify_message1">我们发送了一个验证链接到</string>
   <string name="buy_sell_unverified_email_verify_message2">单击它并返回此处以继续您的交易。</string>
   <string name="buy_sell_unverified_email_verify_open_email">开启电子邮件</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">同意Coinify <a href="ignored">条款</a></string>
+  <string name="coinify">协整</string>
   <string name="buy_sell_verified_email_title">电子邮件已验证！</string>
   <string name="buy_sell_verified_email_message">我们的合作伙伴%1$s将处理您的比特币交易。通过单击同意并继续，您将创建一个具有%1$s的帐户。</string>
   <string name="buy_sell_identification_verification">识别验证</string>
@@ -1220,7 +1231,7 @@
   <string name="kyc_email_title">验证您的电子邮件</string>
   <string name="kyc_email_message">我们需要验证您的电子邮件地址，以增加安全性。</string>
   <string name="kyc_email_hint_focused">你的邮件</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">保存电子邮件时出错，请重试</string>
   <string name="kyc_email_send_verification">发送电子邮件</string>
   <string name="kyc_email_validation_header">检查你的收件箱。</string>
@@ -1245,7 +1256,7 @@
   <string name="kyc_onfido_splash_verification_error">验证ID出错，请重试</string>
   <string name="kyc_veriff_splash_country_supported_header">支持我的国家吗？</string>
   <string name="kyc_veriff_splash_country_supported_subheader">目前，并非所有国家都支持。在继续之前，请检查我们最新的<annotation link="country_list">国家</annotation>列表&lt;/annotation&gt; 。</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">银色验证</string>
   <string name="kyc_veriff_splash_header">让我们确认是你</string>
   <string name="kyc_veriff_splash_subtitle">您需要以下ID类型之一才能继续。</string>
@@ -1267,11 +1278,11 @@
   <string name="kyc_complete_device_verified">设备验证</string>
   <string name="kyc_complete_id_uploaded">ID已上传</string>
   <string name="kyc_complete_video_uploaded">视频已上传</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">我们的区块链支持团队已编写了帮助指南，解释了为什么我们需要验证您的身份。</string>
   <string name="kyc_help_dialog_read_now">现在读</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/zh-CN/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/zh-CN/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">身份验证</string>
   <string name="kyc_settings_status_none">未验证</string>
@@ -1283,7 +1294,7 @@
   <string name="kyc_settings_gold_level_in_review">黄金级-审核中</string>
   <string name="kyc_settings_gold_level_approved">金级-已批准</string>
   <string name="kyc_settings_silver_level_approved">银级-已批准</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">提取KYC状态时出错</string>
   <string name="kyc_status_title_in_progress">正在进行验证</string>
   <string name="kyc_status_title_approved">帐户已批准</string>
@@ -1307,10 +1318,10 @@
   <string name="kyc_drop_off_card_description">从您上次停下来的地方取走并完成身份验证。</string>
   <string name="kyc_drop_off_card_button">继续验证</string>
   <string name="kyc_documents_needed">所需文件</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">您提供的文档有一些问题。请尝试再次上传文档，以继续进行验证。</string>
   <string name="kyc_resubmission_card_button">上传文件</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">我们无法验证您的身份，需要您重新上传所需的文档。</string>
   <string name="kyc_resubmission_splash_description_2">发生这种情况的主要原因：</string>
   <string name="kyc_resubmission_splash_description_3">所需的照片丢失。</string>
@@ -1498,7 +1509,7 @@
   <string name="tx_title_receive">收到%1s</string>
   <string name="tx_title_sell">出售%1s</string>
   <string name="tx_title_buy">购买%1s</string>
-  <string name="tx_title_swap">交换%1s → %2$s</string>
+  <string name="tx_title_swap">交换%1s</string>
   <string name="tx_title_transfer">转移%1s</string>
   <string name="tx_title_fee">费用%1s</string>
   <string name="transaction_detail_value_at_time_swapped">交换后的值： \u0020</string>
@@ -1705,7 +1716,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">存入现金</string>
   <string name="fiat_funds_no_kyc_step_2_description">从您的银行转移现金，并启用您的现金余额。</string>
   <string name="fiat_funds_no_kyc_step_3_title">用现金购买加密货币</string>
-  <string name="fiat_funds_no_kyc_step_3_description">使用您的现金钱包作为购买BTC，ETH，XLM等的付款方式。</string>
+  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[使用您的现金钱包作为购买BTC，ETH，XLM等的付款方式。]]></string>
   <string name="fiat_funds_no_kyc_positive_action">验证我的身份</string>
   <string name="fiat_funds_no_kyc_negative_action">现在不要</string>
   <string name="fiat_funds_no_kyc_step_1_label">1个</string>
@@ -1830,7 +1841,7 @@
   <string name="send_enter_unexpected_error">发生意外的错误。请再试一遍。</string>
   <string name="send_enter_insufficient_gas">您没有足够的ETH来处理此交易。</string>
   <string name="send_select_a_wallet_title">或选择一个钱包</string>
-  <string name="send_internal_transfer_message">目前，您只能将%1$s从%2$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
+  <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
   <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">了解更多信息。 </annotation>
@@ -1879,7 +1890,7 @@
   <string name="interest_summary_accrued">本月应计利息</string>
   <string name="interest_summary_accrued_fail">无法加载应计利息</string>
   <string name="interest_summary_hold_period">初始保留期</string>
-  <string name="interest_summary_hold_period_days">%1$d天</string>
+  <string name="interest_summary_hold_period_days">%1$f天</string>
   <string name="interest_summary_hold_period_fail">无法加载保留期详细信息</string>
   <string name="interest_summary_rate">利率</string>
   <string name="interest_summary_rate_fail">无法加载利率</string>
@@ -1979,17 +1990,17 @@
   <string name="tx_view_locked_funds_1">这些资金将可以立即出售到%1$s菲亚特钱包中，但是您最多只能在%2$s从Blockchain.com上发送或提取这些资金%2$s</string>
   <string name="common_pending">待定</string>
   <string name="confirm_status_msg_insufficient_funds">您的帐户资金不足，无法处理此交易</string>
-  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">请确保您已同意我们的条款。</string>
-  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
   <string name="common_free">自由</string>
-  <string name="two_fa_new_request">正在请求新密码…</string>
+  <string name="two_fa_new_request">正在请求新密码...</string>
   <string name="transfer_funds_title">从导入地址转移？</string>
   <string name="transfer_funds_description">备份短语不会备份导入的地址。为了获得这些资金，我们
 建议将这些余额转移到您的Blockchain.com非托管钱包。
 </string>
-  <string name="two_factor_resend_sms">重新发送短信（%1$d）</string>
+  <string name="two_factor_resend_sms">重新发送短信（ %1$d ）</string>
   <string name="two_factor_retries_exceeded">重试次数过多，请等待60秒，然后重试</string>
   <string name="fee_options_label">%1$s （ %2$s ）</string>
   <string name="fee_options_sat_byte_min_error">至少需要1个sat /字节</string>
@@ -2063,4 +2074,32 @@
   <string name="exchange_rate">汇率</string>
   <string name="in_progress">进行中</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">为了您的安全起见，首次购买卡必须遵守%1$s天的持有期限，然后才能发送或提取已购买的加密货币。保全解除后，我们会通知您。 
+
+同时，您可以在Blockchain.com中出售现金，掉期交易。</string>
+  <string name="recover_funds_warning_message_1">如果有访问权限，则应始终配对或登录
+到您的电子钱包ID和密码。收回资金可能会创建一个新的电子钱包ID。你会
+想继续吗？
+</string>
+  <string name="received_dgld">收到包裹的DGLD</string>
+  <string name="email_request_body_dgld">请将wDGLD发送到Wrapped-DGLD地址%1$s 。</string>
+  <string name="wdgld_available_card_title">立即交易wDGLD</string>
+  <string name="wdgld_available_card_body">在ERC-20令牌化版本的DGLD中包装了数字黄金（wDGLD），将黄金支持的令牌与以太坊的功能和灵活性结合在一起。</string>
+  <string name="wdgld_available_card_cta">立即交易wDGLD</string>
+  <string name="dgld_default_account_label">我的包裹式DGLD钱包</string>
+  <string name="swap_faster">快点</string>
+  <string name="swap_trading_sheet_title">快点。便宜点更好
+使用您的交易钱包交换加密货币。</string>
+  <string name="swap_trading_sheet_subtitle">当您从任何交易钱包交换加密货币时，可以获得更低的费用并使交易速度加倍。</string>
+  <string name="swap_trading_fees_title">掉期相同，费用更低</string>
+  <string name="swap_trading_fees_subtitle">您通过交换加密链外链支付零网络费用</string>
+  <string name="swap_trading_speed_title">掉秒</string>
+  <string name="swap_trading_speed_subtitle">提高速度意味着您的掉期交易可以在数秒而不是数分钟内完成</string>
+  <string name="scan_qr">扫描二维码</string>
+  <string name="qr_activity_hint_any_asset">扫描CryptoCurrency地址或BitPay发票</string>
+  <string name="qr_activity_hint_asset_address">确保仅扫描%1$s QR码</string>
+  <string name="qr_activity_hint_bitpay">扫描BitPay发票</string>
+  <string name="qr_activity_hint_import_wallet">扫描钱包私钥</string>
+  <string name="qr_activity_hint_pairing_code">扫描网络配对QR码</string>
+  <string name="qr_activity_hint_new_web_login">登录网络</string>
 </resources>

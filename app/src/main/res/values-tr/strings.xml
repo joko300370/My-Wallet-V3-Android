@@ -15,14 +15,14 @@
     <item>onikinci kelime</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
-    <item>@string/xlm_memo_hash</item>
-    <item>@string/xlm_memo_return</item>
+    <item>\@ String / xlm_memo_text</item>
+    <item>\@ String / xlm_memo_id</item>
+    <item>\@ String / xlm_memo_hash</item>
+    <item>\@ String / xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>@string/xlm_memo_text</item>
-    <item>@string/xlm_memo_id</item>
+    <item>\@ String / xlm_memo_text</item>
+    <item>\@ String / xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 içe aktarılmış adres</item>
@@ -430,6 +430,15 @@
   <string name="settings_field_cant_be_empty">Alan boş bırakılamaz.</string>
   <string name="settings_error_updating">Ayarlar güncellenirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="request_camera_permission">Kamera erişimi gerekiyor.</string>
+  <string name="request_camera_permission_title">Kamera erişimi</string>
+  <string name="request_location_permission">Konum erişimi gerekli.</string>
+  <string name="request_write_storage_permission">Yazma harici depolama alanı gereklidir.</string>
+  <string name="request_write_and_camera_storage_permission_description">Harici depolama alanı yazma 
+ ve kamera KYC belgelerini yüklemek için gereklidir. 
+</string>
+  <string name="request_write_and_camera_storage_permission_title">Depolama ve kamera yazma 
+ izinler 
+</string>
   <string name="not_specified">belirtilmemiş</string>
   <string name="update_failed">Güncelleme başarısız oldu.</string>
   <string name="verify_mobile">Mobil\'i Doğrula</string>
@@ -897,7 +906,7 @@
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">Swap\'a hoşgeldiniz!</string>
   <string name="swap_intro_title_page_two">Gerçek zamanlı kurlar</string>
-  <string name="swap_intro_title_page_three">%%100 Blokzincir üzerinde işlemler</string>
+  <string name="swap_intro_title_page_three">%100 Blokzincir üzerinde işlemler</string>
   <string name="swap_intro_title_page_four">Anahtarınız sizin kontrolünüzde</string>
   <string name="swap_intro_title_page_five">Riskinizi daha iyi yönetin</string>
   <string name="swap_intro_description_page_one">Cüzdanınızdan çıkmadan kriptolar arası trade yapmanın en kolay yolu.</string>
@@ -1115,6 +1124,8 @@
   <string name="buy_sell_unverified_email_verify_message1">Adresine bir doğrulama bağlantısı gönderdik</string>
   <string name="buy_sell_unverified_email_verify_message2">Tıklayın ve işleminize devam etmek için buraya geri dönün.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-postayı Aç</string>
+  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><![CDATA[<a href=\"ignored\"> şartlar ve koşullarını </a> <a href=\"ignored\"> kabul edin]]></string>
+  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-posta Doğrulandı!</string>
   <string name="buy_sell_verified_email_message">%1$s ortağımız bitcoin işleminizi gerçekleştirecek. Kabul Et ve \'Devam Et\'i tıklayarak %1$s ile bir hesap oluşturacaksınız.</string>
   <string name="buy_sell_identification_verification">Doğrulamayı tanımlayın</string>
@@ -1221,7 +1232,7 @@
   <string name="kyc_email_title">Eposta adresinizi doğrulayın</string>
   <string name="kyc_email_message">Ek güvenlik katmanı olarak e-posta adresinizi doğrulamamız gerekiyor.</string>
   <string name="kyc_email_hint_focused">E-posta adresiniz</string>
-  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">\@ String / kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">E-posta kaydedilirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_email_send_verification">Eposta gönder</string>
   <string name="kyc_email_validation_header">Gelen kutunu kontrol et.</string>
@@ -1233,7 +1244,7 @@
   <string name="kyc_phone_number_message">Bu, bugün kimliğinizi doğrulamamıza ve gelecekte hesabınızı güvende tutmamıza yardımcı olacaktır. Bunu yapmak için telefonunuza bir doğrulama kodu ile bir SMS gönderilir.</string>
   <string name="kyc_phone_number_hint_focused">Senin telefon numaran</string>
   <string name="kyc_phone_number_hint_unfocused">+1 2345678 910</string>
-  <string name="kyc_phone_send_again">Kodu <annotation link="resend_code"> Gönder </annotation></string>
+  <string name="kyc_phone_send_again"><![CDATA[<annotation link=\"resend_code\"> Kodu <annotation link=\"resend_code\"> Gönder </annotation>]]></string>
   <string name="kyc_phone_number_error_saving_number">Cep telefonu numarası kaydedilirken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_phone_number_code_was_resent">Kod yeniden gönderildi</string>
   <string name="kyc_phone_number_validation_header">Adresine gönderilen kodu girin</string>
@@ -1243,8 +1254,8 @@
   <string name="kyc_onfido_splash_header">Sizin Olduğunuzu Onaylayalım</string>
   <string name="kyc_onfido_splash_verification_error">Kimlik doğrulanırken hata oluştu, lütfen tekrar deneyin</string>
   <string name="kyc_veriff_splash_country_supported_header">Ülkem destekleniyor mu?</string>
-  <string name="kyc_veriff_splash_country_supported_subheader">Şu anda tüm ülkeler desteklenmemektedir. <annotation link="country_list"> etmeden önce güncel </annotation> ülke listemize.</string>
-  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_country_supported_subheader"><![CDATA[Şu anda tüm ülkeler desteklenmemektedir. <annotation link=\"country_list\"> etmeden önce güncel <annotation link=\"country_list\"> ülke listemize </annotation> .]]></string>
+  <string name="kyc_veriff_splash_title">\@ String / kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">GÜMÜŞ DOĞRULANDI</string>
   <string name="kyc_veriff_splash_header">Sizin Olduğunuzu Onaylayalım</string>
   <string name="kyc_veriff_splash_subtitle">Devam etmek için aşağıdaki kimlik türlerinden birine ihtiyacınız olacak.</string>
@@ -1266,11 +1277,11 @@
   <string name="kyc_complete_device_verified">Cihaz Onaylandı</string>
   <string name="kyc_complete_id_uploaded">Yüklenen Kimlik</string>
   <string name="kyc_complete_video_uploaded">Video yüklendi</string>
-  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">\@ String / need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Blockchain Destek Ekibimiz, kimliğinizi neden doğrulamamız gerektiğini açıklayan Yardım Kılavuzları yazdı.</string>
   <string name="kyc_help_dialog_read_now">Şimdi Oku</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+  <string name="kyc_help_dialog_contact_support">\@ String / contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">kimlik doğrulama</string>
   <string name="kyc_settings_status_none">doğrulanmamış</string>
@@ -1282,7 +1293,7 @@
   <string name="kyc_settings_gold_level_in_review">Altın Seviyesi - İnceleniyor</string>
   <string name="kyc_settings_gold_level_approved">Altın Seviyesi - Onaylandı</string>
   <string name="kyc_settings_silver_level_approved">Gümüş Seviyesi - Onaylı</string>
-  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">\@ String / kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYC durumu getirilirken hata oluştu</string>
   <string name="kyc_status_title_in_progress">Doğrulama Sürüyor</string>
   <string name="kyc_status_title_approved">Hesap Onaylandı</string>
@@ -1306,10 +1317,10 @@
   <string name="kyc_drop_off_card_description">Kaldığınız yerden devam edin ve kimlik doğrulama işleminizi tamamlayın.</string>
   <string name="kyc_drop_off_card_button">Doğrulamaya devam et</string>
   <string name="kyc_documents_needed">Gerekli belgeler</string>
-  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">\@ String / kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Verdiğiniz belgelerle ilgili bazı sorunlar yaşadık. Doğrulamanıza devam etmek için lütfen belgeleri tekrar yüklemeyi deneyin.</string>
   <string name="kyc_resubmission_card_button">Belgeleri Yükle</string>
-  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">\@ String / kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Kimliğinizi doğrulayamıyoruz ve gerekli belgeleri yeniden yüklemenizi istiyoruz.</string>
   <string name="kyc_resubmission_splash_description_2">Bunun gerçekleşmesinin ana nedenleri:</string>
   <string name="kyc_resubmission_splash_description_3">Gerekli fotoğraflar eksik.</string>
@@ -1453,8 +1464,10 @@
   <string name="simple_buy_amount_to_send">Gönderilecek tutar</string>
   <string name="simple_buy_pending_buy_sheet_title">Bekleyen %1s Satın Al</string>
   <string name="recipient_name_must_match_eur">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.</string>
-  <string name="recipient_name_must_match_gbp">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.\n\nBu hesaba para yatırarak, bankacılık ortağımız <annotation link="modular_terms_and_conditions"> Şartlar ve Koşulları </annotation> anno kabul edersiniz.</string>
- <string name="recipient_name_must_match">Yalnızca adınızdaki bir banka hesabından para gönderin. Aksi takdirde, depozitonuz ertelenebilir veya reddedilebilir.</string>
+  <string name="recipient_name_must_match_gbp"><![CDATA[Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir. 
+
+ Bu hesaba para yatırarak, bankacılık ortağımız <annotation link=\"modular_terms_and_conditions\"> Şartlar ve Koşulları </annotation> anno <annotation link=\"modular_terms_and_conditions\"> kabul edersiniz.]]></string>
+  <string name="recipient_name_must_match">Yalnızca adınızdaki bir banka hesabından para gönderin. Aksi takdirde, depozitonuz ertelenebilir veya reddedilebilir.</string>
   <string name="simple_buy_no_currencies_available_title">Para birimi yok</string>
   <string name="simple_buy_no_currencies_available">Ne yazık ki, şu anda alım satım yapabileceğiniz herhangi bir para birimi yok :(</string>
   <string name="are_ypu_sure">Emin misiniz?</string>
@@ -1492,10 +1505,10 @@
   <string name="tx_sold">Satıldı</string>
   <string name="linked_cards">Bağlantılı Kartlar</string>
   <string name="tx_title_send">%1s gönder</string>
-  <string name="tx_title_receive">teslim almak %1s</string>
+  <string name="tx_title_receive">%1s</string>
   <string name="tx_title_sell">%1s sat</string>
   <string name="tx_title_buy">%1s satın al</string>
-  <string name="tx_title_swap">takas %1s → %2$s</string>
+  <string name="tx_title_swap">%1s</string>
   <string name="tx_title_transfer">%1s aktarımı</string>
   <string name="tx_title_fee">Ücret %1s</string>
   <string name="transaction_detail_value_at_time_swapped">\u0020 değer: \u0020</string>
@@ -1562,7 +1575,7 @@
   <string name="card_in_progress">%1s Satın Al Devam Ediyor</string>
   <string name="we_will_notify_order_complete">Siparişiniz tamamlandığında size haber vereceğiz.</string>
   <string name="completing_card_buy">Satın alma işleminizi şimdi tamamlıyoruz.</string>
-  <string name="card_purchased" formatted="false">%1s Satın</string>
+  <string name="card_purchased" formatted="false">%1s Satın %1s</string>
   <string name="card_purchased_available_now">%1s artık Cüzdanınızda kullanılabilir.</string>
   <string name="invalid_cvv">Geçersiz CVV</string>
   <string name="invalid_date">Geçersiz tarih</string>
@@ -1704,7 +1717,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="fiat_funds_no_kyc_step_2_title">Para Yatırma</string>
   <string name="fiat_funds_no_kyc_step_2_description">Bankanızdan nakit aktarın ve nakit bakiyenizi etkinleştirin.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Nakit ile Kripto Satın Alın</string>
-  <string name="fiat_funds_no_kyc_step_3_description">BTC, ETH, XLM ve daha fazlasını satın almak için nakit cüzdanınızı ödeme yöntemi olarak kullanın.></string>
+  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[BTC, ETH, XLM ve daha fazlasını satın almak için nakit cüzdanınızı ödeme yöntemi olarak kullanın.]]></string>
   <string name="fiat_funds_no_kyc_positive_action">Kimliğimi Doğrula</string>
   <string name="fiat_funds_no_kyc_negative_action">Şimdi değil</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1828,7 +1841,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="send_enter_unexpected_error">Beklenmedik bir hata oldu. Lütfen daha sonra tekrar deneyin.</string>
   <string name="send_enter_insufficient_gas">Bu işlemi gerçekleştirmek içinsize ait yeterli ETH bulunmuyor.</string>
   <string name="send_select_a_wallet_title">veya Bir Cüzdan Seçin</string>
-  <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %2$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
+  <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %1$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
   <string name="purchase_funds_note">Nihai tutar, piyasa hareketliliğinden dolayı değişebilir.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Daha fazla bilgi edinin. </annotation>
@@ -1877,7 +1890,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="interest_summary_accrued">Bu Ay Tahakkuk Eden Faiz</string>
   <string name="interest_summary_accrued_fail">Tahakkuk eden faiz yüklenemiyor</string>
   <string name="interest_summary_hold_period">İlk Bekletme Süresi</string>
-  <string name="interest_summary_hold_period_days">%1$d Gün</string>
+  <string name="interest_summary_hold_period_days">%1$f Gün</string>
   <string name="interest_summary_hold_period_fail">Bekletme süresi ayrıntıları yüklenemiyor</string>
   <string name="interest_summary_rate">Faiz oranı</string>
   <string name="interest_summary_rate_fail">Faiz oranı yüklenemiyor</string>
@@ -2064,4 +2077,32 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="exchange_rate">Takas Oranı</string>
   <string name="in_progress">Devam Ediyor</string>
   <string name="swap_direction">%1$s-&gt;%2$s</string>
+  <string name="security_locked_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz. 
+
+ Bu arada, Blockchain.com\'da Cash\'e satış yapabilir, takas edebilir ve ticaret yapabilirsiniz.</string>
+  <string name="recover_funds_warning_message_1">Erişiminiz varsa her zaman eşleştirmeli veya giriş yapmalısınız
+ Cüzdan Kimliğinize ve şifrenize. Paranızı geri kazanmak yeni bir Cüzdan Kimliği oluşturabilir. Yaparmısın
+ devam etmek ister misin?
+</string>
+  <string name="received_dgld">Sarılmış-DGLD alındı</string>
+  <string name="email_request_body_dgld">Lütfen wDGLD\'yi Sarılmış DGLD adresine %1$s gönderin.</string>
+  <string name="wdgld_available_card_title">Şimdi wDGLD Ticareti Yapın</string>
+  <string name="wdgld_available_card_body">Altın destekli bir jetonu Ethereum\'un gücü ve esnekliğiyle birleştiren, DGLD\'nin ERC-20 tokenize versiyonunda Sarılmış Dijital Altın (wDGLD).</string>
+  <string name="wdgld_available_card_cta">Şimdi wDGLD ticareti yapın</string>
+  <string name="dgld_default_account_label">Sarılı-DGLD Cüzdanım</string>
+  <string name="swap_faster">Daha hızlı</string>
+  <string name="swap_trading_sheet_title">Daha hızlı. Daha ucuz. Daha iyi
+ Ticaret Cüzdanınızla Kripto değiştirin.</string>
+  <string name="swap_trading_sheet_subtitle">Herhangi bir İşlem Cüzdanından kripto değiştirdiğinizde daha düşük ücretler alın ve işlem hızını ikiye katlayın.</string>
+  <string name="swap_trading_fees_title">Aynı Takas, Daha Düşük Ücretler</string>
+  <string name="swap_trading_fees_subtitle">Zincir dışı kriptoları değiştirerek sıfır ağ ücreti ödersiniz</string>
+  <string name="swap_trading_speed_title">Saniyeler İçinde Değiştirin</string>
+  <string name="swap_trading_speed_subtitle">Artan hız, Swap işleminizin dakikalar değil saniyeler içinde gerçekleşmesi anlamına gelir</string>
+  <string name="scan_qr">QR Kodu tara</string>
+  <string name="qr_activity_hint_any_asset">Bir CryptoCurrency adresini veya bir BitPay faturasını tarayın</string>
+  <string name="qr_activity_hint_asset_address">Yalnızca %1$s QR Kodu taradığınızdan emin olun</string>
+  <string name="qr_activity_hint_bitpay">BitPay faturasını tarayın</string>
+  <string name="qr_activity_hint_import_wallet">Cüzdan özel anahtarını tarayın</string>
+  <string name="qr_activity_hint_pairing_code">Web eşleştirme QR kodunu tarayın</string>
+  <string name="qr_activity_hint_new_web_login">Web\'de oturum açın</string>
 </resources>
