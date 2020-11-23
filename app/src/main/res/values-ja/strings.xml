@@ -15,14 +15,14 @@
     <item>12番目の単語</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%dインポートされたアドレス</item>
@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">フィールドを空にすることはできません。</string>
   <string name="settings_error_updating">設定の更新中にエラーが発生しました。もう一度お試しください</string>
   <string name="request_camera_permission">カメラへのアクセスが必要です。</string>
-  <string name="request_camera_permission_title">カメラへのアクセス</string>
-  <string name="request_location_permission">ロケーションへのアクセスが必要です。</string>
-  <string name="request_write_storage_permission">外部ストレージの書き込みが必要です。</string>
-  <string name="request_write_and_camera_storage_permission_description">外部ストレージを書き込む
- KYCドキュメントをアップロードするにはカメラが必要です。 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">ストレージとカメラを書き込む
-許可
-</string>
   <string name="not_specified">指定されていない</string>
   <string name="update_failed">更新に失敗しました。</string>
   <string name="verify_mobile">モバイルを確認</string>
@@ -905,7 +896,7 @@
   <string name="swap_intro_title">スワップ</string>
   <string name="swap_intro_title_page_one">スワップへようこそ！</string>
   <string name="swap_intro_title_page_two">リアルタイム為替レート</string>
-  <string name="swap_intro_title_page_three">100％オンチェーン</string>
+  <string name="swap_intro_title_page_three">100％%オンチェーン</string>
   <string name="swap_intro_title_page_four">あなたはキーをコントロールします</string>
   <string name="swap_intro_title_page_five">より良いリスク管理</string>
   <string name="swap_intro_description_page_one">ウォレットを離れることなく、ある暗号を別の暗号と交換する最も簡単な方法。</string>
@@ -1123,8 +1114,6 @@
   <string name="buy_sell_unverified_email_verify_message1">確認リンクを送信しました</string>
   <string name="buy_sell_unverified_email_verify_message2">それをクリックしてここに戻り、取引を続行します。</string>
   <string name="buy_sell_unverified_email_verify_open_email">メールを開く</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><a href="ignored">利用規約</a>同意する</string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">メール確認済み！</string>
   <string name="buy_sell_verified_email_message">パートナー%1$sがビットコイントランザクションを処理します。同意して「続行」をクリックすると、 %1$sアカウントが作成されます。</string>
   <string name="buy_sell_identification_verification">確認を識別する</string>
@@ -1231,7 +1220,7 @@
   <string name="kyc_email_title">あなたの電子メールを確認します</string>
   <string name="kyc_email_message">セキュリティの追加レイヤーとして、メールアドレスを確認する必要があります。</string>
   <string name="kyc_email_hint_focused">あなたのメール</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">メールの保存中にエラーが発生しました。もう一度お試しください</string>
   <string name="kyc_email_send_verification">メールを送る</string>
   <string name="kyc_email_validation_header">メールチェックしてみて。</string>
@@ -1256,7 +1245,7 @@
   <string name="kyc_onfido_splash_verification_error">IDの確認中にエラーが発生しました。もう一度お試しください</string>
   <string name="kyc_veriff_splash_country_supported_header">私の国はサポートされていますか？</string>
   <string name="kyc_veriff_splash_country_supported_subheader">現在、すべての国がサポートされているわけではありません。先に進む前に、最新の<annotation link="country_list">国のリスト</annotation>確認してください。</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">シルバー検証済み</string>
   <string name="kyc_veriff_splash_header">それがあなたであることを確認しましょう</string>
   <string name="kyc_veriff_splash_subtitle">続行するには、以下のいずれかのIDタイプが必要です。</string>
@@ -1278,11 +1267,11 @@
   <string name="kyc_complete_device_verified">デバイス検証済み</string>
   <string name="kyc_complete_id_uploaded">アップロードされたID</string>
   <string name="kyc_complete_video_uploaded">動画をアップロードしました</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">ブロックチェーンサポートチームは、お客様の身元を確認する必要がある理由を説明するヘルプガイドを作成しました。</string>
   <string name="kyc_help_dialog_read_now">今すぐ読む</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">本人確認</string>
   <string name="kyc_settings_status_none">未確認</string>
@@ -1294,7 +1283,7 @@
   <string name="kyc_settings_gold_level_in_review">ゴールドレベル-レビュー中</string>
   <string name="kyc_settings_gold_level_approved">ゴールドレベル-承認済み</string>
   <string name="kyc_settings_silver_level_approved">シルバーレベル-承認済み</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">KYCステータスの取得エラー</string>
   <string name="kyc_status_title_in_progress">検証中</string>
   <string name="kyc_status_title_approved">アカウントが承認されました</string>
@@ -1318,10 +1307,10 @@
   <string name="kyc_drop_off_card_description">中断したところから始めて、本人確認を完了します。</string>
   <string name="kyc_drop_off_card_button">確認を続ける</string>
   <string name="kyc_documents_needed">必要な書類</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">提供されたドキュメントに問題がありました。確認を続行するには、ドキュメントをもう一度アップロードしてください。</string>
   <string name="kyc_resubmission_card_button">ドキュメントをアップロードする</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">本人確認ができないため、必要な書類を再度アップロードする必要があります。</string>
   <string name="kyc_resubmission_splash_description_2">これが起こる主な理由：</string>
   <string name="kyc_resubmission_splash_description_3">必要な写真がありません。</string>
@@ -1509,7 +1498,7 @@
   <string name="tx_title_receive" formatted="false">%1sを受け取り%1s</string>
   <string name="tx_title_sell">%1s売る</string>
   <string name="tx_title_buy">%1s購入</string>
-  <string name="tx_title_swap">%1sスワップ</string>
+  <string name="tx_title_swap">%1$s → %2$sスワップ</string>
   <string name="tx_title_transfer">%1s転送</string>
   <string name="tx_title_fee">料金%1s</string>
   <string name="transaction_detail_value_at_time_swapped">交換時の値： \u0020</string>
@@ -1716,7 +1705,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">預金</string>
   <string name="fiat_funds_no_kyc_step_2_description">あなたの銀行から現金を転送し、あなたの現金残高を有効にします。</string>
   <string name="fiat_funds_no_kyc_step_3_title">現金で暗号を購入する</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[キャッシュウォレットを支払い方法として使用して、BTC、ETH、XLMなどを購入します。]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">キャッシュウォレットを支払い方法として使用して、BTC、ETH、XLMなどを購入します。</string>
   <string name="fiat_funds_no_kyc_positive_action">本人確認</string>
   <string name="fiat_funds_no_kyc_negative_action">今はやめろ</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1841,7 +1830,7 @@
   <string name="send_enter_unexpected_error">予期しないエラーが発生しました。もう一度やり直してください。</string>
   <string name="send_enter_insufficient_gas">このトランザクションを処理するのに十分なETHがありません。</string>
   <string name="send_select_a_wallet_title">またはウォレットを選択</string>
-  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%1$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
+  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%2$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
   <string name="purchase_funds_note">あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">詳細。 </annotation>
@@ -1890,7 +1879,7 @@
   <string name="interest_summary_accrued">今月の未収利息</string>
   <string name="interest_summary_accrued_fail">経過利息を読み込めません</string>
   <string name="interest_summary_hold_period">最初の保留期間</string>
-  <string name="interest_summary_hold_period_days">%1$f日</string>
+  <string name="interest_summary_hold_period_days">%1$d日</string>
   <string name="interest_summary_hold_period_fail">保持期間の詳細を読み込めません</string>
   <string name="interest_summary_rate">金利</string>
   <string name="interest_summary_rate_fail">金利を読み込めません</string>
@@ -1990,17 +1979,17 @@
   <string name="tx_view_locked_funds_1">これらの資金はすぐに%1$sフィアットウォレットに販売できるようになりますが、Blockchain.comから最大%2$sまでこれらの資金を送金または引き出すことはできません。</string>
   <string name="common_pending">保留中</string>
   <string name="confirm_status_msg_insufficient_funds">この取引を処理するには、このアカウントに十分な資金がありません</string>
-  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">利用規約に同意したことを確認してください。</string>
-  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
   <string name="common_free">自由</string>
   <string name="two_fa_new_request">新しいコードをリクエストしています…</string>
   <string name="transfer_funds_title">インポートしたアドレスから転送しますか？</string>
   <string name="transfer_funds_description">インポートされたアドレスは、バックアップフレーズによってバックアップされません。これらの資金を確保するために、
 これらの残高をBlockchain.comの非管理ウォレットに転送することをお勧めします。
 </string>
-  <string name="two_factor_resend_sms">SMSを再送信します（ %1$d ）</string>
+  <string name="two_factor_resend_sms">SMSを再送信します（%1$d）</string>
   <string name="two_factor_retries_exceeded">再試行を超えた場合は、60秒待ってから再試行してください</string>
   <string name="fee_options_label">%1$s （ %2$s ）</string>
   <string name="fee_options_sat_byte_min_error">最小1sat /バイトが必要</string>

@@ -15,14 +15,14 @@
     <item>twaalfde woord</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 geïmporteerd adres</item>
@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Veld mag niet leeg zijn.</string>
   <string name="settings_error_updating">Fout bij updaten van instellingen, probeer het opnieuw</string>
   <string name="request_camera_permission">Cameratoegang is vereist.</string>
-  <string name="request_camera_permission_title">Toegang tot de camera</string>
-  <string name="request_location_permission">Locatietoegang is vereist.</string>
-  <string name="request_write_storage_permission">Externe opslag schrijven is vereist.</string>
-  <string name="request_write_and_camera_storage_permission_description">Schrijf externe opslag 
- en camera zijn vereist om KYC-documenten te uploaden. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Schrijf opslag en camera 
- rechten 
-</string>
   <string name="not_specified">niet gespecificeerd</string>
   <string name="update_failed">Kan niet updaten.</string>
   <string name="verify_mobile">Verifieer mobiel</string>
@@ -906,7 +897,7 @@
   <string name="swap_intro_title">ruil</string>
   <string name="swap_intro_title_page_one">Welkom bij Swap!</string>
   <string name="swap_intro_title_page_two">Real-time wisselkoersen</string>
-  <string name="swap_intro_title_page_three">100% on-chain</string>
+  <string name="swap_intro_title_page_three">100%% on-chain</string>
   <string name="swap_intro_title_page_four">U beheert uw sleutel</string>
   <string name="swap_intro_title_page_five">Beheer risico\'s beter</string>
   <string name="swap_intro_description_page_one">De eenvoudigste manier om de ene crypto voor de andere te wisselen zonder je portemonnee te verlaten.</string>
@@ -1124,8 +1115,6 @@
   <string name="buy_sell_unverified_email_verify_message1">We hebben een verificatielink gestuurd naar</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik erop en keer hier terug om door te gaan met uw transactie.</string>
   <string name="buy_sell_unverified_email_verify_open_email">E-mail openen</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms"><![CDATA[Ga akkoord met de <a href=\"ignored\"> algemene voorwaarden </a> <a href=\"ignored\">]]></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email geverifieerd!</string>
   <string name="buy_sell_verified_email_message">Onze partner %1$s verwerkt uw bitcoin-transactie. Door op Akkoord en \'Doorgaan\' te klikken, maakt u een account aan met %1$s .</string>
   <string name="buy_sell_identification_verification">Identificeer verificatie</string>
@@ -1232,7 +1221,7 @@
   <string name="kyc_email_title">Controleer je email</string>
   <string name="kyc_email_message">We moeten uw e-mailadres verifiëren als een extra beveiligingslaag.</string>
   <string name="kyc_email_hint_focused">Jouw email</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fout bij het opslaan van e-mail. Probeer het opnieuw</string>
   <string name="kyc_email_send_verification">E-mail verzenden</string>
   <string name="kyc_email_validation_header">Controleer je inbox.</string>
@@ -1257,7 +1246,7 @@
   <string name="kyc_onfido_splash_verification_error">Fout bij het verifiëren van ID. Probeer het opnieuw</string>
   <string name="kyc_veriff_splash_country_supported_header">Wordt mijn land ondersteund?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Op dit moment worden niet alle landen ondersteund. Bekijk onze actuele <annotation link="country_list"> lijst met landen </annotation> voordat u doorgaat.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">ZILVER GECONTROLEERD</string>
   <string name="kyc_veriff_splash_header">Laten we bevestigen dat u het bent</string>
   <string name="kyc_veriff_splash_subtitle">U heeft één van de onderstaande ID-typen nodig om door te gaan.</string>
@@ -1279,11 +1268,11 @@
   <string name="kyc_complete_device_verified">Apparaat geverifieerd</string>
   <string name="kyc_complete_id_uploaded">ID geüpload</string>
   <string name="kyc_complete_video_uploaded">Video geüpload</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Ons Blockchain-ondersteuningsteam heeft Help-handleidingen geschreven waarin wordt uitgelegd waarom we uw identiteit moeten verifiëren.</string>
   <string name="kyc_help_dialog_read_now">Lees nu</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">identiteit verificatie</string>
   <string name="kyc_settings_status_none">Niet geverifieerd</string>
@@ -1295,7 +1284,7 @@
   <string name="kyc_settings_gold_level_in_review">Goudniveau - wordt beoordeeld</string>
   <string name="kyc_settings_gold_level_approved">Gold Level - Goedgekeurd</string>
   <string name="kyc_settings_silver_level_approved">Silver Level - Goedgekeurd</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fout bij ophalen van KYC-status</string>
   <string name="kyc_status_title_in_progress">Verificatie wordt uitgevoerd</string>
   <string name="kyc_status_title_approved">Account goedgekeurd</string>
@@ -1319,10 +1308,10 @@
   <string name="kyc_drop_off_card_description">Ga verder waar je was gebleven en voltooi je identiteitsverificatie.</string>
   <string name="kyc_drop_off_card_button">Ga door met verificatie</string>
   <string name="kyc_documents_needed">Documenten nodig</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">We hadden enkele problemen met de documenten die u heeft verstrekt. Probeer de documenten opnieuw te uploaden om door te gaan met uw verificatie.</string>
   <string name="kyc_resubmission_card_button">Upload documenten</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">We kunnen uw identiteit niet verifiëren en hebben u nodig om de vereiste documenten opnieuw te uploaden.</string>
   <string name="kyc_resubmission_splash_description_2">De belangrijkste redenen hiervoor zijn:</string>
   <string name="kyc_resubmission_splash_description_3">De benodigde foto\'s ontbreken.</string>
@@ -1510,7 +1499,7 @@
   <string name="tx_title_receive">Ontvang %1s</string>
   <string name="tx_title_sell">Verkoop %1s</string>
   <string name="tx_title_buy">Koop %1s</string>
-  <string name="tx_title_swap">Verwissel %1s</string>
+  <string name="tx_title_swap">Verwissel %1$s → %2$s</string>
   <string name="tx_title_transfer">Breng %1s</string>
   <string name="tx_title_fee">Tarief %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Waarde bij verwisseling: \u0020</string>
@@ -1717,7 +1706,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Geld storten</string>
   <string name="fiat_funds_no_kyc_step_2_description">Maak geld over van uw bank en activeer uw kassaldi.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koop Crypto met contant geld</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Gebruik uw geldportemonnee als betaalmethode om BTC, ETH, XLM en meer te kopen.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Gebruik uw geldportemonnee als betaalmethode om BTC, ETH, XLM en meer te kopen.</string>
   <string name="fiat_funds_no_kyc_positive_action">Controleer mijn identiteit</string>
   <string name="fiat_funds_no_kyc_negative_action">Niet nu</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1842,7 +1831,7 @@
   <string name="send_enter_unexpected_error">Er is een onverwachte fout opgetreden. Probeer het a.u.b. opnieuw.</string>
   <string name="send_enter_insufficient_gas">U heeft niet genoeg ETH om deze transactie te verwerken.</string>
   <string name="send_select_a_wallet_title">of Selecteer een portemonnee</string>
-  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %1$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
+  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %2$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
   <string name="purchase_funds_note">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Meer informatie. </annotation>
@@ -1891,7 +1880,7 @@
   <string name="interest_summary_accrued">Opgebouwde rente deze maand</string>
   <string name="interest_summary_accrued_fail">Kan opgebouwde rente niet laden</string>
   <string name="interest_summary_hold_period">Initiële wachtperiode</string>
-  <string name="interest_summary_hold_period_days">%1$f dagen</string>
+  <string name="interest_summary_hold_period_days">%1$d dagen</string>
   <string name="interest_summary_hold_period_fail">Kan details van de holdingsperiode niet laden</string>
   <string name="interest_summary_rate">Rente</string>
   <string name="interest_summary_rate_fail">Kan rentetarief niet laden</string>
@@ -1993,17 +1982,17 @@
   <string name="tx_view_locked_funds_1">Deze fondsen zullen onmiddellijk beschikbaar zijn om te verkopen in een %1$s Fiat-portemonnee, maar u kunt deze fondsen tot %2$s niet verzenden naar of opnemen van Blockchain.com.</string>
   <string name="common_pending">In afwachting</string>
   <string name="confirm_status_msg_insufficient_funds">U heeft onvoldoende saldo op deze rekening om deze transactie te verwerken</string>
-  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Zorg ervoor dat u akkoord gaat met onze voorwaarden.</string>
-  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
   <string name="common_free">Vrij</string>
-  <string name="two_fa_new_request">Nieuwe code aanvragen ...</string>
+  <string name="two_fa_new_request">Nieuwe code aanvragen…</string>
   <string name="transfer_funds_title">Overzetten van geïmporteerd adres?</string>
   <string name="transfer_funds_description">Van geïmporteerde adressen wordt geen back-up gemaakt door uw reservekopiezin. Om deze fondsen veilig te stellen, hebben we
  raden aan om deze saldi over te boeken naar uw Blockchain.com niet-bewaarportefeuille.
 </string>
-  <string name="two_factor_resend_sms">Sms opnieuw verzenden ( %1$d )</string>
+  <string name="two_factor_resend_sms">Sms opnieuw verzenden (%1$d)</string>
   <string name="two_factor_retries_exceeded">Pogingen zijn overschreden. Wacht 60 seconden voordat u het opnieuw probeert</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Minimaal 1 sat / byte vereist</string>

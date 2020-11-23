@@ -15,19 +15,19 @@
     <item>двенадцатое слово</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ Строка / xlm_memo_text</item>
-    <item>\@ Строка / xlm_memo_id</item>
-    <item>\@ Строка / xlm_memo_hash</item>
-    <item>\@ Строка / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ Строка / xlm_memo_text</item>
-    <item>\@ Строка / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
-    <item quantity="one">1 импортированный адрес</item>
+    <item quantity="one">%d импортированный адрес</item>
     <item quantity="few"></item>
-    <item quantity="many"></item>
+    <item quantity="many"></item> 
     <item quantity="other">%d импортированных адресов</item>
   </plurals>
   <string name="upgrade_wallet">Обновить</string>
@@ -154,7 +154,7 @@
   <string name="restoring_wallet">Восстановление кошелька.</string>
   <string name="password">пароль</string>
   <string name="email">Ваш адрес электронной почты</string>
-  <string name="you_agree_terms_of_service"><![CDATA[Создавая учетную запись, вы соглашаетесь с <annotation link=\"terms\"> Terms <annotation link=\"terms\"> Условиями обслуживания </annotation> & <annotation link=\"privacy\"> Политика конфиденциальности </annotation> Blockchain.]]></string>
+  <string name="you_agree_terms_of_service">Создавая учетную запись, вы соглашаетесь с <annotation link="terms">Условиями обслуживания</annotation> &amp; <annotation link="privacy">Политика конфиденциальности</annotation>Blockchain.</string>
   <string name="new_account_cta_text">Продолжить</string>
   <string name="new_account_title">Завести аккаунт</string>
   <string name="strength_weak">слабый</string>
@@ -432,15 +432,6 @@
   <string name="settings_field_cant_be_empty">Поле не может быть пустым.</string>
   <string name="settings_error_updating">Ошибка обновления настроек, попробуйте еще раз</string>
   <string name="request_camera_permission">Требуется доступ к камере.</string>
-  <string name="request_camera_permission_title">Доступ к камере</string>
-  <string name="request_location_permission">Доступ к местоположению не требуется.</string>
-  <string name="request_write_storage_permission">Запись на внешнее хранилище обязательна.</string>
-  <string name="request_write_and_camera_storage_permission_description">Написать внешнее хранилище 
- и камера требуется для загрузки документов KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Пишите память и камеру 
- разрешений 
-</string>
   <string name="not_specified">не указано</string>
   <string name="update_failed">Не удалось обновить.</string>
   <string name="verify_mobile">Проверить мобильный</string>
@@ -908,7 +899,7 @@
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">Добро пожаловать в Swap!</string>
   <string name="swap_intro_title_page_two">Обменный курс в реальном времени</string>
-  <string name="swap_intro_title_page_three">100% на цепочке</string>
+  <string name="swap_intro_title_page_three">100%% на цепочке</string>
   <string name="swap_intro_title_page_four">Вы контролируете свой ключ</string>
   <string name="swap_intro_title_page_five">Лучше управлять рисками</string>
   <string name="swap_intro_description_page_one">Самый простой способ обменять одну криптовалюту на другую, не выходя из кошелька.</string>
@@ -1126,8 +1117,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Мы отправили ссылку для подтверждения</string>
   <string name="buy_sell_unverified_email_verify_message2">Нажмите на нее и вернитесь сюда, чтобы продолжить транзакцию.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Открыть электронную почту</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Согласитесь с Coinify <a href="ignored"> правилами и условиями </a></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email подтвержден!</string>
   <string name="buy_sell_verified_email_message">Наш партнер %1$s обработает вашу биткойн-транзакцию. Нажав «Согласен» и «Продолжить», вы создадите учетную запись с %1$s .</string>
   <string name="buy_sell_identification_verification">Определить подтверждение</string>
@@ -1234,7 +1223,7 @@
   <string name="kyc_email_title">Подтвердите Ваш электронный адрес</string>
   <string name="kyc_email_message">Нам нужно подтвердить ваш адрес электронной почты как дополнительный уровень безопасности.</string>
   <string name="kyc_email_hint_focused">Ваш адрес электронной почты</string>
-  <string name="kyc_email_hint_unfocused">\@ Строка / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Ошибка при сохранении электронной почты, пожалуйста, попробуйте еще раз</string>
   <string name="kyc_email_send_verification">Отправить письмо</string>
   <string name="kyc_email_validation_header">Проверь свои входящие.</string>
@@ -1259,7 +1248,7 @@
   <string name="kyc_onfido_splash_verification_error">Ошибка при подтверждении ID, пожалуйста, попробуйте еще раз</string>
   <string name="kyc_veriff_splash_country_supported_header">Поддерживается ли моя страна?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">В настоящее время поддерживаются не все страны. Проверьте наш обновленный <annotation link="country_list"> список стран </annotation> прежде чем продолжить.</string>
-  <string name="kyc_veriff_splash_title">\@ Строка / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">СЕРЕБРО ПРОВЕРЕНО</string>
   <string name="kyc_veriff_splash_header">Давайте подтвердим, что это ты</string>
   <string name="kyc_veriff_splash_subtitle">Для продолжения вам понадобится один из следующих типов идентификаторов.</string>
@@ -1281,11 +1270,11 @@
   <string name="kyc_complete_device_verified">Устройство проверено</string>
   <string name="kyc_complete_id_uploaded">ID загружен</string>
   <string name="kyc_complete_video_uploaded">Видео загружено</string>
-  <string name="kyc_help_dialog_need_some_help">\@ Строка / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Наша группа поддержки Blockchain написала справочные руководства, объясняющие, почему мы должны подтвердить вашу личность.</string>
   <string name="kyc_help_dialog_read_now">Прочитай сейчас</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ Строка / CONTACT_SUPPORT</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Подтверждение личности</string>
   <string name="kyc_settings_status_none">непроверенный</string>
@@ -1297,7 +1286,7 @@
   <string name="kyc_settings_gold_level_in_review">Золотой уровень - в обзоре</string>
   <string name="kyc_settings_gold_level_approved">Золотой уровень - утвержден</string>
   <string name="kyc_settings_silver_level_approved">Уровень серебра - Утверждено</string>
-  <string name="kyc_settings_tier_status_failed">\@ Строка / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Ошибка при получении статуса KYC</string>
   <string name="kyc_status_title_in_progress">Проверка в процессе</string>
   <string name="kyc_status_title_approved">Аккаунт утвержден</string>
@@ -1321,10 +1310,10 @@
   <string name="kyc_drop_off_card_description">Возьмите, где вы остановились, и завершите проверку вашей личности.</string>
   <string name="kyc_drop_off_card_button">Продолжить проверку</string>
   <string name="kyc_documents_needed">Необходимые документы</string>
-  <string name="kyc_resubmission_card_title">\@ Строка / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">У нас были некоторые проблемы с документами, которые вы предоставили. Пожалуйста, попробуйте загрузить документы еще раз, чтобы продолжить проверку.</string>
   <string name="kyc_resubmission_card_button">Загрузить документы</string>
-  <string name="kyc_resubmission_splash_title">\@ Строка / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Мы не можем подтвердить вашу личность, и вам необходимо повторно загрузить необходимые документы.</string>
   <string name="kyc_resubmission_splash_description_2">Основные причины этого:</string>
   <string name="kyc_resubmission_splash_description_3">Требуемые фотографии отсутствуют.</string>
@@ -1512,7 +1501,7 @@
   <string name="tx_title_receive">Получать %1s</string>
   <string name="tx_title_sell">Продать %1s</string>
   <string name="tx_title_buy">Купить %1s</string>
-  <string name="tx_title_swap">Поменять %1s</string>
+  <string name="tx_title_swap">Поменять %1s → %2$s</string>
   <string name="tx_title_transfer">Перевод %1s</string>
   <string name="tx_title_fee">Плата %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Значение при \u0020 : \u0020</string>
@@ -1719,7 +1708,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Внести наличные</string>
   <string name="fiat_funds_no_kyc_step_2_description">Перечислите наличные деньги из банка и включите баланс наличных средств.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Купить криптовалюту за наличные</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Используйте свой кошелек наличных денег в качестве способа оплаты, чтобы купить BTC, ETH, XLM и другое.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Используйте свой кошелек наличных денег в качестве способа оплаты, чтобы купить BTC, ETH, XLM и другое.></string>
   <string name="fiat_funds_no_kyc_positive_action">Пройти проверку личности</string>
   <string name="fiat_funds_no_kyc_negative_action">Не сейчас</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1844,7 +1833,7 @@
   <string name="send_enter_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
   <string name="send_enter_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
   <string name="send_select_a_wallet_title">или выберите кошелек</string>
-  <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %1$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
+  <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %2$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
   <string name="purchase_funds_note">Ваша итоговая сумма может измениться из-за активности рынка.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Подробнее. </annotation>
@@ -1893,7 +1882,7 @@
   <string name="interest_summary_accrued">Начисленные проценты в этом месяце</string>
   <string name="interest_summary_accrued_fail">Невозможно загрузить начисленные проценты</string>
   <string name="interest_summary_hold_period">Начальный период удержания</string>
-  <string name="interest_summary_hold_period_days">%1$f дней</string>
+  <string name="interest_summary_hold_period_days">%1$d дней</string>
   <string name="interest_summary_hold_period_fail">Не удалось загрузить информацию о периоде хранения</string>
   <string name="interest_summary_rate">Уровень интереса</string>
   <string name="interest_summary_rate_fail">Невозможно загрузить процентную ставку</string>

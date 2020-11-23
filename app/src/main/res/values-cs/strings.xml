@@ -15,14 +15,14 @@
     <item>dvanácté slovo</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importovaná adresa</item>
@@ -432,15 +432,6 @@
   <string name="settings_field_cant_be_empty">Pole nemůže být prázdné.</string>
   <string name="settings_error_updating">Při aktualizaci nastavení došlo k chybě, zkuste to znovu</string>
   <string name="request_camera_permission">Je vyžadován přístup k fotoaparátu.</string>
-  <string name="request_camera_permission_title">Přístup z kamery</string>
-  <string name="request_location_permission">Je vyžadován přístup k poloze.</string>
-  <string name="request_write_storage_permission">Je nutné zapsat externí úložiště.</string>
-  <string name="request_write_and_camera_storage_permission_description">Zapište externí úložiště 
- a kamera jsou povinna nahrávat dokumenty KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Zapište úložiště a fotoaparát 
- oprávnění 
-</string>
   <string name="not_specified">nespecifikováno</string>
   <string name="update_failed">Aktualizace se nezdařila.</string>
   <string name="verify_mobile">Ověřte mobilní zařízení</string>
@@ -908,7 +899,7 @@
   <string name="swap_intro_title">Zaměnit</string>
   <string name="swap_intro_title_page_one">Vítejte ve službě Swap!</string>
   <string name="swap_intro_title_page_two">Směnné kurzy v reálném čase</string>
-  <string name="swap_intro_title_page_three">100% na řetízku</string>
+  <string name="swap_intro_title_page_three">100%% na řetízku</string>
   <string name="swap_intro_title_page_four">Ovládáte svůj klíč</string>
   <string name="swap_intro_title_page_five">Lepší řízení rizik</string>
   <string name="swap_intro_description_page_one">Nejjednodušší způsob, jak vyměnit jedno kryptografické za druhé, aniž byste opustili peněženku.</string>
@@ -1126,8 +1117,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Poslali jsme ověřovací odkaz na adresu</string>
   <string name="buy_sell_unverified_email_verify_message2">Klikněte na něj a vraťte se sem, abyste mohli pokračovat v transakci.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Otevřete e-mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Souhlasíte s Coinify <a href="ignored"> smluvními podmínkami </a></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">E-mail byl ověřen!</string>
   <string name="buy_sell_verified_email_message">Náš partner %1$s zpracuje vaši bitcoinovou transakci. Kliknutím na Souhlasím a Pokračovat vytvoříte účet s %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikujte ověření</string>
@@ -1234,7 +1223,7 @@
   <string name="kyc_email_title">Ověřte svůj email</string>
   <string name="kyc_email_message">Jako dodatečnou vrstvu zabezpečení musíme ověřit vaši e-mailovou adresu.</string>
   <string name="kyc_email_hint_focused">Tvůj e-mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Při ukládání e-mailu došlo k chybě, zkuste to znovu</string>
   <string name="kyc_email_send_verification">Poslat e-mailem</string>
   <string name="kyc_email_validation_header">Zkontrolujte doručenou poštu.</string>
@@ -1259,7 +1248,7 @@
   <string name="kyc_onfido_splash_verification_error">Při ověřování ID došlo k chybě, zkuste to znovu</string>
   <string name="kyc_veriff_splash_country_supported_header">Je moje země podporována?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">V současné době nejsou podporovány všechny země. Než budete pokračovat, zkontrolujte náš aktuální seznam <annotation link="country_list"> zemí </annotation> .</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">STŘÍBRO OVĚŘENO</string>
   <string name="kyc_veriff_splash_header">Potvrďte, že jste to vy</string>
   <string name="kyc_veriff_splash_subtitle">Pro pokračování budete potřebovat 1 z níže uvedených typů ID.</string>
@@ -1281,11 +1270,11 @@
   <string name="kyc_complete_device_verified">Zařízení bylo ověřeno</string>
   <string name="kyc_complete_id_uploaded">ID nahráno</string>
   <string name="kyc_complete_video_uploaded">Video bylo nahráno</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Náš tým podpory blockchainu napsal písemné příručky s vysvětlením, proč potřebujeme ověřit vaši totožnost.</string>
   <string name="kyc_help_dialog_read_now">Přečtěte si nyní</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Ověření identity</string>
   <string name="kyc_settings_status_none">Neověřeno</string>
@@ -1297,7 +1286,7 @@
   <string name="kyc_settings_gold_level_in_review">Zlatá úroveň - probíhá kontrola</string>
   <string name="kyc_settings_gold_level_approved">Zlatá úroveň - schváleno</string>
   <string name="kyc_settings_silver_level_approved">Silver Level - Schváleno</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Při načítání stavu KYC došlo k chybě</string>
   <string name="kyc_status_title_in_progress">Probíhá ověřování</string>
   <string name="kyc_status_title_approved">Účet schválen</string>
@@ -1321,10 +1310,10 @@
   <string name="kyc_drop_off_card_description">Zjistěte, kde jste skončili, a dokončete ověření identity.</string>
   <string name="kyc_drop_off_card_button">Pokračujte v ověřování</string>
   <string name="kyc_documents_needed">Potřebné dokumenty</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Měli jsme nějaké problémy s dodanými dokumenty. Zkuste prosím znovu nahrát dokumenty a pokračovat v ověřování.</string>
   <string name="kyc_resubmission_card_button">Nahrajte dokumenty</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Nemůžeme ověřit vaši totožnost a potřebujeme znovu nahrát požadované dokumenty.</string>
   <string name="kyc_resubmission_splash_description_2">Hlavní důvody, proč k tomu došlo:</string>
   <string name="kyc_resubmission_splash_description_3">Chybí požadované fotografie.</string>
@@ -1468,9 +1457,7 @@
   <string name="simple_buy_amount_to_send">Částka k odeslání</string>
   <string name="simple_buy_pending_buy_sheet_title">Čeká se na nákup %1s</string>
   <string name="recipient_name_must_match_eur">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.</string>
-  <string name="recipient_name_must_match_gbp"><![CDATA[Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut. 
-
- Vložením prostředků na tento účet <annotation link=\"modular_terms_and_conditions\"> souhlas s <annotation link=\"modular_terms_and_conditions\"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.]]></string>
+  <string name="recipient_name_must_match_gbp">Aby byl váš převod úspěšný, musí se výše uvedené jméno příjemce shodovat s jménem držitele účtu na vašem bankovním účtu. Pokud neexistuje shoda, mohl by být váš převod odmítnut.\n\nVložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera</string>
   <string name="recipient_name_must_match">Prostředky zasílejte pouze z vašeho bankovního účtu. Pokud ne, váš vklad může být zpožděn nebo odmítnut.</string>
   <string name="simple_buy_no_currencies_available_title">K dispozici nejsou žádné měny</string>
   <string name="simple_buy_no_currencies_available">Bohužel v současné době neexistují žádné měny, se kterými můžete obchodovat :(</string>
@@ -1512,7 +1499,7 @@
   <string name="tx_title_receive">Dostávat %1s</string>
   <string name="tx_title_sell">Prodejte %1s</string>
   <string name="tx_title_buy">Koupit %1s</string>
-  <string name="tx_title_swap">Zaměnit %1s</string>
+  <string name="tx_title_swap">Zaměnit %1$s → %2$s</string>
   <string name="tx_title_transfer">Převést %1s</string>
   <string name="tx_title_fee">Poplatek %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Hodnota při výměně: \u0020</string>
@@ -1576,7 +1563,7 @@
   <string name="card_error_subtitle">Vraťte se a zkuste to znovu.</string>
   <string name="card_expiry_date">Exp: %1s</string>
   <string name="card_buying">Nákup %1s</string>
-  <string name="card_in_progress" formatted="false">%1s nákup %1s</string>
+  <string name="card_in_progress" formatted="false">%1$s nákup</string>
   <string name="we_will_notify_order_complete">Až bude vaše objednávka dokončena, upozorníme vás.</string>
   <string name="completing_card_buy">Dokončujeme váš nákup.</string>
   <string name="card_purchased">Zakoupeno: %1s</string>
@@ -1672,7 +1659,7 @@
   <string name="bank_transfer">Bankovní převod</string>
   <string name="instantly_buy_crypto_with_card">Okamžitě si zakupte kryptografii s jakýmkoli Visa nebo Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Pošlete peníze přímo z vaší banky do vaší peněženky Blockchain. Jakmile obdržíme manuální převod, použijte tuto hotovost na zakoupení krypto.</string>
-  <string name="by_depositing_funds_terms_and_conds"><![CDATA[Vložením prostředků na tento účet <annotation link=\"modular_terms_and_conditions\"> souhlas s <annotation link=\"modular_terms_and_conditions\"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.]]></string>
+  <string name="by_depositing_funds_terms_and_conds">Vložením prostředků na tento účet souhlas s <annotation link="modular_terms_and_conditions"> smluvními podmínkami Modulr </annotation> , našeho bankovního partnera.</string>
   <string name="add_bank_with_currency">Přidejte banku %1s</string>
   <string name="deposit_currency">Vložte %1s</string>
   <string name="currency_bank_transfer">Bankovní převod</string>
@@ -1719,7 +1706,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Vklad hotovosti</string>
   <string name="fiat_funds_no_kyc_step_2_description">Převeďte hotovost z banky a aktivujte své hotovostní zůstatky.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Koupit kryptografii za hotovost</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Použijte svou peněžní peněženku jako platební metodu k nákupu BTC, ETH, XLM a dalších.</string>
   <string name="fiat_funds_no_kyc_positive_action">Ověřte moji identitu</string>
   <string name="fiat_funds_no_kyc_negative_action">Teď ne</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1844,7 +1831,7 @@
   <string name="send_enter_unexpected_error">Došlo k neočekávané chybě. Prosím zkuste to znovu.</string>
   <string name="send_enter_insufficient_gas">Na zpracování této transakce nemáte dostatek ETH.</string>
   <string name="send_select_a_wallet_title">nebo Vyberte Peněženku</string>
-  <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %1$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
+  <string name="send_internal_transfer_message">V tomto okamžiku můžete přenášet pouze %1$s z vaší %2$s Trade Peněženka do vašeho trezoru peněženky. Jakmile je %1$s ve vaší úschovně, můžete přenést na externí adresy.</string>
   <string name="purchase_funds_note">Vaše konečná částka se může v důsledku tržní aktivity změnit.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Další informace. </annotation>
@@ -1893,7 +1880,7 @@
   <string name="interest_summary_accrued">Nashromážděný úrok tento měsíc</string>
   <string name="interest_summary_accrued_fail">Nelze načíst nahromaděný úrok</string>
   <string name="interest_summary_hold_period">Počáteční období pozastavení</string>
-  <string name="interest_summary_hold_period_days">%1$f dnů</string>
+  <string name="interest_summary_hold_period_days">%1$d dnů</string>
   <string name="interest_summary_hold_period_fail">Nelze načíst podrobnosti doby zadržení</string>
   <string name="interest_summary_rate">Úroková sazba</string>
   <string name="interest_summary_rate_fail">Nelze načíst úrokovou sazbu</string>
@@ -1999,17 +1986,17 @@
   <string name="tx_view_locked_funds_1">Tyto prostředky budou k dispozici k okamžitému prodeji do peněženky Fiat %1$s , ale nebudete moci tyto prostředky odesílat ani vybírat z Blockchain.com až do %2$s</string>
   <string name="common_pending">čekající</string>
   <string name="confirm_status_msg_insufficient_funds">Na tomto účtu nemáte dostatek prostředků ke zpracování této transakce</string>
-  <string name="confirm_status_msg_insufficient_gas">\@ řetězec / send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Ujistěte se, že jste souhlasili s našimi podmínkami.</string>
   <string name="confirm_status_msg_invoice_expired">\@ řetězec / bitpay_invoice_expired</string>
   <string name="confirm_status_msg_unexpected_error">\@ řetězec / send_enter_unexpected_error</string>
   <string name="common_free">Volný, uvolnit</string>
-  <string name="two_fa_new_request">Žádám nový kód ...</string>
+  <string name="two_fa_new_request">Žádám nový kód…</string>
   <string name="transfer_funds_title">Převést z importované adresy?</string>
   <string name="transfer_funds_description">Importované adresy nejsou zálohovány vaší záložní frází. Abychom zajistili tyto prostředky, my
  doporučujeme převést tyto zůstatky do vaší peněženky bez úschovy na Blockchain.com.
 </string>
-  <string name="two_factor_resend_sms">Znovu odeslat SMS ( %1$d )</string>
+  <string name="two_factor_resend_sms">Znovu odeslat SMS (%1$d)</string>
   <string name="two_factor_retries_exceeded">Byl překročen pokus, počkejte prosím 60 sekund a zkuste to znovu</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Je vyžadován minimálně 1 sat / byte</string>

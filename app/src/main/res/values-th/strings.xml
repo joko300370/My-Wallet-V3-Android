@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">ต้องป้อนข้อมูลในฟิลด์</string>
   <string name="settings_error_updating">เกิดข้อผิดพลาดในการอัปเดตการตั้งค่าโปรดลองอีกครั้ง</string>
   <string name="request_camera_permission">ต้องมีการเข้าถึงกล้อง</string>
-  <string name="request_camera_permission_title">การเข้าถึงกล้อง</string>
-  <string name="request_location_permission">ต้องมีการเข้าถึงตำแหน่ง</string>
-  <string name="request_write_storage_permission">จำเป็นต้องใช้ที่เก็บข้อมูลภายนอก</string>
-  <string name="request_write_and_camera_storage_permission_description">เขียนที่เก็บข้อมูลภายนอก 
- และกล้องจะต้องอัปโหลดเอกสาร KYC 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">เขียนที่เก็บข้อมูลและกล้อง 
- สิทธิ์ 
-</string>
   <string name="not_specified">ไม่ได้ระบุ</string>
   <string name="update_failed">ไม่สามารถอัปเดต</string>
   <string name="verify_mobile">ยืนยันมือถือ</string>
@@ -905,7 +896,7 @@
   <string name="swap_intro_title">แลกเปลี่ยน</string>
   <string name="swap_intro_title_page_one">ยินดีต้อนรับสู่ Swap!</string>
   <string name="swap_intro_title_page_two">อัตราแลกเปลี่ยนเรียลไทม์</string>
-  <string name="swap_intro_title_page_three">ออนไลน์ 100%</string>
+  <string name="swap_intro_title_page_three">ออนไลน์ 100%%</string>
   <string name="swap_intro_title_page_four">คุณควบคุมคีย์ของคุณ</string>
   <string name="swap_intro_title_page_five">จัดการความเสี่ยงได้ดีขึ้น</string>
   <string name="swap_intro_description_page_one">วิธีที่ง่ายที่สุดในการแลกเปลี่ยน crypto หนึ่งอันสำหรับอีกอันโดยไม่ต้องออกจากกระเป๋าเงินของคุณ</string>
@@ -1123,8 +1114,6 @@
   <string name="buy_sell_unverified_email_verify_message1">เราได้ส่งลิงก์การยืนยันไปที่</string>
   <string name="buy_sell_unverified_email_verify_message2">คลิกที่มันและกลับมาที่นี่เพื่อทำธุรกรรมของคุณต่อไป</string>
   <string name="buy_sell_unverified_email_verify_open_email">เปิดอีเมล</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">ยอมรับการ Coinify <a href="ignored"> ข้อกำหนดในการให้บริการ </a></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">ยืนยันอีเมลแล้ว!</string>
   <string name="buy_sell_verified_email_message">พันธมิตรของเรา %1$s จะประมวลผลธุรกรรม bitcoin ของคุณ เมื่อคลิกเห็นด้วยและ \'ดำเนินการต่อ\' คุณจะสร้างบัญชีด้วย %1$s</string>
   <string name="buy_sell_identification_verification">ระบุการตรวจสอบ</string>
@@ -1509,7 +1498,7 @@
   <string name="tx_title_receive">รับ %1s</string>
   <string name="tx_title_sell">ขาย %1s</string>
   <string name="tx_title_buy">ซื้อ %1s</string>
-  <string name="tx_title_swap">สลับ %1s</string>
+  <string name="tx_title_swap">สลับ %1s → %2$s</string>
   <string name="tx_title_transfer">โอน %1s</string>
   <string name="tx_title_fee">ค่าธรรมเนียม %1s</string>
   <string name="transaction_detail_value_at_time_swapped">ค่าเมื่อสลับ: \u0020</string>
@@ -1716,7 +1705,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">ฝากเงินสด</string>
   <string name="fiat_funds_no_kyc_step_2_description">โอนเงินสดจากธนาคารของคุณและเปิดใช้ยอดคงเหลือเงินสดของคุณ</string>
   <string name="fiat_funds_no_kyc_step_3_title">ซื้อ Crypto ด้วยเงินสด</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[ใช้กระเป๋าเงินเงินสดของคุณเป็นวิธีการชำระเงินเพื่อซื้อ BTC ETH XLM และอื่น ๆ]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">ใช้กระเป๋าเงินเงินสดของคุณเป็นวิธีการชำระเงินเพื่อซื้อ BTC ETH XLM และอื่น ๆ</string>
   <string name="fiat_funds_no_kyc_positive_action">ยืนยันตัวตนของฉัน</string>
   <string name="fiat_funds_no_kyc_negative_action">ไม่ใช่ตอนนี้</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1843,7 +1832,7 @@
   <string name="send_enter_unexpected_error">ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น. กรุณาลองอีกครั้ง.</string>
   <string name="send_enter_insufficient_gas">คุณมี ETH ไม่เพียงพอที่จะดำเนินธุรกรรมนี้</string>
   <string name="send_select_a_wallet_title">หรือเลือกกระเป๋าเงิน</string>
-  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %1$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
+  <string name="send_internal_transfer_message">ในตอนนี้คุณสามารถโอน %1$s จาก %2$s Trade Wallet ไปยัง Vault Wallets ของคุณได้เท่านั้น เมื่อ %1$s อยู่ใน Vault Wallet ของคุณแล้วคุณสามารถโอนไปยังที่อยู่ภายนอกได้</string>
   <string name="purchase_funds_note">จำนวนเงินสุดท้ายของคุณอาจเปลี่ยนแปลงเนื่องจากกิจกรรมทางการตลาด</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> เรียนรู้เพิ่มเติม </annotation>
@@ -1892,7 +1881,7 @@
   <string name="interest_summary_accrued">ดอกเบี้ยคงค้างของเดือนนี้</string>
   <string name="interest_summary_accrued_fail">ไม่สามารถโหลดดอกเบี้ยค้างรับ</string>
   <string name="interest_summary_hold_period">ระยะเวลาการระงับเริ่มต้น</string>
-  <string name="interest_summary_hold_period_days">%1$f วัน</string>
+  <string name="interest_summary_hold_period_days">%1$d วัน</string>
   <string name="interest_summary_hold_period_fail">ไม่สามารถโหลดรายละเอียดระยะเวลาการถือครอง</string>
   <string name="interest_summary_rate">อัตราดอกเบี้ย</string>
   <string name="interest_summary_rate_fail">ไม่สามารถโหลดอัตราดอกเบี้ย</string>
@@ -1997,12 +1986,12 @@
   <string name="confirm_status_msg_invoice_expired">\@ สตริง / bitpay_invoice_expired</string>
   <string name="confirm_status_msg_unexpected_error">\@ สตริง / send_enter_un ไม่คาดคิด_error</string>
   <string name="common_free">ฟรี</string>
-  <string name="two_fa_new_request">กำลังขอรหัสใหม่ ...</string>
+  <string name="two_fa_new_request">กำลังขอรหัสใหม่…</string>
   <string name="transfer_funds_title">โอนจากที่อยู่ที่นำเข้า?</string>
   <string name="transfer_funds_description">ที่อยู่ที่นำเข้าจะไม่สำรองข้อมูลโดย Backup Phrase ของคุณ เพื่อรักษาความปลอดภัยของเงินเหล่านี้เรา
  ขอแนะนำให้โอนยอดคงเหลือเหล่านี้ไปยังกระเป๋าเงินที่ไม่ได้รับการคุ้มครอง Blockchain.com ของคุณ
 </string>
-  <string name="two_factor_resend_sms">ส่ง SMS อีกครั้ง ( %1$d )</string>
+  <string name="two_factor_resend_sms">ส่ง SMS อีกครั้ง (%1$d)</string>
   <string name="two_factor_retries_exceeded">ลองใหม่เกินแล้วโปรดรอ 60 วินาทีแล้วลองอีกครั้ง</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">ขั้นต่ำ 1 sat / byte ที่ต้องการ</string>

@@ -15,14 +15,14 @@
     <item>kata kedua belas</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="other">%d alamat yang diimpor</item>
@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">Bidang tidak boleh kosong.</string>
   <string name="settings_error_updating">Kesalahan memperbarui pengaturan, silakan coba lagi</string>
   <string name="request_camera_permission">Diperlukan akses kamera.</string>
-  <string name="request_camera_permission_title">Akses kamera</string>
-  <string name="request_location_permission">Diperlukan akses lokasi.</string>
-  <string name="request_write_storage_permission">Diperlukan penyimpanan eksternal tulis.</string>
-  <string name="request_write_and_camera_storage_permission_description">Tulis penyimpanan eksternal 
- dan kamera diperlukan untuk mengunggah dokumen KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Penyimpanan tulis dan kamera 
- izin 
-</string>
   <string name="not_specified">tidak ditentukan</string>
   <string name="update_failed">Gagal memperbarui.</string>
   <string name="verify_mobile">Verifikasi Seluler</string>
@@ -905,7 +896,7 @@
   <string name="swap_intro_title">Menukar</string>
   <string name="swap_intro_title_page_one">Selamat datang di Swap!</string>
   <string name="swap_intro_title_page_two">Nilai Tukar Real-time</string>
-  <string name="swap_intro_title_page_three">100% On-Chain</string>
+  <string name="swap_intro_title_page_three">100%% On-Chain</string>
   <string name="swap_intro_title_page_four">Anda Mengontrol Kunci Anda</string>
   <string name="swap_intro_title_page_five">Kelola Risiko dengan Lebih Baik</string>
   <string name="swap_intro_description_page_one">Cara termudah untuk saling menukar crypto dengan yang lain tanpa meninggalkan dompet Anda.</string>
@@ -1123,8 +1114,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Kami mengirim tautan verifikasi ke</string>
   <string name="buy_sell_unverified_email_verify_message2">Klik dan kembali ke sini untuk melanjutkan transaksi Anda.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Buka Email</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Setuju untuk Coinify <a href="ignored"> syarat dan ketentuan </a></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email terverifikasi!</string>
   <string name="buy_sell_verified_email_message">Mitra kami %1$s akan memproses transaksi bitcoin Anda. Dengan mengklik Setuju dan \'Lanjutkan\' Anda akan membuat akun dengan %1$s .</string>
   <string name="buy_sell_identification_verification">Identifikasi verifikasi</string>
@@ -1231,7 +1220,7 @@
   <string name="kyc_email_title">Verifikasi Email Anda</string>
   <string name="kyc_email_message">Kami perlu memverifikasi alamat email Anda sebagai lapisan keamanan tambahan.</string>
   <string name="kyc_email_hint_focused">Email mu</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Kesalahan menyimpan email, silakan coba lagi</string>
   <string name="kyc_email_send_verification">Mengirim email</string>
   <string name="kyc_email_validation_header">Periksa kotak masuk Anda.</string>
@@ -1256,7 +1245,7 @@
   <string name="kyc_onfido_splash_verification_error">Kesalahan saat memverifikasi ID, silakan coba lagi</string>
   <string name="kyc_veriff_splash_country_supported_header">Apakah negara saya didukung?</string>
   <string name="kyc_veriff_splash_country_supported_subheader">Tidak semua negara didukung saat ini. Periksa <annotation link="country_list"> daftar negara kami yang terbaru </annotation> sebelum melanjutkan.</string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILVER DIVERIFIKASI</string>
   <string name="kyc_veriff_splash_header">Mari Konfirmasikan Itu Anda</string>
   <string name="kyc_veriff_splash_subtitle">Anda perlu 1 tipe ID di bawah untuk melanjutkan.</string>
@@ -1278,11 +1267,11 @@
   <string name="kyc_complete_device_verified">Perangkat Terverifikasi</string>
   <string name="kyc_complete_id_uploaded">ID Diunggah</string>
   <string name="kyc_complete_video_uploaded">Video diunggah</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Tim Dukungan Blockchain kami telah menulis Panduan Bantuan yang menjelaskan mengapa kami perlu memverifikasi identitas Anda.</string>
   <string name="kyc_help_dialog_read_now">Baca sekarang</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Verifikasi Identitas</string>
   <string name="kyc_settings_status_none">Tidak diverifikasi</string>
@@ -1294,7 +1283,7 @@
   <string name="kyc_settings_gold_level_in_review">Level Emas - Dalam ulasan</string>
   <string name="kyc_settings_gold_level_approved">Level Emas - Disetujui</string>
   <string name="kyc_settings_silver_level_approved">Level Perak - Disetujui</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Kesalahan saat mengambil status KYC</string>
   <string name="kyc_status_title_in_progress">Verifikasi Sedang Berlangsung</string>
   <string name="kyc_status_title_approved">Akun Disetujui</string>
@@ -1318,10 +1307,10 @@
   <string name="kyc_drop_off_card_description">Ambil di mana Anda tinggalkan dan lengkapi verifikasi identitas Anda.</string>
   <string name="kyc_drop_off_card_button">Lanjutkan verifikasi</string>
   <string name="kyc_documents_needed">Dokumen diperlukan</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Kami memiliki beberapa masalah dengan dokumen yang Anda berikan. Silakan coba unggah dokumen lagi untuk melanjutkan verifikasi Anda.</string>
   <string name="kyc_resubmission_card_button">Unggah Dokumen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Kami tidak dapat memverifikasi identitas Anda dan meminta Anda mengunggah dokumen yang diperlukan.</string>
   <string name="kyc_resubmission_splash_description_2">Alasan utama hal ini terjadi:</string>
   <string name="kyc_resubmission_splash_description_3">Foto yang diperlukan tidak ada.</string>
@@ -1509,7 +1498,7 @@
   <string name="tx_title_receive">Terima %1s</string>
   <string name="tx_title_sell">Jual %1s</string>
   <string name="tx_title_buy">Beli %1s</string>
-  <string name="tx_title_swap">Tukar %1s</string>
+  <string name="tx_title_swap">Tukar %1s → %2$s</string>
   <string name="tx_title_transfer">Transfer %1s</string>
   <string name="tx_title_fee">Biaya %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Nilai saat ditukar: \u0020</string>
@@ -1716,7 +1705,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Setor Tunai</string>
   <string name="fiat_funds_no_kyc_step_2_description">Transfer uang tunai dari bank Anda dan aktifkan saldo tunai Anda.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Beli Crypto dengan Uang Tunai</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Gunakan dompet tunai Anda sebagai metode pembayaran untuk membeli BTC, ETH, XLM & lainnya.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Gunakan dompet tunai Anda sebagai metode pembayaran untuk membeli BTC, ETH, XLM &amp; lainnya.</string>
   <string name="fiat_funds_no_kyc_positive_action">Verifikasi Identitas Saya</string>
   <string name="fiat_funds_no_kyc_negative_action">Tidak sekarang</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1841,7 +1830,7 @@
   <string name="send_enter_unexpected_error">Terjadi sebuah kesalahan yang tidak diharapkan. Silakan coba lagi.</string>
   <string name="send_enter_insufficient_gas">Anda tidak memiliki cukup ETH untuk memproses transaksi ini.</string>
   <string name="send_select_a_wallet_title">atau Pilih Dompet</string>
-  <string name="send_internal_transfer_message">Saat ini, Anda hanya dapat mentransfer %1$s dari Dompet Dagang %1$s ke Dompet Vault Anda. Setelah %1$s ada di Vault Wallet, Anda dapat mentransfer ke alamat eksternal.</string>
+  <string name="send_internal_transfer_message">Saat ini, Anda hanya dapat mentransfer %1$s dari Dompet Dagang %2$s ke Dompet Vault Anda. Setelah %1$s ada di Vault Wallet, Anda dapat mentransfer ke alamat eksternal.</string>
   <string name="purchase_funds_note">Jumlah akhir Anda dapat berubah karena aktivitas pasar.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Pelajari lebih lanjut. </annotation>
@@ -1890,7 +1879,7 @@
   <string name="interest_summary_accrued">Bunga Yang Masih Harus Dibayar Bulan Ini</string>
   <string name="interest_summary_accrued_fail">Tidak dapat memuat bunga yang masih harus dibayar</string>
   <string name="interest_summary_hold_period">Periode Penahanan Awal</string>
-  <string name="interest_summary_hold_period_days">%1$f Hari</string>
+  <string name="interest_summary_hold_period_days">%1$d Hari</string>
   <string name="interest_summary_hold_period_fail">Tidak dapat memuat detail periode penangguhan</string>
   <string name="interest_summary_rate">Suku bunga</string>
   <string name="interest_summary_rate_fail">Tidak dapat memuat suku bunga</string>
@@ -1990,17 +1979,17 @@
   <string name="tx_view_locked_funds_1">Dana ini akan segera tersedia untuk dijual ke dompet Fiat %1$s , tetapi Anda tidak akan dapat mengirim atau menarik dana ini dari Blockchain.com hingga %2$s</string>
   <string name="common_pending">Menunggu keputusan</string>
   <string name="confirm_status_msg_insufficient_funds">Anda tidak memiliki cukup dana di akun ini untuk memproses transaksi ini</string>
-  <string name="confirm_status_msg_insufficient_gas">\@ string / send_enter_insufficient_gas</string>
+  <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
   <string name="confirm_status_msg_option_invalid">Harap pastikan Anda telah menyetujui Persyaratan kami.</string>
-  <string name="confirm_status_msg_invoice_expired">\@ string / bitpay_invoice_expired</string>
-  <string name="confirm_status_msg_unexpected_error">\@ string / send_enter_unexpected_error</string>
+  <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
+  <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
   <string name="common_free">Gratis</string>
   <string name="two_fa_new_request">Meminta kode baru…</string>
   <string name="transfer_funds_title">Transfer Dari Alamat yang Diimpor?</string>
   <string name="transfer_funds_description">Alamat yang diimpor tidak didukung oleh Frase Cadangan Anda. Untuk mengamankan dana ini, kami
  merekomendasikan untuk mentransfer saldo ini ke Dompet non-penahanan Blockchain.com Anda.
 </string>
-  <string name="two_factor_resend_sms">Kirim ulang SMS ( %1$d )</string>
+  <string name="two_factor_resend_sms">Kirim ulang SMS (%1$d)</string>
   <string name="two_factor_retries_exceeded">Melebihi percobaan ulang, harap tunggu 60 detik sebelum mencoba lagi</string>
   <string name="fee_options_label">%1$s ( %2$s )</string>
   <string name="fee_options_sat_byte_min_error">Minimal 1 sat / byte diperlukan</string>
