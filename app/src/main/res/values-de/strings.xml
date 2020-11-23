@@ -15,14 +15,14 @@
     <item>zwölftes Wort</item>
   </string-array>
   <string-array name="xlm_memo_types_all">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
-    <item>\@ string / xlm_memo_hash</item>
-    <item>\@ string / xlm_memo_return</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
+    <item>@string/xlm_memo_hash</item>
+    <item>@string/xlm_memo_return</item>
   </string-array>
   <string-array name="xlm_memo_types_manual">
-    <item>\@ string / xlm_memo_text</item>
-    <item>\@ string / xlm_memo_id</item>
+    <item>@string/xlm_memo_text</item>
+    <item>@string/xlm_memo_id</item>
   </string-array>
   <plurals name="transfer_label_plural">
     <item quantity="one">1 importierte Adresse</item>
@@ -80,12 +80,12 @@
   <string name="invalid_password_too_short">Bitte geben Sie mehr als 3 Zeichen ein</string>
   <string name="invalid_guid">Ungültige Brieftaschen-ID</string>
   <string name="password_mismatch_error">Passwörter stimmen nicht überein</string>
-  <string name="change_password_new_matches_current">Sie können Ihr aktuelles Passwort nicht als Ihr Passwort verwenden 
- Neues Kennwort 
+  <string name="change_password_new_matches_current">Sie können Ihr aktuelles Passwort nicht als Ihr Passwort verwenden
+ Neues Kennwort
 </string>
   <string name="no_private_key">Privater Schlüssel kann nicht erstellt werden.</string>
   <string name="pin_4_strikes">4 fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
-  <string name="pin_4_strikes_password_accepted">Passwort akzeptiert. Bitte definieren Sie eine neue PIN. 
+  <string name="pin_4_strikes_password_accepted">Passwort akzeptiert. Bitte definieren Sie eine neue PIN.
 </string>
   <string name="bip38_password_entry">Bitte geben Sie das Passwort für den privaten Schlüssel ein</string>
   <string name="pin_entry">Pin eingeben</string>
@@ -96,12 +96,12 @@
   <string name="create_pin">PIN erstellen</string>
   <string name="confirm_pin">PIN bestätigen</string>
   <string name="create_pin_failed">PIN-Erstellung fehlgeschlagen. Bitte koppeln Sie das Gerät erneut.</string>
-  <string name="change_pin_new_matches_current">Sie können Ihre aktuelle PIN nicht als neue PIN verwenden 
+  <string name="change_pin_new_matches_current">Sie können Ihre aktuelle PIN nicht als neue PIN verwenden
 </string>
   <string name="pairing_failed">Pairing fehlgeschlagen. Bitte versuche es erneut.</string>
   <string name="account_locked_title">Konto gesperrt</string>
-  <string name="account_locked_message">Ihr Konto wurde vorsichtshalber vorübergehend gesperrt. 
- Bitte überprüfen Sie Ihre E-Mails für weitere Informationen und versuchen Sie es später erneut. 
+  <string name="account_locked_message">Ihr Konto wurde vorsichtshalber vorübergehend gesperrt.
+ Bitte überprüfen Sie Ihre E-Mails für weitere Informationen und versuchen Sie es später erneut.
 </string>
   <string name="pin_box_0">Pin Box 0</string>
   <string name="pin_box_1">Pin Box 1</string>
@@ -119,8 +119,8 @@
   <string name="keyboard_input_9">Tastatureingabe 9</string>
   <string name="keyboard_input_0">Tastatureingabe 0</string>
   <string name="keyboard_input_delete">Tastatureingabe löschen</string>
-  <string name="check_connectivity_exit">Blockchain Wallet kann keine Internetverbindung herstellen. 
- Bitte überprüfen Sie die Konnektivität Ihres Geräts und versuchen Sie es erneut. 
+  <string name="check_connectivity_exit">Blockchain Wallet kann keine Internetverbindung herstellen.
+ Bitte überprüfen Sie die Konnektivität Ihres Geräts und versuchen Sie es erneut.
 </string>
   <string name="double_encryption_password_error">Fehler beim doppelten Verschlüsselungskennwort. Bitte versuche es erneut.</string>
   <string name="btn_scan_pairing_code">Pairing-Code scannen</string>
@@ -133,17 +133,17 @@
   <string name="pair_wallet_step_2">Gehen Sie zu Einstellungen / Allgemein.</string>
   <string name="landing_title">Willkommen bei Blockchain</string>
   <string name="landing_body">Die einfache Möglichkeit, <b> </b> <b> senden, <b> empfangen </b> , <b> speichern </b> und <b> </b> digitalen Währungen zu handeln </b> .</string>
-  <string name="pair_wallet_step_3">Klicken Sie auf Pairing-Code anzeigen, um einen QR-Code anzuzeigen, ein quadratisches Schwarz 
- &amp; weißer Barcode. Scannen Sie den Code mit Ihrer Kamera. 
+  <string name="pair_wallet_step_3">Klicken Sie auf Pairing-Code anzeigen, um einen QR-Code anzuzeigen, ein quadratisches Schwarz
+ &amp; weißer Barcode. Scannen Sie den Code mit Ihrer Kamera.
 </string>
   <string name="wallet_id">Brieftaschen-ID</string>
   <string name="recover_funds">Geld zurückerhalten</string>
-  <string name="recover_funds_warning_message">Sie sollten immer koppeln oder sich anmelden, wenn Sie Zugriff haben 
- zu Ihrer Brieftaschen-ID und Ihrem Passwort. Wenn Sie Ihr Geld zurückerhalten, wird eine neue Brieftaschen-ID erstellt. Würdest du 
- gerne weitermachen? 
+  <string name="recover_funds_warning_message">Sie sollten immer koppeln oder sich anmelden, wenn Sie Zugriff haben
+ zu Ihrer Brieftaschen-ID und Ihrem Passwort. Wenn Sie Ihr Geld zurückerhalten, wird eine neue Brieftaschen-ID erstellt. Würdest du
+ gerne weitermachen?
 </string>
-  <string name="recover_funds_instructions">Geben Sie Ihre 12 Sicherungswörter mit Leerzeichen ein, um Ihre wiederherzustellen 
- Fonds &amp; Transaktionen 
+  <string name="recover_funds_instructions">Geben Sie Ihre 12 Sicherungswörter mit Leerzeichen ein, um Ihre wiederherzustellen
+ Fonds &amp; Transaktionen
 </string>
   <string name="recovery_passphrase">Sicherungssatz</string>
   <string name="invalid_recovery_phrase">Ungültige Sicherungsphrase. Bitte versuche es erneut</string>
@@ -175,26 +175,26 @@
   <string name="support">Unterstützung</string>
   <string name="rate_us">Bewerten Sie uns</string>
   <string name="licenses">Lizenzen</string>
-  <string name="about">Blockchain Wallet %1$s 
- © %2$s Blockchain Luxembourg SA 
+  <string name="about">Blockchain Wallet %1$s
+ © %2$s Blockchain Luxembourg SA
  Alle Rechte vorbehalten.</string>
   <string name="merchant_download">Kostenlose Händler-App</string>
   <string name="password_or_wipe">Geben Sie mit Ihrem Passwort ein oder vergessen Sie diese Brieftasche</string>
   <string name="use_password">Passwort verwenden</string>
   <string name="wipe_wallet">Brieftasche vergessen</string>
-  <string name="support_leaving_app_warning">Dadurch wird die App verlassen und Sie gelangen zu Ihrem Browser. 
- Fortsetzen? 
+  <string name="support_leaving_app_warning">Dadurch wird die App verlassen und Sie gelangen zu Ihrem Browser.
+ Fortsetzen?
 </string>
-  <string name="weak_password">Das ausgewählte Passwort ist zu schwach, um Ihr Geld zu sichern. Wir stark 
- schlagen vor, dass Sie eine andere auswählen. Möchten Sie ein neues Passwort definieren? 
+  <string name="weak_password">Das ausgewählte Passwort ist zu schwach, um Ihr Geld zu sichern. Wir stark
+ schlagen vor, dass Sie eine andere auswählen. Möchten Sie ein neues Passwort definieren?
 </string>
   <string name="from">Von</string>
   <string name="to">Zu</string>
   <string name="confirm_details">Bestätige Zahlung</string>
   <string name="fee">Gebühr</string>
   <string name="exit_confirm">Drücken Sie die Zurück-Taste erneut, um den Vorgang zu beenden</string>
-  <string name="label_address">Ihre Adresse wurde erfolgreich importiert. Optional a zuweisen 
- freundlicher Anzeigename zu dieser Adresse. 
+  <string name="label_address">Ihre Adresse wurde erfolgreich importiert. Optional a zuweisen
+ freundlicher Anzeigename zu dieser Adresse.
 </string>
   <string name="bip38_error">Ungültiges Passwort für den privaten Schlüssel</string>
   <string name="privkey_error">Nicht erkanntes privates Schlüsselformat</string>
@@ -213,17 +213,17 @@
   <string name="wallet">Brieftasche</string>
   <string name="wallets">Geldbörsen</string>
   <string name="save_name">Name speichern</string>
-  <string name="receive_address_to_clipboard">Diese Empfangsadresse in die Zwischenablage kopieren? Wenn ja, 
- Beachten Sie, dass andere Anwendungen diese Informationen möglicherweise anzeigen können. 
+  <string name="receive_address_to_clipboard">Diese Empfangsadresse in die Zwischenablage kopieren? Wenn ja,
+ Beachten Sie, dass andere Anwendungen diese Informationen möglicherweise anzeigen können.
 </string>
-  <string name="receive_address_to_share">Teilen Sie diese Empfangsadresse zum Senden? Wenn ja, sei 
- Es wird darauf hingewiesen, dass andere Anwendungen diese Informationen möglicherweise anzeigen können. 
+  <string name="receive_address_to_share">Teilen Sie diese Empfangsadresse zum Senden? Wenn ja, sei
+ Es wird darauf hingewiesen, dass andere Anwendungen diese Informationen möglicherweise anzeigen können.
 </string>
-  <string name="guid_to_clipboard">Kopieren Sie Ihre Brieftaschen-ID in die Zwischenablage? Wenn ja, sei darauf hingewiesen 
- Andere Anwendungen können diese Informationen möglicherweise anzeigen. 
+  <string name="guid_to_clipboard">Kopieren Sie Ihre Brieftaschen-ID in die Zwischenablage? Wenn ja, sei darauf hingewiesen
+ Andere Anwendungen können diese Informationen möglicherweise anzeigen.
 </string>
-  <string name="ssl_pinning_invalid">Die sichere Verbindung zum Host ist fehlgeschlagen. Dies könnte darauf hinweisen 
- böswillige Aktivitäten. Bitte überprüfen Sie Ihre Netzwerkverbindung und Ihr Gerät, bevor Sie fortfahren. 
+  <string name="ssl_pinning_invalid">Die sichere Verbindung zum Host ist fehlgeschlagen. Dies könnte darauf hinweisen
+ böswillige Aktivitäten. Bitte überprüfen Sie Ihre Netzwerkverbindung und Ihr Gerät, bevor Sie fortfahren.
 </string>
   <string name="description">Beschreibung</string>
   <string name="name">Name</string>
@@ -250,36 +250,36 @@
   <string name="archived_label">Archiviert</string>
   <string name="UPGRADE_YOUR_WALLET">OK los geht\'s!</string>
   <string name="upgrade_page_1">Vereinfachte Sicherung und Wiederherstellung.</string>
-  <string name="upgrade_page_2">Verbesserte Privatsphäre durch hierarchische deterministische Adressen. 
+  <string name="upgrade_page_2">Verbesserte Privatsphäre durch hierarchische deterministische Adressen.
 </string>
-  <string name="upgrade_page_3">Passen Sie die Art und Weise an, wie Sie Ihr Bitcoin in Ihrer Blockchain organisieren 
- Brieftasche. 
+  <string name="upgrade_page_3">Passen Sie die Art und Weise an, wie Sie Ihr Bitcoin in Ihrer Blockchain organisieren
+ Brieftasche.
 </string>
-  <string name="confirm_upgrade_header">Hey, wir haben diese neuen Funktionen zu Ihrer Blockchain hinzugefügt 
- Brieftasche: 
+  <string name="confirm_upgrade_header">Hey, wir haben diese neuen Funktionen zu Ihrer Blockchain hinzugefügt
+ Brieftasche:
 </string>
   <string name="upgrading">Upgrade durchführen…</string>
-  <string name="upgrading_started_info">Ihr Portemonnaie wird aktualisiert. Bitte haben Sie etwas Geduld 
- einige Zeit abhängig von der Größe und dem Alter Ihrer Brieftasche. 
+  <string name="upgrading_started_info">Ihr Portemonnaie wird aktualisiert. Bitte haben Sie etwas Geduld
+ einige Zeit abhängig von der Größe und dem Alter Ihrer Brieftasche.
 </string>
   <string name="upgrade_success_heading">Ihre Brieftasche wurde aktualisiert!</string>
-  <string name="upgrade_success_info">Sie führen jetzt die sicherste und privateste Blockchain aus 
- Brieftasche. Sie können jetzt mit Ihrer Brieftasche fortfahren. 
+  <string name="upgrade_success_info">Sie führen jetzt die sicherste und privateste Blockchain aus
+ Brieftasche. Sie können jetzt mit Ihrer Brieftasche fortfahren.
 </string>
   <string name="CLOSE">Schließen</string>
   <string name="upgrade_fail_heading">Brieftaschen-Upgrade fehlgeschlagen!</string>
-  <string name="upgrade_fail_info">Beim Aktualisieren Ihrer Brieftasche ist ein Fehler aufgetreten. Bitte versuche es erneut 
- später. 
+  <string name="upgrade_fail_info">Beim Aktualisieren Ihrer Brieftasche ist ein Fehler aufgetreten. Bitte versuche es erneut
+ später.
 </string>
-  <string name="not_sane_error">Ihre Blockchain Wallet-Installation ist unvollständig. Bitte erneut koppeln 
- Ihre Brieftasche oder erstellen Sie eine neue. 
+  <string name="not_sane_error">Ihre Blockchain Wallet-Installation ist unvollständig. Bitte erneut koppeln
+ Ihre Brieftasche oder erstellen Sie eine neue.
 </string>
-  <string name="watchonly_address_receive_warning">Sie erhalten gleich Bitcoin an a 
- nicht ausgabefähige Adresse. Sie können diese Mittel nur ausgeben, wenn Sie Zugriff auf den privaten Schlüssel haben. 
- Fortsetzen? 
+  <string name="watchonly_address_receive_warning">Sie erhalten gleich Bitcoin an a
+ nicht ausgabefähige Adresse. Sie können diese Mittel nur ausgeben, wenn Sie Zugriff auf den privaten Schlüssel haben.
+ Fortsetzen?
 </string>
-  <string name="camera_unavailable">Die Kamera wird derzeit von einer anderen Anwendung geöffnet. Bitte 
- Schließen Sie eine andere Anwendung und versuchen Sie es erneut. 
+  <string name="camera_unavailable">Die Kamera wird derzeit von einer anderen Anwendung geöffnet. Bitte
+ Schließen Sie eine andere Anwendung und versuchen Sie es erneut.
 </string>
   <string name="validating_password">Passwort validieren…</string>
   <string name="validating_pin">PIN validieren…</string>
@@ -287,21 +287,21 @@
   <string name="decrypting_wallet">Brieftasche entschlüsseln…</string>
   <string name="password_unchanged">Passwort unverändert</string>
   <string name="password_changed">Passwort geändert</string>
-  <string name="password_changed_explanation">Ihr Passwort wurde geändert, bitte koppeln Sie Ihr Passwort erneut 
- Brieftasche 
+  <string name="password_changed_explanation">Ihr Passwort wurde geändert, bitte koppeln Sie Ihr Passwort erneut
+ Brieftasche
 </string>
-  <string name="verify_email2">Ihre bestätigte E-Mail-Adresse wird verwendet, um Anmeldecodes zu senden, wenn 
- Es werden verdächtige oder ungewöhnliche Aktivitäten erkannt, um Sie an Ihre Wallet-Login-ID zu erinnern 
- Senden Sie Bitcoin-Zahlungsbenachrichtigungen, wenn Sie Geld erhalten. 
+  <string name="verify_email2">Ihre bestätigte E-Mail-Adresse wird verwendet, um Anmeldecodes zu senden, wenn
+ Es werden verdächtige oder ungewöhnliche Aktivitäten erkannt, um Sie an Ihre Wallet-Login-ID zu erinnern
+ Senden Sie Bitcoin-Zahlungsbenachrichtigungen, wenn Sie Geld erhalten.
 </string>
   <string name="disable_root_warning">Deaktivieren Sie die Warnung für gerootete Geräte</string>
   <string name="auth_failed">Autorisation fehlgeschlagen. Bitte versuche es erneut.</string>
   <string name="send_failed">Senden fehlgeschlagen. Bitte versuche es erneut.</string>
   <string name="wallet_updated">Brieftaschen-Update erhalten</string>
-  <string name="device_rooted">Ihr Gerät scheint gerootet zu sein. Beachten Sie, dass das Speichern von Geldern am 
- Ein gerootetes Gerät ist unsicher und kann außerdem Stabilitätsprobleme verursachen. Wenn Sie fortfahren 
- Verwenden Sie unsere Bitcoin-Brieftasche auf diesem Gerät. Wir empfehlen Ihnen, auf Ihrem Gerät eine doppelte Verschlüsselung zu verwenden 
- Blockchain-Konto. 
+  <string name="device_rooted">Ihr Gerät scheint gerootet zu sein. Beachten Sie, dass das Speichern von Geldern am
+ Ein gerootetes Gerät ist unsicher und kann außerdem Stabilitätsprobleme verursachen. Wenn Sie fortfahren
+ Verwenden Sie unsere Bitcoin-Brieftasche auf diesem Gerät. Wir empfehlen Ihnen, auf Ihrem Gerät eine doppelte Verschlüsselung zu verwenden
+ Blockchain-Konto.
 </string>
   <string name="address_already_in_wallet">Ihre Brieftasche enthält bereits diese Adresse.</string>
   <string name="saving_address">Adresse speichern…</string>
@@ -309,30 +309,30 @@
   <string name="label_cant_be_empty">Das Etikett darf nicht leer sein.</string>
   <string name="label_name_match">Name wird bereits verwendet</string>
   <string name="warning">Warnung</string>
-  <string name="ssl_no_connection">Wir können keine Verbindung zum Host herstellen, um eine sichere Verbindung herzustellen 
- Verbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung und Ihr Gerät, bevor Sie fortfahren. 
+  <string name="ssl_no_connection">Wir können keine Verbindung zum Host herstellen, um eine sichere Verbindung herzustellen
+ Verbindung. Bitte überprüfen Sie Ihre Netzwerkverbindung und Ihr Gerät, bevor Sie fortfahren.
 </string>
   <string name="retry">Wiederholen</string>
-  <string name="archived_description">Dieser Artikel wurde archiviert und ist in der nicht zugänglich 
- Mobile App Erfahrung. Obwohl Sie von diesem Artikel kein Geld senden können, bleibt das Geld übrig 
- sicher. Deaktivieren Sie einfach dieses Element, um es wieder zu verwenden. 
+  <string name="archived_description">Dieser Artikel wurde archiviert und ist in der nicht zugänglich
+ Mobile App Erfahrung. Obwohl Sie von diesem Artikel kein Geld senden können, bleibt das Geld übrig
+ sicher. Deaktivieren Sie einfach dieses Element, um es wieder zu verwenden.
 </string>
-  <string name="not_archived_description">Dieser Artikel ist nicht archiviert. Archivieren Sie diesen Artikel, wenn Sie dies tun 
- Ich möchte es NICHT mehr benutzen. Ihr Geld bleibt sicher und Sie können es unter archivieren 
- Jederzeit. 
+  <string name="not_archived_description">Dieser Artikel ist nicht archiviert. Archivieren Sie diesen Artikel, wenn Sie dies tun
+ Ich möchte es NICHT mehr benutzen. Ihr Geld bleibt sicher und Sie können es unter archivieren
+ Jederzeit.
 </string>
-  <string name="default_account_description">Dieses Element ist als Standard festgelegt und kann nicht verwendet werden 
- archiviert. 
+  <string name="default_account_description">Dieses Element ist als Standard festgelegt und kann nicht verwendet werden
+ archiviert.
 </string>
   <string name="extended_public_key">Erweiterter öffentlicher Schlüssel</string>
   <string name="address">Adresse</string>
   <string name="copy_xpub">Xpub kopieren</string>
-  <string name="scan_this_code">Ihr xPub ist eine erweiterte Funktion, die Ihre gesamte Öffentlichkeit enthält 
- Adressen. 
+  <string name="scan_this_code">Ihr xPub ist eine erweiterte Funktion, die Ihre gesamte Öffentlichkeit enthält
+ Adressen.
 </string>
-  <string name="xpub_sharing_warning">Durch das Teilen Ihres xPub werden andere berechtigt, Ihre zu verfolgen 
- Verlauf der Transaktionen. Als autorisierte Personen können Sie möglicherweise den Zugriff auf Ihre stören 
- Brieftasche, teilen Sie Ihren xPub nur mit Personen, denen Sie vertrauen. 
+  <string name="xpub_sharing_warning">Durch das Teilen Ihres xPub werden andere berechtigt, Ihre zu verfolgen
+ Verlauf der Transaktionen. Als autorisierte Personen können Sie möglicherweise den Zugriff auf Ihre stören
+ Brieftasche, teilen Sie Ihren xPub nur mit Personen, denen Sie vertrauen.
 </string>
   <string name="edit_wallet_name">Namen bearbeiten</string>
   <string name="edit_wallet_name_helper_text">Geben Sie dieser neuen Brieftasche einen Namen.</string>
@@ -346,48 +346,48 @@
   <string name="unarchive_are_you_sure">Möchten Sie diesen Artikel wirklich aus dem Archiv entfernen?</string>
   <string name="make_default">Machen Standard</string>
   <string name="privx_required">Privater Schlüssel benötigt</string>
-  <string name="watch_only_spend_instructions">Diese Aktion erfordert den privaten Schlüssel für die 
- Bitcoin-Adresse %1$s . Bitte scannen Sie den QR-Code. 
+  <string name="watch_only_spend_instructions">Diese Aktion erfordert den privaten Schlüssel für die
+ Bitcoin-Adresse %1$s . Bitte scannen Sie den QR-Code.
 </string>
   <string name="invalid_private_key">Ungültiger privater Schlüssel</string>
-  <string name="watch_only_import_warning">Sie sind dabei, eine nicht ausgabefähige Adresse zu importieren 
- Adresse (oder öffentliches Schlüsselskript) 
- ohne den entsprechenden privaten Schlüssel in der Brieftasche gespeichert. Dies 
- bedeutet, dass das Geld NUR ausgegeben werden kann, wenn Sie den privaten Schlüssel an einer anderen Stelle gespeichert haben. Wenn du 
- tun 
- Wenn der private Schlüssel nicht gespeichert ist, weisen Sie niemanden an, Ihnen Bitcoin an den zu senden 
- nicht ausgabefähig 
- Adresse. 
+  <string name="watch_only_import_warning">Sie sind dabei, eine nicht ausgabefähige Adresse zu importieren
+ Adresse (oder öffentliches Schlüsselskript)
+ ohne den entsprechenden privaten Schlüssel in der Brieftasche gespeichert. Dies
+ bedeutet, dass das Geld NUR ausgegeben werden kann, wenn Sie den privaten Schlüssel an einer anderen Stelle gespeichert haben. Wenn du
+ tun
+ Wenn der private Schlüssel nicht gespeichert ist, weisen Sie niemanden an, Ihnen Bitcoin an den zu senden
+ nicht ausgabefähig
+ Adresse.
 
- Diese Optionen werden nur fortgeschrittenen Benutzern empfohlen. Fortsetzen? 
+ Diese Optionen werden nur fortgeschrittenen Benutzern empfohlen. Fortsetzen?
 </string>
   <string name="scan_private_key">Privaten Schlüssel scannen</string>
   <string name="private_key_successfully_imported">Privater Schlüssel erfolgreich importiert.</string>
-  <string name="private_key_not_matching_address">HINWEIS: Der gescannte private Schlüssel funktioniert nicht 
- entsprechen Ihrer nicht verbrauchbaren Adresse. Um Ihr Geld von dieser Adresse auszugeben, scannen Sie bitte 
- den richtigen privaten Schlüssel. 
+  <string name="private_key_not_matching_address">HINWEIS: Der gescannte private Schlüssel funktioniert nicht
+ entsprechen Ihrer nicht verbrauchbaren Adresse. Um Ihr Geld von dieser Adresse auszugeben, scannen Sie bitte
+ den richtigen privaten Schlüssel.
 </string>
   <string name="watch_only">Nicht ausgabefähig</string>
-  <string name="extended_public_key_description">Wenn Sie ein Händler sind, zeigen Sie Ihren xPub und verwenden Sie die 
- Blockchain Merchant App, um Geld sicher und privat zu erhalten. 
+  <string name="extended_public_key_description">Wenn Sie ein Händler sind, zeigen Sie Ihren xPub und verwenden Sie die
+ Blockchain Merchant App, um Geld sicher und privat zu erhalten.
 
- Halten Sie Ihren xPub privat. 
- Jemand mit Zugriff auf Ihren xPub kann alle Ihre Gelder und Transaktionen anzeigen. 
+ Halten Sie Ihren xPub privat.
+ Jemand mit Zugriff auf Ihren xPub kann alle Ihre Gelder und Transaktionen anzeigen.
 </string>
-  <string name="extended_public_key_description_bch_only">Halten Sie Ihren xPub privat. Jemand mit 
- Durch den Zugriff auf Ihren xPub können Sie alle Ihre Gelder und Transaktionen anzeigen. 
+  <string name="extended_public_key_description_bch_only">Halten Sie Ihren xPub privat. Jemand mit
+ Durch den Zugriff auf Ihren xPub können Sie alle Ihre Gelder und Transaktionen anzeigen.
 </string>
-  <string name="watch_only_description">Dies ist eine nicht ausgabefähige Adresse. Um Ihr Geld auszugeben von 
- In dieser Brieftasche scannen Sie bitte Ihren privaten Schlüssel. 
+  <string name="watch_only_description">Dies ist eine nicht ausgabefähige Adresse. Um Ihr Geld auszugeben von
+ In dieser Brieftasche scannen Sie bitte Ihren privaten Schlüssel.
 </string>
   <string name="success">Erfolg</string>
   <string name="default_label">Standard</string>
   <string name="import_try_again">Versuch es noch einmal</string>
   <string name="transfer">Transfer</string>
   <string name="transfer_funds">Importierte Adressen übertragen?</string>
-  <string name="transfer_recommend">Sieht so aus, als hätten Sie einige Bitcoins in importierten Adressen. 
- Importierte Adressen werden nicht von Ihrer Sicherungsphrase gesichert. Um diese Mittel zu sichern, haben wir 
- empfehlen, diese Guthaben zu übertragen, um sie in Ihr Backup aufzunehmen. 
+  <string name="transfer_recommend">Sieht so aus, als hätten Sie einige Bitcoins in importierten Adressen.
+ Importierte Adressen werden nicht von Ihrer Sicherungsphrase gesichert. Um diese Mittel zu sichern, haben wir
+ empfehlen, diese Guthaben zu übertragen, um sie in Ihr Backup aufzunehmen.
 </string>
   <string name="transfer_confirmed">Übertragung bestätigt</string>
   <string name="transfer_confirm">Übertragung bestätigen</string>
@@ -399,8 +399,8 @@
   <string name="amount">Menge</string>
   <string name="not_now">Nicht jetzt</string>
   <string name="no_confirmed_funds">Keine bestätigten Mittel zum Ausgeben.</string>
-  <string name="transaction_surge">Das Bitcoin-Mining-Netzwerk verzeichnet derzeit ein Hoch 
- Aktivitätsvolumen, was zu empfohlenen Gebühren führt, die höher als üblich sind. 
+  <string name="transaction_surge">Das Bitcoin-Mining-Netzwerk verzeichnet derzeit ein Hoch
+ Aktivitätsvolumen, was zu empfohlenen Gebühren führt, die höher als üblich sind.
 </string>
   <string name="unsupported_encryption_version">Wallet-Version %1$s nicht unterstützt.</string>
   <string name="logout">Ausloggen</string>
@@ -421,59 +421,50 @@
   <string name="disable">Deaktivieren</string>
   <string name="sms">SMS</string>
   <string name="setting_the_exchange">Austausch</string>
-  <string name="disable_2fa_first">Bitte deaktivieren Sie die Bestätigung in zwei Schritten per SMS in der Sicherheit 
- Einstellungen zuerst. 
+  <string name="disable_2fa_first">Bitte deaktivieren Sie die Bestätigung in zwei Schritten per SMS in der Sicherheit
+ Einstellungen zuerst.
 </string>
-  <string name="disable_online_only">Bitte melden Sie sich im Webbrowser in Ihrer Brieftasche an, um sie zu deaktivieren 
- 2FA. 
+  <string name="disable_online_only">Bitte melden Sie sich im Webbrowser in Ihrer Brieftasche an, um sie zu deaktivieren
+ 2FA.
 </string>
   <string name="settings_field_cant_be_empty">Feld kann nicht leer sein.</string>
   <string name="settings_error_updating">Fehler beim Aktualisieren der Einstellungen, versuchen Sie es erneut</string>
   <string name="request_camera_permission">Kamerazugriff ist erforderlich.</string>
-  <string name="request_camera_permission_title">Kamerazugriff</string>
-  <string name="request_location_permission">Standortzugriff ist erforderlich.</string>
-  <string name="request_write_storage_permission">Externer Schreibspeicher ist erforderlich.</string>
-  <string name="request_write_and_camera_storage_permission_description">Externen Speicher schreiben 
- und Kamera sind erforderlich, um KYC-Dokumente hochzuladen. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Schreibspeicher und Kamera 
- Berechtigungen 
-</string>
   <string name="not_specified">unbestimmt</string>
   <string name="update_failed">Aktualisierung fehlgeschlagen.</string>
   <string name="verify_mobile">Überprüfen Sie Mobile</string>
   <string name="select_country">Land auswählen</string>
   <string name="search_country">Land suchen</string>
-  <string name="verify_sms_summary">Wir haben Ihrem Handy eine SMS mit einem 
- Verifizierungs-Schlüssel. Geben Sie den Code ein, um Ihre Handynummer zu überprüfen. 
+  <string name="verify_sms_summary">Wir haben Ihrem Handy eine SMS mit einem
+ Verifizierungs-Schlüssel. Geben Sie den Code ein, um Ihre Handynummer zu überprüfen.
 </string>
   <string name="verify_sms_failed">Code ungültig, bitte versuchen Sie es erneut</string>
-  <string name="mobile_description">Mit Ihrem Mobiltelefon können Sie zwei Faktoren aktivieren 
- Authentifizierung, um Ihre Brieftasche vor unbefugtem Zugriff zu schützen. 
+  <string name="mobile_description">Mit Ihrem Mobiltelefon können Sie zwei Faktoren aktivieren
+ Authentifizierung, um Ihre Brieftasche vor unbefugtem Zugriff zu schützen.
 </string>
   <string name="enable_fingerprint">Fingerabdruck entsperren</string>
   <string name="two_fa">2-stufige Überprüfung</string>
   <string name="tor_requests">Block Tor Anfragen</string>
-  <string name="tor_summary">Blockieren Sie IP-Adressen, von denen bekannt ist, dass sie Teil der Tor-Anonymisierung sind 
- Netzwerk. Das Tor-Netzwerk wird häufig von Hackern verwendet, die versuchen, auf Blockchain zuzugreifen 
- Geldbörsen des Benutzers. 
+  <string name="tor_summary">Blockieren Sie IP-Adressen, von denen bekannt ist, dass sie Teil der Tor-Anonymisierung sind
+ Netzwerk. Das Tor-Netzwerk wird häufig von Hackern verwendet, die versuchen, auf Blockchain zuzugreifen
+ Geldbörsen des Benutzers.
 </string>
   <string name="enable_screenshots">Screenshots aktivieren</string>
-  <string name="enable_screenshots_summary">Einige Bildschirme in der Anwendung können angezeigt werden 
- sensible Daten. Andere Anwendungen können auf diese Screenshots zugreifen. 
+  <string name="enable_screenshots_summary">Einige Bildschirme in der Anwendung können angezeigt werden
+ sensible Daten. Andere Anwendungen können auf diese Screenshots zugreifen.
 </string>
-  <string name="password_hint_summary">Ihre Blockchain Wallet teilt Ihr Passwort niemals mit 
- unsere Server. Dies bedeutet, dass wir keine Ahnung haben, wie Ihr Passwort lautet, und dass wir es bei Ihnen nicht zurücksetzen können 
- Vergiss es. Erstellen Sie einen einprägsamen Passworthinweis, den wir an Ihre bestätigte E-Mail-Adresse senden können 
- falls Sie Ihr Passwort vergessen haben. 
+  <string name="password_hint_summary">Ihre Blockchain Wallet teilt Ihr Passwort niemals mit
+ unsere Server. Dies bedeutet, dass wir keine Ahnung haben, wie Ihr Passwort lautet, und dass wir es bei Ihnen nicht zurücksetzen können
+ Vergiss es. Erstellen Sie einen einprägsamen Passworthinweis, den wir an Ihre bestätigte E-Mail-Adresse senden können
+ falls Sie Ihr Passwort vergessen haben.
 </string>
   <string name="change_password">Passwort ändern</string>
-  <string name="change_password_summary">Ihr Passwort wird niemals an unsere Server weitergegeben 
- Das heißt, wir können nicht anders, als Ihr Passwort zurückzusetzen, wenn Sie es vergessen. Stellen Sie sicher, dass Sie Ihr Geld sichern 
- über das Seitenmenü, das bei einem Passwortverlust den Zugriff auf Ihre Brieftasche wiederherstellen kann. 
+  <string name="change_password_summary">Ihr Passwort wird niemals an unsere Server weitergegeben
+ Das heißt, wir können nicht anders, als Ihr Passwort zurückzusetzen, wenn Sie es vergessen. Stellen Sie sicher, dass Sie Ihr Geld sichern
+ über das Seitenmenü, das bei einem Passwortverlust den Zugriff auf Ihre Brieftasche wiederherstellen kann.
 </string>
-  <string name="verify_email_notice">Wir haben Ihrer E-Mail-Adresse einen Bestätigungslink gesendet. Klicken 
- den Link zur Überprüfung Ihrer E-Mail-Adresse. 
+  <string name="verify_email_notice">Wir haben Ihrer E-Mail-Adresse einen Bestätigungslink gesendet. Klicken
+ den Link zur Überprüfung Ihrer E-Mail-Adresse.
 </string>
   <string name="email_notifications">E-Mail Benachrichtigungen</string>
   <string name="email_notifications_summary">Lassen Sie sich benachrichtigen, wenn Sie Bitcoin erhalten.</string>
@@ -481,19 +472,19 @@
   <string name="new_password">Neues Kennwort</string>
   <string name="sms_verified">Handynummer verifiziert</string>
   <string name="preferences">Einstellungen</string>
-  <string name="two_fa_summary">Schützen Sie Ihre Brieftasche vor unbefugtem Zugriff, indem Sie 2-Step aktivieren 
- Nachprüfung. 
+  <string name="two_fa_summary">Schützen Sie Ihre Brieftasche vor unbefugtem Zugriff, indem Sie 2-Step aktivieren
+ Nachprüfung.
 </string>
-  <string name="two_fa_description">Schützen Sie Ihre Brieftasche durch Aktivieren vor unbefugtem Zugriff 
- 2-Schritt-Überprüfung. Sie können Ihre Handynummer verwenden, um Ihre Brieftasche zu sichern. 
- Dieser Code wird angefordert, wenn Sie versuchen, über den Webbrowser auf Ihre Brieftasche zuzugreifen. 
+  <string name="two_fa_description">Schützen Sie Ihre Brieftasche durch Aktivieren vor unbefugtem Zugriff
+ 2-Schritt-Überprüfung. Sie können Ihre Handynummer verwenden, um Ihre Brieftasche zu sichern.
+ Dieser Code wird angefordert, wenn Sie versuchen, über den Webbrowser auf Ihre Brieftasche zuzugreifen.
 
- Im 
- Um stattdessen andere Authentifizierungsmethoden zu verwenden, melden Sie sich bitte unter %1$s in unserer Web-Brieftasche an 
+ Im
+ Um stattdessen andere Authentifizierungsmethoden zu verwenden, melden Sie sich bitte unter %1$s in unserer Web-Brieftasche an
 </string>
   <string name="rate_title">Bewerten Sie Blockchain Wallet</string>
-  <string name="rate_message">Genießen Sie die Blockchain Wallet? Bitte nehmen Sie sich einen Moment Zeit, um a 
- Überprüfen Sie in Google Play und informieren Sie andere darüber. 
+  <string name="rate_message">Genießen Sie die Blockchain Wallet? Bitte nehmen Sie sich einen Moment Zeit, um a
+ Überprüfen Sie in Google Play und informieren Sie andere darüber.
 </string>
   <string name="rate_yes">Ja, bewerten Sie Blockchain Wallet</string>
   <string name="rate_no">Nein Danke</string>
@@ -507,7 +498,7 @@
   <string name="pairing_code_show_qr">QR-Code anzeigen</string>
   <string name="pairing_code_hide_qr">QR-Code ausblenden</string>
   <string name="pairing_code_warning_1">Halten Sie diesen Code versteckt, bis Sie bereit sind.</string>
-  <string name="pairing_code_warning_2">Bewahren Sie diesen Code sicher auf! 
+  <string name="pairing_code_warning_2">Bewahren Sie diesen Code sicher auf!
  Nicht mit anderen teilen.</string>
   <string name="email_request_subject_btc">Bitcoin Zahlungsanforderung</string>
   <string name="email_request_subject_eth">Ether Zahlungsanforderung</string>
@@ -520,40 +511,40 @@
   <string name="email_request_body_bch">Bitte senden Sie BCH an die Bitcoin Cash-Adresse %1$s .</string>
   <string name="email_request_body_xlm">Bitte senden Sie XLM an die Stellar-Adresse %1$s .</string>
   <string name="email_request_body_fallback">befestigt</string>
-  <string name="share_instructions">Tippen Sie hier, um diese Adresse zu kopieren. Teilen Sie es dem Absender per E-Mail mit 
- oder Text. 
+  <string name="share_instructions">Tippen Sie hier, um diese Adresse zu kopieren. Teilen Sie es dem Absender per E-Mail mit
+ oder Text.
 </string>
   <string name="common_pin_dialog_title">Warnung</string>
-  <string name="common_pin_dialog_message">Die von Ihnen ausgewählte PIN ist sehr häufig und kann sehr häufig sein 
- Lassen Sie sich innerhalb von 3 Versuchen leicht von jemandem erraten, der Zugriff auf Ihr Telefon hat. Möchten Sie verwenden 
- diese PIN trotzdem? 
+  <string name="common_pin_dialog_message">Die von Ihnen ausgewählte PIN ist sehr häufig und kann sehr häufig sein
+ Lassen Sie sich innerhalb von 3 Versuchen leicht von jemandem erraten, der Zugriff auf Ihr Telefon hat. Möchten Sie verwenden
+ diese PIN trotzdem?
 </string>
   <string name="common_pin_dialog_try_again">Versuch es noch einmal</string>
   <string name="common_pin_dialog_continue">Fortsetzen</string>
-  <string name="logged_out_enter_password">Sie haben sich abgemeldet oder es ist ein Fehler beim Entschlüsseln aufgetreten 
- deine Geldbörse. Geben Sie unten Ihr Passwort ein, um sich anzumelden. 
+  <string name="logged_out_enter_password">Sie haben sich abgemeldet oder es ist ein Fehler beim Entschlüsseln aufgetreten
+ deine Geldbörse. Geben Sie unten Ihr Passwort ein, um sich anzumelden.
 </string>
-  <string name="logged_out_forget_wallet">Wenn Sie diese Brieftasche vergessen und von vorne beginnen möchten, 
- Drücken Sie \'Wallet vergessen\'. 
+  <string name="logged_out_forget_wallet">Wenn Sie diese Brieftasche vergessen und von vorne beginnen möchten,
+ Drücken Sie \'Wallet vergessen\'.
 </string>
   <string name="forget_wallet">Brieftasche vergessen</string>
-  <string name="forget_wallet_warning">Dadurch werden alle Brieftaschendaten auf diesem Gerät gelöscht. Bitte 
- Bestätigen Sie, dass Sie Ihre Brieftascheninformationen an anderer Stelle gespeichert haben, andernfalls Bitcoin 
- Brieftasche wird unzugänglich sein !! 
+  <string name="forget_wallet_warning">Dadurch werden alle Brieftaschendaten auf diesem Gerät gelöscht. Bitte
+ Bestätigen Sie, dass Sie Ihre Brieftascheninformationen an anderer Stelle gespeichert haben, andernfalls Bitcoin
+ Brieftasche wird unzugänglich sein !!
 </string>
   <string name="api_fail">Serververbindung konnte nicht hergestellt werden. Bitte versuchen Sie es später noch einmal.</string>
-  <string name="large_tx_warning">Dies ist eine übergroße Bitcoin-Transaktion. Ihre Brieftasche muss 
- Konsolidieren Sie viele kleinere Zahlungen, die Sie in der Vergangenheit erhalten haben. Dies erfordert eine relativ 
- hohe Gebühr, um schnell bestätigt zu werden. 
+  <string name="large_tx_warning">Dies ist eine übergroße Bitcoin-Transaktion. Ihre Brieftasche muss
+ Konsolidieren Sie viele kleinere Zahlungen, die Sie in der Vergangenheit erhalten haben. Dies erfordert eine relativ
+ hohe Gebühr, um schnell bestätigt zu werden.
 </string>
   <string name="accept_higher_fee">Akzeptiere höhere Gebühren</string>
-  <string name="password_reveal_warning">Achtung! Das Offenlegen dieses Textes ermöglicht es Ihrem Passwort 
- in die Zwischenablage kopiert werden, die dann von allen Anwendungen auf Ihrem Gerät gelesen werden kann. Ebenfalls 
- Achten Sie auf Menschen, die hinter Ihnen stehen! 
+  <string name="password_reveal_warning">Achtung! Das Offenlegen dieses Textes ermöglicht es Ihrem Passwort
+ in die Zwischenablage kopiert werden, die dann von allen Anwendungen auf Ihrem Gerät gelesen werden kann. Ebenfalls
+ Achten Sie auf Menschen, die hinter Ihnen stehen!
 </string>
   <string name="push_notifications">Mitteilungen</string>
-  <string name="push_notifications_summary">Aktivieren Sie Benachrichtigungen, um eine Popup-Benachrichtigung zu erhalten 
- wann immer Sie Bitcoin erhalten. 
+  <string name="push_notifications_summary">Aktivieren Sie Benachrichtigungen, um eine Popup-Benachrichtigung zu erhalten
+ wann immer Sie Bitcoin erhalten.
 </string>
   <string name="transaction_detail_title">Transaktion</string>
   <string name="transaction_detail_description_hint">Wofür ist das?</string>
@@ -563,7 +554,7 @@
   <string name="transaction_detail_pending">Ausstehend ( %1$s / %2$s Bestätigungen)</string>
   <string name="transaction_detail_fee">\"Transaktionsgebühr: %1$s \"</string>
   <string name="transaction_detail_value_at_time_received">Wert bei Empfang: \u0020</string>
-  <string name="transaction_detail_value_at_time_transferred">Wert bei Übertragung: \u0020 
+  <string name="transaction_detail_value_at_time_transferred">Wert bei Übertragung: \u0020
 </string>
   <string name="transaction_detail_value_at_time_sent">Wert beim Senden: \u0020</string>
   <string name="transaction_detail_value">Wert: \u0020</string>
@@ -575,25 +566,25 @@
   <string name="transaction_detail_contact_note">Hinweis</string>
   <string name="security_centre_email_check">E-Mail überprüfen</string>
   <string name="backup_header">Sicherungssatz</string>
-  <string name="backup_explanation">Zu Ihrer Sicherheit behält Blockchain keine Passwörter bei 
- Datei. Die folgende Sicherungsphrase mit 12 Wörtern gibt Ihnen Zugriff auf Ihr Guthaben, falls Sie dies tun 
- Verliere dein Passwort. Schreiben Sie es unbedingt auf ein Blatt Papier und bewahren Sie es an einem sicheren Ort auf 
- und sicher. 
+  <string name="backup_explanation">Zu Ihrer Sicherheit behält Blockchain keine Passwörter bei
+ Datei. Die folgende Sicherungsphrase mit 12 Wörtern gibt Ihnen Zugriff auf Ihr Guthaben, falls Sie dies tun
+ Verliere dein Passwort. Schreiben Sie es unbedingt auf ein Blatt Papier und bewahren Sie es an einem sicheren Ort auf
+ und sicher.
 </string>
   <string name="backup_button_start">Sicherung starten</string>
-  <string name="backup_write_down_words">Es ist wichtig, dass Sie Ihre Worte aufschreiben 
- genau so, wie sie hier und in dieser Reihenfolge erscheinen. 
+  <string name="backup_write_down_words">Es ist wichtig, dass Sie Ihre Worte aufschreiben
+ genau so, wie sie hier und in dieser Reihenfolge erscheinen.
 </string>
   <string name="backup_header_complete">Sicherung komplett</string>
-  <string name="backup_complete_message">Sie können Ihre Sicherungsphrase verwenden, um Ihr Guthaben wiederherzustellen, wenn 
- Sie verlieren Ihr Passwort. Jeder, der Zugriff auf Ihre Sicherungsphrase hat, kann auf Ihre Gelder zugreifen 
- Denken Sie daran, es an einem sicheren Ort offline zu halten. 
+  <string name="backup_complete_message">Sie können Ihre Sicherungsphrase verwenden, um Ihr Guthaben wiederherzustellen, wenn
+ Sie verlieren Ihr Passwort. Jeder, der Zugriff auf Ihre Sicherungsphrase hat, kann auf Ihre Gelder zugreifen
+ Denken Sie daran, es an einem sicheren Ort offline zu halten.
 </string>
   <string name="backup_again">Sichern Sie erneut</string>
   <string name="backup_confirmed">Sicherung bestätigt</string>
   <string name="backup_last">Letzte Sicherung: %1$s</string>
-  <string name="backup_verify_heading">Geben Sie die folgenden Wörter aus Ihrer Sicherungsphrase in ein 
- Schließen Sie den Sicherungsvorgang ab. 
+  <string name="backup_verify_heading">Geben Sie die folgenden Wörter aus Ihrer Sicherungsphrase in ein
+ Schließen Sie den Sicherungsvorgang ab.
 </string>
   <string name="backup_next_word">NÄCHSTES WORT</string>
   <string name="backup_previous_word">VORHERIGES WORT</string>
@@ -602,10 +593,10 @@
   <string name="backup_word_mismatch">Wortinkongruenz</string>
   <string name="backup_done">ERLEDIGT</string>
   <string name="backup_lost_mnemonic">Haben Sie Ihre 12-Wörter-Backup-Phrase verloren?</string>
-  <string name="fingerprint_prompt">Verwenden Sie Ihren Fingerabdruck für einen schnelleren und einfacheren Zugriff auf Ihre 
- Brieftasche. 
+  <string name="fingerprint_prompt">Verwenden Sie Ihren Fingerabdruck für einen schnelleren und einfacheren Zugriff auf Ihre
+ Brieftasche.
 
- Bestätigen Sie den Fingerabdruck, um fortzufahren 
+ Bestätigen Sie den Fingerabdruck, um fortzufahren
 </string>
   <string name="fingerprint_description">Bestätigen Sie den Fingerabdruck, um fortzufahren</string>
   <string name="fingerprint_hint">Berührungssensor</string>
@@ -613,54 +604,54 @@
   <string name="fingerprint_not_recognized">Fingerabdruck nicht erkannt. Versuch es noch einmal</string>
   <string name="fingerprint_success">Fingerabdruck erkannt</string>
   <string name="fingerprint_use_pin">Verwenden Sie die PIN</string>
-  <string name="fingerprint_disable_message">Möchten Sie die Anmeldung für Fingerabdrücke wirklich deaktivieren? 
+  <string name="fingerprint_disable_message">Möchten Sie die Anmeldung für Fingerabdrücke wirklich deaktivieren?
 </string>
-  <string name="fingerprint_no_fingerprints_added">Hierzu wurden keine Fingerabdrücke registriert 
- Gerät noch. Möchten Sie jetzt einen Fingerabdruck registrieren? 
+  <string name="fingerprint_no_fingerprints_added">Hierzu wurden keine Fingerabdrücke registriert
+ Gerät noch. Möchten Sie jetzt einen Fingerabdruck registrieren?
 </string>
-  <string name="fingerprint_key_invalidated_description">Entweder die darauf gespeicherten Fingerabdrücke 
- Gerät wurde geändert oder der Schlüsselschutz wurde deaktiviert 
+  <string name="fingerprint_key_invalidated_description">Entweder die darauf gespeicherten Fingerabdrücke
+ Gerät wurde geändert oder der Schlüsselschutz wurde deaktiviert
 </string>
   <string name="fingerprint_key_invalidated_brief">Schlüssel ungültig, PIN-Code erforderlich</string>
-  <string name="fingerprint_fatal_error_register_description">Es sind zu viele gescheitert 
- Versuche in den letzten 30 Minuten. Bitte versuchen Sie es später erneut. 
+  <string name="fingerprint_fatal_error_register_description">Es sind zu viele gescheitert
+ Versuche in den letzten 30 Minuten. Bitte versuchen Sie es später erneut.
 </string>
-  <string name="fingerprint_fatal_error_authenticate_description">Es sind zu viele gescheitert 
- Versuche. Bitte melden Sie sich stattdessen mit Ihrer PIN an. 
+  <string name="fingerprint_fatal_error_authenticate_description">Es sind zu viele gescheitert
+ Versuche. Bitte melden Sie sich stattdessen mit Ihrer PIN an.
 </string>
   <string name="fingerprint_fatal_error_brief">Unerwarteter Fehler</string>
   <string name="shortcut_receive_copy_short">Adresse kopieren</string>
   <string name="shortcut_receive_copy_long">Kopieren Sie die Empfangsadresse in eine andere App</string>
   <string name="shortcut_receive_qr_short">Show Receive QR</string>
   <string name="shortcut_receive_qr_long">QR-Code für Empfangsadresse anzeigen</string>
-  <string name="shortcut_receive_qr_error">Leider ist beim Generieren des QR-Codes ein Fehler aufgetreten 
+  <string name="shortcut_receive_qr_error">Leider ist beim Generieren des QR-Codes ein Fehler aufgetreten
 </string>
-  <string name="shortcut_settings_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie lange auf die App drücken 
- Symbol im Launcher, wodurch der Empfang von Bitcoin noch schneller wird. 
+  <string name="shortcut_settings_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie lange auf die App drücken
+ Symbol im Launcher, wodurch der Empfang von Bitcoin noch schneller wird.
 </string>
   <string name="shortcut_settings_enable">Launcher-Verknüpfungen</string>
   <string name="confirm">Bestätigen</string>
   <string name="swipe_receive_hint">Wischen Sie zum Empfangen</string>
-  <string name="swipe_receive_preference_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie nach links wischen 
- der PIN-Bildschirm, wodurch der Geldempfang noch schneller wird. 
+  <string name="swipe_receive_preference_summary">Zeigen Sie eine Empfangsadresse an, wenn Sie nach links wischen
+ der PIN-Bildschirm, wodurch der Geldempfang noch schneller wird.
 </string>
-  <string name="swipe_receive_address_info">Danach werden nacheinander fünf Adressen geladen 
- Welche Anmeldung ist erforderlich, um neue Adressen anzuzeigen. 
+  <string name="swipe_receive_address_info">Danach werden nacheinander fünf Adressen geladen
+ Welche Anmeldung ist erforderlich, um neue Adressen anzuzeigen.
 </string>
-  <string name="swipe_receive_no_addresses">Derzeit können keine Adressen mehr geladen werden. Einloggen in 
- die App, um mehr zu laden. 
+  <string name="swipe_receive_no_addresses">Derzeit können keine Adressen mehr geladen werden. Einloggen in
+ die App, um mehr zu laden.
 </string>
   <string name="swipe_to_receive_request">Erhalte %1$s</string>
   <string name="swipe_receive_left_arrow">Wischen Sie, um den linken Pfeil zu erhalten</string>
   <string name="swipe_receive_right_arrow">Wischen Sie, um den rechten Pfeil zu erhalten</string>
   <string name="onboarding_fingerprint_title">Fingerabdruck-Login</string>
-  <string name="onboarding_fingerprint_summary">Verwenden Sie die Fingerabdruck-Anmeldung anstelle Ihrer PIN für 
- Authentifizieren Sie sich und greifen Sie auf Ihre Brieftasche zu. 
+  <string name="onboarding_fingerprint_summary">Verwenden Sie die Fingerabdruck-Anmeldung anstelle Ihrer PIN für
+ Authentifizieren Sie sich und greifen Sie auf Ihre Brieftasche zu.
 </string>
   <string name="onboarding_fingerprint_enable">Fingerabdruck aktivieren</string>
   <string name="onboarding_check_inbox_title">Überprüfe deinen Posteingang</string>
-  <string name="onboarding_check_inbox_summary">Suchen Sie nach einer E-Mail von Blockchain und klicken Sie auf 
- Bestätigungslink, um die Einrichtung Ihrer Brieftasche abzuschließen. 
+  <string name="onboarding_check_inbox_summary">Suchen Sie nach einer E-Mail von Blockchain und klicken Sie auf
+ Bestätigungslink, um die Einrichtung Ihrer Brieftasche abzuschließen.
 </string>
   <string name="onboarding_verify_email">E-Mail bestätigen</string>
   <string name="onboarding_qr_codes">QR-Codes</string>
@@ -672,11 +663,11 @@
   <string name="trade_complete_details">Ihr Buy Bitcoin-Handel ist abgeschlossen!</string>
   <string name="view_details">Details anzeigen</string>
   <string name="two_factor_dialog_title">Geben Sie den 2FA-Code ein</string>
-  <string name="two_factor_dialog_message_authenticator">Bitte geben Sie einen gültigen 2FA-Code von Ihrem ein 
- Authentifizierungs-App, um fortzufahren. 
+  <string name="two_factor_dialog_message_authenticator">Bitte geben Sie einen gültigen 2FA-Code von Ihrem ein
+ Authentifizierungs-App, um fortzufahren.
 </string>
-  <string name="two_factor_dialog_message_sms">Wir haben Ihnen gerade eine SMS mit einem 2FA-Code gesendet. 
- Bitte geben Sie es hier ein, um fortzufahren. 
+  <string name="two_factor_dialog_message_sms">Wir haben Ihnen gerade eine SMS mit einem 2FA-Code gesendet.
+ Bitte geben Sie es hier ein, um fortzufahren.
 </string>
   <string name="two_factor_dialog_hint">2FA-Code</string>
   <string name="two_factor_null_error">2FA-Code darf nicht leer sein</string>
@@ -691,15 +682,15 @@
   <string name="fee_options_custom_warning">Nur für fortgeschrittene Benutzer</string>
   <string name="fee_options_fee_too_low">Niedrige Gebühr nicht empfohlen</string>
   <string name="fee_options_fee_too_high">Unnötig hohe Gebühr</string>
-  <string name="fee_options_advanced_warning">Diese Funktion wird nur fortgeschrittenen Benutzern empfohlen. 
- Wenn Sie eine benutzerdefinierte Gebühr wählen, riskieren Sie eine Überzahlung oder Ihre Transaktion wird nie bestätigt. 
+  <string name="fee_options_advanced_warning">Diese Funktion wird nur fortgeschrittenen Benutzern empfohlen.
+ Wenn Sie eine benutzerdefinierte Gebühr wählen, riskieren Sie eine Überzahlung oder Ihre Transaktion wird nie bestätigt.
 </string>
   <string name="fee_options_sat_byte_hint">saß / b</string>
   <string name="fee_options_sat_byte_inline_hint">Normal: %1$s , Priorität: %2$s</string>
   <string name="dismiss">Entlassen</string>
   <string name="second_password_dlg_title">Passwort eingeben</string>
-  <string name="eth_second_password_prompt">Um diesen Service nutzen zu können, müssen Sie Ihre eingeben 
- Zweites Passwort. 
+  <string name="eth_second_password_prompt">Um diesen Service nutzen zu können, müssen Sie Ihre eingeben
+ Zweites Passwort.
 </string>
   <string name="ether">Äther</string>
   <string name="bitcoin">Bitcoin</string>
@@ -707,13 +698,13 @@
   <string name="eth_to_field_helper_no_dropdown">Ätheradresse eingeben</string>
   <string name="eth_invalid_address">Ungültige Etheradresse</string>
   <string name="eth_support_contract_not_allowed">Vertragsadressen werden nicht unterstützt.</string>
-  <string name="eth_support_only_eth">Im Moment unterstützen wir nur die ETH - Sie können nicht empfangen 
- Token an diese Adresse 
+  <string name="eth_support_only_eth">Im Moment unterstützen wir nur die ETH - Sie können nicht empfangen
+ Token an diese Adresse
 </string>
-  <string name="eth_unconfirmed_wait">Bitte warten Sie, bis Ihre vorherige Transaktion bestätigt wurde 
+  <string name="eth_unconfirmed_wait">Bitte warten Sie, bis Ihre vorherige Transaktion bestätigt wurde
 </string>
-  <string name="eth_transaction_complete">Transaktion abgeschlossen! Ihre Transaktionen und Ihr Guthaben werden 
- Update bald, dies kann einige Minuten dauern. 
+  <string name="eth_transaction_complete">Transaktion abgeschlossen! Ihre Transaktionen und Ihr Guthaben werden
+ Update bald, dies kann einige Minuten dauern.
 
 </string>
   <string name="pax_to_field_helper_no_dropdown_1">Geben Sie die USD-D / ETH-Adresse ein</string>
@@ -736,8 +727,8 @@
   <string name="dashboard_asset_balance_wallet">Brieftaschenguthaben</string>
   <string name="dashboard_asset_balance_custodial">Trading Wallet</string>
   <string name="more">Mehr</string>
-  <string name="force_upgrade_message">Die von Ihnen verwendete Version der App ist nicht mehr verfügbar 
- unterstützt. Bitte aktualisieren Sie die App und versuchen Sie es erneut. 
+  <string name="force_upgrade_message">Die von Ihnen verwendete Version der App ist nicht mehr verfügbar
+ unterstützt. Bitte aktualisieren Sie die App und versuchen Sie es erneut.
 </string>
   <string name="tx_decode_error">Adresse kann nicht dekodiert werden</string>
   <string name="bch_all_accounts">Alle Bitcoin Cash Wallets</string>
@@ -759,16 +750,16 @@
   <string name="sunriver_invalid_url_title">Ach nein!</string>
   <string name="sunriver_invalid_campaign_user">Es tut uns leid, das Airdrop-Programm ist derzeit nicht verfügbar, wo Sie sich befinden.</string>
   <string name="sunriver_user_already_registered">Sieht so aus, als hätten Sie Ihren Lufttropfen bereits erhalten!</string>
-  <string name="sunriver_campaign_expired">Es tut uns leid, der XLM-Lufttropfen ist vorbei. Vervollständige deine 
- Profil, um für zukünftige Lufttropfen und Zugangshandel berechtigt zu sein. 
+  <string name="sunriver_campaign_expired">Es tut uns leid, der XLM-Lufttropfen ist vorbei. Vervollständige deine
+ Profil, um für zukünftige Lufttropfen und Zugangshandel berechtigt zu sein.
 </string>
   <string name="sunriver_generic_error">Hoppla! Wir hatten Probleme bei der Verarbeitung Ihres Lufttropfens. Bitte versuche es erneut.</string>
   <string name="sunriver_set_memo">Memo einstellen</string>
   <string name="stablecoin_announcement_introducing_title">Digitale US-Dollar</string>
   <string name="stablecoin_announcement_introducing_description_1">Einführung von USD Digital, einem sicheren und stabilen Krypto-Asset, mit dem Sie Werte speichern können. 1 USD-D = 1 USD.</string>
   <string name="stablecoin_announcement_introducing_link_1">Holen Sie sich USD Digital</string>
-  <string name="pax_no_transactions_message_1">Ihre USD Digital-Transaktionen werden hier angezeigt, sobald Sie 
- Machen Sie Ihre erste Transaktion. 
+  <string name="pax_no_transactions_message_1">Ihre USD Digital-Transaktionen werden hier angezeigt, sobald Sie
+ Machen Sie Ihre erste Transaktion.
 </string>
   <string name="pax_learn_more_link_1">Erfahren Sie mehr über USD Digital</string>
   <string name="pax_swap_now_1">Jetzt gegen USD Digital tauschen</string>
@@ -792,15 +783,15 @@
   <string name="morph_exchange_rate_placeholder">%1$s - &gt; %2$s</string>
   <string name="morph_balance_title">Verfügbar %1$s</string>
   <string name="morph_amount_to_low">%1$s %2$s zum Umtausch erforderlich</string>
-  <string name="morph_confirmation_eth_pending">Ether-Transaktion fehlgeschlagen, bitte warten Sie bis Ihre 
- vorherige Transaktion bestätigt. 
+  <string name="morph_confirmation_eth_pending">Ether-Transaktion fehlgeschlagen, bitte warten Sie bis Ihre
+ vorherige Transaktion bestätigt.
 </string>
-  <string name="morph_failed_explanation">Dieser Handel ist gescheitert. Bitte kehren Sie zur Registerkarte Tauschen zu zurück 
- Starten Sie einen neuen Handel 
+  <string name="morph_failed_explanation">Dieser Handel ist gescheitert. Bitte kehren Sie zur Registerkarte Tauschen zu zurück
+ Starten Sie einen neuen Handel
 </string>
-  <string name="morph_refunded_explanation">Dieser Handel ist abgelaufen, da wir noch nicht erhalten haben 
- Ihr Geld. Wenn wir Ihr Geld erhalten, werden wir Ihren Handel abschließen. Wenn Sie weitere benötigen 
- Hilfe wenden Sie sich bitte an den Support. 
+  <string name="morph_refunded_explanation">Dieser Handel ist abgelaufen, da wir noch nicht erhalten haben
+ Ihr Geld. Wenn wir Ihr Geld erhalten, werden wir Ihren Handel abschließen. Wenn Sie weitere benötigen
+ Hilfe wenden Sie sich bitte an den Support.
 </string>
   <string name="morph_sending_title">Senden von Geldern</string>
   <string name="morph_in_progress_title">In Bearbeitung</string>
@@ -809,13 +800,13 @@
   <string name="morph_refunded_title">Abgelaufen</string>
   <string name="morph_step_number">Schritt %1$s von 3</string>
   <string name="morph_confirm">Bestätigen</string>
-  <string name="morph_success_dlg_text">Erfolg! Ihr Austausch hat 
+  <string name="morph_success_dlg_text">Erfolg! Ihr Austausch hat
  wurde gestartet!</string>
   <string name="morph_success_for_first_gold_pax_trade_title">Ihr Austausch wurde gestartet!</string>
-  <string name="morph_success_for_first_gold_pax_trade_description_1">Noch besser, da Sie brauchen 
- ETH, um USD-D-Trades zu tätigen, haben wir gerade genug ETH in Ihre Brieftasche geworfen, um Ihre zu decken 
- erste 3 Transaktionen 
- 🙌 
+  <string name="morph_success_for_first_gold_pax_trade_description_1">Noch besser, da Sie brauchen
+ ETH, um USD-D-Trades zu tätigen, haben wir gerade genug ETH in Ihre Brieftasche geworfen, um Ihre zu decken
+ erste 3 Transaktionen
+ 🙌
 </string>
   <string name="morph_success_dlg_button">Bestell Details ansehen</string>
   <string name="morph_order_id_title">Auftragsnummer</string>
@@ -823,8 +814,8 @@
   <string name="morph_in_progress_summary">Umtausch in Bearbeitung</string>
   <string name="morph_failed_summary">Umtausch fehlgeschlagen</string>
   <string name="morph_refunded_summary">Umtausch abgelaufen</string>
-  <string name="locked_disclaimer_message">Die Beträge, die Sie senden und empfangen, können sich geringfügig ändern 
- aufgrund der Marktaktivität. Sobald eine Bestellung beginnt, können wir sie nicht mehr stoppen 
+  <string name="locked_disclaimer_message">Die Beträge, die Sie senden und empfangen, können sich geringfügig ändern
+ aufgrund der Marktaktivität. Sobald eine Bestellung beginnt, können wir sie nicht mehr stoppen
 </string>
   <string name="send_to">Senden an</string>
   <string name="receive">Erhalten</string>
@@ -836,12 +827,12 @@
   <string name="order_history">Bestellverlauf</string>
   <string name="no_orders_found">Keine Bestellungen gefunden</string>
   <string name="confirm_swap">Swap bestätigen</string>
-  <string name="status_inprogress_detail">Vielen Dank für Ihre Platzierung! Mittel werden in der Regel erreichen 
- Ihre Brieftasche innerhalb von 2 Stunden und wir senden Ihnen eine Benachrichtigung, wenn dies passiert. Bleib dran 
- des Fortschritts Ihres Handels im Bereich Bestellverlauf. 
+  <string name="status_inprogress_detail">Vielen Dank für Ihre Platzierung! Mittel werden in der Regel erreichen
+ Ihre Brieftasche innerhalb von 2 Stunden und wir senden Ihnen eine Benachrichtigung, wenn dies passiert. Bleib dran
+ des Fortschritts Ihres Handels im Bereich Bestellverlauf.
 </string>
-  <string name="status_failed_expired_detail">Die meisten Swap-Börsen werden nahtlos abgeschlossen 
- zwei Stunden. Bitte kontaktieren Sie uns. Gemeinsam können wir das herausfinden. 
+  <string name="status_failed_expired_detail">Die meisten Swap-Börsen werden nahtlos abgeschlossen
+ zwei Stunden. Bitte kontaktieren Sie uns. Gemeinsam können wir das herausfinden.
 </string>
   <string name="failed_expired_status_title">Hmm, etwas stimmt nicht. 👀</string>
   <string name="status_request_refund">Kontaktieren Sie Support</string>
@@ -864,13 +855,13 @@
   <string name="the_exchange_announcement_body">Es ist Zeit, einen besseren Krypto-Austausch zu erreichen. Kaufen, verkaufen und handeln Sie mehr digitale Assets an der Blockchain.com Exchange.</string>
   <string name="the_exchange_announcement_cta_text">Kasse der Börse</string>
   <string name="the_exchange_slogan_kyc_promo">Es gibt eine neue Art zu handeln. Verknüpfen Sie Ihre Brieftasche für den sofortigen Zugriff.</string>
-  <string name="the_exchange_thunder_kyc_promo">Handel 
+  <string name="the_exchange_thunder_kyc_promo">Handel
  Blitzschnell</string>
-  <string name="the_exchange_built_kyc_promo">Gebaut von 
+  <string name="the_exchange_built_kyc_promo">Gebaut von
  Blockchain.com</string>
-  <string name="the_exchange_dollar_kyc_promo">Zugriff auf mehr 
+  <string name="the_exchange_dollar_kyc_promo">Zugriff auf mehr
  Kryptos</string>
-  <string name="the_exchange_bill_kyc_promo">Ein- und Auszahlung 
+  <string name="the_exchange_bill_kyc_promo">Ein- und Auszahlung
  Euro / Dollar</string>
   <string name="the_exchange_permission_app_can">Unser Austausch wird in der Lage sein:</string>
   <string name="the_exchange_permission_app_cant">Wird nicht:</string>
@@ -906,7 +897,7 @@
   <string name="swap_intro_title">Swap</string>
   <string name="swap_intro_title_page_one">Willkommen bei Swap!</string>
   <string name="swap_intro_title_page_two">Echtzeit-Wechselkurse</string>
-  <string name="swap_intro_title_page_three">100 % in Blockchain</string>
+  <string name="swap_intro_title_page_three">100%% in Blockchain</string>
   <string name="swap_intro_title_page_four">Sie kontrollieren Ihren Schlüssel</string>
   <string name="swap_intro_title_page_five">Besseres Risikomanagement</string>
   <string name="swap_intro_description_page_one">Der einfachste Weg, einen Crypto gegen einen anderen zu tauschen, ohne die Wallet verlassen zu müssen.</string>
@@ -949,7 +940,7 @@
   <string name="kyc_airdrop_card_title">Willst du kostenlose Krypto?</string>
   <string name="kyc_airdrop_card_body">Überprüfen Sie Ihre Identität, um an unserem Airdrop-Programm teilzunehmen, und erhalten Sie kostenlose Krypto von zukünftigen Airdrops.</string>
   <string name="kyc_airdrop_card_cta">Bestätigung starten</string>
-  <string name="coinify_account_created_success">Erfolg! 
+  <string name="coinify_account_created_success">Erfolg!
  Account erstellt</string>
   <string name="buy_sell_launcher_error">Fehler beim Abrufen von Kauf- / Verkaufsdaten</string>
   <string name="airdrop_received_sheet_heading">Airdrop</string>
@@ -968,7 +959,7 @@
   <string name="custody_intro_body_1">Wenn Sie Krypto kaufen, speichern wir Ihr Geld sicher für Sie in einer Crypto Trading Wallet. Diese Gelder werden von uns in Ihrem Namen gespeichert. Sie können sie bei uns aufbewahren oder in Ihre nicht verwahrte Brieftasche übertragen, um sie zu besitzen und aufzubewahren.</string>
   <string name="custody_intro_body_2">Wenn Sie diese Gelder tauschen oder senden möchten, müssen Sie sie auf Ihre Bitcoin-Geldbörse übertragen.</string>
   <string name="backup_before_send_title">Sichern Sie Ihre Brieftasche</string>
-  <string name="backup_before_send_body">Mit Ihrer Sicherungsphrase können Sie Ihre Krypto wiederherstellen, wenn Sie den Zugriff auf Ihre Brieftasche verlieren. 
+  <string name="backup_before_send_body">Mit Ihrer Sicherungsphrase können Sie Ihre Krypto wiederherstellen, wenn Sie den Zugriff auf Ihre Brieftasche verlieren.
 
  Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an einem sicheren Ort auf. Teile es niemals mit jemandem. Ihre Sicherungsphrase ist der Schlüssel zur Wiederherstellung Ihrer Krypto, falls Sie jemals gesperrt werden.</string>
   <string name="backup_before_send_cta">Jetzt sichern</string>
@@ -991,9 +982,9 @@
   <string name="buy_sell_overview_could_not_start_kyc">KYC konnte nicht neu gestartet werden. Bitte versuchen Sie es später erneut.</string>
   <string name="buy_sell_overview_empty_list">Ihre Bestellhistorie wird hier angezeigt</string>
   <string name="buy_sell_overview_in_review_title">vervollständige dein Profil</string>
-  <string name="buy_sell_overview_denied_title">Identitätsprüfung 
+  <string name="buy_sell_overview_denied_title">Identitätsprüfung
  verweigert</string>
-  <string name="buy_sell_overview_pending_title">Vollständige Identität 
+  <string name="buy_sell_overview_pending_title">Vollständige Identität
  Nachprüfung</string>
   <string name="buy_sell_overview_in_review_button">Jetzt mit Karte kaufen</string>
   <string name="buy_sell_overview_denied_button">Versuch es noch einmal</string>
@@ -1026,7 +1017,7 @@
   <string name="buy_sell_detail_bank_disclaimer">Der Eingang von Geldern auf Ihr Bankkonto dauert normalerweise zwischen 2 und 3 Werktagen.</string>
   <string name="buy_sell_detail_refund_message">Coinify hat diesen Verkaufsauftrag storniert und Ihnen eine E-Mail mit Anweisungen zur Rückerstattung Ihres Guthabens gesendet.</string>
   <string name="buy_sell_details_whats_next">Was kommt als nächstes?</string>
-  <string name="buy_sell_awaiting_funds_description">Senden Sie %1$s innerhalb der nächsten 48 Stunden an Coinify. 
+  <string name="buy_sell_awaiting_funds_description">Senden Sie %1$s innerhalb der nächsten 48 Stunden an Coinify.
 
  Bankkonten, die Geld senden, müssen denselben Namen haben wie Ihr von der Regierung ausgestellter Ausweis. Andernfalls wird es abgelehnt.</string>
   <string name="buy_sell_awaiting_funds_already_sent">Ich habe das Geld bereits an Coinify geschickt</string>
@@ -1103,7 +1094,7 @@
   <string name="buy_sell_confirmation_you_will_receive">Gesamtbetrag der geschuldeten Gutschrift</string>
   <string name="buy_sell_confirmation_btc_to_receive_description">%1$s BTC wird direkt von Ihrer Blockchain-Brieftasche an Coinify gesendet, sobald Sie auf Senden klicken.</string>
   <string name="buy_sell_confirmation_sell_rate_disclaimer">Ich akzeptiere, dass Coinify meine Bestellung nach Abschluss der Bitcoin-Transaktion bearbeitet und dass Bitcoin zum jeweils verfügbaren Wechselkurs gehandelt wird, der vom angezeigten Kurs abweichen kann.</string>
-  <string name="buy_sell_card_payment_success_title">Erfolg! 
+  <string name="buy_sell_card_payment_success_title">Erfolg!
  Auftrag erstellt</string>
   <string name="buy_sell_card_payment_success_message">Das Guthaben sollte innerhalb von 3 Tagen auf Ihrem Konto eingehen.</string>
   <string name="buy_sell_card_order_created_title">Auftrag erstellt</string>
@@ -1124,8 +1115,6 @@
   <string name="buy_sell_unverified_email_verify_message1">Wir haben einen Bestätigungslink an gesendet</string>
   <string name="buy_sell_unverified_email_verify_message2">Klicken Sie darauf und kehren Sie hierher zurück, um mit Ihrer Transaktion fortzufahren.</string>
   <string name="buy_sell_unverified_email_verify_open_email">Öffnen Sie die E-Mail</string>
-  <string name="buy_sell_unverified_email_verify_agree_coinify_terms">Stimmen Sie zu, <a href="ignored"> Geschäftsbedingungen </a></string>
-  <string name="coinify">Coinify</string>
   <string name="buy_sell_verified_email_title">Email überprüft!</string>
   <string name="buy_sell_verified_email_message">Unser Partner %1$s wird Ihre Bitcoin-Transaktion abwickeln. Wenn Sie auf Zustimmen und dann auf Weiter klicken, erstellen Sie ein Konto mit %1$s .</string>
   <string name="buy_sell_identification_verification">Identifizieren Sie die Überprüfung</string>
@@ -1232,7 +1221,7 @@
   <string name="kyc_email_title">Bestätigen Sie Ihre E-Mail</string>
   <string name="kyc_email_message">Wir müssen Ihre E-Mail-Adresse als zusätzliche Sicherheitsebene überprüfen.</string>
   <string name="kyc_email_hint_focused">Deine E-Mail</string>
-  <string name="kyc_email_hint_unfocused">\@ string / kyc_email_hint_focused</string>
+  <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
   <string name="kyc_email_error_saving_email">Fehler beim Speichern der E-Mail, versuchen Sie es erneut</string>
   <string name="kyc_email_send_verification">E-Mail senden</string>
   <string name="kyc_email_validation_header">Überprüfe deinen Posteingang.</string>
@@ -1256,8 +1245,8 @@
   <string name="kyc_onfido_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
   <string name="kyc_onfido_splash_verification_error">Fehler beim Überprüfen der ID, versuchen Sie es erneut</string>
   <string name="kyc_veriff_splash_country_supported_header">Wird mein Land unterstützt?</string>
-  <string name="kyc_veriff_splash_country_supported_subheader"><![CDATA[Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link=\"country_list\"> Liste der Länder </annotation> bevor Sie <annotation link=\"country_list\"> .]]></string>
-  <string name="kyc_veriff_splash_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_veriff_splash_country_supported_subheader">Derzeit werden nicht alle Länder unterstützt. Überprüfen Sie unsere aktuelle <annotation link="country_list"> Liste der Länder </annotation> bevor Sie</string>
+  <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
   <string name="kyc_veriff_splash_error_silver">SILBER ÜBERPRÜFT</string>
   <string name="kyc_veriff_splash_header">Lassen Sie uns bestätigen, dass Sie es sind</string>
   <string name="kyc_veriff_splash_subtitle">Sie benötigen einen der folgenden ID-Typen, um fortzufahren.</string>
@@ -1279,11 +1268,11 @@
   <string name="kyc_complete_device_verified">Gerät verifiziert</string>
   <string name="kyc_complete_id_uploaded">ID hochgeladen</string>
   <string name="kyc_complete_video_uploaded">Video hochgeladen</string>
-  <string name="kyc_help_dialog_need_some_help">\@ string / need_some_help</string>
+  <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
   <string name="kyc_help_dialog_need_some_help_body">Unser Blockchain-Support-Team hat Hilfehandbücher verfasst, in denen erläutert wird, warum wir Ihre Identität überprüfen müssen.</string>
   <string name="kyc_help_dialog_read_now">Lies jetzt</string>
   <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-  <string name="kyc_help_dialog_contact_support">\@ string / contact_support</string>
+  <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
   <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
   <string name="kyc_settings_identity_verification">Identitätsprüfung</string>
   <string name="kyc_settings_status_none">Nicht überprüft</string>
@@ -1295,7 +1284,7 @@
   <string name="kyc_settings_gold_level_in_review">Gold Level - Im Rückblick</string>
   <string name="kyc_settings_gold_level_approved">Gold Level - Genehmigt</string>
   <string name="kyc_settings_silver_level_approved">Silberstufe - Genehmigt</string>
-  <string name="kyc_settings_tier_status_failed">\@ string / kyc_settings_status_rejected</string>
+  <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
   <string name="kyc_status_error">Fehler beim Abrufen des KYC-Status</string>
   <string name="kyc_status_title_in_progress">Überprüfung läuft</string>
   <string name="kyc_status_title_approved">Konto genehmigt</string>
@@ -1319,10 +1308,10 @@
   <string name="kyc_drop_off_card_description">Fahren Sie dort fort, wo Sie aufgehört haben, und führen Sie Ihre Identitätsprüfung durch.</string>
   <string name="kyc_drop_off_card_button">Setzen Sie die Überprüfung fort</string>
   <string name="kyc_documents_needed">Erforderliche Dokumente</string>
-  <string name="kyc_resubmission_card_title">\@ string / kyc_documents_needed</string>
+  <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
   <string name="kyc_resubmission_card_description">Wir hatten einige Probleme mit den von Ihnen gelieferten Dokumenten. Bitte versuchen Sie erneut, die Dokumente hochzuladen, um mit Ihrer Überprüfung fortzufahren.</string>
   <string name="kyc_resubmission_card_button">Dokumente hochladen</string>
-  <string name="kyc_resubmission_splash_title">\@ string / kyc_resubmission_card_title</string>
+  <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
   <string name="kyc_resubmission_splash_description_1">Wir können Ihre Identität nicht überprüfen und müssen die erforderlichen Dokumente erneut hochladen.</string>
   <string name="kyc_resubmission_splash_description_2">Hauptgründe dafür:</string>
   <string name="kyc_resubmission_splash_description_3">Die erforderlichen Fotos fehlen.</string>
@@ -1341,7 +1330,7 @@
   <string name="stacks_airdrop_complete_card_button">Details anzeigen</string>
   <string name="stacks_airdrop_registered_mini_card_title">Eine Belohnung für das Goldlevel</string>
   <string name="stacks_airdrop_registered_mini_card_body">Wir lassen Sie 2020 kostenlos kryptografieren</string>
-  <string name="stacks_airdrop_share_msg">Hallo! Ich habe mir gerade mit Blockstack meinen Platz für Blockchain\'s neuesten Airdrop gesichert. Melden Sie sich an und lassen Sie sich verifizieren, um kostenlose Stapel zu erhalten! 
+  <string name="stacks_airdrop_share_msg">Hallo! Ich habe mir gerade mit Blockstack meinen Platz für Blockchain\'s neuesten Airdrop gesichert. Melden Sie sich an und lassen Sie sich verifizieren, um kostenlose Stapel zu erhalten!
  http://blockchain.com/getcrypto</string>
   <string name="gold_level">Goldlevel</string>
   <string name="silver_level">Silberlevel</string>
@@ -1400,10 +1389,10 @@
   <string name="insufficient_funds">Unzureichende Mittel</string>
   <string name="insufficient_eth_for_fees">Nicht genug ETH für Transaktionsgebühren</string>
   <string name="not_enough_funds_with_currency">Nicht genug %1$s</string>
-  <string name="minimum_balance_body">Stellar erfordert, dass alle Stellar-Konten ein Mindestguthaben von Lumen oder XLM aufweisen. 
- Dies bedeutet, dass Sie kein Guthaben aus Ihrer Stellar Wallet senden können, bei dem Ihre Stellar Wallet weniger als das Mindestguthaben aufweist. 
- Dies bedeutet auch, dass Sie zum Senden von XLM an ein neues Stellar-Konto genügend XLM senden müssen, um die Mindestguthabenanforderungen zu erfüllen. 
- Die aktuelle Mindestguthabenanforderung beträgt 1 XLM. 
+  <string name="minimum_balance_body">Stellar erfordert, dass alle Stellar-Konten ein Mindestguthaben von Lumen oder XLM aufweisen.
+ Dies bedeutet, dass Sie kein Guthaben aus Ihrer Stellar Wallet senden können, bei dem Ihre Stellar Wallet weniger als das Mindestguthaben aufweist.
+ Dies bedeutet auch, dass Sie zum Senden von XLM an ein neues Stellar-Konto genügend XLM senden müssen, um die Mindestguthabenanforderungen zu erfüllen.
+ Die aktuelle Mindestguthabenanforderung beträgt 1 XLM.
 </string>
   <string name="minimum_balance_read_more_blurb">Weitere Informationen zu Stellars Mindestguthaben finden Sie auf Stellar.org</string>
   <string name="minimum_balance_explanation_title">Mindestguthaben</string>
@@ -1457,7 +1446,7 @@
   <string name="kyc_manual_review_required">Manuelle Überprüfung erforderlich</string>
   <string name="kyc_pending_review">Ausstehende Bewertung</string>
   <string name="kyc_veriff_but_not_eligible_review">Erfolgreiche Bewerbung</string>
-  <string name="kyc_veriff_but_not_eligible_review_info">Ihre Identität wurde erfolgreich überprüft. Sie sind jetzt Gold Level und können bis zu 25000 $ pro Tag handeln. 
+  <string name="kyc_veriff_but_not_eligible_review_info">Ihre Identität wurde erfolgreich überprüft. Sie sind jetzt Gold Level und können bis zu 25000 $ pro Tag handeln.
 
  Der Kauf ist in Ihrer Region noch nicht verfügbar. Wir werden Sie informieren, sobald dies geschieht.</string>
   <string name="continue_to_wallet">Weiter zur Brieftasche</string>
@@ -1466,9 +1455,7 @@
   <string name="simple_buy_amount_to_send">Zu sendender Betrag</string>
   <string name="simple_buy_pending_buy_sheet_title">Ausstehender %1s-Kauf</string>
   <string name="recipient_name_must_match_eur">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.</string>
-  <string name="recipient_name_must_match_gbp"><![CDATA[Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt. 
-
- Durch die <annotation link=\"modular_terms_and_conditions\"> auf dieses Konto stimmen Sie den <annotation link=\"modular_terms_and_conditions\"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.]]></string>
+  <string name="recipient_name_must_match_gbp">Der Name Ihres Empfängers muss mit dem Namen des Kontoinhabers auf Ihrem Bankkonto übereinstimmen, damit Ihre Überweisung erfolgreich ist. Ihre Überweisung kann abgelehnt werden, wenn keine Übereinstimmung vorliegt.\n\nDurch die  auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.</string>
   <string name="recipient_name_must_match">Senden Sie nur Geld von einem Bankkonto in Ihrem Namen. Wenn nicht, kann Ihre Einzahlung verzögert oder abgelehnt werden.</string>
   <string name="simple_buy_no_currencies_available_title">Keine Währungen verfügbar</string>
   <string name="simple_buy_no_currencies_available">Leider gibt es derzeit keine Währungen, mit denen Sie handeln können :(</string>
@@ -1510,7 +1497,7 @@
   <string name="tx_title_receive">Erhalte %1s</string>
   <string name="tx_title_sell">Verkaufe %1s</string>
   <string name="tx_title_buy">Kaufen Sie %1s</string>
-  <string name="tx_title_swap">Tauschen Sie %1s</string>
+  <string name="tx_title_swap">Tauschen Sie %1s → %2$s</string>
   <string name="tx_title_transfer">%1s</string>
   <string name="tx_title_fee">Gebühr %1s</string>
   <string name="transaction_detail_value_at_time_swapped">Wert beim \u0020 : \u0020</string>
@@ -1629,7 +1616,7 @@
   <string name="activity_details_title_swap">Tauschen</string>
   <string name="activity_details_label_confirming">Bestätigen</string>
   <string name="activity_details_label_waiting_on_funds">Warten auf Geld</string>
-  <string name="activity_details_label_confirmations">%1$d von %2$d 
+  <string name="activity_details_label_confirmations">%1$d von %2$d
  Bestätigungen</string>
   <string name="activity_details_title_fee">Gasgebühr</string>
   <string name="activity_details_transaction_fee">Gas für</string>
@@ -1656,9 +1643,9 @@
   <string name="activity_details_historic_transferred">Wert bei Übertragung</string>
   <string name="activity_details_historic_value_load_fail">Historische Wertinformationen konnten nicht geladen werden</string>
   <string name="received_usdt">Tether erhalten</string>
-  <string name="watch_only_not_supported">Importieren einer nicht ausgabefähigen Adresse (einer Adresse oder eines Skripts mit öffentlichem Schlüssel) 
- ohne den entsprechenden privaten Schlüssel) wird nicht unterstützt. Bitte versuchen Sie es erneut mit 
- eine Adresse und einen privaten Schlüssel. 
+  <string name="watch_only_not_supported">Importieren einer nicht ausgabefähigen Adresse (einer Adresse oder eines Skripts mit öffentlichem Schlüssel)
+ ohne den entsprechenden privaten Schlüssel) wird nicht unterstützt. Bitte versuchen Sie es erneut mit
+ eine Adresse und einen privaten Schlüssel.
 </string>
   <string name="linked_banks">Verbundene Banken</string>
   <string name="tx_title_deposit">Einzahlung %1s</string>
@@ -1670,14 +1657,14 @@
   <string name="bank_transfer">Banküberweisung</string>
   <string name="instantly_buy_crypto_with_card">Kaufen Sie Krypto sofort mit einem Visum oder einer Mastercard.</string>
   <string name="send_funds_directly_from_your_bank">Senden Sie Geld direkt von Ihrer Bank an Ihre Blockchain Wallet. Sobald wir die manuelle Überweisung erhalten haben, verwenden Sie dieses Geld, um Krypto zu kaufen.</string>
-  <string name="by_depositing_funds_terms_and_conds"><![CDATA[Durch die <annotation link=\"modular_terms_and_conditions\"> auf dieses Konto stimmen Sie den <annotation link=\"modular_terms_and_conditions\"> Allgemeinen Geschäftsbedingungen von Modulr </annotation> , unserem Bankpartner, zu.]]></string>
+  <string name="by_depositing_funds_terms_and_conds">Durch die auf dieses Konto stimmen Sie den <annotation link="modular_terms_and_conditions"> Allgemeinen Geschäftsbedingungen von Modulr</annotation> , unserem Bankpartner, zu.></string>
   <string name="add_bank_with_currency">Fügen Sie eine %1s Bank hinzu</string>
   <string name="deposit_currency">Einzahlung %1s</string>
   <string name="currency_bank_transfer">Banküberweisung</string>
   <string name="link_transfer_instructions">Bitte überweisen Sie %1s von Ihrer persönlichen Bank an Blockchain.com. Dadurch wird Ihr Bankkonto sicher verknüpft.</string>
   <string name="payment">Zahlung</string>
   <string name="buy_now_1">Kaufen Sie %1s</string>
-  <string name="simple_buy_transfer_details_error">Beim Laden der Übertragungsdetails ist ein Fehler aufgetreten. 
+  <string name="simple_buy_transfer_details_error">Beim Laden der Übertragungsdetails ist ein Fehler aufgetreten.
 
  Bitte versuchen Sie es später noch einmal.</string>
   <string name="algo_default_account_label">Meine Algorand Brieftasche</string>
@@ -1717,7 +1704,7 @@
   <string name="fiat_funds_no_kyc_step_2_title">Geld einzahlen</string>
   <string name="fiat_funds_no_kyc_step_2_description">Überweisen Sie Bargeld von Ihrer Bank und aktivieren Sie Ihr Barguthaben.</string>
   <string name="fiat_funds_no_kyc_step_3_title">Kaufen Sie Crypto mit Bargeld</string>
-  <string name="fiat_funds_no_kyc_step_3_description"><![CDATA[Verwenden Sie Ihre Geldbörse als Zahlungsmethode, um BTC, ETH, XLM und mehr zu kaufen.]]></string>
+  <string name="fiat_funds_no_kyc_step_3_description">Verwenden Sie Ihre Geldbörse als Zahlungsmethode, um BTC, ETH, XLM und mehr zu kaufen.></string>
   <string name="fiat_funds_no_kyc_positive_action">Überprüfen Sie meine Identität</string>
   <string name="fiat_funds_no_kyc_negative_action">Nicht jetzt</string>
   <string name="fiat_funds_no_kyc_step_1_label">1</string>
@@ -1766,8 +1753,8 @@
   <string name="notification_payments_summary">Zahlungsbenachrichtigungen</string>
   <string name="notification_payments_description">Benachrichtigungen im Zusammenhang mit Zahlungen</string>
   <string name="enable_cloud_backup">Aktivieren Sie Cloud-Backups</string>
-  <string name="enable_cloud_backup_summary">Speichern Sie das verschlüsselte Backup in Ihrem Google Drive-Konto. 
- wenn verfügbar. Auf diese Weise können Sie Ihre Brieftasche wiederherstellen, wenn Sie dieses Gerät verlieren. 
+  <string name="enable_cloud_backup_summary">Speichern Sie das verschlüsselte Backup in Ihrem Google Drive-Konto.
+ wenn verfügbar. Auf diese Weise können Sie Ihre Brieftasche wiederherstellen, wenn Sie dieses Gerät verlieren.
 </string>
   <string name="tx_title_interest">%1$s Zinsen verdient</string>
   <string name="dashboard_asset_actions_send_dsc">Überweisen Sie %1$s auf eine beliebige Brieftasche</string>
@@ -1785,10 +1772,10 @@
   <string name="cloud_backup_card_body">Sie können Ihre Brieftasche jetzt sicher in der Cloud sichern. Sie können Backups in Ihren Brieftascheneinstellungen deaktivieren.</string>
   <string name="cloud_backup_card_cta">Mehr erfahren</string>
   <string name="basic_transfer_lock_warn" formatted="false">Ihr verfügbares Guthaben zum Abheben beträgt %1s . Der verbleibende Restbetrag in %2s kann innerhalb von 7 Tagen abgehoben werden.</string>
-  <string name="basic_transfer_lock_learn_more"><![CDATA[<annotation link=\"balance_lock\"> Weitere <annotation link=\"balance_lock\"> </annotation> .]]></string>
+  <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock"> Weitere </annotation></string>
   <string name="basic_transfer_error_insufficient_funds_title">Unzureichende Mittel</string>
   <string name="basic_transfer_error_insufficient_funds">Sie haben nicht genügend Guthaben auf Ihrem Konto, um diese Transaktion abzuschließen.</string>
-  <string name="basic_transfer_error_locked_funds"><![CDATA[Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden. <annotation link=\"balance_lock\"> Weitere <annotation link=\"balance_lock\"> </annotation> .]]></string>
+  <string name="basic_transfer_error_locked_funds">Ihre Krypto kann innerhalb von 7 Tagen zurückgezogen werden.<annotation link="balance_lock"> Weitere </annotation>></string>
   <string name="erc20_need_more_eth_error_body_1">Sie benötigen die ETH, um Ihre %1$s zu senden</string>
   <string name="purchase_card_note_1">Ihr endgültiger Betrag kann sich aufgrund der Marktaktivität ändern. Auf Ihr Guthaben wird eine anfängliche Sperrfrist von 7 Tagen angewendet.</string>
   <string name="select_deposit_source_title">Übertragen von</string>
@@ -1842,9 +1829,9 @@
   <string name="send_enter_unexpected_error">Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.</string>
   <string name="send_enter_insufficient_gas">Sie haben nicht genug ETH, um diese Transaktion abzuwickeln.</string>
   <string name="send_select_a_wallet_title">oder Wählen Sie eine Brieftasche</string>
-  <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %1$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
+  <string name="send_internal_transfer_message">Derzeit können Sie nur %1$s von Ihrer %2$s Trade Wallet auf Ihre Vault Wallets übertragen. Sobald sich %1$s in Ihrer Vault-Brieftasche befindet, können Sie an externe Adressen übertragen.</string>
   <string name="purchase_funds_note">Ihr endgültiger Betrag kann sich aufgrund von Marktaktivitäten ändern.</string>
-  <string name="common_linked_learn_more"><![CDATA[<annotation link=\"learn_more_link\"> Weitere <annotation link=\"learn_more_link\"> . </annotation>]]></string>
+  <string name="common_linked_learn_more"><annotation link="learn_more_link"> Weitere.</annotation></string>
   <string name="interest_announcement_title">Verdienen Sie noch heute Interesse an Ihrer Krypto!</string>
   <string name="interest_announcement_description">Übertragen Sie Crypto und verdienen Sie Zinsen für BTC, ETH und viele mehr.</string>
   <string name="interest_announcement_action">Mehr erfahren</string>
@@ -1889,7 +1876,7 @@
   <string name="interest_summary_accrued">In diesem Monat aufgelaufene Zinsen</string>
   <string name="interest_summary_accrued_fail">Aufgelaufene Zinsen können nicht geladen werden</string>
   <string name="interest_summary_hold_period">Anfängliche Haltezeit</string>
-  <string name="interest_summary_hold_period_days">%1$f Tage</string>
+  <string name="interest_summary_hold_period_days">%1$d Tage</string>
   <string name="interest_summary_hold_period_fail">Details zur Haltezeit können nicht geladen werden</string>
   <string name="interest_summary_rate">Zinsrate</string>
   <string name="interest_summary_rate_fail">Zinssatz kann nicht geladen werden</string>
@@ -1954,12 +1941,12 @@
   <string name="send_error_tx_option_invalid">Ein Fehler ist aufgetreten</string>
   <string name="send_to_exchange_xlm_title">An eine Börse senden?</string>
   <string name="send_to_exchange_xlm_blurb">Fügen Sie ein Memo hinzu, um Geldverluste zu vermeiden.</string>
-  <string name="send_to_exchange_xlm_link"><![CDATA[<annotation link=\"send_memo_link\"> Weitere <annotation link=\"send_memo_link\"> zu den Kontostandanforderungen. </annotation>]]></string>
+  <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link"> Weitere zu den Kontostandanforderungen. </annotation>></string>
   <string name="send_confirm_memo_text_hint">Fügen Sie ein Memo hinzu (max. 28 Zeichen)</string>
   <string name="send_confirm_memo_id_hint">Fügen Sie eine ID hinzu</string>
   <string name="send_invalid_option_dsc_memo">Ungültige Beschreibung / Memo</string>
   <string name="interest_error_title">Zinsdetails können nicht geladen werden</string>
-  <string name="interest_error_desc">Beim Laden der Zinskontodaten ist ein Fehler aufgetreten. 
+  <string name="interest_error_desc">Beim Laden der Zinskontodaten ist ein Fehler aufgetreten.
  Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut oder wenden Sie sich an den Support, wenn das Problem weiterhin besteht.</string>
   <string name="sell_is_coming_soon">Kaufen &amp; Verkaufen in Kürze</string>
   <string name="sell_is_coming_soon_description">Derzeit unterstützen wir den Kauf oder Verkauf von Krypto in Ihrer Region nicht. Wir senden Ihnen dann ein Update.</string>
@@ -2072,8 +2059,7 @@
   <string name="exchange_rate">Wechselkurs</string>
   <string name="in_progress">In Bearbeitung</string>
   <string name="swap_direction">%1$s-&gt;%2$s</string>
-  <string name="security_locked_funds_explanation">Zu Ihrer Sicherheit unterliegen erstmalige Kartenkäufe einer Haltedauer von %1$s pro Tag, bevor Sie Ihre gekaufte Krypto senden oder abheben können. Wir werden Sie benachrichtigen, wenn der Laderaum aufgehoben wird. 
-
+  <string name="security_locked_funds_explanation">Zu Ihrer Sicherheit unterliegen erstmalige Kartenkäufe einer Haltedauer von %1$s pro Tag, bevor Sie Ihre gekaufte Krypto senden oder abheben können. Wir werden Sie benachrichtigen, wenn der Laderaum aufgehoben wird.
  In der Zwischenzeit können Sie innerhalb von Blockchain.com in Bargeld verkaufen, tauschen und handeln.</string>
   <string name="recover_funds_warning_message_1">Sie sollten immer koppeln oder sich anmelden, wenn Sie Zugriff haben
  zu Ihrer Brieftaschen-ID und Ihrem Passwort. Wenn Sie Ihr Geld zurückerhalten, wird möglicherweise eine neue Brieftaschen-ID erstellt. Würdest du
