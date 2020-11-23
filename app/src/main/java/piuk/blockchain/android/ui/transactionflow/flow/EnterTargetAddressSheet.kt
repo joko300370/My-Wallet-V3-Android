@@ -68,7 +68,6 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
                 from_details.updateAccount(
                     newState.sendingAccount,
                     {},
-                    disposables,
                     DefaultCellDecorator()
                 )
 

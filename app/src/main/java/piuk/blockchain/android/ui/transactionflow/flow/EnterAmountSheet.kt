@@ -181,7 +181,9 @@ class EnterAmountSheet : TransactionFlowSheet() {
             amount_sheet_asset_icon.setCoinIcon(state.sendingAccount.asset)
 
             if (customiser.showTargetIcon(state)) {
-                amount_sheet_target_icon.setCoinIcon((state.selectedTarget as CryptoAccount).asset)
+                (state.selectedTarget as? CryptoAccount)?.let {
+                    amount_sheet_target_icon.setCoinIcon(it.asset)
+                }
             } else {
                 amount_sheet_target_icon.gone()
             }
