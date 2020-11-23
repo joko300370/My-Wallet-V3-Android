@@ -103,6 +103,10 @@ class CryptoActivityDetailsBottomSheet :
             }
         }
 
+        /* TODO we should improve error handling here
+         * if(newState.isError) {}
+         */
+
         if (listAdapter.items != newState.listOfItems) {
             listAdapter.items = newState.listOfItems.toList()
             listAdapter.notifyDataSetChanged()
