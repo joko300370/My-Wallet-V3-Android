@@ -51,12 +51,7 @@ abstract class CryptoAccountBase : CryptoAccount {
         this.hasTransactions = hasTransactions
     }
 
-    private val swapDirections: Set<TransferDirection>
-        get() = when (this) {
-            is CryptoNonCustodialAccount -> setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
-            is CustodialTradingAccount -> setOf(TransferDirection.INTERNAL)
-            else -> emptySet()
-        }
+    protected abstract val directions: Set<TransferDirection>
 
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
@@ -98,7 +93,7 @@ abstract class CryptoAccountBase : CryptoAccount {
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
         activityList: List<ActivitySummaryItem>
-    ) = custodialWalletManager.getSwapActivityForAsset(asset, swapDirections)
+    ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
         .map { swapItems ->
             swapItems.map {
                 swapItemToSummary(it)
@@ -142,6 +137,9 @@ internal class CryptoExchangeAccount(
             )
         )
 
+    override val directions: Set<TransferDirection>
+        get() = emptySet()
+
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
@@ -177,6 +175,8 @@ abstract class CryptoNonCustodialAccount(
                 add(AssetAction.Swap)
             }
         }
+
+    override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
 
     override val sourceState: Single<TxSourceState>
         get() = actionableBalance.map {
