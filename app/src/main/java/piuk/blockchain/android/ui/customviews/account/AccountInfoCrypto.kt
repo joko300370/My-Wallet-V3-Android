@@ -7,6 +7,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
+import info.blockchain.balance.Money
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -21,6 +24,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
@@ -39,6 +43,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val compositeDisposable = CompositeDisposable()
+    private var accountBalance: Money? = null
+    private var isEnabled: Boolean? = null
+    private var interestRate: Double? = null
+    private var displayedAccount: CryptoAccount = NullCryptoAccount()
 
     init {
         LayoutInflater.from(context)
@@ -59,25 +67,31 @@ class AccountInfoCrypto @JvmOverloads constructor(
         onAccountClicked: (CryptoAccount) -> Unit,
         cellDecorator: CellDecorator
     ) {
-        updateAccountDetails(account, onAccountClicked, cellDecorator)
+        val accountsAreTheSame = displayedAccount.eq(account)
+        updateAccountDetails(account, accountsAreTheSame, onAccountClicked, cellDecorator)
 
         when (account) {
-            is InterestAccount -> setInterestAccountDetails(account)
+            is InterestAccount -> setInterestAccountDetails(account, accountsAreTheSame)
             is TradingAccount -> asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
             is NonCustodialAccount -> asset_account_icon.gone()
             else -> asset_account_icon.gone()
         }
+        displayedAccount = account
     }
 
     private fun setInterestAccountDetails(
-        account: CryptoAccount
+        account: CryptoAccount,
+        accountsAreTheSame: Boolean
     ) {
         asset_account_icon.setImageResource(R.drawable.ic_account_badge_interest)
 
         compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { asset_subtitle.text = resources.getString(R.string.empty) }
+            .doOnSuccess {
+                interestRate = it
+            }.startWithValue(interestRate?.takeIf { accountsAreTheSame })
             .subscribeBy(
-                onSuccess = {
+                onNext = {
                     asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
                 },
                 onError = {
@@ -91,6 +105,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
     private fun updateAccountDetails(
         account: CryptoAccount,
+        accountsAreTheSame: Boolean,
         onAccountClicked: (CryptoAccount) -> Unit,
         cellDecorator: CellDecorator
     ) {
@@ -101,13 +116,13 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
         asset_subtitle.setText(crypto.assetName())
 
-        wallet_balance_crypto.invisible()
-        wallet_balance_fiat.invisible()
-
         compositeDisposable += account.accountBalance
+            .doOnSuccess {
+                accountBalance = it
+            }.startWithValue(accountBalance?.takeIf { accountsAreTheSame })
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { accountBalance ->
+                onNext = { accountBalance ->
                     wallet_balance_crypto.text = accountBalance.toStringWithSymbol()
                     wallet_balance_fiat.text =
                         accountBalance.toFiat(
@@ -134,9 +149,13 @@ class AccountInfoCrypto @JvmOverloads constructor(
             }
 
         container.alpha = 1f
-        compositeDisposable += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
+        compositeDisposable += cellDecorator.isEnabled()
+            .doOnSuccess {
+                isEnabled = it
+            }.startWithValue(isEnabled?.takeIf { accountsAreTheSame })
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { isEnabled ->
+                onNext = { isEnabled ->
                     if (isEnabled) {
                         setOnClickListener {
                             onAccountClicked(account)
@@ -156,3 +175,18 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable.clear()
     }
 }
+
+private fun CryptoAccount.eq(other: CryptoAccount): Boolean {
+    if (this is NullCryptoAccount || other is NullCryptoAccount)
+        return false
+    if (this::class == other::class && this.asset == other.asset && this.label == other.label) {
+        println("sameeeee ${this.asset}")
+        return true
+    }
+    return false
+}
+
+private fun <T> Single<T>.startWithValue(value: T?): Observable<T> =
+    value?.let {
+        this.toObservable().startWith(value)
+    } ?: this.toObservable()
