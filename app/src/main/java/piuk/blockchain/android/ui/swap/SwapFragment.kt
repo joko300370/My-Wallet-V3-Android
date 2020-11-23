@@ -14,7 +14,6 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.SwapLimits
 import com.blockchain.swap.nabu.datamanagers.SwapOrder
-import com.blockchain.swap.nabu.datamanagers.SwapPair
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
@@ -30,7 +29,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet

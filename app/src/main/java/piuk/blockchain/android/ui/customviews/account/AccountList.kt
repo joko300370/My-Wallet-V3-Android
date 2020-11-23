@@ -164,7 +164,6 @@ private class AccountsDelegateAdapter(
                 FiatAccountDelegate(
                     statusDecorator,
                     onAccountClicked,
-                    compositeDisposable,
                     showSelectionStatus
                 )
             )
@@ -230,7 +229,6 @@ private class CryptoSingleAccountViewHolder(
 private class FiatAccountDelegate<in T>(
     private val statusDecorator: StatusDecorator,
     private val onAccountClicked: (FiatAccount) -> Unit,
-    private val compositeDisposable: CompositeDisposable,
     private val showSelectionStatus: Boolean
 ) : AdapterDelegate<T> {
 
@@ -239,7 +237,6 @@ private class FiatAccountDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         FiatAccountViewHolder(
-            compositeDisposable,
             showSelectionStatus,
             parent.inflate(R.layout.item_account_select_fiat)
         )
@@ -253,12 +250,11 @@ private class FiatAccountDelegate<in T>(
 }
 
 private class FiatAccountViewHolder(
-    private val compositeDisposable: CompositeDisposable,
     private val showSelectionStatus: Boolean,
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    fun bind(
         selectableAccountItem: SelectableAccountItem,
         statusDecorator: StatusDecorator,
         onAccountClicked: (FiatAccount) -> Unit
@@ -272,19 +268,11 @@ private class FiatAccountViewHolder(
                 }
             }
             fiat_container.alpha = 1f
-            fiat_account.updateAccount(selectableAccountItem.account as FiatAccount, compositeDisposable)
-
-            compositeDisposable += statusDecorator(selectableAccountItem.account).isEnabled()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { isEnabled ->
-                    if (isEnabled) {
-                        setOnClickListener { onAccountClicked(selectableAccountItem.account) }
-                        fiat_container.alpha = 1f
-                    } else {
-                        fiat_container.alpha = .6f
-                        setOnClickListener { }
-                    }
-                }
+            fiat_account.updateAccount(
+                selectableAccountItem.account as FiatAccount,
+                statusDecorator(selectableAccountItem.account),
+                onAccountClicked
+            )
         }
     }
 }
