@@ -2067,4 +2067,32 @@
   <string name="exchange_rate">อัตราแลกเปลี่ยน</string>
   <string name="in_progress">กำลังดำเนินการ</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">เพื่อความปลอดภัยของคุณการซื้อบัตรครั้งแรกจะมีระยะเวลาการถือครอง %1$s วันก่อนที่คุณจะสามารถส่งหรือถอนการเข้ารหัสลับที่คุณซื้อได้ เราจะแจ้งให้คุณทราบเมื่อมีการยกเลิกการระงับ 
+
+ ในระหว่างนี้คุณสามารถขายเป็นเงินสดแลกเปลี่ยนและแลกเปลี่ยนภายใน Blockchain.com</string>
+  <string name="recover_funds_warning_message_1">คุณควรจับคู่หรือเข้าสู่ระบบทุกครั้งหากคุณสามารถเข้าถึงได้
+ ไปยัง ID Wallet และรหัสผ่านของคุณ การกู้คืนเงินของคุณอาจสร้างรหัส Wallet ใหม่ คุณจะ
+ ต้องการดำเนินการต่อ?
+</string>
+  <string name="received_dgld">ได้รับ Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">โปรดส่ง wDGLD ไปยังที่อยู่ Wrapped-DGLD %1$s</string>
+  <string name="wdgld_available_card_title">เทรด wDGLD ตอนนี้</string>
+  <string name="wdgld_available_card_body">ห่อ Digital Gold (wDGLD) ใน DGLD เวอร์ชันโทเค็น ERC-20 ซึ่งรวมโทเค็นที่ได้รับการสนับสนุนด้วยทองคำเข้ากับพลังและความยืดหยุ่นของ Ethereum</string>
+  <string name="wdgld_available_card_cta">เทรด wDGLD ตอนนี้</string>
+  <string name="dgld_default_account_label">กระเป๋าเงิน DGLD แบบห่อของฉัน</string>
+  <string name="swap_faster">เร็วขึ้น</string>
+  <string name="swap_trading_sheet_title">เร็วขึ้น ถูกกว่า. ดีกว่า
+ แลกเปลี่ยน Crypto กับ Trading Wallet ของคุณ</string>
+  <string name="swap_trading_sheet_subtitle">รับค่าธรรมเนียมที่ต่ำกว่าและเพิ่มความเร็วในการทำธุรกรรมเป็นสองเท่าเมื่อคุณเปลี่ยน crypto จาก Trading Wallet ใด ๆ</string>
+  <string name="swap_trading_fees_title">Swap เดียวกันค่าธรรมเนียมต่ำกว่า</string>
+  <string name="swap_trading_fees_subtitle">คุณจ่ายค่าธรรมเนียมเครือข่ายเป็นศูนย์โดยการแลกเปลี่ยน crypto off-chain</string>
+  <string name="swap_trading_speed_title">สลับเป็นวินาที</string>
+  <string name="swap_trading_speed_subtitle">ความเร็วที่เพิ่มขึ้นหมายถึงการแลกเปลี่ยน Swap ของคุณจะเคลียร์ในไม่กี่วินาทีไม่ใช่นาที</string>
+  <string name="scan_qr">สแกน QR Code</string>
+  <string name="qr_activity_hint_any_asset">สแกนที่อยู่ CryptoCurrency หรือใบแจ้งหนี้ BitPay</string>
+  <string name="qr_activity_hint_asset_address">อย่าลืมสแกน QR Code %1$s</string>
+  <string name="qr_activity_hint_bitpay">สแกนใบแจ้งหนี้ BitPay</string>
+  <string name="qr_activity_hint_import_wallet">สแกนคีย์ส่วนตัวของกระเป๋าเงิน</string>
+  <string name="qr_activity_hint_pairing_code">สแกนเว็บจับคู่รหัส QR</string>
+  <string name="qr_activity_hint_new_web_login">ล็อกอินเข้าสู่เว็บ</string>
 </resources>

@@ -2070,4 +2070,32 @@
   <string name="exchange_rate">Směnný kurz</string>
   <string name="in_progress">Probíhá</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Kvůli vaší bezpečnosti podléhají první nákupy karty období zadržení %1$s den, než budete moci odesílat nebo vybírat zakoupené kryptoměny. Až bude blokování zrušeno, budeme vás informovat. 
+
+ Mezitím můžete na Blockchain.com prodávat v hotovosti, swapovat a obchodovat.</string>
+  <string name="recover_funds_warning_message_1">Pokud máte přístup, měli byste se vždy spárovat nebo přihlásit
+ na vaše ID peněženky a heslo. Obnovením svých prostředků můžete vytvořit nové ID peněženky. Mohl bys
+ chtěli byste pokračovat?
+</string>
+  <string name="received_dgld">Obdrženo zabalené-DGLD</string>
+  <string name="email_request_body_dgld">Zašlete prosím wDGLD na adresu Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Obchodujte s wDGLD hned teď</string>
+  <string name="wdgld_available_card_body">Zabalené digitální zlato (wDGLD) ve verzi DGLD s tokenizací ERC-20, kombinující token se zlatou podporou a silou a flexibilitou Etherea.</string>
+  <string name="wdgld_available_card_cta">Obchodujte s wDGLD hned teď</string>
+  <string name="dgld_default_account_label">Moje zabalená peněženka DGLD</string>
+  <string name="swap_faster">Rychlejší</string>
+  <string name="swap_trading_sheet_title">Rychlejší. Levnější. Lepší
+ Vyměňte krypto za svou obchodní peněženku.</string>
+  <string name="swap_trading_sheet_subtitle">Získejte nižší poplatky a zdvojnásobte rychlost transakce při výměně kryptoměny z jakékoli obchodní peněženky.</string>
+  <string name="swap_trading_fees_title">Stejný swap, nižší poplatky</string>
+  <string name="swap_trading_fees_subtitle">Výměnou kryptoměny mimo řetězec platíte nulové síťové poplatky</string>
+  <string name="swap_trading_speed_title">Vyměňte během několika sekund</string>
+  <string name="swap_trading_speed_subtitle">Zvýšená rychlost znamená, že váš obchod se swapem se vymaže během několika sekund, ne minut</string>
+  <string name="scan_qr">Naskenujte QR kód</string>
+  <string name="qr_activity_hint_any_asset">Naskenujte adresu kryptoměny nebo fakturu BitPay</string>
+  <string name="qr_activity_hint_asset_address">Nezapomeňte naskenovat pouze QR kód %1$s</string>
+  <string name="qr_activity_hint_bitpay">Naskenujte fakturu BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Naskenujte soukromý klíč peněženky</string>
+  <string name="qr_activity_hint_pairing_code">Naskenujte QR kód párování webu</string>
+  <string name="qr_activity_hint_new_web_login">Přihlaste se na web</string>
 </resources>

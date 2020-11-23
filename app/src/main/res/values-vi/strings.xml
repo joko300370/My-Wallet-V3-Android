@@ -2063,4 +2063,32 @@
   <string name="exchange_rate">Tỷ giá</string>
   <string name="in_progress">Trong tiến trình</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Để bảo mật cho bạn, các giao dịch mua thẻ lần đầu tiên phải tuân theo khoảng thời gian giữ %1$s ngày trước khi bạn có thể gửi hoặc rút tiền điện tử đã mua của mình. Chúng tôi sẽ thông báo cho bạn khi lệnh giữ được dỡ bỏ. 
+
+ Trong thời gian chờ đợi, bạn có thể bán thành Tiền mặt, hoán đổi và giao dịch trong Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Bạn phải luôn ghép nối hoặc đăng nhập nếu bạn có quyền truy cập
+ vào ID và mật khẩu Wallet của bạn. Việc khôi phục tiền của bạn có thể tạo ID Wallet mới. Bạn sẽ
+ muốn tiếp tục?
+</string>
+  <string name="received_dgld">Đã nhận Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Vui lòng gửi wDGLD đến địa chỉ Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Giao dịch wDGLD ngay</string>
+  <string name="wdgld_available_card_body">Được bọc vàng kỹ thuật số (wDGLD) trong phiên bản mã hóa ERC-20 của DGLD, kết hợp mã thông báo được hỗ trợ bằng vàng với sức mạnh và tính linh hoạt của Ethereum.</string>
+  <string name="wdgld_available_card_cta">Giao dịch wDGLD ngay bây giờ</string>
+  <string name="dgld_default_account_label">Ví DGLD được bọc của tôi</string>
+  <string name="swap_faster">Nhanh hơn</string>
+  <string name="swap_trading_sheet_title">Nhanh hơn. Giá rẻ hơn. Tốt hơn
+ Hoán đổi tiền điện tử với Ví giao dịch của bạn.</string>
+  <string name="swap_trading_sheet_subtitle">Nhận phí thấp hơn và tăng gấp đôi tốc độ giao dịch khi bạn Hoán đổi tiền điện tử của mình từ bất kỳ Ví giao dịch nào.</string>
+  <string name="swap_trading_fees_title">Hoán đổi giống nhau, Phí thấp hơn</string>
+  <string name="swap_trading_fees_subtitle">Bạn không phải trả phí mạng bằng cách hoán đổi tiền điện tử ngoài chuỗi</string>
+  <string name="swap_trading_speed_title">Hoán đổi trong vài giây</string>
+  <string name="swap_trading_speed_subtitle">Tốc độ tăng lên có nghĩa là giao dịch Hoán đổi của bạn sẽ hoàn thành trong vài giây chứ không phải vài phút</string>
+  <string name="scan_qr">Quét mã QR</string>
+  <string name="qr_activity_hint_any_asset">Quét địa chỉ CryptoCurrency hoặc hóa đơn BitPay</string>
+  <string name="qr_activity_hint_asset_address">Đảm bảo chỉ quét Mã QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Quét hóa đơn BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Quét khóa cá nhân của ví</string>
+  <string name="qr_activity_hint_pairing_code">Quét mã QR ghép nối web</string>
+  <string name="qr_activity_hint_new_web_login">Đăng nhập vào web</string>
 </resources>

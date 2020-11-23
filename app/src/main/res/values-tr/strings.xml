@@ -2064,4 +2064,32 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
   <string name="exchange_rate">Takas Oranı</string>
   <string name="in_progress">Devam Ediyor</string>
   <string name="swap_direction">%1$s-&gt;%2$s</string>
+  <string name="security_locked_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz. 
+
+ Bu arada, Blockchain.com\'da Cash\'e satış yapabilir, takas edebilir ve ticaret yapabilirsiniz.</string>
+  <string name="recover_funds_warning_message_1">Erişiminiz varsa her zaman eşleştirmeli veya giriş yapmalısınız
+ Cüzdan Kimliğinize ve şifrenize. Paranızı geri kazanmak yeni bir Cüzdan Kimliği oluşturabilir. Yaparmısın
+ devam etmek ister misin?
+</string>
+  <string name="received_dgld">Sarılmış-DGLD alındı</string>
+  <string name="email_request_body_dgld">Lütfen wDGLD\'yi Sarılmış DGLD adresine %1$s gönderin.</string>
+  <string name="wdgld_available_card_title">Şimdi wDGLD Ticareti Yapın</string>
+  <string name="wdgld_available_card_body">Altın destekli bir jetonu Ethereum\'un gücü ve esnekliğiyle birleştiren, DGLD\'nin ERC-20 tokenize versiyonunda Sarılmış Dijital Altın (wDGLD).</string>
+  <string name="wdgld_available_card_cta">Şimdi wDGLD ticareti yapın</string>
+  <string name="dgld_default_account_label">Sarılı-DGLD Cüzdanım</string>
+  <string name="swap_faster">Daha hızlı</string>
+  <string name="swap_trading_sheet_title">Daha hızlı. Daha ucuz. Daha iyi
+ Ticaret Cüzdanınızla Kripto değiştirin.</string>
+  <string name="swap_trading_sheet_subtitle">Herhangi bir İşlem Cüzdanından kripto değiştirdiğinizde daha düşük ücretler alın ve işlem hızını ikiye katlayın.</string>
+  <string name="swap_trading_fees_title">Aynı Takas, Daha Düşük Ücretler</string>
+  <string name="swap_trading_fees_subtitle">Zincir dışı kriptoları değiştirerek sıfır ağ ücreti ödersiniz</string>
+  <string name="swap_trading_speed_title">Saniyeler İçinde Değiştirin</string>
+  <string name="swap_trading_speed_subtitle">Artan hız, Swap işleminizin dakikalar değil saniyeler içinde gerçekleşmesi anlamına gelir</string>
+  <string name="scan_qr">QR Kodu tara</string>
+  <string name="qr_activity_hint_any_asset">Bir CryptoCurrency adresini veya bir BitPay faturasını tarayın</string>
+  <string name="qr_activity_hint_asset_address">Yalnızca %1$s QR Kodu taradığınızdan emin olun</string>
+  <string name="qr_activity_hint_bitpay">BitPay faturasını tarayın</string>
+  <string name="qr_activity_hint_import_wallet">Cüzdan özel anahtarını tarayın</string>
+  <string name="qr_activity_hint_pairing_code">Web eşleştirme QR kodunu tarayın</string>
+  <string name="qr_activity_hint_new_web_login">Web\'de oturum açın</string>
 </resources>

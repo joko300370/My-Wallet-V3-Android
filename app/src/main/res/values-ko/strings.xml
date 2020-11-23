@@ -2063,4 +2063,32 @@
   <string name="exchange_rate">환율</string>
   <string name="in_progress">진행 중</string>
   <string name="swap_direction">%1$s &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">보안을 위해 최초 카드 구매는 구매 한 암호 화폐를 보내거나 인출하기 전에 %1$s 일의 보유 기간이 적용됩니다. 보류가 해제되면 알려 드리겠습니다. 
+
+ 그 동안 Blockchain.com 내에서 현금으로 판매, 교환 및 거래 할 수 있습니다.</string>
+  <string name="recover_funds_warning_message_1">액세스 권한이 있으면 항상 페어링하거나 로그인해야합니다.
+ 지갑 ID 및 비밀번호에. 자금을 복구하면 새 지갑 ID가 생성 될 수 있습니다. 당신은
+ 계속 하시겠습니까?
+</string>
+  <string name="received_dgld">Wrapped-DGLD 수령</string>
+  <string name="email_request_body_dgld">Wrapped-DGLD 주소 %1$s 로 wDGLD를 보내십시오.</string>
+  <string name="wdgld_available_card_title">지금 wDGLD 거래</string>
+  <string name="wdgld_available_card_body">DGLD의 ERC-20 토큰 화 된 버전의 랩드 디지털 골드 (wDGLD)는 금 지원 토큰을 이더 리움의 힘 및 유연성과 결합합니다.</string>
+  <string name="wdgld_available_card_cta">지금 wDGLD 거래</string>
+  <string name="dgld_default_account_label">내 포장 DGLD 지갑</string>
+  <string name="swap_faster">더 빠르게</string>
+  <string name="swap_trading_sheet_title">더 빨리. 더 싸다. 보다 나은
+ 거래 지갑으로 암호 화폐를 교환하세요.</string>
+  <string name="swap_trading_sheet_subtitle">거래 지갑에서 암호 화폐를 교환하면 수수료를 낮추고 거래 속도를 두 배로 높일 수 있습니다.</string>
+  <string name="swap_trading_fees_title">동일한 스왑, 낮은 수수료</string>
+  <string name="swap_trading_fees_subtitle">오프 체인 암호 화폐를 교환하여 네트워크 수수료를 지불하지 않습니다.</string>
+  <string name="swap_trading_speed_title">몇 초 만에 스왑</string>
+  <string name="swap_trading_speed_subtitle">속도가 증가하면 스왑 거래가 몇 분이 아닌 몇 초 안에 완료됩니다.</string>
+  <string name="scan_qr">QR 코드 스캔</string>
+  <string name="qr_activity_hint_any_asset">CryptoCurrency 주소 또는 BitPay 인보이스 스캔</string>
+  <string name="qr_activity_hint_asset_address">%1$s QR 코드 만 스캔하세요.</string>
+  <string name="qr_activity_hint_bitpay">BitPay 인보이스 스캔</string>
+  <string name="qr_activity_hint_import_wallet">지갑 개인 키 스캔</string>
+  <string name="qr_activity_hint_pairing_code">웹 페어링 QR 코드 스캔</string>
+  <string name="qr_activity_hint_new_web_login">웹에 로그인</string>
 </resources>
