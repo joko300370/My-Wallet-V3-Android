@@ -134,19 +134,16 @@ class AccountInfoCrypto @JvmOverloads constructor(
             }
 
         container.alpha = 1f
-        setOnClickListener { println("account clicked not setted") }
         compositeDisposable += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { isEnabled ->
                     if (isEnabled) {
                         setOnClickListener {
-                            println("account clicked with assettt ${account.asset}")
                             onAccountClicked(account)
                         }
                         container.alpha = 1f
                     } else {
                         container.alpha = .6f
-                        setOnClickListener { println("account clicked not setted") }
                     }
                 }
             )
