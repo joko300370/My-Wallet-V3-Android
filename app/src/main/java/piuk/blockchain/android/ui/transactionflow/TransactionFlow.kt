@@ -166,7 +166,7 @@ class TransactionFlow(
                 analyticsHooks.onStepChanged(newState)
             }
         }
-        newState.currentStep.let {
+        newState.currentStep.takeIf { it != TransactionStep.ZERO }?.let {
             showFlowStep(it)
             currentStep = it
         }
