@@ -149,7 +149,6 @@ class TransactionFlow(
         super.finishFlow()
     }
 
-
     private fun handleStateChange(newState: TransactionState) {
         if (currentStep == newState.currentStep)
             return

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.annotation.StringRes
@@ -25,7 +24,6 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
 
     override val host: Host
         get() = activeTransactionFlow.getFlow()
-
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
