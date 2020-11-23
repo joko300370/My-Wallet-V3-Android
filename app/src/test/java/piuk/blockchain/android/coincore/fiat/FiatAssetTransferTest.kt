@@ -64,7 +64,7 @@ class FiatAssetTransferTest {
             .assertNoErrors()
             .assertComplete()
             .assertValue { list ->
-                list.size == 2
+                list.isEmpty()
             }
     }
 

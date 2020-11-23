@@ -91,7 +91,7 @@ abstract class Erc20NonCustodialAccount(
                 }
             }
                 .flatMap {
-                    appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                    appendSwapActivity(custodialWalletManager, asset, it)
                 }
                 .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }

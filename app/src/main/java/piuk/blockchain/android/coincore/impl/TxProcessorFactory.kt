@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.NonCustodialSellEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
@@ -104,13 +105,23 @@ class TxProcessorFactory(
                         tiersService = kycTierService,
                         engine = engine,
                         environmentConfig = environmentConfig,
-                        custodialWalletManager = walletManager,
                         direction = if (target is CustodialTradingAccount)
                             TransferDirection.FROM_USERKEY else TransferDirection.ON_CHAIN
                     )
                 )
             )
-
+            is FiatAccount -> Single.just(TransactionProcessor(
+                exchangeRates = exchangeRates,
+                sourceAccount = source,
+                txTarget = target,
+                engine = NonCustodialSellEngine(
+                    quotesProvider = quotesProvider,
+                    walletManager = walletManager,
+                    kycTierService = kycTierService,
+                    engine = engine,
+                    environmentConfig = environmentConfig
+                )
+            ))
             else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
         }
     }
@@ -141,7 +152,8 @@ class TxProcessorFactory(
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesProvider = quotesProvider,
-                        kycTierService = kycTierService
+                        kycTierService = kycTierService,
+                        environmentConfig = environmentConfig
                     )
                 )
             )
@@ -165,7 +177,8 @@ class TxProcessorFactory(
                     engine = CustodialSellTxEngine(
                         walletManager = walletManager,
                         quotesProvider = quotesProvider,
-                        kycTierService = kycTierService
+                        kycTierService = kycTierService,
+                        environmentConfig = environmentConfig
                     )
                 )
             )

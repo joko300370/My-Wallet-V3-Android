@@ -51,6 +51,8 @@ abstract class CryptoAccountBase : CryptoAccount {
         this.hasTransactions = hasTransactions
     }
 
+    protected abstract val directions: Set<TransferDirection>
+
     override val sourceState: Single<TxSourceState>
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
@@ -90,7 +92,6 @@ abstract class CryptoAccountBase : CryptoAccount {
     protected fun appendSwapActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
-        directions: List<TransferDirection>,
         activityList: List<ActivitySummaryItem>
     ) = custodialWalletManager.getSwapActivityForAsset(asset, directions)
         .map { swapItems ->
@@ -136,6 +137,9 @@ internal class CryptoExchangeAccount(
             )
         )
 
+    override val directions: Set<TransferDirection>
+        get() = emptySet()
+
     override val isDefault: Boolean = false
     override val isFunded: Boolean = false
 
@@ -161,18 +165,18 @@ abstract class CryptoNonCustodialAccount(
     override val isFunded: Boolean = true
 
     override val actions: AvailableActions
-        get() =
-            mutableSetOf(
-                AssetAction.ViewActivity,
-                AssetAction.Send,
-                AssetAction.Receive,
-                AssetAction.Swap
-            ).apply {
-                if (!isFunded || isArchived) {
-                    remove(AssetAction.Send)
-                    remove(AssetAction.Swap)
-                }
+        get() = mutableSetOf(
+            AssetAction.ViewActivity,
+            AssetAction.Receive
+        ).apply {
+            if (isFunded && !isArchived) {
+                add(AssetAction.Send)
+                add(AssetAction.Sell)
+                add(AssetAction.Swap)
             }
+        }
+
+    override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
 
     override val sourceState: Single<TxSourceState>
         get() = actionableBalance.map {
@@ -187,11 +191,6 @@ abstract class CryptoNonCustodialAccount(
         Single.fromCallable { payloadDataManager.isDoubleEncrypted }
 
     abstract fun createTxEngine(): TxEngine
-
-    protected val nonCustodialSwapDirections = listOf(
-        TransferDirection.ON_CHAIN,
-        TransferDirection.FROM_USERKEY
-    )
 
     override val isArchived: Boolean
         get() = false

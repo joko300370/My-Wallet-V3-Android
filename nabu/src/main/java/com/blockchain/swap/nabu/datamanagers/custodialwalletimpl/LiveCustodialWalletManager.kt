@@ -683,7 +683,7 @@ class LiveCustodialWalletManager(
 
     override fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<TransferDirection>
+        directions: Set<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
 

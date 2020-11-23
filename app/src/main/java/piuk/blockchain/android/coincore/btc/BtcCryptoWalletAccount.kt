@@ -90,7 +90,7 @@ internal class BtcCryptoWalletAccount(
                 ) as ActivitySummaryItem
             }
             .flatMap {
-                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                appendSwapActivity(custodialWalletManager, asset, it)
             }
             .doOnSuccess {
                 setHasTransactions(it.isNotEmpty())

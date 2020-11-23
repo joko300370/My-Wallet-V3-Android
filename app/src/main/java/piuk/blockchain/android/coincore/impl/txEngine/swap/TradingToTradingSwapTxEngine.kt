@@ -11,12 +11,14 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
     quotesProvider: QuotesProvider,
-    kycTierService: TierService
-) : SwapEngineBase(quotesProvider, walletManager, kycTierService) {
+    kycTierService: TierService,
+    environmentConfig: EnvironmentConfig
+) : SwapEngineBase(quotesProvider, walletManager, kycTierService, environmentConfig) {
 
     override fun assertInputsValid() {
         require(txTarget is CustodialTradingAccount)

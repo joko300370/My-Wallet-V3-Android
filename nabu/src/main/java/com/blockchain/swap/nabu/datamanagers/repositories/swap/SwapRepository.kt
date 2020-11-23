@@ -32,7 +32,7 @@ class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: Swap
 
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<TransferDirection>
+        directions: Set<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
         swapActivityCache.getCachedSingle().map { list ->
             list.filter {

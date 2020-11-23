@@ -55,6 +55,8 @@ open class CustodialTradingAccount(
             )
         }
 
+    override val directions: Set<TransferDirection> = setOf(TransferDirection.INTERNAL)
+
     override val onTxCompleted: (TxResult) -> Completable
         get() = { txResult ->
             receiveAddress.flatMapCompletable {
@@ -112,7 +114,7 @@ open class CustodialTradingAccount(
             .mapList { orderToSummary(it) }
             .filterActivityStates()
             .flatMap {
-                appendSwapActivity(custodialWalletManager, asset, custodialSwapDirections, it)
+                appendSwapActivity(custodialWalletManager, asset, it)
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
@@ -144,10 +146,11 @@ open class CustodialTradingAccount(
                 AssetAction.ViewActivity
             ).apply {
                 if (isFunded && !isArchived) {
-                    add(AssetAction.Sell)
                     add(AssetAction.Send)
-                    if (isEligibleForSimpleBuy.get())
+                    if (isEligibleForSimpleBuy.get()) {
+                        add(AssetAction.Sell)
                         add(AssetAction.Swap)
+                    }
                 }
             }.toSet()
 
@@ -190,7 +193,5 @@ open class CustodialTradingAccount(
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION
         )
-
-        private val custodialSwapDirections = listOf(TransferDirection.INTERNAL)
     }
 }

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.impl.txEngine.swap
+package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
@@ -15,38 +15,35 @@ import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
-class OnChainSwapEngine(
-    quotesProvider: QuotesProvider,
-    walletManager: CustodialWalletManager,
-    tiersService: TierService,
-    override val direction: TransferDirection,
+class NonCustodialSellEngine(
     private val engine: OnChainTxEngineBase,
-    environmentConfig: EnvironmentConfig
-) : SwapEngineBase(
-    quotesProvider, walletManager, tiersService, environmentConfig
+    environmentConfig: EnvironmentConfig,
+    walletManager: CustodialWalletManager,
+    kycTierService: TierService,
+    quotesProvider: QuotesProvider
+) : SellTxEngine(
+    walletManager, kycTierService, quotesProvider, environmentConfig
 ) {
+    override val direction: TransferDirection
+        get() = TransferDirection.FROM_USERKEY
 
-    override fun doInitialiseTx(): Single<PendingTx> {
-        return quotesEngine.pricedQuote.firstOrError().doOnSuccess { pricedQuote ->
+    override fun doInitialiseTx(): Single<PendingTx> =
+        quotesEngine.pricedQuote.firstOrError().doOnSuccess { pricedQuote ->
             engine.startFromQuote(pricedQuote)
         }.flatMap { quote ->
             engine.doInitialiseTx().flatMap {
                 updateLimits(it, quote)
             }
         }.map { px ->
-            px.copy(feeLevel = FeeLevel.Priority)
+            px.copy(feeLevel = FeeLevel.Priority, selectedFiat = userFiat)
         }.handlePendingOrdersError(
             PendingTx(
                 amount = CryptoValue.zero(sourceAccount.asset),
                 available = CryptoValue.zero(sourceAccount.asset),
                 fees = CryptoValue.ZeroBch,
-                selectedFiat = userFiat)
+                selectedFiat = userFiat
+            )
         )
-    }
-
-    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
-        return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice().clearConfirmations()
-    }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
         return engine.doValidateAmount(pendingTx).flatMap {
@@ -74,8 +71,12 @@ class OnChainSwapEngine(
         }.updateTxValidity(pendingTx)
     }
 
+    override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
+        return engine.doUpdateAmount(amount, pendingTx).updateQuotePrice().clearConfirmations()
+    }
+
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
-        return createOrder(pendingTx).flatMap { order ->
+        return createSellOrder(pendingTx).flatMap { order ->
             engine.restartFromOrder(order, pendingTx).flatMap { px ->
                 engine.doExecute(px, secondPassword).updateOrderStatus(order.id)
             }

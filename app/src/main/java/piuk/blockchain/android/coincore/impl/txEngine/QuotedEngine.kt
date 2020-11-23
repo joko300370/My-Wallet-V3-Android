@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.swap.nabu.datamanagers.CustodialOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
@@ -11,6 +12,7 @@ import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
@@ -19,10 +21,14 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
+import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import java.lang.IllegalStateException
 import java.math.RoundingMode
 
@@ -33,7 +39,8 @@ private val PendingTx.quoteSub: Disposable?
 abstract class QuotedEngine(
     private val quotesProvider: QuotesProvider,
     private val kycTierService: TierService,
-    private val walletManager: CustodialWalletManager
+    private val walletManager: CustodialWalletManager,
+    private val environmentConfig: EnvironmentConfig
 ) : TxEngine() {
     protected lateinit var quotesEngine: TransferQuotesEngine
     protected abstract val direction: TransferDirection
@@ -113,6 +120,40 @@ abstract class QuotedEngine(
         pendingTx.quoteSub?.dispose()
         quotesEngine.stop()
     }
+
+    protected fun OnChainTxEngineBase.startFromQuote(quote: PricedQuote) {
+        start(
+            sourceAccount = sourceAccount,
+            txTarget = makeExternalAssetAddress(
+                asset = sourceAccount.asset,
+                address = quote.transferQuote.sampleDepositAddress,
+                environmentConfig = environmentConfig
+            ),
+            exchangeRates = exchangeRates
+        )
+    }
+
+    protected fun OnChainTxEngineBase.restartFromOrder(order: CustodialOrder, pendingTx: PendingTx): Single<PendingTx> =
+        restart(
+            txTarget = makeExternalAssetAddress(
+                asset = sourceAccount.asset,
+                address = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
+                environmentConfig = environmentConfig,
+                postTransactions = { Completable.complete() }
+            ),
+            pendingTx = pendingTx
+        )
+
+    protected fun Single<TxResult>.updateOrderStatus(orderId: String): Single<TxResult> = onErrorResumeNext { error ->
+        walletManager.updateSwapOrder(orderId, false).onErrorComplete().toSingle {
+            throw error
+        }
+    }
+        .flatMap { result ->
+            walletManager.updateSwapOrder(orderId, true).onErrorComplete().thenSingle {
+                Single.just(result)
+            }
+        }
 
     override fun stop(pendingTx: PendingTx) {
         disposeQuotesFetching(pendingTx)
