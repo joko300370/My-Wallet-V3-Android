@@ -71,7 +71,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 newState.fiatRate?.let { rate ->
                     amount_sheet_max_available.text =
                         "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                                "(${availableBalance.toStringWithSymbol()})"
+                            "(${availableBalance.toStringWithSymbol()})"
                 }
             }
 
@@ -87,7 +87,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
                     IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
                         dismiss()
-                        KycNavHostActivity.start(requireActivity(), CampaignType.Swap)
+                        KycNavHostActivity.start(requireActivity(), CampaignType.Swap, true)
                     }
                 }
             } ?: amount_sheet_input.hideLabels()
