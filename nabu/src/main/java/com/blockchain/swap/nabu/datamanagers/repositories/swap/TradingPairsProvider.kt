@@ -2,8 +2,8 @@ package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.swap.nabu.service.NabuService
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
 interface TradingPairsProvider {
@@ -20,7 +20,9 @@ class TradingPairsProviderImpl(
         response.mapNotNull { pair ->
             val parts = pair.split("-")
             if (parts.size != 2) return@mapNotNull null
-            CurrencyPair.fromRawPair(pair, LiveCustodialWalletManager.SUPPORTED_FUNDS_CURRENCIES)
+            val source = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return@mapNotNull null
+            val destination = CryptoCurrency.fromNetworkTicker(parts[1]) ?: return@mapNotNull null
+            CurrencyPair.CryptoCurrencyPair(source, destination)
         }
     }
 }
