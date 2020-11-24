@@ -89,45 +89,47 @@ class TransactionInteractor(
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
-        Singles.zip(
-            coincore.getTransactionTargets(sourceAccount, action),
-            action.apiPairs(),
-            eligibilityProvider.isEligibleForSimpleBuy()
-        ).map { (accountList, currencyPairs, eligible) ->
-            if (action == AssetAction.Swap) {
-                val pairs = currencyPairs.map { it as CurrencyPair.CryptoCurrencyPair }
-                accountList.filterIsInstance(CryptoAccount::class.java)
-                    .filter { account ->
-                        pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
-                    }.filter { account ->
-                        eligible or (account is NonCustodialAccount)
-                    }
-            } else {
-                val pairs = currencyPairs.map { it as CurrencyPair.CryptoToFiatCurrencyPair }
-                accountList.filterIsInstance(FiatAccount::class.java)
-                    .filter { account ->
-                        pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
-                    }
-            }
+        when (action) {
+            AssetAction.Swap -> swapTargets(sourceAccount)
+            AssetAction.Sell -> sellTargets(sourceAccount)
+            else -> coincore.getTransactionTargets(sourceAccount, action)
         }
 
-    private fun AssetAction.apiPairs(): Single<List<CurrencyPair>> =
-        when (this) {
-            AssetAction.Swap -> custodialRepository.getSwapAvailablePairs()
-                .map { it.map { pair -> pair as CurrencyPair } }
-            AssetAction.Sell -> kotlin.run {
-                val availableFiats =
-                    custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
-                return@run custodialWalletManager.getSupportedBuySellCryptoCurrencies()
-                    .zipWith(availableFiats) { supportedPairs, fiats ->
-                        supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
-                            .map {
-                                CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
-                                    it.fiatCurrency) as CurrencyPair
-                            }
+    private fun sellTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> {
+        val availableFiats =
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+        val apiPairs = custodialWalletManager.getSupportedBuySellCryptoCurrencies()
+            .zipWith(availableFiats) { supportedPairs, fiats ->
+                supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
+                    .map {
+                        CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
+                            it.fiatCurrency)
                     }
             }
-            else -> Single.just(emptyList())
+
+        return Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, AssetAction.Sell),
+            apiPairs
+        ).map { (accountList, pairs) ->
+            accountList.filterIsInstance(FiatAccount::class.java)
+                .filter { account ->
+                    pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
+                }
+        }
+    }
+
+    private fun swapTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> =
+        Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, AssetAction.Swap),
+            custodialRepository.getSwapAvailablePairs(),
+            eligibilityProvider.isEligibleForSimpleBuy()
+        ).map { (accountList, pairs, eligible) ->
+            accountList.filterIsInstance(CryptoAccount::class.java)
+                .filter { account ->
+                    pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
+                }.filter { account ->
+                    eligible or (account is NonCustodialAccount)
+                }
         }
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
