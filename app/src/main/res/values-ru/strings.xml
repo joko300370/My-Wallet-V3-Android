@@ -2070,4 +2070,32 @@
   <string name="exchange_rate">Обменный курс</string>
   <string name="in_progress">В процессе</string>
   <string name="swap_direction">%1$s-&gt;%2$s</string>
+  <string name="security_locked_funds_explanation">В целях вашей безопасности при первой покупке карты действует период хранения %1$s прежде чем вы сможете отправить или вывести купленную криптовалюту. Мы сообщим вам, когда задержка будет снята. 
+
+ А пока вы можете продавать за наличные, обменивать и торговать на Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Вы всегда должны сопрягать или входить в систему, если у вас есть доступ
+ на ваш идентификатор кошелька и пароль. После восстановления ваших средств может быть создан новый идентификатор кошелька. Не могли бы вы
+ хотел бы продолжить?
+</string>
+  <string name="received_dgld">Получено Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Отправьте wDGLD на адрес Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Торгуйте wDGLD сейчас</string>
+  <string name="wdgld_available_card_body">Обернуто Digital Gold (wDGLD) в токенизированной версии DGLD стандарта ERC-20, сочетающей в себе токен с золотым покрытием и мощь и гибкость Ethereum.</string>
+  <string name="wdgld_available_card_cta">Торгуйте wDGLD сейчас</string>
+  <string name="dgld_default_account_label">Мой кошелек Wrapped-DGLD</string>
+  <string name="swap_faster">Быстрее</string>
+  <string name="swap_trading_sheet_title">Быстрее. Дешевле. Лучше
+ Обменяйте криптовалюту на свой торговый кошелек.</string>
+  <string name="swap_trading_sheet_subtitle">Получите более низкие комиссии и удвоите скорость транзакций, когда вы обмениваете криптовалюту с любого торгового кошелька.</string>
+  <string name="swap_trading_fees_title">Тот же своп, более низкие комиссии</string>
+  <string name="swap_trading_fees_subtitle">Вы платите нулевую плату за сеть, обменивая криптовалюту вне сети</string>
+  <string name="swap_trading_speed_title">Обмен за секунды</string>
+  <string name="swap_trading_speed_subtitle">Повышенная скорость означает, что ваша сделка своп очищается за секунды, а не за минуты.</string>
+  <string name="scan_qr">Отсканируйте QR-код</string>
+  <string name="qr_activity_hint_any_asset">Отсканируйте адрес CryptoCurrency или счет BitPay</string>
+  <string name="qr_activity_hint_asset_address">Убедитесь, что вы сканируете только QR-код %1$s</string>
+  <string name="qr_activity_hint_bitpay">Отсканировать счет BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Сканировать приватный ключ кошелька</string>
+  <string name="qr_activity_hint_pairing_code">Отсканируйте QR-код для веб-сопряжения</string>
+  <string name="qr_activity_hint_new_web_login">Авторизоваться в сети</string>
 </resources>

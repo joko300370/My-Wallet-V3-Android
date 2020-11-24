@@ -318,7 +318,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 nextEnabled = false,
                 currentStep = TransactionStep.IN_PROGRESS,
-                executionStatus = TxExecutionStatus.IN_PROGRESS
+                executionStatus = TxExecutionStatus.InProgress
             ).updateBackstack(oldState)
     }
 
@@ -329,7 +329,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 nextEnabled = true,
                 currentStep = TransactionStep.IN_PROGRESS,
-                executionStatus = TxExecutionStatus.ERROR
+                executionStatus = TxExecutionStatus.Error(error.message ?: "")
             ).updateBackstack(oldState)
     }
 
@@ -346,7 +346,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 nextEnabled = true,
-                executionStatus = TxExecutionStatus.COMPLETED
+                executionStatus = TxExecutionStatus.Completed
             ).updateBackstack(oldState)
     }
 

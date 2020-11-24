@@ -15,7 +15,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_interest_details_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_interest_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -53,7 +53,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
     private lateinit var cryptoCurrency: CryptoCurrency
 
     override val layoutResource: Int
-        get() = R.layout.dialog_interest_details_sheet
+        get() = R.layout.dialog_sheet_interest_details
 
     private val disposables = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()

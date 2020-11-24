@@ -6,8 +6,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.dialog_account_selector_sheet.*
-import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_account_selector.*
+import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -30,7 +30,7 @@ class AccountSelectSheet(
     }
 
     override val layoutResource: Int
-        get() = R.layout.dialog_account_selector_sheet
+        get() = R.layout.dialog_sheet_account_selector
 
     private val coincore: Coincore by scopedInject()
     private val disposables = CompositeDisposable()

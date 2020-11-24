@@ -35,8 +35,10 @@ class TransactionInOutMapper(
             CryptoCurrency.XLM -> handleXlmToAndFrom(item)
             CryptoCurrency.ETHER,
             CryptoCurrency.PAX,
-            CryptoCurrency.USDT -> handleErc20ToAndFrom(item)
-            else -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
+            CryptoCurrency.USDT,
+            CryptoCurrency.DGLD -> handleEthAndErc20ToAndFrom(item)
+            CryptoCurrency.STX,
+            CryptoCurrency.ALGO -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
         }
 
     private fun handleXlmToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
@@ -65,7 +67,7 @@ class TransactionInOutMapper(
                 )
             }
 
-    private fun handleErc20ToAndFrom(
+    private fun handleEthAndErc20ToAndFrom(
         activitySummaryItem: NonCustodialActivitySummaryItem
     ): Single<TransactionInOutDetails> {
 

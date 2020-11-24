@@ -11,7 +11,6 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.CustodialOrder
@@ -30,7 +29,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
 import piuk.blockchain.android.ui.customviews.TrendingPair
@@ -48,7 +47,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 
-class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Host {
+class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Host, TradingWalletPromoBottomSheet.Host {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,13 +75,11 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         swap_cta.apply {
             analytics.logEvent(SwapAnalyticsEvents.NewSwapClicked)
             setOnClickListener {
-                TransactionFlow(
-                    action = AssetAction.Swap
-                ).apply {
-                    startFlow(
-                        fragmentManager = childFragmentManager,
-                        host = this@SwapFragment
-                    )
+                if (!walletPrefs.hasSeenTradingSwapPromo) {
+                    walletPrefs.setSeenTradingSwapPromo()
+                    showBottomSheet(TradingWalletPromoBottomSheet.newInstance())
+                } else {
+                    startSwap()
                 }
             }
             gone()
@@ -95,6 +92,17 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         loadSwapOrKyc()
     }
 
+    private fun startSwap() {
+        TransactionFlow(
+            action = AssetAction.Swap
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@SwapFragment
+            )
+        }
+    }
+
     override fun verificationCtaClicked() {
         analytics.logEvent(SwapAnalyticsEvents.SwapSilverLimitSheetCta)
         walletPrefs.setSeenSwapPromo()
@@ -103,6 +111,10 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
 
     override fun onSheetClosed() {
         walletPrefs.setSeenSwapPromo()
+    }
+
+    override fun startNewSwap() {
+        startSwap()
     }
 
     private fun loadSwapOrKyc() {
@@ -182,8 +194,12 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     )
                 )
             )
-            childFragmentManager.beginTransaction().add(fragment, TAG).commit()
+            showBottomSheet(fragment)
         }
+    }
+
+    private fun showBottomSheet(fragment: SlidingModalBottomDialog) {
+        childFragmentManager.beginTransaction().add(fragment, TAG).commit()
     }
 
     private fun onTrendingPairClicked(): (TrendingPair) -> Unit = { pair ->
@@ -274,7 +290,9 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         val limits: TransferLimits,
         val orders: List<CustodialOrder>
     )
-}
 
-private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
-    pairs.any { it.source == this.asset }
+    override fun onDestroyView() {
+        compositeDisposable.clear()
+        super.onDestroyView()
+    }
+}

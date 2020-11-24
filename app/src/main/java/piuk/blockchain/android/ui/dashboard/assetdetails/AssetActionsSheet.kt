@@ -112,7 +112,6 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         dialogView.asset_actions_account_details.updateAccount(
             state.selectedAccount.selectFirstAccount(),
             {},
-            disposables,
             PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
         )
     }

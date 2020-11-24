@@ -230,7 +230,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             action = AssetAction.Sell
         ).apply {
             startFlow(
-                fragmentManager = childFragmentManager,
+                fragmentManager = fragmentManager ?: return,
                 host = this@SellIntroFragment
             )
         }
@@ -244,6 +244,11 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
                     .map { it.cryptoCurrency }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
     }
 
     companion object {

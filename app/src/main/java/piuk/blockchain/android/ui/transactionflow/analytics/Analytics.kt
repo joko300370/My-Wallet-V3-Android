@@ -6,6 +6,8 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
+import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -117,7 +119,7 @@ class TxFlowAnalytics(
     fun onEnterAddressCtaClick(state: TransactionState) {
         when (state.action) {
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.SwapConfirmPair(
-                source = state.asset,
+                asset = state.asset,
                 target = state.selectedTarget.toCategory()
             ))
             else -> {
@@ -188,28 +190,38 @@ class TxFlowAnalytics(
             AssetAction.Send ->
                 analytics.logEvent(
                     SendAnalyticsEvent.TransactionSuccess(
-                        asset = state.asset
+                        asset = state.asset,
+                        target = state.selectedTarget.toCategory(),
+                        source = state.sendingAccount.toCategory()
                     )
                 )
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionSuccess)
             AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionSuccess(state.asset))
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionSuccess(
-                source = state.asset,
-                target = state.selectedTarget.toCategory()
+                asset = state.asset,
+                target = state.selectedTarget.toCategory(),
+                source = state.sendingAccount.toCategory()
             ))
             else -> {
             }
         }
     }
 
-    fun onTransactionFailure(state: TransactionState) {
+    fun onTransactionFailure(state: TransactionState, error: String) {
         when (state.action) {
-            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.TransactionFailed)
+            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.TransactionFailure(
+                asset = state.asset,
+                target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
+                source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
+                error = error
+            ))
             AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionFailed)
             AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionFailed(state.asset))
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionFailed(
-                source = state.asset,
-                target = state.selectedTarget.toCategory()
+                asset = state.asset,
+                target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
+                source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
+                error = error
             ))
             else -> {
             }
@@ -220,6 +232,16 @@ class TxFlowAnalytics(
         if (oldLevel != newLevel) {
             analytics.logEvent(SendAnalyticsEvent.FeeChanged(oldLevel, newLevel))
         }
+    }
+
+    companion object {
+        internal const val PARAM_ASSET = "asset"
+        internal const val PARAM_SOURCE = "source"
+        internal const val PARAM_TARGET = "target"
+        internal const val PARAM_ERROR = "error"
+        internal const val PARAM_OLD_FEE = "old_fee"
+        internal const val PARAM_NEW_FEE = "new_fee"
+        internal const val FEE_SCHEDULE = "fee_level"
     }
 }
 

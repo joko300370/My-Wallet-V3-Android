@@ -26,4 +26,7 @@ interface WalletStatus {
 
     val isNewUser: Boolean
     fun setNewUser()
+
+    val hasSeenTradingSwapPromo: Boolean
+    fun setSeenTradingSwapPromo()
 }

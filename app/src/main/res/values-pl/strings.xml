@@ -2076,4 +2076,32 @@
   <string name="exchange_rate">Kurs wymiany</string>
   <string name="in_progress">W trakcie</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Ze względów bezpieczeństwa pierwsze zakupy kartą podlegają %1$s dniowemu okresowi przechowywania, zanim będzie można wysłać lub wypłacić zakupione krypto. Powiadomimy Cię, gdy blokada zostanie zniesiona. 
+
+ W międzyczasie możesz sprzedawać za gotówkę, wymieniać się i handlować na Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Jeśli masz dostęp, zawsze powinieneś sparować lub zalogować się
+ do swojego identyfikatora portfela i hasła. Odzyskanie środków może spowodować utworzenie nowego identyfikatora portfela. Mógłbyś
+ chcesz kontynuować?
+</string>
+  <string name="received_dgld">Otrzymano Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Wyślij wDGLD na adres Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Handluj wDGLD teraz</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) w tokenizowanej wersji DGLD ERC-20, łączący token zabezpieczony złotem z mocą i elastycznością Ethereum.</string>
+  <string name="wdgld_available_card_cta">Handluj wDGLD teraz</string>
+  <string name="dgld_default_account_label">Mój portfel Wrapped-DGLD</string>
+  <string name="swap_faster">Szybciej</string>
+  <string name="swap_trading_sheet_title">Szybciej. Taniej. Lepszy
+ Zamień krypto z portfelem handlowym.</string>
+  <string name="swap_trading_sheet_subtitle">Uzyskaj niższe opłaty i podwoj prędkość transakcji, wymieniając krypto z dowolnego portfela handlowego.</string>
+  <string name="swap_trading_fees_title">Ta sama zamiana, niższe opłaty</string>
+  <string name="swap_trading_fees_subtitle">Płacisz zerowe opłaty sieciowe, wymieniając kryptowaluty poza łańcuchem</string>
+  <string name="swap_trading_speed_title">Zamień w kilka sekund</string>
+  <string name="swap_trading_speed_subtitle">Zwiększona prędkość oznacza, że Twoja transakcja Swap jest rozliczana w ciągu kilku sekund, a nie minut</string>
+  <string name="scan_qr">Zeskanuj kod QR</string>
+  <string name="qr_activity_hint_any_asset">Zeskanuj adres CryptoCurrency lub fakturę BitPay</string>
+  <string name="qr_activity_hint_asset_address">Pamiętaj, aby zeskanować tylko kod QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Zeskanuj fakturę BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Zeskanuj klucz prywatny portfela</string>
+  <string name="qr_activity_hint_pairing_code">Zeskanuj kod QR parowania internetowego</string>
+  <string name="qr_activity_hint_new_web_login">Zaloguj się do sieci</string>
 </resources>

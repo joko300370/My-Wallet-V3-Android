@@ -27,6 +27,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
@@ -78,13 +79,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val coincore: Coincore by scopedInject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
             analytics = get(),
-            onFundsItemClicked = { onFundsClicked(it) }
+            onFundsItemClicked = { onFundsClicked(it) },
+            coincore = coincore
         )
     }
 

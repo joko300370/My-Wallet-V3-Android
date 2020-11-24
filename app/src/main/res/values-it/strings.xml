@@ -2066,4 +2066,32 @@
   <string name="exchange_rate">Tasso di cambio</string>
   <string name="in_progress">In corso</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata. 
+
+ Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Dovresti sempre eseguire l\'accoppiamento o il login se hai accesso
+ al tuo ID Wallet e password. Il recupero dei tuoi fondi potrebbe creare un nuovo ID Wallet. Vorresti
+ piace continuare?
+</string>
+  <string name="received_dgld">Ricevuto Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Invia wDGLD all\'indirizzo Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Fai trading con wDGLD ora</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) in una versione tokenizzata ERC-20 di DGLD, che combina un token sostenuto dall\'oro con la potenza e la flessibilità di Ethereum.</string>
+  <string name="wdgld_available_card_cta">Fai trading con wDGLD adesso</string>
+  <string name="dgld_default_account_label">Il mio portafoglio DGLD avvolto</string>
+  <string name="swap_faster">Più veloce</string>
+  <string name="swap_trading_sheet_title">Più veloce. Più economico. Meglio
+ Scambia Crypto con il tuo portafoglio di trading.</string>
+  <string name="swap_trading_sheet_subtitle">Ottieni commissioni inferiori e raddoppia la velocità di transazione quando scambi la tua crittografia da qualsiasi Trading Wallet.</string>
+  <string name="swap_trading_fees_title">Stesso scambio, commissioni inferiori</string>
+  <string name="swap_trading_fees_subtitle">Paghi zero commissioni di rete scambiando criptovalute fuori catena</string>
+  <string name="swap_trading_speed_title">Scambia in pochi secondi</string>
+  <string name="swap_trading_speed_subtitle">Una maggiore velocità significa che il tuo scambio di scambio si cancella in pochi secondi, non minuti</string>
+  <string name="scan_qr">Scansiona un codice QR</string>
+  <string name="qr_activity_hint_any_asset">Scansiona un indirizzo CryptoCurrency o una fattura BitPay</string>
+  <string name="qr_activity_hint_asset_address">Assicurati di scansionare solo un codice QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Scansiona una fattura BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Scansiona una chiave privata del portafoglio</string>
+  <string name="qr_activity_hint_pairing_code">Scansiona un codice QR di accoppiamento web</string>
+  <string name="qr_activity_hint_new_web_login">Accedi al web</string>
 </resources>

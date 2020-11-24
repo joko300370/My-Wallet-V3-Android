@@ -16,9 +16,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.bank_details_error_layout.view.*
-import kotlinx.android.synthetic.main.link_bank_account_layout.view.*
-import kotlinx.android.synthetic.main.link_bank_account_layout.view.bank_deposit_instruction
-import kotlinx.android.synthetic.main.link_bank_account_layout.view.title
+import kotlinx.android.synthetic.main.dialog_sheet_link_bank_account.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_link_bank_account.view.title
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
@@ -46,7 +45,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
         arguments?.getBoolean(IS_FOR_LINK) ?: false
     }
 
-    override val layoutResource = R.layout.link_bank_account_layout
+    override val layoutResource = R.layout.dialog_sheet_link_bank_account
 
     override fun initControls(view: View) {
         compositeDisposable += custodialWalletManager.getBankAccountDetails(fiatCurrency)
