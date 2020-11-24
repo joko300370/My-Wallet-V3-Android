@@ -1,25 +1,24 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import piuk.blockchain.android.util.getColor
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.setCoinIcon
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
-import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
-import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.dashboard.CryptoAssetState
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import com.robinhood.spark.SparkAdapter
 import info.blockchain.balance.CryptoCurrency
-import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.cardLayout
+import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.dashboard.CryptoAssetState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
+import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.getColor
+import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
@@ -51,8 +50,11 @@ private class AssetCardViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    fun bind(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
         with(itemView) {
+            fiat_balance.contentDescription = "$FIAT_BALANCE_ID${state.currency.networkTicker}"
+            crypto_balance.contentDescription = "$CRYPTO_BALANCE_ID${state.currency.networkTicker}"
+
             icon.setCoinIcon(state.currency)
             currency.setText(state.currency.assetName())
         }
@@ -143,6 +145,11 @@ private class AssetCardViewHolder(
 
             error_msg.visible()
         }
+    }
+
+    companion object {
+        private const val FIAT_BALANCE_ID = "DashboardAssetFiatBalance_"
+        private const val CRYPTO_BALANCE_ID = "DashboardAssetCryptoBalance_"
     }
 }
 
