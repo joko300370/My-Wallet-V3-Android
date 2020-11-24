@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +41,19 @@ class WalletCredentialsMetadataUpdaterTest {
             Maybe.empty<WalletCredentialsMetadata>()
         )
 
-        subject.checkAndUpdate().test()
+        // This is nasty. I'd like a much better way of testing for chained subscriptions TODO
+        var subFlag = false
+        val updateResult = Completable.complete()
+            .doOnSubscribe { subFlag = true }
+
+        whenever(metadataRepository.saveMetadata(
+            WalletCredentialsMetadata(GUID_1, PASSWORD_1, KEY_1),
+            WalletCredentialsMetadata::class.java,
+            WalletCredentialsMetadata.WALLET_CREDENTIALS_METADATA_NODE
+        )).thenReturn(updateResult)
+
+        subject.checkAndUpdate()
+            .test()
 
         verify(payloadDataManager).guid
         verify(payloadDataManager).tempPassword
@@ -55,6 +68,9 @@ class WalletCredentialsMetadataUpdaterTest {
             WalletCredentialsMetadata::class.java,
             WalletCredentialsMetadata.WALLET_CREDENTIALS_METADATA_NODE
         )
+
+        assert(subFlag)
+
         verifyNoMoreInteractions(metadataRepository)
         verifyNoMoreInteractions(payloadDataManager)
     }
