@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import info.blockchain.balance.CryptoCurrency
@@ -33,6 +35,8 @@ class TransactionInteractor(
     private val coincore: Coincore,
     private val addressFactory: AddressFactory,
     private val custodialRepository: CustodialRepository,
+    private val custodialWalletManager: CustodialWalletManager,
+    private val currencyPrefs: CurrencyPrefs,
     private val eligibilityProvider: EligibilityProvider
 ) {
     private var transactionProcessor: TransactionProcessor? = null
@@ -85,31 +89,46 @@ class TransactionInteractor(
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
-        if (action != AssetAction.Swap && action != AssetAction.Sell)
-            coincore.getTransactionTargets(sourceAccount, action)
-        else
-            Singles.zip(
-                coincore.getTransactionTargets(sourceAccount, action),
-                if (action == AssetAction.Swap) custodialRepository.getSwapAvailablePairs()
-                else custodialRepository.getSellAvailablePairs(),
-                eligibilityProvider.isEligibleForSimpleBuy()
-            ).map { (accountList, currencyPairs, eligible) ->
-                if (action == AssetAction.Swap) {
-                    val pairs = currencyPairs.map { it as CurrencyPair.CryptoCurrencyPair }
-                    accountList.filterIsInstance(CryptoAccount::class.java)
-                        .filter { account ->
-                            pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
-                        }.filter { account ->
-                            eligible or (account is NonCustodialAccount)
-                        }
-                } else {
-                    val pairs = currencyPairs.map { it as CurrencyPair.CryptoToFiatCurrencyPair }
-                    accountList.filterIsInstance(FiatAccount::class.java)
-                        .filter { account ->
-                            pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
-                        }
-                }
+        Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, action),
+            action.apiPairs(),
+            eligibilityProvider.isEligibleForSimpleBuy()
+        ).map { (accountList, currencyPairs, eligible) ->
+            if (action == AssetAction.Swap) {
+                val pairs = currencyPairs.map { it as CurrencyPair.CryptoCurrencyPair }
+                accountList.filterIsInstance(CryptoAccount::class.java)
+                    .filter { account ->
+                        pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
+                    }.filter { account ->
+                        eligible or (account is NonCustodialAccount)
+                    }
+            } else {
+                val pairs = currencyPairs.map { it as CurrencyPair.CryptoToFiatCurrencyPair }
+                accountList.filterIsInstance(FiatAccount::class.java)
+                    .filter { account ->
+                        pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
+                    }
             }
+        }
+
+    private fun AssetAction.apiPairs(): Single<List<CurrencyPair>> =
+        when (this) {
+            AssetAction.Swap -> custodialRepository.getSwapAvailablePairs()
+                .map { it.map { pair -> pair as CurrencyPair } }
+            AssetAction.Sell -> kotlin.run {
+                val availableFiats =
+                    custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+                return@run custodialWalletManager.getSupportedBuySellCryptoCurrencies()
+                    .zipWith(availableFiats) { supportedPairs, fiats ->
+                        supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
+                            .map {
+                                CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
+                                    it.fiatCurrency) as CurrencyPair
+                            }
+                    }
+            }
+            else -> Single.just(emptyList())
+        }
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
