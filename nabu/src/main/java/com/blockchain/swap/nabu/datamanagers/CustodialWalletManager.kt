@@ -166,8 +166,13 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(direction: SwapDirection, quoteId: String, volume: Money, destinationAddress: String? = null):
-            Single<SwapOrder>
+    fun createSwapOrder(
+        direction: SwapDirection,
+        quoteId: String,
+        volume: Money,
+        destinationAddress: String? = null,
+        refundAddress: String? = null
+    ): Single<SwapOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
