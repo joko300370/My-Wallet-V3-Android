@@ -25,11 +25,6 @@ class CustodialRepository(pairsProvider: TradingPairsProvider, activityProvider:
     fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
         pairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
 
-    fun getSellAvailablePairs(): Single<List<CurrencyPair.CryptoToFiatCurrencyPair>> =
-        pairsCache.getCachedSingle().map {
-            it.filterIsInstance<CurrencyPair.CryptoToFiatCurrencyPair>()
-        }
-
     fun getSwapActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
