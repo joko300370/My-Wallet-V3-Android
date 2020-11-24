@@ -37,7 +37,7 @@ import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepositor
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
@@ -89,7 +89,7 @@ class LiveCustodialWalletManager(
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
     private val interestRepository: InterestRepository,
-    private val swapRepository: SwapRepository
+    private val custodialRepository: CustodialRepository
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -685,7 +685,7 @@ class LiveCustodialWalletManager(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
     ): Single<List<SwapTransactionItem>> =
-        swapRepository.getSwapActivityForAsset(cryptoCurrency, directions)
+        custodialRepository.getSwapActivityForAsset(cryptoCurrency, directions)
 
     override fun updateSwapOrder(id: String, success: Boolean): Completable =
         authenticator.authenticateCompletable { sessionToken ->
@@ -797,7 +797,7 @@ class LiveCustodialWalletManager(
 
     companion object {
 
-        private val SUPPORTED_FUNDS_CURRENCIES = listOf(
+        val SUPPORTED_FUNDS_CURRENCIES = listOf(
             "GBP", "EUR", "USD"
         )
     }

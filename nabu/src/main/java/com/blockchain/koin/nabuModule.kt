@@ -45,7 +45,7 @@ import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProvi
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProviderImpl
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
@@ -112,7 +112,7 @@ val nabuModule = module {
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
                 interestRepository = get(),
-                swapRepository = get()
+                custodialRepository = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -222,7 +222,7 @@ val nabuModule = module {
         }
 
         scoped {
-            SwapRepository(
+            CustodialRepository(
                 pairsProvider = get(),
                 activityProvider = get()
             )

@@ -2,8 +2,8 @@ package com.blockchain.swap.nabu.datamanagers.repositories.swap
 
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.swap.nabu.service.NabuService
-import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
 interface TradingPairsProvider {
@@ -20,17 +20,7 @@ class TradingPairsProviderImpl(
         response.mapNotNull { pair ->
             val parts = pair.split("-")
             if (parts.size != 2) return@mapNotNull null
-            val source = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return@mapNotNull null
-            val destination = CryptoCurrency.fromNetworkTicker(parts[1])
-            if (destination != null)
-                return@mapNotNull CurrencyPair.CryptoCurrencyPair(source, destination)
-            else
-                return@mapNotNull CurrencyPair.CryptoToFiatCurrencyPair(source, parts[1])
+            CurrencyPair.fromRawPair(pair, LiveCustodialWalletManager.SUPPORTED_FUNDS_CURRENCIES)
         }
-    }.map {
-        it.toMutableList().apply {
-            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.BTC, "EUR"))
-            add(CurrencyPair.CryptoToFiatCurrencyPair(CryptoCurrency.ETHER, "EUR"))
-        }.toList()
     }
 }

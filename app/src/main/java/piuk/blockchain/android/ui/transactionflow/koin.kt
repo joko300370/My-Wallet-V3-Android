@@ -114,7 +114,7 @@ val transactionModule = module {
             TransactionInteractor(
                 coincore = payloadScope.get(),
                 addressFactory = payloadScope.get(),
-                swapRepository = payloadScope.get(),
+                custodialRepository = payloadScope.get(),
                 eligibilityProvider = payloadScope.get()
             )
         }
