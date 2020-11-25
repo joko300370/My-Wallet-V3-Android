@@ -178,7 +178,7 @@ abstract class SwapEngineBase(
     protected fun createOrder(pendingTx: PendingTx): Single<CustodialOrder> =
         target.receiveAddress.zipWith(sourceAccount.receiveAddress.onErrorReturn { NullAddress })
             .flatMap { (destinationAddr, refAddress) ->
-                walletManager.createSwapOrder(
+                walletManager.createCustodialOrder(
                     direction = direction,
                     quoteId = quotesEngine.getLatestQuote().transferQuote.id,
                     volume = pendingTx.amount,
