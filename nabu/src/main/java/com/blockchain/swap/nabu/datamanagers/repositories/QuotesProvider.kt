@@ -9,9 +9,6 @@ import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.service.NabuService
-import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.Money
-import java.math.BigInteger
 import java.util.Date
 
 class QuotesProvider(

@@ -14,8 +14,6 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
