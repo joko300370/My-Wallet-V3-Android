@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -23,7 +23,7 @@ import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -62,10 +62,10 @@ abstract class CryptoAccountBase : CryptoAccount {
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
 
-    private fun custodialItemToSummary(item: CustodialTransactionItem): CustodialActivitySummaryItem {
+    private fun custodialItemToSummary(item: TradeTransactionItem): TradeActivitySummaryItem {
         val sendingAccount = this
         return with(item) {
-            CustodialActivitySummaryItem(
+            TradeActivitySummaryItem(
                 exchangeRates = exchangeRates,
                 txId = normaliseTxId(txId),
                 timeStampMs = timeStampMs,
@@ -102,7 +102,7 @@ abstract class CryptoAccountBase : CryptoAccount {
         }
 
     protected abstract fun reconcileSwaps(
-        custodialItems: List<CustodialActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem>
 }
@@ -150,7 +150,7 @@ internal class CryptoExchangeAccount(
     // No activity on exchange accounts, so just return the activity list
     // unmodified - they should both be empty anyway
     override fun reconcileSwaps(
-        custodialItems: List<CustodialActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> = activity
 }
@@ -195,11 +195,11 @@ abstract class CryptoNonCustodialAccount(
         get() = false
 
     override fun reconcileSwaps(
-        custodialItems: List<CustodialActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> {
         val activityList = activity.toMutableList()
-        custodialItems.forEach { custodialItem ->
+        tradeItems.forEach { custodialItem ->
             val hit = activityList.find {
                 it.txId.contains(custodialItem.txId, true)
             } as? NonCustodialActivitySummaryItem

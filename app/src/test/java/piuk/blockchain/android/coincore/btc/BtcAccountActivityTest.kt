@@ -7,7 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -21,7 +21,7 @@ import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -86,7 +86,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -142,7 +142,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -173,7 +173,7 @@ class BtcAccountActivityTest {
                 val swapItem = it[0]
 
                 it.size == 1 &&
-                        swapItem is CustodialActivitySummaryItem &&
+                        swapItem is TradeActivitySummaryItem &&
                         swapItem.txId == swapSummary.txId &&
                         swapItem.direction == swapSummary.direction &&
                         swapItem.currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC,
@@ -204,7 +204,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,

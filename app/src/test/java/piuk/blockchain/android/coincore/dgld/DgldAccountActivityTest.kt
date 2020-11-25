@@ -7,7 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -79,7 +79,7 @@ class DgldAccountActivityTest {
             timestamp = 1557334297
         )
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "123",
             1L,
             TransferDirection.ON_CHAIN,

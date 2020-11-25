@@ -11,7 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -84,7 +84,7 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -155,7 +155,7 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -226,7 +226,7 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -256,7 +256,7 @@ class XlmAccountActivityTest {
             .assertValueAt(0) {
                 val swapItem = it[0]
                 it.size == 1 &&
-                        swapItem is CustodialActivitySummaryItem &&
+                        swapItem is TradeActivitySummaryItem &&
                         swapItem.txId == swapSummary.txId &&
                         swapItem.direction == swapSummary.direction &&
                         swapItem.currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM,

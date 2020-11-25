@@ -24,7 +24,7 @@ import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
@@ -126,7 +126,7 @@ class ActivityDetailsInteractor(
     }
 
     fun loadSwapItems(
-        item: CustodialActivitySummaryItem
+        item: TradeActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
         val list = mutableListOf(
             TransactionId(item.txId),
@@ -149,7 +149,7 @@ class ActivityDetailsInteractor(
         }
     }
 
-    private fun buildReceivingLabel(item: CustodialActivitySummaryItem): Single<To> {
+    private fun buildReceivingLabel(item: TradeActivitySummaryItem): Single<To> {
         val cryptoPair = item.currencyPair as? CurrencyPair.CryptoCurrencyPair
             ?: throw IllegalStateException("Receive label is only supported for swap summary items")
         return when (item.direction) {
@@ -203,7 +203,7 @@ class ActivityDetailsInteractor(
     fun getSwapActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
-    ): CustodialActivitySummaryItem? =
+    ): TradeActivitySummaryItem? =
         assetActivityRepository.findCachedSwapItem(cryptoCurrency, txHash)
 
     fun getFiatActivityDetails(

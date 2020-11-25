@@ -11,7 +11,7 @@ import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
@@ -25,7 +25,7 @@ class SellActivityItemDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        (items[position] as? CustodialActivitySummaryItem)?.let {
+        (items[position] as? TradeActivitySummaryItem)?.let {
             it.currencyPair is CurrencyPair.CryptoToFiatCurrencyPair
         } ?: false
 
@@ -37,7 +37,7 @@ class SellActivityItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as SellActivityItemViewHolder).bind(
-        items[position] as CustodialActivitySummaryItem,
+        items[position] as TradeActivitySummaryItem,
         onItemClicked
     )
 }
@@ -47,7 +47,7 @@ private class SellActivityItemViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(
-        tx: CustodialActivitySummaryItem,
+        tx: TradeActivitySummaryItem,
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {

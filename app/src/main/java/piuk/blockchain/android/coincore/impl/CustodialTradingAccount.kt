@@ -23,7 +23,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
@@ -175,7 +175,7 @@ open class CustodialTradingAccount(
                 paymentMethodType = order.paymentMethodType
             )
         } else {
-            CustodialActivitySummaryItem(
+            TradeActivitySummaryItem(
                 exchangeRates = exchangeRates,
                 txId = order.id,
                 timeStampMs = order.created.time,
@@ -200,7 +200,7 @@ open class CustodialTradingAccount(
         return flattenAsObservable { list ->
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)) or
-                        (it is CustodialActivitySummaryItem && displayedStates.contains(it.state))
+                        (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
             }
         }.toList()
     }
@@ -208,9 +208,9 @@ open class CustodialTradingAccount(
     // No need to reconcile sends and swaps in custodial accounts, the BE deals with this
     // Return a list containing both supplied list
     override fun reconcileSwaps(
-        custodialItems: List<CustodialActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
-    ): List<ActivitySummaryItem> = activity + custodialItems
+    ): List<ActivitySummaryItem> = activity + tradeItems
 
     companion object {
         private val displayedStates = setOf(

@@ -7,7 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -24,7 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -86,7 +86,7 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "hash",
             1L,
             TransferDirection.ON_CHAIN,
@@ -114,7 +114,7 @@ class EthAccountActivityTest {
             .assertValue {
                 it.size == 1 &&
                         it[0].run {
-                            this is CustodialActivitySummaryItem &&
+                            this is TradeActivitySummaryItem &&
                                     txId == swapSummary.txId &&
                                     direction == swapSummary.direction &&
                                     currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER,
@@ -152,7 +152,7 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        val swapSummary = CustodialTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "123",
             1L,
             TransferDirection.ON_CHAIN,

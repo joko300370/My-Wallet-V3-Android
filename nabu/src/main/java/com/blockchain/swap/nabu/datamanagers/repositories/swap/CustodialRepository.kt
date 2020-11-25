@@ -28,7 +28,7 @@ class CustodialRepository(pairsProvider: TradingPairsProvider, activityProvider:
     fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<CustodialTransactionItem>> =
+    ): Single<List<TradeTransactionItem>> =
         swapActivityCache.getCachedSingle().map { list ->
             list.filter {
                 when (it.currencyPair) {

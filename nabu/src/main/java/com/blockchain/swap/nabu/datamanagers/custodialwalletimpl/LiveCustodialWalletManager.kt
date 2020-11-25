@@ -38,7 +38,7 @@ import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -686,7 +686,7 @@ class LiveCustodialWalletManager(
     override fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<CustodialTransactionItem>> =
+    ): Single<List<TradeTransactionItem>> =
         custodialRepository.getCustodialActivityForAsset(cryptoCurrency, directions)
 
     override fun updateOrder(id: String, success: Boolean): Completable =

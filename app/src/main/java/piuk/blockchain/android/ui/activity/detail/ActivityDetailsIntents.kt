@@ -7,7 +7,7 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import java.util.Date
@@ -89,7 +89,7 @@ class LoadCustodialInterestHeaderDataIntent(
 }
 
 class LoadSwapHeaderDataIntent(
-    private val summaryItem: CustodialActivitySummaryItem
+    private val summaryItem: TradeActivitySummaryItem
 ) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState.copy(

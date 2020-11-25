@@ -6,7 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -191,7 +191,7 @@ interface CustodialWalletManager {
     fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<CustodialTransactionItem>>
+    ): Single<List<TradeTransactionItem>>
 
     fun updateOrder(
         id: String,

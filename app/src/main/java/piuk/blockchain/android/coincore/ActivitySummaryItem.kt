@@ -68,7 +68,7 @@ abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
     abstract val account: SingleAccount
 }
 
-data class CustodialActivitySummaryItem(
+data class TradeActivitySummaryItem(
     override val exchangeRates: ExchangeRateDataManager,
     override val txId: String,
     override val timeStampMs: Long,

@@ -15,7 +15,7 @@ import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 interface SwapActivityProvider {
-    fun getSwapActivity(): Single<List<CustodialTransactionItem>>
+    fun getSwapActivity(): Single<List<TradeTransactionItem>>
 }
 
 class SwapActivityProviderImpl(
@@ -24,7 +24,7 @@ class SwapActivityProviderImpl(
     private val currencyPrefs: CurrencyPrefs,
     private val exchangeRates: ExchangeRateDataManager
 ) : SwapActivityProvider {
-    override fun getSwapActivity(): Single<List<CustodialTransactionItem>> =
+    override fun getSwapActivity(): Single<List<TradeTransactionItem>> =
         authenticator.authenticate { sessionToken ->
             nabuService.fetchSwapActivity(sessionToken)
         }.map { response ->
@@ -33,7 +33,7 @@ class SwapActivityProviderImpl(
 
                 val apiFiat = FiatValue.fromMinor(it.fiatCurrency, it.fiatValue.toLong())
                 val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-                CustodialTransactionItem(
+                TradeTransactionItem(
                     txId = it.kind.depositTxHash ?: it.id,
                     timeStampMs = it.createdAt.fromIso8601ToUtc()?.time
                         ?: throw java.lang.IllegalStateException("Missing timestamp or bad formatting"),
@@ -63,7 +63,7 @@ class SwapActivityProviderImpl(
         }
 }
 
-data class CustodialTransactionItem(
+data class TradeTransactionItem(
     val txId: String,
     val timeStampMs: Long,
     val direction: TransferDirection,
