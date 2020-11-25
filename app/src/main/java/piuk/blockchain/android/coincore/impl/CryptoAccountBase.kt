@@ -97,8 +97,8 @@ abstract class CryptoAccountBase : CryptoAccount {
             swapItems.map {
                 custodialItemToSummary(it)
             }
-        }.map { costodialItemsActivity ->
-            reconcileSwaps(costodialItemsActivity, activityList)
+        }.map { custodialItemsActivity ->
+            reconcileSwaps(custodialItemsActivity, activityList)
         }
 
     protected abstract fun reconcileSwaps(
