@@ -78,7 +78,8 @@ class CreateOrderRequest(
     private val direction: String,
     private val quoteId: String,
     private val volume: String,
-    private val destinationAddress: String? = null
+    private val destinationAddress: String? = null,
+    private val refundAddress: String? = null
 )
 
 class UpdateSwapOrderBody(

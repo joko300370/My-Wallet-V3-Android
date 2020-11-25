@@ -14,7 +14,11 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
@@ -174,19 +178,24 @@ abstract class SwapEngineBase(
     }
 
     protected fun createOrder(pendingTx: PendingTx): Single<CustodialOrder> =
-        target.receiveAddress.flatMap {
-            walletManager.createCustodialOrder(
-                direction = direction,
-                quoteId = quotesEngine.getLatestQuote().transferQuote.id,
-                volume = pendingTx.amount,
-                destinationAddress = if (direction.requiresDestinationAddress()) it.address else null
-            )
-        }.doFinally {
-            disposeQuotesFetching(pendingTx)
-        }
+        target.receiveAddress.zipWith(sourceAccount.receiveAddress.onErrorReturn { NullAddress })
+            .flatMap { (destinationAddr, refAddress) ->
+                walletManager.createSwapOrder(
+                    direction = direction,
+                    quoteId = quotesEngine.getLatestQuote().transferQuote.id,
+                    volume = pendingTx.amount,
+                    destinationAddress = if (direction.requiresDestinationAddress()) destinationAddr.address else null,
+                    refundAddress = if (direction.requireRefundAddress()) refAddress.address else null
+                )
+            }.doFinally {
+                disposeQuotesFetching(pendingTx)
+            }
 
     private fun TransferDirection.requiresDestinationAddress() =
         this == TransferDirection.ON_CHAIN || this == TransferDirection.TO_USERKEY
+
+    private fun TransferDirection.requireRefundAddress() =
+        this == TransferDirection.ON_CHAIN || this == TransferDirection.FROM_USERKEY
 
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money, staticFee: Money): Money =
         CryptoValue.fromMajor(

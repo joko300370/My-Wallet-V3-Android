@@ -44,7 +44,7 @@ class SwapActivityProviderImpl(
                     it.state.toSwapState(),
                     CryptoValue.fromMinor(sendingAsset, it.priceFunnel.inputMoney.toBigInteger()),
                     CryptoValue.fromMinor(receivingAsset, it.priceFunnel.outputMoney.toBigInteger()),
-                    getFeeForAsset(receivingAsset, it.priceFunnel.networkFee),
+                    CryptoValue.fromMinor(receivingAsset, it.priceFunnel.networkFee.toBigInteger()),
                     sendingAsset,
                     receivingAsset,
                     localFiat,
@@ -54,15 +54,6 @@ class SwapActivityProviderImpl(
                 it.state.displayableState
             }
         }
-
-    private fun getFeeForAsset(receivingAsset: CryptoCurrency, networkFee: String): CryptoValue =
-        CryptoValue.fromMinor(
-            if (receivingAsset.hasFeature(CryptoCurrency.IS_ERC20)) {
-                CryptoCurrency.ETHER
-            } else {
-                receivingAsset
-            }, networkFee.toBigInteger()
-        )
 
     private fun String.mapToDirection(): TransferDirection =
         when (this) {

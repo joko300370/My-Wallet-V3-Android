@@ -646,7 +646,8 @@ class LiveCustodialWalletManager(
         direction: TransferDirection,
         quoteId: String,
         volume: Money,
-        destinationAddress: String?
+        destinationAddress: String?,
+        refundAddress: String?
     ): Single<CustodialOrder> =
         authenticator.authenticate { sessionToken ->
             nabuService.createSwapOrder(
@@ -655,7 +656,8 @@ class LiveCustodialWalletManager(
                     direction = direction.toString(),
                     quoteId = quoteId,
                     volume = volume.toBigInteger().toString(),
-                    destinationAddress = destinationAddress
+                    destinationAddress = destinationAddress,
+                    refundAddress = refundAddress
                 )
             ).map {
                 it.toCustodialOrder() ?: throw IllegalStateException("Invalid order created")

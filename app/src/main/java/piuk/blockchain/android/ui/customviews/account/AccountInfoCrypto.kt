@@ -135,6 +135,9 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
         container.alpha = 1f
         compositeDisposable += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                setOnClickListener { }
+            }
             .subscribeBy(
                 onSuccess = { isEnabled ->
                     if (isEnabled) {

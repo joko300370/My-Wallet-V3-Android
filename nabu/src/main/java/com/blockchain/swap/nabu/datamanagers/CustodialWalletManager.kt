@@ -171,7 +171,8 @@ interface CustodialWalletManager {
         direction: TransferDirection,
         quoteId: String,
         volume: Money,
-        destinationAddress: String? = null
+        destinationAddress: String? = null,
+        refundAddress: String? = null
     ): Single<CustodialOrder>
 
     fun createPendingDeposit(
