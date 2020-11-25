@@ -1,10 +1,10 @@
-package piuk.blockchain.androidcoreui.utils
+package piuk.blockchain.android.ui.customviews.dialogs
 
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MotionEvent
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.R
 
 @Deprecated("This is now built into the secure activity base class")
 class OverlayDetection constructor(private val prefs: PersistentPrefs) {

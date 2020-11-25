@@ -17,12 +17,12 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.balance.CryptoCurrency
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityAccountEditBinding
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus

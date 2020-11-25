@@ -32,8 +32,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.*
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.ViewUtils

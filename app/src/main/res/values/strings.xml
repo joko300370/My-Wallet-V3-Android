@@ -817,8 +817,6 @@
     <string name="eth_second_password_prompt">To use this service, we require you to enter your
         second password.
     </string>
-    <string name="ether">Ether</string>
-    <string name="bitcoin">Bitcoin</string>
 
     <!-- PAX/ERC 20 -->
     <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>

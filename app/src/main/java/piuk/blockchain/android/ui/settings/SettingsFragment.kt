@@ -38,7 +38,6 @@ import com.blockchain.notifications.analytics.linkBankEventWithCurrency
 import com.blockchain.swap.nabu.datamanagers.LinkedBank
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.mukesh.countrypicker.fragments.CountryPicker
@@ -60,6 +59,7 @@ import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage

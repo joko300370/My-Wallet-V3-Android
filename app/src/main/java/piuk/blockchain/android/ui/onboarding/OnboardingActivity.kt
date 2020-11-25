@@ -6,10 +6,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import com.blockchain.ui.dialog.MaterialProgressDialog
 
 internal class OnboardingActivity : BaseMvpActivity<OnboardingView, OnboardingPresenter>(),
     OnboardingView,

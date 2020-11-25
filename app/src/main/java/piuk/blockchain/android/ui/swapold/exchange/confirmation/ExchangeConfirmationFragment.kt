@@ -36,13 +36,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_homebrew_trade_confirmation.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.swapold.exchange.detail.HomebrewTradeDetailActivity
 import piuk.blockchain.android.ui.swapold.exchange.model.SwapErrorDialogContent
 import piuk.blockchain.android.ui.swapold.exchange.model.Trade
 import piuk.blockchain.android.ui.swapold.ui.SwapErrorBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.toast

@@ -3,13 +3,13 @@ package piuk.blockchain.android.ui.swapold.exchange.history
 import androidx.annotation.VisibleForTesting
 import com.blockchain.swap.common.trade.MorphTrade
 import com.blockchain.swap.common.trade.MorphTradeDataHistoryList
-import piuk.blockchain.android.ui.swapold.exchange.model.Trade
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.ui.swapold.exchange.model.Trade
+import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.utils.DateUtil
 import timber.log.Timber
 
 class TradeHistoryPresenter(
