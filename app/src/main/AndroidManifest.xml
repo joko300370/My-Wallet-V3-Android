@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -17,6 +18,7 @@
         android:backupAgent="piuk.blockchain.androidcore.utils.CloudBackupAgent"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
@@ -63,16 +65,18 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.transfer.receive.activity.ReceiveActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
         <activity
             android:name=".ui.home.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.MainActivity"
             android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="piuk.blockchain.android.ui.scan.QrScanActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -163,7 +167,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="piuk.blockchain.android.withdraw.WithdrawActivity"
+            android:name=".withdraw.WithdrawActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -181,7 +185,6 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/notification_tint" />
@@ -189,10 +192,20 @@
              Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message.
         -->
+
+        <meta-data
+            android:name="com.sec.android.support.multiwindow"
+            android:value="false" />
+        <meta-data
+            android:name="com.samsung.android.sdk.multiwindow.multiinstance.enable"
+            android:value="false" />
+        <meta-data
+            android:name="com.samsung.android.sdk.multiwindow.penwindow.enable"
+            android:value="false" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="${BACKUP_API_KEY}" />

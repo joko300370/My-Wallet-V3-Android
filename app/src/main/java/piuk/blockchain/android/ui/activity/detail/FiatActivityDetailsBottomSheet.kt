@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.swap.nabu.datamanagers.TransactionState
 import com.blockchain.swap.nabu.datamanagers.TransactionType
-import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_activity_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -33,7 +33,7 @@ class FiatActivityDetailsBottomSheet :
     }
 
     override val layoutResource: Int
-        get() = R.layout.dialog_activity_details_sheet
+        get() = R.layout.dialog_sheet_activity_details
 
     override fun initControls(view: View) {
         with(view) {

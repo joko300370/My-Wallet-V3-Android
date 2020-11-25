@@ -71,6 +71,7 @@ class CoinsWebSocketStrategyTest {
         on { getString(R.string.received_ethereum) } `it returns` "Received Ether"
         on { getString(R.string.received_usd_pax_1) } `it returns` "Received USD Digital"
         on { getString(R.string.received_usdt) } `it returns` "Received Tether"
+        on { getString(R.string.received_dgld) } `it returns` "Received Wrapped-DGLD"
         on { getString(R.string.common_from) } `it returns` "From"
     }
 
@@ -79,6 +80,10 @@ class CoinsWebSocketStrategyTest {
     }
 
     private val usdtAccount: Erc20Account = mock {
+        on { fetchAddressCompletable() } `it returns` Completable.complete()
+    }
+
+    private val dgldAccount: Erc20Account = mock {
         on { fetchAddressCompletable() } `it returns` Completable.complete()
     }
 
@@ -119,6 +124,7 @@ class CoinsWebSocketStrategyTest {
         gson = Gson(),
         paxAccount = paxAccount,
         usdtAccount = usdtAccount,
+        dgldAccount = dgldAccount,
         bchDataManager = bchDataManager,
         payloadDataManager = payloadDataManager,
         accessState = mock(),

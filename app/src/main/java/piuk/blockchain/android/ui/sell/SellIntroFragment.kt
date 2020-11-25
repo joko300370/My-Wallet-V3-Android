@@ -32,6 +32,7 @@ import kotlinx.android.synthetic.main.sell_intro_fragment.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -40,6 +41,7 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcoreui.utils.extensions.gone
@@ -167,7 +169,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             description = getString(R.string.sell_crypto_subtitle),
             icon = R.drawable.ic_cart,
             secondaryButton = ButtonOptions(false) {},
-            primaryButton = ButtonOptions(true) {},
+            primaryButton = ButtonOptions(true) {
+                (activity as? HomeNavigator)?.launchKyc(CampaignType.SimpleBuy)
+            },
             showSheetIndicator = false
         )
     }
@@ -239,7 +243,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             action = AssetAction.Sell
         ).apply {
             startFlow(
-                fragmentManager = childFragmentManager,
+                fragmentManager = fragmentManager ?: return,
                 host = this@SellIntroFragment
             )
         }
@@ -253,6 +257,11 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
                     .map { it.cryptoCurrency }
             }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        compositeDisposable.clear()
     }
 
     companion object {

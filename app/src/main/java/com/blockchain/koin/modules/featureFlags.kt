@@ -3,6 +3,7 @@ package com.blockchain.koin.modules
 import com.blockchain.koin.cardPaymentsFeatureFlag
 import com.blockchain.koin.coinifyFeatureFlag
 import com.blockchain.koin.coinifyUsersToKyc
+import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pitAnnouncementFeatureFlag
@@ -63,5 +64,9 @@ val featureFlagsModule = module {
 
     factory(newSwapFeatureFlag) {
         get<RemoteConfig>().featureFlag("new_swap_enabled")
+    }
+
+    factory(dgldFeatureFlag) {
+        get<RemoteConfig>().featureFlag("wdgld_enabled")
     }
 }

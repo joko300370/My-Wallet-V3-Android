@@ -17,7 +17,6 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
-import com.google.zxing.BarcodeFormat
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
 import io.reactivex.disposables.CompositeDisposable
@@ -29,14 +28,14 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
 import piuk.blockchain.android.ui.account.adapter.AccountAdapter
 import piuk.blockchain.android.ui.account.adapter.AccountHeadersListener
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.ui.zxing.Intents
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -47,7 +46,6 @@ import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
-import java.util.EnumSet
 import java.util.Locale
 
 class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
@@ -120,22 +118,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
         return super.dispatchTouchEvent(ev)
     }
 
-    override fun startScanForResult() {
-        Intent(this, CaptureActivity::class.java).apply {
-            putExtra(Intents.Scan.FORMATS, EnumSet.allOf(BarcodeFormat::class.java))
-            putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE)
-        }.run { startActivityForResult(this, IMPORT_PRIVATE_REQUEST_CODE) }
-    }
-
     override fun onCreateNewClicked() {
         createNewAccount()
-    }
-
-    override fun onImportAddressClicked() {
-        QrScanHandler.requestScanPermissions(
-            activity = this,
-            rootView = linear_layout_root
-        ) { onScanButtonClicked() }
     }
 
     override fun onAccountClicked(cryptoCurrency: CryptoCurrency, correctedPosition: Int) {
@@ -159,17 +143,21 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
             position
         }
 
-    private fun onScanButtonClicked() {
+    override fun onImportAddressClicked() {
         secondPasswordHandler.validate(object : SecondPasswordHandler.ResultListener {
             override fun onNoSecondPassword() {
-                presenter.onScanButtonClicked()
+                showScanActivity()
             }
 
             override fun onSecondPasswordValidated(validatedSecondPassword: String) {
                 presenter.doubleEncryptionPassword = validatedSecondPassword
-                presenter.onScanButtonClicked()
+                showScanActivity()
             }
         })
+    }
+
+    private fun showScanActivity() {
+        QrScanActivity.start(this, QrExpected.IMPORT_KEYS_QR)
     }
 
     private fun createNewAccount() {
@@ -234,12 +222,10 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == AppCompatActivity.RESULT_OK &&
-            requestCode == IMPORT_PRIVATE_REQUEST_CODE &&
-            data != null && data.getStringExtra(CaptureActivity.SCAN_RESULT) != null
+        if (resultCode == AppCompatActivity.RESULT_OK && requestCode == QrScanActivity.SCAN_URI_RESULT &&
+            data.getRawScanData() != null
         ) {
-
-            val strResult = data.getStringExtra(CaptureActivity.SCAN_RESULT)
+            val strResult = data.getRawScanData()
             presenter.onAddressScanned(strResult)
             setResult(resultCode)
         } else if (resultCode == AppCompatActivity.RESULT_OK && requestCode == EDIT_ACTIVITY_REQUEST_CODE) {
@@ -267,9 +253,8 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
             .show()
     }
 
-    override fun showWatchOnlyWarningDialog(address: String) {
+    override fun showWatchOnlyUnsupportedMsg() {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
-            .setTitle(R.string.warning)
             .setCancelable(false)
             .setMessage(getString(R.string.watch_only_not_supported))
             .setPositiveButton(R.string.ok_cap, null)
@@ -370,8 +355,6 @@ class AccountActivity : BaseMvpActivity<AccountView, AccountPresenter>(),
     override fun getView() = this
 
     companion object {
-
-        private const val IMPORT_PRIVATE_REQUEST_CODE = 2006
         private const val EDIT_ACTIVITY_REQUEST_CODE = 2007
     }
 }

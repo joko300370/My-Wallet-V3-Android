@@ -12,9 +12,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -27,6 +29,7 @@ class AccountInfoFiat @JvmOverloads constructor(
 
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
 
     init {
         LayoutInflater.from(context)
@@ -36,12 +39,17 @@ class AccountInfoFiat @JvmOverloads constructor(
     var account: FiatAccount? = null
         private set
 
-    fun updateAccount(account: FiatAccount, disposables: CompositeDisposable) {
+    fun updateAccount(account: FiatAccount, cellDecorator: CellDecorator, onAccountClicked: (FiatAccount) -> Unit) {
+        compositeDisposable.clear()
         this.account = account
-        updateView(account, disposables)
+        updateView(account, cellDecorator, onAccountClicked)
     }
 
-    private fun updateView(account: FiatAccount, disposables: CompositeDisposable) {
+    private fun updateView(
+        account: FiatAccount,
+        cellDecorator: CellDecorator,
+        onAccountClicked: (FiatAccount) -> Unit
+    ) {
 
         val userFiat = currencyPrefs.selectedFiatCurrency
 
@@ -49,7 +57,7 @@ class AccountInfoFiat @JvmOverloads constructor(
         icon.setIcon(account.fiatCurrency)
         asset_subtitle.text = account.fiatCurrency
 
-        disposables += account.accountBalance
+        compositeDisposable += account.accountBalance
             .flatMap { balanceInAccountCurrency ->
                 if (userFiat == account.fiatCurrency)
                     Single.just(balanceInAccountCurrency to balanceInAccountCurrency)
@@ -68,5 +76,23 @@ class AccountInfoFiat @JvmOverloads constructor(
                     wallet_balance_exchange_fiat.text = balanceInAccountCurrency.toStringWithSymbol()
                 }
             }
-        }
+
+        setOnClickListener { }
+        compositeDisposable += cellDecorator.isEnabled()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { isEnabled ->
+                if (isEnabled) {
+                    setOnClickListener { onAccountClicked(account) }
+                    fiat_container.alpha = 1f
+                } else {
+                    fiat_container.alpha = .6f
+                    setOnClickListener { }
+                }
+            }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        compositeDisposable.clear()
+    }
 }

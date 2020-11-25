@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.view.View
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.accounts.CellDecorator
@@ -35,7 +35,7 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
         SwapAccountSelectSheetFeeDecorator(account)
 
     override val layoutResource: Int
-        get() = R.layout.dialog_account_selector_sheet
+        get() = R.layout.dialog_sheet_account_selector
 
     override fun initControls(view: View) {
         view.apply {

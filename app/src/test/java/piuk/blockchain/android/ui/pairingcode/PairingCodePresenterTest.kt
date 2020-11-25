@@ -17,7 +17,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager

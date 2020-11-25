@@ -23,6 +23,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="60dp"
+        tools:visibility="visible"
         android:background="@drawable/bkgd_grey_100_rounded">
 
         <ImageView

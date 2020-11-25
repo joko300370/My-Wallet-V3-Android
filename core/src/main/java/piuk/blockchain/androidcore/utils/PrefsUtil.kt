@@ -233,6 +233,11 @@ class PrefsUtil(
 
     override fun setSeenSwapPromo() = setValue(SWAP_KYC_PROMO, true)
 
+    override val hasSeenTradingSwapPromo: Boolean
+        get() = getValue(SWAP_TRADING_PROMO, false)
+
+    override fun setSeenTradingSwapPromo() = setValue(SWAP_TRADING_PROMO, true)
+
     override val resendSmsRetries: Int
         get() = getValue(TWO_FA_SMS_RETRIES, MAX_ALLOWED_RETRIES)
 
@@ -449,6 +454,7 @@ class PrefsUtil(
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
         private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
         private const val SWAP_KYC_PROMO = "SWAP_KYC_PROMO"
+        private const val SWAP_TRADING_PROMO = "SWAP_TRADING_PROMO"
         private const val TWO_FA_SMS_RETRIES = "TWO_FA_SMS_RETRIES"
         private const val IS_NEW_USER = "IS_NEW_USER"
         private const val MAX_ALLOWED_RETRIES = 3

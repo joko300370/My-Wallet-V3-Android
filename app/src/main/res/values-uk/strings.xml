@@ -432,15 +432,6 @@
   <string name="settings_field_cant_be_empty">Поле не може бути порожнім.</string>
   <string name="settings_error_updating">Помилка оновлення налаштувань. Повторіть спробу</string>
   <string name="request_camera_permission">Потрібен доступ до камери.</string>
-  <string name="request_camera_permission_title">Доступ до камери</string>
-  <string name="request_location_permission">Потрібен доступ до місцезнаходження.</string>
-  <string name="request_write_storage_permission">Потрібно записати зовнішнє сховище.</string>
-  <string name="request_write_and_camera_storage_permission_description">Пишіть зовнішнє сховище 
- та камера потрібна для завантаження документів KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Напишіть сховище та камеру 
- дозволи 
-</string>
   <string name="not_specified">не визначено</string>
   <string name="update_failed">Не вдалося оновити.</string>
   <string name="verify_mobile">Підтвердити мобільний телефон</string>
@@ -1842,7 +1833,7 @@
   <string name="send_enter_unexpected_error">Виникла несподівана помилка. Будь ласка спробуйте ще раз.</string>
   <string name="send_enter_insufficient_gas">У вас недостатньо ETH для обробки цієї транзакції.</string>
   <string name="send_select_a_wallet_title">або Виберіть гаманець</string>
-  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %1$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
+  <string name="send_internal_transfer_message">Наразі ви можете перенести лише %1$s зі свого торгового гаманця %2$s у ваші гаманці Vault. Як тільки %1$s знаходиться у вашому гаманці Vault, ви можете перенести його на зовнішні адреси.</string>
   <string name="purchase_funds_note">Ваша остаточна сума може змінитися через ринкову активність.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Докладніше. </annotation>
@@ -2081,4 +2072,32 @@
   <string name="exchange_rate">Обмінний курс</string>
   <string name="in_progress">В процесі</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">З міркувань безпеки для перших покупок на картці передбачається %1$s денний термін зберігання, перш ніж ви зможете надіслати або вивести придбану криптовалюту. Ми повідомимо вас, коли затримання буде знято. 
+
+ Тим часом ви можете продавати готівкою, обмінюватися та торгувати на Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Ви завжди повинні створювати пари або входити, якщо у вас є доступ
+ на ваш ідентифікатор гаманця та пароль. Повернення коштів може створити новий ідентифікатор гаманця. Міг би ти
+ хотіли б продовжувати?
+</string>
+  <string name="received_dgld">Отримано загорнуте DGLD</string>
+  <string name="email_request_body_dgld">Будь ласка, надішліть wDGLD на адресу Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Торгуйте wDGLD зараз</string>
+  <string name="wdgld_available_card_body">Обгорнуте цифрове золото (wDGLD) в токенизованій версії DGLD, що поєднує ERC-20, поєднуючи токен із підтримкою золота з потужністю та гнучкістю Ethereum.</string>
+  <string name="wdgld_available_card_cta">Торгуйте wDGLD зараз</string>
+  <string name="dgld_default_account_label">Мій гаманець із загорнутим DGLD</string>
+  <string name="swap_faster">Швидше</string>
+  <string name="swap_trading_sheet_title">Швидше. Дешевше. Краще
+ Поміняйте криптовалюту на свій торговий гаманець.</string>
+  <string name="swap_trading_sheet_subtitle">Отримайте нижчі комісії та подвойте швидкість транзакції, коли заміните свою криптовалюту з будь-якого торгового гаманця.</string>
+  <string name="swap_trading_fees_title">Той самий своп, нижча плата</string>
+  <string name="swap_trading_fees_subtitle">Ви платите нульову комісію за мережу, помінявши криптовалюту поза мережею</string>
+  <string name="swap_trading_speed_title">Поміняти місцями за секунди</string>
+  <string name="swap_trading_speed_subtitle">Збільшена швидкість означає, що ваша торгівля свопом очищається за секунди, а не за хвилини</string>
+  <string name="scan_qr">Відскануйте QR-код</string>
+  <string name="qr_activity_hint_any_asset">Відскануйте адресу CryptoCurrency або рахунок-фактуру BitPay</string>
+  <string name="qr_activity_hint_asset_address">Обов’язково скануйте лише QR-код %1$s</string>
+  <string name="qr_activity_hint_bitpay">Відскануйте рахунок-фактуру BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Відскануйте приватний ключ гаманця</string>
+  <string name="qr_activity_hint_pairing_code">Відскануйте QR-код веб-сполучення</string>
+  <string name="qr_activity_hint_new_web_login">Увійдіть в Інтернет</string>
 </resources>

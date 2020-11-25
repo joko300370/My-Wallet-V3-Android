@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.home
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
+import com.blockchain.extensions.exhaustive
 import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
@@ -32,7 +33,7 @@ import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.kyc.KycLinkState
 import piuk.blockchain.android.scan.QrScanError
-import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
@@ -79,6 +80,7 @@ class MainPresenter internal constructor(
     private val credentialsWiper: CredentialsWiper,
     private val payloadDataManager: PayloadDataManager,
     private val exchangeRateFactory: ExchangeRateDataManager,
+    private val qrProcessor: QrScanResultProcessor,
     private val environmentSettings: EnvironmentConfig,
     private val kycStatusHelper: KycStatusHelper,
     private val lockboxDataManager: LockboxDataManager,
@@ -375,7 +377,7 @@ class MainPresenter internal constructor(
     }
 
     fun processScanResult(scanData: String) {
-        compositeDisposable += QrScanHandler.processScan(scanData)
+        compositeDisposable += qrProcessor.processScan(scanData)
             .subscribeBy(
                 onSuccess = {
                     when (it) {
@@ -383,7 +385,8 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
-                    }
+                        is ScanResult.ImportedWallet -> TODO()
+                    }.exhaustive
                 },
                 onError = {
                     when (it) {

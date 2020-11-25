@@ -14,7 +14,6 @@
         android:layout_margin="@dimen/small_margin"
         android:background="@android:color/transparent"
         android:digits="0123456789-.,"
-        android:minHeight="80dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:gravity="center"
@@ -23,6 +22,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="$1241" />
+
+    <TextView
+        android:id="@+id/fake_hint"
+        style="@style/Text.Semibold.40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:visibility="gone"
+        android:textColor="@color/grey_200"
+        app:layout_constraintBottom_toBottomOf="@+id/enter_amount"
+        app:layout_constraintStart_toStartOf="@+id/enter_amount"
+        app:layout_constraintTop_toTopOf="@+id/enter_amount"
+        tools:visibility="gone" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/exchange_amount"
@@ -72,10 +84,10 @@
         android:layout_marginStart="@dimen/size_massive"
         android:layout_marginTop="@dimen/tiny_margin"
         android:layout_marginEnd="@dimen/size_massive"
-        android:gravity="center"
-        android:visibility="gone"
         android:clickable="true"
         android:focusable="true"
+        android:gravity="center"
+        android:visibility="gone"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

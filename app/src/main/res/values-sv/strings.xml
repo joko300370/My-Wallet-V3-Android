@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Fältet kan inte vara tomt.</string>
   <string name="settings_error_updating">Fel vid uppdatering av inställningar, försök igen</string>
   <string name="request_camera_permission">Kameratillgång krävs.</string>
-  <string name="request_camera_permission_title">Kameratillgång</string>
-  <string name="request_location_permission">Platsåtkomst krävs.</string>
-  <string name="request_write_storage_permission">Skriv extern lagring krävs.</string>
-  <string name="request_write_and_camera_storage_permission_description">Skriv extern lagring 
- och kamera krävs för att ladda upp KYC-dokument. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Skriv lagring och kamera 
- behörigheter 
-</string>
   <string name="not_specified">ej angivet</string>
   <string name="update_failed">Det gick inte att uppdatera.</string>
   <string name="verify_mobile">Verifiera mobil</string>
@@ -1840,7 +1831,7 @@
   <string name="send_enter_unexpected_error">Ett oväntat fel har uppstått. Var god försök igen.</string>
   <string name="send_enter_insufficient_gas">Du har inte tillräckligt med ETH för att behandla denna transaktion.</string>
   <string name="send_select_a_wallet_title">eller Välj en plånbok</string>
-  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %1$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
+  <string name="send_internal_transfer_message">För närvarande kan du bara överföra %1$s från din %2$s handelsplånbok till dina valvplånbok. När %1$s finns i din Vault Wallet kan du överföra till externa adresser.</string>
   <string name="purchase_funds_note">Ditt slutliga belopp kan förändras på grund av marknadsaktivitet.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Läs mer. </annotation>
@@ -2075,4 +2066,32 @@
   <string name="exchange_rate">Växlingskurs</string>
   <string name="in_progress">Pågående</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">För din säkerhet är kortinköp för första gången föremål för en innehavsperiod på %1$s innan du kan skicka eller ta ut din köpta krypto. Vi meddelar dig när lastrummet lyfts. 
+
+ Under tiden kan du sälja till kontanter, byta och handla inom Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Du bör alltid para eller logga in om du har tillgång
+ till ditt plånbok-ID och lösenord. Återvinning av dina medel kan skapa ett nytt Wallet-ID. Skulle du
+ vill fortsätta?
+</string>
+  <string name="received_dgld">Mottagen Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Skicka wDGLD till Wrapped-DGLD-adressen %1$s .</string>
+  <string name="wdgld_available_card_title">Handla wDGLD nu</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) i en ERC-20 tokeniserad version av DGLD, som kombinerar en guldbackad token med Ethereums kraft och flexibilitet.</string>
+  <string name="wdgld_available_card_cta">Handla wDGLD nu</string>
+  <string name="dgld_default_account_label">My Wrapped-DGLD Wallet</string>
+  <string name="swap_faster">Snabbare</string>
+  <string name="swap_trading_sheet_title">Snabbare. Billigare. Bättre
+ Byt Crypto med din handelsplånbok.</string>
+  <string name="swap_trading_sheet_subtitle">Få lägre avgifter och dubbla transaktionshastigheten när du byter din krypto från valfri handelsplånbok.</string>
+  <string name="swap_trading_fees_title">Samma byte, lägre avgifter</string>
+  <string name="swap_trading_fees_subtitle">Du betalar noll nätverksavgifter genom att byta krypto off-chain</string>
+  <string name="swap_trading_speed_title">Byt på sekunder</string>
+  <string name="swap_trading_speed_subtitle">Ökad hastighet innebär att din Swap-handel rensas på några sekunder, inte minuter</string>
+  <string name="scan_qr">Skanna en QR-kod</string>
+  <string name="qr_activity_hint_any_asset">Skanna en CryptoCurrency-adress eller en BitPay-faktura</string>
+  <string name="qr_activity_hint_asset_address">Se till att bara skanna en %1$s QR-kod</string>
+  <string name="qr_activity_hint_bitpay">Skanna en BitPay-faktura</string>
+  <string name="qr_activity_hint_import_wallet">Skanna en plånbok privat nyckel</string>
+  <string name="qr_activity_hint_pairing_code">Skanna en QR-kod för webbparning</string>
+  <string name="qr_activity_hint_new_web_login">Logga in på webben</string>
 </resources>

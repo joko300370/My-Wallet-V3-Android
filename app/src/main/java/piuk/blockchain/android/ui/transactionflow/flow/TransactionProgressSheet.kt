@@ -22,19 +22,19 @@ class TransactionProgressSheet : TransactionFlowSheet() {
         dialogView.tx_progress_view.setAssetIcon(customiser.transactionProgressIcon(newState))
 
         when (newState.executionStatus) {
-            TxExecutionStatus.IN_PROGRESS -> dialogView.tx_progress_view.showTxInProgress(
+            is TxExecutionStatus.InProgress -> dialogView.tx_progress_view.showTxInProgress(
                 customiser.transactionProgressTitle(newState),
                 customiser.transactionProgressMessage(newState)
             )
-            TxExecutionStatus.COMPLETED -> {
+            is TxExecutionStatus.Completed -> {
                 analyticsHooks.onTransactionSuccess(newState)
                 dialogView.tx_progress_view.showTxSuccess(
                     customiser.transactionCompleteTitle(newState),
                     customiser.transactionCompleteMessage(newState)
                 )
             }
-            TxExecutionStatus.ERROR -> {
-                analyticsHooks.onTransactionFailure(newState)
+            is TxExecutionStatus.Error -> {
+                analyticsHooks.onTransactionFailure(newState, newState.executionStatus.message)
                 dialogView.tx_progress_view.showTxError(
                     getString(R.string.send_progress_error_title),
                     getString(R.string.send_progress_error_subtitle)

@@ -18,11 +18,9 @@ interface AccountView : View {
 
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
 
-    fun showWatchOnlyWarningDialog(address: String)
+    fun showWatchOnlyUnsupportedMsg()
 
     fun showRenameImportedAddressDialog(address: LegacyAddress)
-
-    fun startScanForResult()
 
     fun showBip38PasswordDialog(data: String)
 

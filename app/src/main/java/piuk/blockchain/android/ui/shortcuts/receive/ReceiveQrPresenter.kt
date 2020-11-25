@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.shortcuts.receive
 import androidx.annotation.VisibleForTesting
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom

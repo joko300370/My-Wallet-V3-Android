@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Le champ ne peut pas être vide.</string>
   <string name="settings_error_updating">Erreur lors de la mise à jour des paramètres, veuillez réessayer</string>
   <string name="request_camera_permission">L\'accès à la caméra est requis.</string>
-  <string name="request_camera_permission_title">Accès à la caméra</string>
-  <string name="request_location_permission">L\'accès à l\'emplacement est requis.</string>
-  <string name="request_write_storage_permission">Écrire un stockage externe est requis.</string>
-  <string name="request_write_and_camera_storage_permission_description">Écrire un stockage externe 
- et la caméra sont nécessaires pour télécharger les documents KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Stockage d\'écriture et caméra 
- autorisations 
-</string>
   <string name="not_specified">non précisé</string>
   <string name="update_failed">Échec de mise à jour.</string>
   <string name="verify_mobile">Vérifier mobile</string>
@@ -2071,4 +2062,32 @@ Veuillez réessayer plus tard.</string>
   <string name="exchange_rate">Taux de change</string>
   <string name="in_progress">En cours</string>
   <string name="swap_direction">%1$s-&gt;%2$s</string>
+  <string name="security_locked_funds_explanation">Pour votre sécurité, les premiers achats par carte sont soumis à une période de détention de %1$s jours avant que vous puissiez envoyer ou retirer votre crypto acheté. Nous vous informerons lorsque la suspension sera levée. 
+
+ En attendant, vous pouvez vendre en espèces, échanger et échanger sur Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Vous devez toujours coupler ou vous connecter si vous avez accès
+ à votre identifiant et mot de passe Wallet. La récupération de vos fonds peut créer un nouvel identifiant Wallet. Voudriez-vous
+ aimez continuer?
+</string>
+  <string name="received_dgld">Reçu enveloppé-DGLD</string>
+  <string name="email_request_body_dgld">Veuillez envoyer wDGLD à l\'adresse Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Échangez wDGLD maintenant</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) dans une version tokenisée ERC-20 de DGLD, combinant un jeton adossé à l\'or avec la puissance et la flexibilité d\'Ethereum.</string>
+  <string name="wdgld_available_card_cta">Échangez wDGLD maintenant</string>
+  <string name="dgld_default_account_label">Mon portefeuille DGLD enveloppé</string>
+  <string name="swap_faster">plus rapide</string>
+  <string name="swap_trading_sheet_title">Plus rapide. Moins cher. Mieux
+ Échangez Crypto avec votre portefeuille de trading.</string>
+  <string name="swap_trading_sheet_subtitle">Obtenez des frais moins élevés et doublez la vitesse de transaction lorsque vous échangez votre crypto de n\'importe quel portefeuille de trading.</string>
+  <string name="swap_trading_fees_title">Même swap, frais moins élevés</string>
+  <string name="swap_trading_fees_subtitle">Vous ne payez aucun frais de réseau en échangeant la crypto hors chaîne</string>
+  <string name="swap_trading_speed_title">Swap en quelques secondes</string>
+  <string name="swap_trading_speed_subtitle">L\'augmentation de la vitesse signifie que votre échange de swap s\'efface en quelques secondes et non en quelques minutes</string>
+  <string name="scan_qr">Scanner un code QR</string>
+  <string name="qr_activity_hint_any_asset">Scanner une adresse CryptoCurrency ou une facture BitPay</string>
+  <string name="qr_activity_hint_asset_address">Assurez-vous de scanner uniquement un code QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Scanner une facture BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Scanner une clé privée de portefeuille</string>
+  <string name="qr_activity_hint_pairing_code">Scanner un code QR de couplage Web</string>
+  <string name="qr_activity_hint_new_web_login">Connectez-vous au Web</string>
 </resources>

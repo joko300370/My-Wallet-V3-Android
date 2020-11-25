@@ -11,13 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.swap.nabu.datamanagers.InterestState
-import com.blockchain.ui.urllinks.makeBlockExplorerUrl
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.dialog_activity_details_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_activity_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -26,6 +25,7 @@ import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegat
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.util.makeBlockExplorerUrl
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CryptoActivityDetailsBottomSheet :
@@ -42,7 +42,7 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     override val layoutResource: Int
-        get() = R.layout.dialog_activity_details_sheet
+        get() = R.layout.dialog_sheet_activity_details
 
     override val model: ActivityDetailsModel by scopedInject()
 
@@ -102,6 +102,10 @@ class CryptoActivityDetailsBottomSheet :
                 )
             }
         }
+
+        /* TODO we should improve error handling here
+         * if(newState.isError) {}
+         */
 
         if (listAdapter.items != newState.listOfItems) {
             listAdapter.items = newState.listOfItems.toList()
@@ -199,7 +203,7 @@ class CryptoActivityDetailsBottomSheet :
 
                 status.text = getString(when {
                     transactionType == TransactionSummary.TransactionType.SENT ||
-                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }
@@ -212,7 +216,7 @@ class CryptoActivityDetailsBottomSheet :
                         R.string.activity_details_label_pending
                     }
                     transactionType == TransactionSummary.TransactionType.BUY ||
-                            transactionType == TransactionSummary.TransactionType.SELL ->
+                        transactionType == TransactionSummary.TransactionType.SELL ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds
@@ -278,7 +282,7 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     private fun onActionItemClicked() {
-        val explorerUri = makeBlockExplorerUrl(arguments.cryptoCurrency, arguments.txId)
+        val explorerUri = arguments.cryptoCurrency.makeBlockExplorerUrl(arguments.txId)
         logAnalyticsForExplorer()
         Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(explorerUri)

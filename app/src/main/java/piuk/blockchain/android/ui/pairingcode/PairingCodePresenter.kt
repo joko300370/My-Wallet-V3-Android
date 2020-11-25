@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import io.reactivex.Observable
 import okhttp3.ResponseBody
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.extensions.addToCompositeDisposable
 import piuk.blockchain.androidcore.data.auth.AuthDataManager

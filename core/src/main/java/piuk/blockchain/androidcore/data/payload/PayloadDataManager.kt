@@ -3,6 +3,7 @@ package piuk.blockchain.androidcore.data.payload
 import info.blockchain.api.data.Balance
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.bip44.HDWalletFactory
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -45,6 +46,7 @@ class PayloadDataManager(
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
     private val networkParameters = environmentConfig.bitcoinNetworkParameters
+
     val metadataCredentials: MetadataCredentials?
         get() = tempPassword?.let {
             MetadataCredentials(guid, sharedKey, it)
@@ -78,7 +80,7 @@ class PayloadDataManager(
     val payloadChecksum: String?
         get() = payloadManager.payloadChecksum
 
-    var tempPassword: String?
+    var tempPassword: String
         get() = payloadManager.tempPassword
         set(password) {
             payloadManager.tempPassword = password
@@ -159,6 +161,20 @@ class PayloadDataManager(
             password
         )
     }.applySchedulers()
+
+    /**
+     * Retrieves a  master key from a 12 word mnemonic
+     */
+    fun generateMasterKeyFromSeed(
+        recoveryPhrase: String,
+        networkParams: NetworkParameters
+    ): DeterministicKey = HDWalletFactory.restoreWallet(
+        networkParams,
+        HDWalletFactory.Language.US,
+        recoveryPhrase,
+        "",
+        1
+    ).masterKey
 
     /**
      * Creates a new HD wallet and Blockchain.info account.

@@ -13,13 +13,13 @@ class SwapAccountSelectSheetFeeDecorator(private val account: BlockchainAccount)
 
     override fun view(context: Context): Maybe<View> =
         if (account is TradingAccount) {
-            Maybe.just(lowFeesView(context))
+            Maybe.just(tradingAccountBadgesView(context))
         } else
             Maybe.empty()
 
-    private fun lowFeesView(context: Context) =
+    private fun tradingAccountBadgesView(context: Context) =
         LayoutInflater.from(context).inflate(
-            R.layout.low_fees_layout,
+            R.layout.trading_account_badges_layout,
             null,
             false
         )

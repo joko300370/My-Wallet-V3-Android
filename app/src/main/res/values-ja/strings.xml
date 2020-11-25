@@ -429,15 +429,6 @@
   <string name="settings_field_cant_be_empty">フィールドを空にすることはできません。</string>
   <string name="settings_error_updating">設定の更新中にエラーが発生しました。もう一度お試しください</string>
   <string name="request_camera_permission">カメラへのアクセスが必要です。</string>
-  <string name="request_camera_permission_title">カメラへのアクセス</string>
-  <string name="request_location_permission">ロケーションへのアクセスが必要です。</string>
-  <string name="request_write_storage_permission">外部ストレージの書き込みが必要です。</string>
-  <string name="request_write_and_camera_storage_permission_description">外部ストレージを書き込む
- KYCドキュメントをアップロードするにはカメラが必要です。 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">ストレージとカメラを書き込む
-許可
-</string>
   <string name="not_specified">指定されていない</string>
   <string name="update_failed">更新に失敗しました。</string>
   <string name="verify_mobile">モバイルを確認</string>
@@ -1839,7 +1830,7 @@
   <string name="send_enter_unexpected_error">予期しないエラーが発生しました。もう一度やり直してください。</string>
   <string name="send_enter_insufficient_gas">このトランザクションを処理するのに十分なETHがありません。</string>
   <string name="send_select_a_wallet_title">またはウォレットを選択</string>
-  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%1$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
+  <string name="send_internal_transfer_message">この時点で、あなただけ転送することができます%1$sあなたから%2$sあなたのVault財布に貿易財布。 %1$sがVaultウォレットに入ると、外部アドレスに転送できます。</string>
   <string name="purchase_funds_note">あなたの最終的な量は、市場活動のために変わるかもしれません。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">詳細。 </annotation>
@@ -2072,4 +2063,32 @@
   <string name="exchange_rate">為替レート</string>
   <string name="in_progress">進行中</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">安全のため、初めてカードを購入すると、購入した暗号を送信または撤回する前に、 %1$s日の保持期間が適用されます。保留が解除されたときに通知します。 
+
+それまでの間、Blockchain.com内で現金に売り、スワップし、取引することができます。</string>
+  <string name="recover_funds_warning_message_1">アクセスできる場合は、常にペアリングまたはログインする必要があります
+ウォレットIDとパスワードに。資金を回収すると、新しいウォレットIDが作成される場合があります。よろしいですか
+続けたいですか？
+</string>
+  <string name="received_dgld">ラップされたDGLDを受信</string>
+  <string name="email_request_body_dgld">wDGLDをWrapped-DGLDアドレス%1$s送信してください。</string>
+  <string name="wdgld_available_card_title">今すぐwDGLDを取引する</string>
+  <string name="wdgld_available_card_body">DGLDのERC-20トークン化バージョンのラップされたデジタルゴールド（wDGLD）。ゴールドで裏打ちされたトークンとイーサリアムのパワーと柔軟性を組み合わせています。</string>
+  <string name="wdgld_available_card_cta">今すぐwDGLDを取引する</string>
+  <string name="dgld_default_account_label">私のラップされたDGLDウォレット</string>
+  <string name="swap_faster">もっと早く</string>
+  <string name="swap_trading_sheet_title">もっと早く。安い。より良い
+暗号をトレーディングウォレットと交換します。</string>
+  <string name="swap_trading_sheet_subtitle">トレーディングウォレットから暗号を交換すると、手数料が安くなり、取引速度が2倍になります。</string>
+  <string name="swap_trading_fees_title">同じスワップ、低料金</string>
+  <string name="swap_trading_fees_subtitle">あなたは暗号オフチェーンを交換することによってゼロネットワーク料金を支払います</string>
+  <string name="swap_trading_speed_title">秒単位で交換</string>
+  <string name="swap_trading_speed_subtitle">スピードの向上は、スワップ取引が数分ではなく数秒でクリアされることを意味します</string>
+  <string name="scan_qr">QRコードをスキャンする</string>
+  <string name="qr_activity_hint_any_asset">CryptoCurrencyアドレスまたはBitPay請求書をスキャンします</string>
+  <string name="qr_activity_hint_asset_address">必ず%1$s QRコードのみをスキャンしてください</string>
+  <string name="qr_activity_hint_bitpay">BitPayの請求書をスキャンする</string>
+  <string name="qr_activity_hint_import_wallet">ウォレットの秘密鍵をスキャンする</string>
+  <string name="qr_activity_hint_pairing_code">WebペアリングQRコードをスキャンする</string>
+  <string name="qr_activity_hint_new_web_login">Webにログインする</string>
 </resources>

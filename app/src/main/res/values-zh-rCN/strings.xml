@@ -418,15 +418,6 @@
   <string name="settings_field_cant_be_empty">字段不能为空。</string>
   <string name="settings_error_updating">更新设置时出错，请重试</string>
   <string name="request_camera_permission">需要访问相机。</string>
-  <string name="request_camera_permission_title">摄像头访问</string>
-  <string name="request_location_permission">需要位置访问权限。</string>
-  <string name="request_write_storage_permission">需要写入外部存储。</string>
-  <string name="request_write_and_camera_storage_permission_description">写外部存储
-和相机需要上传KYC文档。 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">写存储和相机
-权限
-</string>
   <string name="not_specified">未标明</string>
   <string name="update_failed">更新失败。</string>
   <string name="verify_mobile">验证手机</string>
@@ -1827,7 +1818,7 @@
   <string name="send_enter_unexpected_error">发生意外的错误。请再试一遍。</string>
   <string name="send_enter_insufficient_gas">您没有足够的ETH来处理此交易。</string>
   <string name="send_select_a_wallet_title">或选择一个钱包</string>
-  <string name="send_internal_transfer_message">目前，您只能将%1$s从%1$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
+  <string name="send_internal_transfer_message">目前，您只能将%1$s从%2$s贸易钱包转移到保险柜钱包。将%1$s放入保管箱钱包后，您可以转移到外部地址。</string>
   <string name="purchase_funds_note">您的最终金额可能会因市场活动而改变。</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link">了解更多信息。 </annotation>
@@ -2060,4 +2051,32 @@
   <string name="exchange_rate">汇率</string>
   <string name="in_progress">进行中</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">为了您的安全起见，首次购买卡必须遵守%1$s天的持有期限，然后才能发送或提取已购买的加密货币。保全解除后，我们会通知您。 
+
+同时，您可以在Blockchain.com中出售现金，掉期交易。</string>
+  <string name="recover_funds_warning_message_1">如果有访问权限，则应始终配对或登录
+到您的电子钱包ID和密码。收回资金可能会创建一个新的电子钱包ID。你会
+想继续吗？
+</string>
+  <string name="received_dgld">收到包裹的DGLD</string>
+  <string name="email_request_body_dgld">请将wDGLD发送到Wrapped-DGLD地址%1$s 。</string>
+  <string name="wdgld_available_card_title">立即交易wDGLD</string>
+  <string name="wdgld_available_card_body">在ERC-20令牌化版本的DGLD中包装了数字黄金（wDGLD），将黄金支持的令牌与以太坊的功能和灵活性结合在一起。</string>
+  <string name="wdgld_available_card_cta">立即交易wDGLD</string>
+  <string name="dgld_default_account_label">我的包裹式DGLD钱包</string>
+  <string name="swap_faster">快点</string>
+  <string name="swap_trading_sheet_title">快点。便宜点更好
+使用您的交易钱包交换加密货币。</string>
+  <string name="swap_trading_sheet_subtitle">当您从任何交易钱包交换加密货币时，可以获得更低的费用并使交易速度加倍。</string>
+  <string name="swap_trading_fees_title">掉期相同，费用更低</string>
+  <string name="swap_trading_fees_subtitle">您通过交换加密链外链支付零网络费用</string>
+  <string name="swap_trading_speed_title">掉秒</string>
+  <string name="swap_trading_speed_subtitle">提高速度意味着您的掉期交易可以在数秒而不是数分钟内完成</string>
+  <string name="scan_qr">扫描二维码</string>
+  <string name="qr_activity_hint_any_asset">扫描CryptoCurrency地址或BitPay发票</string>
+  <string name="qr_activity_hint_asset_address">确保仅扫描%1$s QR码</string>
+  <string name="qr_activity_hint_bitpay">扫描BitPay发票</string>
+  <string name="qr_activity_hint_import_wallet">扫描钱包私钥</string>
+  <string name="qr_activity_hint_pairing_code">扫描网络配对QR码</string>
+  <string name="qr_activity_hint_new_web_login">登录网络</string>
 </resources>

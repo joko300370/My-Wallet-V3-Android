@@ -12,5 +12,4 @@ include ':app',
         ':sunriver',
         ':testutils',
         ':testutils-android',
-        ':veriff',
-        ':zxing'
+        ':veriff'

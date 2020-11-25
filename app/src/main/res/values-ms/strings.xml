@@ -418,15 +418,6 @@
   <string name="settings_field_cant_be_empty">Bidang tidak boleh kosong.</string>
   <string name="settings_error_updating">Ralat semasa mengemas kini tetapan, sila cuba lagi</string>
   <string name="request_camera_permission">Akses kamera diperlukan.</string>
-  <string name="request_camera_permission_title">Akses kamera</string>
-  <string name="request_location_permission">Akses lokasi diperlukan.</string>
-  <string name="request_write_storage_permission">Tulis storan luaran diperlukan.</string>
-  <string name="request_write_and_camera_storage_permission_description">Tulis storan luaran 
- dan kamera diperlukan untuk memuat naik dokumen KYC. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Tulis storan dan kamera 
- kebenaran 
-</string>
   <string name="not_specified">tidak dinyatakan</string>
   <string name="update_failed">Gagal mengemaskini.</string>
   <string name="verify_mobile">Sahkan Mobile</string>
@@ -1827,7 +1818,7 @@
   <string name="send_enter_unexpected_error">Ralat tidak dijangka telah berlaku. Sila cuba lagi.</string>
   <string name="send_enter_insufficient_gas">Anda tidak mempunyai ETH yang mencukupi untuk memproses transaksi ini.</string>
   <string name="send_select_a_wallet_title">atau Pilih Dompet</string>
-  <string name="send_internal_transfer_message">Pada masa ini, anda hanya dapat memindahkan %1$s dari Dompet Perdagangan %1$s ke Dompet Vault anda. Setelah %1$s berada di Vault Wallet anda, anda boleh memindahkan ke alamat luaran.</string>
+  <string name="send_internal_transfer_message">Pada masa ini, anda hanya dapat memindahkan %1$s dari Dompet Perdagangan %2$s ke Dompet Vault anda. Setelah %1$s berada di Vault Wallet anda, anda boleh memindahkan ke alamat luaran.</string>
   <string name="purchase_funds_note">Jumlah akhir anda mungkin berubah kerana aktiviti pasaran.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ketahui lebih lanjut. </annotation>
@@ -2060,4 +2051,32 @@
   <string name="exchange_rate">Kadar pertukaran</string>
   <string name="in_progress">Dalam Kemajuan</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Untuk keselamatan anda, pembelian kad kali pertama dikenakan tempoh penahanan %1$s hari sebelum anda dapat menghantar atau menarik balik kripto yang anda beli. Kami akan memberitahu anda apabila penangguhan diangkat. 
+
+ Sementara itu, anda boleh menjual ke Tunai, menukar, dan berdagang dalam Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Anda harus selalu memasangkan atau log masuk jika anda mempunyai akses
+ ke ID dan kata laluan Wallet anda. Memulihkan dana anda boleh membuat ID Wallet baru. Adakah anda
+ suka meneruskan?
+</string>
+  <string name="received_dgld">Diterima Dibungkus-DGLD</string>
+  <string name="email_request_body_dgld">Sila hantar wDGLD ke alamat Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Berdagang wDGLD Sekarang</string>
+  <string name="wdgld_available_card_body">Digital Gold yang dibungkus (wDGLD) dalam versi DGLD yang diberi token ERC-20, menggabungkan token yang disokong emas dengan kekuatan dan fleksibiliti Ethereum.</string>
+  <string name="wdgld_available_card_cta">Berdagang wDGLD sekarang</string>
+  <string name="dgld_default_account_label">Dompet Wrapped-DGLD saya</string>
+  <string name="swap_faster">Lebih pantas</string>
+  <string name="swap_trading_sheet_title">Lebih pantas. Lebih murah. Lebih baik
+ Tukar Crypto dengan Dompet Dagangan anda.</string>
+  <string name="swap_trading_sheet_subtitle">Dapatkan yuran yang lebih rendah dan gandakan kelajuan transaksi apabila anda menukar kripto anda dari mana-mana Dompet Dagangan.</string>
+  <string name="swap_trading_fees_title">Pertukaran Sama, Bayaran Lebih Rendah</string>
+  <string name="swap_trading_fees_subtitle">Anda membayar sifar yuran rangkaian dengan menukar crypto di luar rantai</string>
+  <string name="swap_trading_speed_title">Tukar dalam Detik</string>
+  <string name="swap_trading_speed_subtitle">Kelajuan yang meningkat bermaksud perdagangan Swap anda terhapus dalam beberapa saat, bukan beberapa minit</string>
+  <string name="scan_qr">Imbas Kod QR</string>
+  <string name="qr_activity_hint_any_asset">Imbas alamat CryptoCurrency atau invois BitPay</string>
+  <string name="qr_activity_hint_asset_address">Pastikan anda hanya mengimbas Kod QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Imbas invois BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Imbas kunci peribadi dompet</string>
+  <string name="qr_activity_hint_pairing_code">Imbas kod QR pasangan web</string>
+  <string name="qr_activity_hint_new_web_login">Log masuk ke web</string>
 </resources>

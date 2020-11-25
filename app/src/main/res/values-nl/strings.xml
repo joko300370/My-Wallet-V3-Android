@@ -430,15 +430,6 @@
   <string name="settings_field_cant_be_empty">Veld mag niet leeg zijn.</string>
   <string name="settings_error_updating">Fout bij updaten van instellingen, probeer het opnieuw</string>
   <string name="request_camera_permission">Cameratoegang is vereist.</string>
-  <string name="request_camera_permission_title">Toegang tot de camera</string>
-  <string name="request_location_permission">Locatietoegang is vereist.</string>
-  <string name="request_write_storage_permission">Externe opslag schrijven is vereist.</string>
-  <string name="request_write_and_camera_storage_permission_description">Schrijf externe opslag 
- en camera zijn vereist om KYC-documenten te uploaden. 
-</string>
-  <string name="request_write_and_camera_storage_permission_title">Schrijf opslag en camera 
- rechten 
-</string>
   <string name="not_specified">niet gespecificeerd</string>
   <string name="update_failed">Kan niet updaten.</string>
   <string name="verify_mobile">Verifieer mobiel</string>
@@ -1840,7 +1831,7 @@
   <string name="send_enter_unexpected_error">Er is een onverwachte fout opgetreden. Probeer het a.u.b. opnieuw.</string>
   <string name="send_enter_insufficient_gas">U heeft niet genoeg ETH om deze transactie te verwerken.</string>
   <string name="send_select_a_wallet_title">of Selecteer een portemonnee</string>
-  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %1$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
+  <string name="send_internal_transfer_message">Op dit moment kunt u alleen %1$s overboeken van uw %2$s Trade Wallet naar uw Vault Wallets. Zodra %1$s zich in uw Vault Wallet bevindt, kunt u overzetten naar externe adressen.</string>
   <string name="purchase_funds_note">Uw uiteindelijke bedrag kan veranderen als gevolg van marktactiviteit.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Meer informatie. </annotation>
@@ -2075,4 +2066,32 @@
   <string name="exchange_rate">Wisselkoers</string>
   <string name="in_progress">Bezig</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Voor uw veiligheid zijn de eerste kaartaankopen onderworpen aan een vasthoudperiode van %1$s dag voordat u uw gekochte crypto kunt verzenden of opnemen. We laten het je weten wanneer het ruim wordt opgeheven. 
+
+ In de tussentijd kunt u verkopen in Cash, ruilen en handelen binnen Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">U moet altijd koppelen of inloggen als u toegang heeft
+ naar uw Wallet-ID en wachtwoord. Als u uw geld terugkrijgt, kan er een nieuwe Wallet-ID worden gemaakt. Zou jij
+ doorgaan?
+</string>
+  <string name="received_dgld">Ontvangen Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Stuur wDGLD naar het Wrapped-DGLD-adres %1$s .</string>
+  <string name="wdgld_available_card_title">Handel nu in wDGLD</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) in een ERC-20 tokenized versie van DGLD, waarbij een door goud ondersteund token wordt gecombineerd met de kracht en flexibiliteit van Ethereum.</string>
+  <string name="wdgld_available_card_cta">Handel nu in wDGLD</string>
+  <string name="dgld_default_account_label">Mijn ingepakte DGLD-portemonnee</string>
+  <string name="swap_faster">Sneller</string>
+  <string name="swap_trading_sheet_title">Sneller. Goedkoper. Beter
+ Ruil Crypto met uw handelsportefeuille.</string>
+  <string name="swap_trading_sheet_subtitle">Krijg lagere kosten en verdubbel de transactiesnelheid wanneer u uw crypto ruilt vanuit een handelsportefeuille.</string>
+  <string name="swap_trading_fees_title">Dezelfde ruil, lagere kosten</string>
+  <string name="swap_trading_fees_subtitle">U betaalt geen netwerkkosten door crypto off-chain te ruilen</string>
+  <string name="swap_trading_speed_title">Wissel binnen enkele seconden</string>
+  <string name="swap_trading_speed_subtitle">Verhoogde snelheid betekent dat uw ruiltransactie binnen enkele seconden wordt gewist, niet in minuten</string>
+  <string name="scan_qr">Scan een QR-code</string>
+  <string name="qr_activity_hint_any_asset">Scan een CryptoCurrency-adres of een BitPay-factuur</string>
+  <string name="qr_activity_hint_asset_address">Zorg ervoor dat u alleen een QR-code van %1$s scant</string>
+  <string name="qr_activity_hint_bitpay">Scan een BitPay-factuur</string>
+  <string name="qr_activity_hint_import_wallet">Scan de privésleutel van een portemonnee</string>
+  <string name="qr_activity_hint_pairing_code">Scan een QR-code voor webkoppeling</string>
+  <string name="qr_activity_hint_new_web_login">Log in op internet</string>
 </resources>

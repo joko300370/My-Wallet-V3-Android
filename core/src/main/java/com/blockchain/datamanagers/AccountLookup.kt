@@ -27,7 +27,8 @@ internal class AccountLookup(
             }
             CryptoCurrency.ETHER,
             CryptoCurrency.PAX,
-            CryptoCurrency.USDT -> ethDataManager.getEthWallet()!!.account
+            CryptoCurrency.USDT,
+            CryptoCurrency.DGLD -> ethDataManager.getEthWallet()!!.account
             CryptoCurrency.XLM -> throw IllegalArgumentException(
                 "Access to the XLM Json data is not allowed or required"
             )

@@ -6,7 +6,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.base.UiState
 import kotlin.properties.Delegates
@@ -126,9 +126,10 @@ class SwipeToReceivePresenter(
                 nextAddress = paxAddress,
                 hasAddresses = swipeToReceiveHelper.getPaxReceiveAddress().isNotEmpty()
             )
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
+            CryptoCurrency.STX,
+            CryptoCurrency.ALGO,
+            CryptoCurrency.USDT,
+            CryptoCurrency.DGLD -> TODO("STUB: ${cryptoCurrency.networkTicker} NOT IMPLEMENTED")
         }
 
     companion object {

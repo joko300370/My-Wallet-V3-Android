@@ -1,8 +1,16 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
+import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.FEE_SCHEDULE
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ASSET
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ERROR
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_NEW_FEE
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_OLD_FEE
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_SOURCE
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_TARGET
 
 sealed class SendAnalyticsEvent(
     override val event: String,
@@ -17,7 +25,6 @@ sealed class SendAnalyticsEvent(
     object EnterAmountCtaClick : SendAnalyticsEvent("send_enter_amount_confirm")
     object ConfirmationsDisplayed : SendAnalyticsEvent("send_summary_shown")
     object CancelTransaction : SendAnalyticsEvent("send_summary_cancel")
-    object TransactionFailed : SendAnalyticsEvent("send_confirm_error")
 
     data class ConfirmTransaction(
         val asset: CryptoCurrency,
@@ -34,13 +41,30 @@ sealed class SendAnalyticsEvent(
         )
     )
 
-    data class TransactionSuccess(val asset: CryptoCurrency) :
+    data class TransactionSuccess(val asset: CryptoCurrency, val target: String, val source: String) :
         SendAnalyticsEvent(
             "send_confirm_success",
             mapOf(
-                PARAM_ASSET to asset.networkTicker
+                PARAM_ASSET to asset.networkTicker,
+                PARAM_TARGET to target,
+                PARAM_SOURCE to source
             )
         )
+
+    data class TransactionFailure(
+        val asset: CryptoCurrency,
+        val target: String?,
+        val source: String?,
+        val error: String
+    ) : SendAnalyticsEvent(
+        "send_confirm_error",
+        mapOf(
+            PARAM_ASSET to asset.networkTicker,
+            PARAM_TARGET to target,
+            PARAM_SOURCE to source,
+            PARAM_ERROR to error
+        ).withoutNullValues()
+    )
 
     data class FeeChanged(val oldFee: FeeLevel, val newFee: FeeLevel) :
         SendAnalyticsEvent(
@@ -50,13 +74,4 @@ sealed class SendAnalyticsEvent(
                 PARAM_NEW_FEE to newFee.name
             )
         )
-
-    companion object {
-        private const val PARAM_ASSET = "asset"
-        private const val PARAM_SOURCE = "source"
-        private const val PARAM_TARGET = "target"
-        private const val PARAM_OLD_FEE = "old_fee"
-        private const val PARAM_NEW_FEE = "new_fee"
-        private const val FEE_SCHEDULE = "fee_level"
-    }
 }

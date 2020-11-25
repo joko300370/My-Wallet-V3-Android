@@ -427,11 +427,17 @@
  najpierw ustawienia. 
 </string>
   <string name="disable_online_only">Zaloguj się do swojego portfela w przeglądarce internetowej, aby wyłączyć 
- 2FA. 
-</string>
-  <string name="settings_field_cant_be_empty">Pole nie może być puste.</string>
-  <string name="settings_error_updating">Błąd podczas aktualizacji ustawień, spróbuj ponownie</string>
-  <string name="request_camera_permission">Wymagany jest dostęp do kamery.</string>
+ 2FA.</string>
+
+    <string name="settings_field_cant_be_empty">Pole nie może być puste.</string>
+    <string name="settings_error_updating">Błąd podczas aktualizacji ustawień, spróbuj ponownie</string>
+    <string name="request_camera_permission">Wymagany jest dostęp do kamery.</string>
+    <string name="not_specified">nieokreślony</string>
+    <string name="update_failed">Nie udało się zaktualizować.</string>
+    <string name="verify_mobile">Verify Mobile</string>
+    <string name="select_country">Wybierz kraj</string>
+    <string name="search_country">Wyszukaj kraj</string>
+    <string name="verify_sms_summary">Wysłaliśmy na Twój telefon komórkowy wiadomość SMS z numerem</string>
   <string name="request_camera_permission_title">Dostęp do kamery</string>
   <string name="request_location_permission">Wymagany jest dostęp do lokalizacji.</string>
   <string name="request_write_storage_permission">Wymagane jest zapisanie pamięci zewnętrznej.</string>
@@ -439,16 +445,7 @@
  i kamera są wymagane do przesyłania dokumentów KYC. 
 </string>
   <string name="request_write_and_camera_storage_permission_title">Zapisz pamięć i aparat 
- uprawnienia 
-</string>
-  <string name="not_specified">nieokreślony</string>
-  <string name="update_failed">Nie udało się zaktualizować.</string>
-  <string name="verify_mobile">Verify Mobile</string>
-  <string name="select_country">Wybierz kraj</string>
-  <string name="search_country">Wyszukaj kraj</string>
-  <string name="verify_sms_summary">Wysłaliśmy na Twój telefon komórkowy wiadomość SMS z numerem 
- kod weryfikacyjny. Wpisz kod, aby zweryfikować swój numer telefonu komórkowego. 
-</string>
+ uprawnienia</string>
   <string name="verify_sms_failed">Niepoprawny kod, spróbuj ponownie</string>
   <string name="mobile_description">W telefonie komórkowym można włączyć dwa czynniki 
  uwierzytelnianie, które pomaga zabezpieczyć portfel przed nieautoryzowanym dostępem. 
@@ -1840,7 +1837,7 @@
   <string name="send_enter_unexpected_error">Wystąpił nieoczekiwany błąd. Proszę spróbuj ponownie.</string>
   <string name="send_enter_insufficient_gas">Nie masz wystarczającej liczby ETH, aby przetworzyć tę transakcję.</string>
   <string name="send_select_a_wallet_title">lub Wybierz portfel</string>
-  <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %1$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
+  <string name="send_internal_transfer_message">W tej chwili możesz przenieść tylko %1$s ze swojego portfela handlowego %2$s do swoich portfeli Vault. Gdy %1$s się w Twoim portfelu Vault, możesz przenieść na adresy zewnętrzne.</string>
   <string name="purchase_funds_note">Twoja ostateczna kwota może ulec zmianie ze względu na aktywność na rynku.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Dowiedz się więcej. </annotation>
@@ -2079,4 +2076,32 @@
   <string name="exchange_rate">Kurs wymiany</string>
   <string name="in_progress">W trakcie</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Ze względów bezpieczeństwa pierwsze zakupy kartą podlegają %1$s dniowemu okresowi przechowywania, zanim będzie można wysłać lub wypłacić zakupione krypto. Powiadomimy Cię, gdy blokada zostanie zniesiona. 
+
+ W międzyczasie możesz sprzedawać za gotówkę, wymieniać się i handlować na Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Jeśli masz dostęp, zawsze powinieneś sparować lub zalogować się
+ do swojego identyfikatora portfela i hasła. Odzyskanie środków może spowodować utworzenie nowego identyfikatora portfela. Mógłbyś
+ chcesz kontynuować?
+</string>
+  <string name="received_dgld">Otrzymano Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Wyślij wDGLD na adres Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Handluj wDGLD teraz</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) w tokenizowanej wersji DGLD ERC-20, łączący token zabezpieczony złotem z mocą i elastycznością Ethereum.</string>
+  <string name="wdgld_available_card_cta">Handluj wDGLD teraz</string>
+  <string name="dgld_default_account_label">Mój portfel Wrapped-DGLD</string>
+  <string name="swap_faster">Szybciej</string>
+  <string name="swap_trading_sheet_title">Szybciej. Taniej. Lepszy
+ Zamień krypto z portfelem handlowym.</string>
+  <string name="swap_trading_sheet_subtitle">Uzyskaj niższe opłaty i podwoj prędkość transakcji, wymieniając krypto z dowolnego portfela handlowego.</string>
+  <string name="swap_trading_fees_title">Ta sama zamiana, niższe opłaty</string>
+  <string name="swap_trading_fees_subtitle">Płacisz zerowe opłaty sieciowe, wymieniając kryptowaluty poza łańcuchem</string>
+  <string name="swap_trading_speed_title">Zamień w kilka sekund</string>
+  <string name="swap_trading_speed_subtitle">Zwiększona prędkość oznacza, że Twoja transakcja Swap jest rozliczana w ciągu kilku sekund, a nie minut</string>
+  <string name="scan_qr">Zeskanuj kod QR</string>
+  <string name="qr_activity_hint_any_asset">Zeskanuj adres CryptoCurrency lub fakturę BitPay</string>
+  <string name="qr_activity_hint_asset_address">Pamiętaj, aby zeskanować tylko kod QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Zeskanuj fakturę BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Zeskanuj klucz prywatny portfela</string>
+  <string name="qr_activity_hint_pairing_code">Zeskanuj kod QR parowania internetowego</string>
+  <string name="qr_activity_hint_new_web_login">Zaloguj się do sieci</string>
 </resources>

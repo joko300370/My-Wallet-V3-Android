@@ -14,7 +14,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_fiat_funds_detail_sheet.view.*
+import kotlinx.android.synthetic.main.dialog_sheet_fiat_funds_detail.view.*
 import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
@@ -49,7 +49,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     private var account: FiatAccount = NullFiatAccount
 
     override val layoutResource: Int
-        get() = R.layout.dialog_fiat_funds_detail_sheet
+        get() = R.layout.dialog_sheet_fiat_funds_detail
 
     override fun initControls(view: View) {
         val ticker = account.fiatCurrency

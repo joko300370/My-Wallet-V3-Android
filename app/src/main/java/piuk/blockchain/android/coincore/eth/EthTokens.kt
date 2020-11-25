@@ -57,15 +57,18 @@ internal class EthAsset(
     eligibilityProvider
 ) {
 
+    private val labelList = mapOf(
+        CryptoCurrency.ETHER to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER),
+        CryptoCurrency.PAX to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
+        CryptoCurrency.USDT to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT),
+        CryptoCurrency.DGLD to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.DGLD)
+    )
+
     override val asset: CryptoCurrency
         get() = CryptoCurrency.ETHER
 
     override fun initToken(): Completable =
-        ethDataManager.initEthereumWallet(
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER),
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT)
-        )
+        ethDataManager.initEthereumWallet(labelList)
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(

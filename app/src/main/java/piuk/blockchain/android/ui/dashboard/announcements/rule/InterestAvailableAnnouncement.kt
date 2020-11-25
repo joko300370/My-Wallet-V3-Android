@@ -32,7 +32,7 @@ class InterestAvailableAnnouncement(
         host.showAnnouncementCard(
             card = StandardAnnouncementCard(
                 name = name,
-                dismissRule = DismissRule.CardPeriodic,
+                dismissRule = DismissRule.CardOneTime,
                 dismissEntry = dismissEntry,
                 titleText = R.string.interest_announcement_title,
                 bodyText = R.string.interest_announcement_description,

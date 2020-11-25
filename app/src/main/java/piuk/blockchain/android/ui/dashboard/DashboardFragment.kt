@@ -27,6 +27,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
@@ -78,13 +79,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private val announcements: AnnouncementList by scopedInject()
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val coincore: Coincore by scopedInject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
             prefs = get(),
             onCardClicked = { onAssetClicked(it) },
             analytics = get(),
-            onFundsItemClicked = { onFundsClicked(it) }
+            onFundsItemClicked = { onFundsClicked(it) },
+            coincore = coincore
         )
     }
 
@@ -111,14 +114,19 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
+    @UiThread
     private fun doRender(newState: DashboardState) {
 
         swipe.isRefreshing = false
 
-        if (displayList.isEmpty()) {
-            createDisplayList(newState)
+        if (newState.assets.isNotEmpty()) {
+            if (displayList.isEmpty()) {
+                createDisplayList(newState)
+            } else {
+                updateDisplayList(newState)
+            }
         } else {
-            updateDisplayList(newState)
+            // TODO clear display list
         }
 
         if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
@@ -149,13 +157,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             add(IDX_CARD_ANNOUNCE, EmptyDashboardItem()) // Placeholder for announcements
             add(IDX_CARD_BALANCE, newState)
             add(IDX_FUNDS_BALANCE, EmptyDashboardItem()) // Placeholder for funds
-            add(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC])
-            add(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER])
-            add(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH])
-            add(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM])
-            add(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO])
-            add(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX])
-            add(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT])
+            addAll(newState.assets.values)
         }
         theAdapter.notifyDataSetChanged()
     }
@@ -164,14 +166,9 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         with(displayList) {
 
             val modList = mutableListOf<RefreshFn?>()
-
-            modList.add(handleUpdatedAssetState(IDX_CARD_BTC, newState.assets[CryptoCurrency.BTC]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_ETH, newState.assets[CryptoCurrency.ETHER]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_BCH, newState.assets[CryptoCurrency.BCH]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_XLM, newState.assets[CryptoCurrency.XLM]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_ALGO, newState.assets[CryptoCurrency.ALGO]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_PAX, newState.assets[CryptoCurrency.PAX]))
-            modList.add(handleUpdatedAssetState(IDX_CARD_USDT, newState.assets[CryptoCurrency.USDT]))
+            newState.assets.values.forEachIndexed { index, v ->
+                modList.add(handleUpdatedAssetState(IDX_ASSET_CARDS_START + index, v))
+            }
 
             modList.removeAll { it == null }
 
@@ -325,7 +322,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         super.onResume()
         setupToolbar()
         compositeDisposable += actionEvent.subscribe {
-            model.process(RefreshAllIntent)
+            initOrUpdateAssets()
         }
 
         (activity as? MainActivity)?.let {
@@ -339,7 +336,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         announcements.checkLatest(announcementHost, compositeDisposable)
 
-        model.process(RefreshAllIntent)
+        initOrUpdateAssets()
+    }
+
+    private fun initOrUpdateAssets() {
+        if (displayList.isEmpty()) {
+            model.process(GetAvailableAssets)
+        } else {
+            model.process(RefreshAllIntent)
+        }
     }
 
     override fun onPause() {
@@ -549,13 +554,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1
         private const val IDX_FUNDS_BALANCE = 2
-        private const val IDX_CARD_BTC = 3
-        private const val IDX_CARD_ETH = 4
-        private const val IDX_CARD_BCH = 5
-        private const val IDX_CARD_XLM = 6
-        private const val IDX_CARD_ALGO = 7
-        private const val IDX_CARD_PAX = 8
-        private const val IDX_CARD_USDT = 9
+        private const val IDX_ASSET_CARDS_START = 3
 
         private const val BACKUP_FUNDS_REQUEST_CODE = 8265
     }

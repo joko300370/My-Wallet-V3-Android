@@ -48,7 +48,8 @@ class TransactionInteractor(
         addressFactory.parse(address, asset)
             .switchIfEmpty(
                 Single.error<ReceiveAddress>(
-                    TxValidationFailure(ValidationState.INVALID_ADDRESS))
+                    TxValidationFailure(ValidationState.INVALID_ADDRESS)
+                )
             )
             .onErrorResumeNext { e ->
                 if (e.isUnexpectedContractError) {
@@ -83,33 +84,37 @@ class TransactionInteractor(
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
-        if (action != AssetAction.Swap) coincore.getTransactionTargets(sourceAccount, action)
-        else Singles.zip(
-            coincore.getTransactionTargets(sourceAccount, action),
-            swapRepository.getSwapAvailablePairs(),
-            eligibilityProvider.isEligibleForSimpleBuy()
-        )
-            .map { (accountList, pairs, eligible) ->
+        if (action != AssetAction.Swap)
+            coincore.getTransactionTargets(sourceAccount, action)
+        else
+            Singles.zip(
+                coincore.getTransactionTargets(sourceAccount, action),
+                swapRepository.getSwapAvailablePairs(),
+                eligibilityProvider.isEligibleForSimpleBuy()
+            ).map { (accountList, pairs, eligible) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
                     .filter { account ->
                         pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
                     }.filter { account ->
                         eligible or (account is NonCustodialAccount)
                     }
-            }
+                }
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWallets().zipWith(swapRepository.getSwapAvailablePairs()).map { (accountGroup, pairs) ->
-            accountGroup.accounts.filter { account ->
-                (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
-            }
-        }.map {
-            it.map { account -> account as CryptoAccount }.filter { account ->
-                account.actions.contains(AssetAction.Swap)
+        return coincore.allWallets()
+            .zipWith(
+                swapRepository.getSwapAvailablePairs()
+            ).map { (accountGroup, pairs) ->
+                accountGroup.accounts.filter { account ->
+                    (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
+                }
+            }.map {
+                it.map { account -> account as CryptoAccount }.filter { account ->
+                    account.actions.contains(AssetAction.Swap)
+                }
             }
         }
-    }
 
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
@@ -129,9 +134,7 @@ class TransactionInteractor(
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun reset() {
-        transactionProcessor?.let {
-            it.reset()
-        } ?: Timber.e("Transaction Interactor - calling reset on uninitialised transaction")
+        transactionProcessor?.reset() ?: Timber.i("TxProcessor is not initialised yet")
     }
 }
 

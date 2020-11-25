@@ -428,6 +428,7 @@
   <string name="disable_online_only">Vă rugăm să vă conectați la portofelul din browserul web pentru a dezactiva acest lucru 
  2FA. 
 </string>
+
   <string name="settings_field_cant_be_empty">Câmpul nu poate fi gol.</string>
   <string name="settings_error_updating">Eroare la actualizarea setărilor, încercați din nou</string>
   <string name="request_camera_permission">Accesul camerei este necesar.</string>
@@ -446,6 +447,7 @@
   <string name="select_country">Selecteaza tara</string>
   <string name="search_country">Țara de căutare</string>
   <string name="verify_sms_summary">Am trimis telefonului tău un mesaj SMS cu un 
+
  cod de verificare. Introduceți codul pentru a verifica numărul dvs. de telefon mobil. 
 </string>
   <string name="verify_sms_failed">Codul este nevalid, încercați din nou</string>
@@ -1839,7 +1841,7 @@
   <string name="send_enter_unexpected_error">A aparut o eroare neasteptata. Vă rugăm să încercați din nou.</string>
   <string name="send_enter_insufficient_gas">Nu aveți suficient ETH pentru a procesa această tranzacție.</string>
   <string name="send_select_a_wallet_title">sau Selectați un portofel</string>
-  <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %1$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
+  <string name="send_internal_transfer_message">În acest moment, puteți transfera doar %1$s din portofelul %2$s portofelele Vault. Odată ce %1$s este în portofelul dvs. Vault, puteți transfera la adrese externe.</string>
   <string name="purchase_funds_note">Suma finală se poate modifica din cauza activității de pe piață.</string>
   <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Aflați mai multe. </annotation>
@@ -2076,4 +2078,32 @@
   <string name="exchange_rate">Rata de schimb</string>
   <string name="in_progress">In progres</string>
   <string name="swap_direction">%1$s - &gt; %2$s</string>
+  <string name="security_locked_funds_explanation">Pentru siguranța dvs., achizițiile pentru prima dată cu carduri sunt supuse unei perioade de reținere de %1$s zile înainte de a putea trimite sau retrage cripta achiziționată. Vă vom anunța când ridicarea calității este ridicată. 
+
+ Între timp, puteți vinde în numerar, swap și tranzacționare în cadrul Blockchain.com.</string>
+  <string name="recover_funds_warning_message_1">Ar trebui să vă asociați sau să vă conectați întotdeauna dacă aveți acces
+ către ID-ul și parola Wallet. Recuperarea fondurilor dvs. poate crea un nou ID Wallet. Ai vrea
+ îți place să continui?
+</string>
+  <string name="received_dgld">A primit Wrapped-DGLD</string>
+  <string name="email_request_body_dgld">Vă rugăm să trimiteți wDGLD la adresa Wrapped-DGLD %1$s .</string>
+  <string name="wdgld_available_card_title">Tranzacționează wDGLD acum</string>
+  <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) într-o versiune tokenizată ERC-20 a DGLD, combinând un token susținut cu aur cu puterea și flexibilitatea Ethereum.</string>
+  <string name="wdgld_available_card_cta">Tranzacționează wDGLD acum</string>
+  <string name="dgld_default_account_label">Portofelul meu Wrapped-DGLD</string>
+  <string name="swap_faster">Mai repede</string>
+  <string name="swap_trading_sheet_title">Mai repede. Mai ieftin. Mai bine
+ Schimbă Crypto cu portofelul tău de tranzacționare.</string>
+  <string name="swap_trading_sheet_subtitle">Obțineți taxe mai mici și dublați viteza tranzacției când schimbați cripto-ul din orice portofel de tranzacționare.</string>
+  <string name="swap_trading_fees_title">Același swap, taxe mai mici</string>
+  <string name="swap_trading_fees_subtitle">Plătiți zero taxe de rețea schimbând cripto-ul în afara lanțului</string>
+  <string name="swap_trading_speed_title">Schimbați în secunde</string>
+  <string name="swap_trading_speed_subtitle">Viteza crescută înseamnă că tranzacția Swap se anulează în câteva secunde, nu în câteva minute</string>
+  <string name="scan_qr">Scanați un cod QR</string>
+  <string name="qr_activity_hint_any_asset">Scanați o adresă CryptoCurrency sau o factură BitPay</string>
+  <string name="qr_activity_hint_asset_address">Asigurați-vă că scanați doar un cod QR %1$s</string>
+  <string name="qr_activity_hint_bitpay">Scanați o factură BitPay</string>
+  <string name="qr_activity_hint_import_wallet">Scanați o cheie privată pentru portofel</string>
+  <string name="qr_activity_hint_pairing_code">Scanați un cod QR de asociere web</string>
+  <string name="qr_activity_hint_new_web_login">Conectați-vă la web</string>
 </resources>

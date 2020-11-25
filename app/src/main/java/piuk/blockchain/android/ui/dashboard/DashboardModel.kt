@@ -105,12 +105,7 @@ enum class DashboardSheet {
 }
 
 data class DashboardState(
-    val assets: AssetMap = AssetMap(
-        CryptoCurrency.activeCurrencies().associateBy(
-            keySelector = { it },
-            valueTransform = { CryptoAssetState(it) }
-        )
-    ),
+    val assets: AssetMap = AssetMap(emptyMap()),
     val showDashboardSheet: DashboardSheet? = null,
     val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
@@ -169,6 +164,10 @@ data class DashboardState(
 
     override fun getFundsFiat(fiat: String): Money =
         fiatAssets?.totalBalance ?: FiatValue.zero(fiat)
+
+    val assetMapKeys = assets.keys
+
+    val erc20Assets = assetMapKeys.filter { it.hasFeature(CryptoCurrency.IS_ERC20) }
 }
 
 data class CryptoAssetState(
@@ -212,8 +211,11 @@ class DashboardModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
+            is GetAvailableAssets -> {
+                interactor.getAvailableAssets(this)
+            }
             is RefreshAllIntent -> {
-                interactor.refreshBalances(this, AssetFilter.All)
+                interactor.refreshBalances(this, AssetFilter.All, previousState)
             }
             is BalanceUpdate -> {
                 process(CheckForCustodialBalanceIntent(intent.cryptoCurrency))
@@ -245,7 +247,8 @@ class DashboardModel(
             is UpdateLaunchDialogFlow,
             is ClearBottomSheet,
             is UpdateSelectedCryptoAccount,
-            is ShowBackupSheet -> null
+            is ShowBackupSheet,
+            is UpdateDashboardCurrencies -> null
         }
     }
 
