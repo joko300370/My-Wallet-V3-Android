@@ -6,7 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 
-class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: SwapActivityProvider) {
+class CustodialRepository(pairsProvider: TradingPairsProvider, activityProvider: SwapActivityProvider) {
 
     private val swapPairsCache = TimedCacheRequest(
         cacheLifetimeSeconds = LONG_CACHE,
@@ -25,18 +25,18 @@ class SwapRepository(pairsProvider: TradingPairsProvider, activityProvider: Swap
     fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
         swapPairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
 
-    fun getSellAvailablePairs(): Single<List<CurrencyPair.CryptoToFiatCurrencyPair>> =
-        swapPairsCache.getCachedSingle().map {
-            it.filterIsInstance<CurrencyPair.CryptoToFiatCurrencyPair>()
-        }
-
-    fun getSwapActivityForAsset(
+    fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<SwapTransactionItem>> =
+    ): Single<List<CustodialTransactionItem>> =
         swapActivityCache.getCachedSingle().map { list ->
             list.filter {
-                it.sendingAsset == cryptoCurrency && directions.contains(it.direction)
+                when (it.currencyPair) {
+                    is CurrencyPair.CryptoCurrencyPair -> it.currencyPair.source == cryptoCurrency &&
+                            directions.contains(it.direction)
+                    is CurrencyPair.CryptoToFiatCurrencyPair -> it.currencyPair.source == cryptoCurrency &&
+                            directions.contains(it.direction)
+                }
             }
         }
 

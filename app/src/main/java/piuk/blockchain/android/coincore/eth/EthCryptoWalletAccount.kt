@@ -93,7 +93,7 @@ internal class EthCryptoWalletAccount(
                         }
                     }
                     .flatMap {
-                        appendSwapActivity(custodialWalletManager, asset, it)
+                        appendCustodialActivity(custodialWalletManager, asset, it)
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }

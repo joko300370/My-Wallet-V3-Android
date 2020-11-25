@@ -18,7 +18,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -119,7 +119,7 @@ internal class CryptoInterestAccount(
 
     // No swaps on interest accounts, so just return the activity list unmodified
     override fun reconcileSwaps(
-        swaps: List<SwapActivitySummaryItem>,
+        custodialItems: List<CustodialActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> = activity
 

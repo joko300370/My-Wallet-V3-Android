@@ -83,7 +83,7 @@ internal class BchCryptoWalletAccount private constructor(
                 ) as ActivitySummaryItem
             }
             .flatMap {
-                appendSwapActivity(custodialWalletManager, asset, it)
+                appendCustodialActivity(custodialWalletManager, asset, it)
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 

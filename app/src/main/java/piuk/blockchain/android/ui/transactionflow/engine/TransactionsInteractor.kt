@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.engine
 
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -31,7 +31,7 @@ import timber.log.Timber
 class TransactionInteractor(
     private val coincore: Coincore,
     private val addressFactory: AddressFactory,
-    private val swapRepository: SwapRepository,
+    private val custodialRepository: CustodialRepository,
     private val eligibilityProvider: EligibilityProvider
 ) {
     private var transactionProcessor: TransactionProcessor? = null
@@ -89,7 +89,7 @@ class TransactionInteractor(
         else
             Singles.zip(
                 coincore.getTransactionTargets(sourceAccount, action),
-                swapRepository.getSwapAvailablePairs(),
+                custodialRepository.getSwapAvailablePairs(),
                 eligibilityProvider.isEligibleForSimpleBuy()
             ).map { (accountList, pairs, eligible) ->
                 accountList.filterIsInstance(CryptoAccount::class.java)
@@ -104,7 +104,7 @@ class TransactionInteractor(
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
         return coincore.allWallets()
             .zipWith(
-                swapRepository.getSwapAvailablePairs()
+                custodialRepository.getSwapAvailablePairs()
             ).map { (accountGroup, pairs) ->
                 accountGroup.accounts.filter { account ->
                     (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false

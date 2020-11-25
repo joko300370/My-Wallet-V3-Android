@@ -145,12 +145,12 @@ abstract class QuotedEngine(
         )
 
     protected fun Single<TxResult>.updateOrderStatus(orderId: String): Single<TxResult> = onErrorResumeNext { error ->
-        walletManager.updateSwapOrder(orderId, false).onErrorComplete().toSingle {
+        walletManager.updateOrder(orderId, false).onErrorComplete().toSingle {
             throw error
         }
     }
         .flatMap { result ->
-            walletManager.updateSwapOrder(orderId, true).onErrorComplete().thenSingle {
+            walletManager.updateOrder(orderId, true).onErrorComplete().thenSingle {
                 Single.just(result)
             }
         }

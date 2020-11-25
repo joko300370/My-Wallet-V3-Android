@@ -3,10 +3,11 @@ package piuk.blockchain.android.coincore.btc
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -20,7 +21,7 @@ import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -85,7 +86,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = CustodialTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -95,8 +96,7 @@ class BtcAccountActivityTest {
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroEth,
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"
         )
@@ -105,7 +105,7 @@ class BtcAccountActivityTest {
 
         whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
             .thenReturn(Single.just(transactionSummaries))
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         subject.activity
@@ -117,10 +117,10 @@ class BtcAccountActivityTest {
                 val btcItem = it[0]
 
                 it.size == 1 &&
-                    btcItem is BtcActivitySummaryItem &&
-                    btcItem.txId == summary.hash &&
-                    btcItem.confirmations == summary.confirmations &&
-                    btcItem.transactionType == summary.transactionType
+                        btcItem is BtcActivitySummaryItem &&
+                        btcItem.txId == summary.hash &&
+                        btcItem.confirmations == summary.confirmations &&
+                        btcItem.transactionType == summary.transactionType
             }
 
         verify(payloadDataManager).getAccountTransactions(any(), any(), any())
@@ -142,7 +142,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = CustodialTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -152,8 +152,7 @@ class BtcAccountActivityTest {
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroEth,
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"
         )
@@ -162,7 +161,7 @@ class BtcAccountActivityTest {
 
         whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
             .thenReturn(Single.just(transactionSummaries))
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         subject.activity
@@ -174,16 +173,16 @@ class BtcAccountActivityTest {
                 val swapItem = it[0]
 
                 it.size == 1 &&
-                swapItem is SwapActivitySummaryItem &&
-                swapItem.txId == swapSummary.txId &&
-                swapItem.direction == swapSummary.direction &&
-                swapItem.sendingAsset == swapSummary.sendingAsset &&
-                swapItem.receivingAsset == swapSummary.receivingAsset &&
-                swapItem.sendingAddress == swapSummary.sendingAddress &&
-                swapItem.receivingAddress == swapSummary.receivingAddress &&
-                swapItem.state == swapSummary.state &&
-                swapItem.fiatValue == swapSummary.fiatValue &&
-                swapItem.fiatCurrency == swapSummary.fiatCurrency
+                        swapItem is CustodialActivitySummaryItem &&
+                        swapItem.txId == swapSummary.txId &&
+                        swapItem.direction == swapSummary.direction &&
+                        swapItem.currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC,
+                    CryptoCurrency.ETHER) &&
+                        swapItem.sendingAddress == swapSummary.sendingAddress &&
+                        swapItem.receivingAddress == swapSummary.receivingAddress &&
+                        swapItem.state == swapSummary.state &&
+                        swapItem.fiatValue == swapSummary.fiatValue &&
+                        swapItem.fiatCurrency == swapSummary.fiatCurrency
             }
 
         verify(payloadDataManager).getAccountTransactions(any(), any(), any())
@@ -205,7 +204,7 @@ class BtcAccountActivityTest {
 
         val transactionSummaries = listOf(summary)
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = CustodialTransactionItem(
             TX_HASH_SWAP,
             1L,
             TransferDirection.ON_CHAIN,
@@ -215,8 +214,7 @@ class BtcAccountActivityTest {
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroEth,
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"
         )
@@ -225,7 +223,7 @@ class BtcAccountActivityTest {
 
         whenever(payloadDataManager.getAccountTransactions(any(), any(), any()))
             .thenReturn(Single.just(transactionSummaries))
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         subject.activity
@@ -237,10 +235,10 @@ class BtcAccountActivityTest {
                 val btcItem = it[0]
 
                 it.size == 1 &&
-                btcItem is BtcActivitySummaryItem &&
-                btcItem.txId == summary.hash &&
-                btcItem.confirmations == summary.confirmations &&
-                btcItem.transactionType == summary.transactionType
+                        btcItem is BtcActivitySummaryItem &&
+                        btcItem.txId == summary.hash &&
+                        btcItem.confirmations == summary.confirmations &&
+                        btcItem.transactionType == summary.transactionType
             }
 
         verify(payloadDataManager).getAccountTransactions(any(), any(), any())
