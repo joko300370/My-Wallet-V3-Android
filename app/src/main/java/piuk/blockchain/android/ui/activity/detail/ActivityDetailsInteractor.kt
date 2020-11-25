@@ -150,8 +150,8 @@ class ActivityDetailsInteractor(
     }
 
     private fun buildReceivingLabel(item: TradeActivitySummaryItem): Single<To> {
-        val cryptoPair = item.currencyPair as? CurrencyPair.CryptoCurrencyPair
-            ?: throw IllegalStateException("Receive label is only supported for swap summary items")
+        require(item.currencyPair is CurrencyPair.CryptoCurrencyPair)
+        val cryptoPair = item.currencyPair
         return when (item.direction) {
             TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
                 .toSingle().map {

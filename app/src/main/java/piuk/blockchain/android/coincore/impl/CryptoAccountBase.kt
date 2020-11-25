@@ -88,7 +88,7 @@ abstract class CryptoAccountBase : CryptoAccount {
     private fun normaliseTxId(txId: String): String =
         txId.replace("-", "")
 
-    protected fun appendCustodialActivity(
+    protected fun appendTradeActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
         activityList: List<ActivitySummaryItem>

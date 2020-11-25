@@ -118,7 +118,7 @@ open class CustodialTradingAccount(
             .mapList { orderToSummary(it) }
             .filterActivityStates()
             .flatMap {
-                appendCustodialActivity(custodialWalletManager, asset, it)
+                appendTradeActivity(custodialWalletManager, asset, it)
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
