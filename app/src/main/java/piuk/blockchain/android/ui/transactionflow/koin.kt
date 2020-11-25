@@ -115,6 +115,8 @@ val transactionModule = module {
                 coincore = payloadScope.get(),
                 addressFactory = payloadScope.get(),
                 custodialRepository = payloadScope.get(),
+                custodialWalletManager = payloadScope.get(),
+                currencyPrefs = get(),
                 eligibilityProvider = payloadScope.get()
             )
         }

@@ -798,7 +798,6 @@ class LiveCustodialWalletManager(
     }
 
     companion object {
-
         internal val SUPPORTED_FUNDS_CURRENCIES = listOf(
             "GBP", "EUR", "USD"
         )

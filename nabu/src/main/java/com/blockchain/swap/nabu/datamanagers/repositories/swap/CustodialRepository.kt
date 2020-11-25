@@ -8,7 +8,7 @@ import io.reactivex.Single
 
 class CustodialRepository(pairsProvider: TradingPairsProvider, activityProvider: SwapActivityProvider) {
 
-    private val swapPairsCache = TimedCacheRequest(
+    private val pairsCache = TimedCacheRequest(
         cacheLifetimeSeconds = LONG_CACHE,
         refreshFn = {
             pairsProvider.getAvailablePairs()
@@ -23,7 +23,7 @@ class CustodialRepository(pairsProvider: TradingPairsProvider, activityProvider:
     )
 
     fun getSwapAvailablePairs(): Single<List<CurrencyPair.CryptoCurrencyPair>> =
-        swapPairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
+        pairsCache.getCachedSingle().map { it.filterIsInstance<CurrencyPair.CryptoCurrencyPair>() }
 
     fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
