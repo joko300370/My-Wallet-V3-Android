@@ -18,7 +18,7 @@ sealed class ActivityDetailsType
 data class Created(val date: Date) : ActivityDetailsType()
 data class Amount(val value: Money) : ActivityDetailsType()
 data class Fee(val feeValue: Money?) : ActivityDetailsType()
-data class SwapFee(val feeValue: Money) : ActivityDetailsType()
+data class NetworkFee(val feeValue: Money) : ActivityDetailsType()
 data class Value(val currentFiatValue: Money?) : ActivityDetailsType()
 data class HistoricValue(
     val fiatAtExecution: Money?,
@@ -37,7 +37,7 @@ data class Action(val action: String = "") : ActivityDetailsType()
 data class CancelAction(val cancelAction: String = "") : ActivityDetailsType()
 data class BuyFee(val feeValue: FiatValue) : ActivityDetailsType()
 data class BuyPurchaseAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
-data class SellPurchaseAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
+data class SellPurchaseAmount(val value: Money) : ActivityDetailsType()
 data class TransactionId(val txId: String) : ActivityDetailsType()
 data class BuyCryptoWallet(val crypto: CryptoCurrency) : ActivityDetailsType()
 data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
@@ -83,6 +83,7 @@ class ActivityDetailsModel(
                     CryptoActivityType.CUSTODIAL_TRADING -> loadCustodialTradingActivityDetails(intent)
                     CryptoActivityType.CUSTODIAL_INTEREST -> loadCustodialInterestActivityDetails(intent)
                     CryptoActivityType.SWAP -> loadSwapActivityDetails(intent)
+                    CryptoActivityType.SELL -> loadSellActivityDetails(intent)
                     CryptoActivityType.UNKNOWN -> {
                         throw IllegalStateException(
                             "Cannot load activity details for an unknown account type"
@@ -122,8 +123,25 @@ class ActivityDetailsModel(
             is LoadCustodialTradingHeaderDataIntent,
             is LoadCustodialInterestHeaderDataIntent,
             is LoadSwapHeaderDataIntent,
+            is LoadSellHeaderDataIntent,
             is LoadNonCustodialHeaderDataIntent -> null
         }
+    }
+
+    private fun loadSellActivityDetails(intent: LoadActivityDetailsIntent) {
+        interactor.getTradeActivityDetails(
+            cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash
+        )?.let {
+            process(LoadSellHeaderDataIntent(it))
+            interactor.loadSellItems(it).subscribeBy(
+                onSuccess = { items ->
+                    process(ListItemsLoadedIntent(items))
+                },
+                onError = {
+                    process(ListItemsFailedToLoadIntent)
+                })
+        } ?: process(ActivityDetailsLoadFailedIntent)
     }
 
     private fun loadListDetailsForDirection(
@@ -181,7 +199,7 @@ class ActivityDetailsModel(
         } ?: process(ActivityDetailsLoadFailedIntent)
 
     private fun loadSwapActivityDetails(intent: LoadActivityDetailsIntent) =
-        interactor.getSwapActivityDetails(cryptoCurrency = intent.cryptoCurrency,
+        interactor.getTradeActivityDetails(cryptoCurrency = intent.cryptoCurrency,
             txHash = intent.txHash)?.let {
             process(LoadSwapHeaderDataIntent(it))
             interactor.loadSwapItems(it).subscribeBy(

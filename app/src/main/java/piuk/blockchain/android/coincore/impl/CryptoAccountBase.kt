@@ -26,6 +26,7 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -198,8 +199,9 @@ abstract class CryptoNonCustodialAccount(
         tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> {
+        val removedIndexes = mutableListOf<Int>()
         val activityList = activity.toMutableList()
-        tradeItems.forEach { custodialItem ->
+        tradeItems.forEachIndexed { index, custodialItem ->
             val hit = activityList.find {
                 it.txId.contains(custodialItem.txId, true)
             } as? NonCustodialActivitySummaryItem
@@ -211,9 +213,15 @@ abstract class CryptoNonCustodialAccount(
                         .map { it as Money }
                 )
                 activityList.add(updatedSwap)
+                removedIndexes.add(index)
             }
         }
-        return activityList.toList()
+
+        val mutableTrades = tradeItems.toMutableList()
+        removedIndexes.forEach {
+            mutableTrades.removeAt(it)
+        }
+        return activityList.toList() + mutableTrades.toList()
     }
 }
 

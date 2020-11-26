@@ -60,7 +60,7 @@ private class SellActivityItemViewHolder(
                 if (tx.state.isPending) {
                     icon.setIsConfirming()
                 } else {
-                    icon.setImageResource(R.drawable.ic_tx_swap)
+                    icon.setImageResource(R.drawable.ic_tx_sell)
                     icon.setAssetIconColours(it.source, context)
                 }
                 setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SELL) }
