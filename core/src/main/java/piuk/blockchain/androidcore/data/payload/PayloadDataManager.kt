@@ -80,7 +80,8 @@ class PayloadDataManager(
     val payloadChecksum: String?
         get() = payloadManager.payloadChecksum
 
-    var tempPassword: String
+    // Can be null if the user is not currently logged in and has no pin set
+    var tempPassword: String?
         get() = payloadManager.tempPassword
         set(password) {
             payloadManager.tempPassword = password
