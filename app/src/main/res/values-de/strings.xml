@@ -1669,7 +1669,7 @@
  Bitte versuchen Sie es später noch einmal.</string>
   <string name="algo_default_account_label">Meine Algorand Brieftasche</string>
   <string name="usdt_default_account_label">Mein Tether Wallet</string>
-  <string name="add_bank_title" formatted="false">%1s Bank %1s</string>
+  <string name="add_bank_title" formatted="false">Bank hinzufügen %1$s</string>
   <string name="order_error_subtitle">Mach dir keine Sorgen. Ihr Geld ist sicher. Bitte versuchen Sie es erneut oder wenden Sie sich an unser Suppport-Team, um Hilfe zu erhalten.</string>
   <string name="currency_not_supported_1">Derzeit unterstützen wir den Kauf von Krypto mit %1s</string>
   <string name="checkout_funds_label">Mittel</string>
