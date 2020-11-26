@@ -17,8 +17,6 @@ import android.text.util.Linkify
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -46,6 +44,7 @@ import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import kotlinx.android.synthetic.main.modal_change_password2.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -80,6 +79,7 @@ import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost {
 
@@ -827,21 +827,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val newPasswordConfirmation =
             pwLayout.findViewById<AppCompatEditText>(R.id.confirm_password)
 
-        val entropyMeter = pwLayout.findViewById<RelativeLayout>(R.id.entropy_meter)
-        val passStrengthBar = pwLayout.findViewById<ProgressBar>(R.id.pass_strength_bar)
-        passStrengthBar.max = 100
-        val passStrengthVerdict = pwLayout.findViewById<TextView>(R.id.pass_strength_verdict)
-
         newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
                 newPassword.postDelayed({
                     if (activity != null && !activity!!.isFinishing) {
-                        entropyMeter.visibility = View.VISIBLE
-                        setPasswordStrength(
-                            passStrengthVerdict,
-                            passStrengthBar,
-                            editable.toString()
-                        )
+                        password_strength.visibility = View.VISIBLE
+                        setPasswordStrength(editable.toString())
                     }
                 }, 200)
             }
@@ -977,24 +968,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun setPasswordStrength(
-        passStrengthVerdict: TextView,
-        passStrengthBar: ProgressBar,
         pw: String
     ) {
         if (activity != null && !activity!!.isFinishing) {
-            val strengthVerdicts = intArrayOf(
-                R.string.strength_weak,
-                R.string.strength_medium,
-                R.string.strength_normal,
-                R.string.strength_strong
-            )
-            val strengthColors = intArrayOf(
-                R.drawable.progress_red,
-                R.drawable.progress_orange,
-                R.drawable.progress_blue,
-                R.drawable.progress_green
-            )
-            pwStrength = Math.round(PasswordUtil.getStrength(pw)).toInt()
+            pwStrength = PasswordUtil.getStrength(pw).roundToInt()
 
             if (pw == settingsPresenter.email) pwStrength = 0
 
@@ -1010,10 +987,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                     pwStrengthLevel = 1
             }
 
-            passStrengthBar.progress = pwStrength
-            passStrengthBar.progressDrawable =
-                ContextCompat.getDrawable(activity!!, strengthColors[pwStrengthLevel])
-            passStrengthVerdict.text = resources.getString(strengthVerdicts[pwStrengthLevel])
+            password_strength.setStrengthProgress(pwStrength)
+            password_strength.updateLevelUI(pwStrengthLevel)
         }
     }
 
