@@ -26,7 +26,6 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -194,7 +193,7 @@ abstract class CryptoNonCustodialAccount(
 
     override val isArchived: Boolean
         get() = false
-    
+
     override fun reconcileSwaps(
         tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
