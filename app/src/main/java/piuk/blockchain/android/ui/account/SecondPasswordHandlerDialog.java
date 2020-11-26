@@ -1,18 +1,22 @@
 package piuk.blockchain.android.ui.account;
 
 import android.content.Context;
+import android.text.InputType;
+
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
-import android.text.InputType;
-import piuk.blockchain.android.util.CurrentContextAccess;
+
+import com.blockchain.ui.password.SecondPasswordHandler;
+
+import org.jetbrains.annotations.NotNull;
+
 import info.blockchain.wallet.payload.PayloadManager;
 import io.reactivex.Observable;
-import org.jetbrains.annotations.NotNull;
 import piuk.blockchain.android.R;
 import piuk.blockchain.android.data.rxjava.RxUtil;
-import com.blockchain.ui.password.SecondPasswordHandler;
-import com.blockchain.ui.dialog.MaterialProgressDialog;
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog;
+import piuk.blockchain.android.util.CurrentContextAccess;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.ViewUtils;
 import timber.log.Timber;

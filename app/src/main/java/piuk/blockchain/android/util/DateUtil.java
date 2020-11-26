@@ -1,14 +1,15 @@
-package piuk.blockchain.androidcoreui.utils;
+package piuk.blockchain.android.util;
 
 import android.content.Context;
 import android.text.format.DateUtils;
-import piuk.blockchain.androidcoreui.R;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import piuk.blockchain.androidcoreui.R;
+
+@Deprecated()
 public class DateUtil {
 
     private Context context;

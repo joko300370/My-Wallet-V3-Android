@@ -1,16 +1,15 @@
-package com.blockchain.ui.dialog
+package piuk.blockchain.android.ui.customviews.dialogs
 
 import android.content.Context
 import android.content.DialogInterface
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.os.Build
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import android.view.View
 import kotlinx.android.synthetic.main.progress_dialog_compat.view.*
-
-import piuk.blockchain.androidcoreui.R
+import piuk.blockchain.android.R
 
 /**
  * Creates an [AlertDialog] with a custom view for emulating a Material Design progress

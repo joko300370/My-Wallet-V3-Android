@@ -6,7 +6,7 @@
     </style>
 
     <style name="Text.Standard">
-        <item name="fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter_medium</item>
     </style>
 
     <style name="Text.Standard.12">
@@ -54,7 +54,7 @@
     </style>
 
     <style name="Text.VeryLight.Semibold">
-        <item name="fontFamily">@font/inter_medium</item>
+        <item name="fontFamily">@font/inter_semibold</item>
     </style>
 
     <style name="Text.VeryLight.Semibold.16">
@@ -78,7 +78,7 @@
     </style>
 
     <style name="Text.Red.Semibold">
-        <item name="fontFamily">@font/inter_medium</item>
+        <item name="fontFamily">@font/inter_semibold</item>
     </style>
 
     <style name="Text.Red.Semibold.12">
@@ -86,7 +86,7 @@
     </style>
 
     <style name="Text.Blue.Semibold">
-        <item name="fontFamily">@font/inter_medium</item>
+        <item name="fontFamily">@font/inter_semibold</item>
     </style>
 
     <style name="Text.Blue.Semibold.12">
@@ -102,7 +102,7 @@
     </style>
 
     <style name="Text.White.Semibold">
-        <item name="fontFamily">@font/inter_medium</item>
+        <item name="fontFamily">@font/inter_semibold</item>
     </style>
 
     <style name="Text.Blue.Semibold.Centered">
@@ -154,7 +154,7 @@
     </style>
 
     <style name="Text.Semibold">
-        <item name="fontFamily">@font/inter_medium</item>
+        <item name="fontFamily">@font/inter_semibold</item>
     </style>
 
     <style name="Text.Semibold.20">

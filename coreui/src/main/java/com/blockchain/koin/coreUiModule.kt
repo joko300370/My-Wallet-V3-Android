@@ -15,7 +15,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.androidcoreui.BuildConfig
-import piuk.blockchain.androidcoreui.utils.OverlayDetection
 import piuk.blockchain.androidcoreui.utils.logging.InjectableLogging
 
 val coreUiModule = module {
@@ -34,10 +33,6 @@ val coreUiModule = module {
         .bind(ABTestExperiment::class)
 
     factory { InjectableLogging(get()) as EventLogger }
-
-    single {
-        OverlayDetection(get())
-    }
 
     single {
         CrashLoggerImpl(BuildConfig.DEBUG)

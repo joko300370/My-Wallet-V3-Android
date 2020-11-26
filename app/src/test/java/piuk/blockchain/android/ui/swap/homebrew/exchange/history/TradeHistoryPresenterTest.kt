@@ -13,7 +13,7 @@ import org.junit.Test
 import piuk.blockchain.android.ui.swapold.exchange.history.ExchangeUiState
 import piuk.blockchain.android.ui.swapold.exchange.history.TradeHistoryPresenter
 import piuk.blockchain.android.ui.swapold.exchange.history.TradeHistoryView
-import piuk.blockchain.androidcoreui.utils.DateUtil
+import piuk.blockchain.android.util.DateUtil
 import java.util.Locale
 
 class TradeHistoryPresenterTest {

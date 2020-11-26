@@ -1,4 +1,4 @@
-package com.blockchain.ui.dialog
+package piuk.blockchain.android.ui.customviews.dialogs
 
 import android.app.Dialog
 import android.content.Context
@@ -11,14 +11,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.androidcoreui.R
+import kotlinx.android.synthetic.main.dialog_select_country.*
+import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 import java.util.SortedMap
 import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.dialog_select_country.list_view_countries as listView
-import kotlinx.android.synthetic.main.dialog_select_country.progress_bar_select_country_dialog as progressBar
-import kotlinx.android.synthetic.main.dialog_select_country.search_view_country as searchView
 
 class CountryDialog(
     context: Context,
@@ -50,10 +48,10 @@ class CountryDialog(
             android.R.id.text1,
             countryMap.keys.toTypedArray()
         )
-        listView.adapter = arrayAdapter
-        progressBar.gone()
+        list_view_countries.adapter = arrayAdapter
+        progress_bar_select_country_dialog.gone()
 
-        listView.onItemClickListener =
+        list_view_countries.onItemClickListener =
             AdapterView.OnItemClickListener { parent, _, position, _ ->
                 val item = parent!!.getItemAtPosition(position).toString()
                 val code = countryMap[item]!!
@@ -61,7 +59,7 @@ class CountryDialog(
                 dismiss()
             }
 
-        searchView.apply {
+        search_view_country.apply {
             queryHint = context.getString(R.string.search_country)
 
             this.queryTextChanges()
