@@ -38,7 +38,7 @@ import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.cards.CardResponse
@@ -683,13 +683,13 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getSwapActivityForAsset(
+    override fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<SwapTransactionItem>> =
-        custodialRepository.getSwapActivityForAsset(cryptoCurrency, directions)
+    ): Single<List<TradeTransactionItem>> =
+        custodialRepository.getCustodialActivityForAsset(cryptoCurrency, directions)
 
-    override fun updateSwapOrder(id: String, success: Boolean): Completable =
+    override fun updateOrder(id: String, success: Boolean): Completable =
         authenticator.authenticateCompletable { sessionToken ->
             nabuService.updateOrder(
                 sessionToken = sessionToken,
@@ -766,7 +766,7 @@ class LiveCustodialWalletManager(
     private fun CustodialOrderResponse.toSwapOrder(): CustodialOrder? {
         return CustodialOrder(
             id = this.id,
-            state = this.state.toSwapState(),
+            state = this.state.toCustodialOrderState(),
             depositAddress = this.kind.depositAddress,
             createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
             inputMoney = CryptoValue.fromMinor(
@@ -785,7 +785,7 @@ class LiveCustodialWalletManager(
     private fun CustodialOrderResponse.toCustodialOrder(): CustodialOrder? {
         return CustodialOrder(
             id = this.id,
-            state = this.state.toSwapState(),
+            state = this.state.toCustodialOrderState(),
             depositAddress = this.kind.depositAddress,
             createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
             inputMoney = CurrencyPair.fromRawPair(pair, SUPPORTED_FUNDS_CURRENCIES)?.let {
@@ -798,8 +798,7 @@ class LiveCustodialWalletManager(
     }
 
     companion object {
-
-        val SUPPORTED_FUNDS_CURRENCIES = listOf(
+        internal val SUPPORTED_FUNDS_CURRENCIES = listOf(
             "GBP", "EUR", "USD"
         )
     }
@@ -819,7 +818,7 @@ private fun String.toTransactionState(): TransactionState =
         else -> TransactionState.UNKNOWN
     }
 
-fun String.toSwapState(): CustodialOrderState =
+fun String.toCustodialOrderState(): CustodialOrderState =
     when (this) {
         CustodialOrderResponse.CREATED -> CustodialOrderState.CREATED
         CustodialOrderResponse.PENDING_CONFIRMATION -> CustodialOrderState.PENDING_CONFIRMATION

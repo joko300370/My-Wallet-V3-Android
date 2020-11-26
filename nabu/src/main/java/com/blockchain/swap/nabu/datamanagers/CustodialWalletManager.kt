@@ -1,11 +1,12 @@
 package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -187,12 +188,12 @@ interface CustodialWalletManager {
 
     fun getSwapTrades(): Single<List<CustodialOrder>>
 
-    fun getSwapActivityForAsset(
+    fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
         directions: Set<TransferDirection>
-    ): Single<List<SwapTransactionItem>>
+    ): Single<List<TradeTransactionItem>>
 
-    fun updateSwapOrder(
+    fun updateOrder(
         id: String,
         success: Boolean
     ): Completable
@@ -505,18 +506,21 @@ sealed class CurrencyPair(val rawValue: String) {
 
     fun toDestinationMoney(value: BigInteger): Money =
         when (this) {
-            is CryptoCurrencyPair -> CryptoValue.fromMinor(source, value)
+            is CryptoCurrencyPair -> CryptoValue.fromMinor(destination, value)
             is CryptoToFiatCurrencyPair -> FiatValue.fromMinor(destination, value.toLong())
         }
 
     fun toDestinationMoney(value: BigDecimal): Money =
         when (this) {
-            is CryptoCurrencyPair -> CryptoValue.fromMajor(source, value)
+            is CryptoCurrencyPair -> CryptoValue.fromMajor(destination, value)
             is CryptoToFiatCurrencyPair -> FiatValue.fromMajor(destination, value)
         }
 
     companion object {
-        fun fromRawPair(rawValue: String, supportedFiatCurrencies: List<String>): CurrencyPair? {
+        fun fromRawPair(
+            rawValue: String,
+            supportedFiatCurrencies: List<String> = LiveCustodialWalletManager.SUPPORTED_FUNDS_CURRENCIES
+        ): CurrencyPair? {
             val parts = rawValue.split("-")
             val source: CryptoCurrency = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return null
             val destinationCryptoCurrency: CryptoCurrency? = CryptoCurrency.fromNetworkTicker(parts[1])

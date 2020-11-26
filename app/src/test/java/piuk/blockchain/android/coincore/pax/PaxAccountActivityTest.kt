@@ -3,10 +3,11 @@ package piuk.blockchain.android.coincore.pax
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -78,7 +79,7 @@ class PaxAccountActivityTest {
             timestamp = 1557334297
         )
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "123",
             1L,
             TransferDirection.ON_CHAIN,
@@ -88,8 +89,7 @@ class PaxAccountActivityTest {
             CryptoValue.ZeroPax,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.PAX,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.PAX, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
@@ -120,7 +120,7 @@ class PaxAccountActivityTest {
             )
         )
 
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         subject.activity

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.repositories
 
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.repositories.ExpiringRepository
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
@@ -14,7 +15,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -66,9 +67,13 @@ class AssetActivityRepository(
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
         }
 
-    fun findCachedSwapItem(cryptoCurrency: CryptoCurrency, txHash: String): SwapActivitySummaryItem? =
-        transactionCache.filterIsInstance<SwapActivitySummaryItem>().find {
-            it.sendingAsset == cryptoCurrency && it.txId == txHash
+    fun findCachedSwapItem(cryptoCurrency: CryptoCurrency, txHash: String): TradeActivitySummaryItem? =
+        transactionCache.filterIsInstance<TradeActivitySummaryItem>().find {
+            when (it.currencyPair) {
+                is CurrencyPair.CryptoCurrencyPair -> it.currencyPair.source == cryptoCurrency && it.txId == txHash
+                is CurrencyPair.CryptoToFiatCurrencyPair ->
+                    it.currencyPair.source == cryptoCurrency && it.txId == txHash
+            }
         }
 
     fun findCachedItem(currency: String, txHash: String): FiatActivitySummaryItem? =

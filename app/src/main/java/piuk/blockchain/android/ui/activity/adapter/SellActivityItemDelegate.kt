@@ -20,29 +20,29 @@ import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import java.util.Date
 
-class SwapActivityItemDelegate<in T>(
+class SellActivityItemDelegate<in T>(
     private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         (items[position] as? TradeActivitySummaryItem)?.let {
-            it.currencyPair is CurrencyPair.CryptoCurrencyPair
+            it.currencyPair is CurrencyPair.CryptoToFiatCurrencyPair
         } ?: false
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        SwapActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
+        SellActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
 
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
-    ) = (holder as SwapActivityItemViewHolder).bind(
+    ) = (holder as SellActivityItemViewHolder).bind(
         items[position] as TradeActivitySummaryItem,
         onItemClicked
     )
 }
 
-private class SwapActivityItemViewHolder(
+private class SellActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
@@ -51,13 +51,11 @@ private class SwapActivityItemViewHolder(
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {
-
             status_date.text = Date(tx.timeStampMs).toFormattedDate()
-            (tx.currencyPair as? CurrencyPair.CryptoCurrencyPair)?.let {
+            (tx.currencyPair as? CurrencyPair.CryptoToFiatCurrencyPair)?.let {
                 tx_type.text = context.resources.getString(
-                    R.string.tx_title_swap,
-                    it.source.displayTicker,
-                    it.destination.displayTicker
+                    R.string.tx_title_sell,
+                    it.source.displayTicker
                 )
                 if (tx.state.isPending) {
                     icon.setIsConfirming()
@@ -65,11 +63,9 @@ private class SwapActivityItemViewHolder(
                     icon.setImageResource(R.drawable.ic_tx_swap)
                     icon.setAssetIconColours(it.source, context)
                 }
-                setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP) }
+                setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SELL) }
             }
-
             setTextColours(tx.state.isPending)
-
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
             asset_balance_fiat.text = tx.fiatValue.toStringWithSymbol()
             asset_balance_fiat.visible()

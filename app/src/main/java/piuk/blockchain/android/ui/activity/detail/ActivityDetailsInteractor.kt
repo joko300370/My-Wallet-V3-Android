@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
@@ -23,7 +24,7 @@ import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
@@ -125,7 +126,7 @@ class ActivityDetailsInteractor(
     }
 
     fun loadSwapItems(
-        item: SwapActivitySummaryItem
+        item: TradeActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
         val list = mutableListOf(
             TransactionId(item.txId),
@@ -148,14 +149,16 @@ class ActivityDetailsInteractor(
         }
     }
 
-    private fun buildReceivingLabel(item: SwapActivitySummaryItem): Single<To> {
+    private fun buildReceivingLabel(item: TradeActivitySummaryItem): Single<To> {
+        require(item.currencyPair is CurrencyPair.CryptoCurrencyPair)
+        val cryptoPair = item.currencyPair
         return when (item.direction) {
-            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(item.receivingAsset, item.receivingAddress!!)
+            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
                 .toSingle().map {
                     To(it.label)
                 }
             TransferDirection.INTERNAL,
-            TransferDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial)
+            TransferDirection.FROM_USERKEY -> coincore[cryptoPair.destination].accountGroup(AssetFilter.Custodial)
                 .toSingle()
                 .map {
                     To(it.selectFirstAccount().label)
@@ -200,7 +203,7 @@ class ActivityDetailsInteractor(
     fun getSwapActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
-    ): SwapActivitySummaryItem? =
+    ): TradeActivitySummaryItem? =
         assetActivityRepository.findCachedSwapItem(cryptoCurrency, txHash)
 
     fun getFiatActivityDetails(
