@@ -194,14 +194,13 @@ abstract class CryptoNonCustodialAccount(
 
     override val isArchived: Boolean
         get() = false
-
+    
     override fun reconcileSwaps(
         tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> {
-        val removedIndexes = mutableListOf<Int>()
         val activityList = activity.toMutableList()
-        tradeItems.forEachIndexed { index, custodialItem ->
+        tradeItems.forEach { custodialItem ->
             val hit = activityList.find {
                 it.txId.contains(custodialItem.txId, true)
             } as? NonCustodialActivitySummaryItem
@@ -213,15 +212,9 @@ abstract class CryptoNonCustodialAccount(
                         .map { it as Money }
                 )
                 activityList.add(updatedSwap)
-                removedIndexes.add(index)
             }
         }
-
-        val mutableTrades = tradeItems.toMutableList()
-        removedIndexes.forEach {
-            mutableTrades.removeAt(it)
-        }
-        return activityList.toList() + mutableTrades.toList()
+        return activityList.toList()
     }
 }
 
