@@ -148,7 +148,8 @@ data class BuySellOrderResponse(
     val attributes: CardPaymentAttributes?,
     val expiresAt: String,
     val updatedAt: String,
-    val side: String
+    val side: String,
+    val depositPaymentId: String?
 ) {
     companion object {
         const val PENDING_DEPOSIT = "PENDING_DEPOSIT"

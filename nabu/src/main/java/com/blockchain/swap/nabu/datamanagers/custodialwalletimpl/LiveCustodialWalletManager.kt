@@ -917,7 +917,8 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
         else
             FiatValue.fromMinor(outputCurrency, outputQuantity.toLongOrDefault(0)),
         attributes = attributes,
-        type = type()
+        type = type(),
+        depositPaymentId = depositPaymentId ?: ""
     )
 }
 
