@@ -1,12 +1,8 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
-import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ASSET
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_ERROR
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_SOURCE
-import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_TARGET
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.constructMap
 
 sealed class SwapAnalyticsEvents(
     override val event: String,
@@ -62,19 +58,4 @@ sealed class SwapAnalyticsEvents(
         source = source,
         error = error
     ))
-
-    companion object {
-        private fun constructMap(
-            asset: CryptoCurrency,
-            target: String?,
-            error: String? = null,
-            source: String? = null
-        ): Map<String, String> =
-            mapOf(
-                PARAM_ASSET to asset.networkTicker,
-                PARAM_TARGET to target,
-                PARAM_SOURCE to source,
-                PARAM_ERROR to error
-            ).withoutNullValues()
-    }
 }
