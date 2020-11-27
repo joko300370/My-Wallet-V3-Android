@@ -23,7 +23,6 @@ enum class CryptoCurrency(
                 CryptoCurrency.MULTI_WALLET or
                 CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
 
-
     ),
     ETHER(
         networkTicker = "ETH",
