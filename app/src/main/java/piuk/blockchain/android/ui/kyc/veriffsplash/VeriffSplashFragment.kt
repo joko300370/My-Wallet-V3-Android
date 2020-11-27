@@ -38,8 +38,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.StringUtils
@@ -65,9 +63,6 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private val presenter: VeriffSplashPresenter by scopedInject()
     private val stringUtils: StringUtils by inject()
-    private val currencyPrefs: CurrencyPrefs by inject()
-    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
-    private val compositeDisposable = CompositeDisposable()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     override val countryCode by unsafeLazy {
         VeriffSplashFragmentArgs.fromBundle(arguments ?: Bundle()).countryCode
@@ -178,29 +173,14 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
     }
 
     override fun continueToSwap() {
-        val activity = requireActivity()
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        TransactionFlow(
-                            action = AssetAction.Swap
-                        ).apply {
-                            startFlow(
-                                fragmentManager = childFragmentManager,
-                                host = this@VeriffSplashFragment
-                            )
-                        }
-                    } else {
-                        HomebrewNavHostActivity.start(
-                            activity,
-                            currencyPrefs.selectedFiatCurrency
-                        )
-                        activity.finish()
-                    }
-                }
+        TransactionFlow(
+            action = AssetAction.Swap
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@VeriffSplashFragment
             )
+        }
     }
 
     override fun createPresenter(): VeriffSplashPresenter = presenter

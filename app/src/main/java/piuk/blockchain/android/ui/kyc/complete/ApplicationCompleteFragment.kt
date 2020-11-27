@@ -27,7 +27,6 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
@@ -69,6 +68,8 @@ class ApplicationCompleteFragment : Fragment() {
                     onNext = { (_, isTier1OrTier2Verified) ->
                         when (progressListener.campaignType) {
                             CampaignType.Swap -> {
+                            /* // todo launch flow
+
                                 activity?.finish()
                                 if (isTier1OrTier2Verified) {
                                     HomebrewNavHostActivity.start(
@@ -77,7 +78,7 @@ class ApplicationCompleteFragment : Fragment() {
                                     )
                                 } else {
                                     KycStatusActivity.start(requireContext(), CampaignType.Swap)
-                                }
+                                }*/
                             }
                             CampaignType.SimpleBuy -> {
                                 activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE)

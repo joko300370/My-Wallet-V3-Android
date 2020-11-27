@@ -5,7 +5,6 @@ import com.blockchain.koin.coinifyFeatureFlag
 import com.blockchain.koin.coinifyUsersToKyc
 import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.interestAccountFeatureFlag
-import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pitAnnouncementFeatureFlag
 import com.blockchain.koin.pitFeatureFlag
 import com.blockchain.koin.sellFeatureFlag
@@ -60,10 +59,6 @@ val featureFlagsModule = module {
 
     factory(interestAccountFeatureFlag) {
         get<RemoteConfig>().featureFlag("interest_account_enabled")
-    }
-
-    factory(newSwapFeatureFlag) {
-        get<RemoteConfig>().featureFlag("new_swap_enabled")
     }
 
     factory(dgldFeatureFlag) {
