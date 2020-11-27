@@ -101,6 +101,19 @@ class LoadSwapHeaderDataIntent(
     }
 }
 
+class LoadSellHeaderDataIntent(
+    private val summaryItem: TradeActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            transactionType = TransactionSummary.TransactionType.SELL,
+            amount = summaryItem.receivingValue,
+            isPending = summaryItem.state.isPending,
+            isFeeTransaction = false
+        )
+    }
+}
+
 class ListItemsLoadedIntent(
     private val list: List<ActivityDetailsType>
 ) : ActivityDetailsIntents() {

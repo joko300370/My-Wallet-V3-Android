@@ -67,7 +67,7 @@ class AssetActivityRepository(
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
         }
 
-    fun findCachedSwapItem(cryptoCurrency: CryptoCurrency, txHash: String): TradeActivitySummaryItem? =
+    fun findCachedTradeItem(cryptoCurrency: CryptoCurrency, txHash: String): TradeActivitySummaryItem? =
         transactionCache.filterIsInstance<TradeActivitySummaryItem>().find {
             when (it.currencyPair) {
                 is CurrencyPair.CryptoCurrencyPair -> it.currencyPair.source == cryptoCurrency && it.txId == txHash

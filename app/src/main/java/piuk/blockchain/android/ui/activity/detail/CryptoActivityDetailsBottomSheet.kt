@@ -62,12 +62,17 @@ class CryptoActivityDetailsBottomSheet :
         get() = this?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("Cryptocurrency should not be null")
 
+    private val Bundle?.activityType
+        get() = this?.getSerializable(ARG_ACTIVITY_TYPE) as? CryptoActivityType
+            ?: throw IllegalArgumentException("ActivityDetailsType should not be null")
+
     private lateinit var currentState: ActivityDetailState
 
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
     override fun initControls(view: View) {
+        loadActivityDetails(arguments.cryptoCurrency, arguments.txId, arguments.activityType)
         view.details_list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
@@ -203,11 +208,12 @@ class CryptoActivityDetailsBottomSheet :
 
                 status.text = getString(when {
                     transactionType == TransactionSummary.TransactionType.SENT ||
-                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }
-                    isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP -> {
+                    isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
+                            transactionType == TransactionSummary.TransactionType.SELL -> {
                         if (isFeeTransaction) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
                         } else {
@@ -215,8 +221,7 @@ class CryptoActivityDetailsBottomSheet :
                         }
                         R.string.activity_details_label_pending
                     }
-                    transactionType == TransactionSummary.TransactionType.BUY ||
-                        transactionType == TransactionSummary.TransactionType.SELL ->
+                    transactionType == TransactionSummary.TransactionType.BUY ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds
@@ -298,7 +303,8 @@ class CryptoActivityDetailsBottomSheet :
                 R.string.activity_details_title_received)
             TransactionSummary.TransactionType.SENT -> getString(R.string.activity_details_title_sent)
             TransactionSummary.TransactionType.BUY -> getString(R.string.activity_details_title_buy)
-            TransactionSummary.TransactionType.SELL -> getString(R.string.activity_details_title_sell)
+            TransactionSummary.TransactionType.SELL -> getString(R.string.activity_details_title_sell_1,
+                arguments.cryptoCurrency.displayTicker)
             TransactionSummary.TransactionType.SWAP -> getString(R.string.activity_details_title_swap)
             TransactionSummary.TransactionType.DEPOSIT -> getString(
                 R.string.activity_details_title_deposit)
@@ -355,6 +361,7 @@ class CryptoActivityDetailsBottomSheet :
 
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto_currency"
+        private const val ARG_ACTIVITY_TYPE = "activity_type"
         private const val ARG_TRANSACTION_HASH = "tx_hash"
 
         fun newInstance(
@@ -366,9 +373,8 @@ class CryptoActivityDetailsBottomSheet :
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                     putString(ARG_TRANSACTION_HASH, txHash)
+                    putSerializable(ARG_ACTIVITY_TYPE, activityType)
                 }
-
-                loadActivityDetails(cryptoCurrency, txHash, activityType)
             }
         }
     }

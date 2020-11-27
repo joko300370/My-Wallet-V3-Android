@@ -1771,7 +1771,7 @@
     <string name="activity_details_title_received">Receive</string>
     <string name="activity_details_title_sent">Send</string>
     <string name="activity_details_title_buy">Buy</string>
-    <string name="activity_details_title_sell">Sell</string>
+    <string name="activity_details_title_sell_1">Sell %1$s</string>
     <string name="activity_details_title_swap">Swap</string>
     <string name="activity_details_title_deposit">Transfer</string>
     <string name="activity_details_title_interest_earned">Interest Earned</string>

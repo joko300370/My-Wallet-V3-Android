@@ -140,12 +140,28 @@ class ActivityDetailsInteractor(
             buildReceivingLabel(item)
         ) { depositFee: Money, toItem: To ->
             list.apply {
-                add(SwapFee(depositFee))
+                add(NetworkFee(depositFee))
                 add(toItem)
                 add(SwapReceiveAmount(item.receivingValue))
-                add(SwapFee(item.withdrawalNetworkFee))
+                add(NetworkFee(item.withdrawalNetworkFee))
             }
             list.toList()
+        }
+    }
+
+    fun loadSellItems(
+        item: TradeActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> {
+        return item.depositNetworkFee.map { fee ->
+            listOf(
+                TransactionId(item.txId),
+                Created(Date(item.timeStampMs)),
+                From(item.sendingAccount.label),
+                Amount(item.sendingValue),
+                From(item.sendingAccount.label),
+                NetworkFee(fee),
+                SellPurchaseAmount(item.receivingValue)
+            )
         }
     }
 
@@ -200,11 +216,11 @@ class ActivityDetailsInteractor(
         assetActivityRepository.findCachedItem(cryptoCurrency,
             txHash) as? CustodialInterestActivitySummaryItem
 
-    fun getSwapActivityDetails(
+    fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): TradeActivitySummaryItem? =
-        assetActivityRepository.findCachedSwapItem(cryptoCurrency, txHash)
+        assetActivityRepository.findCachedTradeItem(cryptoCurrency, txHash)
 
     fun getFiatActivityDetails(
         currency: String,
