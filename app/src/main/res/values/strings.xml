@@ -27,6 +27,7 @@
     <string name="common_pending">Pending</string>
     <string name="common_free">Free</string>
     <string name="common_zero">0</string>
+    <string name="common_retry">Retry</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -174,9 +175,9 @@
     <string name="new_account_title">Create an Account</string>
     <string name="strength_weak">Weak</string>
     <string name="strength_medium">Regular</string>
-
+    <string name="strength_normal">Good</string>
     <string name="strength_strong">Strong</string>
-    <string name="strength_normal">Normal</string>
+    <string name="strength_hint">Use at least 8 characters, a mix of letters, numbers and symbols.</string>
 
     <string name="btn_continue">Continue</string>
     <string name="btn_forgot_password">Forgot Password?"</string>
@@ -215,9 +216,7 @@
     <string name="support_leaving_app_warning">This will leave the app and take you to your browser.
         Continue?
     </string>
-    <string name="weak_password">The selected password is too weak to secure your funds. We strongly
-        suggest you select a different one. Would you like to define a new password?
-    </string>
+    <string name="weak_password">The selected password is too weak to secure your funds. Please define a different password.</string>
 
     <string name="confirm_details">Confirm Payment</string>
 

@@ -20,7 +20,9 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-                CryptoCurrency.MULTI_WALLET
+                CryptoCurrency.MULTI_WALLET or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+
 
     ),
     ETHER(
@@ -30,7 +32,8 @@ enum class CryptoCurrency(
         userDp = 8,
         requiredConfirmations = 12,
         featureFlags =
-        CryptoCurrency.PRICE_CHARTING
+        CryptoCurrency.PRICE_CHARTING or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     BCH(
         networkTicker = "BCH",
@@ -40,7 +43,9 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-                CryptoCurrency.MULTI_WALLET
+                CryptoCurrency.MULTI_WALLET or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+
     ),
     XLM(
         networkTicker = "XLM",
@@ -49,7 +54,8 @@ enum class CryptoCurrency(
         userDp = 7,
         requiredConfirmations = 1,
         featureFlags =
-        CryptoCurrency.PRICE_CHARTING
+        CryptoCurrency.PRICE_CHARTING or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     ALGO(
         networkTicker = "ALGO",
@@ -73,7 +79,8 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
-        featureFlags = CryptoCurrency.IS_ERC20
+        featureFlags = CryptoCurrency.IS_ERC20 or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     USDT(
         networkTicker = "USDT",
@@ -110,11 +117,19 @@ enum class CryptoCurrency(
             it.hasFeature(IS_ERC20)
         }
 
+        @Deprecated("Temporary fix")
+        fun swipeToReceiveAssets(): List<CryptoCurrency> = values().filter {
+            it.hasFeature(OFFLINE_RECEIVE_ADDRESS)
+        }
+
         const val PRICE_CHARTING = 0x00000001L
         const val MULTI_WALLET = 0x00000002L
         const val CUSTODIAL_ONLY = 0x0000004L
         const val IS_ERC20 = 0x00000008L
 
         const val STUB_ASSET = 0x10000000L
+
+        // TEMP Crash workaround until swipe to receive is updated to use coincore
+        const val OFFLINE_RECEIVE_ADDRESS = 0x20000000L
     }
 }

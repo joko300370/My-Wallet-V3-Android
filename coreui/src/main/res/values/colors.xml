@@ -41,6 +41,7 @@
     <!-- For warning messages -->
     <color name="product_green_medium">@color/green_600</color>
     <color name="product_red_medium">@color/red_600</color>
+    <color name="product_orange_medium">@color/orange_600</color>
 
     <!-- Specified in designs but not named in spec -->
     <color name="primary_grey_dark">@color/grey_800</color>

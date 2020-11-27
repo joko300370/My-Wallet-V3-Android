@@ -34,6 +34,7 @@ import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.getDecimalPlaces
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -41,8 +42,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
-import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnTabSelectedListener
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -352,13 +351,9 @@ class AssetDetailSheet :
             xAxis.isGranularityEnabled = true
             setExtraOffsets(8f, 0f, 0f, 10f)
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_grey_medium))
-            loadFont(
-                context,
-                CustomFont.MONTSERRAT_LIGHT
-            ) {
-                xAxis.typeface = it
-                axisLeft.typeface = it
-            }
+            val typeFace = context.loadInterMedium()
+            xAxis.typeface = typeFace
+            axisLeft.typeface = typeFace
         }
     }
 
