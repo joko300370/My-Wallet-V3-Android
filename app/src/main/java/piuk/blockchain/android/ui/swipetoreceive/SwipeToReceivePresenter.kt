@@ -17,11 +17,11 @@ class SwipeToReceivePresenter(
 ) : BasePresenter<SwipeToReceiveView>() {
 
     internal var currencyPosition by Delegates.observable(0) { _, _, new ->
-        check(new in 0 until currencyList.size) { "Invalid currency position" }
+        check(new in currencyList.indices) { "Invalid currency position" }
         onCurrencySelected(currencyList[new])
     }
 
-    private val currencyList = CryptoCurrency.values()
+    private val currencyList = CryptoCurrency.swipeToReceiveAssets()
 
     private val bitcoinAddress: Single<String>
         get() = swipeToReceiveHelper.getNextAvailableBitcoinAddressSingle()

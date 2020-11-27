@@ -8,6 +8,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager.Companion.SUPPORTED_FUNDS_CURRENCIES
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.toCustodialOrderState
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
+import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -35,7 +36,7 @@ class SwapActivityProviderImpl(
                 val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
                 TradeTransactionItem(
                     txId = it.kind.depositTxHash ?: it.id,
-                    timeStampMs = it.createdAt.fromIso8601ToUtc()?.time
+                    timeStampMs = it.createdAt.fromIso8601ToUtc()?.toLocalTime()?.time
                         ?: throw java.lang.IllegalStateException("Missing timestamp or bad formatting"),
                     direction = it.kind.direction.mapToDirection(),
                     sendingAddress = it.kind.depositAddress,
