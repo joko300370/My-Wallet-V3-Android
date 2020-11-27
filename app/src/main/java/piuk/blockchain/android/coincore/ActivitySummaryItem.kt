@@ -125,7 +125,8 @@ data class CustodialTradingActivitySummaryItem(
     val type: OrderType,
     val fee: FiatValue,
     val paymentMethodId: String,
-    val paymentMethodType: PaymentMethodType
+    val paymentMethodType: PaymentMethodType,
+    val depositPaymentId: String
 ) : CryptoActivitySummaryItem()
 
 abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {

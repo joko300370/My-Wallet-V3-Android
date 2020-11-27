@@ -172,7 +172,8 @@ open class CustodialTradingAccount(
                 account = this,
                 type = order.type,
                 paymentMethodId = order.paymentMethodId,
-                paymentMethodType = order.paymentMethodType
+                paymentMethodType = order.paymentMethodType,
+                depositPaymentId = order.depositPaymentId
             )
         } else {
             TradeActivitySummaryItem(

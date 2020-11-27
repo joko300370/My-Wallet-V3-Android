@@ -6,12 +6,6 @@ import android.preference.PreferenceManager
 import com.blockchain.datamanagers.AccountLookup
 import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.DataManagerPayloadDecrypt
-import com.blockchain.datamanagers.MaximumSpendableCalculator
-import com.blockchain.datamanagers.SelfFeeCalculatingTransactionExecutor
-import com.blockchain.datamanagers.TransactionExecutor
-import com.blockchain.datamanagers.TransactionExecutorViaDataManagers
-import com.blockchain.datamanagers.TransactionExecutorWithoutFees
-import com.blockchain.fees.FeeType
 import com.blockchain.logging.LastTxUpdateDateOnSettingsService
 import com.blockchain.logging.LastTxUpdater
 import com.blockchain.logging.NullLogger
@@ -116,49 +110,6 @@ val coreModule = module {
         factory { AddressResolver(get(), get(), get()) }
 
         factory { AccountLookup(get(), get(), get()) }
-
-        factory {
-            TransactionExecutorViaDataManagers(
-                payloadDataManager = get(),
-                ethDataManager = get(),
-                paxAccount = get(paxAccount),
-                usdtAccount = get(usdtAccount),
-                sendDataManager = get(),
-                addressResolver = get(),
-                accountLookup = get(),
-                defaultAccountDataManager = get(),
-                ethereumAccountWrapper = get(),
-                xlmSender = get(),
-                coinSelectionRemoteConfig = get(),
-                analytics = get()
-            ) as TransactionExecutor
-        }
-
-        factory(regularFee) {
-            SelfFeeCalculatingTransactionExecutor(
-                get(),
-                get(),
-                get(),
-                FeeType.Regular
-            ) as TransactionExecutorWithoutFees
-        }
-
-        factory(priorityFee) {
-            SelfFeeCalculatingTransactionExecutor(
-                get(),
-                get(),
-                get(),
-                FeeType.Priority
-            ) as TransactionExecutorWithoutFees
-        }
-
-        factory(regularFee) {
-            get<TransactionExecutorWithoutFees>(regularFee) as MaximumSpendableCalculator
-        }
-
-        factory(priorityFee) {
-            get<TransactionExecutorWithoutFees>(priorityFee) as MaximumSpendableCalculator
-        }
 
         scoped { EthDataStore() }
 

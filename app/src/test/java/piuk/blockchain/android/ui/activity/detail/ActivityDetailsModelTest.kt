@@ -57,7 +57,8 @@ class ActivityDetailsModelTest {
         account = mock(),
         paymentMethodId = "123",
         paymentMethodType = PaymentMethodType.PAYMENT_CARD,
-        type = OrderType.BUY
+        type = OrderType.BUY,
+        depositPaymentId = ""
     )
 
     private val custodialInterestItem = CustodialInterestActivitySummaryItem(

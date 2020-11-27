@@ -13,7 +13,6 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
-import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScope
@@ -117,8 +116,6 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
@@ -456,10 +453,6 @@ val applicationModule = module {
             ThePitDeepLinkParser()
         }
 
-        factory {
-            SwapIntroPresenter(prefs = get())
-        }
-
         factory { EmailVerificationDeepLinkHelper() }
 
         factory {
@@ -545,12 +538,6 @@ val applicationModule = module {
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
                 coincore = get()
-            )
-        }
-
-        factory {
-            SwapTypeSwitcher(
-                newSwapFeatureFlag = get(newSwapFeatureFlag)
             )
         }
 
