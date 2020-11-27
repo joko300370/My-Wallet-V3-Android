@@ -26,7 +26,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
@@ -65,7 +64,6 @@ interface MainView : MvpView, HomeNavigator {
     fun enableSwapButton(isEnabled: Boolean)
     fun displayLockboxMenu(lockboxAvailable: Boolean)
     fun showTestnetWarning()
-    fun launchSwapIntro()
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
@@ -333,32 +331,6 @@ class MainPresenter internal constructor(
 
     internal fun clearLoginState() {
         accessState.logout()
-    }
-
-    internal fun startSwapOrKyc(source: CryptoAccount?, target: CryptoAccount?) {
-        compositeDisposable += nabuUser.observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { it.printStackTrace() }, onSuccess = { nabuUser ->
-                if (nabuUser.tiers?.current ?: 0 > 0) {
-                    view?.launchSwap(
-                        sourceAccount = source,
-                        targetAccount = target
-                    )
-                } else {
-                    if (
-                        nabuUser.kycState == KycState.Rejected ||
-                        nabuUser.kycState == KycState.UnderReview ||
-                        nabuUser.kycState == KycState.Pending
-                    )
-                        view?.launchPendingVerificationScreen(CampaignType.Swap)
-                    else if (nabuUser.kycState == KycState.None) {
-                        if (!prefs.swapIntroCompleted) {
-                            view?.launchSwapIntro()
-                        } else {
-                            view?.launchKyc(CampaignType.Swap)
-                        }
-                    }
-                }
-            })
     }
 
     fun onThePitMenuClicked() {
