@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
+import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.Analytics
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
@@ -32,7 +34,12 @@ class TxFlowAnalytics(
                     analytics.logEvent(SendAnalyticsEvent.CancelTransaction)
             AssetAction.Sell ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
-                    analytics.logEvent(SellAnalyticsEvent.CancelTransaction)
+                    analytics.logEvent(
+                        SellAnalyticsEvent(
+                            event = SellAnalytics.CancelTransaction,
+                            asset = state.asset,
+                            source = state.sendingAccount.toCategory()
+                        ))
             AssetAction.Swap ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
                     analytics.logEvent(SwapAnalyticsEvents.CancelTransaction)
@@ -47,7 +54,7 @@ class TxFlowAnalytics(
     fun onStepChanged(state: TransactionState) {
         when (state.action) {
             AssetAction.Send -> triggerSendScreenEvent(state.currentStep)
-            AssetAction.Sell -> triggerSellScreenEvent(state.currentStep)
+            AssetAction.Sell -> triggerSellScreenEvent(state)
             AssetAction.Swap -> triggerSwapScreenEvent(state.currentStep)
             AssetAction.Deposit -> triggerDepositScreenEvent(state.currentStep)
             else -> {
@@ -86,9 +93,14 @@ class TxFlowAnalytics(
         }
     }
 
-    private fun triggerSellScreenEvent(step: TransactionStep) {
-        when (step) {
-            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(SellAnalyticsEvent.ConfirmationsDisplayed)
+    private fun triggerSellScreenEvent(state: TransactionState) {
+        when (state.currentStep) {
+            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(
+                SellAnalyticsEvent(
+                    event = SellAnalytics.ConfirmationsDisplayed,
+                    asset = state.asset,
+                    source = state.sendingAccount.toCategory()
+                ))
             else -> {
             }
         }
@@ -143,7 +155,11 @@ class TxFlowAnalytics(
             AssetAction.Send ->
                 analytics.logEvent(SendAnalyticsEvent.EnterAmountCtaClick)
             AssetAction.Sell ->
-                analytics.logEvent(SellAnalyticsEvent.EnterAmountCtaClick(state.asset))
+                analytics.logEvent(SellAnalyticsEvent(
+                    event = SellAnalytics.EnterAmountCtaClick,
+                    asset = state.asset,
+                    source = state.sendingAccount.toCategory()
+                ))
             AssetAction.Deposit ->
                 analytics.logEvent(DepositAnalyticsEvent.EnterAmountCtaClick(state.asset))
             AssetAction.Swap ->
@@ -173,7 +189,11 @@ class TxFlowAnalytics(
                     state.asset
                 ))
             AssetAction.Sell ->
-                analytics.logEvent(SellAnalyticsEvent.ConfirmTransaction)
+                analytics.logEvent(SellAnalyticsEvent(
+                    event = SellAnalytics.ConfirmTransaction,
+                    asset = state.asset,
+                    source = state.sendingAccount.toCategory()
+                ))
             AssetAction.Swap ->
                 analytics.logEvent(SwapAnalyticsEvents.SwapConfirmCta(
                     source = state.asset,
@@ -195,7 +215,11 @@ class TxFlowAnalytics(
                         source = state.sendingAccount.toCategory()
                     )
                 )
-            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionSuccess)
+            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent(
+                event = SellAnalytics.TransactionSuccess,
+                asset = state.asset,
+                source = state.sendingAccount.toCategory()
+            ))
             AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionSuccess(state.asset))
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionSuccess(
                 asset = state.asset,
@@ -215,7 +239,11 @@ class TxFlowAnalytics(
                 source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
                 error = error
             ))
-            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent.TransactionFailed)
+            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent(
+                event = SellAnalytics.TransactionFailed,
+                asset = state.asset,
+                source = state.sendingAccount.toCategory()
+            ))
             AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionFailed(state.asset))
             AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionFailed(
                 asset = state.asset,
@@ -242,6 +270,19 @@ class TxFlowAnalytics(
         internal const val PARAM_OLD_FEE = "old_fee"
         internal const val PARAM_NEW_FEE = "new_fee"
         internal const val FEE_SCHEDULE = "fee_level"
+
+        internal fun constructMap(
+            asset: CryptoCurrency,
+            target: String?,
+            error: String? = null,
+            source: String? = null
+        ): Map<String, String> =
+            mapOf(
+                PARAM_ASSET to asset.networkTicker,
+                PARAM_TARGET to target,
+                PARAM_SOURCE to source,
+                PARAM_ERROR to error
+            ).withoutNullValues()
     }
 }
 

@@ -2,28 +2,23 @@ package piuk.blockchain.android.ui.transactionflow.analytics
 
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import info.blockchain.balance.CryptoCurrency
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.constructMap
 
-sealed class SellAnalyticsEvent(
+class SellAnalyticsEvent(
     override val event: String,
     override val params: Map<String, String> = emptyMap()
 ) : AnalyticsEvent {
 
-    object ConfirmationsDisplayed : SellAnalyticsEvent("sell_checkout_shown")
-    object ConfirmTransaction : SellAnalyticsEvent("send_summary_confirm")
-    object CancelTransaction : SellAnalyticsEvent("sell_checkout_cancel")
-    object TransactionFailed : SellAnalyticsEvent("sell_checkout_error")
-    object TransactionSuccess : SellAnalyticsEvent("sell_checkout_success")
+    constructor(event: SellAnalytics, asset: CryptoCurrency, source: String) : this(event.value, constructMap(
+        asset = asset, source = source, target = WALLET_TYPE_CUSTODIAL
+    ))
+}
 
-    data class EnterAmountCtaClick(
-        val asset: CryptoCurrency
-    ) : SellAnalyticsEvent(
-        "sell_amount_confirm_click",
-        mapOf(
-            PARAM_ASSET to asset.networkTicker
-        )
-    )
-
-    companion object {
-        private const val PARAM_ASSET = "asset"
-    }
+enum class SellAnalytics(internal val value: String) {
+    ConfirmationsDisplayed("sell_checkout_shown"),
+    ConfirmTransaction("send_summary_confirm"),
+    CancelTransaction("sell_checkout_cancel"),
+    TransactionFailed("sell_checkout_error"),
+    TransactionSuccess("sell_checkout_success"),
+    EnterAmountCtaClick("sell_amount_confirm_click")
 }
