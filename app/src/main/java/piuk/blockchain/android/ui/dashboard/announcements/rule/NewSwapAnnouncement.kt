@@ -9,24 +9,34 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 
 class NewSwapAnnouncement(
-    tiersService: TierService,
-    eligibilityProvider: EligibilityProvider,
+    private val tiersService: TierService,
+    private val eligibilityProvider: EligibilityProvider,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 
-    override val dismissKey =
-        NewSwapAnnouncement.DISMISS_KEY
+    private var suggestedAnnouncement: Int = 0
+
+    override val dismissKey: String
+        get() = DISMISS_KEY.plus(suggestedAnnouncement.toString())
 
     override val name: String
-        get() = "swapi"
+        get() = "swap_announcements"
 
-    override fun shouldShow(): Single<Boolean> {
-        if (dismissEntry.isDismissed) {
-            return Single.just(false)
+    override fun shouldShow(): Single<Boolean> =
+        tiersService.tiers().map {
+            it.isVerified()
+        }.flatMap {
+            if (!it)
+                Single.just(0)
+            else eligibilityProvider.isEligibleForSimpleBuy().map { eligible ->
+                if (eligible) 2
+                else 1
+            }
+        }.doOnSuccess {
+            suggestedAnnouncement = it
+        }.map {
+            dismissEntry.isDismissed
         }
-
-        return kycTiersQueries.isKycResubmissionRequired()
-    }
 
     override fun show(host: AnnouncementHost) {
         TODO("Not yet implemented")
