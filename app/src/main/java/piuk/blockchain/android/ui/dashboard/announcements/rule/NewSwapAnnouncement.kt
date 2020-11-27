@@ -20,7 +20,7 @@ class NewSwapAnnouncement(
         get() = DISMISS_KEY.plus(suggestedAnnouncement.toString())
 
     override val name: String
-        get() = "swap_announcements"
+        get() = "swap_banners"
 
     override fun shouldShow(): Single<Boolean> =
         tiersService.tiers().map {
@@ -39,7 +39,7 @@ class NewSwapAnnouncement(
         }
 
     override fun show(host: AnnouncementHost) {
-        TODO("Not yet implemented")
+        println("lalalala $suggestedAnnouncement")
     }
 
     companion object {

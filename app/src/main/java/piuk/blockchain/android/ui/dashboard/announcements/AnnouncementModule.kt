@@ -141,8 +141,8 @@ val dashboardAnnouncementsModule = module {
         factory {
             NewSwapAnnouncement(
                 dismissRecorder = get(),
-                tierSer = get(),
-                walletSettings = get()
+                tiersService = get(),
+                eligibilityProvider = get()
             )
         }.bind(AnnouncementRule::class)
 
