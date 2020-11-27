@@ -16,7 +16,6 @@ import com.blockchain.lockbox.koin.lockboxModule
 import com.blockchain.network.modules.apiModule
 import com.blockchain.network.modules.okHttpModule
 import com.blockchain.notifications.koin.notificationModule
-import com.blockchain.swap.koin.swapModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -69,7 +68,6 @@ object KoinStarter {
                 serviceModule,
                 startupUiModule,
                 sunriverModule,
-                swapModule,
                 walletModule,
                 xlmModule
             ))

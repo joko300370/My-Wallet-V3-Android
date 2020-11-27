@@ -23,12 +23,15 @@ import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_kyc_complete.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class ApplicationCompleteFragment : Fragment() {
+class ApplicationCompleteFragment : Fragment(), DialogFlow.FlowHost {
 
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
@@ -65,17 +68,7 @@ class ApplicationCompleteFragment : Fragment() {
                     onNext = { (_, isTier1OrTier2Verified) ->
                         when (progressListener.campaignType) {
                             CampaignType.Swap -> {
-                            /* // todo launch flow
-
-                                activity?.finish()
-                                if (isTier1OrTier2Verified) {
-                                    HomebrewNavHostActivity.start(
-                                        requireContext(),
-                                        get<CurrencyPrefs>().selectedFiatCurrency
-                                    )
-                                } else {
-                                    KycStatusActivity.start(requireContext(), CampaignType.Swap)
-                                }*/
+                                launchSwap()
                             }
                             CampaignType.SimpleBuy -> {
                                 activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE)
@@ -90,8 +83,25 @@ class ApplicationCompleteFragment : Fragment() {
                 )
     }
 
+    private fun launchSwap() {
+        val transactionFlow =
+            TransactionFlow(
+                action = AssetAction.Swap
+            )
+
+        transactionFlow.apply {
+            startFlow(
+                fragmentManager = fragmentManager ?: return,
+                host = this@ApplicationCompleteFragment
+            )
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         compositeDisposable.clear()
+    }
+
+    override fun onFlowFinished() {
     }
 }
