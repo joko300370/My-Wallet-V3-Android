@@ -95,9 +95,9 @@ class AccountList @JvmOverloads constructor(
             .observeOn(uiScheduler)
             .subscribeBy(
                 onSuccess = {
-                    (adapter as? AccountsDelegateAdapter)?.updateList(it.map { account ->
+                    (adapter as? AccountsDelegateAdapter)?.items = it.map { account ->
                         SelectableAccountItem(account, false)
-                    })
+                    }
 
                     if (it.isEmpty()) {
                         onEmptyList()
@@ -118,10 +118,10 @@ class AccountList @JvmOverloads constructor(
 
     fun updatedSelectedAccount(selectedAccount: BlockchainAccount) {
         if ((adapter as AccountsDelegateAdapter).items.isNotEmpty()) {
-            (adapter as AccountsDelegateAdapter).updateList(
+            (adapter as AccountsDelegateAdapter).items =
                 (adapter as AccountsDelegateAdapter).items.map {
                     SelectableAccountItem(it.account, selectedAccount == it.account)
-                })
+                }
         } else {
             // if list is empty, we're in a race condition between loading and selecting, so store value and check
             // it once items loaded
@@ -130,10 +130,10 @@ class AccountList @JvmOverloads constructor(
     }
 
     fun clearSelectedAccount() {
-        (adapter as AccountsDelegateAdapter).updateList(
+        (adapter as AccountsDelegateAdapter).items =
             (adapter as AccountsDelegateAdapter).items.map {
                 SelectableAccountItem(it.account, false)
-            })
+            }
     }
 
     var onLoadError: (Throwable) -> Unit = {}
@@ -149,6 +149,12 @@ private class AccountsDelegateAdapter(
 ) : DelegationAdapter<SelectableAccountItem>(AdapterDelegatesManager(), emptyList()) {
 
     override var items: List<SelectableAccountItem> = emptyList()
+        set(value) {
+            val diffResult =
+                DiffUtil.calculateDiff(AccountsDiffUtil(this.items, value))
+            field = value
+            diffResult.dispatchUpdatesTo(this)
+        }
 
     init {
         with(delegatesManager) {
@@ -174,13 +180,6 @@ private class AccountsDelegateAdapter(
                 )
             )
         }
-    }
-
-    fun updateList(newAccounts: List<SelectableAccountItem>) {
-        val diffResult =
-            DiffUtil.calculateDiff(AccountsDiffUtil(this.items, newAccounts))
-        items = newAccounts
-        diffResult.dispatchUpdatesTo(this);
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {

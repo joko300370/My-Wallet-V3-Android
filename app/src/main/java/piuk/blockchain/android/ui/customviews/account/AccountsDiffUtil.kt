@@ -3,9 +3,10 @@ package piuk.blockchain.android.ui.customviews.account
 import androidx.recyclerview.widget.DiffUtil
 import piuk.blockchain.android.coincore.isTheSameWith
 
-
-internal class AccountsDiffUtil(private val oldAccounts: List<SelectableAccountItem>, private val newAccounts: List<SelectableAccountItem>) :
-    DiffUtil.Callback() {
+internal class AccountsDiffUtil(
+    private val oldAccounts: List<SelectableAccountItem>,
+    private val newAccounts: List<SelectableAccountItem>
+) : DiffUtil.Callback() {
 
     override fun getOldListSize(): Int = oldAccounts.size
 

@@ -184,9 +184,6 @@ object NullFiatAccount : FiatAccount {
 
 fun BlockchainAccount.isTheSameWith(other: BlockchainAccount): Boolean {
 
-    if (this is NullCryptoAccount || other is NullCryptoAccount)
-        return false
-
     if (this::class == other::class &&
         this.label == other.label &&
         this.hasTheSameAsset(other)
@@ -209,4 +206,3 @@ private fun BlockchainAccount.hasTheSameAsset(other: BlockchainAccount): Boolean
 
     return false
 }
-

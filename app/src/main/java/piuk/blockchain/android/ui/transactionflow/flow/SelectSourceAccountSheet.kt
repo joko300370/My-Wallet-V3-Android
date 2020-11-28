@@ -14,8 +14,12 @@ import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 class SelectSourceAccountSheet : TransactionFlowSheet() {
 
     private val customiser: TransactionFlowCustomiser by inject()
-
+    private var avilableSources = emptyList<CryptoAccount>()
     override fun render(newState: TransactionState) {
+        if (avilableSources == newState.availableSources) {
+            // If list displays already the same accounts return so to avoid the annoying flickering
+            return
+        }
         with(dialogView) {
             account_list.initialise(
                 source = Single.just(newState.availableSources.map { it }),
@@ -29,6 +33,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
                 account_list_empty.visible()
             }
         }
+        avilableSources = newState.availableSources
     }
 
     override val layoutResource: Int
