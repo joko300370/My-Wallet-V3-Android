@@ -17,7 +17,7 @@ class WalletCredentialsMetadataUpdater(
 
     fun checkAndUpdate(): Completable {
         val guid = payloadDataManager.guid
-        val password = payloadDataManager.tempPassword
+        val password = payloadDataManager.tempPassword ?: ""
         val sharedKey = payloadDataManager.sharedKey
 
         return metadataRepository.loadMetadata(
@@ -26,8 +26,8 @@ class WalletCredentialsMetadataUpdater(
         ).filter {
             it.guid == guid && it.password == password && it.sharedKey == sharedKey
         }.isEmpty
-        .doOnSuccess {
-            if (it) updateMetadata(guid, password, sharedKey)
-        }.ignoreElement()
+        .flatMapCompletable {
+            if (it) updateMetadata(guid, password, sharedKey) else Completable.complete()
+        }
     }
 }

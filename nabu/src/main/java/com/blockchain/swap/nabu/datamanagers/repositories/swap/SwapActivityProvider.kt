@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.SwapDirection
 import com.blockchain.swap.nabu.datamanagers.SwapOrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.toSwapState
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
+import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -37,14 +38,15 @@ class SwapActivityProviderImpl(
                 val localFiat = apiFiat.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
                 SwapTransactionItem(
                     it.kind.depositTxHash ?: it.id,
-                    it.createdAt.fromIso8601ToUtc()!!.time,
+                    it.createdAt.fromIso8601ToUtc()?.toLocalTime()?.time
+                        ?: throw java.lang.IllegalStateException("Missing timestamp or bad formatting"),
                     it.kind.direction.mapToDirection(),
                     it.kind.depositAddress,
                     it.kind.withdrawalAddress,
                     it.state.toSwapState(),
                     CryptoValue.fromMinor(sendingAsset, it.priceFunnel.inputMoney.toBigInteger()),
                     CryptoValue.fromMinor(receivingAsset, it.priceFunnel.outputMoney.toBigInteger()),
-                    getFeeForAsset(receivingAsset, it.priceFunnel.networkFee),
+                    CryptoValue.fromMinor(receivingAsset, it.priceFunnel.networkFee.toBigInteger()),
                     sendingAsset,
                     receivingAsset,
                     localFiat,
@@ -54,15 +56,6 @@ class SwapActivityProviderImpl(
                 it.state.displayableState
             }
         }
-
-    private fun getFeeForAsset(receivingAsset: CryptoCurrency, networkFee: String): CryptoValue =
-        CryptoValue.fromMinor(
-            if (receivingAsset.hasFeature(CryptoCurrency.IS_ERC20)) {
-                CryptoCurrency.ETHER
-            } else {
-                receivingAsset
-            }, networkFee.toBigInteger()
-        )
 
     private fun String.mapToDirection(): SwapDirection =
         when (this) {

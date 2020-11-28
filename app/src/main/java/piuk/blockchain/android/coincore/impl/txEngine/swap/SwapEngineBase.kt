@@ -18,7 +18,9 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -252,16 +254,18 @@ abstract class SwapEngineBase(
         startQuotesFetchingIfNotStarted(pendingTx)
 
     protected fun createOrder(pendingTx: PendingTx): Single<SwapOrder> =
-        target.receiveAddress.flatMap {
-            walletManager.createSwapOrder(
-                direction = direction,
-                quoteId = quotesEngine.getLatestQuote().swapQuote.id,
-                volume = pendingTx.amount,
-                destinationAddress = if (direction.requiresDestinationAddress()) it.address else null
-            )
-        }.doFinally {
-            disposeQuotesFetching(pendingTx)
-        }
+        target.receiveAddress.zipWith(sourceAccount.receiveAddress.onErrorReturn { NullAddress })
+            .flatMap { (destinationAddr, refAddress) ->
+                walletManager.createSwapOrder(
+                    direction = direction,
+                    quoteId = quotesEngine.getLatestQuote().swapQuote.id,
+                    volume = pendingTx.amount,
+                    destinationAddress = if (direction.requiresDestinationAddress()) destinationAddr.address else null,
+                    refundAddress = if (direction.requireRefundAddress()) refAddress.address else null
+                )
+            }.doFinally {
+                disposeQuotesFetching(pendingTx)
+            }
 
     private fun disposeQuotesFetching(pendingTx: PendingTx) {
         pendingTx.quoteSub?.dispose()
@@ -274,6 +278,9 @@ abstract class SwapEngineBase(
 
     private fun SwapDirection.requiresDestinationAddress() =
         this == SwapDirection.ON_CHAIN || this == SwapDirection.TO_USERKEY
+
+    private fun SwapDirection.requireRefundAddress() =
+        this == SwapDirection.ON_CHAIN || this == SwapDirection.FROM_USERKEY
 
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money, staticFee: Money): Money =
         CryptoValue.fromMajor(

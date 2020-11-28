@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
 import io.reactivex.Observable
@@ -29,7 +30,6 @@ import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
@@ -67,12 +67,15 @@ class AccountInfoCrypto @JvmOverloads constructor(
         onAccountClicked: (CryptoAccount) -> Unit,
         cellDecorator: CellDecorator
     ) {
-        val accountsAreTheSame = displayedAccount.eq(account)
+        val accountsAreTheSame = displayedAccount.isTheSameWith(account)
         updateAccountDetails(account, accountsAreTheSame, onAccountClicked, cellDecorator)
 
         when (account) {
             is InterestAccount -> setInterestAccountDetails(account, accountsAreTheSame)
-            is TradingAccount -> asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
+            is TradingAccount -> {
+                asset_account_icon.visible()
+                asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
+            }
             is NonCustodialAccount -> asset_account_icon.gone()
             else -> asset_account_icon.gone()
         }
@@ -119,7 +122,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable += account.accountBalance
             .doOnSuccess {
                 accountBalance = it
-            }.startWithValue(accountBalance?.takeIf { accountsAreTheSame })
+            }.startWithValue(accountBalance?.takeIf { accountsAreTheSame } ?: CryptoValue.zero(account.asset))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { accountBalance ->
@@ -129,9 +132,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
                             exchangeRates,
                             currencyPrefs.selectedFiatCurrency
                         ).toStringWithSymbol()
-
-                    wallet_balance_crypto.visible()
-                    wallet_balance_fiat.visible()
                 },
                 onError = {
                     Timber.e("Cannot get balance for ${account.label}")
@@ -154,6 +154,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
                 isEnabled = it
             }.startWithValue(isEnabled?.takeIf { accountsAreTheSame })
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                setOnClickListener {
+                }
+            }
             .subscribeBy(
                 onNext = { isEnabled ->
                     if (isEnabled) {
@@ -170,17 +174,15 @@ class AccountInfoCrypto @JvmOverloads constructor(
         container.removePossibleBottomView()
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
+    fun dispose() {
         compositeDisposable.clear()
     }
 }
 
-private fun CryptoAccount.eq(other: CryptoAccount): Boolean {
+private fun CryptoAccount.isTheSameWith(other: CryptoAccount): Boolean {
     if (this is NullCryptoAccount || other is NullCryptoAccount)
         return false
     if (this::class == other::class && this.asset == other.asset && this.label == other.label) {
-        println("sameeeee ${this.asset}")
         return true
     }
     return false

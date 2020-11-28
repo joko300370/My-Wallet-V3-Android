@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
+import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.button_kyc_invalid_country_message_me as buttonMessageMe

@@ -9,19 +9,11 @@ import com.blockchain.extensions.px
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -46,9 +38,6 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
 
     private val presenter: KycStatusPresenter by scopedInject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
-    private val currencyPrefs: CurrencyPrefs by inject()
-    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
-    private val compositeDisposable = CompositeDisposable()
     private var progressDialog: MaterialProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,21 +60,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
     }
 
     override fun startExchange() {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        startSwapFlow()
-                    } else {
-                        HomebrewNavHostActivity.start(
-                            context = this,
-                            defaultCurrency = currencyPrefs.selectedFiatCurrency
-                        )
-                        finish()
-                    }
-                }
-            )
+        startSwapFlow()
     }
 
     private fun startSwapFlow() {

@@ -77,7 +77,6 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         resetSheetParent()
-        host.onSheetClosed()
         super.onCancel(dialog)
     }
 

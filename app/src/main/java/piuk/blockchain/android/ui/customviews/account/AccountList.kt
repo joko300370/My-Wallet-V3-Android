@@ -178,14 +178,16 @@ private class AccountsDelegateAdapter(
         }
     }
 
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-
     fun updateList(newAccounts: List<SelectableAccountItem>) {
         val diffResult =
             DiffUtil.calculateDiff(AccountsDiffUtil(this.items, newAccounts))
         items = newAccounts
         diffResult.dispatchUpdatesTo(this);
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+        (holder as? CryptoSingleAccountViewHolder)?.dispose()
     }
 }
 
@@ -201,7 +203,7 @@ private class CryptoAccountDelegate(
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         CryptoSingleAccountViewHolder(showSelectionStatus,
             parent.inflate(R.layout.item_account_select_crypto))
-    
+
     override fun onBindViewHolder(
         items: List<SelectableAccountItem>,
         position: Int,
@@ -234,6 +236,10 @@ private class CryptoSingleAccountViewHolder(
             crypto_account.updateAccount(selectableAccountItem.account as CryptoAccount, onAccountClicked,
                 statusDecorator(selectableAccountItem.account))
         }
+    }
+
+    fun dispose() {
+        itemView.crypto_account.dispose()
     }
 }
 

@@ -21,7 +21,6 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -43,6 +42,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage

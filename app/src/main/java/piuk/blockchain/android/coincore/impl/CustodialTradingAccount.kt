@@ -164,7 +164,8 @@ open class CustodialTradingAccount(
             account = this,
             type = buyOrder.type,
             paymentMethodId = buyOrder.paymentMethodId,
-            paymentMethodType = buyOrder.paymentMethodType
+            paymentMethodType = buyOrder.paymentMethodType,
+            depositPaymentId = buyOrder.depositPaymentId
         )
 
     // Stop gap filter, until we finalise which item we wish to display to the user.

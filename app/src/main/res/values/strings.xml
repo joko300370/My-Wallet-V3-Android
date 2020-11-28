@@ -26,6 +26,8 @@
     <string name="common_empty_cta">Tap to refresh</string>
     <string name="common_pending">Pending</string>
     <string name="common_free">Free</string>
+    <string name="common_zero">0</string>
+    <string name="common_retry">Retry</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -126,22 +128,6 @@
     <string name="account_locked_message">Your account has been locked temporarily as a precaution.
         Please check your email for more information and try again later.
     </string>
-    <string name="pin_box_0">Pin Box 0</string>
-    <string name="pin_box_1">Pin Box 1</string>
-    <string name="pin_box_2">Pin Box 2</string>
-    <string name="pin_box_3">Pin Box 3</string>
-    <string name="fingerprint_logo">Fingerprint Logo</string>
-    <string name="keyboard_input_1">Keyboard Input 1</string>
-    <string name="keyboard_input_2">Keyboard Input 2</string>
-    <string name="keyboard_input_3">Keyboard Input 3</string>
-    <string name="keyboard_input_4">Keyboard Input 4</string>
-    <string name="keyboard_input_5">Keyboard Input 5</string>
-    <string name="keyboard_input_6">Keyboard Input 6</string>
-    <string name="keyboard_input_7">Keyboard Input 7</string>
-    <string name="keyboard_input_8">Keyboard Input 8</string>
-    <string name="keyboard_input_9">Keyboard Input 9</string>
-
-    <string name="keyboard_input_0">Keyboard Input 0</string>
 
     <string name="keyboard_input_delete">Keyboard Input Delete</string>
 
@@ -189,9 +175,9 @@
     <string name="new_account_title">Create an Account</string>
     <string name="strength_weak">Weak</string>
     <string name="strength_medium">Regular</string>
-
+    <string name="strength_normal">Good</string>
     <string name="strength_strong">Strong</string>
-    <string name="strength_normal">Normal</string>
+    <string name="strength_hint">Use at least 8 characters, a mix of letters, numbers and symbols.</string>
 
     <string name="btn_continue">Continue</string>
     <string name="btn_forgot_password">Forgot Password?"</string>
@@ -230,9 +216,7 @@
     <string name="support_leaving_app_warning">This will leave the app and take you to your browser.
         Continue?
     </string>
-    <string name="weak_password">The selected password is too weak to secure your funds. We strongly
-        suggest you select a different one. Would you like to define a new password?
-    </string>
+    <string name="weak_password">The selected password is too weak to secure your funds. Please define a different password.</string>
 
     <string name="confirm_details">Confirm Payment</string>
 
@@ -281,7 +265,6 @@
     </string>
     <string name="description">Description</string>
     <string name="name">Name</string>
-    <string name="content_desc_edit_account_label">Edit Account Label</string>
 
     <string name="save">Save</string>
     <string name="next">Next</string>
@@ -833,8 +816,6 @@
     <string name="eth_second_password_prompt">To use this service, we require you to enter your
         second password.
     </string>
-    <string name="ether">Ether</string>
-    <string name="bitcoin">Bitcoin</string>
 
     <!-- PAX/ERC 20 -->
     <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>
@@ -2128,5 +2109,22 @@
 
     <string name="security_locked_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
 
-
+    <!-- content descriptor IDs -->
+    <string name="content_desc_enter_amount">Enter Amount</string>
+    <string name="content_desc_edit_account_label">Edit Account Label</string>
+    <string name="pin_box_0">Pin Box 0</string>
+    <string name="pin_box_1">Pin Box 1</string>
+    <string name="pin_box_2">Pin Box 2</string>
+    <string name="pin_box_3">Pin Box 3</string>
+    <string name="fingerprint_logo">Fingerprint Logo</string>
+    <string name="keyboard_input_1">Keyboard Input 1</string>
+    <string name="keyboard_input_2">Keyboard Input 2</string>
+    <string name="keyboard_input_3">Keyboard Input 3</string>
+    <string name="keyboard_input_4">Keyboard Input 4</string>
+    <string name="keyboard_input_5">Keyboard Input 5</string>
+    <string name="keyboard_input_6">Keyboard Input 6</string>
+    <string name="keyboard_input_7">Keyboard Input 7</string>
+    <string name="keyboard_input_8">Keyboard Input 8</string>
+    <string name="keyboard_input_9">Keyboard Input 9</string>
+    <string name="keyboard_input_0">Keyboard Input 0</string>
 </resources>

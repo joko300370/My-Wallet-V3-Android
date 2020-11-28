@@ -13,7 +13,6 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
-import com.blockchain.koin.newSwapFeatureFlag
 import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScope
@@ -91,6 +90,7 @@ import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
 import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
+import piuk.blockchain.android.ui.customviews.dialogs.OverlayDetection
 import piuk.blockchain.android.ui.dashboard.AssetOrderingConfig
 import piuk.blockchain.android.ui.dashboard.AssetOrderingConfigImpl
 import piuk.blockchain.android.ui.dashboard.BalanceAnalyticsReporter
@@ -116,8 +116,6 @@ import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapintro.SwapIntroPresenter
 import piuk.blockchain.android.ui.swipetoreceive.AddressGenerator
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
@@ -128,6 +126,7 @@ import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.CurrentContextAccess
+import piuk.blockchain.android.util.DateUtil
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.ResourceDefaultLabels
@@ -147,7 +146,6 @@ import piuk.blockchain.androidcore.data.erc20.UsdtAccount
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.SSLVerifyUtil
-import piuk.blockchain.androidcoreui.utils.DateUtil
 
 val applicationModule = module {
 
@@ -455,10 +453,6 @@ val applicationModule = module {
             ThePitDeepLinkParser()
         }
 
-        factory {
-            SwapIntroPresenter(prefs = get())
-        }
-
         factory { EmailVerificationDeepLinkHelper() }
 
         factory {
@@ -544,12 +538,6 @@ val applicationModule = module {
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
                 coincore = get()
-            )
-        }
-
-        factory {
-            SwapTypeSwitcher(
-                newSwapFeatureFlag = get(newSwapFeatureFlag)
             )
         }
 
@@ -893,4 +881,8 @@ val applicationModule = module {
             crashLogger = get()
         )
     }.bind(AssetOrderingConfig::class)
+
+    single {
+        OverlayDetection(get())
+    }
 }

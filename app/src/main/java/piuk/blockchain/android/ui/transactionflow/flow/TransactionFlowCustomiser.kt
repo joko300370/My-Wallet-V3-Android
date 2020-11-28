@@ -6,6 +6,8 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
+import piuk.blockchain.android.accounts.CellDecorator
+import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -35,6 +37,7 @@ interface TransactionFlowCustomiser {
     fun selectTargetSubtitle(state: TransactionState): String
     fun selectTargetSourceLabel(state: TransactionState): String
     fun selectTargetDestinationLabel(state: TransactionState): String
+    fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator
     fun enterAmountTitle(state: TransactionState): String
     fun enterAmountActionIcon(state: TransactionState): Int
     fun enterAmountActionIconCustomisation(state: TransactionState): Boolean
@@ -141,6 +144,12 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.common_receive)
             else -> resources.getString(R.string.common_to)
+        }
+
+    override fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator =
+        when (state.action) {
+            AssetAction.Swap -> SwapAccountSelectSheetFeeDecorator(account)
+            else -> DefaultCellDecorator()
         }
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =

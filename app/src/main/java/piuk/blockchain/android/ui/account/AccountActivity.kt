@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.payload.data.LegacyAddress
@@ -31,11 +30,12 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.account.AccountPresenter.Companion.ADDRESS_LABEL_MAX_LENGTH
 import piuk.blockchain.android.ui.account.adapter.AccountAdapter
 import piuk.blockchain.android.ui.account.adapter.AccountHeadersListener
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.ui.scan.QrScanActivity
-import piuk.blockchain.android.ui.scan.QrExpected
-import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume

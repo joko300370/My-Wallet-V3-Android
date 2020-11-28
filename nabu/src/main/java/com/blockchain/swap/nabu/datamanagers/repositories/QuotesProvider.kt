@@ -9,7 +9,6 @@ import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.service.NabuService
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import java.util.Date
 
@@ -34,14 +33,7 @@ class QuotesProvider(
                             price = CryptoValue.fromMinor(pair.destination, price.price.toBigInteger())
                         )
                     },
-                    networkFee = CryptoValue.fromMinor(
-                        if (pair.destination.hasFeature(CryptoCurrency.IS_ERC20)) {
-                            CryptoCurrency.ETHER
-                        } else {
-                            pair.destination
-                        },
-                        it.networkFee.toBigInteger()
-                    ),
+                    networkFee = CryptoValue.fromMinor(pair.destination, it.networkFee.toBigInteger()),
                     staticFee = CryptoValue.fromMinor(pair.source, it.staticFee.toBigInteger()),
                     sampleDepositAddress = it.sampleDepositAddress,
                     expirationDate = it.expiresAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
