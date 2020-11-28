@@ -60,8 +60,6 @@ class AccountList @JvmOverloads constructor(
         addItemDecoration(
             BlockchainListDividerDecor(context)
         )
-
-        setHasFixedSize(true)
     }
 
     fun initialise(
@@ -218,7 +216,7 @@ private class CryptoAccountDelegate(
 private class CryptoSingleAccountViewHolder(
     private val showSelectionStatus: Boolean,
     itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
 
     fun bind(
         selectableAccountItem: SelectableAccountItem,
@@ -238,7 +236,7 @@ private class CryptoSingleAccountViewHolder(
         }
     }
 
-    fun dispose() {
+    override fun dispose() {
         itemView.crypto_account.dispose()
     }
 }
@@ -269,7 +267,7 @@ private class FiatAccountDelegate(
 private class FiatAccountViewHolder(
     private val showSelectionStatus: Boolean,
     itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
 
     fun bind(
         selectableAccountItem: SelectableAccountItem,
@@ -291,6 +289,10 @@ private class FiatAccountViewHolder(
                 onAccountClicked
             )
         }
+    }
+
+    override fun dispose() {
+        itemView.fiat_account.dispose()
     }
 }
 
@@ -320,7 +322,7 @@ private class AllWalletsAccountDelegate(
 private class AllWalletsAccountViewHolder(
     private val compositeDisposable: CompositeDisposable,
     itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
 
     fun bind(
         selectableAccountItem: SelectableAccountItem,
@@ -329,11 +331,12 @@ private class AllWalletsAccountViewHolder(
     ) {
         with(itemView) {
 
-            account_group.updateAccount(selectableAccountItem.account as AllWalletsAccount, compositeDisposable)
+            account_group.updateAccount(selectableAccountItem.account as AllWalletsAccount)
             account_group.alpha = 1f
 
             compositeDisposable += statusDecorator(selectableAccountItem.account).isEnabled()
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { setOnClickListener { } }
                 .subscribeBy(
                     onSuccess = { isEnabled ->
                         if (isEnabled) {
@@ -347,4 +350,12 @@ private class AllWalletsAccountViewHolder(
                 )
         }
     }
+
+    override fun dispose() {
+        itemView.account_group.dispose()
+    }
+}
+
+interface DisposableViewHolder {
+    fun dispose()
 }
