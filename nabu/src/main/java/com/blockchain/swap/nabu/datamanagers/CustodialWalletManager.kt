@@ -263,7 +263,8 @@ data class BuySellOrder(
     val price: FiatValue? = null,
     val orderValue: Money? = null,
     val attributes: CardPaymentAttributes? = null,
-    val type: OrderType
+    val type: OrderType,
+    val depositPaymentId: String
 )
 
 typealias BuyOrderList = List<BuySellOrder>

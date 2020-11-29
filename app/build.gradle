@@ -281,7 +281,6 @@ dependencies {
     implementation project(':coreui')
     implementation project(':notifications')
     implementation project(':nabu')
-    implementation project(':swap')
     implementation project(':sunriver')
     implementation project(':lockbox')
 

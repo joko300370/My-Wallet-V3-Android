@@ -30,7 +30,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardA
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
@@ -112,14 +111,6 @@ val dashboardAnnouncementsModule = module {
             BitpayAnnouncement(
                 dismissRecorder = get(),
                 walletStatus = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
-            SwapAnnouncement(
-                dataManager = get(),
-                queries = get(),
-                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
 

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
-import androidx.annotation.VisibleForTesting
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single

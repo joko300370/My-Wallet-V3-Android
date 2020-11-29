@@ -1,5 +1,6 @@
 package piuk.blockchain.android.repositories
 
+import com.blockchain.swap.nabu.datamanagers.TransactionType
 import com.blockchain.swap.nabu.datamanagers.repositories.ExpiringRepository
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
@@ -13,8 +14,11 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -58,7 +62,33 @@ class AssetActivityRepository(
                         }
                     }
                 }.sorted()
+
+                if (account is AllWalletsAccount) {
+                    reconcileTransfersAndBuys(list)
+                } else {
+                    list
+                }
             }
+    }
+
+    private fun reconcileTransfersAndBuys(list: ActivitySummaryList): List<ActivitySummaryItem> {
+        val custodialWalletActivity = list.filter {
+            it.account is TradingAccount && it is CustodialTradingActivitySummaryItem
+        }
+        val activityList = list.toMutableList()
+
+        custodialWalletActivity.forEach { custodialItem ->
+            val item = custodialItem as CustodialTradingActivitySummaryItem
+            val matchingItem = activityList.find { a ->
+                a.txId.contains(item.depositPaymentId)
+            } as? FiatActivitySummaryItem
+
+            if (matchingItem?.type == TransactionType.DEPOSIT) {
+                activityList.remove(matchingItem)
+            }
+        }
+
+        return activityList.toList().sorted()
     }
 
     fun findCachedItem(cryptoCurrency: CryptoCurrency, txHash: String): ActivitySummaryItem? =

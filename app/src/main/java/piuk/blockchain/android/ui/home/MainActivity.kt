@@ -67,15 +67,11 @@ import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
-import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
@@ -100,7 +96,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
-    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
     override val view: MainView = this
@@ -310,7 +305,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             }
             f is DashboardFragment -> f.onBackPressed()
             f is BuySellFragment -> f.onBackPressed()
-            f is SwapIntroFragment -> f.onBackPressed()
             else -> {
                 // Switch to dashboard fragment - it's not clear, though,
                 // how we can ever wind up here...
@@ -470,36 +464,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        startSwapFlow(sourceAccount, targetAccount)
-                    } else {
-                        presenter.startSwapOrKyc(sourceAccount, targetAccount)
-                    }
-                }
-            )
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
     override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        startSwapFlow(sourceAccount, targetAccount)
-                    } else {
-                        HomebrewNavHostActivity.start(
-                            context = this,
-                            defaultCurrency = presenter.defaultCurrency,
-                            toCryptoCurrency = targetAccount?.asset,
-                            fromCryptoCurrency = sourceAccount?.asset
-                        )
-                    }
-                }
-            )
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
     override fun getStartIntent(): Intent {
@@ -698,18 +667,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         _refreshAnnouncements.onNext(Unit)
     }
 
-    override fun launchKycIntro() {
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
-    }
-
-    override fun launchSwapIntro() {
-        setCurrentTabItem(ITEM_SWAP)
-
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
-    }
-
     override fun launchPendingVerificationScreen(campaignType: CampaignType) {
         KycStatusActivity.start(this, campaignType)
     }
@@ -815,18 +772,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 msgTitle = R.string.tour_step_three_title,
                 msgBody = R.string.tour_step_three_body,
                 msgButton = R.string.tour_step_three_btn
-            ),
-            IntroTourStep(
-                name = "Step_Four",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_SWAP) },
-                triggerClick = {
-                    replaceContentFragment(SwapTourFragment.newInstance())
-                },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroSwapViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_swap,
-                msgTitle = R.string.tour_step_four_title,
-                msgBody = R.string.tour_step_four_body,
-                msgButton = R.string.tour_step_four_btn
             )
         )
 
