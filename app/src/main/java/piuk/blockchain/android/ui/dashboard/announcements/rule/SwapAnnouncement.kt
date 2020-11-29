@@ -80,7 +80,7 @@ class SwapAnnouncement(
                 titleText = title,
                 bodyText = body,
                 ctaText = ctaText,
-                iconImage = R.drawable.vector_dgld_colored,
+                iconImage = R.drawable.ic_swap_blue_circle,
                 dismissFunction = {
                     host.dismissAnnouncementCard()
                 },
