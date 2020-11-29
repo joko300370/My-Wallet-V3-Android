@@ -118,15 +118,19 @@ class AccountList @JvmOverloads constructor(
     }
 
     fun updatedSelectedAccount(selectedAccount: BlockchainAccount) {
-        if ((adapter as AccountsDelegateAdapter).items.isNotEmpty()) {
-            (adapter as AccountsDelegateAdapter).items =
-                (adapter as AccountsDelegateAdapter).items.map {
-                    SelectableAccountItem(it.account, selectedAccount == it.account)
+        (adapter as AccountsDelegateAdapter).items.let {
+            if (it.isNotEmpty()) {
+                (adapter as AccountsDelegateAdapter).items = it.map { sAccount ->
+                    SelectableAccountItem(
+                        sAccount.account,
+                        selectedAccount == sAccount.account
+                    )
                 }
-        } else {
-            // if list is empty, we're in a race condition between loading and selecting, so store value and check
-            // it once items loaded
-            lastSelectedAccount = selectedAccount
+            } else {
+                // if list is empty, we're in a race condition between loading and selecting, so store value and check
+                // it once items loaded
+                lastSelectedAccount = selectedAccount
+            }
         }
     }
 
