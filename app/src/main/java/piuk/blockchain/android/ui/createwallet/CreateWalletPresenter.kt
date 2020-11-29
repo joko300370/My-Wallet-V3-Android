@@ -8,6 +8,7 @@ import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -53,7 +54,7 @@ class CreateWalletPresenter(
             password1.length < 4 -> { view.showError(R.string.invalid_password_too_short); false }
             password1.length > 255 -> { view.showError(R.string.invalid_password); false }
             password1 != password2 -> { view.showError(R.string.password_mismatch_error); false }
-            passwordStrength < 50 -> { view.warnWeakPassword(email, password1); false }
+            !passwordStrength.isStrongEnough() -> { view.warnWeakPassword(email, password1); false }
             else -> true
         }
 
@@ -126,3 +127,6 @@ class CreateWalletPresenter(
     fun logEventPasswordOneClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickPasswordFirst)
     fun logEventPasswordTwoClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickPasswordSecond)
 }
+
+private fun Int.isStrongEnough(): Boolean =
+    this > 50 || BuildConfig.DEBUG
