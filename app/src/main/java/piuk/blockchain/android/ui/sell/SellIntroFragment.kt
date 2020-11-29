@@ -195,6 +195,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     coincore.allWallets().map {
                         it.accounts.filter { account ->
                             account is CustodialTradingAccount &&
+                                    account.isFunded &&
                                     supportedCryptos.contains(account.asset)
                         }
                     },
@@ -270,5 +271,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     override fun onFlowFinished() {
         host.onSellFinished()
+        loadSellDetails()
     }
 }

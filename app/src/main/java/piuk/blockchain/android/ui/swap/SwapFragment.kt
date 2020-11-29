@@ -69,7 +69,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         super.onViewCreated(view, savedInstanceState)
 
         swap_error.setDetails {
-            loadSwapOrKyc()
+            loadSwapOrKyc(true)
         }
 
         swap_cta.apply {
@@ -89,7 +89,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             DividerItemDecoration.VERTICAL
         ))
 
-        loadSwapOrKyc()
+        loadSwapOrKyc(showLoading = true)
     }
 
     private fun startSwap() {
@@ -117,7 +117,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         startSwap()
     }
 
-    private fun loadSwapOrKyc() {
+    private fun loadSwapOrKyc(showLoading: Boolean) {
         compositeDisposable +=
             Singles.zip(
                 kycTierService.tiers(),
@@ -134,7 +134,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    showLoadingUi()
+                    if (showLoading)
+                        showLoadingUi()
                 }
                 .subscribeBy(
                     onSuccess = { composite ->
@@ -281,7 +282,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     override fun onFlowFinished() {
-        loadSwapOrKyc()
+        loadSwapOrKyc(showLoading = false)
     }
 
     private data class SwapComposite(

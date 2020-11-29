@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.account.HeaderDecoration
+import piuk.blockchain.android.ui.customviews.account.removeAllHeaderDecorations
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -99,6 +100,7 @@ class BuyIntroFragment : Fragment() {
             label = R.string.select_crypto_you_want,
             title = R.string.buy_with_cash)
 
+        rv_cryptos.removeAllHeaderDecorations()
         rv_cryptos.addItemDecoration(
             HeaderDecoration.with(requireContext())
                 .parallax(0.5f)

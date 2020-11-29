@@ -181,28 +181,3 @@ object NullFiatAccount : FiatAccount {
     ): Single<Money> =
         Single.just(FiatValue.zero(fiatCurrency))
 }
-
-fun BlockchainAccount.isTheSameWith(other: BlockchainAccount): Boolean {
-
-    if (this::class == other::class &&
-        this.label == other.label &&
-        this.hasTheSameAsset(other)
-    ) {
-        return true
-    }
-    return false
-}
-
-private fun BlockchainAccount.hasTheSameAsset(other: BlockchainAccount): Boolean {
-    val thisCryptoAsset = (this as? CryptoAccount)?.asset
-    val otherCryptoAsset = (other as? CryptoAccount)?.asset
-    if (thisCryptoAsset != null && thisCryptoAsset == otherCryptoAsset)
-        return true
-
-    val thisFiatAsset = (this as? FiatAccount)?.fiatCurrency
-    val otherFiatAsset = (other as? FiatAccount)?.fiatCurrency
-    if (thisFiatAsset != null && thisFiatAsset == otherFiatAsset)
-        return true
-
-    return false
-}

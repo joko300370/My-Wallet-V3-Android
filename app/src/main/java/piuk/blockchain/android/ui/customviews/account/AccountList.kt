@@ -70,6 +70,7 @@ class AccountList @JvmOverloads constructor(
         introView: IntroHeaderView? = null,
         shouldShowSelectionStatus: Boolean = false
     ) {
+        removeAllHeaderDecorations()
 
         introView?.let {
             addItemDecoration(
@@ -80,13 +81,13 @@ class AccountList @JvmOverloads constructor(
             )
         }
 
-        val theAdapter = AccountsDelegateAdapter(
-            statusDecorator = status,
-            onAccountClicked = { onAccountSelected(it) },
-            showSelectionStatus = shouldShowSelectionStatus
-        )
-        adapter = theAdapter
-
+        if (adapter == null) {
+            adapter = AccountsDelegateAdapter(
+                statusDecorator = status,
+                onAccountClicked = { onAccountSelected(it) },
+                showSelectionStatus = shouldShowSelectionStatus
+            )
+        }
         loadItems(source)
     }
 

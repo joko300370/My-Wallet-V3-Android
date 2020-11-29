@@ -179,15 +179,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
     }
 }
 
-private fun CryptoAccount.isTheSameWith(other: CryptoAccount): Boolean {
-    if (this is NullCryptoAccount || other is NullCryptoAccount)
-        return false
-    if (this::class == other::class && this.asset == other.asset && this.label == other.label) {
-        return true
-    }
-    return false
-}
-
 private fun <T> Single<T>.startWithValue(value: T?): Observable<T> =
     value?.let {
         this.toObservable().startWith(value)
