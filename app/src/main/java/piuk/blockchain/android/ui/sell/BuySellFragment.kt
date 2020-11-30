@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.sell
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -112,6 +111,13 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         not_eligible_description.visible()
     }
 
+    private val pagerAdapter: ViewPagerAdapter by lazy {
+        ViewPagerAdapter(
+            listOf(getString(R.string.buy), getString(R.string.sell)),
+            childFragmentManager
+        )
+    }
+
     private fun renderBuySellUi(sellEnabled: Boolean) {
         if (sellEnabled) {
             tab_layout.setupWithViewPager(pager)
@@ -121,17 +127,17 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             activity?.setupToolbar(R.string.buy)
         }
 
-        pager.adapter = ViewPagerAdapter(
-            listOf(getString(R.string.buy), getString(R.string.sell)),
-            sellEnabled,
-            childFragmentManager
-        )
+        pagerAdapter.sellEnabled = sellEnabled
 
-        when (showView) {
-            BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
-                BuySellViewType.TYPE_BUY.ordinal, true)
-            BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
-                BuySellViewType.TYPE_SELL.ordinal, true)
+        if (pager.adapter == null) {
+            pager.adapter = pagerAdapter
+
+            when (showView) {
+                BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
+                    BuySellViewType.TYPE_BUY.ordinal, true)
+                BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
+                    BuySellViewType.TYPE_SELL.ordinal, true)
+            }
         }
 
         pager.visible()
@@ -187,13 +193,16 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onBackPressed(): Boolean = false
 }
 
-@SuppressLint("WrongConstant")
-class ViewPagerAdapter(
+internal class ViewPagerAdapter(
     private val titlesList: List<String>,
-    private val sellEnabled: Boolean,
     fragmentManager: FragmentManager
-) :
-    FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
+    var sellEnabled: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     override fun getCount(): Int = if (sellEnabled) titlesList.size else 1
     override fun getPageTitle(position: Int): CharSequence =

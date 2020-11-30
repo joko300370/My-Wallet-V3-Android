@@ -61,13 +61,13 @@ class AssetActivityRepository(
                             account == item.account
                         }
                     }
-                }.sorted()
-
-                if (account is AllWalletsAccount) {
-                    reconcileTransfersAndBuys(list)
-                } else {
-                    list
                 }
+            }.map { filteredList ->
+                if (account is AllWalletsAccount) {
+                    reconcileTransfersAndBuys(filteredList)
+                } else {
+                    filteredList
+                }.sorted()
             }
     }
 
