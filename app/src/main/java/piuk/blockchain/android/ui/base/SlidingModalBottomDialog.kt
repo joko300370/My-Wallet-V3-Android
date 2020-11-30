@@ -23,6 +23,8 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
             ?: throw IllegalStateException("Host is not a SlidingModalBottomDialog.Host")
     }
 
+    private var dismissed = false
+
     protected lateinit var dialogView: View
 
     protected val analytics: Analytics by inject()
@@ -43,7 +45,8 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
                     BottomSheetBehavior.STATE_EXPANDED -> onSheetExpanded()
                     BottomSheetBehavior.STATE_COLLAPSED -> onSheetCollapsed()
                     BottomSheetBehavior.STATE_HIDDEN -> onSheetHidden()
-                    else -> { /* shouldn't get here! */ }
+                    else -> { /* shouldn't get here! */
+                    }
                 }
             }
 
@@ -67,23 +70,34 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     }
 
     @CallSuper
-    protected open fun onSheetExpanded() { }
+    protected open fun onSheetExpanded() {
+    }
 
     @CallSuper
-    protected open fun onSheetCollapsed() { }
+    protected open fun onSheetCollapsed() {
+    }
 
     protected abstract val layoutResource: Int
     protected abstract fun initControls(view: View)
 
     override fun onCancel(dialog: DialogInterface) {
-        resetSheetParent()
         super.onCancel(dialog)
+        if (dismissed) {
+            return
+        }
+        dismissed = true
+        host.onSheetClosed()
+        resetSheetParent()
     }
 
     override fun dismiss() {
+        super.dismiss()
+        if (dismissed) {
+            return
+        }
+        dismissed = true
         resetSheetParent()
         host.onSheetClosed()
-        super.dismiss()
     }
 
     private fun resetSheetParent() {
