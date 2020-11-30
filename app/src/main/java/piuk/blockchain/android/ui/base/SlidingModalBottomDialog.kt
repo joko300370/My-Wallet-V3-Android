@@ -9,11 +9,7 @@ import com.blockchain.notifications.analytics.Analytics
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
-import io.reactivex.rxkotlin.plusAssign
-import java.util.concurrent.TimeUnit
 
 abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
 
@@ -21,9 +17,6 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
         fun onSheetClosed()
     }
 
-    private val dismiss = PublishSubject.create<Unit>()
-    private val onCancel = PublishSubject.create<Unit>()
-    private val compositeDisposable = CompositeDisposable()
     protected open val host: Host by lazy {
         parentFragment as? Host
             ?: activity as? Host
@@ -50,8 +43,7 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
                     BottomSheetBehavior.STATE_EXPANDED -> onSheetExpanded()
                     BottomSheetBehavior.STATE_COLLAPSED -> onSheetCollapsed()
                     BottomSheetBehavior.STATE_HIDDEN -> onSheetHidden()
-                    else -> { /* shouldn't get here! */
-                    }
+                    else -> { /* shouldn't get here! */ }
                 }
             }
 
@@ -66,12 +58,6 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
-        compositeDisposable += dismiss.mergeWith(onCancel).throttleWithTimeout(500, TimeUnit.MILLISECONDS)
-            .subscribe {
-                resetSheetParent()
-                host.onSheetClosed()
-            }
-
         return dlg
     }
 
@@ -81,33 +67,27 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     }
 
     @CallSuper
-    protected open fun onSheetExpanded() {
-    }
+    protected open fun onSheetExpanded() { }
 
     @CallSuper
-    protected open fun onSheetCollapsed() {
-    }
+    protected open fun onSheetCollapsed() { }
 
     protected abstract val layoutResource: Int
     protected abstract fun initControls(view: View)
 
     override fun onCancel(dialog: DialogInterface) {
-        onCancel.onNext(Unit)
+        resetSheetParent()
         super.onCancel(dialog)
     }
 
     override fun dismiss() {
-        dismiss.onNext(Unit)
+        resetSheetParent()
+        host.onSheetClosed()
         super.dismiss()
     }
 
     private fun resetSheetParent() {
         val bottomSheetBehavior = BottomSheetBehavior.from(dialogView.parent as View)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-
-    override fun onDestroy() {
-        compositeDisposable.clear()
-        super.onDestroy()
     }
 }
