@@ -26,7 +26,7 @@ class EnvironmentSettings : EnvironmentConfig {
             CryptoCurrency.DGLD -> TODO("STUB: DGLD NOT IMPLEMENTED")
         }
 
-    override fun isRunningOnDebugMode(): Boolean = BuildConfig.DEBUG
+    override fun isRunningInDebugMode(): Boolean = BuildConfig.DEBUG
 
     override val environment: Environment = Environment.fromString(BuildConfig.ENVIRONMENT)
 

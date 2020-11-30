@@ -60,7 +60,7 @@ class BankDetailsBottomSheet : SlidingModalBottomDialog() {
     private fun closeBecauseError(logMsg: String) {
         Timber.d("Cannot open bank details sheet: $logMsg")
         onCtaOKClick()
-        if (environmentConfig.isRunningOnDebugMode()) {
+        if (environmentConfig.isRunningInDebugMode()) {
             ToastCustom.makeText(
                 parentContext,
                 "Cannot open bank details sheet: $logMsg",

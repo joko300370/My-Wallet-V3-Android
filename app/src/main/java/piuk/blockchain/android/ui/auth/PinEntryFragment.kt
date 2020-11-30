@@ -134,7 +134,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             }
         })
 
-        if (environmentConfig.isRunningOnDebugMode()) {
+        if (environmentConfig.isRunningInDebugMode()) {
             ToastCustom.makeText(
                 activity,
                 "Current environment: " + environmentConfig.environment.getName(),

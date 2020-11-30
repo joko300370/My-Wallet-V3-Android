@@ -88,7 +88,7 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         crashLogger.init(this)
         crashLogger.userLanguageLocale(resources.configuration.locale.language)
 
-        if (environmentSettings.isRunningOnDebugMode()) {
+        if (environmentSettings.isRunningInDebugMode()) {
             Stetho.initializeWithDefaults(this)
         }
 

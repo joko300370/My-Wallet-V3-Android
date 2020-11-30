@@ -139,7 +139,7 @@ class CreateWalletPresenter(
     fun logEventPasswordTwoClicked() = analytics.logEventOnce(AnalyticsEvents.WalletSignupClickPasswordSecond)
 
     private fun Int.isStrongEnough(): Boolean {
-        val limit = if (environmentConfig.isRunningOnDebugMode()) 1 else 50
+        val limit = if (environmentConfig.isRunningInDebugMode()) 1 else 50
         return this >= limit
     }
 }

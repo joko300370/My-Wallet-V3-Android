@@ -231,7 +231,7 @@ class CreateWalletPresenterTest {
     @Test
     fun `validateCredentials weak password running on non debug modde`() {
         // Arrange
-        whenever(environmentConfig.isRunningOnDebugMode()).thenReturn(false)
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(false)
         // Act
         subject.passwordStrength = 20
         val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
@@ -244,7 +244,7 @@ class CreateWalletPresenterTest {
     @Test
     fun `validateCredentials weak password running on  debug modde`() {
         // Arrange
-        whenever(environmentConfig.isRunningOnDebugMode()).thenReturn(true)
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(true)
         // Act
         subject.passwordStrength = 5
         val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
