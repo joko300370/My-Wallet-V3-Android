@@ -66,9 +66,7 @@ class SwapAnnouncement(
             }
             AnnouncementType.NOT_ELIGIBLE,
             AnnouncementType.ELIGIBLE -> {
-                {
-                    host.startSwap()
-                }
+                host::startSwap
             }
         }
 
