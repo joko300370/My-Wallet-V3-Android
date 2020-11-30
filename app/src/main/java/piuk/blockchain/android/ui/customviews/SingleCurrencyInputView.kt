@@ -49,13 +49,13 @@ class SingleCurrencyInputView(context: Context, attrs: AttributeSet) : Constrain
                 configuration.let {
                     when (it) {
                         is SingleInputViewConfiguration.Fiat -> {
-                            val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                            val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->
                                 FiatValue.fromMajor(it.fiatCurrency, amount)
                             } ?: FiatValue.zero(it.fiatCurrency)
                             amountSubject.onNext(fiatAmount)
                         }
                         is SingleInputViewConfiguration.Crypto -> {
-                            val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
                                 CryptoValue.fromMajor(it.cryptoCurrency, amount)
                             } ?: CryptoValue.zero(it.cryptoCurrency)
 
