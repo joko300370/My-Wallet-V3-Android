@@ -337,7 +337,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectSourceAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.swap)
+            AssetAction.Swap -> resources.getString(R.string.common_swap)
             else -> ""
         }
     }

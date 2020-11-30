@@ -34,7 +34,6 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -64,6 +63,8 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
@@ -75,8 +76,6 @@ import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.scan.QrScanActivity
-import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
@@ -588,7 +587,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
         if (sourceAccount == null && destinationAccount == null) {
             setCurrentTabItem(ITEM_SWAP)
-            toolbar_general.title = getString(R.string.swap)
+            toolbar_general.title = getString(R.string.common_swap)
             val swapFragment = SwapFragment.newInstance()
             replaceContentFragment(swapFragment)
         } else if (sourceAccount != null) {

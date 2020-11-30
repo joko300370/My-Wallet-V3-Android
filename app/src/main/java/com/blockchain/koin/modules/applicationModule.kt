@@ -389,7 +389,8 @@ val applicationModule = module {
                 accessState = get(),
                 prngFixer = get(),
                 analytics = get(),
-                walletPrefs = get()
+                walletPrefs = get(),
+                environmentConfig = get()
             )
         }
 

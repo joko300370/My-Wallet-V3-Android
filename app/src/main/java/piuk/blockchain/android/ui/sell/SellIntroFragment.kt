@@ -36,6 +36,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
@@ -257,5 +258,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     override fun onFlowFinished() {
         host.onSellFinished()
+        loadSellDetails()
     }
 }

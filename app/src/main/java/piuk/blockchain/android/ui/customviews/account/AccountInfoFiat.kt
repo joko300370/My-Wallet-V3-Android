@@ -36,12 +36,8 @@ class AccountInfoFiat @JvmOverloads constructor(
             .inflate(R.layout.view_account_fiat_overview, this, true)
     }
 
-    var account: FiatAccount? = null
-        private set
-
     fun updateAccount(account: FiatAccount, cellDecorator: CellDecorator, onAccountClicked: (FiatAccount) -> Unit) {
         compositeDisposable.clear()
-        this.account = account
         updateView(account, cellDecorator, onAccountClicked)
     }
 
@@ -91,8 +87,7 @@ class AccountInfoFiat @JvmOverloads constructor(
             }
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
+    fun dispose() {
         compositeDisposable.clear()
     }
 }

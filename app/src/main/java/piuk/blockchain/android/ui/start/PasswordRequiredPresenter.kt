@@ -12,6 +12,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 interface PasswordRequiredView : PasswordAuthView {
     fun restartPage()
     fun showForgetWalletWarning(onForgetConfirmed: () -> Unit)
+    fun showWalletGuid(guid: String)
 }
 
 class PasswordRequiredPresenter(
@@ -38,6 +39,12 @@ class PasswordRequiredPresenter(
         view?.showForgetWalletWarning {
             appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
         }
+    }
+
+    fun loadWalletGuid() {
+        view?.showWalletGuid(
+            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+        )
     }
 
     override fun onAuthFailed() {
