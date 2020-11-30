@@ -7,10 +7,12 @@ import android.text.Selection
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
+import info.blockchain.utils.tryParseBigDecimal
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.androidcoreui.ui.customviews.AutofitEdittext
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import java.math.BigDecimal
 import kotlin.properties.Delegates
 
 class PrefixedOrSuffixedEditText : AutofitEdittext {
@@ -94,8 +96,11 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
         }
     }
 
-    internal val majorValue: String
+    private val majorValue: String
         get() = text.toString().removePrefix(prefix ?: "").removeSuffix(suffix ?: "")
+
+    internal val bigDecimalValue: BigDecimal?
+        get() = majorValue.tryParseBigDecimal()
 
     private var prefix: String? = null
 

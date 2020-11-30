@@ -119,7 +119,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         get() = configuration.isInitialised
 
     private fun getLastEnteredAmount(configuration: FiatCryptoViewConfiguration): Money =
-        enter_amount.majorValue.toBigDecimalOrNull()?.let { enterAmount ->
+        enter_amount.bigDecimalValue?.let { enterAmount ->
             if (configuration.input == CurrencyType.Fiat) FiatValue.fromMajor(configuration.fiatCurrency, enterAmount)
             else CryptoValue.fromMajor(cryptoCurrency, enterAmount)
         } ?: FiatValue.zero(configuration.fiatCurrency)
@@ -252,7 +252,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private fun updateExchangeAmountAndOutput(currencyType: CurrencyType) {
         if (configuration.input == CurrencyType.Fiat) {
 
-            val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+            val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->
                 FiatValue.fromMajor(configuration.fiatCurrency, amount)
             } ?: FiatValue.zero(configuration.fiatCurrency)
 
@@ -263,7 +263,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                 if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
             )
         } else {
-            val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
                 CryptoValue.fromMajor(cryptoCurrency, amount)
             } ?: CryptoValue.zero(cryptoCurrency)
 
