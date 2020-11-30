@@ -80,6 +80,11 @@ abstract class SlidingModalBottomDialog : BottomSheetDialogFragment() {
     protected abstract val layoutResource: Int
     protected abstract fun initControls(view: View)
 
+    // We use this dismissed flag to make sure that only one of onCancel or dismiss methods are called,
+    // when the bottomsheet is dismissed in different ways.
+    // When the bottomsheet is dismissed with the back button onCancel is called but not dismiss. On the hand
+    // if bottomsheet is dismissed by code (.dismiss()) or with slide gesture then both methods are called.
+
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
         if (dismissed) {

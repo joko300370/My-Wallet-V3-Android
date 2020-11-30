@@ -92,7 +92,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
             .doOnSubscribe { asset_subtitle.text = resources.getString(R.string.empty) }
             .doOnSuccess {
                 interestRate = it
-            }.startWithValue(interestRate.initialValue(accountsAreTheSame))
+            }.startWithValueIfCondition(value = interestRate, condition = accountsAreTheSame)
             .subscribeBy(
                 onNext = {
                     asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
@@ -122,9 +122,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable += account.accountBalance
             .doOnSuccess {
                 accountBalance = it
-            }.startWithValue(
-                accountBalance.initialValue(accountsAreTheSame)
-                    ?: CryptoValue.zero(account.asset) // start with zero balance in other case
+            }.startWithValueIfCondition(
+                value = accountBalance,
+                alternativeValue = CryptoValue.zero(account.asset),
+                condition = accountsAreTheSame
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -155,7 +156,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable += cellDecorator.isEnabled()
             .doOnSuccess {
                 isEnabled = it
-            }.startWithValue(isEnabled.initialValue(accountsAreTheSame))
+            }.startWithValueIfCondition(value = isEnabled, condition = accountsAreTheSame)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 setOnClickListener {
@@ -185,7 +186,17 @@ class AccountInfoCrypto @JvmOverloads constructor(
         if (accountsAreTheSame) this else null
 }
 
-private fun <T> Single<T>.startWithValue(value: T?): Observable<T> =
-    value?.let {
-        this.toObservable().startWith(value)
-    } ?: this.toObservable()
+private fun <T> Single<T>.startWithValueIfCondition(
+    value: T?,
+    alternativeValue: T? = null,
+    condition: Boolean
+): Observable<T> =
+    if (!condition)
+        this.toObservable()
+    else {
+        when {
+            value != null -> this.toObservable().startWith(value)
+            alternativeValue != null -> this.toObservable().startWith(alternativeValue)
+            else -> this.toObservable()
+        }
+    }
