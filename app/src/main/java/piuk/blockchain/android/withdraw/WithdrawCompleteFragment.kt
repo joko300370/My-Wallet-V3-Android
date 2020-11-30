@@ -8,12 +8,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.withdrawEventWithCurrency
 import info.blockchain.balance.FiatValue
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.icon
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.ok_btn
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.progress
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.state_indicator
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.subtitle
-import kotlinx.android.synthetic.main.fragment_withdraw_complete.title
+import kotlinx.android.synthetic.main.fragment_withdraw_complete.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
@@ -86,7 +81,7 @@ class WithdrawCompleteFragment : MviFragment<WithdrawModel, WithdrawIntent, With
             }
             hasError -> {
                 state_indicator.setImageResource(R.drawable.ic_alert)
-                title.text = getString(R.string.card_error_title)
+                title.text = getString(R.string.common_oops)
                 subtitle.text = getString(R.string.order_error_subtitle)
             }
         }

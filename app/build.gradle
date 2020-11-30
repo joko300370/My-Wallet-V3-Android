@@ -52,27 +52,14 @@ android {
         ]
 
         resConfigs 'en',
-                'cs',
                 'de',
                 'es',
                 'fr',
-                'id',
                 'it',
-                'ja',
-                'ko',
-                'ms',
-                'nl',
-                'pl',
                 'pt',
                 'pt-rBR',
-                'ro',
                 'ru',
-                'sv',
-                'th',
-                'tr',
-                'uk',
-                'vi',
-                'zh-rCN'
+                'tr'
     }
     buildTypes {
         release {

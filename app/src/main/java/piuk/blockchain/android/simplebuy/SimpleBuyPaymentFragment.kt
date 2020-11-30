@@ -160,7 +160,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             }
             hasError -> {
                 transaction_progress_view.showTxError(
-                    getString(R.string.card_error_title),
+                    getString(R.string.common_oops),
                     getString(R.string.order_error_subtitle))
             }
         }

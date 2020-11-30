@@ -77,7 +77,7 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
         private const val CAN_ADD_CARD_KEY = "can_add_card_key"
         private const val CAN_LINK_FUNDS_KEY = "can_link_funds_key"
         fun newInstance(paymentMethods: List<PaymentMethod>, canAddCard: Boolean, canLindFunds: Boolean):
-                PaymentMethodChooserBottomSheet {
+            PaymentMethodChooserBottomSheet {
             val bundle = Bundle()
             bundle.putSerializable(SUPPORTED_PAYMENT_METHODS, paymentMethods as Serializable)
             bundle.putBoolean(CAN_ADD_CARD_KEY, canAddCard)
