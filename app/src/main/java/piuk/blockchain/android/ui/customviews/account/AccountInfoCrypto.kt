@@ -92,7 +92,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
             .doOnSubscribe { asset_subtitle.text = resources.getString(R.string.empty) }
             .doOnSuccess {
                 interestRate = it
-            }.startWithValue(interestRate?.takeIf { accountsAreTheSame })
+            }.startWithValue(interestRate.initialValue(accountsAreTheSame))
             .subscribeBy(
                 onNext = {
                     asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
@@ -122,7 +122,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable += account.accountBalance
             .doOnSuccess {
                 accountBalance = it
-            }.startWithValue(accountBalance?.takeIf { accountsAreTheSame } ?: CryptoValue.zero(account.asset))
+            }.startWithValue(
+                accountBalance.initialValue(accountsAreTheSame)
+                    ?: CryptoValue.zero(account.asset) // start with zero balance in other case
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { accountBalance ->
@@ -152,7 +155,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         compositeDisposable += cellDecorator.isEnabled()
             .doOnSuccess {
                 isEnabled = it
-            }.startWithValue(isEnabled?.takeIf { accountsAreTheSame })
+            }.startWithValue(isEnabled.initialValue(accountsAreTheSame))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 setOnClickListener {
@@ -177,6 +180,9 @@ class AccountInfoCrypto @JvmOverloads constructor(
     fun dispose() {
         compositeDisposable.clear()
     }
+
+    private fun <T> T.initialValue(accountsAreTheSame: Boolean): T? =
+        if (accountsAreTheSame) this else null
 }
 
 private fun <T> Single<T>.startWithValue(value: T?): Observable<T> =
