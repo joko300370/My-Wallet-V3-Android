@@ -148,7 +148,7 @@ open class EthOnChainTxEngine(
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
                 pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
-                    ethDataManager.updateErc20TransactionNotes(hash, notes.text)
+                    ethDataManager.updateTransactionNotes(hash, notes.text)
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
