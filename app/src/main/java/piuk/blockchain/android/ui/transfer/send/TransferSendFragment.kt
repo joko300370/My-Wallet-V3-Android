@@ -5,11 +5,11 @@ import android.view.View
 import com.blockchain.notifications.analytics.Analytics
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
+import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow

@@ -15,7 +15,9 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
+import info.blockchain.wallet.payload.data.Account
 import io.reactivex.Single
+import org.amshove.kluent.itReturns
 import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
@@ -38,22 +40,23 @@ class BtcAccountActivityTest {
     private val walletPrefs: WalletStatus = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
 
+    private val jsonAccount: Account = mock {
+        on { isArchived } itReturns false
+        on { xpub } itReturns ACCOUNT_XPUB
+    }
+
     private val subject =
         BtcCryptoWalletAccount(
-            label = "TestBtcAccount",
-            address = "",
             payloadManager = payloadDataManager,
             hdAccountIndex = -1,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
-            isDefault = true,
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
-            internalAccount = mock(),
+            internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPrefs,
-            custodialWalletManager = custodialWalletManager,
-            isArchived = false
+            custodialWalletManager = custodialWalletManager
         )
 
     @get:Rule
@@ -251,5 +254,6 @@ class BtcAccountActivityTest {
         private const val TX_HASH_SEND_NO_MATCH = "0x0987654321"
         private const val TX_HASH_RECEIVE = "0x12345678890"
         private const val TX_HASH_SWAP = "12345678890"
+        private const val ACCOUNT_XPUB = "1234jfwepsdfapsksefksdwperoun894y98hefjbnakscdfoiw4rnwef"
     }
 }

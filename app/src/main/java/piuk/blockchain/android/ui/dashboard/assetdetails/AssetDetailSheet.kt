@@ -24,7 +24,6 @@ import info.blockchain.wallet.prices.data.PriceDatum
 import kotlinx.android.synthetic.main.dialog_sheet_dashboard_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -32,6 +31,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.getDecimalPlaces
 import piuk.blockchain.android.util.loadInterMedium

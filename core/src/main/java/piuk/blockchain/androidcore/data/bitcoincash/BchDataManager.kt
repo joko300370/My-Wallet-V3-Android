@@ -87,7 +87,17 @@ class BchDataManager(
             }
             .subscribeOn(Schedulers.io())
 
+    @Deprecated("Use syncWithServer")
     fun serializeForSaving(): String = bchDataStore.bchMetadata!!.toJson()
+
+    fun syncWithServer(): Completable =
+        metadataManager.saveToMetadata(
+            bchDataStore.bchMetadata!!.toJson(),
+            BitcoinCashWallet.METADATA_TYPE_EXTERNAL
+        )
+
+    fun updateTransactions() =
+        Completable.fromObservable(getWalletTransactions(50, 50))
 
     @VisibleForTesting
     internal fun fetchMetadata(

@@ -100,7 +100,7 @@ internal class PaxAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
 }
 

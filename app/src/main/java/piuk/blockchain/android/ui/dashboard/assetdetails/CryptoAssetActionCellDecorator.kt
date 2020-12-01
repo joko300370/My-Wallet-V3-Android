@@ -7,9 +7,9 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.status_line_info.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
 
 class CryptoAssetActionCellDecorator(private val account: CryptoAccount) : CellDecorator {
     override fun view(context: Context): Maybe<View> =

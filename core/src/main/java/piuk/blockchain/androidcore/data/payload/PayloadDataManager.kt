@@ -33,7 +33,6 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
-import java.util.ArrayList
 import java.util.LinkedHashMap
 
 class PayloadDataManager(
@@ -441,26 +440,17 @@ class PayloadDataManager(
         }.applySchedulers()
 
     /**
-     * Sets a private key for an associated [LegacyAddress] which is already in the [ ] as a watch only address
+     * Add a private key for a [LegacyAddress]
      *
      * @param key An [ECKey]
      * @param secondPassword An optional double encryption password
      * @return An [Observable] representing a successful save
      */
-    fun setKeyForLegacyAddress(key: ECKey, secondPassword: String?): Observable<LegacyAddress> =
+    fun addLegacyAddressFromKey(key: ECKey, secondPassword: String?): Single<LegacyAddress> =
         rxPinning.call<LegacyAddress> {
             payloadService.setKeyForLegacyAddress(key, secondPassword)
         }.applySchedulers()
-
-    /**
-     * Allows you to add a [LegacyAddress] to the [Wallet]
-     *
-     * @param legacyAddress The new address
-     * @return A [Completable] object representing a successful save
-     */
-    fun addLegacyAddress(legacyAddress: LegacyAddress): Completable =
-        rxPinning.call { payloadService.addLegacyAddress(legacyAddress) }
-            .applySchedulers()
+        .singleOrError()
 
     /**
      * Allows you to propagate changes to a [LegacyAddress] through the [Wallet]
@@ -480,9 +470,15 @@ class PayloadDataManager(
      * @return An [ECKey]
      * @see PrivateKeyFactory
      */
-    fun getKeyFromImportedData(format: String, data: String): Observable<ECKey> =
-        Observable.fromCallable { privateKeyFactory.getKey(format, data) }
-            .applySchedulers()
+    fun getKeyFromImportedData(keyFormat: String, keyData: String): Single<ECKey> =
+        Single.fromCallable {
+            privateKeyFactory.getKey(keyFormat, keyData)
+        }.applySchedulers()
+
+    fun getBip38KeyFromImportedData(keyData: String, keyPassword: String): Single<ECKey> =
+        Single.fromCallable {
+            privateKeyFactory.getBip38Key(networkParameters, keyData, keyPassword)
+        }.applySchedulers()
 
     /**
      * Returns the balance of an address. If the address isn't found in the address map object, the
@@ -639,66 +635,15 @@ class PayloadDataManager(
     // HELPER METHODS
     // /////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Returns the index for an [Account], assuming that the supplied position was gotten from
-     * a list of only those Accounts which are active.
-     *
-     * @param position The position of the [Account] that you want to select from a list of
-     * active Accounts
-     * @return The position of the [Account] within the full list of Accounts
-     */
-    fun getPositionOfAccountFromActiveList(position: Int): Int {
-        val accounts = accounts
-        var adjustedPosition = 0
-        for (i in accounts.indices) {
-            val account = accounts[i]
-            if (!account.isArchived) {
-                if (position == adjustedPosition) {
-                    return i
-                }
-                adjustedPosition++
-            }
-        }
-
-        return 0
-    }
-
-    /**
-     * Returns the index for an [Account] in a list of active-only Accounts, where the
-     * supplied `accountIndex` is the position of the Account in the full list of both active
-     * and archived Accounts.
-     *
-     * @param accountIndex The position of an [Account] in the full list of Accounts
-     * @return The Account's position within a list of active-only Accounts. Will be -1 if you
-     * attempt to find the position of an archived Account
-     */
-    fun getPositionOfAccountInActiveList(accountIndex: Int): Int {
-        // Filter accounts by active
-        val activeAccounts = ArrayList<Account>()
-        val accounts = accounts
-        for (i in accounts.indices) {
-            val account = accounts[i]
-            if (!account.isArchived) {
-                activeAccounts.add(account)
-            }
-        }
-
-        // Find corrected position
-        return activeAccounts.indexOf(accounts[accountIndex])
+    fun setDefaultIndex(defaultIndex: Int) {
+        wallet!!.hdWallets[0].defaultAccountIdx = defaultIndex
     }
 
     fun validateSecondPassword(secondPassword: String?): Boolean =
         payloadManager.validateSecondPassword(secondPassword)
 
-    @Deprecated(
-        "This seems to be always called with bitcoin network parameters, just use other overload")
-    @Throws(Exception::class)
-    fun decryptHDWallet(networkParameters: NetworkParameters, secondPassword: String?) {
-        payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
-    }
-
     @Throws(Exception::class)
     fun decryptHDWallet(secondPassword: String?) {
-        decryptHDWallet(networkParameters, secondPassword)
+        payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
     }
 }

@@ -82,7 +82,7 @@ internal class StxAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         false
 }
 

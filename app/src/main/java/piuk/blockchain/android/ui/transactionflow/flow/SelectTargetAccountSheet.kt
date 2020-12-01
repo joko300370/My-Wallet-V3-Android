@@ -5,9 +5,9 @@ import io.reactivex.Single
 import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.androidcoreui.utils.extensions.visible

@@ -9,13 +9,16 @@ import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.util.FormatsUtil
+import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.Coin
+import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -24,6 +27,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -38,6 +42,7 @@ internal class BtcAsset(
     payloadManager: PayloadDataManager,
     private val sendDataManager: SendDataManager,
     private val feeDataManager: FeeDataManager,
+    private val coinsWebsocket: CoinsWebSocketStrategy,
     custodialManager: CustodialWalletManager,
     exchangeRates: ExchangeRateDataManager,
     historicRates: ExchangeRateService,
@@ -73,39 +78,12 @@ internal class BtcAsset(
         Single.fromCallable {
             with(payloadManager) {
                 val result = mutableListOf<CryptoAccount>()
-                val defaultIndex = defaultAccountIndex
-                accounts.forEachIndexed { i, a ->
-                    result.add(
-                        BtcCryptoWalletAccount.createHdAccount(
-                            jsonAccount = a,
-                            payloadManager = payloadManager,
-                            hdAccountIndex = i,
-                            sendDataManager = sendDataManager,
-                            feeDataManager = feeDataManager,
-                            isDefault = i == defaultIndex,
-                            exchangeRates = exchangeRates,
-                            networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager,
-                            isArchived = a.isArchived
-                        )
-                    )
+                accounts.forEachIndexed { i, account ->
+                    result.add(btcAccountFromPayloadAccount(i, account))
                 }
 
-                legacyAddresses.forEach { a ->
-                    result.add(
-                        BtcCryptoWalletAccount.createLegacyAccount(
-                            legacyAccount = a,
-                            payloadManager = payloadManager,
-                            sendDataManager = sendDataManager,
-                            feeDataManager = feeDataManager,
-                            exchangeRates = exchangeRates,
-                            networkParameters = environmentConfig.bitcoinNetworkParameters,
-                            walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager,
-                            isArchived = a.tag == LegacyAddress.ARCHIVED_ADDRESS
-                        )
-                    )
+                legacyAddresses.forEach { account ->
+                    result.add(btcAccountFromLegacyAccount(account))
                 }
                 result
             }
@@ -124,10 +102,75 @@ internal class BtcAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidBitcoinAddress(
             environmentConfig.bitcoinNetworkParameters,
             address
+        )
+
+    fun createAccount(label: String, secondPassword: String?): Single<BtcCryptoWalletAccount> =
+        payloadManager.createNewAccount(label, secondPassword)
+            .singleOrError()
+            .map { btcAccountFromPayloadAccount(payloadManager.accounts.size - 1, it) }
+//            .doOnSuccess { updateAccountList(it) } TODO: Dynamic loading. Next PR
+            .doOnSuccess { coinsWebsocket.subscribeToXpubBtc(it.xpubAddress) }
+
+    fun importLegacyAddressFromKey(
+        keyData: String,
+        keyFormat: String,
+        keyPassword: String? = null, // Required for BIP38 format keys
+        walletSecondPassword: String? = null
+    ): Single<BtcCryptoWalletAccount> {
+        require(keyData.isNotEmpty())
+        require(keyPassword != null || keyFormat != PrivateKeyFactory.BIP38)
+
+        return when (keyFormat) {
+            PrivateKeyFactory.BIP38 -> extractBip38Key(keyData, keyPassword!!)
+            else -> extractKey(keyData, keyFormat)
+        }.map { key ->
+            if (!key.hasPrivKey())
+                throw Exception()
+            key
+        }.flatMap { key ->
+            payloadManager.addLegacyAddressFromKey(key, walletSecondPassword)
+        }.map { legacyAddress ->
+            btcAccountFromLegacyAccount(legacyAddress)
+        }.doOnSuccess { btcAccount ->
+            // updateAccountList(btcAccount) TODO: Dynamic loading. Next PR
+        }.doOnSuccess { btcAccount ->
+            coinsWebsocket.subscribeToExtraBtcAddress(btcAccount.xpubAddress)
+        }
+    }
+
+    private fun extractBip38Key(keyData: String, keyPassword: String): Single<ECKey> =
+        payloadManager.getBip38KeyFromImportedData(keyData, keyPassword)
+
+    private fun extractKey(keyData: String, keyFormat: String): Single<ECKey> =
+        payloadManager.getKeyFromImportedData(keyFormat, keyData)
+
+    private fun btcAccountFromPayloadAccount(index: Int, payloadAccount: Account): BtcCryptoWalletAccount =
+        BtcCryptoWalletAccount.createHdAccount(
+            jsonAccount = payloadAccount,
+            payloadManager = payloadManager,
+            hdAccountIndex = index,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            exchangeRates = exchangeRates,
+            networkParameters = environmentConfig.bitcoinNetworkParameters,
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialManager
+        )
+
+    private fun btcAccountFromLegacyAccount(payloadAccount: LegacyAddress): BtcCryptoWalletAccount =
+        BtcCryptoWalletAccount.createLegacyAccount(
+            legacyAccount = payloadAccount,
+            payloadManager = payloadManager,
+            sendDataManager = sendDataManager,
+            feeDataManager = feeDataManager,
+            exchangeRates = exchangeRates,
+            networkParameters = environmentConfig.bitcoinNetworkParameters,
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialManager
         )
 }
 

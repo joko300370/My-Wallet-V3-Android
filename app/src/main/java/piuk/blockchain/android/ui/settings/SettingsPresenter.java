@@ -625,7 +625,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private void showUpdatePasswordFailed(@NonNull String fallbackPassword) {
         payloadManager.setTempPassword(fallbackPassword);
 
-        getView().showToast(R.string.remote_save_ko, ToastCustom.TYPE_ERROR);
+        getView().showToast(R.string.remote_save_failed, ToastCustom.TYPE_ERROR);
         getView().showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR);
     }
 

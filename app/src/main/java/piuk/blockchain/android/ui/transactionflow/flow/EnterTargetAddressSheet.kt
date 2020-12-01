@@ -15,11 +15,11 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_tx_flow_enter_address.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
