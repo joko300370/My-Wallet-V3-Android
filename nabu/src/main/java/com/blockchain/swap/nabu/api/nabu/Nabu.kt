@@ -447,6 +447,6 @@ internal interface Nabu {
     @GET(NABU_SWAP_ACTIVITY)
     fun fetchSwapActivity(
         @Header("authorization") authorization: String,
-        @Header("limit") limit: Int = 50
+        @Query("limit") limit: Int = 50
     ): Single<List<SwapOrderResponse>>
 }
