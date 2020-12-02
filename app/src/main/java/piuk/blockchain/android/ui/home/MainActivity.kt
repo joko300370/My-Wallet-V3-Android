@@ -49,8 +49,8 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
+import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
@@ -206,6 +206,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             // Select Dashboard by default
             setOnTabSelectedListener(tabSelectedListener)
             currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL else ITEM_HOME
+        }
+
+        if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {
+            startSwapFlow()
         }
     }
 
@@ -693,6 +697,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
+        const val SHOW_SWAP = "SHOW_SWAP"
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
