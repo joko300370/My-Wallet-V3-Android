@@ -11,6 +11,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
 import info.blockchain.wallet.multiaddress.TransactionSummary
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -29,6 +30,7 @@ import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import java.lang.UnsupportedOperationException
 import java.math.BigInteger
 
 internal const val transactionFetchCount = 50
@@ -215,6 +217,22 @@ abstract class CryptoNonCustodialAccount(
         }
         return activityList.toList()
     }
+
+    // For editing etc
+    open fun updateLabel(newLabel: String): Completable =
+        Completable.error(UnsupportedOperationException("Cannot update account label for $asset accounts"))
+
+    open fun archive(): Completable =
+        Completable.error(UnsupportedOperationException("Cannot archive $asset accounts"))
+
+    open fun unarchive(): Completable =
+        Completable.error(UnsupportedOperationException("Cannot unarchive $asset accounts"))
+
+    open fun setAsDefault(): Completable =
+        Completable.error(UnsupportedOperationException("$asset doesn't support multiple accounts"))
+
+    open val xpubAddress: String
+        get() = throw UnsupportedOperationException("$asset doesn't support xpub")
 }
 
 // Currently only one custodial account is supported for each asset,

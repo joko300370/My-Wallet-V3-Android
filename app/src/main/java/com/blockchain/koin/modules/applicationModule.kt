@@ -2,7 +2,6 @@ package com.blockchain.koin.modules
 
 import android.content.Context
 import com.blockchain.accounts.AccountList
-import com.blockchain.accounts.AsyncAllAccountList
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
 import com.blockchain.koin.cardPaymentsFeatureFlag
@@ -23,7 +22,6 @@ import com.blockchain.koin.simpleBuyFeatureFlag
 import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
-import com.blockchain.koin.xlm
 import com.blockchain.logging.DigitalTrust
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
@@ -34,7 +32,6 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountM
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.metadata.MetadataDerivation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.OkHttpClient
@@ -42,7 +39,6 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.accounts.AsyncAllAccountListImplementation
 import piuk.blockchain.android.accounts.BchAccountListAdapter
 import piuk.blockchain.android.accounts.BtcAccountListAdapter
 import piuk.blockchain.android.accounts.EthAccountListAdapter
@@ -74,10 +70,8 @@ import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingImpl
 import piuk.blockchain.android.thepit.ThePitDeepLinkParser
-import piuk.blockchain.android.ui.account.AccountEditPresenter
-import piuk.blockchain.android.ui.account.AccountPresenter
-import piuk.blockchain.android.ui.account.ConfirmPaymentPresenter
-import piuk.blockchain.android.ui.account.SecondPasswordHandlerDialog
+import piuk.blockchain.android.ui.addresses.AccountPresenter
+import piuk.blockchain.android.ui.customviews.SecondPasswordDialog
 import piuk.blockchain.android.ui.airdrops.AirdropCentrePresenter
 import piuk.blockchain.android.ui.auth.FirebaseMobileNoticeRemoteConfig
 import piuk.blockchain.android.ui.auth.MobileNoticeRemoteConfig
@@ -86,7 +80,6 @@ import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedPresente
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingPresenter
 import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
-import piuk.blockchain.android.ui.chooser.WalletAccountHelper
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
 import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
@@ -253,13 +246,7 @@ val applicationModule = module {
         }
 
         factory {
-            WalletAccountHelper(
-                payloadManager = get()
-            )
-        }
-
-        factory {
-            SecondPasswordHandlerDialog(get(), get())
+            SecondPasswordDialog(contextAccess = get(), payloadManager = get())
         }.bind(SecondPasswordHandler::class)
 
         factory { KycStatusHelper(get(), get(), get(), get()) }
@@ -474,25 +461,10 @@ val applicationModule = module {
 
         factory {
             AccountPresenter(
-                payloadDataManager = get(),
-                bchDataManager = get(),
-                metadataManager = get(),
                 privateKeyFactory = get(),
-                environmentSettings = get(),
                 analytics = get(),
-                coinsWebSocketStrategy = get(),
-                coincore = get(),
-                sendDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                custodialWalletManager = get()
+                coincore = get()
             )
-        }
-
-        factory {
-            ConfirmPaymentPresenter()
         }
 
         factory {
@@ -737,22 +709,6 @@ val applicationModule = module {
         }
 
         factory {
-            AccountEditPresenter(
-                prefs = get(),
-                stringUtils = get(),
-                payloadDataManager = get(),
-                bchDataManager = get(),
-                metadataManager = get(),
-                sendDataManager = get(),
-                swipeToReceiveHelper = get(),
-                dynamicFeeCache = get(),
-                analytics = get(),
-                exchangeRates = get(),
-                coinSelectionRemoteConfig = get()
-            )
-        }
-
-        factory {
             BackupWalletCompletedPresenter(
                 walletStatus = get()
             )
@@ -821,19 +777,6 @@ val applicationModule = module {
         factory(eth) { EthAccountListAdapter(get()) }.bind(AccountList::class)
         factory(pax) { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
         factory(usdt) { UsdtAccountListAdapter(get(), get()) }.bind(AccountList::class)
-
-        factory {
-            AsyncAllAccountListImplementation(
-                mapOf(
-                    CryptoCurrency.BTC to get(btc),
-                    CryptoCurrency.ETHER to get(eth),
-                    CryptoCurrency.BCH to get(bch),
-                    CryptoCurrency.XLM to get(xlm),
-                    CryptoCurrency.PAX to get(pax),
-                    CryptoCurrency.USDT to get(usdt)
-                )
-            )
-        }.bind(AsyncAllAccountList::class)
     }
 
     factory {

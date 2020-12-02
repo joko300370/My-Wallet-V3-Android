@@ -14,7 +14,6 @@ import info.blockchain.wallet.exceptions.AccountLockedException;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
-import info.blockchain.wallet.exceptions.PayloadException;
 import info.blockchain.wallet.exceptions.ServerConnectionException;
 import info.blockchain.wallet.exceptions.UnsupportedVersionException;
 import info.blockchain.wallet.payload.data.Account;
@@ -679,26 +678,6 @@ public class PinEntryPresenterTest {
         verify(activity).showProgressDialog(anyInt(), isNull());
         verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
         verify(activity).goToPasswordRequiredActivity();
-    }
-
-    @SuppressLint("VisibleForTests")
-    @Test
-    public void updatePayloadPayloadExceptionException() {
-        // Arrange
-        when(payloadManager.initializeAndDecrypt(anyString(), anyString(), anyString()))
-                .thenReturn(Completable.error(new PayloadException()));
-        when(prefsUtil.getValue(anyString(), anyString())).thenReturn("prefs string");
-        Wallet mockPayload = mock(Wallet.class);
-        when(mockPayload.getSharedKey()).thenReturn("1234567890");
-        when(payloadManager.getWallet()).thenReturn(mockPayload);
-        // Act
-        subject.updatePayload("");
-        // Assert
-        verify(activity).showProgressDialog(anyInt(), isNull());
-        verify(payloadManager).initializeAndDecrypt(anyString(), anyString(), anyString());
-        //noinspection WrongConstant
-        verify(activity).showToast(anyInt(), anyString());
-        verify(appUtil).restartApp(LauncherActivity.class);
     }
 
     @SuppressLint("VisibleForTests")

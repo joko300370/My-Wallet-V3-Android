@@ -5,6 +5,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
@@ -56,12 +57,13 @@ class Coincore internal constructor(
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)
 
-    fun allWallets(): Single<AccountGroup> =
+    fun allWallets(includeArchived: Boolean = false): Single<AccountGroup> =
         Maybe.concat(
             allAssets.map {
                 it.accountGroup().map { grp -> grp.accounts }
             }
         ).reduce { a, l -> a + l }
+//            .map { list -> list.filter { a -> (a is CryptoAccount && (a.is) }
             .map { list ->
                 AllWalletsAccount(list, defaultLabels) as AccountGroup
             }.toSingle()
@@ -165,4 +167,15 @@ class Coincore internal constructor(
             target,
             action
         )
+
+    @Suppress("SameParameterValue")
+    private fun allAccounts(includeArchived: Boolean = false): Observable<SingleAccount> =
+        allWallets(includeArchived).map { it.accounts }
+            .flattenAsObservable { it }
+
+    fun isLabelUnique(label: String): Single<Boolean> =
+        allAccounts(true)
+            .filter { a -> a.label.compareTo(label, true) == 0 }
+            .toList()
+            .map { it.isEmpty() }
 }

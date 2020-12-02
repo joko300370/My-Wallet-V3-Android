@@ -49,7 +49,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.account.AccountActivity
+import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity

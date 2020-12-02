@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible

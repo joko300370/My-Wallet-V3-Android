@@ -59,5 +59,5 @@ internal class Erc20ActivitySummaryItem(
     override val confirmations: Int = (lastBlockNumber - transfer.blockNumber).toInt()
 
     override fun updateDescription(description: String): Completable =
-        ethDataManager.updateErc20TransactionNotes(txId, description)
+        ethDataManager.updateErc20TransactionNotes(txId, description, cryptoCurrency)
 }

@@ -151,15 +151,18 @@ internal class UpgradeWalletActivity : BaseMvpActivity<UpgradeWalletView, Upgrad
     }
 
     private fun upgradeClicked() {
-        secondPasswordHandler.validate(object : SecondPasswordHandler.ResultListener {
-            override fun onNoSecondPassword() {
-                presenter.onUpgradeRequested(null)
-            }
+        secondPasswordHandler.validate(
+            this,
+            object : SecondPasswordHandler.ResultListener {
+                override fun onNoSecondPassword() {
+                    presenter.onUpgradeRequested(null)
+                }
 
-            override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                presenter.onUpgradeRequested(validatedSecondPassword)
+                override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                    presenter.onUpgradeRequested(validatedSecondPassword)
+                }
             }
-        })
+        )
     }
 
     private fun setSelectedPage(position: Int) {

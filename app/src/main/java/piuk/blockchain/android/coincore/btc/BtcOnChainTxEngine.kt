@@ -7,15 +7,12 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeOptions
-import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Transaction
 import org.koin.core.KoinComponent
@@ -24,7 +21,6 @@ import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
@@ -88,11 +84,7 @@ class BtcOnChainTxEngine(
     }
 
     private val sourceAddress: String by unsafeLazy {
-        if (btcSource.isHDAccount) {
-            (btcSource.internalAccount as Account).xpub
-        } else {
-            (btcSource.internalAccount as LegacyAddress).address
-        }
+        btcSource.xpubAddress
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -340,8 +332,8 @@ class BtcOnChainTxEngine(
         secondPassword: String
     ): Single<EngineTransaction> =
         Singles.zip(
-            getBtcChangeAddress(),
-            getBtcKeys(pendingTx, secondPassword)
+            btcSource.getChangeAddress(),
+            btcSource.getSigningKeys(pendingTx.utxoBundle, secondPassword)
         ).map { (changeAddress, keys) ->
             BtcPreparedTx(
                 sendDataManager.createAndSignBtcTransaction(
@@ -356,73 +348,23 @@ class BtcOnChainTxEngine(
         }
 
     override fun doOnTransactionSuccess(pendingTx: PendingTx) {
-        incrementBtcReceiveAddress(pendingTx)
+        btcSource.incrementReceiveAddress()
+        updateInternalBtcBalances(pendingTx)
     }
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
     }
 
-    private fun getBtcKeys(pendingTx: PendingTx, secondPassword: String): Single<List<ECKey>> {
-        if (btcSource.isHDAccount) {
-            if (btcDataManager.isDoubleEncrypted) {
-                btcDataManager.decryptHDWallet(secondPassword)
-            }
-
-            return Single.just(
-                btcDataManager.getHDKeysForSigning(
-                    account = btcSource.internalAccount as Account,
-                    unspentOutputBundle = pendingTx.utxoBundle
-                )
-            )
-        } else {
-            val password = if (btcDataManager.isDoubleEncrypted) secondPassword else null
-            return Single.just(
-                listOf(
-                    btcDataManager.getAddressECKey(
-                        legacyAddress = btcSource.internalAccount as LegacyAddress,
-                        secondPassword = password
-                    ) ?: throw fatalError(TransferError("Private key not found for legacy BTC address"))
-                )
-            )
-        }
-    }
-
-    private fun getBtcChangeAddress(): Single<String> {
-        return if (btcSource.isHDAccount) {
-            btcDataManager.getNextChangeAddress(btcSource.internalAccount as Account)
-                .singleOrError()
-        } else {
-            Single.just((btcSource.internalAccount as LegacyAddress).address)
-        }
-    }
-
-    private fun incrementBtcReceiveAddress(pendingTx: PendingTx) {
-        if (btcSource.isHDAccount) {
-            val account = btcSource.internalAccount as Account
-            btcDataManager.incrementChangeAddress(account)
-            btcDataManager.incrementReceiveAddress(account)
-            updateInternalBtcBalances(pendingTx)
-        }
-    }
-
     // Update balance immediately after spend - until refresh from server
     private fun updateInternalBtcBalances(pendingTx: PendingTx) {
         try {
             val totalSent = pendingTx.totalSent.toBigInteger()
-            if (btcSource.isHDAccount) {
-                val account = btcSource.internalAccount as Account
-                btcDataManager.subtractAmountFromAddressBalance(
-                    account.xpub,
-                    totalSent.toLong()
-                )
-            } else {
-                val address = btcSource.internalAccount as LegacyAddress
-                btcDataManager.subtractAmountFromAddressBalance(
-                    address.address,
-                    totalSent.toLong()
-                )
-            }
+            val address = btcSource.xpubAddress
+            btcDataManager.subtractAmountFromAddressBalance(
+                address,
+                totalSent.toLong()
+            )
         } catch (e: Exception) {
             Timber.e(e)
         }

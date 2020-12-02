@@ -204,7 +204,7 @@
     <string name="imported_addresses">Imported Addresses</string>
 
     <string name="remote_save_ok">Successfully saved</string>
-    <string name="remote_save_ko">Save unsuccessful</string>
+    <string name="remote_save_failed">Save unsuccessful</string>
 
     <string name="change_pin_code">Change PIN</string>
     <string name="drawer_addresses">Addresses</string>
@@ -372,6 +372,8 @@
     </string>
 
     <string name="transfer_all">Transfer all</string>
+    <string name="transfer_amount">Transfer Amount</string>
+    <string name="dont_ask_again">Don’t ask me again.</string>
 
     <string name="amount">Amount</string>
     <string name="not_now">Not now</string>

@@ -101,7 +101,7 @@ internal class EthAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidEthereumAddress(address)
 }
 

@@ -1,7 +1,6 @@
 package piuk.blockchain.androidcore.data.payload
 
 import com.blockchain.ui.password.SecondPasswordHandler
-import com.blockchain.ui.password.secondPassword
 import com.blockchain.wallet.Seed
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt

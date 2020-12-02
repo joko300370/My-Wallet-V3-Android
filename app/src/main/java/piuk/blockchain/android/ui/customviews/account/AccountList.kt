@@ -18,8 +18,6 @@ import kotlinx.android.synthetic.main.item_account_select_crypto.view.*
 import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.item_account_select_group.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount

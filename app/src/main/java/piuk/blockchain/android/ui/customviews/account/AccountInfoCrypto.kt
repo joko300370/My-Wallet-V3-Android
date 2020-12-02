@@ -18,9 +18,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
-import piuk.blockchain.android.accounts.removePossibleBottomView
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
@@ -56,7 +53,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     fun updateAccount(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        cellDecorator: CellDecorator
+        cellDecorator: CellDecorator = DefaultCellDecorator()
     ) {
         compositeDisposable.clear()
         updateView(account, onAccountClicked, cellDecorator)

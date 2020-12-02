@@ -33,24 +33,26 @@ class BackupWalletStartingFragment :
 
         button_start.setOnClickListener {
             if (presenter.isDoubleEncrypted()) {
-                secondPasswordHandler.validate(object :
-                    SecondPasswordHandler.ResultListener {
-                    override fun onNoSecondPassword() {
-                        throw IllegalStateException("This point should never be reached")
-                    }
-
-                    override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                        val fragment = BackupWalletWordListFragment().apply {
-                            arguments = Bundle().apply {
-                                putString(
-                                    BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
-                                    validatedSecondPassword
-                                )
-                            }
+                secondPasswordHandler.validate(
+                    requireContext(),
+                    object : SecondPasswordHandler.ResultListener {
+                        override fun onNoSecondPassword() {
+                            throw IllegalStateException("This point should never be reached")
                         }
-                        loadFragment(fragment)
+
+                        override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                            val fragment = BackupWalletWordListFragment().apply {
+                                arguments = Bundle().apply {
+                                    putString(
+                                        BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
+                                        validatedSecondPassword
+                                    )
+                                }
+                            }
+                            loadFragment(fragment)
+                        }
                     }
-                })
+                )
             } else {
                 loadFragment(BackupWalletWordListFragment())
             }

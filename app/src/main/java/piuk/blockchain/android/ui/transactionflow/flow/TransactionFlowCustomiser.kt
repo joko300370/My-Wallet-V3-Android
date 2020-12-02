@@ -6,8 +6,6 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -16,6 +14,8 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
+import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState

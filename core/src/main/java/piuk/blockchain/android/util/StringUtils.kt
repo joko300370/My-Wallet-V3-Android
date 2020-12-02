@@ -13,6 +13,7 @@ import androidx.annotation.StringRes
 
 class StringUtils(private val context: Context) {
 
+    @Deprecated("Don't be get getting strings in non-UI code")
     fun getString(@StringRes stringId: Int): String {
         return context.getString(stringId)
     }

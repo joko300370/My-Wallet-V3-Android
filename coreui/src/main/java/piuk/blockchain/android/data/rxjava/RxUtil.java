@@ -28,19 +28,6 @@ import timber.log.Timber;
 public final class RxUtil {
 
     /**
-     * Applies standard Schedulers to an {@link Observable}, ie IO for subscription, Main Thread for
-     * onNext/onComplete/onError
-     *
-     * @deprecated Use {@link RxSchedulingExtensions} instead if referenced from Kotlin.
-     */
-    @Deprecated
-    public static <T> ObservableTransformer<T, T> applySchedulersToObservable() {
-        return observable -> observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(Timber::e);
-    }
-
-    /**
      * Applies standard Schedulers to a {@link io.reactivex.Completable}, ie IO for subscription,
      * Main Thread for onNext/onComplete/onError
      *

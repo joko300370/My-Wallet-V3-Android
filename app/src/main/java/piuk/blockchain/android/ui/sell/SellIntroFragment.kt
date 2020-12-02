@@ -30,16 +30,15 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.sell_intro_fragment.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow

@@ -98,7 +98,7 @@ internal class XlmAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         xlmDataManager.isAddressValid(address)
 }
 

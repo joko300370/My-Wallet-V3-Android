@@ -14,7 +14,6 @@ import info.blockchain.wallet.exceptions.AccountLockedException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
-import info.blockchain.wallet.exceptions.PayloadException
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import info.blockchain.wallet.exceptions.UnsupportedVersionException
 import io.reactivex.rxkotlin.plusAssign
@@ -277,10 +276,6 @@ class PinEntryPresenter(
             }
             is UnsupportedVersionException -> view.showWalletVersionNotSupportedDialog(t.message)
             is DecryptionException -> view.goToPasswordRequiredActivity()
-            is PayloadException -> {
-                // This shouldn't happen - Payload retrieved from server couldn't be parsed
-                showFatalErrorToastAndRestart(R.string.unexpected_error, t)
-            }
             is HDWalletException -> {
                 // This shouldn't happen. HD fatal error - not safe to continue - don't clear credentials
                 showFatalErrorToastAndRestart(R.string.unexpected_error, t)
@@ -327,10 +322,6 @@ class PinEntryPresenter(
             is ServerConnectionException,
             is SocketTimeoutException ->
                 showFatalErrorToastAndRestart(R.string.server_unreachable_exit, t)
-            is PayloadException -> {
-                // This shouldn't happen - Payload retrieved from server couldn't be parsed
-                showFatalErrorToastAndRestart(R.string.unexpected_error, t)
-            }
             is HDWalletException -> {
                 // This shouldn't happen. HD fatal error - not safe to continue - don't clear credentials
                 showFatalErrorToastAndRestart(R.string.unexpected_error, t)
