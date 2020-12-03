@@ -13,19 +13,10 @@ internal class PromptingSeedAccessAdapter(
     SeedAccessWithoutPrompt by seedAccessWithoutPrompt {
 
     override val seedPromptIfRequired: Maybe<Seed>
-        get() =
-            Maybe.concat(
+        get() = Maybe.concat(
                 seed,
                 promptForSeed
             ).firstElement()
-
-    override val seedForcePrompt: Maybe<Seed>
-        get() =
-            if (secondPasswordHandler.hasSecondPasswordSet) {
-                promptForSeed
-            } else {
-                seed
-            }
 
     private val promptForSeed: Maybe<Seed>
         get() = secondPasswordHandler

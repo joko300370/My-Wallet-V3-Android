@@ -1344,14 +1344,14 @@ private fun givenAllMemosMapToNone(): MemoMapper =
 
 private fun givenNoExpectedSecretAccess(): XlmSecretAccess =
     mock {
-        on { getPrivate(any()) } `it throws` RuntimeException("Not expected")
+        on { getPrivate(any(), any()) } `it throws` RuntimeException("Not expected")
     }
 
 private fun givenPrivateForPublic(vararg pairs: Pair<String, String>): XlmSecretAccess {
     val mock: XlmSecretAccess = mock()
     for (pair in pairs) {
-        whenever(mock.getPrivate(HorizonKeyPair.Public(pair.first))).thenReturn(
-            Maybe.just(
+        whenever(mock.getPrivate(HorizonKeyPair.Public(pair.first), null)).thenReturn(
+            Single.just(
                 HorizonKeyPair.Private(
                     pair.first,
                     pair.second.toCharArray()

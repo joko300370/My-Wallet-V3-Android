@@ -7,7 +7,6 @@ import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import io.reactivex.Maybe
@@ -62,76 +61,5 @@ class PromptingSeedAccessAdapterTest {
 
         verify(secondPasswordHandler).secondPassword()
         verifyNoMoreInteractions(secondPasswordHandler)
-    }
-
-    @Test
-    fun `insist on seed prompt - but no second password set still returns seed`() {
-        val theSeed: Seed = mock()
-        val seedAccessWithoutPrompt: SeedAccessWithoutPrompt = mock {
-            on { seed } `it returns` Maybe.just(theSeed)
-        }
-        val secondPasswordHandler: SecondPasswordHandler = mock {
-            on { hasSecondPasswordSet } `it returns` false
-        }
-        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(seedAccessWithoutPrompt, secondPasswordHandler)
-
-        val test = seedAccess.seedForcePrompt.test()
-
-        verify(seedAccessWithoutPrompt, never()).seed(any())
-        verify(secondPasswordHandler, never()).validate(any())
-
-        test.assertValue(theSeed)
-            .assertComplete()
-    }
-
-    @Test
-    fun `insist on seed prompt - cancel pressed`() {
-        val theSeed: Seed = mock()
-        val seedAccessWithoutPrompt: SeedAccessWithoutPrompt = mock {
-            on { seed } `it returns` Maybe.just(theSeed)
-        }
-        val secondPasswordHandler: SecondPasswordHandler = mock {
-            on { hasSecondPasswordSet } `it returns` true
-            on { secondPassword() } itReturns Maybe.empty()
-        }
-        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(seedAccessWithoutPrompt, secondPasswordHandler)
-
-        seedAccess.seedForcePrompt.test()
-            .assertNoValues()
-            .assertComplete()
-
-        verify(seedAccessWithoutPrompt, never()).seed(any())
-        verify(seedAccessWithoutPrompt, never()).seed
-    }
-
-    @Test
-    fun `insist on seed prompt - cancel pressed, then restarted`() {
-        val theSeed: Seed = mock()
-        val seedAccessWithoutPrompt: SeedAccessWithoutPrompt = mock {
-            on { seed } itReturns Maybe.empty()
-            on { seed(any()) } itReturns Maybe.just(theSeed)
-        }
-
-        val secondPasswordHandler: SecondPasswordHandler = mock {
-            on { hasSecondPasswordSet } itReturns true
-            on { secondPassword() } itReturns Maybe.empty() itReturns Maybe.just("ABC")
-        }
-
-        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(seedAccessWithoutPrompt, secondPasswordHandler)
-
-        val seedForcePrompt = seedAccess.seedForcePrompt
-
-        seedForcePrompt.test()
-            .assertNoValues()
-            .assertComplete()
-
-        verify(seedAccessWithoutPrompt, never()).seed(any())
-        verify(seedAccessWithoutPrompt, never()).seed
-
-        seedAccess.seedPromptIfRequired.test()
-            .assertValue(theSeed)
-            .assertComplete()
-
-        verify(seedAccessWithoutPrompt).seed("ABC")
     }
 }

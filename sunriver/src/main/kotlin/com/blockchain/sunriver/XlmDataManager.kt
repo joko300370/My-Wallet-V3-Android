@@ -38,11 +38,15 @@ class XlmDataManager internal constructor(
     }.cache()
 
     fun sendFunds(
-        sendDetails: SendDetails
+        sendDetails: SendDetails,
+        secondPassword: String? = null
     ): Single<SendFundsResult> =
         Single.defer {
             Singles.zip(
-                xlmSecretAccess.getPrivate(HorizonKeyPair.Public(sendDetails.fromXlm.accountId)).toSingle(),
+                xlmSecretAccess.getPrivate(
+                    HorizonKeyPair.Public(sendDetails.fromXlm.accountId),
+                    secondPassword
+                ),
                 xlmTimeoutFetcher.transactionTimeout(),
                 xlmProxyUrl
             ).map {
@@ -214,19 +218,6 @@ class XlmSendException(message: String) : RuntimeException(message)
 
 private fun XlmAccount.toReference() =
     AccountReference.Xlm(label ?: "", publicKey)
-
-/**
- * Send funds, if it fails, it throws
- */
-fun XlmDataManager.sendFundsOrThrow(
-    sendDetails: SendDetails
-): Single<SendFundsResult> =
-    sendFunds(sendDetails)
-        .doOnSuccess {
-            if (!it.success) {
-                throw SendException(it)
-            }
-        }
 
 class SendException(
     result: SendFundsResult
