@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.models.swap
 
+@Suppress("unused")
 class QuoteRequest(
     private val product: String,
     private val direction: String,

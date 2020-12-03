@@ -308,14 +308,10 @@ class BchDataManager(
     fun getBalance(address: String): Single<BigInteger> =
         payloadDataManager.getBalanceOfBchAddresses(listOf(address))
             .map { it[address]!!.finalBalance }
-
             .doOnError(Timber::e)
             .singleOrError()
             .doOnSuccess { updateBalanceForAddress(address, it) }
             .onErrorReturn { BigInteger.ZERO }
-
-    fun getImportedAddressBalance(): BigInteger =
-        bchDataStore.bchWallet?.getImportedAddressBalance() ?: BigInteger.ZERO
 
     fun getAddressTransactions(
         address: String,
@@ -329,14 +325,6 @@ class BchDataManager(
     fun getWalletTransactions(limit: Int = 50, offset: Int = 0): Observable<List<TransactionSummary>> =
         rxPinning.call<List<TransactionSummary>> {
             Observable.fromCallable { fetchWalletTransactions(limit, offset) }
-        }.applySchedulers()
-
-    fun getImportedAddressTransactions(
-        limit: Int,
-        offset: Int
-    ): Observable<List<TransactionSummary>> =
-        rxPinning.call<List<TransactionSummary>> {
-            Observable.fromCallable { fetchImportedAddressTransactions(limit, offset) }
         }.applySchedulers()
 
     /**
@@ -357,9 +345,6 @@ class BchDataManager(
     fun setDefaultAccountPosition(position: Int) {
         bchDataStore.bchMetadata!!.defaultAcccountIdx = position
     }
-
-    fun getDefaultDeterministicAccount(): DeterministicAccount? =
-        bchDataStore.bchWallet?.accounts?.get(getDefaultAccountPosition())
 
     fun getDefaultGenericMetadataAccount(): GenericMetadataAccount? =
         getAccountMetadataList().elementAtOrNull(getDefaultAccountPosition())
@@ -494,19 +479,6 @@ class BchDataManager(
     private fun fetchWalletTransactions(limit: Int, offset: Int): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
             null, // legacy list
-            getActiveXpubsAndImportedAddresses(),
-            null,
-            limit,
-            offset
-        )
-
-    @WebRequest
-    private fun fetchImportedAddressTransactions(
-        limit: Int,
-        offset: Int
-    ): MutableList<TransactionSummary> =
-        bchDataStore.bchWallet!!.getTransactions(
-            payloadDataManager.legacyAddressStringList, // legacy list
             getActiveXpubsAndImportedAddresses(),
             null,
             limit,

@@ -11,6 +11,7 @@ import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
@@ -63,42 +64,34 @@ class AccountPresenter internal constructor(
      *
      * @param accountLabel A label for the account to be created
      */
+    private class NameInUseException() : Exception()
+
     @SuppressLint("CheckResult")
     internal fun createNewAccount(accountLabel: String, secondPassword: String? = null) {
-        compositeDisposable += coincore.isLabelUnique(accountLabel)
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        doCreateNewAccount(accountLabel, secondPassword)
-                    } else {
-                        view?.showError(R.string.label_name_match)
-                    }
-                },
-                onError = {
-                    Timber.e("Error checking for unique label")
-                }
-            )
-        }
-
-    private fun doCreateNewAccount(accountLabel: String, secondPassword: String?) {
         val btcAsset = coincore[CryptoCurrency.BTC] as BtcAsset
         val bchAsset = coincore[CryptoCurrency.BCH] as BchAsset
 
-        compositeDisposable += btcAsset.createAccount(accountLabel, secondPassword)
-            .flatMapCompletable {
+        compositeDisposable += coincore.isLabelUnique(accountLabel)
+            .flatMap { isUnique ->
+                if (!isUnique) {
+                    Single.error(NameInUseException())
+                } else {
+                    btcAsset.createAccount(accountLabel, secondPassword)
+                }
+            }.flatMapCompletable {
                 bchAsset.createAccount(it.xpubAddress)
-            }
+            }.observeOn(AndroidSchedulers.mainThread())
             .showProgress()
             .subscribeBy(
                 onComplete = {
                     view?.showSuccess(R.string.remote_save_ok)
-                    onViewReady()
                     analytics.logEvent(WalletAnalytics.AddNewWallet)
                 },
                 onError = { throwable ->
                     Timber.e(throwable)
                     when (throwable) {
                         is DecryptionException -> view?.showError(R.string.double_encryption_password_error)
+                        is NameInUseException -> view?.showError(R.string.label_name_match)
                         else -> view?.showError(R.string.unexpected_error)
                     }
                 }
@@ -107,6 +100,7 @@ class AccountPresenter internal constructor(
 
     internal fun updateLegacyAddressLabel(newLabel: String, account: CryptoNonCustodialAccount) {
         compositeDisposable += account.updateLabel(newLabel)
+            .observeOn(AndroidSchedulers.mainThread())
             .showProgress()
             .subscribeBy(
                 onComplete = {
@@ -121,6 +115,7 @@ class AccountPresenter internal constructor(
 
     internal fun checkBalanceForTransfer(account: CryptoNonCustodialAccount) {
         compositeDisposable += account.actionableBalance
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy {
             if (it.isPositive) {
                 view?.showTransferFunds(account)
