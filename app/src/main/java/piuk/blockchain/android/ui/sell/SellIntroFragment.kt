@@ -10,7 +10,6 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
@@ -36,7 +35,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
@@ -108,7 +106,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderSellError() {
         accounts_list.gone()
-        sell_info_group.gone()
         sell_empty.setDetails {
             loadSellDetails()
         }
@@ -118,7 +115,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderRejectedKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -149,7 +145,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderNonKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -193,9 +188,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
                 accounts_list.initialise(
                     coincore.allWallets().map {
-                        it.accounts.filter { account ->
-                            account is CustodialTradingAccount &&
-                                    account.isFunded &&
+                        it.accounts.filterIsInstance<CryptoAccount>().filter { account ->
+                            account.actions.contains(AssetAction.Sell) &&
                                     supportedCryptos.contains(account.asset)
                         }
                     },
@@ -216,8 +210,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     }
 
     private fun renderSellInfo() {
-        sell_info_group.visible()
-
         val sellInfoIntro = getString(R.string.sell_info_blurb_1)
         val sellInfoBold = getString(R.string.sell_info_blurb_2)
         val sellInfoEnd = getString(R.string.sell_info_blurb_3)
@@ -228,12 +220,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             .append(sellInfoEnd)
         sb.setSpan(StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        sell_info_blurb.setText(sb, TextView.BufferType.SPANNABLE)
-        sell_info_action.setOnClickListener {
-            analytics.logEvent(SellAnalytics.SellTabInfo)
-            host.onSellInfoClicked()
-        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)

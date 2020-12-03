@@ -20,9 +20,8 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.MULTI_WALLET or
-            CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
-
+                CryptoCurrency.MULTI_WALLET or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     ETHER(
         networkTicker = "ETH",
@@ -32,7 +31,7 @@ enum class CryptoCurrency(
         requiredConfirmations = 12,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     BCH(
         networkTicker = "BCH",
@@ -42,8 +41,9 @@ enum class CryptoCurrency(
         requiredConfirmations = 3,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.MULTI_WALLET or
-            CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+                CryptoCurrency.MULTI_WALLET or
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+
     ),
     XLM(
         networkTicker = "XLM",
@@ -53,7 +53,7 @@ enum class CryptoCurrency(
         requiredConfirmations = 1,
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
-            CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     ALGO(
         networkTicker = "ALGO",
@@ -78,7 +78,7 @@ enum class CryptoCurrency(
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
         featureFlags = CryptoCurrency.IS_ERC20 or
-            CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
+                CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
     USDT(
         networkTicker = "USDT",
@@ -126,6 +126,7 @@ enum class CryptoCurrency(
         const val IS_ERC20 = 0x00000008L
 
         const val STUB_ASSET = 0x10000000L
+
         // TEMP Crash workaround until swipe to receive is updated to use coincore
         const val OFFLINE_RECEIVE_ADDRESS = 0x20000000L
     }

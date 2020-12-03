@@ -1,11 +1,12 @@
 package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
 import com.blockchain.swap.nabu.models.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
@@ -22,6 +23,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Date
 
@@ -166,13 +168,13 @@ interface CustodialWalletManager {
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun createSwapOrder(
-        direction: SwapDirection,
+    fun createCustodialOrder(
+        direction: TransferDirection,
         quoteId: String,
         volume: Money,
         destinationAddress: String? = null,
         refundAddress: String? = null
-    ): Single<SwapOrder>
+    ): Single<CustodialOrder>
 
     fun createPendingDeposit(
         crypto: CryptoCurrency,
@@ -182,19 +184,21 @@ interface CustodialWalletManager {
         product: Product
     ): Completable
 
-    fun getSwapLimits(currency: String): Single<SwapLimits>
+    fun getSwapLimits(currency: String): Single<TransferLimits>
 
-    fun getSwapTrades(): Single<List<SwapOrder>>
+    fun getSwapTrades(): Single<List<CustodialOrder>>
 
-    fun getSwapActivityForAsset(
+    fun getCustodialActivityForAsset(
         cryptoCurrency: CryptoCurrency,
-        directions: List<SwapDirection>
-    ): Single<List<SwapTransactionItem>>
+        directions: Set<TransferDirection>
+    ): Single<List<TradeTransactionItem>>
 
-    fun updateSwapOrder(
+    fun updateOrder(
         id: String,
         success: Boolean
     ): Completable
+
+    fun isFiatCurrencySupported(destination: String): Boolean
 }
 
 data class InterestActivityItem(
@@ -304,7 +308,7 @@ enum class TransactionState {
     UNKNOWN
 }
 
-enum class SwapOrderState {
+enum class CustodialOrderState {
     CREATED,
     PENDING_CONFIRMATION,
     PENDING_LEDGER,
@@ -318,7 +322,7 @@ enum class SwapOrderState {
     FAILED,
     UNKNOWN;
 
-    private val pendingState: Set<SwapOrderState>
+    private val pendingState: Set<CustodialOrderState>
         get() = setOf(
             PENDING_EXECUTION,
             PENDING_CONFIRMATION,
@@ -355,7 +359,7 @@ data class CustodialQuote(
     val rate: FiatValue
 )
 
-enum class SwapDirection {
+enum class TransferDirection {
     ON_CHAIN, // from non-custodial to non-custodial
     FROM_USERKEY, // from non-custodial to custodial
     TO_USERKEY, // from custodial to non-custodial - not in use currently
@@ -478,7 +482,7 @@ enum class Partner {
     UNKNOWN
 }
 
-data class SwapQuote(
+data class TransferQuote(
     val id: String = "",
     val prices: List<PriceTier> = emptyList(),
     val expirationDate: Date = Date(),
@@ -491,6 +495,43 @@ data class SwapQuote(
 sealed class CurrencyPair(val rawValue: String) {
     data class CryptoCurrencyPair(val source: CryptoCurrency, val destination: CryptoCurrency) :
         CurrencyPair("${source.networkTicker}-${destination.networkTicker}")
+
+    data class CryptoToFiatCurrencyPair(val source: CryptoCurrency, val destination: String) :
+        CurrencyPair("${source.networkTicker}-$destination")
+
+    fun toSourceMoney(value: BigInteger): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMinor(source, value)
+            is CryptoToFiatCurrencyPair -> CryptoValue.fromMinor(source, value)
+        }
+
+    fun toDestinationMoney(value: BigInteger): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMinor(destination, value)
+            is CryptoToFiatCurrencyPair -> FiatValue.fromMinor(destination, value.toLong())
+        }
+
+    fun toDestinationMoney(value: BigDecimal): Money =
+        when (this) {
+            is CryptoCurrencyPair -> CryptoValue.fromMajor(destination, value)
+            is CryptoToFiatCurrencyPair -> FiatValue.fromMajor(destination, value)
+        }
+
+    companion object {
+        fun fromRawPair(
+            rawValue: String,
+            supportedFiatCurrencies: List<String> = LiveCustodialWalletManager.SUPPORTED_FUNDS_CURRENCIES
+        ): CurrencyPair? {
+            val parts = rawValue.split("-")
+            val source: CryptoCurrency = CryptoCurrency.fromNetworkTicker(parts[0]) ?: return null
+            val destinationCryptoCurrency: CryptoCurrency? = CryptoCurrency.fromNetworkTicker(parts[1])
+            if (destinationCryptoCurrency != null)
+                return CryptoCurrencyPair(source, destinationCryptoCurrency)
+            if (supportedFiatCurrencies.contains(parts[1]))
+                return CryptoToFiatCurrencyPair(source, parts[1])
+            return null
+        }
+    }
 }
 
 data class PriceTier(
@@ -498,7 +539,7 @@ data class PriceTier(
     val price: Money
 )
 
-data class SwapLimits(
+data class TransferLimits(
     val minLimit: FiatValue,
     val maxOrder: FiatValue,
     val maxLimit: FiatValue
@@ -510,16 +551,11 @@ data class SwapLimits(
     )
 }
 
-data class SwapOrder(
+data class CustodialOrder(
     val id: String,
-    val state: SwapOrderState,
+    val state: CustodialOrderState,
     val depositAddress: String?,
     val createdAt: Date,
     val inputMoney: Money,
     val outputMoney: Money
-)
-
-data class SwapPair(
-    val source: CryptoCurrency,
-    val destination: CryptoCurrency
 )

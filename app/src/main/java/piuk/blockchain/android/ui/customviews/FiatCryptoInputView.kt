@@ -63,7 +63,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     var exchangeRate: ExchangeRate.CryptoToFiat? = null
         set(value) {
             field = value
-            updateExchangeAmountAndOutput(configuration.input)
+            updateExchangeAmountAndOutput()
         }
 
     private val cryptoToFiatRate: ExchangeRate.CryptoToFiat
@@ -88,7 +88,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             override fun afterTextChanged(s: Editable?) {
                 if (configuration.isInitialised.not())
                     return
-                updateExchangeAmountAndOutput(configuration.input)
+                updateExchangeAmountAndOutput()
             }
         })
 
@@ -248,7 +248,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private fun CurrencyType.swap(): CurrencyType =
         if (this == CurrencyType.Fiat) CurrencyType.Crypto else CurrencyType.Fiat
 
-    private fun updateExchangeAmountAndOutput(currencyType: CurrencyType) {
+    private fun updateExchangeAmountAndOutput() {
         if (configuration.input == CurrencyType.Fiat) {
 
             val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->

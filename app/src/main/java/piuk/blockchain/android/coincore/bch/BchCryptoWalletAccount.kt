@@ -77,6 +77,7 @@ internal class BchCryptoWalletAccount private constructor(
             }
 
     override val activity: Single<ActivitySummaryList>
+
         get() = bchManager.getAddressTransactions(
             xpubAddress,
             transactionFetchCount,
@@ -89,7 +90,7 @@ internal class BchCryptoWalletAccount private constructor(
                 account = this
             ) as ActivitySummaryItem
         }.flatMap {
-            appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+            appendTradeActivity(custodialWalletManager, asset, it)
         }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =

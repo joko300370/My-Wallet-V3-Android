@@ -4,6 +4,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
 import com.blockchain.swap.nabu.datamanagers.InterestState
 import com.blockchain.swap.nabu.datamanagers.Product
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.models.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -17,7 +18,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -61,6 +62,9 @@ internal class CryptoInterestAccount(
                 )
             }
         }
+
+    override val directions: Set<TransferDirection>
+        get() = emptySet()
 
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
@@ -115,7 +119,7 @@ internal class CryptoInterestAccount(
 
     // No swaps on interest accounts, so just return the activity list unmodified
     override fun reconcileSwaps(
-        swaps: List<SwapActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> = activity
 

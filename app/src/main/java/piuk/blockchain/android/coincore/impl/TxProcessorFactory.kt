@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
@@ -16,10 +16,11 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.NonCustodialSellEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
@@ -104,13 +105,23 @@ class TxProcessorFactory(
                         tiersService = kycTierService,
                         engine = engine,
                         environmentConfig = environmentConfig,
-                        custodialWalletManager = walletManager,
                         direction = if (target is CustodialTradingAccount)
-                            SwapDirection.FROM_USERKEY else SwapDirection.ON_CHAIN
+                            TransferDirection.FROM_USERKEY else TransferDirection.ON_CHAIN
                     )
                 )
             )
-
+            is FiatAccount -> Single.just(TransactionProcessor(
+                exchangeRates = exchangeRates,
+                sourceAccount = source,
+                txTarget = target,
+                engine = NonCustodialSellEngine(
+                    quotesProvider = quotesProvider,
+                    walletManager = walletManager,
+                    kycTierService = kycTierService,
+                    engine = engine,
+                    environmentConfig = environmentConfig
+                )
+            ))
             else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
         }
     }
@@ -141,7 +152,8 @@ class TxProcessorFactory(
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesProvider = quotesProvider,
-                        kycTierService = kycTierService
+                        kycTierService = kycTierService,
+                        environmentConfig = environmentConfig
                     )
                 )
             )
@@ -163,7 +175,10 @@ class TxProcessorFactory(
                     sourceAccount = source,
                     txTarget = target,
                     engine = CustodialSellTxEngine(
-                        walletManager = walletManager
+                        walletManager = walletManager,
+                        quotesProvider = quotesProvider,
+                        kycTierService = kycTierService,
+                        environmentConfig = environmentConfig
                     )
                 )
             )

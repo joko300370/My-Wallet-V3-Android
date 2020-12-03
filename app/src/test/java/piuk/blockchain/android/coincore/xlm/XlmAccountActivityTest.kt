@@ -7,10 +7,11 @@ import com.blockchain.sunriver.HorizonKeyPair
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.models.XlmTransaction
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
+import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -24,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -83,24 +84,26 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.XLM,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        )))
             .thenReturn(Single.just(summaryList))
 
         // Act
@@ -112,21 +115,25 @@ class XlmAccountActivityTest {
                 val xlmItem = it[0]
 
                 it.size == 1 &&
-                    xlmItem is NonCustodialActivitySummaryItem &&
-                    CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
-                    xlmTransaction.hash == xlmItem.txId &&
-                    TransactionSummary.TransactionType.RECEIVED == xlmItem.transactionType &&
-                    1 == xlmItem.confirmations &&
-                    !xlmItem.isFeeTransaction &&
-                    output == xlmItem.value.toBigInteger() &&
-                    mapOf(HORIZON_ACCOUNT_ID_2 to CryptoValue.fromMinor(CryptoCurrency.XLM,
-                        BigInteger.ZERO)) == xlmItem.inputsMap &&
-                    mapOf(
-                        HORIZON_ACCOUNT_ID_1 to CryptoValue.fromMinor(CryptoCurrency.XLM, output)) == xlmItem.outputsMap
+                        xlmItem is NonCustodialActivitySummaryItem &&
+                        CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
+                        xlmTransaction.hash == xlmItem.txId &&
+                        TransactionSummary.TransactionType.RECEIVED == xlmItem.transactionType &&
+                        1 == xlmItem.confirmations &&
+                        !xlmItem.isFeeTransaction &&
+                        output == xlmItem.value.toBigInteger() &&
+                        mapOf(HORIZON_ACCOUNT_ID_2 to CryptoValue.fromMinor(CryptoCurrency.XLM,
+                            BigInteger.ZERO)) == xlmItem.inputsMap &&
+                        mapOf(
+                            HORIZON_ACCOUNT_ID_1 to CryptoValue.fromMinor(CryptoCurrency.XLM,
+                                output)) == xlmItem.outputsMap
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
+        verify(custodialWalletManager).getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        ))
     }
 
     @Test
@@ -148,24 +155,26 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.XLM,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        )))
             .thenReturn(Single.just(summaryList))
 
         // Act
@@ -177,25 +186,28 @@ class XlmAccountActivityTest {
                 val xlmItem = it[0]
 
                 it.size == 1 &&
-                xlmItem is NonCustodialActivitySummaryItem &&
-                CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
-                xlmTransaction.hash == xlmItem.txId &&
-                TransactionSummary.TransactionType.SENT == xlmItem.transactionType &&
-                1 == xlmItem.confirmations &&
-                !xlmItem.isFeeTransaction &&
-                total == xlmItem.value.toBigInteger() &&
-                mapOf(
-                    HORIZON_ACCOUNT_ID_2 to
-                        CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)
-                ) == xlmItem.inputsMap &&
-                mapOf(
-                    HORIZON_ACCOUNT_ID_1 to
-                        CryptoValue.fromMinor(CryptoCurrency.XLM, total)
-                ) == xlmItem.outputsMap
+                        xlmItem is NonCustodialActivitySummaryItem &&
+                        CryptoCurrency.XLM == xlmItem.cryptoCurrency &&
+                        xlmTransaction.hash == xlmItem.txId &&
+                        TransactionSummary.TransactionType.SENT == xlmItem.transactionType &&
+                        1 == xlmItem.confirmations &&
+                        !xlmItem.isFeeTransaction &&
+                        total == xlmItem.value.toBigInteger() &&
+                        mapOf(
+                            HORIZON_ACCOUNT_ID_2 to
+                                    CryptoValue.fromMinor(CryptoCurrency.XLM, BigInteger.ZERO)
+                        ) == xlmItem.inputsMap &&
+                        mapOf(
+                            HORIZON_ACCOUNT_ID_1 to
+                                    CryptoValue.fromMinor(CryptoCurrency.XLM, total)
+                        ) == xlmItem.outputsMap
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
+        verify(custodialWalletManager).getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        ))
     }
 
     @Test
@@ -214,24 +226,26 @@ class XlmAccountActivityTest {
         whenever(xlmDataManager.getTransactionList())
             .thenReturn(Single.just(listOf(xlmTransaction)))
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             TX_HASH_SWAP,
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroXlm,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.XLM,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        )))
             .thenReturn(Single.just(summaryList))
 
         // Act
@@ -242,20 +256,23 @@ class XlmAccountActivityTest {
             .assertValueAt(0) {
                 val swapItem = it[0]
                 it.size == 1 &&
-                swapItem is SwapActivitySummaryItem &&
-                swapItem.txId == swapSummary.txId &&
-                swapItem.direction == swapSummary.direction &&
-                swapItem.sendingAsset == swapSummary.sendingAsset &&
-                swapItem.receivingAsset == swapSummary.receivingAsset &&
-                swapItem.sendingAddress == swapSummary.sendingAddress &&
-                swapItem.receivingAddress == swapSummary.receivingAddress &&
-                swapItem.state == swapSummary.state &&
-                swapItem.fiatValue == swapSummary.fiatValue &&
-                swapItem.fiatCurrency == swapSummary.fiatCurrency
+                        swapItem is TradeActivitySummaryItem &&
+                        swapItem.txId == swapSummary.txId &&
+                        swapItem.direction == swapSummary.direction &&
+                        swapItem.currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM,
+                    CryptoCurrency.BTC) &&
+                        swapItem.sendingAddress == swapSummary.sendingAddress &&
+                        swapItem.receivingAddress == swapSummary.receivingAddress &&
+                        swapItem.state == swapSummary.state &&
+                        swapItem.fiatValue == swapSummary.fiatValue &&
+                        swapItem.fiatCurrency == swapSummary.fiatCurrency
             }
 
         verify(xlmDataManager).getTransactionList()
-        verify(custodialWalletManager).getSwapActivityForAsset(CryptoCurrency.XLM, subject.nonCustodialSwapDirections)
+        verify(custodialWalletManager).getCustodialActivityForAsset(CryptoCurrency.XLM, setOf(
+            TransferDirection.ON_CHAIN,
+            TransferDirection.FROM_USERKEY
+        ))
     }
 
     companion object {

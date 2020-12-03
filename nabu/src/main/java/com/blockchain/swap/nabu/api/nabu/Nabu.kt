@@ -55,7 +55,7 @@ import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
 import com.blockchain.swap.nabu.models.swap.QuoteRequest
 import com.blockchain.swap.nabu.models.swap.QuoteResponse
 import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
-import com.blockchain.swap.nabu.models.swap.SwapOrderResponse
+import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
 import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
 import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
@@ -282,7 +282,7 @@ internal interface Nabu {
     ): Completable
 
     @GET(NABU_SWAP_ORDER)
-    fun getSwapOrders(@Header("authorization") authorization: String): Single<List<SwapOrderResponse>>
+    fun getSwapOrders(@Header("authorization") authorization: String): Single<List<CustodialOrderResponse>>
 
     @GET(NABU_SWAP_PAIRS)
     fun getSwapAvailablePairs(@Header("authorization") authorization: String): Single<List<String>>
@@ -435,7 +435,7 @@ internal interface Nabu {
     fun createSwapOrder(
         @Header("authorization") authorization: String,
         @Body order: CreateOrderRequest
-    ): Single<SwapOrderResponse>
+    ): Single<CustodialOrderResponse>
 
     @GET(NABU_SWAP_LIMITS)
     fun fetchSwapLimits(
@@ -448,5 +448,5 @@ internal interface Nabu {
     fun fetchSwapActivity(
         @Header("authorization") authorization: String,
         @Query("limit") limit: Int = 50
-    ): Single<List<SwapOrderResponse>>
+    ): Single<List<CustodialOrderResponse>>
 }

@@ -95,7 +95,6 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
             CardStatus.ACTIVE)).subscribeBy(onSuccess = {
             availableCards = it
         })
-
         card_number.displayCardTypeIcon(false)
         activity.setupToolbar(R.string.add_card_title)
         analytics.logEvent(SimpleBuyAnalytics.ADD_CARD)

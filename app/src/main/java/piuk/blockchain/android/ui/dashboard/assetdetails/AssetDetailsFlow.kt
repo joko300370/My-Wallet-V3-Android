@@ -126,7 +126,7 @@ class AssetDetailsFlow(
             .map {
                 it.filter { a ->
                     (action == AssetAction.Receive || a.isFunded) && (a.actions.contains(action)) ||
-                        action == AssetAction.Deposit
+                            action == AssetAction.Deposit
                 }
             }
 
@@ -245,11 +245,19 @@ class AssetDetailsFlow(
         when (localState.hostAction) {
             AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
             AssetAction.Send -> launchNewSend(singleAccount)
+            AssetAction.Sell -> launchSell(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
             else -> throw IllegalStateException(
                 "Account selection not supported for this action ${localState.hostAction}")
+        }
+    }
+
+    private fun launchSell(singleAccount: SingleAccount) {
+        (singleAccount as? CryptoAccount)?.let {
+            assetFlowHost.goToSellFrom(it)
+            finishFlow()
         }
     }
 

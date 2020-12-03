@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
@@ -11,12 +11,14 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
     quotesProvider: QuotesProvider,
-    kycTierService: TierService
-) : SwapEngineBase(quotesProvider, walletManager, kycTierService) {
+    kycTierService: TierService,
+    environmentConfig: EnvironmentConfig
+) : SwapEngineBase(quotesProvider, walletManager, kycTierService, environmentConfig) {
 
     override fun assertInputsValid() {
         require(txTarget is CustodialTradingAccount)
@@ -45,8 +47,8 @@ class TradingToTradingSwapTxEngine(
             )
         )
 
-    override val direction: SwapDirection
-        get() = SwapDirection.INTERNAL
+    override val direction: TransferDirection
+        get() = TransferDirection.INTERNAL
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createOrder(pendingTx).map {

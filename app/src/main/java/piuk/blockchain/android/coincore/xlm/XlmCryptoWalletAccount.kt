@@ -66,7 +66,7 @@ internal class XlmCryptoWalletAccount(
                     account = this
                 ) as ActivitySummaryItem
             }.flatMap {
-                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                appendTradeActivity(custodialWalletManager, asset, it)
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =

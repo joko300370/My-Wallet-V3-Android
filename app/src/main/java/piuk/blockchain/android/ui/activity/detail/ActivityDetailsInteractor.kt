@@ -1,10 +1,11 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -23,7 +24,7 @@ import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
@@ -125,7 +126,7 @@ class ActivityDetailsInteractor(
     }
 
     fun loadSwapItems(
-        item: SwapActivitySummaryItem
+        item: TradeActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
         val list = mutableListOf(
             TransactionId(item.txId),
@@ -139,27 +140,46 @@ class ActivityDetailsInteractor(
             buildReceivingLabel(item)
         ) { depositFee: Money, toItem: To ->
             list.apply {
-                add(SwapFee(depositFee))
+                add(NetworkFee(depositFee))
                 add(toItem)
                 add(SwapReceiveAmount(item.receivingValue))
-                add(SwapFee(item.withdrawalNetworkFee))
+                add(NetworkFee(item.withdrawalNetworkFee))
             }
             list.toList()
         }
     }
 
-    private fun buildReceivingLabel(item: SwapActivitySummaryItem): Single<To> {
+    fun loadSellItems(
+        item: TradeActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> {
+        return item.depositNetworkFee.map { fee ->
+            listOf(
+                TransactionId(item.txId),
+                Created(Date(item.timeStampMs)),
+                From(item.sendingAccount.label),
+                Amount(item.sendingValue),
+                From(item.sendingAccount.label),
+                NetworkFee(fee),
+                SellPurchaseAmount(item.receivingValue)
+            )
+        }
+    }
+
+    private fun buildReceivingLabel(item: TradeActivitySummaryItem): Single<To> {
+        require(item.currencyPair is CurrencyPair.CryptoCurrencyPair)
+        val cryptoPair = item.currencyPair
         return when (item.direction) {
-            SwapDirection.ON_CHAIN -> coincore.findAccountByAddress(item.receivingAsset, item.receivingAddress!!)
+            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
                 .toSingle().map {
                     To(it.label)
                 }
-            SwapDirection.INTERNAL,
-            SwapDirection.FROM_USERKEY -> coincore[item.receivingAsset].accountGroup(AssetFilter.Custodial).toSingle()
+            TransferDirection.INTERNAL,
+            TransferDirection.FROM_USERKEY -> coincore[cryptoPair.destination].accountGroup(AssetFilter.Custodial)
+                .toSingle()
                 .map {
                     To(it.selectFirstAccount().label)
                 }
-            SwapDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
+            TransferDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
         }
     }
 
@@ -196,11 +216,11 @@ class ActivityDetailsInteractor(
         assetActivityRepository.findCachedItem(cryptoCurrency,
             txHash) as? CustodialInterestActivitySummaryItem
 
-    fun getSwapActivityDetails(
+    fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
-    ): SwapActivitySummaryItem? =
-        assetActivityRepository.findCachedSwapItem(cryptoCurrency, txHash)
+    ): TradeActivitySummaryItem? =
+        assetActivityRepository.findCachedTradeItem(cryptoCurrency, txHash)
 
     fun getFiatActivityDetails(
         currency: String,

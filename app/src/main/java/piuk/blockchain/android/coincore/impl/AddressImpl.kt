@@ -16,9 +16,9 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 internal fun makeExternalAssetAddress(
     asset: CryptoCurrency,
     address: String,
-    label: String,
+    label: String = address,
     environmentConfig: EnvironmentConfig,
-    postTransactions: (TxResult) -> Completable
+    postTransactions: (TxResult) -> Completable = { Completable.complete() }
 ): CryptoAddress =
     when (asset) {
         CryptoCurrency.PAX,
