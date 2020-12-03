@@ -63,7 +63,10 @@ internal class BtcCryptoWalletAccount(
         get() = hasFunds.get()
 
     override val accountBalance: Single<Money>
-        get() = payloadDataManager.getAddressBalanceRefresh(xpubAddress)
+        get() = getAccountBalance(false)
+
+    private fun getAccountBalance(forceRefresh: Boolean): Single<Money> =
+        payloadDataManager.getAddressBalanceRefresh(xpubAddress, forceRefresh)
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
@@ -150,6 +153,7 @@ internal class BtcCryptoWalletAccount(
         return payloadDataManager.syncPayloadWithServer()
             .doOnError { setArchivedBits(isArchived) } // Revert
             .then { payloadDataManager.updateAllTransactions() }
+            .then { getAccountBalance(true).ignoreElement() }
     }
 
     private fun setArchivedBits(newIsArchived: Boolean) {

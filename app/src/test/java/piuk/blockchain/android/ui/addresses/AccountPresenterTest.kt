@@ -70,6 +70,8 @@ class AccountPresenterTest {
         subject.createNewAccount(NEW_BTC_LABEL)
 
         // Assert
+        verify(activity).showProgressDialog(R.string.please_wait, null)
+        verify(activity).dismissProgressDialog()
         verify(activity).showError(R.string.label_name_match)
         verifyNoMoreInteractions(activity)
     }

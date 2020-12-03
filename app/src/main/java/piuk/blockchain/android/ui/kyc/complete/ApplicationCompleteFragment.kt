@@ -1,19 +1,15 @@
 package piuk.blockchain.android.ui.kyc.complete
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.swap.nabu.models.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -23,15 +19,17 @@ import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_kyc_complete.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import timber.log.Timber
 
-class ApplicationCompleteFragment : Fragment(), DialogFlow.FlowHost {
+class ApplicationCompleteFragment : Fragment() {
 
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
     private val compositeDisposable = CompositeDisposable()
@@ -84,24 +82,16 @@ class ApplicationCompleteFragment : Fragment(), DialogFlow.FlowHost {
     }
 
     private fun launchSwap() {
-        val transactionFlow =
-            TransactionFlow(
-                action = AssetAction.Swap
-            )
-
-        transactionFlow.apply {
-            startFlow(
-                fragmentManager = fragmentManager ?: return,
-                host = this@ApplicationCompleteFragment
-            )
+        val b = Bundle().apply {
+            putBoolean(MainActivity.SHOW_SWAP, true)
         }
+
+        MainActivity.start(requireContext(), b)
+        activity?.finish()
     }
 
     override fun onPause() {
         super.onPause()
         compositeDisposable.clear()
-    }
-
-    override fun onFlowFinished() {
     }
 }

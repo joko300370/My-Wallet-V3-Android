@@ -37,6 +37,7 @@ import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
+import java.math.BigDecimal
 import java.math.BigInteger
 
 private const val STATE_UTXO = "btc_utxo"
@@ -247,8 +248,8 @@ class BtcOnChainTxEngine(
             outputs = 2 // assumes change required
         )
 
-        val relativeFee = 100.toBigDecimal() * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
-        return fiatValue.toBigDecimal() > LARGE_TX_FEE.toBigDecimal() &&
+        val relativeFee = BigDecimal(100) * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
+        return fiatValue.toBigDecimal() > BigDecimal(LARGE_TX_FEE) &&
             txSize > LARGE_TX_SIZE &&
             relativeFee > LARGE_TX_PERCENTAGE
     }
@@ -374,7 +375,7 @@ class BtcOnChainTxEngine(
         const val LARGE_TX_FIAT = "USD"
         const val LARGE_TX_FEE = 0.5
         const val LARGE_TX_SIZE = 1024
-        val LARGE_TX_PERCENTAGE = 1.0.toBigDecimal()
+        val LARGE_TX_PERCENTAGE = BigDecimal(1.0)
     }
 
     // TEMP diagnostics - TODO Remove this once we're stable

@@ -152,7 +152,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                                 onSwapPairClicked = onPairClicked
                             )
 
-                            if (!composite.tiers.isApprovedFor(KycTierLevel.GOLD)) {
+                            if (!composite.tiers.isInitialisedFor(KycTierLevel.GOLD)) {
                                 showKycUpsellIfEligible(composite.limits)
                             }
                         } else {
