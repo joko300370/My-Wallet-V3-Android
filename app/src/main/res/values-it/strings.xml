@@ -540,7 +540,7 @@
     <string name="eth_second_password_prompt">Per utilizzare questo servizio, ti chiediamo di inserire il tuo
  seconda password. 
 </string>
-    <string name="ether">Etere</string>
+    <string name="ether">Ether</string>
     <string name="bitcoin">Bitcoin</string>
     <string name="dashboard_title">Pannello di controllo</string>
     <string name="dashboard_time_span_last_day">Ultimo giorno</string>
@@ -1441,4 +1441,16 @@
     <string name="qr_activity_hint_import_wallet">Scansiona una chiave privata del portafoglio</string>
     <string name="qr_activity_hint_pairing_code">Scansiona un codice QR di accoppiamento web</string>
     <string name="qr_activity_hint_new_web_login">Accedi al web</string>
+
+    <string name="common_try_again">Riprova</string>
+    <string name="common_oops">Ops! Qualcosa è andato storto.</string>
+    <string name="min_with_value">%1$s min</string>
+    <string name="max_with_value">%1$s max</string>
+    <string name="upgrade_now">Aggiorna ora</string>
+    <string name="swap_faster_cheaper">Scambia più velocemente. Più economico. Meglio.</string>
+    <string name="swap_better">Scambia meglio.</string>
+    <string name="swap_hot">Scambialo come se fosse caldo.</string>
+    <string name="swap_upgrade_to_gold">Passa a Gold e scambia più velocemente, con limiti più alti, commissioni più basse e un\'esperienza migliore.</string>
+    <string name="swap_better_experience">Abbiamo aggiornato Swap con un nuovo look e una migliore esperienza.</string>
+    <string name="swap_faster_cheaper_better">Più veloce. Più economico. Meglio. La nostra nuova esperienza di scambio ti consente di scambiare criptovalute con meno tocchi.</string>
 </resources>
