@@ -56,7 +56,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             cryptoCurrency,
             configuration.fiatCurrency,
             defExchangeRateDataManager.getLastPrice(cryptoCurrency, configuration.fiatCurrency)
-                .toBigDecimal()
         )
 
     private val currencyPrefs: CurrencyPrefs by inject()

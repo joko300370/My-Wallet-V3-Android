@@ -223,4 +223,3 @@ fun ExchangeRateDataManager.fetchExchangeRate(
 ): Single<BigDecimal> =
     updateTickers()
         .andThen(Single.defer { Single.just(getLastPrice(cryptoCurrency, currencyName)) })
-        .map { it.toBigDecimal() }
