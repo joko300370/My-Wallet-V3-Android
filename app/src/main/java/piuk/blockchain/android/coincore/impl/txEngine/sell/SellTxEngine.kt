@@ -45,7 +45,7 @@ abstract class SellTxEngine(
         val exchangeRate = ExchangeRate.CryptoToFiat(
             sourceAccount.asset,
             userFiat,
-            exchangeRates.getLastPrice(sourceAccount.asset, userFiat).toBigDecimal()
+            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
         )
 
         return pendingTx.copy(
