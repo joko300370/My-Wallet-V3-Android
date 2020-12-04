@@ -44,7 +44,6 @@ import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.modal_change_password2.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -58,6 +57,7 @@ import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
+import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
@@ -824,15 +824,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         val currentPassword = pwLayout.findViewById<AppCompatEditText>(R.id.current_password)
         val newPassword = pwLayout.findViewById<AppCompatEditText>(R.id.new_password)
-        val newPasswordConfirmation =
-            pwLayout.findViewById<AppCompatEditText>(R.id.confirm_password)
+        val newPasswordConfirmation = pwLayout.findViewById<AppCompatEditText>(R.id.confirm_password)
+        val passwordStrength = pwLayout.findViewById<PasswordStrengthView>(R.id.password_strength)
 
         newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
                 newPassword.postDelayed({
                     if (activity != null && !activity!!.isFinishing) {
-                        password_strength.visibility = View.VISIBLE
-                        setPasswordStrength(editable.toString())
+                        passwordStrength.visibility = View.VISIBLE
+                        setPasswordStrength(editable.toString(), passwordStrength)
                     }
                 }, 200)
             }
@@ -968,7 +968,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun setPasswordStrength(
-        pw: String
+        pw: String,
+        passwordStrengthView: PasswordStrengthView
     ) {
         if (activity != null && !activity!!.isFinishing) {
             pwStrength = PasswordUtil.getStrength(pw).roundToInt()
@@ -987,8 +988,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                     pwStrengthLevel = 1
             }
 
-            password_strength.setStrengthProgress(pwStrength)
-            password_strength.updateLevelUI(pwStrengthLevel)
+            passwordStrengthView.setStrengthProgress(pwStrength)
+            passwordStrengthView.updateLevelUI(pwStrengthLevel)
         }
     }
 
