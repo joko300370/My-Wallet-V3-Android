@@ -28,6 +28,7 @@ abstract class TransactionFlowSheet : MviBottomSheet<TransactionModel, Transacti
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         savedInstanceState?.let {
+            dismiss()
             model.process(TransactionIntent.ResetFlow)
         }
     }
