@@ -205,7 +205,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             // Select Dashboard by default
             setOnTabSelectedListener(tabSelectedListener)
-            currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL else ITEM_HOME
+
+            if (savedInstanceState == null) {
+                currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL
+                else ITEM_HOME
+            }
         }
 
         if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {

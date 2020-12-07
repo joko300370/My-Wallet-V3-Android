@@ -37,6 +37,8 @@ import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
+import piuk.blockchain.android.util.getAccount
+import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -214,6 +216,9 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     override fun onBackPressed(): Boolean = false
 
+    private val preselectedAccount: BlockchainAccount?
+        get() = arguments?.getAccount(PARAM_ACCOUNT)
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -222,6 +227,9 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        preselectedAccount?.let {
+            onAccountSelected(it)
+        } ?: onShowAllActivity()
 
         setupSwipeRefresh()
         setupRecycler()
@@ -329,9 +337,14 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     }
 
     companion object {
+        private const val PARAM_ACCOUNT = "PARAM_ACCOUNT"
+
         fun newInstance(account: BlockchainAccount?): ActivitiesFragment {
             return ActivitiesFragment().apply {
-                account?.let { onAccountSelected(it) } ?: onShowAllActivity()
+                arguments = Bundle().apply {
+                    if (account != null)
+                        putAccount(PARAM_ACCOUNT, account)
+                }
             }
         }
     }

@@ -53,6 +53,8 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 
     @CallSuper
     open fun finishFlow() {
+        if (fragmentManager?.isDestroyed == true)
+            return
         host?.onFlowFinished()
     }
 

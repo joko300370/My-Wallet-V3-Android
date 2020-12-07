@@ -63,12 +63,9 @@ private class CustodialTradingActivityItemViewHolder(
             setTextColours(tx.status)
 
             asset_balance_fiat.text = tx.fundedFiat.toStringWithSymbol()
-            if (tx.status == OrderState.FINISHED) {
-                asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            } else {
-                asset_balance_crypto.text =
-                    context.getString(R.string.activity_custodial_pending_value)
-            }
+
+            asset_balance_crypto.text = tx.value.toStringWithSymbol()
+
             setOnClickListener {
                 onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.CUSTODIAL_TRADING)
             }

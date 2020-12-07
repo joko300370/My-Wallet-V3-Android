@@ -12,7 +12,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
@@ -78,9 +77,9 @@ class AccountInfoFiat @JvmOverloads constructor(
             .subscribe { isEnabled ->
                 if (isEnabled) {
                     setOnClickListener { onAccountClicked(account) }
-                    fiat_container.alpha = 1f
+                    container.alpha = 1f
                 } else {
-                    fiat_container.alpha = .6f
+                    container.alpha = .6f
                     setOnClickListener { }
                 }
             }
