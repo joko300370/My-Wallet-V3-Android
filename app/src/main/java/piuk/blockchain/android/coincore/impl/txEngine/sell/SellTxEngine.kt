@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.swap.nabu.datamanagers.CustodialOrder
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.swap.nabu.models.nabu.KycTiers
@@ -12,6 +13,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
@@ -128,13 +130,19 @@ abstract class SellTxEngine(
     }
 
     protected fun createSellOrder(pendingTx: PendingTx): Single<CustodialOrder> =
-        walletManager.createCustodialOrder(
-            direction = direction,
-            quoteId = quotesEngine.getLatestQuote().transferQuote.id,
-            volume = pendingTx.amount
-        ).doFinally {
-            disposeQuotesFetching(pendingTx)
+        sourceAccount.receiveAddress.onErrorReturn { NullAddress }.flatMap { refAddress ->
+            walletManager.createCustodialOrder(
+                direction = direction,
+                quoteId = quotesEngine.getLatestQuote().transferQuote.id,
+                volume = pendingTx.amount,
+                refundAddress = if (direction.requiresRefundAddress()) refAddress.address else null
+            ).doFinally {
+                disposeQuotesFetching(pendingTx)
+            }
         }
+
+    private fun TransferDirection.requiresRefundAddress() =
+        this == TransferDirection.FROM_USERKEY
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
