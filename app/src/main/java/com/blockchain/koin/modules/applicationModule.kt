@@ -393,9 +393,7 @@ val applicationModule = module {
         }
 
         factory {
-            BackupWalletStartingPresenter(
-                payloadDataManager = get()
-            )
+            BackupWalletStartingPresenter()
         }
 
         factory {

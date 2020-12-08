@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.backup.BackupManager
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
@@ -19,7 +20,8 @@ class PrefsUtil(
     private val store: SharedPreferences,
     private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
-    private val uuidGenerator: UUIDGenerator
+    private val uuidGenerator: UUIDGenerator,
+    private val crashLogger: CrashLogger
 ) : PersistentPrefs {
 
     private var isUnderAutomationTesting = false // Don't persist!
@@ -101,7 +103,17 @@ class PrefsUtil(
     // From CurrencyPrefs
     override var selectedFiatCurrency: String
         get() = getValue(KEY_SELECTED_FIAT, "")
-        set(fiat) = setValue(KEY_SELECTED_FIAT, fiat)
+        set(fiat) {
+            // We are seeing some crashes when this is read and is invalid when creating a FiatValue object.
+            // So we'll try and catch them when it's written and find the root cause on a future iteration
+            // Check the currency is supported and throw a meaningful exception message if it's not
+            try {
+                Currency.getInstance(fiat)
+                setValue(KEY_SELECTED_FIAT, fiat)
+            } catch (e: IllegalArgumentException) {
+                crashLogger.logAndRethrowException(IllegalArgumentException("Unknown currency id: $fiat"))
+            }
+        }
 
     override var selectedCryptoCurrency: CryptoCurrency
         get() =

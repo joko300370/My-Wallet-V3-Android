@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.StringRes
+import androidx.annotation.UiThread
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.WalletAnalytics
 import com.google.zxing.WriterException
@@ -24,6 +25,7 @@ import piuk.blockchain.android.coincore.bch.BchCryptoWalletAccount
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.scan.QRCodeEncoder
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.toast
@@ -73,11 +75,9 @@ class AccountEditSheet : SlidingModalBottomDialog() {
                         onSuccess = {
                             visible()
                             if (account.isArchived) {
-                                alpha =
-                                    DISABLED_ALPHA
+                                alpha = DISABLED_ALPHA
                             } else {
-                                alpha =
-                                    ENABLED_ALPHA
+                                alpha = ENABLED_ALPHA
                                 isClickable = true
                                 setOnClickListener { handleTransfer(account) }
                             }
@@ -231,15 +231,17 @@ class AccountEditSheet : SlidingModalBottomDialog() {
         require(account.isInternalAccount)
 
         val qrString: String = account.xpubAddress
-        generateQrCode(qrString)?.let {
-            showAddressQrCode(
-                requireContext(),
-                R.string.extended_public_key,
-                R.string.scan_this_code,
-                R.string.copy_xpub,
-                it,
-                qrString
-            )
+        generateQrCode(qrString)?.let { bmp ->
+            context?.let { ctx ->
+                showAddressQrCode(
+                    ctx,
+                    R.string.extended_public_key,
+                    R.string.scan_this_code,
+                    R.string.copy_xpub,
+                    bmp,
+                    qrString
+                )
+            }
             analytics.logEvent(WalletAnalytics.ShowXpub)
         }
     }
@@ -351,9 +353,27 @@ class AccountEditSheet : SlidingModalBottomDialog() {
             }
     }
 
+    private var progressDialog: MaterialProgressDialog? = null
+
+    @UiThread
+    private fun doShowProgress() {
+        doHideProgress()
+        progressDialog = MaterialProgressDialog(requireContext()).apply {
+            setCancelable(false)
+            setMessage(R.string.please_wait)
+            show()
+        }
+    }
+
+    @UiThread
+    private fun doHideProgress() {
+        progressDialog?.dismiss()
+        progressDialog = null
+    }
+
     private fun Completable.showProgress() =
-        this.doOnSubscribe { /* Show progress dlg */ }
-            .doOnTerminate { /* Hide progress dlg */ }
+        this.doOnSubscribe { doShowProgress() }
+            .doOnTerminate { doHideProgress() }
 
     private fun Completable.updateUi(account: CryptoNonCustodialAccount) =
         this.doOnComplete { configureUi(account) }

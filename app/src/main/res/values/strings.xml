@@ -499,6 +499,7 @@
         or text.
     </string>
     <string name="common_pin_dialog_title">Warning</string>
+    <string name="share_failed">Unable to share with %1$s</string>
 
     <!-- COMMON PIN CODES -->
     <string name="common_pin_dialog_message">The PIN you have selected is extremely common and may

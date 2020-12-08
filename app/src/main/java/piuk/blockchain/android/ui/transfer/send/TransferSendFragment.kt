@@ -61,10 +61,13 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         require(account is CryptoAccount)
-        require(account.actions.contains(AssetAction.Send))
 
-        analytics.logEvent(TransferAnalyticsEvent.SourceWalletSelected(account))
-        startTransactionFlow(account)
+        // It is possible that the balance is zero and the account is unable to send, even though we filter
+        // because async tx and refreshing, so check rather than require here:
+        if (account.actions.contains(AssetAction.Send)) {
+            analytics.logEvent(TransferAnalyticsEvent.SourceWalletSelected(account))
+            startTransactionFlow(account)
+        }
     }
 
     private fun startTransactionFlow(fromAccount: CryptoAccount) {

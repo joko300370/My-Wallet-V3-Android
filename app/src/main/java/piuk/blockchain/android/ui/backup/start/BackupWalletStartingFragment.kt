@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.backup.start
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,30 +31,18 @@ class BackupWalletStartingFragment :
         super.onViewCreated(view, savedInstanceState)
 
         button_start.setOnClickListener {
-            if (presenter.isDoubleEncrypted()) {
-                secondPasswordHandler.validate(
-                    requireContext(),
-                    object : SecondPasswordHandler.ResultListener {
-                        override fun onNoSecondPassword() {
-                            throw IllegalStateException("This point should never be reached")
-                        }
-
-                        override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                            val fragment = BackupWalletWordListFragment().apply {
-                                arguments = Bundle().apply {
-                                    putString(
-                                        BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
-                                        validatedSecondPassword
-                                    )
-                                }
-                            }
-                            loadFragment(fragment)
-                        }
+            secondPasswordHandler.validate(
+                requireContext(),
+                object : SecondPasswordHandler.ResultListener {
+                    override fun onNoSecondPassword() {
+                        loadFragmentWordListFragment()
                     }
-                )
-            } else {
-                loadFragment(BackupWalletWordListFragment())
-            }
+
+                    override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                        loadFragmentWordListFragment(validatedSecondPassword)
+                    }
+                }
+            )
         }
     }
 
@@ -63,7 +50,17 @@ class BackupWalletStartingFragment :
 
     override fun getMvpView() = this
 
-    private fun loadFragment(fragment: Fragment) {
+    private fun loadFragmentWordListFragment(secondPassword: String? = null) {
+        val fragment = BackupWalletWordListFragment().apply {
+            secondPassword?.let {
+                arguments = Bundle().apply {
+                    putString(
+                        BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
+                        it
+                    )
+                }
+            }
+        }
         activity?.run {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)

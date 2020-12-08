@@ -66,7 +66,7 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
             it.beginTransaction().run {
                 apply { oldSheet?.let { sheet -> remove(sheet) } }
                 apply { bottomSheet?.let { sheet -> add(sheet, bottomSheetTag) } }
-                commitNow()
+                commitNowAllowingStateLoss()
             }
         }
     }
