@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.navigation.NavDirections
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.swap.nabu.service.TierUpdater

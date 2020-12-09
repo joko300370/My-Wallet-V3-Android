@@ -43,7 +43,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
-import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
@@ -67,8 +66,6 @@ private typealias RefreshFn = () -> Unit
 
 class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
     ForceBackupForSendSheet.Host,
-    BankDetailsBottomSheet.Host,
-    SimpleBuyCancelOrderBottomSheet.Host,
     FiatFundsDetailSheet.Host,
     KycBenefitsBottomSheet.Host,
     DialogFlow.FlowHost,
@@ -200,7 +197,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             when (state.showDashboardSheet) {
                 DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
                     blockstackCampaignName)
-                DashboardSheet.SIMPLE_BUY_PAYMENT -> BankDetailsBottomSheet.newInstance()
                 DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance(state.backupSheetDetails!!)
                 DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
@@ -409,9 +405,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         override fun startStxReceivedDetail() =
             model.process(ShowDashboardSheet(DashboardSheet.STX_AIRDROP_COMPLETE))
 
-        override fun startSimpleBuyPaymentDetail() =
-            model.process(ShowDashboardSheet(DashboardSheet.SIMPLE_BUY_PAYMENT))
-
         override fun finishSimpleBuySignup() {
             navigator().resumeSimpleBuyKyc()
         }
@@ -437,21 +430,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun openBrowserLink(url: String) =
             requireContext().launchUrlInBrowser(url)
-    }
-
-    override fun startWarnCancelSimpleBuyOrder() {
-        analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_PRESS_CANCEL)
-        model.process(ShowDashboardSheet(DashboardSheet.SIMPLE_BUY_CANCEL_ORDER))
-    }
-
-    override fun cancelOrderConfirmAction(cancelOrder: Boolean, orderId: String?) {
-        if (cancelOrder && orderId != null) {
-            analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_CONFIRMED)
-            model.process(CancelSimpleBuyOrder(orderId))
-        } else {
-            analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_GO_BACK)
-            model.process(ShowDashboardSheet(DashboardSheet.SIMPLE_BUY_PAYMENT))
-        }
     }
 
     override fun depositFiat(account: FiatAccount) {

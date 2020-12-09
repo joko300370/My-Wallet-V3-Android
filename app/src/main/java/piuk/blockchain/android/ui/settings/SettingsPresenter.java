@@ -11,14 +11,12 @@ import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.notifications.analytics.AnalyticsEvents;
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents;
 import com.blockchain.preferences.SimpleBuyPrefs;
-import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod;
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus;
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel;
-import com.blockchain.swap.nabu.models.nabu.NabuApiException;
-import com.blockchain.swap.nabu.models.nabu.NabuErrorStatusCodes;
-
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel;
+import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException;
+import com.blockchain.swap.nabu.models.responses.nabu.NabuErrorStatusCodes;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,10 +69,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     @VisibleForTesting
     Settings settings;
     private final PitLinking pitLinking;
-    private final FeatureFlag cardsFeatureFlag;
-    private final FeatureFlag fundsFeatureFlag;
     private final Analytics analytics;
-    private final FeatureFlag featureFlag;
     private PitLinkingState pitLinkState = new PitLinkingState();
 
     // Show dialog "are you sure you want to disable fingerprint login?
@@ -95,9 +90,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         KycStatusHelper kycStatusHelper,
         PitLinking pitLinking,
         Analytics analytics,
-        FeatureFlag featureFlag,
-        FeatureFlag cardsFeatureFlag,
-        FeatureFlag fundsFeatureFlag,
         SimpleBuyPrefs simpleBuyPrefs
     ) {
         this.fingerprintHelper = fingerprintHelper;
@@ -115,10 +107,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         this.kycStatusHelper = kycStatusHelper;
         this.pitLinking = pitLinking;
         this.simpleBuyPrefs = simpleBuyPrefs;
-        this.fundsFeatureFlag = fundsFeatureFlag;
         this.analytics = analytics;
-        this.featureFlag = featureFlag;
-        this.cardsFeatureFlag = cardsFeatureFlag;
         this.custodialWalletManager = custodialWalletManager;
     }
 
@@ -144,13 +133,11 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         updateBanks();
         getCompositeDisposable().add(pitLinking.getState().subscribe(this::onPitStateUpdated, throwable -> {
         }));
-        getCompositeDisposable().add(featureFlag.getEnabled().subscribe(this::showPitItem));
     }
 
     private void updateCards() {
         getCompositeDisposable().add(
-            Single.zip(cardsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
-                (enabled, kycState) -> enabled && kycState.isApprovedFor(KycTierLevel.GOLD))
+                kycStatusHelper.getSettingsKycStateTier().map(kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD))
                 .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
                 .flatMap(enabled -> {
                     if (enabled) {
@@ -170,16 +157,9 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void updateBanks() {
         getCompositeDisposable().add(
-            Single.zip(fundsFeatureFlag.getEnabled(), kycStatusHelper.getSettingsKycStateTier(),
-                (enabled, kycState) -> new Pair<>(enabled, kycState.isApprovedFor(KycTierLevel.GOLD)))
-                .flatMap(pair -> {
-                    if (pair.first) {
-                        return canLinkBank(getFiatUnits(), pair.second).doOnSuccess(linkDetails ->
-                            getView().banksEnabled(linkDetails.first)).zipWith(custodialWalletManager.getLinkedBanks(), (linkDetails, linkedBanks) -> new SettingsFragment.LinkedBanksAndSupportedCurrencies(linkedBanks, linkDetails.second));
-                    } else {
-                        return Single.just(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
-                    }
-                })
+                kycStatusHelper.getSettingsKycStateTier().map(kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD))
+                .flatMap(isGold -> canLinkBank(getFiatUnits(),isGold).doOnSuccess(linkDetails ->
+                    getView().banksEnabled(linkDetails.first)).zipWith(custodialWalletManager.getLinkedBeneficiaries(), (linkDetails, linkedBanks) -> new SettingsFragment.LinkedBanksAndSupportedCurrencies(linkedBanks, linkDetails.second)))
                 .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe(disposable -> {
                 getView().banksEnabled(false);
                 onBanksUpdated(new SettingsFragment.LinkedBanksAndSupportedCurrencies(Collections.emptyList(), Collections.emptyList()));
@@ -196,10 +176,6 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
 
     private void onBanksUpdated(SettingsFragment.LinkedBanksAndSupportedCurrencies linkedAndSupportedCurrencies) {
         getView().updateBanks(linkedAndSupportedCurrencies);
-    }
-
-    private void showPitItem(Boolean pitEnabled) {
-        getView().isPitEnabled(pitEnabled);
     }
 
     private void onPitStateUpdated(PitLinkingState state) {

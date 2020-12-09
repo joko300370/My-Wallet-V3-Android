@@ -10,8 +10,8 @@ import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
-import com.blockchain.swap.nabu.models.simplebuy.EverypayPaymentAttrs
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPaymentAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.mock
@@ -131,7 +131,7 @@ class SimpleBuyModelTest {
                 orderValue = CryptoValue.ZeroBtc,
                 paymentMethodId = "213",
                 updated = Date(),
-                paymentMethodType = PaymentMethodType.BANK_ACCOUNT,
+                paymentMethodType = PaymentMethodType.FUNDS,
                 fiat = FiatValue.zero("USD"),
                 pair = "USD-BTC",
                 type = OrderType.BUY,
@@ -153,7 +153,7 @@ class SimpleBuyModelTest {
 
     @Test
     fun `update kyc state shall make interactor poll for kyc state and update the state accordingly`() {
-        whenever(interactor.pollForKycState("USD"))
+        whenever(interactor.pollForKycState())
             .thenReturn(Single.just(SimpleBuyIntent.KycStateUpdated(KycState.VERIFIED_AND_ELIGIBLE)))
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchKycState)
@@ -221,32 +221,16 @@ class SimpleBuyModelTest {
                         sellLimits = BuySellLimits(100, 5024558))
                 ))))
 
-        whenever(interactor.fetchPredefinedAmounts("USD"))
-            .thenReturn(Single.just(SimpleBuyIntent.UpdatedPredefinedAmounts(listOf(
-                FiatValue.fromMinor("USD", 100000),
-                FiatValue.fromMinor("USD", 5000),
-                FiatValue.fromMinor("USD", 1000),
-                FiatValue.fromMinor("USD", 500)))))
-
         val testObserver = model.state.test()
-        model.process(SimpleBuyIntent.FetchPredefinedAmounts("USD"))
         model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
 
         testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(predefinedAmounts = listOf(
-            FiatValue.fromMinor("USD", 100000),
-            FiatValue.fromMinor("USD", 5000),
-            FiatValue.fromMinor("USD", 1000),
-            FiatValue.fromMinor("USD", 500))))
-
-        testObserver.assertValueAt(2, defaultState.copy(
+        testObserver.assertValueAt(1, defaultState.copy(
             supportedPairsAndLimits = listOf(
                 BuySellPair(pair = "BTC-USD", buyLimits = BuySellLimits(100, 3000),
                     sellLimits = BuySellLimits(100, 5024558))
             ),
-            selectedCryptoCurrency = CryptoCurrency.BTC,
-            predefinedAmounts = listOf(
-                FiatValue.fromMinor("USD", 1000),
-                FiatValue.fromMinor("USD", 500))))
+            selectedCryptoCurrency = CryptoCurrency.BTC
+        ))
     }
 }

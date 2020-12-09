@@ -33,8 +33,7 @@ import java.util.Locale
 import java.util.Currency
 import kotlin.properties.Delegates
 
-class FiatCryptoInputView(context: Context, attrs: AttributeSet)
-    : ConstraintLayout(context, attrs), KoinComponent {
+class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
 
     val onImeAction: Observable<PrefixedOrSuffixedEditText.ImeOptions> by lazy {
         enter_amount.onImeAction

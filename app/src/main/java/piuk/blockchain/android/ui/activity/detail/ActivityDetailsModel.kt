@@ -44,7 +44,7 @@ data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
 data class BuyPaymentMethod(val paymentDetails: PaymentDetails) : ActivityDetailsType()
 data class SwapReceiveAmount(val receivedAmount: Money) : ActivityDetailsType()
 
-data class PaymentDetails(val paymentMethodId: String, val label: String?, val endDigits: String?)
+data class PaymentDetails(val paymentMethodId: String, val label: String? = null, val endDigits: String? = null)
 
 enum class DescriptionState {
     NOT_SET,

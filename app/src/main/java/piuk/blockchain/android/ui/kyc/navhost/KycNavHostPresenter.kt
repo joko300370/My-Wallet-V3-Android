@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.kyc.navhost
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.UserState
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.UserState
 import com.blockchain.swap.nabu.service.TierUpdater
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers

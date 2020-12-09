@@ -3,8 +3,6 @@ package piuk.blockchain.android.ui.dashboard.announcements
 import com.blockchain.koin.coinifyUsersToKyc
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.pitAnnouncementFeatureFlag
-import com.blockchain.koin.sellFeatureFlag
 import com.blockchain.koin.dgldFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
@@ -28,7 +26,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAird
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
@@ -94,7 +91,6 @@ val dashboardAnnouncementsModule = module {
             PitAnnouncement(
                 pitLink = get(),
                 dismissRecorder = get(),
-                featureFlag = get(pitAnnouncementFeatureFlag),
                 analytics = get()
             )
         }.bind(AnnouncementRule::class)
@@ -146,8 +142,7 @@ val dashboardAnnouncementsModule = module {
 
         factory {
             BuyBitcoinAnnouncement(
-                dismissRecorder = get(),
-                simpleBuyAvailability = get()
+                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
 
@@ -195,14 +190,6 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            SimpleBuyPendingBuyAnnouncement(
-                dismissRecorder = get(),
-                analytics = get(),
-                queries = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
             SimpleBuyAddCardAnnouncement(
                 dismissRecorder = get(),
                 analytics = get(),
@@ -229,7 +216,6 @@ val dashboardAnnouncementsModule = module {
             SellIntroAnnouncement(
                 dismissRecorder = get(),
                 eligibilityProvider = get(),
-                sellFeatureFlag = get(sellFeatureFlag),
                 coincore = get(),
                 analytics = get()
             )

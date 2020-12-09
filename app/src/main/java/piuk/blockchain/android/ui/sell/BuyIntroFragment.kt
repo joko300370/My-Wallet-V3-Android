@@ -12,7 +12,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.BuySellPairs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.ui.trackLoading
+import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -76,7 +76,7 @@ class BuyIntroFragment : Fragment() {
                 .doOnSubscribe {
                     buy_empty.gone()
                 }
-                .trackLoading(appUtil.activityIndicator)
+                .trackProgress(appUtil.activityIndicator)
                 .subscribeBy(
                     onSuccess = { (exchangeRates, buyPairs) ->
                         renderBuyIntro(buyPairs, exchangeRates)

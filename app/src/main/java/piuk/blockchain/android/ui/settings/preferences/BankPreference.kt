@@ -6,7 +6,7 @@ import android.text.TextUtils
 import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.loadInterMedium
@@ -15,7 +15,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class BankPreference(
     fiatCurrency: String,
-    private val bank: LinkedBank? = null,
+    private val bank: Beneficiary? = null,
     context: Context
 ) : Preference(context, null, R.attr.preferenceStyle, 0) {
     private val typeface: Typeface = context.loadInterMedium()

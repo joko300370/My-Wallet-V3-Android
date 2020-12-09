@@ -33,9 +33,9 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.linkBankEventWithCurrency
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.mukesh.countrypicker.fragments.CountryPicker
@@ -178,6 +178,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
 
         thePit.onClick { settingsPresenter.onThePitClicked() }
+        thePit?.isVisible = true
 
         // Preferences
         fiatPref.onClick { showDialogFiatUnits() }
@@ -285,10 +286,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
     }
 
-    override fun isPitEnabled(enabled: Boolean) {
-        thePit?.isVisible = enabled
-    }
-
     override fun hideProgressDialog() {
         progressDialog?.dismiss()
         progressDialog = null
@@ -386,7 +383,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
         val existingBanks = prefsExistingBanks()
 
-        val newBanks = linkedAndSupportedCurrencies.linkedBanks.filterNot { existingBanks.contains(it.id) }
+        val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
 
         newBanks.forEach { bank ->
             banksPref?.addPreference(
@@ -400,7 +397,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
 
         addOrUpdateLinkBankForCurrencies(
-            linkedAndSupportedCurrencies.linkedBanks.size + 1,
+            linkedAndSupportedCurrencies.beneficiaries.size + 1,
             linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
         )
     }
@@ -425,11 +422,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     data class LinkedBanksAndSupportedCurrencies(
-        val linkedBanks: List<LinkedBank>,
+        val beneficiaries: List<Beneficiary>,
         val supportedCurrencies: List<String>
     )
 
-    private fun removeBank(bank: LinkedBank) {
+    private fun removeBank(bank: Beneficiary) {
         RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 

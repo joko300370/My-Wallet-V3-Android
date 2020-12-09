@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,13 +28,11 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
-import piuk.blockchain.android.ui.dashboard.sheets.BankDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.putAccount
@@ -52,10 +49,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
-    AccountSelectSheet.SelectionHost,
-    CryptoActivityDetailsBottomSheet.Host,
-    BankDetailsBottomSheet.Host,
-    SimpleBuyCancelOrderBottomSheet.Host {
+    AccountSelectSheet.SelectionHost {
 
     override val model: ActivitiesModel by scopedInject()
 
@@ -122,12 +116,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                         showBottomSheet(
                             FiatActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId))
                     }
-                }
-                ActivitiesSheet.BANK_TRANSFER_DETAILS -> {
-                    showBottomSheet(BankDetailsBottomSheet.newInstance())
-                }
-                ActivitiesSheet.BANK_ORDER_CANCEL -> {
-                    showBottomSheet(SimpleBuyCancelOrderBottomSheet.newInstance(false))
                 }
             }
         }
@@ -307,28 +295,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     override fun onAccountSelected(account: BlockchainAccount) {
         model.process(AccountSelectedIntent(account, false))
-    }
-
-    override fun onShowBankDetailsSelected() {
-        model.process(ShowBankTransferDetailsIntent)
-    }
-
-    override fun onShowBankCancelOrder() {
-        model.process(ShowCancelOrderIntent)
-    }
-
-    override fun startWarnCancelSimpleBuyOrder() {
-        model.process(ShowCancelOrderIntent)
-    }
-
-    override fun cancelOrderConfirmAction(cancelOrder: Boolean, orderId: String?) {
-        if (cancelOrder && orderId != null) {
-            analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_CONFIRMED)
-            model.process(CancelSimpleBuyOrderIntent(orderId))
-        } else {
-            analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_GO_BACK)
-            model.process(ShowCancelOrderIntent)
-        }
     }
 
     // SlidingModalBottomDialog.Host

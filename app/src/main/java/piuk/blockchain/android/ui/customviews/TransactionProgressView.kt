@@ -7,25 +7,14 @@ import android.util.AttributeSet
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.view_transaction_progress.view.*
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class TransactionProgressView(context: Context, attrs: AttributeSet) :
     ConstraintLayout(context, attrs), KoinComponent {
-
-    private val stringUtils: StringUtils by inject()
-    private val compositeDisposable = CompositeDisposable()
-    private val walletManager: CustodialWalletManager by scopedInject()
-    private val currencyPrefs: CurrencyPrefs by scopedInject()
 
     init {
         inflate(context, R.layout.view_transaction_progress, this)
@@ -54,11 +43,6 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         tx_ok_btn.visible()
         tx_state_indicator.setImageResource(R.drawable.ic_pending_clock)
         setText(title, subtitle)
-    }
-
-    override fun onDetachedFromWindow() {
-        compositeDisposable.clear()
-        super.onDetachedFromWindow()
     }
 
     fun showTxSuccess(

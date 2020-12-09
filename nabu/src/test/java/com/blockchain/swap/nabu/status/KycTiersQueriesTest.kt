@@ -1,15 +1,15 @@
 package com.blockchain.swap.nabu.status
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.TierResponse
-import com.blockchain.swap.nabu.models.nabu.TierLevels
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.models.nabu.ProductsUsed
-import com.blockchain.swap.nabu.models.nabu.UserState
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
+import com.blockchain.swap.nabu.models.responses.nabu.LimitsJson
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.TierResponse
+import com.blockchain.swap.nabu.models.responses.nabu.TierLevels
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.ProductsUsed
+import com.blockchain.swap.nabu.models.responses.nabu.UserState
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.mock
 import io.reactivex.Single

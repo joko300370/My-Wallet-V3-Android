@@ -5,7 +5,7 @@ import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate

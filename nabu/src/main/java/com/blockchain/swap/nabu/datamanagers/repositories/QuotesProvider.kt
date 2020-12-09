@@ -7,7 +7,7 @@ import com.blockchain.swap.nabu.datamanagers.PriceTier
 import com.blockchain.swap.nabu.datamanagers.TransferQuote
 import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.swap.nabu.extensions.toLocalTime
-import com.blockchain.swap.nabu.models.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.responses.swap.QuoteRequest
 import com.blockchain.swap.nabu.service.NabuService
 import java.util.Date
 

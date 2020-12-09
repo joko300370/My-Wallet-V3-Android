@@ -28,11 +28,16 @@
     <string name="common_free">Free</string>
     <string name="common_zero">0</string>
     <string name="common_retry">Retry</string>
+    <string name="common_continue">Continue</string>
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
 
+    <plurals name="transfer_label_plural">
+        <item quantity="one">1 imported address</item>
+        <item quantity="other">%d imported addresses</item>
+    </plurals>
+    <string name="upgrade_wallet">Upgrade</string>
     <string name="backup_wallet">Backup funds</string>
-
     <string name="action_settings">Settings</string>
 
     <!-- nav menu -->
@@ -891,7 +896,7 @@
 
     <!-- WDGLD announcement -->
     <string name="wdgld_available_card_title">Trade wDGLD Now</string>
-    <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) in an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
+    <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) is an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
     <string name="wdgld_available_card_cta">Trade wDGLD now</string>
 
     <!-- Airdrop Status bottom sheet -->
@@ -1738,7 +1743,9 @@
     <string name="qr_activity_hint_pairing_code">Scan a web pairing QR code</string>
     <string name="qr_activity_hint_new_web_login">Log in to web</string>
 
-    <string name="security_locked_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
+    <string name="security_locked_card_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. For your security, buy orders with a bank account are subject up to a %1$s day holding period. You can Swap or Sell during this time. We will notify you once the funds are fully available.</string>
+    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days. Learn more</string>
 
     <!-- content descriptor IDs -->
     <string name="content_desc_enter_amount">Enter Amount</string>
@@ -1760,8 +1767,37 @@
     <string name="keyboard_input_0">Keyboard Input 0</string>
     <string name="swap_faster_cheaper">Swap Faster. Cheaper. Better.</string>
     <string name="swap_better">Swap better.</string>
-    <string name="swap_hot">Swap it like it\'s hot.</string>
+    <string name="swap_hot">Swap it like it’s hot.</string>
     <string name="swap_upgrade_to_gold">Upgrade to Gold and Swap faster, with higher limits, lower fees, and a better experience.</string>
     <string name="swap_better_experience">We’ve updated Swap with a new look and better experience.</string>
     <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
+    <string name="link_a_bank">Link a Bank</string>
+    <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
+    <string name="add_payment_method">Add a Payment Method</string>
+    <string name="pay_with_my">Pay with my</string>
+
+    <!-- Yodlee splash -->
+    <string name="yodlee_splash_title">Secure Connection</string>
+    <string name="yodlee_splash_blurb">Yodlee securely stores your credentials adhering to leading industry practices for data security, regulatory compliance and privacy.\n <annotation link="yodlee_learn_more">Learn more</annotation></string>
+    <string name="yodlee_splash_tos_pp">By tapping continue, you Agree to Yodlee’s <annotation link="yodlee_tos">Terms and Conditions</annotation> and <annotation link="yodlee_pp">Privacy Policy</annotation>.</string>
+    <string name="yodlee_connection_title">Taking you to Yodlee…</string>
+    <string name="yodlee_connection_subtitle">This could take up to 30 seconds.</string>
+    <string name="yodlee_linking_title">Taking you back to your Wallet…</string>
+    <string name="yodlee_linking_subtitle">This could take up to 30 seconds. Please do not go back or close the app.</string>
+    <string name="yodlee_linking_generic_error_title">Oops! Something went wrong</string>
+    <string name="yodlee_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
+    <string name="yodlee_linking_timeout_error_subtitle">It looks like this is taking too long, please try again.</string>
+    <string name="yodlee_linking_already_linked_error_subtitle">It looks like you’ve already linked this account! Please try linking a different one.</string>
+    <string name="yodlee_linking_checking_error_title">Please link a Checking Account.</string>
+    <string name="yodlee_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
+    <string name="yodlee_linking_success_title">Bank Linked!</string>
+    <string name="yodlee_linking_success_subtitle">Your %1$s account is now linked to your Blockchain.com Wallet.</string>
+    <string name="yodlee_parsing_error">There was an issue linking with Yodlee, please try again or contact support.</string>
+    <string name="yodlee_flow_exited">Yodlee linking exited, would you like to try again?</string>
+    <string name="yodlee_unexpected_error">Oops, something went wrong while linking with Yodlee, please try again.</string>
+    <string name="yodlee_linking_cancel">Cancel &amp; Go Back</string>
+    <string name="please_try_linking_your_bank_again">Please try linking your bank again. If this keeps happening, please contact support.</string>
+    <string name="available_to_trade">Available to Trade</string>
+    <string name="instantly">Instantly</string>
+    <string name="instantly_available">Instantly Available</string>
 </resources>

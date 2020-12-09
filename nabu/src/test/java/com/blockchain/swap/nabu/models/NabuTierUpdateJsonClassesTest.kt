@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu.models
 
-import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
+import com.blockchain.swap.nabu.models.responses.nabu.TierUpdateJson
 import com.blockchain.serialization.JsonSerializable
 import com.blockchain.testutils.`should be assignable from`
 import org.junit.Test

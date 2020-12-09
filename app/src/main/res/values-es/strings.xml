@@ -1405,7 +1405,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="exchange_rate">Tipo de cambio</string>
     <string name="in_progress">En curso</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_funds_explanation">Por su seguridad, las compras con tarjeta por primera vez están sujetas a un período de retención de %1$s días antes de que pueda enviar o retirar su criptografía comprada. Le notificaremos cuando se levante la retención.
+    <string name="security_locked_card_funds_explanation">Por su seguridad, las compras con tarjeta por primera vez están sujetas a un período de retención de %1$s días antes de que pueda enviar o retirar su criptografía comprada. Le notificaremos cuando se levante la retención.
 
  Mientras tanto, puede vender en efectivo, intercambiar y comerciar dentro de Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Siempre debe emparejar o iniciar sesión si tiene acceso

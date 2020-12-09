@@ -7,7 +7,6 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.wallet.api.Environment
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
@@ -38,7 +37,6 @@ class LauncherPresenter(
     private val settingsDataManager: SettingsDataManager,
     private val notificationTokenManager: NotificationTokenManager,
     private val envSettings: EnvironmentConfig,
-    private val featureFlag: FeatureFlag,
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
@@ -153,9 +151,7 @@ class LauncherPresenter(
                 if (!shouldCheckForSimpleBuyLaunching())
                     Single.just(false)
                 else {
-                    featureFlag.enabled.map { simpleBuyFeatureFlagEnabled ->
-                        simpleBuyFeatureFlagEnabled && walletJustCreated()
-                    }
+                    Single.just(walletJustCreated())
                 }
             }.flatMap { simpleBuyShouldLaunched ->
                 if (!simpleBuyShouldLaunched && noCurrencySet())

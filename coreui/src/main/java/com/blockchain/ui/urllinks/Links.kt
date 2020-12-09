@@ -59,3 +59,8 @@ const val URL_XLM_MIN_BALANCE =
         "Why-do-Stellar-addresses-have-a-minimum-balance-requirement-"
 
 const val URL_TX_FEES = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
+
+// TODO update these
+const val YODLEE_LEARN_MORE = "https://www.google.com"
+const val YODLEE_TOS = "https://www.google.com"
+const val YODLEE_PP = "https://www.google.com"

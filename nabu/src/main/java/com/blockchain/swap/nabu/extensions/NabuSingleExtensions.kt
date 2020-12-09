@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu.extensions
 
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single

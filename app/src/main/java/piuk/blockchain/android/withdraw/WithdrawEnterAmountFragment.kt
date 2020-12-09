@@ -9,7 +9,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.withdrawEventWithCurrency
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -118,14 +118,14 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
                 )
             }
         }
-        bank_details_root.visibleIf { newState.linkedBanks != null }
-        newState.linkedBanks?.let {
+        bank_details_root.visibleIf { newState.beneficiaries != null }
+        newState.beneficiaries?.let {
             if (it.isEmpty()) {
                 renderUiForNoBanks(newState.currency ?: return)
             }
         }
         newState.selectedBank?.let {
-            renderUiForBank(it, newState.linkedBanks ?: return, newState.currency ?: return)
+            renderUiForBank(it, newState.beneficiaries ?: return, newState.currency ?: return)
         }
 
         btn_continue.isEnabled = newState.selectedBank != null && newState.amountIsValid()
@@ -147,7 +147,7 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
         }
     }
 
-    override fun onNewBankSelected(bank: LinkedBank) {
+    override fun onNewBankSelected(bank: Beneficiary) {
         model.process(WithdrawIntent.SelectedBankUpdated(bank))
     }
 
@@ -159,7 +159,7 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
         ))
     }
 
-    private fun renderUiForBank(bank: LinkedBank, banks: List<LinkedBank>, currency: String) {
+    private fun renderUiForBank(bank: Beneficiary, banks: List<Beneficiary>, currency: String) {
         bank_icon.setImageResource(R.drawable.ic_bank_transfer)
         bank_title.text = bank.title.plus(" ${bank.account}")
         bank_details_root.setOnClickListener {
@@ -169,9 +169,9 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
         bank_title.visible()
     }
 
-    private fun openBankChooserBottomSheet(linkedBanks: List<LinkedBank>, currency: String) {
+    private fun openBankChooserBottomSheet(beneficiaries: List<Beneficiary>, currency: String) {
         showBottomSheet(BankChooserBottomSheet.newInstance(
-            linkedBanks,
+            beneficiaries,
             currency
         ))
     }
@@ -194,6 +194,6 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
 }
 
 interface BankChooserHost : SlidingModalBottomDialog.Host {
-    fun onNewBankSelected(bank: LinkedBank)
+    fun onNewBankSelected(bank: Beneficiary)
     fun addBankWithCurrency(currency: String)
 }

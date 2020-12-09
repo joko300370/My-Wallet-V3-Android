@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers.featureflags
 
 import com.blockchain.swap.nabu.datamanagers.repositories.NabuUserRepository
-import com.blockchain.swap.nabu.models.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
 import io.reactivex.Single
 
 class KycFeatureEligibility(private val userRepository: NabuUserRepository) : FeatureEligibility {

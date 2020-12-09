@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.models.interest.DisabledReason
+import com.blockchain.swap.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money

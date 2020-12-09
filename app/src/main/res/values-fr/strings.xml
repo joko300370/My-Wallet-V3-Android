@@ -1410,7 +1410,7 @@ Veuillez réessayer plus tard.</string>
     <string name="exchange_rate">Taux de change</string>
     <string name="in_progress">En cours</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_funds_explanation">Pour votre sécurité, les premiers achats par carte sont soumis à une période de détention de %1$s jours avant que vous puissiez envoyer ou retirer votre crypto acheté. Nous vous informerons lorsque la suspension sera levée.
+    <string name="security_locked_card_funds_explanation">Pour votre sécurité, les premiers achats par carte sont soumis à une période de détention de %1$s jours avant que vous puissiez envoyer ou retirer votre crypto acheté. Nous vous informerons lorsque la suspension sera levée.
 
  En attendant, vous pouvez vendre en espèces, échanger et échanger sur Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Vous devez toujours coupler ou vous connecter si vous avez accès

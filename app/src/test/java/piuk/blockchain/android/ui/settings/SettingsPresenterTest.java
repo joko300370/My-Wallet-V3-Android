@@ -8,8 +8,8 @@ import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
-import com.blockchain.swap.nabu.models.nabu.KycTierState;
-import com.blockchain.swap.nabu.models.nabu.NabuApiException;
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState;
+import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;
@@ -132,9 +132,6 @@ public class SettingsPresenterTest extends RxTest {
                 kycStatusHelper,
                 pitLinking,
                 analytics,
-                featureFlag,
-                cardsFeatureFlag,
-                fundsFeatureFlag,
                 simpleBuyPrefs
         );
         subject.initView(activity);
@@ -162,7 +159,7 @@ public class SettingsPresenterTest extends RxTest {
         when(featureFlag.getEnabled()).thenReturn(Single.just(true));
         when(cardsFeatureFlag.getEnabled()).thenReturn(Single.just(true));
         when(fundsFeatureFlag.getEnabled()).thenReturn(Single.just(true));
-        when(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(Collections.emptyList()));
+        when(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(Collections.emptyList()));
 
         // Act
         subject.onViewReady();
@@ -172,7 +169,6 @@ public class SettingsPresenterTest extends RxTest {
         verify(activity).setUpUi();
         verify(activity).setPitLinkingState(false);
         verify(activity, times(2)).updateCards(anyList());
-        verify(activity).isPitEnabled(true);
         assertEquals(mockSettings, subject.settings);
     }
 
@@ -188,7 +184,7 @@ public class SettingsPresenterTest extends RxTest {
         when(cardsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
         when(fundsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
         when(custodialWalletManager.updateSupportedCardTypes(anyString(), anyBoolean())).thenReturn(Completable.complete());
-        when(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(Collections.emptyList()));
+        when(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(Collections.emptyList()));
         when(custodialWalletManager.fetchUnawareLimitsCards(anyList()))
                 .thenReturn(Single.just(Collections.emptyList()));
 
@@ -199,8 +195,7 @@ public class SettingsPresenterTest extends RxTest {
         verify(activity).showProgressDialog(anyInt());
         verify(activity).hideProgressDialog();
         verify(activity).setUpUi();
-        verify(activity, times(2)).updateCards(anyList());
-        verify(activity).isPitEnabled(false);
+        verify(activity).updateCards(anyList());
         assertNotSame(settings, subject.settings);
     }
 

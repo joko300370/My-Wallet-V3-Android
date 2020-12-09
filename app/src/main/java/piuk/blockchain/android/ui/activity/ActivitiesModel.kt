@@ -13,9 +13,7 @@ import timber.log.Timber
 enum class ActivitiesSheet {
     ACCOUNT_SELECTOR,
     CRYPTO_ACTIVITY_DETAILS,
-    FIAT_ACTIVITY_DETAILS,
-    BANK_TRANSFER_DETAILS,
-    BANK_ORDER_CANCEL
+    FIAT_ACTIVITY_DETAILS
 }
 
 enum class CryptoActivityType {

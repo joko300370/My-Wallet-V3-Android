@@ -12,10 +12,10 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.swap.nabu.datamanagers.TransferLimits
 import com.blockchain.swap.nabu.datamanagers.CustodialOrder
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers

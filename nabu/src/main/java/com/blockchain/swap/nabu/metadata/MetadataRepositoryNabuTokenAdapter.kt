@@ -5,9 +5,9 @@ import com.blockchain.metadata.MetadataRepository
 import com.blockchain.swap.nabu.CreateNabuToken
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.rx.maybeCache
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.tokenresponse.mapFromMetadata
-import com.blockchain.swap.nabu.models.tokenresponse.mapToMetadata
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.mapFromMetadata
+import com.blockchain.swap.nabu.models.responses.tokenresponse.mapToMetadata
 import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.metadata.MetadataManager

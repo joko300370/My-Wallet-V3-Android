@@ -1412,7 +1412,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="exchange_rate">Takas Oranı</string>
     <string name="in_progress">Devam Ediyor</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz.
+    <string name="security_locked_card_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz.
 
  Bu arada, Blockchain.com\'da Cash\'e satış yapabilir, takas edebilir ve ticaret yapabilirsiniz.</string>
     <string name="recover_funds_warning_message_1">Erişiminiz varsa her zaman eşleştirmeli veya giriş yapmalısınız

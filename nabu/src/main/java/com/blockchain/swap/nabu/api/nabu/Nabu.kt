@@ -1,65 +1,70 @@
 package com.blockchain.swap.nabu.api.nabu
 
-import com.blockchain.swap.nabu.models.cards.BeneficiariesResponse
-import com.blockchain.swap.nabu.models.cards.CardResponse
-import com.blockchain.swap.nabu.models.cards.PaymentMethodsResponse
-import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
-import com.blockchain.swap.nabu.models.interest.InterestActivityResponse
-import com.blockchain.swap.nabu.models.interest.InterestAddressResponse
-import com.blockchain.swap.nabu.models.interest.InterestEligibilityFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestEnabledResponse
-import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestRateResponse
-import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
-import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
-import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.models.nabu.NabuBasicUser
-import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
-import com.blockchain.swap.nabu.models.nabu.NabuJwt
-import com.blockchain.swap.nabu.models.nabu.NabuStateResponse
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.RecordCountryRequest
-import com.blockchain.swap.nabu.models.nabu.RegisterCampaignRequest
-import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressRequest
-import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
-import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
-import com.blockchain.swap.nabu.models.nabu.SupportedDocumentsResponse
-import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.VeriffToken
-import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
-import com.blockchain.swap.nabu.models.simplebuy.ActivateCardResponse
-import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
-import com.blockchain.swap.nabu.models.simplebuy.AddNewCardResponse
-import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
-import com.blockchain.swap.nabu.models.simplebuy.BuyOrderListResponse
-import com.blockchain.swap.nabu.models.simplebuy.BuySellOrderResponse
-import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
-import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
-import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.FeesResponse
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyAllBalancesResponse
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyBalanceResponse
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
-import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckResponse
-import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
-import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
-import com.blockchain.swap.nabu.models.swap.QuoteRequest
-import com.blockchain.swap.nabu.models.swap.QuoteResponse
-import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
-import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
-import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
+import com.blockchain.swap.nabu.models.responses.banktransfer.CreateLinkBankResponse
+import com.blockchain.swap.nabu.models.responses.banktransfer.LinkedBankTransferResponse
+import com.blockchain.swap.nabu.models.responses.banktransfer.UpdateProviderAccountBody
+import com.blockchain.swap.nabu.models.responses.cards.BeneficiariesResponse
+import com.blockchain.swap.nabu.models.responses.cards.CardResponse
+import com.blockchain.swap.nabu.models.responses.cards.PaymentMethodResponse
+import com.blockchain.swap.nabu.models.responses.cards.PaymentMethodsResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestAccountDetailsResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestActivityResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestAddressResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestEligibilityFullResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestEnabledResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestLimitsFullResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestRateResponse
+import com.blockchain.swap.nabu.models.responses.nabu.AddAddressRequest
+import com.blockchain.swap.nabu.models.responses.nabu.AirdropStatusList
+import com.blockchain.swap.nabu.models.responses.nabu.ApplicantIdRequest
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.NabuBasicUser
+import com.blockchain.swap.nabu.models.responses.nabu.NabuCountryResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuJwt
+import com.blockchain.swap.nabu.models.responses.nabu.NabuStateResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.RecordCountryRequest
+import com.blockchain.swap.nabu.models.responses.nabu.RegisterCampaignRequest
+import com.blockchain.swap.nabu.models.responses.nabu.SendToMercuryAddressRequest
+import com.blockchain.swap.nabu.models.responses.nabu.SendToMercuryAddressResponse
+import com.blockchain.swap.nabu.models.responses.nabu.SendWithdrawalAddressesRequest
+import com.blockchain.swap.nabu.models.responses.nabu.SupportedDocumentsResponse
+import com.blockchain.swap.nabu.models.responses.nabu.TierUpdateJson
+import com.blockchain.swap.nabu.models.responses.nabu.VeriffToken
+import com.blockchain.swap.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.swap.nabu.models.responses.simplebuy.ActivateCardResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.AddNewCardBodyRequest
+import com.blockchain.swap.nabu.models.responses.simplebuy.AddNewCardResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.BuyOrderListResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.BuySellOrderResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPartnerAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.responses.simplebuy.DepositRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.FeesResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyAllBalancesResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyCurrency
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyEligibility
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransferFundsResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.responses.simplebuy.WithdrawLocksCheckRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.WithdrawLocksCheckResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.WithdrawRequestBody
+import com.blockchain.swap.nabu.models.responses.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.responses.swap.CustodialOrderResponse
+import com.blockchain.swap.nabu.models.responses.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.responses.swap.QuoteResponse
+import com.blockchain.swap.nabu.models.responses.swap.SwapLimitsResponse
+import com.blockchain.swap.nabu.models.responses.swap.UpdateSwapOrderBody
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenRequest
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.Response
@@ -356,8 +361,14 @@ internal interface Nabu {
         @Query("checkEligibility") checkEligibility: Boolean?
     ): Single<PaymentMethodsResponse>
 
+    @GET(NABU_ELIGIBLE_PAYMENT_METHODS)
+    fun getPaymentMethodsForSimpleBuy(
+        @Header("authorization") authorization: String,
+        @Query("currency") currency: String
+    ): Single<List<PaymentMethodResponse>>
+
     @GET(NABU_BENEFICIARIES)
-    fun getLinkedBanks(
+    fun getLinkedBeneficiaries(
         @Header("authorization") authorization: String
     ): Single<List<BeneficiariesResponse>>
 
@@ -449,4 +460,28 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("limit") limit: Int = 50
     ): Single<List<CustodialOrderResponse>>
+
+    @GET("$NABU_LINKED_BANK/{id}")
+    fun getLinkedBank(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String
+    ): Single<LinkedBankTransferResponse>
+
+    @POST(NABU_LINK_BANK)
+    fun linkABank(
+        @Header("authorization") authorization: String,
+        @Body body: CreateLinkBankRequestBody
+    ): Single<CreateLinkBankResponse>
+
+    @POST("$NABU_UPDATE_PROVIDER/{id}/update")
+    fun updateProviderAccount(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: UpdateProviderAccountBody
+    ): Completable
+
+    @GET(NABU_LINK_BANK)
+    fun getLinkedBanks(
+        @Header("authorization") authorization: String
+    ): Single<List<LinkedBankTransferResponse>>
 }

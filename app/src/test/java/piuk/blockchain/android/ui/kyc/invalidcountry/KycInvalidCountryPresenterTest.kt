@@ -4,7 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import com.blockchain.swap.nabu.metadata.NabuCredentialsMetadata
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever

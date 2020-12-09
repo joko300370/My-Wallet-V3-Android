@@ -8,7 +8,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.CurrencySelected
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.ui.trackLoading
+import com.blockchain.ui.trackProgress
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -57,7 +57,7 @@ class SimpleBuySelectCurrencyFragment : MviBottomSheet<SimpleBuyModel, SimpleBuy
 
     private fun updateFiat(item: CurrencyItem) {
         compositeDisposable += settingsDataManager.updateFiatUnit(item.symbol)
-            .trackLoading(appUtil.activityIndicator)
+            .trackProgress(appUtil.activityIndicator)
             .doOnSubscribe {
                 adapter.canSelect = false
             }

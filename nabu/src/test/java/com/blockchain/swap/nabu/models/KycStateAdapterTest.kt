@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.models
 
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.KycStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.KycStateAdapter
 import com.squareup.moshi.JsonDataException
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw`

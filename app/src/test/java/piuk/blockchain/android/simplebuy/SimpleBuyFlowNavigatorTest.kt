@@ -2,7 +2,7 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.nabu.KycTierState
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
 import com.blockchain.swap.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever

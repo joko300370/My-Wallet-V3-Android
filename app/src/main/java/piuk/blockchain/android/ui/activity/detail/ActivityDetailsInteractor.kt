@@ -4,10 +4,12 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CurrencyPair
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.PaymentLimits
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.TransferDirection
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.swap.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -60,31 +62,41 @@ class ActivityDetailsInteractor(
             BuyFee(summaryItem.fee)
         )
 
-        return if (summaryItem.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
-            custodialWalletManager.getCardDetails(
+        return when (summaryItem.paymentMethodType) {
+            PaymentMethodType.PAYMENT_CARD -> custodialWalletManager.getCardDetails(
                 summaryItem.paymentMethodId
             )
                 .map { paymentMethod ->
                     addPaymentDetailsToList(list, paymentMethod, summaryItem)
-
                     list.toList()
                 }.onErrorReturn {
                     addPaymentDetailsToList(list, null, summaryItem)
 
                     list.toList()
                 }
-        } else {
-            list.add(BuyPaymentMethod(
-                PaymentDetails(summaryItem.paymentMethodId, label = null,
-                    endDigits = null
-                )))
-
-            if (summaryItem.status == OrderState.AWAITING_FUNDS ||
-                summaryItem.status == OrderState.PENDING_EXECUTION
-            ) {
-                list.add(CancelAction())
+            PaymentMethodType.BANK_TRANSFER -> custodialWalletManager.getLinkedBank(
+                summaryItem.paymentMethodId
+            ).map {
+                it.toPaymentMethod()
+            }.map { paymentMethod ->
+                addPaymentDetailsToList(list, paymentMethod, summaryItem)
+                list.toList()
+            }.onErrorReturn {
+                addPaymentDetailsToList(list, null, summaryItem)
+                list.toList()
             }
-            Single.just(list.toList())
+
+            else -> {
+                list.add(BuyPaymentMethod(
+                    PaymentDetails(summaryItem.paymentMethodId)))
+
+                if (summaryItem.status == OrderState.AWAITING_FUNDS ||
+                    summaryItem.status == OrderState.PENDING_EXECUTION
+                ) {
+                    list.add(CancelAction())
+                }
+                Single.just(list.toList())
+            }
         }
     }
 
@@ -185,18 +197,14 @@ class ActivityDetailsInteractor(
 
     private fun addPaymentDetailsToList(
         list: MutableList<ActivityDetailsType>,
-        paymentMethod: PaymentMethod.Card?,
+        paymentMethod: PaymentMethod?,
         summaryItem: CustodialTradingActivitySummaryItem
     ) {
         paymentMethod?.let {
             list.add(BuyPaymentMethod(PaymentDetails(
-                it.cardId, it.uiLabel(), it.endDigits
+                it.id, it.label(), it.endDigits()
             )))
-        } ?: list.add(BuyPaymentMethod(
-            PaymentDetails(summaryItem.paymentMethodId,
-                label = null, endDigits = null)
-        ))
-
+        } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
         if (summaryItem.status == OrderState.PENDING_CONFIRMATION) {
             list.add(CancelAction())
         }
@@ -479,3 +487,25 @@ class ActivityDetailsInteractor(
         else -> null
     }
 }
+
+private fun PaymentMethod.endDigits(): String? =
+    when (this) {
+        is PaymentMethod.Bank -> accountEnding
+        is PaymentMethod.Card -> endDigits
+        else -> null
+    }
+
+private fun PaymentMethod.label(): String? =
+    when (this) {
+        is PaymentMethod.Bank -> bankName
+        is PaymentMethod.Card -> uiLabel()
+        else -> null
+    }
+
+private fun LinkedBank.toPaymentMethod() =
+    PaymentMethod.Bank(
+        bankId = id,
+        limits = PaymentLimits(0, 0, currency),
+        bankName = name,
+        accountEnding = accountNumber
+    )

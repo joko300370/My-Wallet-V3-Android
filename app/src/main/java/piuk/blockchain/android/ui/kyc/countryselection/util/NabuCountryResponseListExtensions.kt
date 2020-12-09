@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.kyc.countryselection.util
 
 import android.os.Parcelable
-import com.blockchain.swap.nabu.models.nabu.NabuRegion
+import com.blockchain.swap.nabu.models.responses.nabu.NabuRegion
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 

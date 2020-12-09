@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.nabu
 
 import com.blockchain.serialization.JsonSerializable
-import com.blockchain.swap.nabu.models.nabu.RegisterCampaignRequest
+import com.blockchain.swap.nabu.models.responses.nabu.RegisterCampaignRequest
 import com.blockchain.testutils.`should be assignable from`
 import org.junit.Test
 

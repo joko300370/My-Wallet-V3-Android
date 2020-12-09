@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.thepit
 
 import com.blockchain.annotations.CommonCode
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.preferences.ThePitLinkingPrefs

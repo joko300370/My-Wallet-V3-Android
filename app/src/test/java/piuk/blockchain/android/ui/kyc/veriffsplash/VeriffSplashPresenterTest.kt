@@ -2,10 +2,10 @@ package piuk.blockchain.android.ui.kyc.veriffsplash
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
+import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.responses.nabu.SupportedDocuments
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.veriff.VeriffApplicantAndToken

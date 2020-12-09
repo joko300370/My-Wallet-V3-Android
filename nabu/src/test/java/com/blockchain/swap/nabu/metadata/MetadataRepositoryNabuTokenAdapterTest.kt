@@ -3,9 +3,9 @@ package com.blockchain.swap.nabu.metadata
 import com.blockchain.exceptions.MetadataNotFoundException
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.swap.nabu.CreateNabuToken
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.tokenresponse.mapFromMetadata
-import com.blockchain.swap.nabu.models.tokenresponse.mapToMetadata
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.mapFromMetadata
+import com.blockchain.swap.nabu.models.responses.tokenresponse.mapToMetadata
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify

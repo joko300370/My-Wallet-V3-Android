@@ -3,7 +3,7 @@ package piuk.blockchain.android.simplebuy
 import com.blockchain.swap.nabu.datamanagers.BankAccount
 import com.blockchain.swap.nabu.datamanagers.BankDetail
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
-import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.BankAccountResponse
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.StringUtils
 

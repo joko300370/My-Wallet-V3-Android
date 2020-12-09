@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu
 
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 
 fun getEmptySessionToken(): NabuSessionTokenResponse =
     NabuSessionTokenResponse(

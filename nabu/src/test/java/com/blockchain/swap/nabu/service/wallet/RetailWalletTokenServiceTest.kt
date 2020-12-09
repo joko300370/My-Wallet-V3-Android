@@ -1,8 +1,8 @@
 package com.blockchain.swap.nabu.service.wallet
 
 import com.blockchain.swap.nabu.api.wallet.RETAIL_JWT_TOKEN
-import com.blockchain.swap.nabu.models.nabu.KycStateAdapter
-import com.blockchain.swap.nabu.models.nabu.UserStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.KycStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.UserStateAdapter
 import com.blockchain.swap.nabu.service.RetailWalletTokenService
 import com.blockchain.testutils.MockedRetrofitTest
 import com.blockchain.testutils.getStringFromResource

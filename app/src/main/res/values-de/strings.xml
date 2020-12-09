@@ -1407,7 +1407,7 @@
     <string name="exchange_rate">Wechselkurs</string>
     <string name="in_progress">In Bearbeitung</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_funds_explanation">Zu Ihrer Sicherheit unterliegen erstmalige Kartenkäufe einer Haltedauer von %1$s pro Tag, bevor Sie Ihre gekaufte Krypto senden oder abheben können. Wir werden Sie benachrichtigen, wenn der Laderaum aufgehoben wird.
+    <string name="security_locked_card_funds_explanation">Zu Ihrer Sicherheit unterliegen erstmalige Kartenkäufe einer Haltedauer von %1$s pro Tag, bevor Sie Ihre gekaufte Krypto senden oder abheben können. Wir werden Sie benachrichtigen, wenn der Laderaum aufgehoben wird.
  In der Zwischenzeit können Sie innerhalb von Blockchain.com in Bargeld verkaufen, tauschen und handeln.</string>
     <string name="recover_funds_warning_message_1">Sie sollten immer koppeln oder sich anmelden, wenn Sie Zugriff haben
  zu Ihrer Brieftaschen-ID und Ihrem Passwort. Wenn Sie Ihr Geld zurückerhalten, wird möglicherweise eine neue Brieftaschen-ID erstellt. Würdest du

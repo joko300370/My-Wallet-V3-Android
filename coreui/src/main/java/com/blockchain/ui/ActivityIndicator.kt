@@ -17,7 +17,7 @@ class ActivityIndicator {
         .replay(1)
         .refCount()
 
-    fun <T> Observable<T>.trackLoading(): Observable<T> {
+    fun <T> Observable<T>.trackProgress(): Observable<T> {
         return this.doOnSubscribe {
             increment()
         }.doFinally {
@@ -25,7 +25,7 @@ class ActivityIndicator {
         }
     }
 
-    fun <T> Single<T>.trackLoading(): Single<T> {
+    fun <T> Single<T>.trackProgress(): Single<T> {
         return this.doOnSubscribe {
             increment()
         }.doFinally {
@@ -33,7 +33,7 @@ class ActivityIndicator {
         }
     }
 
-    fun <T> Maybe<T>.trackLoading(): Maybe<T> {
+    fun <T> Maybe<T>.trackProgress(): Maybe<T> {
         return this.doOnSubscribe {
             increment()
         }.doFinally {
@@ -41,7 +41,7 @@ class ActivityIndicator {
         }
     }
 
-    fun Completable.trackLoading(): Completable {
+    fun Completable.trackProgress(): Completable {
         return this.doOnSubscribe {
             increment()
         }.doFinally {
@@ -62,30 +62,30 @@ class ActivityIndicator {
     }
 }
 
-fun <T> Observable<T>.trackLoading(activityIndicator: ActivityIndicator?): Observable<T> =
+fun <T> Observable<T>.trackProgress(activityIndicator: ActivityIndicator?): Observable<T> =
     activityIndicator?.let {
         with(it) {
-            trackLoading()
+            this@trackProgress.trackProgress()
         }
     } ?: this
 
-fun <T> Maybe<T>.trackLoading(activityIndicator: ActivityIndicator?): Maybe<T> =
+fun <T> Maybe<T>.trackProgress(activityIndicator: ActivityIndicator?): Maybe<T> =
     activityIndicator?.let {
         with(it) {
-            trackLoading()
+            this@trackProgress.trackProgress()
         }
     } ?: this
 
-fun <T> Single<T>.trackLoading(activityIndicator: ActivityIndicator?): Single<T> =
+fun <T> Single<T>.trackProgress(activityIndicator: ActivityIndicator?): Single<T> =
     activityIndicator?.let {
         with(it) {
-            trackLoading()
+            trackProgress()
         }
     } ?: this
 
-fun Completable.trackLoading(activityIndicator: ActivityIndicator?): Completable =
+fun Completable.trackProgress(activityIndicator: ActivityIndicator?): Completable =
     activityIndicator?.let {
         with(it) {
-            trackLoading()
+            this@trackProgress.trackProgress()
         }
     } ?: this

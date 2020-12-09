@@ -35,7 +35,6 @@ class SellIntroAnnouncementTest {
             SellIntroAnnouncement(
                 dismissRecorder = dismissRecorder,
                 eligibilityProvider = eligibilityProvider,
-                sellFeatureFlag = sellFeatureFlag,
                 coincore = coincore,
                 analytics = analytics
             )

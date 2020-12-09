@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.interest
 
 import com.blockchain.swap.nabu.Authenticator
-import com.blockchain.swap.nabu.models.interest.DisabledReason
+import com.blockchain.swap.nabu.models.responses.interest.DisabledReason
 import com.blockchain.swap.nabu.service.NabuService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single

@@ -8,14 +8,13 @@ import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.CampaignData
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
+import com.blockchain.swap.nabu.models.responses.nabu.CampaignData
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.swap.nabu.models.responses.nabu.NabuErrorCodes
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -59,7 +58,6 @@ interface MainView : MvpView, HomeNavigator {
     fun showProgressDialog(@StringRes message: Int)
     fun hideProgressDialog()
     fun clearAllDynamicShortcuts()
-    fun setPitEnabled(enabled: Boolean)
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
     fun displayLockboxMenu(lockboxAvailable: Boolean)
@@ -85,7 +83,6 @@ class MainPresenter internal constructor(
     private val deepLinkProcessor: DeepLinkProcessor,
     private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
-    private val pitFeatureFlag: FeatureFlag,
     private val pitLinking: PitLinking,
     private val nabuDataManager: NabuDataManager,
     private val simpleBuySync: SimpleBuySyncFactory,
@@ -117,15 +114,10 @@ class MainPresenter internal constructor(
             checkLockboxAvailability()
             lightSimpleBuySync()
             doPushNotifications()
-            checkPitAvailability()
         }
     }
 
     override fun onViewDetached() {}
-
-    private fun checkPitAvailability() {
-        compositeDisposable += pitFeatureFlag.enabled.subscribeBy { view?.setPitEnabled(it) }
-    }
 
     private fun checkLockboxAvailability() {
         compositeDisposable += lockboxDataManager.isLockboxAvailable()

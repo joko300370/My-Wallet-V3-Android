@@ -3,7 +3,7 @@ package com.blockchain.swap.nabu.datamanagers
 import com.blockchain.logging.CrashLogger
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers

@@ -3,8 +3,8 @@ package com.blockchain.swap.nabu.datamanagers
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.swap.nabu.Authenticator
 import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock

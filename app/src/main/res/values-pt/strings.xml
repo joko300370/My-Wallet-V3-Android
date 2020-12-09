@@ -1413,7 +1413,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="exchange_rate">Taxa de câmbio</string>
     <string name="in_progress">Em progresso</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_funds_explanation">Para sua segurança, as primeiras compras com cartão estão sujeitas a um período de retenção de %1$s dias antes que você possa enviar ou retirar sua criptografia comprada. Notificaremos você quando o bloqueio for retirado.
+    <string name="security_locked_card_funds_explanation">Para sua segurança, as primeiras compras com cartão estão sujeitas a um período de retenção de %1$s dias antes que você possa enviar ou retirar sua criptografia comprada. Notificaremos você quando o bloqueio for retirado.
 
  Nesse ínterim, você pode vender em dinheiro, trocar e negociar em Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Você deve sempre emparelhar ou fazer login se tiver acesso

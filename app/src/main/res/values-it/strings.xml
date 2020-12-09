@@ -1414,7 +1414,7 @@
     <string name="exchange_rate">Tasso di cambio</string>
     <string name="in_progress">In corso</string>
     <string name="swap_direction">%1$s - &gt; %2$s</string>
-    <string name="security_locked_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata.
+    <string name="security_locked_card_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata.
 
  Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Dovresti sempre eseguire l\'accoppiamento o il login se hai accesso

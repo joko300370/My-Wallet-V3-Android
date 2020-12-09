@@ -2,8 +2,8 @@ package piuk.blockchain.android.cards.partners
 
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.Partner
-import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
-import com.blockchain.swap.nabu.models.simplebuy.EveryPayAttrs
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPartnerAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.EveryPayAttrs
 import io.reactivex.Single
 import piuk.blockchain.android.cards.CardData
 import piuk.blockchain.android.everypay.models.CardDetailRequest

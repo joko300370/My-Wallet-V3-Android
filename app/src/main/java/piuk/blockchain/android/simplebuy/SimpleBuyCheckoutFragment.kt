@@ -10,34 +10,36 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.eventWithPaymentMethod
 import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.CustodialQuote
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_checkout.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.extensions.secondsToDays
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.goneIf
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
+import piuk.blockchain.androidcoreui.utils.extensions.visible
 import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
 
     override val model: SimpleBuyModel by scopedInject()
-    private val stringUtils: StringUtils by inject()
     private var lastState: SimpleBuyState? = null
     private val checkoutAdapter = CheckoutAdapter()
 
     private val isForPendingPayment: Boolean by unsafeLazy {
         arguments?.getBoolean(PENDING_PAYMENT_ORDER_KEY, false) ?: false
+    }
+
+    private val showOnlyOrderData: Boolean by unsafeLazy {
+        arguments?.getBoolean(SHOW_ONLY_ORDER_DATA, false) ?: false
     }
 
     override fun onCreateView(
@@ -55,6 +57,14 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
 
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.CHECKOUT))
+        if (!showOnlyOrderData)
+            setUpToolbar()
+
+        model.process(SimpleBuyIntent.FetchQuote)
+        model.process(SimpleBuyIntent.FetchWithdrawLockTime)
+    }
+
+    private fun setUpToolbar() {
         activity.setupToolbar(
             if (isForPendingPayment) {
                 R.string.order_details
@@ -63,9 +73,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             },
             !isForPendingPayment
         )
-        model.process(SimpleBuyIntent.FetchQuote)
-        model.process(SimpleBuyIntent.FetchBankAccount)
-        model.process(SimpleBuyIntent.FetchWithdrawLockTime)
     }
 
     override fun backPressedHandled(): Boolean =
@@ -86,17 +93,28 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
 
         progress.visibleIf { newState.isLoading }
-        purchase_note.text = when {
-            newState.selectedPaymentMethod?.isBank() == true -> {
-                getString(R.string.purchase_bank_note, newState.selectedCryptoCurrency?.displayTicker)
-            }
+        val note = when {
             newState.selectedPaymentMethod?.isCard() == true -> {
                 getString(R.string.purchase_card_note_1)
             }
             newState.selectedPaymentMethod?.isFunds() == true -> {
                 getString(R.string.purchase_funds_note)
             }
+            newState.selectedPaymentMethod?.isBank() == true -> {
+                newState.withdrawalLockPeriod.secondsToDays().takeIf { it > 0 }?.let {
+                    getString(R.string.security_locked_funds_bank_transfer_explanation, it.toString())
+                }
+            }
             else -> ""
+        }
+
+        purchase_note.apply {
+            if (note.isNullOrBlank())
+                gone()
+            else {
+                visible()
+                text = note
+            }
         }
 
         if (newState.errorState != null) {
@@ -116,11 +134,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             OrderState.FINISHED, // Funds orders are getting finished right after confirmation
             OrderState.AWAITING_FUNDS -> {
                 if (newState.confirmationActionRequested) {
-                    if (newState.selectedPaymentMethod?.isBank() == true) {
-                        navigator().goToBankDetailsScreen()
-                    } else {
-                        navigator().goToCardPaymentScreen()
-                    }
+                    navigator().goToCardPaymentScreen()
                 }
             }
             OrderState.CANCELED -> {
@@ -134,15 +148,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     private fun showAmountForMethod(newState: SimpleBuyState) {
-        amount.text = if (newState.selectedPaymentMethod?.isBank() == true) {
-            if (newState.orderState == OrderState.PENDING_CONFIRMATION) {
-                newState.custodialQuote?.estimatedAmount()
-            } else {
-                newState.orderValue?.toStringWithSymbol()
-            }
-        } else {
-            newState.orderValue?.toStringWithSymbol()
-        }
+        amount.text = newState.orderValue?.toStringWithSymbol()
     }
 
     private fun updateStatusPill(newState: SimpleBuyState) {
@@ -168,16 +174,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     private fun getListFields(state: SimpleBuyState) =
-        listOf(
-            if (state.selectedPaymentMethod?.isBank() == true) {
-                CheckoutItem(getString(R.string.morph_exchange_rate),
-                    "${state.custodialQuote?.rate?.toStringWithSymbol()} / " +
-                            "${state.selectedCryptoCurrency?.displayTicker}")
-            } else {
-                CheckoutItem(getString(R.string.morph_exchange_rate),
-                    "${state.orderExchangePrice?.toStringWithSymbol()} / " +
-                            "${state.selectedCryptoCurrency?.displayTicker}")
-            },
+        listOfNotNull(
+            CheckoutItem(getString(R.string.morph_exchange_rate),
+                "${state.orderExchangePrice?.toStringWithSymbol()} / " +
+                        "${state.selectedCryptoCurrency?.displayTicker}"),
 
             CheckoutItem(getString(R.string.fees),
                 state.fee?.toStringWithSymbol() ?: FiatValue.zero(state.fiatCurrency)
@@ -190,11 +190,12 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 state.selectedPaymentMethod?.let {
                     paymentMethodLabel(it, state.fiatCurrency)
                 } ?: ""
-            )
+            ),
+            state.selectedPaymentMethod?.isBank()?.let {
+                CheckoutItem(getString(R.string.available_to_trade),
+                    getString(R.string.instantly))
+            }
         )
-
-    private fun CustodialQuote.estimatedAmount(): String =
-        getString(R.string.approximately_symbol, estimatedAmount.toStringWithSymbol())
 
     private fun isPendingOrAwaitingFunds(orderState: OrderState) =
         isForPendingPayment || orderState == OrderState.AWAITING_FUNDS
@@ -225,6 +226,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                     }
                 }
             }
+            visibleIf { !showOnlyOrderData }
         }
 
         button_action.isEnabled = !state.isLoading
@@ -240,7 +242,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         fiatCurrency: String
     ): String =
         when (selectedPaymentMethod.paymentMethodType) {
-            PaymentMethodType.BANK_ACCOUNT -> getString(R.string.checkout_bank_transfer_label)
             PaymentMethodType.FUNDS -> getString(R.string.currency_funds_wallet, fiatCurrency)
             else -> selectedPaymentMethod.label ?: ""
         }
@@ -276,11 +277,13 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     companion object {
         private const val PENDING_PAYMENT_ORDER_KEY = "PENDING_PAYMENT_KEY"
+        private const val SHOW_ONLY_ORDER_DATA = "SHOW_ONLY_ORDER_DATA"
 
-        fun newInstance(isForPending: Boolean = false): SimpleBuyCheckoutFragment {
+        fun newInstance(isForPending: Boolean = false, showOnlyOrderData: Boolean = false): SimpleBuyCheckoutFragment {
             val fragment = SimpleBuyCheckoutFragment()
             fragment.arguments = Bundle().apply {
                 putBoolean(PENDING_PAYMENT_ORDER_KEY, isForPending)
+                putBoolean(SHOW_ONLY_ORDER_DATA, showOnlyOrderData)
             }
             return fragment
         }

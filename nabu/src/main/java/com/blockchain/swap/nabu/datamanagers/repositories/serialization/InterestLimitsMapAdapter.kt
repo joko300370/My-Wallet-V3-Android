@@ -1,8 +1,8 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.serialization
 
-import com.blockchain.swap.nabu.models.interest.AssetLimitsResponse
-import com.blockchain.swap.nabu.models.interest.InterestLimitsFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestLimitsResponse
+import com.blockchain.swap.nabu.models.responses.interest.AssetLimitsResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestLimitsFullResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestLimitsResponse
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonReader
 

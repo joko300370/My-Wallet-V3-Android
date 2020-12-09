@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.models
 
-import com.blockchain.swap.nabu.models.nabu.Limits
-import com.blockchain.swap.nabu.models.nabu.LimitsJson
+import com.blockchain.swap.nabu.models.responses.nabu.Limits
+import com.blockchain.swap.nabu.models.responses.nabu.LimitsJson
 import com.blockchain.testutils.gbp
 import com.blockchain.testutils.usd
 import org.amshove.kluent.`should be`

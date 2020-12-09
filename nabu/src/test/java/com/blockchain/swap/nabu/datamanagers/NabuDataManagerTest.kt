@@ -2,14 +2,14 @@ package com.blockchain.swap.nabu.datamanagers
 
 import com.blockchain.logging.DigitalTrust
 import com.blockchain.swap.nabu.getEmptySessionToken
-import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
-import com.blockchain.swap.nabu.models.nabu.NabuStateResponse
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.RegisterCampaignRequest
-import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.wallet.RetailJwtResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuCountryResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuStateResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.RegisterCampaignRequest
+import com.blockchain.swap.nabu.models.responses.nabu.Scope
+import com.blockchain.swap.nabu.models.responses.nabu.SupportedDocuments
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.wallet.RetailJwtResponse
 import com.blockchain.swap.nabu.service.NabuService
 import com.blockchain.swap.nabu.service.RetailWalletTokenService
 import com.blockchain.swap.nabu.stores.NabuSessionTokenStore

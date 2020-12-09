@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu.datamanagers
 
-import com.blockchain.swap.nabu.models.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
 import com.blockchain.swap.nabu.NabuToken
 import io.reactivex.Single
 

@@ -1,6 +1,6 @@
 package piuk.blockchain.android.withdraw.mvi
 
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.simplebuy.ErrorState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -31,9 +31,9 @@ sealed class WithdrawIntent : MviIntent<WithdrawState> {
             oldState.copy(balance = balance)
     }
 
-    data class BanksUpdated(private val linkedBanks: List<LinkedBank>) : WithdrawIntent() {
+    data class BanksUpdated(private val beneficiaries: List<Beneficiary>) : WithdrawIntent() {
         override fun reduce(oldState: WithdrawState): WithdrawState =
-            oldState.copy(linkedBanks = linkedBanks, selectedBank = linkedBanks.getOrNull(0))
+            oldState.copy(beneficiaries = beneficiaries, selectedBank = beneficiaries.getOrNull(0))
     }
 
     data class AmountUpdated(private val amount: FiatValue) : WithdrawIntent() {
@@ -56,7 +56,7 @@ sealed class WithdrawIntent : MviIntent<WithdrawState> {
             oldState.copy(fee = fee)
     }
 
-    class SelectedBankUpdated(private val bank: LinkedBank) : WithdrawIntent() {
+    class SelectedBankUpdated(private val bank: Beneficiary) : WithdrawIntent() {
         override fun reduce(oldState: WithdrawState): WithdrawState =
             oldState.copy(selectedBank = bank)
     }

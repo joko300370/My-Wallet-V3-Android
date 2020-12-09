@@ -106,7 +106,6 @@ public class LauncherPresenterTest {
                 settingsDataManager,
                 notificationTokenManager,
                 environmentConfig,
-                featureFlag,
                 currencyPrefs,
                 analytics,
                 prerequisites,

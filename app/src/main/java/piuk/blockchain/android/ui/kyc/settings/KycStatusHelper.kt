@@ -2,12 +2,12 @@ package piuk.blockchain.android.ui.kyc.settings
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.exceptions.MetadataNotFoundException
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.models.nabu.UserState
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.Scope
+import com.blockchain.swap.nabu.models.responses.nabu.UserState
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Completable
 import io.reactivex.Single

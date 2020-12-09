@@ -1,13 +1,13 @@
 package com.blockchain.swap.nabu.service.nabu
 
 import com.blockchain.swap.nabu.api.nabu.NABU_KYC_TIERS
-import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.KycTierStateAdapter
-import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierResponse
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.LimitsJson
+import com.blockchain.swap.nabu.models.responses.nabu.TierResponse
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.swap.nabu.Authenticator
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.serialization.BigDecimalAdaptor
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.service.NabuTierService

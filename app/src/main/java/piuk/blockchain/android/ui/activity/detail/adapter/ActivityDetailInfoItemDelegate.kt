@@ -134,9 +134,6 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is SellPurchaseAmount -> infoType.value.toStringWithSymbol()
             is BuyPaymentMethod -> {
                 when {
-                    infoType.paymentDetails.paymentMethodId == PaymentMethod.BANK_PAYMENT_ID -> {
-                        parent.context.getString(R.string.checkout_bank_transfer_label)
-                    }
                     infoType.paymentDetails.endDigits != null &&
                         infoType.paymentDetails.label != null -> {
                         parent.context.getString(R.string.common_hyphenated_strings,

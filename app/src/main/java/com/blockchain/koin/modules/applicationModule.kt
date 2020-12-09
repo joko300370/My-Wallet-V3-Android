@@ -4,7 +4,6 @@ import android.content.Context
 import com.blockchain.accounts.AccountList
 import com.blockchain.koin.bch
 import com.blockchain.koin.btc
-import com.blockchain.koin.cardPaymentsFeatureFlag
 import com.blockchain.koin.dgldAccount
 import com.blockchain.koin.eth
 import com.blockchain.koin.eur
@@ -16,10 +15,6 @@ import com.blockchain.koin.pax
 import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.pitFeatureFlag
-import com.blockchain.koin.sellFeatureFlag
-import com.blockchain.koin.simpleBuyFeatureFlag
-import com.blockchain.koin.simpleBuyFundsFeatureFlag
 import com.blockchain.koin.usdt
 import com.blockchain.koin.usdtAccount
 import com.blockchain.logging.DigitalTrust
@@ -51,15 +46,14 @@ import piuk.blockchain.android.data.api.bitpay.BitPayService
 import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
 import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.EURPaymentAccountMapper
 import piuk.blockchain.android.simplebuy.GBPPaymentAccountMapper
-import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.simplebuy.SimpleBuyFlowNavigator
 import piuk.blockchain.android.simplebuy.SimpleBuyInflateAdapter
 import piuk.blockchain.android.simplebuy.SimpleBuyInteractor
@@ -71,7 +65,6 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingImpl
 import piuk.blockchain.android.thepit.ThePitDeepLinkParser
 import piuk.blockchain.android.ui.addresses.AccountPresenter
-import piuk.blockchain.android.ui.customviews.SecondPasswordDialog
 import piuk.blockchain.android.ui.airdrops.AirdropCentrePresenter
 import piuk.blockchain.android.ui.auth.FirebaseMobileNoticeRemoteConfig
 import piuk.blockchain.android.ui.auth.MobileNoticeRemoteConfig
@@ -81,6 +74,7 @@ import piuk.blockchain.android.ui.backup.start.BackupWalletStartingPresenter
 import piuk.blockchain.android.ui.backup.verify.BackupVerifyPresenter
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListPresenter
 import piuk.blockchain.android.ui.createwallet.CreateWalletPresenter
+import piuk.blockchain.android.ui.customviews.SecondPasswordDialog
 import piuk.blockchain.android.ui.customviews.SwapTrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.dialogs.OverlayDetection
@@ -293,7 +287,6 @@ val applicationModule = module {
                 deepLinkProcessor = get(),
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
-                pitFeatureFlag = get(pitFeatureFlag),
                 pitLinking = get(),
                 nabuDataManager = get(),
                 nabuToken = get(),
@@ -333,12 +326,6 @@ val applicationModule = module {
 
         factory {
             GsonBuilder().create()
-        }
-
-        factory {
-            SimpleBuyAvailability(
-                simpleBuyFlag = get(simpleBuyFeatureFlag)
-            )
         }
 
         factory {
@@ -583,7 +570,6 @@ val applicationModule = module {
                 simpleBuyModel = get(),
                 custodialWalletManager = get(),
                 currencyPrefs = get(),
-                sellFeatureFlag = get(sellFeatureFlag),
                 tierService = get(),
                 eligibilityProvider = get()
             )
@@ -597,7 +583,6 @@ val applicationModule = module {
 
             SimpleBuySyncFactory(
                 custodialWallet = get(),
-                availabilityChecker = get(),
                 localStateAdapter = inflateAdapter
             )
         }
@@ -638,9 +623,6 @@ val applicationModule = module {
                 /* kycStatusHelper = */ get(),
                 /* pitLinking = */ get(),
                 /* analytics = */ get(),
-                /* featureFlag = */get(pitFeatureFlag),
-                /* featureFlag = */get(cardPaymentsFeatureFlag),
-                /* featureFlag = */get(simpleBuyFundsFeatureFlag),
                 /* simpleBuyPrefs = */get()
             )
         }
@@ -730,7 +712,6 @@ val applicationModule = module {
                 settingsDataManager = get(),
                 notificationTokenManager = get(),
                 envSettings = get(),
-                featureFlag = get(simpleBuyFeatureFlag),
                 currencyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),

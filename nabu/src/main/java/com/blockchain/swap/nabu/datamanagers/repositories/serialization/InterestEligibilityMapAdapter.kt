@@ -1,8 +1,8 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.serialization
 
-import com.blockchain.swap.nabu.models.interest.DisabledReason
-import com.blockchain.swap.nabu.models.interest.InterestEligibilityFullResponse
-import com.blockchain.swap.nabu.models.interest.InterestEligibilityResponse
+import com.blockchain.swap.nabu.models.responses.interest.DisabledReason
+import com.blockchain.swap.nabu.models.responses.interest.InterestEligibilityFullResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestEligibilityResponse
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader

@@ -4,7 +4,7 @@ import com.blockchain.testutils.rxInit
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.NabuUserSync
 import com.blockchain.swap.nabu.getBlankNabuUser
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions

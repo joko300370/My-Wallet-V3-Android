@@ -2,8 +2,8 @@ package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
-import com.blockchain.swap.nabu.models.nabu.TierUpdateJson
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.TierUpdateJson
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import com.blockchain.swap.nabu.Authenticator
 import io.reactivex.Completable
 import io.reactivex.Single

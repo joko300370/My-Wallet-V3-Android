@@ -22,19 +22,14 @@ import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.makeBlockExplorerUrl
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CryptoActivityDetailsBottomSheet :
     MviBottomSheet<ActivityDetailsModel, ActivityDetailsIntents, ActivityDetailState>() {
-
-    interface Host : SlidingModalBottomDialog.Host {
-        fun onShowBankDetailsSelected()
-        fun onShowBankCancelOrder()
-    }
 
     override val host: Host by lazy {
         super.host as? Host
@@ -49,8 +44,7 @@ class CryptoActivityDetailsBottomSheet :
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(
             onActionItemClicked = { onActionItemClicked() },
-            onDescriptionItemUpdated = { onDescriptionItemClicked(it) },
-            onCancelActionItemClicked = { onCancelActionItemClicked() }
+            onDescriptionItemUpdated = { onDescriptionItemClicked(it) }
         )
     }
 
@@ -143,7 +137,7 @@ class CryptoActivityDetailsBottomSheet :
 
     private fun showTransactionTypeUi(state: ActivityDetailState, view: View) {
         if (state.transactionType == TransactionSummary.TransactionType.BUY) {
-            showBuyUi(state, view)
+            showBuyUi(view, state)
         } else if (state.transactionType == TransactionSummary.TransactionType.INTEREST_EARNED ||
             state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
             state.transactionType == TransactionSummary.TransactionType.WITHDRAW
@@ -154,30 +148,24 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     private fun showBuyUi(
-        state: ActivityDetailState,
-        view: View
+        view: View,
+        state: ActivityDetailState
     ) {
         if (state.isPending || state.isPendingExecution) {
-            view.custodial_tx_button.text =
-                getString(R.string.activity_details_view_bank_transfer_details)
-            view.custodial_tx_button.setOnClickListener {
-                host.onShowBankDetailsSelected()
-                dismiss()
-            }
-        } else {
-            view.custodial_tx_button.text =
-                getString(R.string.activity_details_buy_again)
-            view.custodial_tx_button.setOnClickListener {
-                analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
-                compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
-                    AndroidSchedulers.mainThread())
-                    .subscribe {
-                        startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
-                        dismiss()
-                    }
-            }
+            view.custodial_tx_button.gone()
+            return
         }
-
+        view.custodial_tx_button.text =
+            getString(R.string.activity_details_buy_again)
+        view.custodial_tx_button.setOnClickListener {
+            analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
+            compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
+                AndroidSchedulers.mainThread())
+                .subscribe {
+                    startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
+                    dismiss()
+                }
+        }
         view.custodial_tx_button.visible()
     }
 
@@ -278,12 +266,6 @@ class CryptoActivityDetailsBottomSheet :
     private fun onDescriptionItemClicked(description: String) {
         model.process(
             UpdateDescriptionIntent(arguments.txId, arguments.cryptoCurrency, description))
-    }
-
-    private fun onCancelActionItemClicked() {
-        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_CANCEL)
-        host.onShowBankCancelOrder()
-        dismiss()
     }
 
     private fun onActionItemClicked() {

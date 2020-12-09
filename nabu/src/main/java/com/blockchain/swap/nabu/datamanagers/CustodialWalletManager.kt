@@ -6,12 +6,14 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
+import com.blockchain.swap.nabu.models.data.LinkBankTransfer
+import com.blockchain.swap.nabu.models.data.LinkedBank
+import com.blockchain.swap.nabu.models.responses.interest.InterestActivityItemResponse
+import com.blockchain.swap.nabu.models.responses.interest.InterestAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPartnerAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPaymentAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
-import com.blockchain.swap.nabu.models.interest.InterestActivityItemResponse
-import com.blockchain.swap.nabu.models.interest.InterestAttributes
-import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
-import com.blockchain.swap.nabu.models.simplebuy.CardPaymentAttributes
-import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -126,11 +128,15 @@ interface CustodialWalletManager {
 
     fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
 
-    fun getLinkedBanks(): Single<List<LinkedBank>>
+    fun getLinkedBeneficiaries(): Single<List<Beneficiary>>
+
+    fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer>
+
+    fun updateAccountProviderId(linkingId: String, providerAccountId: String): Completable
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
-        isTier2Approved: Boolean
+        onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated>
@@ -143,7 +149,8 @@ interface CustodialWalletManager {
         states: List<CardStatus>
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
-    fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?): Single<BuySellOrder>
+    fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?, paymentMethodId: String?):
+            Single<BuySellOrder>
 
     fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
 
@@ -197,6 +204,12 @@ interface CustodialWalletManager {
         id: String,
         success: Boolean
     ): Completable
+
+    fun getLinkedBank(
+        id: String
+    ): Single<LinkedBank>
+
+    fun getLinkedBanks(): Single<List<LinkedBank>>
 
     fun isFiatCurrencySupported(destination: String): Boolean
 }
@@ -277,7 +290,7 @@ data class OrderInput(private val symbol: String, private val amount: String? = 
 
 data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
-data class LinkedBank(
+data class Beneficiary(
     val id: String,
     val title: String,
     val account: String,
@@ -382,8 +395,6 @@ sealed class SimpleBuyError : Throwable() {
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
     Serializable {
     object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
-    data class BankTransfer(override val limits: PaymentLimits) :
-        PaymentMethod(BANK_PAYMENT_ID, limits, BANK_PAYMENT_METHOD_ORDER)
 
     data class UndefinedCard(override val limits: PaymentLimits) :
         PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER)
@@ -398,6 +409,23 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
         PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER)
 
+    data class UndefinedBankTransfer(override val limits: PaymentLimits) :
+        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER)
+
+    data class Bank(
+        val bankId: String,
+        override val limits: PaymentLimits,
+        val bankName: String,
+        val accountEnding: String
+    ) : PaymentMethod(bankId, limits, BANK_PAYMENT_METHOD_ORDER), Serializable {
+
+        val accountDottedLastDigits: String
+            get() = "•••• $accountEnding"
+
+        override fun detailedLabel() =
+            "$bankName $accountEnding"
+    }
+
     data class Card(
         val cardId: String,
         override val limits: PaymentLimits,
@@ -408,7 +436,8 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         val cardType: CardType,
         val status: CardStatus
     ) : PaymentMethod(cardId, limits, CARD_PAYMENT_METHOD_ORDER), Serializable {
-        fun uiLabelWithDigits() =
+
+        override fun detailedLabel() =
             "${uiLabel()} ${dottedEndDigits()}"
 
         fun uiLabel() =
@@ -429,19 +458,28 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
             }
     }
 
+    fun canUsedForPaying(): Boolean =
+        this is Card || this is Funds || this is Bank
+
+    fun canBeAdded(): Boolean =
+        this is UndefinedBankTransfer || this is UndefinedFunds || this is UndefinedCard
+
+    open fun detailedLabel(): String = ""
+
     companion object {
-        const val BANK_PAYMENT_ID = "BANK_PAYMENT_ID"
         const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
         const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
+        const val UNDEFINED_BANK_TRANSFER_PAYMENT_ID = "UNDEFINED_BANK_TRANSFER_PAYMENT_ID"
 
         private const val UNDEFINED_PAYMENT_METHOD_ORDER = 0
         private const val FUNDS_PAYMENT_METHOD_ORDER = 1
-        private const val BANK_PAYMENT_METHOD_ORDER = 2
         private const val CARD_PAYMENT_METHOD_ORDER = 3
+        private const val BANK_PAYMENT_METHOD_ORDER = 2
         private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 4
-        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 5
+        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 5
+        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 6
     }
 }
 

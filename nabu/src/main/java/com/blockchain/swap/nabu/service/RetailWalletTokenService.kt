@@ -2,7 +2,7 @@ package com.blockchain.swap.nabu.service
 
 import com.blockchain.swap.nabu.api.wallet.RETAIL_JWT_TOKEN
 import com.blockchain.swap.nabu.api.wallet.RetailWallet
-import com.blockchain.swap.nabu.models.wallet.RetailJwtResponse
+import com.blockchain.swap.nabu.models.responses.wallet.RetailJwtResponse
 import io.reactivex.Single
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import retrofit2.Retrofit

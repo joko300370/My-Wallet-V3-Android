@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.kyc.address
 import com.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.getBlankNabuUser
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.TierLevels
+import com.blockchain.swap.nabu.models.responses.nabu.TierLevels
 import com.blockchain.swap.nabu.NabuToken
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single

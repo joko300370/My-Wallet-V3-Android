@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.status
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.swap.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith

@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu
 
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
 import io.reactivex.Single
 
 interface CreateNabuToken {

@@ -1,10 +1,10 @@
 package com.blockchain.swap.nabu.models
 
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.nabu.TierResponse
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
+import com.blockchain.swap.nabu.models.responses.nabu.LimitsJson
+import com.blockchain.swap.nabu.models.responses.nabu.TierResponse
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import junit.framework.Assert.assertTrue
 import org.junit.Test
 

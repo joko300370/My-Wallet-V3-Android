@@ -1,6 +1,6 @@
 package com.blockchain.swap.nabu.stores
 
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.utils.Optional
 import io.reactivex.Observable
 

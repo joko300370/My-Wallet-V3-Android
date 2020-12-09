@@ -4,5 +4,6 @@
         <attr name="intro_header_title" format="string" />
         <attr name="intro_header_label" format="string" />
         <attr name="intro_header_icon" format="reference" />
+        <attr name="intro_header_separator" format="boolean" />
     </declare-styleable>
 </resources>

@@ -14,6 +14,8 @@ import com.blockchain.swap.nabu.datamanagers.BalancesProvider
 import com.blockchain.swap.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.swap.nabu.datamanagers.ExtraAttributesProvider
+import com.blockchain.swap.nabu.datamanagers.ExtraAttributesProviderImpl
 import com.blockchain.swap.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.swap.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
@@ -26,6 +28,8 @@ import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.swap.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.swap.nabu.datamanagers.WalletReporter
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
+import com.blockchain.swap.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
+import com.blockchain.swap.nabu.datamanagers.featureflags.BankLinkingEnabledProviderImpl
 import com.blockchain.swap.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
@@ -41,19 +45,19 @@ import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimit
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestEligibilityMapAdapter
 import com.blockchain.swap.nabu.datamanagers.repositories.serialization.InterestLimitsMapAdapter
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapActivityProviderImpl
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProvider
 import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradingPairsProviderImpl
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.swap.nabu.metadata.MetadataRepositoryNabuTokenAdapter
-import com.blockchain.swap.nabu.models.nabu.CampaignStateMoshiAdapter
-import com.blockchain.swap.nabu.models.nabu.CampaignTransactionStateMoshiAdapter
-import com.blockchain.swap.nabu.models.nabu.IsoDateMoshiAdapter
-import com.blockchain.swap.nabu.models.nabu.KycStateAdapter
-import com.blockchain.swap.nabu.models.nabu.KycTierStateAdapter
-import com.blockchain.swap.nabu.models.nabu.UserCampaignStateMoshiAdapter
-import com.blockchain.swap.nabu.models.nabu.UserStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.CampaignStateMoshiAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.CampaignTransactionStateMoshiAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.IsoDateMoshiAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.KycStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.KycTierStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.UserCampaignStateMoshiAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.UserStateAdapter
 import com.blockchain.swap.nabu.service.NabuMarketsService
 import com.blockchain.swap.nabu.service.NabuService
 import com.blockchain.swap.nabu.service.NabuTierService
@@ -107,14 +111,25 @@ val nabuModule = module {
                 paymentAccountMapperMappers = mapOf(
                     "EUR" to get(eur), "GBP" to get(gbp)
                 ),
-                cardsPaymentFeatureFlag = get(cardPaymentsFeatureFlag),
-                fundsFeatureFlag = get(simpleBuyFundsFeatureFlag),
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
                 interestRepository = get(),
-                custodialRepository = get()
+                custodialRepository = get(),
+                extraAttributesProvider = get(),
+                bankLinkingEnabledProvider = get()
             )
         }.bind(CustodialWalletManager::class)
+
+        factory {
+            ExtraAttributesProviderImpl()
+        }.bind(ExtraAttributesProvider::class)
+
+        factory {
+            BankLinkingEnabledProviderImpl(
+                achFF = get(achFeatureFlag),
+                globalLinkingFF = get(bankLinkingFeatureFlag)
+            )
+        }.bind(BankLinkingEnabledProvider::class)
 
         factory {
             NabuCachedEligibilityProvider(

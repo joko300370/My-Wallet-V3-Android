@@ -1,6 +1,6 @@
 package piuk.blockchain.android.withdraw.mvi
 
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.simplebuy.ErrorState
@@ -13,11 +13,11 @@ data class WithdrawState(
     val amount: FiatValue? = null,
     val isLoading: Boolean = false,
     val errorState: ErrorState? = null,
-    val selectedBank: LinkedBank? = null,
+    val selectedBank: Beneficiary? = null,
     val fee: FiatValue? = null,
     val withdrawSucceeded: Boolean = false,
     val withdrawRequested: Boolean = false,
-    val linkedBanks: List<LinkedBank>? = null
+    val beneficiaries: List<Beneficiary>? = null
 ) : MviState {
     fun amountIsValid(): Boolean =
         amount?.let { amount ->

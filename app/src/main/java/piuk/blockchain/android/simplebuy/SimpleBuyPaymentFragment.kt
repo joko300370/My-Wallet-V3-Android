@@ -15,6 +15,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -79,6 +80,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
             isFirstLoad = false
         }
+        require(newState.selectedPaymentMethod != null)
 
         newState.orderValue?.let {
             renderTitleAndSubtitle(
@@ -87,14 +89,16 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 newState.paymentSucceeded,
                 newState.errorState != null,
                 newState.paymentPending,
-                newState.withdrawalLockPeriod
+                newState.withdrawalLockPeriod,
+                newState.selectedPaymentMethod.paymentMethodType
             )
         } ?: renderTitleAndSubtitle(
-            null,
-            newState.isLoading,
-            false,
-            newState.errorState != null,
-            false
+            value = null,
+            loading = newState.isLoading,
+            paymentSucceeded = false,
+            hasError = newState.errorState != null,
+            pending = false,
+            paymentMethod = newState.selectedPaymentMethod.paymentMethodType
         )
 
         transaction_progress_view.onCtaClick {
@@ -131,7 +135,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         paymentSucceeded: Boolean,
         hasError: Boolean,
         pending: Boolean,
-        lockedFundsTime: BigInteger = BigInteger.ZERO
+        lockedFundsTime: BigInteger = BigInteger.ZERO,
+        paymentMethod: PaymentMethodType
     ) {
         when {
             paymentSucceeded && value != null -> {
@@ -144,7 +149,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 } else {
                     transaction_progress_view.showPendingTx(
                         getString(R.string.card_purchased, value.formatOrSymbolForZero()),
-                        subtitleForLockedFunds(lockedFundDays)
+                        subtitleForLockedFunds(lockedFundDays, paymentMethod)
                     )
                 }
             }
@@ -166,9 +171,16 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         }
     }
 
-    private fun subtitleForLockedFunds(lockedFundDays: Long): SpannableStringBuilder {
-        val intro =
-            getString(R.string.security_locked_funds_explanation, lockedFundDays.toString())
+    private fun subtitleForLockedFunds(lockedFundDays: Long, paymentMethod: PaymentMethodType): SpannableStringBuilder {
+        val intro = when (paymentMethod) {
+            PaymentMethodType.PAYMENT_CARD -> getString(R.string.security_locked_card_funds_explanation,
+                lockedFundDays.toString())
+            PaymentMethodType.BANK_TRANSFER ->
+                getString(R.string.security_locked_funds_bank_transfer_payment_screen_explanation,
+                    lockedFundDays.toString())
+            else -> return SpannableStringBuilder()
+        }
+
         val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
 
         val learnLink = stringUtils.getStringWithMappedLinks(

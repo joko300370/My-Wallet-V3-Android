@@ -2,7 +2,7 @@ package com.blockchain.swap.nabu.datamanagers.repositories
 
 import com.blockchain.rx.TimedCacheRequest
 import com.blockchain.swap.nabu.datamanagers.NabuDataUserProvider
-import com.blockchain.swap.nabu.models.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
 import io.reactivex.Single
 
 class NabuUserRepository(nabuDataUserProvider: NabuDataUserProvider) {

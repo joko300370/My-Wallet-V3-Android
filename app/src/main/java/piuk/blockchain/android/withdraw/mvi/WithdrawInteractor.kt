@@ -14,7 +14,7 @@ class WithdrawInteractor(
             .defaultIfEmpty(FiatValue.zero(currency))
 
     fun fetchLinkedBanks(currency: String) =
-        custodialWalletManager.getLinkedBanks().map { banks ->
+        custodialWalletManager.getLinkedBeneficiaries().map { banks ->
             banks.filter { it.currency == currency }
         }
 

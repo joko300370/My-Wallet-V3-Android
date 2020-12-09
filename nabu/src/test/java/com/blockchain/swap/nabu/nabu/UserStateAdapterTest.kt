@@ -1,7 +1,7 @@
 package com.blockchain.swap.nabu.nabu
 
-import com.blockchain.swap.nabu.models.nabu.UserState
-import com.blockchain.swap.nabu.models.nabu.UserStateAdapter
+import com.blockchain.swap.nabu.models.responses.nabu.UserState
+import com.blockchain.swap.nabu.models.responses.nabu.UserStateAdapter
 import com.squareup.moshi.JsonDataException
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw`

@@ -4,11 +4,11 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.exceptions.MetadataNotFoundException
 import piuk.blockchain.android.ui.getBlankNabuUser
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.Address
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.TierLevels
-import com.blockchain.swap.nabu.models.nabu.UserState
+import com.blockchain.swap.nabu.models.responses.nabu.Address
+import com.blockchain.swap.nabu.models.responses.nabu.KycState
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.TierLevels
+import com.blockchain.swap.nabu.models.responses.nabu.UserState
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.service.TierUpdater
 import piuk.blockchain.android.ui.validOfflineToken

@@ -4,47 +4,50 @@ import com.blockchain.swap.nabu.api.nabu.Nabu
 import com.blockchain.swap.nabu.datamanagers.SimpleBuyError
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.extensions.wrapErrorMessage
-import com.blockchain.swap.nabu.models.interest.InterestAccountDetailsResponse
-import com.blockchain.swap.nabu.models.nabu.AddAddressRequest
-import com.blockchain.swap.nabu.models.nabu.AirdropStatusList
-import com.blockchain.swap.nabu.models.nabu.ApplicantIdRequest
-import com.blockchain.swap.nabu.models.nabu.NabuBasicUser
-import com.blockchain.swap.nabu.models.nabu.NabuCountryResponse
-import com.blockchain.swap.nabu.models.nabu.NabuJwt
-import com.blockchain.swap.nabu.models.nabu.NabuStateResponse
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.RecordCountryRequest
-import com.blockchain.swap.nabu.models.nabu.RegisterCampaignRequest
-import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressRequest
-import com.blockchain.swap.nabu.models.nabu.SendToMercuryAddressResponse
-import com.blockchain.swap.nabu.models.nabu.SendWithdrawalAddressesRequest
-import com.blockchain.swap.nabu.models.nabu.SupportedDocuments
-import com.blockchain.swap.nabu.models.nabu.WalletMercuryLink
-import com.blockchain.swap.nabu.models.simplebuy.AddNewCardBodyRequest
-import com.blockchain.swap.nabu.models.simplebuy.BankAccountResponse
-import com.blockchain.swap.nabu.models.simplebuy.CardPartnerAttributes
-import com.blockchain.swap.nabu.models.simplebuy.ConfirmOrderRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.CustodialWalletOrder
-import com.blockchain.swap.nabu.models.simplebuy.DepositRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyCurrency
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyEligibility
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyPairsResp
-import com.blockchain.swap.nabu.models.simplebuy.SimpleBuyQuoteResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransactionsResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransferFundsResponse
-import com.blockchain.swap.nabu.models.simplebuy.TransferRequest
-import com.blockchain.swap.nabu.models.simplebuy.WithdrawLocksCheckRequestBody
-import com.blockchain.swap.nabu.models.simplebuy.WithdrawRequestBody
-import com.blockchain.swap.nabu.models.swap.CreateOrderRequest
-import com.blockchain.swap.nabu.models.swap.QuoteRequest
-import com.blockchain.swap.nabu.models.swap.QuoteResponse
-import com.blockchain.swap.nabu.models.swap.SwapLimitsResponse
-import com.blockchain.swap.nabu.models.swap.CustodialOrderResponse
-import com.blockchain.swap.nabu.models.swap.UpdateSwapOrderBody
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenRequest
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.tokenresponse.NabuSessionTokenResponse
+import com.blockchain.swap.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
+import com.blockchain.swap.nabu.models.responses.banktransfer.LinkBankAttributes
+import com.blockchain.swap.nabu.models.responses.banktransfer.UpdateProviderAccountBody
+import com.blockchain.swap.nabu.models.responses.interest.InterestAccountDetailsResponse
+import com.blockchain.swap.nabu.models.responses.nabu.AddAddressRequest
+import com.blockchain.swap.nabu.models.responses.nabu.AirdropStatusList
+import com.blockchain.swap.nabu.models.responses.nabu.ApplicantIdRequest
+import com.blockchain.swap.nabu.models.responses.nabu.NabuBasicUser
+import com.blockchain.swap.nabu.models.responses.nabu.NabuCountryResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuJwt
+import com.blockchain.swap.nabu.models.responses.nabu.NabuStateResponse
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.RecordCountryRequest
+import com.blockchain.swap.nabu.models.responses.nabu.RegisterCampaignRequest
+import com.blockchain.swap.nabu.models.responses.nabu.Scope
+import com.blockchain.swap.nabu.models.responses.nabu.SendToMercuryAddressRequest
+import com.blockchain.swap.nabu.models.responses.nabu.SendToMercuryAddressResponse
+import com.blockchain.swap.nabu.models.responses.nabu.SendWithdrawalAddressesRequest
+import com.blockchain.swap.nabu.models.responses.nabu.SupportedDocuments
+import com.blockchain.swap.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.swap.nabu.models.responses.simplebuy.AddNewCardBodyRequest
+import com.blockchain.swap.nabu.models.responses.simplebuy.BankAccountResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.CardPartnerAttributes
+import com.blockchain.swap.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.swap.nabu.models.responses.simplebuy.DepositRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyCurrency
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyEligibility
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyPairsResp
+import com.blockchain.swap.nabu.models.responses.simplebuy.SimpleBuyQuoteResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransactionsResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransferFundsResponse
+import com.blockchain.swap.nabu.models.responses.simplebuy.TransferRequest
+import com.blockchain.swap.nabu.models.responses.simplebuy.WithdrawLocksCheckRequestBody
+import com.blockchain.swap.nabu.models.responses.simplebuy.WithdrawRequestBody
+import com.blockchain.swap.nabu.models.responses.swap.CreateOrderRequest
+import com.blockchain.swap.nabu.models.responses.swap.CustodialOrderResponse
+import com.blockchain.swap.nabu.models.responses.swap.QuoteRequest
+import com.blockchain.swap.nabu.models.responses.swap.QuoteResponse
+import com.blockchain.swap.nabu.models.responses.swap.SwapLimitsResponse
+import com.blockchain.swap.nabu.models.responses.swap.UpdateSwapOrderBody
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenRequest
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.veriff.VeriffApplicantAndToken
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -505,8 +508,40 @@ class NabuService(retrofit: Retrofit) {
         checkEligibility = checkEligibility
     ).wrapErrorMessage()
 
-    fun getLinkedBanks(sessionToken: NabuSessionTokenResponse) =
-        service.getLinkedBanks(sessionToken.authHeader).wrapErrorMessage()
+    fun getPaymentMethodsForSimpleBuy(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String
+    ) = service.getPaymentMethodsForSimpleBuy(
+        authorization = sessionToken.authHeader,
+        currency = currency
+    ).wrapErrorMessage()
+
+    fun getBeneficiaries(sessionToken: NabuSessionTokenResponse) =
+        service.getLinkedBeneficiaries(sessionToken.authHeader).wrapErrorMessage()
+
+    fun linkToABank(
+        sessionToken: NabuSessionTokenResponse,
+        fiatCurrency: String,
+        userId: String,
+        attributes: LinkBankAttributes?
+    ) = service.linkABank(
+        sessionToken.authHeader,
+        CreateLinkBankRequestBody(
+            fiatCurrency,
+            userId,
+            attributes
+        )
+    ).wrapErrorMessage()
+
+    fun updateAccountProviderId(
+        sessionToken: NabuSessionTokenResponse,
+        id: String,
+        body: UpdateProviderAccountBody
+    ) = service.updateProviderAccount(
+        sessionToken.authHeader,
+        id,
+        body
+    ).wrapErrorMessage()
 
     fun getCards(
         sessionToken: NabuSessionTokenResponse
@@ -586,6 +621,17 @@ class NabuService(retrofit: Retrofit) {
     fun getInterestEligibility(
         sessionToken: NabuSessionTokenResponse
     ) = service.getInterestEligibility(authorization = sessionToken.authHeader)
+        .wrapErrorMessage()
+
+    fun getLinkedBank(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.getLinkedBank(authorization = sessionToken.authHeader, id = id)
+        .wrapErrorMessage()
+
+    fun getLinkedBanks(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getLinkedBanks(authorization = sessionToken.authHeader)
         .wrapErrorMessage()
 
     companion object {

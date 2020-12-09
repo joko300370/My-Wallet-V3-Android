@@ -188,7 +188,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         toolbar_general.navigationIcon = ContextCompat.getDrawable(this, R.drawable.vector_menu)
         toolbar_general.title = ""
         setSupportActionBar(toolbar_general)
-
         // Styling
         bottom_navigation.apply {
             addItems(toolbarNavigationItems())
@@ -385,10 +384,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         PitLaunchBottomDialog.launch(this)
     }
 
-    override fun setPitEnabled(enabled: Boolean) {
-        setPitVisible(enabled)
-    }
-
     override fun launchBackupFunds(fragment: Fragment?, requestCode: Int) {
         fragment?.let {
             BackupWalletActivity.startForResult(it, requestCode)
@@ -480,11 +475,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun getStartIntent(): Intent {
         return intent
-    }
-
-    private fun setPitVisible(visible: Boolean) {
-        val menu = menu
-        menu.findItem(R.id.nav_the_exchange).isVisible = visible
     }
 
     override fun clearAllDynamicShortcuts() {

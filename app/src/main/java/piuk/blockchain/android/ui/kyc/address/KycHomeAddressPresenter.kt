@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.kyc.address
 
 import piuk.blockchain.android.ui.kyc.BaseKycPresenter
-import com.blockchain.swap.nabu.models.nabu.Scope
+import com.blockchain.swap.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
 import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.swap.nabu.NabuToken

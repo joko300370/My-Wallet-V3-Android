@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.kyc.countryselection
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuRegion
-import com.blockchain.swap.nabu.models.nabu.Scope
+import com.blockchain.swap.nabu.models.responses.nabu.NabuRegion
+import com.blockchain.swap.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
 import piuk.blockchain.android.ui.kyc.countryselection.util.toDisplayList

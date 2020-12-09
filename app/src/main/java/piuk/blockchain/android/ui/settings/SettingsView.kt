@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
@@ -75,6 +75,4 @@ internal interface SettingsView : View {
     fun showWarningDialog(@StringRes message: Int)
 
     fun launchKycFlow()
-
-    fun isPitEnabled(enabled: Boolean)
 }

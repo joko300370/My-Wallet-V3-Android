@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.thepit
 
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuUser
+import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.swap.nabu.NabuToken
