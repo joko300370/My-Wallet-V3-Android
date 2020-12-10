@@ -28,15 +28,16 @@ data class LinkedBank(
     val name: String,
     val accountNumber: String,
     val state: LinkedBankState,
-    val errorStatus: LinkedBankErrorState,
-    val errorMessage: String
+    val errorStatus: LinkedBankErrorState
 )
 
 enum class LinkedBankErrorState {
     ACCOUNT_ALREADY_LINKED,
-    OTHER,
-    UNKNOWN
+    ACCOUNT_TYPE_UNSUPPORTED,
+    UNKNOWN,
+    NONE
 }
+
 enum class LinkedBankState {
     PENDING, BLOCKED, ACTIVE, UNKNOWN
 }

@@ -61,7 +61,6 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
     }
 
     private fun showErrorState(state: ErrorState) {
-        // TODO add states for bank already linked and other API failures
         val errorText = when (state) {
             ErrorState.BankLinkingUpdateFailed -> {
                 getString(R.string.yodlee_linking_generic_error_subtitle)

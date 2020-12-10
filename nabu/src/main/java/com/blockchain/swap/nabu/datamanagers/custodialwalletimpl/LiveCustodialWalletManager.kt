@@ -786,8 +786,7 @@ class LiveCustodialWalletManager(
             state = state.toLinkedBankState(),
             name = details?.bankName ?: "",
             accountNumber = details?.accountNumber?.replace("x", "") ?: "",
-            errorStatus = error?.code?.toLinkedBankErrorState() ?: LinkedBankErrorState.UNKNOWN,
-            errorMessage = error?.message ?: ""
+            errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE
         )
     }
 
@@ -932,12 +931,11 @@ private fun String.toLinkBankedPartner(supportedBankPartners: List<BankPartner>)
     } else null
 }
 
-private fun Int.toLinkedBankErrorState(): LinkedBankErrorState =
+private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
     when (this) {
-        // TODO add error codes here
-        else -> {
-            LinkedBankErrorState.UNKNOWN
-        }
+        LinkedBankTransferResponse.ERROR_ALREADY_LINKED -> LinkedBankErrorState.ACCOUNT_ALREADY_LINKED
+        LinkedBankTransferResponse.ERROR_UNSUPPORTED_ACCOUNT -> LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED
+        else -> LinkedBankErrorState.UNKNOWN
     }
 
 private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {

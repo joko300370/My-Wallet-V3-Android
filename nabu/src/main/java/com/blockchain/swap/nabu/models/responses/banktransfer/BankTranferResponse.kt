@@ -31,19 +31,17 @@ data class LinkedBankTransferResponse(
     val currency: String,
     val state: String,
     val details: LinkedBankDetailsResponse?,
-    val error: LinkedBankDetailsError?
+    val error: String?
 ) {
     companion object {
         const val ACTIVE = "ACTIVE"
         const val PENDING = "PENDING"
         const val BLOCKED = "BLOCKED"
+
+        const val ERROR_ALREADY_LINKED = "BANK_TRANSFER_ACCOUNT_ALREADY_LINKED"
+        const val ERROR_UNSUPPORTED_ACCOUNT = "BANK_TRANSFER_ACCOUNT_INFO_NOT_FOUND"
     }
 }
-
-data class LinkedBankDetailsError(
-    val code: Int,
-    val message: String
-)
 
 data class UpdateProviderAccountBody(
     val attributes: ProviderAccountAttrs
