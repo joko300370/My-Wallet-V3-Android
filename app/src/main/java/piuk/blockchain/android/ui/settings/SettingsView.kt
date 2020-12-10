@@ -6,7 +6,7 @@ import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
-internal interface SettingsView : View {
+interface SettingsView : View {
 
     fun setUpUi()
 
