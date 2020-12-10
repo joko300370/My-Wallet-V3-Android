@@ -360,7 +360,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun handleErrorState(errorState: ErrorState) {
-        if (errorState == ErrorState.BankLinkingNotSupported) {
+        if (errorState == ErrorState.LinkedBankNotSupported) {
             model.process(SimpleBuyIntent.ClearError)
             model.process(SimpleBuyIntent.ClearAnySelectedPaymentMethods)
             navigator().launchBankLinkingWithError(errorState)

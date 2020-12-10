@@ -103,7 +103,7 @@ class SimpleBuyModel(
                 interactor.linkNewBank(previousState.fiatCurrency)
                     .subscribeBy(
                         onSuccess = { process(it) },
-                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported)) }
+                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
                     )
             }
 
@@ -115,11 +115,11 @@ class SimpleBuyModel(
                         if (isEligibleToLinkABank) {
                             process(SimpleBuyIntent.LinkBankTransferRequested)
                         } else {
-                            process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported))
+                            process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported))
                         }
                     },
                     onError = {
-                        process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported))
+                        process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported))
                     }
                 )
             }
