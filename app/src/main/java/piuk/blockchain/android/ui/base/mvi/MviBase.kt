@@ -56,7 +56,9 @@ abstract class MviModel<S : MviState, I : MviIntent<S>>(
     }
 
     fun process(intent: I) = intents.onNext(intent)
-    fun destroy() { disposables.clear() }
+    fun destroy() {
+        disposables.clear()
+    }
 
     protected open fun distinctIntentFilter(previousIntent: I, nextIntent: I): Boolean {
         return previousIntent == nextIntent
