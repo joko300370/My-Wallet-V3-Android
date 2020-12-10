@@ -33,6 +33,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.notifications.analytics.linkBankEventWithCurrency
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
@@ -141,6 +142,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
+    private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
 
@@ -270,11 +272,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {}
+            intent == null -> {
+            }
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
-                showUpdateEmailDialog(activity!!, settingsPresenter)
+                showUpdateEmailDialog(activity!!, settingsPresenter, "", false)
         }
     }
 
@@ -420,11 +423,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             }
         }
     }
-
-    data class LinkedBanksAndSupportedCurrencies(
-        val beneficiaries: List<Beneficiary>,
-        val supportedCurrencies: List<String>
-    )
 
     private fun removeBank(bank: Beneficiary) {
         RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
@@ -578,7 +576,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun onUpdateEmailClicked() {
-        showUpdateEmailDialog(requireActivity(), settingsPresenter)
+        showUpdateEmailDialog(requireActivity(), settingsPresenter, "", false)
     }
 
     private fun onAboutClicked() {
@@ -609,8 +607,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }, 300)
     }
 
-    private fun showDialogMobile() {
-        if (settingsPresenter.authType != Settings.AUTH_TYPE_OFF) {
+    private fun showDialogMobile(authType: Int, sms: String, isSmsVerified: Boolean) {
+        if (authType != Settings.AUTH_TYPE_OFF) {
             AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
                 .setTitle(R.string.warning)
                 .setMessage(R.string.disable_2fa_first)
@@ -640,8 +638,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 }
             }
 
-            if (settingsPresenter.sms.isNotEmpty()) {
-                mobileNumberTextView.text = settingsPresenter.sms
+            if (sms.isNotEmpty()) {
+                mobileNumberTextView.text = sms
                 mobileNumberTextView.visibility = View.VISIBLE
             }
 
@@ -653,10 +651,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 .setPositiveButton(R.string.update, null)
                 .setNegativeButton(android.R.string.cancel, null)
 
-            if (!settingsPresenter.isSmsVerified && settingsPresenter.sms.isNotEmpty()) {
+            if (!isSmsVerified && sms.isNotEmpty()) {
                 alertDialogSmsBuilder.setNeutralButton(R.string.verify) { dialogInterface, i ->
                     settingsPresenter.updateSms(
-                        settingsPresenter.sms
+                        sms
                     )
                 }
             }
@@ -699,7 +697,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun showDialogFiatUnits() {
         val currencies = settingsPresenter.currencyLabels
-        val strCurrency = settingsPresenter.fiatUnits
+        val strCurrency = currencyPrefs.selectedFiatCurrency
         var selected = 0
         for (i in currencies.indices) {
             if (currencies[i].endsWith(strCurrency)) {
@@ -718,8 +716,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .show()
     }
 
-    override fun showDialogVerifySms() {
-        val editText = AppCompatEditText(activity!!)
+    override fun showDialogVerifySms(sms: String) {
+        val editText = AppCompatEditText(activity)
         editText.setSingleLine(true)
 
         val dialog = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
@@ -729,9 +727,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setCancelable(false)
             .setPositiveButton(R.string.verify, null)
             .setNegativeButton(android.R.string.cancel, null)
-            .setNeutralButton(R.string.resend) { dialogInterface, i ->
+            .setNeutralButton(R.string.resend) { _, _ ->
                 settingsPresenter.updateSms(
-                    settingsPresenter.sms
+                    sms
                 )
             }
             .create()
@@ -1046,3 +1044,8 @@ fun Preference?.onClick(onClick: () -> Unit) {
         true
     }
 }
+
+data class LinkedBanksAndSupportedCurrencies(
+    val beneficiaries: List<Beneficiary>,
+    val supportedCurrencies: List<String>
+)

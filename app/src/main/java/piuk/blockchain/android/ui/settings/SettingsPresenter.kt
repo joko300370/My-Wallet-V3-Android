@@ -1,15 +1,12 @@
 package piuk.blockchain.android.ui.settings
 
 import android.annotation.SuppressLint
-import android.util.Pair
-import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import com.blockchain.preferences.CurrencyPrefs.selectedFiatCurrency
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
@@ -21,26 +18,23 @@ import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.android.data.rxjava.RxUtil
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.zipWith
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.settings.SettingsFragment.LinkedBanksAndSupportedCurrencies
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.data.settings.Email
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -48,10 +42,8 @@ import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import timber.log.Timber
-import java.util.*
 
-class SettingsPresenter     // Show dialog "are you sure you want to disable fingerprint login?
-    (
+class SettingsPresenter(
     private val fingerprintHelper: FingerprintHelper,
     private val authDataManager: AuthDataManager,
     private val settingsDataManager: SettingsDataManager,
@@ -60,6 +52,7 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     private val payloadDataManager: PayloadDataManager,
     private val stringUtils: StringUtils,
     private val prefs: PersistentPrefs,
+    private val currencyPrefs: CurrencyPrefs,
     private val accessState: AccessState,
     private val custodialWalletManager: CustodialWalletManager,
     private val swipeToReceiveHelper: SwipeToReceiveHelper,
@@ -69,188 +62,185 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     private val pitLinking: PitLinking,
     private val analytics: Analytics,
     private val simpleBuyPrefs: SimpleBuyPrefs
-) : BasePresenter<SettingsView?>() {
-    @VisibleForTesting
-    var settings: Settings? = null
-    private var pitLinkState = PitLinkingState()
+) : BasePresenter<SettingsView>() {
+
     override fun onViewReady() {
-        view!!.showProgressDialog(R.string.please_wait)
-        // Fetch updated settings
-        compositeDisposable.add(
-            settingsDataManager.fetchSettings()
-                .doAfterTerminate { handleUpdate() }
-                .doOnNext { ignored: Settings? -> loadKyc2TierState() }
-                .subscribe(
-                    { updatedSettings: Settings? -> settings = updatedSettings }
-                ) { throwable: Throwable? ->
-                    if (settings == null) {
-                        // Show unloaded if necessary, keep old settings if failed update
-                        settings = Settings()
-                    }
-                    // Warn error when updating
-                    view!!.showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR)
-                })
+        view?.showProgressDialog(R.string.please_wait)
+        compositeDisposable += settingsDataManager.fetchSettings()
+            .doOnNext { loadKyc2TierState() }
+            .subscribeBy(
+                onNext = { handleUpdate(it) },
+                onError = {
+                    handleUpdate(Settings())
+                    view?.showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR)
+                }
+            )
+
+        compositeDisposable += pitLinking.state
+            .subscribeBy(
+                onNext = { state -> onPitStateUpdated(state) },
+                onError = { Timber.e(it) }
+            )
         updateCards()
         updateBanks()
-        compositeDisposable.add(pitLinking.state.subscribe({ state: PitLinkingState -> onPitStateUpdated(state) }) { throwable: Throwable? -> })
     }
 
     private fun updateCards() {
-        compositeDisposable.add(
-            kycStatusHelper.getSettingsKycStateTier()
-                .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-                .doOnSuccess { enabled: Boolean? ->
-                    view!!.cardsEnabled(
-                        enabled!!)
+        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
+            .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
+            .doOnSuccess { isGold: Boolean ->
+                view?.cardsEnabled(isGold)
+            }
+            .flatMap { isGold ->
+                if (isGold) {
+                    custodialWalletManager.updateSupportedCardTypes(fiatUnit).andThen(
+                        custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)))
+                } else {
+                    Single.just(emptyList())
                 }
-                .flatMap { enabled: Boolean ->
-                    if (enabled) {
-                        return@flatMap custodialWalletManager.updateSupportedCardTypes(fiatUnits).andThen(
-                            custodialWalletManager.fetchUnawareLimitsCards(
-                                Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)))
-                    } else {
-                        return@flatMap Single.just(emptyList<PaymentMethod.Card>())
-                    }
-                }
-                .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe { disposable: Disposable? ->
-                    view!!.cardsEnabled(false)
-                    onCardsUpdated(emptyList())
-                    view!!.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-                }
-                .subscribe { cards: List<PaymentMethod.Card> -> onCardsUpdated(cards) })
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                view?.cardsEnabled(false)
+                onCardsUpdated(emptyList())
+            }
+            .subscribe { cards -> onCardsUpdated(cards) }
     }
+
+    private val fiatUnit: String
+        get() = currencyPrefs.selectedFiatCurrency
 
     private fun updateBanks() {
-        compositeDisposable.add(
-            kycStatusHelper.getSettingsKycStateTier()
-                .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-                .flatMap { isGold: Boolean ->
-                    canLinkBank(
-                        fiatUnits, isGold).doOnSuccess { linkDetails: Pair<Boolean?, List<String?>?> ->
-                        view!!.banksEnabled(
-                            linkDetails.first!!)
-                    }.zipWith<List<Beneficiary?>, LinkedBanksAndSupportedCurrencies>(
-                        custodialWalletManager.getLinkedBeneficiaries(),
-                        BiFunction { linkDetails: Pair<Boolean?, List<String?>?>, linkedBanks: List<Beneficiary?>? ->
-                            LinkedBanksAndSupportedCurrencies(linkedBanks,
-                                linkDetails.second)
-                        })
+        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
+            .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
+            .flatMap { isGold: Boolean ->
+                supportedCurrencies(fiatUnit, isGold).doOnSuccess {
+                    view?.banksEnabled(it.isNotEmpty())
                 }
-                .observeOn(AndroidSchedulers.mainThread()).doOnSubscribe { disposable: Disposable? ->
-                    view!!.banksEnabled(false)
-                    onBanksUpdated(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-                    view!!.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-                }
-                .subscribe { linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies ->
-                    onBanksUpdated(linkedAndSupportedCurrencies)
-                })
-    }
-
-    private fun canLinkBank(fiat: String, isGold: Boolean): Single<Pair<Boolean?, List<String?>?>> {
-        return custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
-            .map { supportedCurrencies: List<String?> -> Pair(supportedCurrencies.size > 0, supportedCurrencies) }
+                    .zipWith(custodialWalletManager.getLinkedBeneficiaries()) { supportedCurrencies, linkedBeneficiaries ->
+                        LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
+                    }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                view?.banksEnabled(false)
+                onBanksUpdated(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
+                view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
+            }
+            .subscribe { linkedAndSupportedCurrencies ->
+                onBanksUpdated(linkedAndSupportedCurrencies)
+            }
     }
 
     private fun onBanksUpdated(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
-        view!!.updateBanks(linkedAndSupportedCurrencies)
-    }
-
-    private fun onPitStateUpdated(state: PitLinkingState) {
-        pitLinkState = state
-        view!!.setPitLinkingState(pitLinkState.isLinked)
+        view?.updateBanks(linkedAndSupportedCurrencies)
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {
-        view!!.updateCards(cards)
+        view?.updateCards(cards)
     }
 
+    private fun onPitStateUpdated(state: PitLinkingState) {
+        view?.setPitLinkingState(state.isLinked)
+
+        pitClickedListener = if (state.isLinked) {
+            { view?.launchThePit() }
+        } else {
+            { view?.launchThePitLandingActivity() }
+        }
+    }
+
+
+    private fun supportedCurrencies(fiat: String, isGold: Boolean): Single<List<String>> =
+        custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
+
     private fun loadKyc2TierState() {
-        compositeDisposable.add(
+        compositeDisposable +=
             kycStatusHelper.getSettingsKycStateTier()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { settingsKycState: KycTiers? -> view!!.setKycState(settingsKycState!!) }) { t: Throwable? ->
-                    Timber.e(t)
-                }
-        )
+                .subscribeBy(
+                    onSuccess = { view?.setKycState(it) },
+                    onError = { Timber.e(it) }
+                )
     }
 
     fun onKycStatusClicked() {
-        view!!.launchKycFlow()
+        view?.launchKycFlow()
     }
 
-    private fun handleUpdate() {
-        view!!.hideProgressDialog()
-        view!!.setUpUi()
-        updateUi()
+    private fun handleUpdate(settings: Settings) {
+        view?.hideProgressDialog()
+        view?.setUpUi()
+        updateUi(settings)
     }
 
-    private fun updateUi() {
+    private fun updateUi(settings: Settings) {
         // GUID
-        view!!.setGuidSummary(settings!!.guid)
+        view?.setGuidSummary(settings.guid ?: "")
 
         // Email
-        var emailAndStatus = settings!!.email
+        var emailAndStatus = settings.email
         if (emailAndStatus == null || emailAndStatus.isEmpty()) {
             emailAndStatus = stringUtils.getString(R.string.not_specified)
-        } else if (settings!!.isEmailVerified) {
+        } else if (settings.isEmailVerified) {
             emailAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
         } else {
             emailAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
         }
-        view!!.setEmailSummary(emailAndStatus)
+        view?.setEmailSummary(emailAndStatus)
 
         // Phone
-        var smsAndStatus = settings!!.smsNumber
+        var smsAndStatus = settings.smsNumber
         if (smsAndStatus == null || smsAndStatus.isEmpty()) {
             smsAndStatus = stringUtils.getString(R.string.not_specified)
-        } else if (settings!!.isSmsVerified) {
+        } else if (settings.isSmsVerified) {
             smsAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
         } else {
             smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
         }
-        view!!.setSmsSummary(smsAndStatus)
+        view?.setSmsSummary(smsAndStatus)
 
         // Fiat
-        view!!.setFiatSummary(fiatUnits)
+        view?.setFiatSummary(fiatUnit)
 
         // Email notifications
-        view!!.setEmailNotificationsVisibility(settings!!.isEmailVerified)
+        view?.setEmailNotificationsVisibility(settings.isEmailVerified)
 
         // Push and Email notification status
-        view!!.setEmailNotificationPref(false)
-        view!!.setPushNotificationPref(arePushNotificationEnabled())
-        if (settings!!.isNotificationsOn && !settings!!.notificationsType.isEmpty()) {
-            for (type in settings!!.notificationsType) {
+        view?.setEmailNotificationPref(false)
+        view?.setPushNotificationPref(arePushNotificationEnabled())
+        if (settings.isNotificationsOn && settings.notificationsType.isNotEmpty()) {
+            for (type in settings.notificationsType) {
                 if (type == Settings.NOTIFICATION_TYPE_EMAIL || type == Settings.NOTIFICATION_TYPE_ALL) {
-                    view!!.setEmailNotificationPref(true)
+                    view?.setEmailNotificationPref(true)
                     break
                 }
             }
         }
 
         // Fingerprint
-        view!!.setFingerprintVisibility(ifFingerprintHardwareAvailable)
-        view!!.updateFingerprintPreferenceStatus()
+        view?.setFingerprintVisibility(ifFingerprintHardwareAvailable)
+        view?.updateFingerprintPreferenceStatus()
 
         // 2FA
-        view!!.setTwoFaPreference(settings!!.authType != Settings.AUTH_TYPE_OFF)
+        view?.setTwoFaPreference(settings.authType != Settings.AUTH_TYPE_OFF)
 
         // Tor
-        view!!.setTorBlocked(settings!!.isBlockTorIps)
+        view?.setTorBlocked(settings.isBlockTorIps)
 
         // Screenshots
-        view!!.setScreenshotsEnabled(prefs.getValue(PersistentPrefs.KEY_SCREENSHOTS_ENABLED, false))
+        view?.setScreenshotsEnabled(prefs.getValue(PersistentPrefs.KEY_SCREENSHOTS_ENABLED, false))
 
         // Launcher shortcuts
-        view!!.setLauncherShortcutVisibility(AndroidUtils.is25orHigher())
+        view?.setLauncherShortcutVisibility(AndroidUtils.is25orHigher())
     }
 
     /**
      * @return true if the device has usable fingerprint hardware
      */
-    val ifFingerprintHardwareAvailable: Boolean
+    private val ifFingerprintHardwareAvailable: Boolean
         get() = fingerprintHelper.isHardwareDetected()
+
 
     /**
      * @return true if the user has previously enabled fingerprint login
@@ -276,22 +266,22 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     fun onFingerprintClicked() {
         if (ifFingerprintUnlockEnabled) {
             // Show dialog "are you sure you want to disable fingerprint login?
-            view!!.showDisableFingerprintDialog()
+            view?.showDisableFingerprintDialog()
         } else if (!fingerprintHelper.areFingerprintsEnrolled()) {
             // No fingerprints enrolled, prompt user to add some
-            view!!.showNoFingerprintsAddedDialog()
+            view?.showNoFingerprintsAddedDialog()
         } else {
             val pin = accessState.pin
-            if (pin != null && !pin.isEmpty()) {
-                view!!.showFingerprintDialog(pin)
+            if (pin.isNotEmpty()) {
+                view?.showFingerprintDialog(pin)
             } else {
                 throw IllegalStateException("PIN code not found in AccessState")
             }
         }
     }
 
-    private fun isInvalidString(string: String?): Boolean {
-        return string == null || string.isEmpty() || string.length >= 256
+    private fun String?.isInvalid(): Boolean {
+        return this == null || this.isEmpty() || this.length >= 256
     }
 
     /**
@@ -303,29 +293,31 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     /**
      * @return the user's email or an empty string if not set
      */
-    val email: String
-        get() = if (settings!!.email != null) settings!!.email else ""
+    /*  val email: String
+          get() = settings?.email ?: ""*/
 
     /**
      * @return the user's phone number or an empty string if not set
      */
-    val sms: String
-        get() = if (settings!!.smsNumber != null) settings!!.smsNumber else ""
+    /* val sms: String
+         get() = settings?.smsNumber ?: ""*/
+
 
     /**
      * @return is the user's phone number is verified
      */
-    val isSmsVerified: Boolean
-        get() = settings!!.isSmsVerified
-    val isEmailVerified: Boolean
-        get() = settings!!.isEmailVerified
+    /*  val isSmsVerified: Boolean
+          get() = settings?.isSmsVerified ?: false*/
+
+    /* val isEmailVerified: Boolean
+         get() = settings?.isEmailVerified ?: false*/
 
     /**
      * @return the current auth type
      * @see Settings
      */
-    val authType: Int
-        get() = settings!!.authType
+    /* val authType: Int?
+         get() = settings?.authType*/
 
     /**
      * Write key/value to [android.content.SharedPreferences]
@@ -333,9 +325,9 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param key   The key under which to store the data
      * @param value The value to be stored as a String
      */
-    fun updatePreferences(key: String?, value: String?) {
-        prefs.setValue(key!!, value!!)
-        updateUi()
+    fun updatePreferences(key: String, value: String) {
+        prefs.setValue(key, value)
+        //   updateUi()
     }
 
     /**
@@ -344,9 +336,9 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param key   The key under which to store the data
      * @param value The value to be stored as an int
      */
-    fun updatePreferences(key: String?, value: Int) {
-        prefs.setValue(key!!, value)
-        updateUi()
+    fun updatePreferences(key: String, value: Int) {
+        prefs.setValue(key, value)
+        //  updateUi()
     }
 
     /**
@@ -355,9 +347,9 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param key   The key under which to store the data
      * @param value The value to be stored as a boolean
      */
-    fun updatePreferences(key: String?, value: Boolean) {
-        prefs.setValue(key!!, value)
-        updateUi()
+    fun updatePreferences(key: String, value: Boolean) {
+        prefs.setValue(key, value)
+        //   updateUi()
     }
 
     /**
@@ -365,18 +357,22 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      *
      * @param email The email address to be saved
      */
-    fun updateEmail(email: String?) {
-        if (isInvalidString(email)) {
-            view!!.setEmailSummary(stringUtils.getString(R.string.not_specified))
+    fun updateEmail(email: String) {
+        if (email.isInvalid()) {
+            view?.setEmailSummary(stringUtils.getString(R.string.not_specified))
         } else {
-            compositeDisposable.add(
-                emailUpdater.updateEmailAndSync(email!!)
-                    .flatMap { e: Email? -> settingsDataManager.fetchSettings().singleOrError() }
-                    .subscribe({ settings: Settings? ->
-                        this.settings = settings
-                        updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false)
-                        view!!.showDialogEmailVerification()
-                    }) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+            compositeDisposable +=
+                emailUpdater.updateEmailAndSync(email)
+                    .flatMap { settingsDataManager.fetchSettings().singleOrError() }
+                    .subscribeBy(
+                        onSuccess = {
+                            updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false, it)
+                            view?.showDialogEmailVerification()
+                        },
+                        onError = {
+                            view?.showToast(R.string.update_failed,
+                                ToastCustom.TYPE_ERROR)
+                        })
         }
     }
 
@@ -385,21 +381,24 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      *
      * @param sms The phone number to be saved
      */
-    fun updateSms(sms: String?) {
-        if (isInvalidString(sms)) {
-            view!!.setSmsSummary(stringUtils.getString(R.string.not_specified))
+    fun updateSms(sms: String) {
+        if (sms.isInvalid()) {
+            view?.setSmsSummary(stringUtils.getString(R.string.not_specified))
         } else {
-            compositeDisposable.add(
-                settingsDataManager.updateSms(sms!!)
-                    .doOnNext { settings: Settings? -> this.settings = settings }
-                    .flatMapCompletable { ignored: Settings? -> syncPhoneNumberWithNabu() }
+            compositeDisposable +=
+                settingsDataManager.updateSms(sms)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        updateNotification(Settings.NOTIFICATION_TYPE_SMS, false)
-                        view!!.showDialogVerifySms()
-                    }) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+                    .doOnNext { updateNotification(Settings.NOTIFICATION_TYPE_SMS, false, it) }
+                    .flatMapCompletable { syncPhoneNumberWithNabu() }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onComplete = {
+                            view?.showDialogVerifySms()
+                        },
+                        onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
         }
     }
+
 
     /**
      * Verifies a user's number, shows verified dialog after success
@@ -407,30 +406,31 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param code The verification code which has been sent to the user
      */
     fun verifySms(code: String) {
-        view!!.showProgressDialog(R.string.please_wait)
-        compositeDisposable.add(
+        view?.showProgressDialog(R.string.please_wait)
+        compositeDisposable +=
             settingsDataManager.verifySms(code)
-                .doOnNext { settings: Settings? -> this.settings = settings }
-                .flatMapCompletable { ignored: Settings? -> syncPhoneNumberWithNabu() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { updateUi(it) }
+                .flatMapCompletable { syncPhoneNumberWithNabu() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate {
-                    view!!.hideProgressDialog()
-                    updateUi()
+                    view?.hideProgressDialog()
                 }
-                .subscribe(
-                    { view!!.showDialogSmsVerified() }
-                ) { throwable: Throwable? -> view!!.showWarningDialog(R.string.verify_sms_failed) })
+                .subscribeBy(
+                    onComplete = { view?.showDialogSmsVerified() },
+                    onError = { view?.showWarningDialog(R.string.verify_sms_failed) }
+                )
     }
 
     private fun syncPhoneNumberWithNabu(): Completable {
         return kycStatusHelper.syncPhoneNumberWithNabu()
+            .subscribeOn(Schedulers.io())
             .onErrorResumeNext { throwable: Throwable? ->
-                if (throwable is NabuApiException) {
-                    if (throwable.getErrorStatusCode() === NabuErrorStatusCodes.AlreadyRegistered) {
-                        return@onErrorResumeNext Completable.complete()
-                    }
-                }
-                Completable.error(throwable)
+                if (throwable is NabuApiException && throwable.getErrorStatusCode() ==
+                    NabuErrorStatusCodes.AlreadyRegistered
+                )
+                    Completable.complete()
+                else Completable.error(throwable)
             }
     }
 
@@ -440,13 +440,14 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param blocked Whether or not to block Tor requests
      */
     fun updateTor(blocked: Boolean) {
-        compositeDisposable.add(
+        compositeDisposable +=
             settingsDataManager.updateTor(blocked)
-                .doAfterTerminate { updateUi() }
-                .subscribe(
-                    { settings: Settings? -> this.settings = settings }
-                ) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+                .subscribeBy(
+                    onNext = { updateUi(it) },
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                )
     }
+
 
     /**
      * Sets the auth type used for 2FA. Pass in [Settings.AUTH_TYPE_OFF] to disable 2FA
@@ -455,12 +456,13 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @see Settings
      */
     fun updateTwoFa(type: Int) {
-        compositeDisposable.add(
+        compositeDisposable +=
             settingsDataManager.updateTwoFactor(type)
-                .doAfterTerminate { updateUi() }
-                .subscribe(
-                    { settings: Settings? -> this.settings = settings }
-                ) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+                .doAfterTerminate { }
+                .subscribeBy(
+                    onNext = { updateUi(it) },
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                )
     }
 
     /**
@@ -470,49 +472,45 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
      * @param enable Whether or not to enable the notification type
      * @see Settings
      */
-    fun updateNotification(type: Int, enable: Boolean) {
-        if (enable && isNotificationTypeEnabled(type)) {
+    fun updateNotification(type: Int, enable: Boolean, settings: Settings) {
+        if (enable && settings.isNotificationTypeEnabled(type)) {
             // No need to change
-            updateUi()
+            updateUi(settings)
             return
-        } else if (!enable && isNotificationTypeDisabled(type)) {
+        } else if (!enable && settings.isNotificationTypeDisabled(type)) {
             // No need to change
-            updateUi()
+            updateUi(settings)
             return
         }
-        compositeDisposable.add(
-            Observable.just(enable)
-                .flatMap { aBoolean: Boolean ->
-                    if (aBoolean) {
-                        return@flatMap settingsDataManager.enableNotification(type, settings!!.notificationsType)
-                    } else {
-                        return@flatMap settingsDataManager.disableNotification(type, settings!!.notificationsType)
-                    }
-                }
-                .doOnNext { settings: Settings? -> this.settings = settings }
-                .flatMapCompletable { ignored: Settings? ->
+        val notificationsUpdate = if (enable) settingsDataManager.enableNotification(type, settings.notificationsType)
+        else settingsDataManager.disableNotification(type, settings.notificationsType)
+
+        compositeDisposable +=
+            notificationsUpdate
+                .doOnNext { updateUi(it) }
+                .flatMapCompletable {
                     if (enable) {
-                        return@flatMapCompletable payloadDataManager.syncPayloadAndPublicKeys()
+                        payloadDataManager.syncPayloadAndPublicKeys()
                     } else {
-                        return@flatMapCompletable payloadDataManager.syncPayloadWithServer()
+                        payloadDataManager.syncPayloadWithServer()
                     }
                 }
-                .doAfterTerminate { updateUi() }
-                .subscribe(
-                    {}
-                ) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+                .subscribeBy(
+                    onComplete = {},
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                )
     }
 
-    private fun isNotificationTypeEnabled(type: Int): Boolean {
-        return (settings!!.isNotificationsOn
-                && (settings!!.notificationsType.contains(type)
-                || settings!!.notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)))
+    private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
+        return (isNotificationsOn
+                && (notificationsType.contains(type)
+                || notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)))
     }
 
-    private fun isNotificationTypeDisabled(type: Int): Boolean {
-        return (settings!!.notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE)
-                || (!settings!!.notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)
-                && !settings!!.notificationsType.contains(type)))
+    private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
+        return (notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE)
+                || (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)
+                && !notificationsType.contains(type)))
     }
 
     /**
@@ -521,8 +519,9 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     fun pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS)
         prefs.pinId = ""
-        view!!.goToPinEntryPage()
+        view?.goToPinEntryPage()
     }
+
 
     /**
      * Updates the user's password
@@ -533,53 +532,54 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     @SuppressLint("CheckResult")
     fun updatePassword(password: String, fallbackPassword: String) {
         payloadManager.tempPassword = password
-        authDataManager.createPin(password, accessState.pin)
-            .doOnSubscribe { ignored: Disposable? -> view!!.showProgressDialog(R.string.please_wait) }
-            .doOnTerminate { view!!.hideProgressDialog() }
+        compositeDisposable += authDataManager.createPin(password, accessState.pin)
+            .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
+            .doOnTerminate { view?.hideProgressDialog() }
             .andThen(payloadDataManager.syncPayloadWithServer())
-            .compose(RxUtil.addCompletableToCompositeDisposable(this))
-            .subscribe(
-                {
-                    view!!.showToast(R.string.password_changed, ToastCustom.TYPE_OK)
+            .subscribeBy(
+                onComplete = {
+                    view?.showToast(R.string.password_changed, ToastCustom.TYPE_OK)
                     analytics.logEvent(SettingsAnalyticsEvents.PasswordChanged)
-                }
-            ) { throwable: Throwable? -> showUpdatePasswordFailed(fallbackPassword) }
+                },
+                onError = { showUpdatePasswordFailed(fallbackPassword) })
     }
 
     private fun showUpdatePasswordFailed(fallbackPassword: String) {
         payloadManager.tempPassword = fallbackPassword
-        view!!.showToast(R.string.remote_save_failed, ToastCustom.TYPE_ERROR)
-        view!!.showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR)
+        view?.showToast(R.string.remote_save_failed, ToastCustom.TYPE_ERROR)
+        view?.showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR)
     }
 
     /**
      * Updates the user's fiat unit preference
      */
     fun updateFiatUnit(fiatUnit: String) {
-        compositeDisposable.add(
+        compositeDisposable +=
             settingsDataManager.updateFiatUnit(fiatUnit)
-                .doAfterTerminate { updateUi() }
-                .subscribe(
-                    { settings: Settings? ->
-                        if (prefs.selectedFiatCurrency == fiatUnit) analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency)
+                .subscribeBy(
+                    onNext = {
+                        if (currencyPrefs.selectedFiatCurrency != fiatUnit)
+                            analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency)
                         prefs.selectedFiatCurrency = fiatUnit
                         simpleBuyPrefs.clearState()
-                        this.settings = settings
                         analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged)
-                    }
-                ) { throwable: Throwable? -> view!!.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+                        updateUi(it)
+                    },
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
     }
 
     fun storeSwipeToReceiveAddresses() {
-        compositeDisposable.add(
+        compositeDisposable +=
             swipeToReceiveHelper.generateAddresses()
                 .subscribeOn(Schedulers.computation())
-                .doOnSubscribe { disposable: Disposable? -> view!!.showProgressDialog(R.string.please_wait) }
-                .doOnTerminate { view!!.hideProgressDialog() }
-                .subscribe({}) { throwable: Throwable? ->
-                    view!!.showToast(R.string.update_failed,
-                        ToastCustom.TYPE_ERROR)
-                })
+                .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
+                .doOnTerminate { view?.hideProgressDialog() }
+                .subscribeBy(
+                    onComplete = {},
+                    onError = {
+                        view?.showToast(R.string.update_failed,
+                            ToastCustom.TYPE_ERROR)
+                    })
     }
 
     fun clearSwipeToReceiveData() {
@@ -598,27 +598,27 @@ class SettingsPresenter     // Show dialog "are you sure you want to disable fin
     }
 
     fun enablePushNotifications() {
-        notificationTokenManager.enableNotifications()
-            .compose(RxUtil.addCompletableToCompositeDisposable(this))
-            .doOnComplete { view!!.setPushNotificationPref(true) }
-            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+        compositeDisposable += notificationTokenManager.enableNotifications()
+            .subscribeBy(
+                onComplete = { view?.setPushNotificationPref(true) },
+                onError = { Timber.e(it) }
+            )
     }
 
     fun disablePushNotifications() {
-        notificationTokenManager.disableNotifications()
-            .compose(RxUtil.addCompletableToCompositeDisposable(this))
-            .doOnComplete { view!!.setPushNotificationPref(false) }
-            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+        compositeDisposable += notificationTokenManager.disableNotifications()
+            .subscribeBy(
+                onComplete = { view?.setPushNotificationPref(false) },
+                onError = { Timber.e(it) }
+            )
     }
 
     val currencyLabels: Array<String>
         get() = exchangeRateDataManager.getCurrencyLabels()
 
     fun onThePitClicked() {
-        if (pitLinkState.isLinked) {
-            view!!.launchThePit()
-        } else {
-            view!!.launchThePitLandingActivity()
-        }
+        pitClickedListener()
     }
+
+    private var pitClickedListener = {}
 }

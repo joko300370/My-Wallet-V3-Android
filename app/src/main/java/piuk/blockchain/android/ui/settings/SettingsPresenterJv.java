@@ -1,3 +1,4 @@
+/*
 package piuk.blockchain.android.ui.settings;
 
 import android.annotation.SuppressLint;
@@ -42,14 +43,13 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager;
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager;
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager;
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater;
-import piuk.blockchain.androidcore.data.settings.SettingsDataManager;
 import piuk.blockchain.androidcore.utils.PersistentPrefs;
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter;
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom;
 import piuk.blockchain.androidcoreui.utils.AndroidUtils;
 import timber.log.Timber;
 
-public class SettingsPresenter extends BasePresenter<SettingsView> {
+public class SettingsPresenterJv extends BasePresenter<SettingsView> {
 
     private final FingerprintHelper fingerprintHelper;
     private final AuthDataManager authDataManager;
@@ -73,7 +73,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
     private PitLinkingState pitLinkState = new PitLinkingState();
 
     // Show dialog "are you sure you want to disable fingerprint login?
-    public SettingsPresenter(
+    public SettingsPresenterJv(
         FingerprintHelper fingerprintHelper,
         AuthDataManager authDataManager,
         SettingsDataManager settingsDataManager,
@@ -270,25 +270,28 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getView().setLauncherShortcutVisibility(AndroidUtils.is25orHigher());
     }
 
-    /**
+*
      * @return true if the device has usable fingerprint hardware
-     */
+
+
     boolean getIfFingerprintHardwareAvailable() {
         return fingerprintHelper.isHardwareDetected();
     }
 
-    /**
+*
      * @return true if the user has previously enabled fingerprint login
-     */
+
+
     boolean getIfFingerprintUnlockEnabled() {
         return fingerprintHelper.isFingerprintUnlockEnabled();
     }
 
-    /**
+*
      * Sets fingerprint unlock enabled and clears the encrypted PIN if {@param enabled} is false
      *
      * @param enabled Whether or not the fingerprint unlock feature is set up
-     */
+
+
     void setFingerprintUnlockEnabled(boolean enabled) {
         fingerprintHelper.setFingerprintUnlockEnabled(enabled);
         if (!enabled) {
@@ -296,9 +299,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
     }
 
-    /**
+*
      * Handle fingerprint preference toggle
-     */
+
+
     void onFingerprintClicked() {
         if (getIfFingerprintUnlockEnabled()) {
             // Show dialog "are you sure you want to disable fingerprint login?
@@ -320,41 +324,46 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         return string == null || string.isEmpty() || string.length() >= 256;
     }
 
-    /**
+*
      * @return the user's preferred Fiat currency unit
-     */
+
+
     @NonNull
     String getFiatUnits() {
         return prefs.getSelectedFiatCurrency();
     }
 
-    /**
+*
      * @return the temporary password from the Payload Manager
-     */
+
+
     @NonNull
     String getTempPassword() {
         return payloadManager.getTempPassword();
     }
 
-    /**
+*
      * @return the user's email or an empty string if not set
-     */
+
+
     @NonNull
     String getEmail() {
         return settings.getEmail() != null ? settings.getEmail() : "";
     }
 
-    /**
+*
      * @return the user's phone number or an empty string if not set
-     */
+
+
     @NonNull
     String getSms() {
         return settings.getSmsNumber() != null ? settings.getSmsNumber() : "";
     }
 
-    /**
+*
      * @return is the user's phone number is verified
-     */
+
+
     boolean isSmsVerified() {
         return settings.isSmsVerified();
     }
@@ -363,52 +372,57 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         return settings.isEmailVerified();
     }
 
-    /**
+*
      * @return the current auth type
      * @see Settings
-     */
+
+
     int getAuthType() {
         return settings.getAuthType();
     }
 
-    /**
+*
      * Write key/value to {@link android.content.SharedPreferences}
      *
      * @param key   The key under which to store the data
      * @param value The value to be stored as a String
-     */
+
+
     void updatePreferences(String key, String value) {
         prefs.setValue(key, value);
         updateUi();
     }
 
-    /**
+*
      * Write key/value to {@link android.content.SharedPreferences}
      *
      * @param key   The key under which to store the data
      * @param value The value to be stored as an int
-     */
+
+
     void updatePreferences(String key, int value) {
         prefs.setValue(key, value);
         updateUi();
     }
 
-    /**
+*
      * Write key/value to {@link android.content.SharedPreferences}
      *
      * @param key   The key under which to store the data
      * @param value The value to be stored as a boolean
-     */
+
+
     void updatePreferences(String key, boolean value) {
         prefs.setValue(key, value);
         updateUi();
     }
 
-    /**
+*
      * Updates the user's email, prompts user to check their email for verification after success
      *
      * @param email The email address to be saved
-     */
+
+
     void updateEmail(String email) {
         if (isInvalidString(email)) {
             getView().setEmailSummary(stringUtils.getString(R.string.not_specified));
@@ -424,11 +438,12 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
     }
 
-    /**
+*
      * Updates the user's phone number, prompts user to verify their number after success
      *
      * @param sms The phone number to be saved
-     */
+
+
     void updateSms(String sms) {
         if (isInvalidString(sms)) {
             getView().setSmsSummary(stringUtils.getString(R.string.not_specified));
@@ -447,11 +462,12 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
     }
 
-    /**
+*
      * Verifies a user's number, shows verified dialog after success
      *
      * @param code The verification code which has been sent to the user
-     */
+
+
     void verifySms(@NonNull String code) {
         getView().showProgressDialog(R.string.please_wait);
         getCompositeDisposable().add(
@@ -481,11 +497,12 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             });
     }
 
-    /**
+*
      * Updates the user's Tor blocking preference
      *
      * @param blocked Whether or not to block Tor requests
-     */
+
+
     void updateTor(boolean blocked) {
         getCompositeDisposable().add(
             settingsDataManager.updateTor(blocked)
@@ -495,12 +512,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                     throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
-    /**
+*
      * Sets the auth type used for 2FA. Pass in {@link Settings#AUTH_TYPE_OFF} to disable 2FA
      *
      * @param type The auth type used for 2FA
      * @see Settings
-     */
+
+
     void updateTwoFa(int type) {
         getCompositeDisposable().add(
             settingsDataManager.updateTwoFactor(type)
@@ -510,13 +528,14 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                     throwable -> getView().showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)));
     }
 
-    /**
+*
      * Updates the user's notification preferences. Will not make any web requests if not necessary.
      *
      * @param type   The notification type to be updated
      * @param enable Whether or not to enable the notification type
      * @see Settings
-     */
+
+
     void updateNotification(int type, boolean enable) {
         if (enable && isNotificationTypeEnabled(type)) {
             // No need to change
@@ -565,9 +584,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
             && !settings.getNotificationsType().contains(type));
     }
 
-    /**
+*
      * PIN code validated, take user to PIN change page
-     */
+
+
     void pinCodeValidatedForChange() {
         prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS);
         prefs.setPinId("");
@@ -575,12 +595,13 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getView().goToPinEntryPage();
     }
 
-    /**
+*
      * Updates the user's password
      *
      * @param password         The requested new password as a String
      * @param fallbackPassword The user's current password as a fallback
-     */
+
+
     @SuppressLint("CheckResult")
     void updatePassword(@NonNull String password, @NonNull String fallbackPassword) {
         payloadManager.setTempPassword(password);
@@ -605,9 +626,10 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         getView().showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR);
     }
 
-    /**
+*
      * Updates the user's fiat unit preference
-     */
+
+
     void updateFiatUnit(String fiatUnit) {
         getCompositeDisposable().add(
             settingsDataManager.updateFiatUnit(fiatUnit)
@@ -685,3 +707,4 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
         }
     }
 }
+*/

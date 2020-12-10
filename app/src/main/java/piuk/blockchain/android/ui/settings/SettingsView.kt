@@ -50,7 +50,7 @@ interface SettingsView : View {
 
     fun updateCards(cards: List<PaymentMethod.Card>)
 
-    fun updateBanks(linkedAndSupportedCurrencies: SettingsFragment.LinkedBanksAndSupportedCurrencies)
+    fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies)
 
     fun cardsEnabled(enabled: Boolean)
 
@@ -60,7 +60,7 @@ interface SettingsView : View {
 
     fun showDialogEmailVerification()
 
-    fun showDialogVerifySms()
+    fun showDialogVerifySms(sms:String)
 
     fun showDialogSmsVerified()
 
