@@ -498,17 +498,7 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    fun getPaymentMethods(
-        sessionToken: NabuSessionTokenResponse,
-        currency: String,
-        checkEligibility: Boolean
-    ) = service.getPaymentMethods(
-        authorization = sessionToken.authHeader,
-        currency = currency,
-        checkEligibility = checkEligibility
-    ).wrapErrorMessage()
-
-    fun getPaymentMethodsForSimpleBuy(
+    fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
         currency: String
     ) = service.getPaymentMethodsForSimpleBuy(

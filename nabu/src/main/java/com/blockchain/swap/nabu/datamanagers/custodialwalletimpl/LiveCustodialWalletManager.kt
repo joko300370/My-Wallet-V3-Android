@@ -295,7 +295,7 @@ class LiveCustodialWalletManager(
     private fun BuyOrderListResponse.filterAndMapToOrder(crypto: CryptoCurrency): List<BuySellOrder> =
         this.filter { order ->
             order.outputCurrency == crypto.networkTicker ||
-                order.inputCurrency == crypto.networkTicker
+                    order.inputCurrency == crypto.networkTicker
         }
             .map { order -> order.toBuySellOrder() }
 
@@ -361,12 +361,11 @@ class LiveCustodialWalletManager(
     }
 
     override fun updateSupportedCardTypes(
-        fiatCurrency: String,
-        isTier2Approved: Boolean
+        fiatCurrency: String
     ): Completable =
         authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved).doOnSuccess {
-                updateSupportedCards(it.methods)
+            nabuService.paymentMethods(it, fiatCurrency).doOnSuccess { paymentMethods ->
+                updateSupportedCards(paymentMethods)
             }
         }.ignoreElement()
 
@@ -415,10 +414,13 @@ class LiveCustodialWalletManager(
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>> = paymentMethods(fiatCurrency, onlyEligible)
 
-    private val updateSupportedCards: (List<PaymentMethodResponse>) -> Unit = {
-        val cardTypes = it.filter { it.subTypes.isNullOrEmpty().not() }.mapNotNull {
-            it.subTypes
-        }.flatten().distinct()
+    private val updateSupportedCards: (List<PaymentMethodResponse>) -> Unit = { paymentMethods ->
+        val cardTypes =
+            paymentMethods
+                .filter { it.eligible && it.type.toPaymentMethodType() == PaymentMethodType.PAYMENT_CARD }
+                .filter { it.subTypes.isNullOrEmpty().not() }
+                .mapNotNull { it.subTypes }
+                .flatten().distinct()
         simpleBuyPrefs.updateSupportedCards(cardTypes.joinToString())
     }
 
@@ -426,7 +428,7 @@ class LiveCustodialWalletManager(
         sessionTokenResponse: NabuSessionTokenResponse,
         fiatCurrency: String,
         onlyEligible: Boolean
-    ) = nabuService.getPaymentMethodsForSimpleBuy(sessionTokenResponse, fiatCurrency).map { methods ->
+    ) = nabuService.paymentMethods(sessionTokenResponse, fiatCurrency).map { methods ->
         methods.filter { method -> method.eligible || !onlyEligible }
     }.doOnSuccess {
         updateSupportedCards(it)
@@ -676,11 +678,11 @@ class LiveCustodialWalletManager(
     ): Single<List<String>> {
 
         return authenticator.authenticate {
-            nabuService.getPaymentMethods(it, fiatCurrency, isTier2Approved)
-        }.map { paymentMethodsResponse ->
-            paymentMethodsResponse.methods.filter {
+            nabuService.paymentMethods(it, fiatCurrency)
+        }.map { methods ->
+            methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                    SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
             }.mapNotNull {
                 it.currency
             }
@@ -1055,11 +1057,11 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
         paymentMethodId = paymentMethodId ?: (
-            when (paymentType.toPaymentMethodType()) {
-                PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
-                PaymentMethodType.BANK_TRANSFER -> PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
-                else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
-            }),
+                when (paymentType.toPaymentMethodType()) {
+                    PaymentMethodType.FUNDS -> PaymentMethod.FUNDS_PAYMENT_ID
+                    PaymentMethodType.BANK_TRANSFER -> PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+                    else -> PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+                }),
         paymentMethodType = paymentType.toPaymentMethodType(),
         price = price?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLong())

@@ -141,7 +141,7 @@ public class SettingsPresenter extends BasePresenter<SettingsView> {
                 .doOnSuccess(enabled -> getView().cardsEnabled(enabled))
                 .flatMap(enabled -> {
                     if (enabled) {
-                        return custodialWalletManager.updateSupportedCardTypes(getFiatUnits(), true).andThen(
+                        return custodialWalletManager.updateSupportedCardTypes(getFiatUnits()).andThen(
                             custodialWalletManager.fetchUnawareLimitsCards(
                                 Arrays.asList(CardStatus.ACTIVE, CardStatus.EXPIRED)));
                     } else {
