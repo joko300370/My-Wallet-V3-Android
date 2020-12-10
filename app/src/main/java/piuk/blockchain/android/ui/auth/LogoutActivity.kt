@@ -8,6 +8,8 @@ import com.blockchain.swap.nabu.datamanagers.NabuDataManager
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.StringQualifier
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.ui.transactionflow.transactionScopeOrNull
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -55,10 +57,19 @@ class LogoutActivity : AppCompatActivity() {
         dgldAccount.clear()
         bchDataManager.clearBchAccountDetails()
         nabuDataManager.clearAccessToken()
+        resetTransaction()
 
         walletOptionsState.wipe()
 
         loginState.isLoggedIn = false
         finishAffinity()
+    }
+
+    private fun resetTransaction() {
+        transactionScopeOrNull()?.let { scope ->
+            val model: TransactionModel = scope.get()
+            model.destroy()
+            scope.close()
+        }
     }
 }
