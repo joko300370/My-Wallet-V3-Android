@@ -96,7 +96,6 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_cancel.setOnClickListener {
             navigator().exitSimpleBuyFlow()
         }
-
     }
 
     private fun showLinkingInProgress() {
