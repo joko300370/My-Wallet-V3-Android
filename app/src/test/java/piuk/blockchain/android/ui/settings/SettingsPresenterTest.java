@@ -183,7 +183,7 @@ public class SettingsPresenterTest extends RxTest {
         when(featureFlag.getEnabled()).thenReturn(Single.just(false));
         when(cardsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
         when(fundsFeatureFlag.getEnabled()).thenReturn(Single.just(false));
-        when(custodialWalletManager.updateSupportedCardTypes(anyString(), anyBoolean())).thenReturn(Completable.complete());
+        when(custodialWalletManager.updateSupportedCardTypes(anyString())).thenReturn(Completable.complete());
         when(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(Collections.emptyList()));
         when(custodialWalletManager.fetchUnawareLimitsCards(anyList()))
                 .thenReturn(Single.just(Collections.emptyList()));
