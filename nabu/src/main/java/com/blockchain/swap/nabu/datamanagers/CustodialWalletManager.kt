@@ -126,7 +126,7 @@ interface CustodialWalletManager {
     // For test/dev
     fun cancelAllPendingOrders(): Completable
 
-    fun updateSupportedCardTypes(fiatCurrency: String, isTier2Approved: Boolean): Completable
+    fun updateSupportedCardTypes(fiatCurrency: String): Completable
 
     fun getLinkedBeneficiaries(): Single<List<Beneficiary>>
 

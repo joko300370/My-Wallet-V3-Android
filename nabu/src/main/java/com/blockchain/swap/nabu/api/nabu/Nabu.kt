@@ -7,7 +7,6 @@ import com.blockchain.swap.nabu.models.responses.banktransfer.UpdateProviderAcco
 import com.blockchain.swap.nabu.models.responses.cards.BeneficiariesResponse
 import com.blockchain.swap.nabu.models.responses.cards.CardResponse
 import com.blockchain.swap.nabu.models.responses.cards.PaymentMethodResponse
-import com.blockchain.swap.nabu.models.responses.cards.PaymentMethodsResponse
 import com.blockchain.swap.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.swap.nabu.models.responses.interest.InterestActivityResponse
 import com.blockchain.swap.nabu.models.responses.interest.InterestAddressResponse
@@ -353,13 +352,6 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Path("cardId") cardId: String
     ): Single<CardResponse>
-
-    @GET(NABU_PAYMENT_METHODS)
-    fun getPaymentMethods(
-        @Header("authorization") authorization: String,
-        @Query("currency") currency: String,
-        @Query("checkEligibility") checkEligibility: Boolean?
-    ): Single<PaymentMethodsResponse>
 
     @GET(NABU_ELIGIBLE_PAYMENT_METHODS)
     fun getPaymentMethodsForSimpleBuy(
