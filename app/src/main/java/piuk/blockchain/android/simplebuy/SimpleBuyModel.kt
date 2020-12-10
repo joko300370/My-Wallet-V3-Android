@@ -152,12 +152,16 @@ class SimpleBuyModel(
                                 LinkedBankState.UNKNOWN -> {
                                     when (it.errorStatus) {
                                         LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
-                                            // TODO
-                                            // process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
+                                            process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
                                         }
-                                        LinkedBankErrorState.OTHER,
                                         LinkedBankErrorState.UNKNOWN -> {
                                             process(SimpleBuyIntent.LinkedBankStateError)
+                                        }
+                                        LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
+                                            process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
+                                        }
+                                        LinkedBankErrorState.NONE -> {
+                                            // do nothing
                                         }
                                     }
                                 }
