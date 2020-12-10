@@ -103,7 +103,7 @@ class SimpleBuyModel(
                 interactor.linkNewBank(previousState.fiatCurrency)
                     .subscribeBy(
                         onSuccess = { process(it) },
-                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
+                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported)) }
                     )
             }
 
@@ -115,11 +115,11 @@ class SimpleBuyModel(
                         if (isEligibleToLinkABank) {
                             process(SimpleBuyIntent.LinkBankTransferRequested)
                         } else {
-                            process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported))
+                            process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported))
                         }
                     },
                     onError = {
-                        process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported))
+                        process(SimpleBuyIntent.ErrorIntent(ErrorState.BankLinkingNotSupported))
                     }
                 )
             }
@@ -152,12 +152,16 @@ class SimpleBuyModel(
                                 LinkedBankState.UNKNOWN -> {
                                     when (it.errorStatus) {
                                         LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
-                                            // TODO
-                                            // process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
+                                            process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
                                         }
-                                        LinkedBankErrorState.OTHER,
                                         LinkedBankErrorState.UNKNOWN -> {
                                             process(SimpleBuyIntent.LinkedBankStateError)
+                                        }
+                                        LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
+                                            process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
+                                        }
+                                        LinkedBankErrorState.NONE -> {
+                                            // do nothing
                                         }
                                     }
                                 }

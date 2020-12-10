@@ -172,6 +172,13 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         )
     }
 
+    object LinkedBankStateUnsupportedAccount : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
+            errorState = ErrorState.LinkedBankAccountUnsupported,
+            isLoading = false
+        )
+    }
+
     object LinkedBankStateTimeout : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
             errorState = ErrorState.BankLinkingTimeout,

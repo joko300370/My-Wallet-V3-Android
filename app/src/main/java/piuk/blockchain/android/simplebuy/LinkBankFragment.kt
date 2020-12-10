@@ -61,24 +61,26 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
     }
 
     private fun showErrorState(state: ErrorState) {
-        val errorText = when (state) {
-            ErrorState.BankLinkingUpdateFailed -> {
-                getString(R.string.yodlee_linking_generic_error_subtitle)
-            }
-            ErrorState.BankLinkingFailed -> {
-                getString(R.string.yodlee_linking_generic_error_subtitle)
-            }
+        when (state) {
             ErrorState.BankLinkingTimeout -> {
-                getString(R.string.yodlee_linking_timeout_error_subtitle)
+                link_bank_btn.text = getString(R.string.common_try_again)
+                link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_timeout_error_subtitle)
             }
             ErrorState.LinkedBankAlreadyLinked -> {
-                getString(R.string.yodlee_linking_already_linked_error_subtitle)
+                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_account)
+                link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_already_linked_error_subtitle)
             }
-            ErrorState.LinkedBankNotSupported -> {
-                getString(R.string.yodlee_linking_generic_error_subtitle)
+            ErrorState.LinkedBankAccountUnsupported -> {
+                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
+                link_bank_title.text = getString(R.string.yodlee_linking_checking_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_checking_error_subtitle)
             }
             else -> {
-                getString(R.string.yodlee_linking_generic_error_subtitle)
+                link_bank_btn.text = getString(R.string.common_try_again)
+                link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_generic_error_subtitle)
             }
         }
 
@@ -86,7 +88,6 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_progress.gone()
         link_bank_state_indicator.setImageResource(R.drawable.ic_alert_white_bkgd)
         link_bank_state_indicator.visible()
-        link_bank_btn.text = getString(R.string.common_try_again)
         link_bank_btn.visible()
         link_bank_btn.setOnClickListener {
             navigator().pop()
@@ -95,8 +96,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_cancel.setOnClickListener {
             navigator().exitSimpleBuyFlow()
         }
-        link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
-        link_bank_subtitle.text = errorText
+
     }
 
     private fun showLinkingInProgress() {

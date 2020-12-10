@@ -105,7 +105,7 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
 
         // Case when user is not eligible for a payment method after kyc is done
         // (Can happen only for bank at this state)
-        if (newState.errorState == ErrorState.LinkedBankNotSupported) {
+        if (newState.errorState == ErrorState.BankLinkingNotSupported) {
             kyc_icon.setImageResource(R.drawable.ic_bank_details_big)
             kyc_icon.visible()
             verif_text.text = getString(R.string.common_oops)
@@ -117,7 +117,7 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
             kyc_icon.visible()
         }
 
-        bank_linked_failed.visibleIf { newState.errorState == ErrorState.LinkedBankNotSupported }
+        bank_linked_failed.visibleIf { newState.errorState == ErrorState.BankLinkingNotSupported }
         progress.visibleIf { newState.isLoading }
     }
 
