@@ -41,17 +41,6 @@ abstract class AccountSelectorFragment : Fragment() {
         account_selector_account_list.onListLoaded = ::doOnListLoaded
     }
 
-    fun initialiseAccountSelector(
-        statusDecorator: StatusDecorator,
-        onAccountSelected: (BlockchainAccount) -> Unit
-    ) {
-        account_selector_account_list.onAccountSelected = onAccountSelected
-        account_selector_account_list.initialise(
-            coincore.allWallets().map { it.accounts.filter(filterFn) },
-            statusDecorator
-        )
-    }
-
     fun initialiseAccountSelectorWithHeader(
         statusDecorator: StatusDecorator,
         onAccountSelected: (BlockchainAccount) -> Unit,
@@ -64,7 +53,9 @@ abstract class AccountSelectorFragment : Fragment() {
 
         account_selector_account_list.onAccountSelected = onAccountSelected
         account_selector_account_list.initialise(
-            coincore.allWallets().map { it.accounts.filter(filterFn) },
+            coincore.allWallets().map {
+                it.accounts.filter(filterFn)
+            },
             statusDecorator,
             introHeaderView
         )

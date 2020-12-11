@@ -111,8 +111,8 @@ internal class BtcAsset(
     fun createAccount(label: String, secondPassword: String?): Single<BtcCryptoWalletAccount> =
         payloadManager.createNewAccount(label, secondPassword)
             .singleOrError()
-            .map { btcAccountFromPayloadAccount(payloadManager.accounts.size - 1, it) }
-//            .doOnSuccess { updateAccountList(it) } TODO: Dynamic loading. Next PR
+            .map { btcAccountFromPayloadAccount(payloadManager.accountCount - 1, it) }
+            .doOnSuccess { forceAccountRefresh() }
             .doOnSuccess { coinsWebsocket.subscribeToXpubBtc(it.xpubAddress) }
 
     fun importLegacyAddressFromKey(
@@ -135,8 +135,8 @@ internal class BtcAsset(
             payloadManager.addLegacyAddressFromKey(key, walletSecondPassword)
         }.map { legacyAddress ->
             btcAccountFromLegacyAccount(legacyAddress)
-        }.doOnSuccess { btcAccount ->
-            // updateAccountList(btcAccount) TODO: Dynamic loading. Next PR
+        }.doOnSuccess {
+            forceAccountRefresh()
         }.doOnSuccess { btcAccount ->
             coinsWebsocket.subscribeToExtraBtcAddress(btcAccount.xpubAddress)
         }

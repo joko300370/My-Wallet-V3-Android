@@ -58,6 +58,9 @@ class PayloadDataManager(
     val accounts: List<Account>
         get() = wallet?.hdWallets?.get(0)?.accounts ?: emptyList()
 
+    val accountCount: Int
+        get() = wallet?.hdWallets?.get(0)?.accounts?.size ?: 0
+
     var legacyAddresses: List<LegacyAddress>
         get() = wallet?.legacyAddressList ?: emptyList()
         set(addresses) {

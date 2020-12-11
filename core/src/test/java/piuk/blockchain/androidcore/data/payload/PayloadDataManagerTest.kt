@@ -47,7 +47,6 @@ class PayloadDataManagerTest {
     private val mainNetParams = BitcoinMainNetParams.get()
     private val testScheduler = TestScheduler()
 
-    @Suppress("unused")
     @get:Rule
     val initSchedulers = rxInit {
         mainTrampoline()

@@ -81,7 +81,6 @@ abstract class Erc20BaseAccount(
         val transferMethodHex = "0xa9059cbb"
 
         return transferMethodHex + TypeEncoder.encode(Address(to)) +
-            TypeEncoder.encode(org.web3j.abi.datatypes.generated.Uint256(
-                amount))
+            TypeEncoder.encode(org.web3j.abi.datatypes.generated.Uint256(amount))
     }
 }

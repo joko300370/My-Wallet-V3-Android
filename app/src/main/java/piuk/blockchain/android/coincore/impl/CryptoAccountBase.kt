@@ -121,6 +121,9 @@ internal class CryptoExchangeAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
+    override fun matches(other: CryptoAccount): Boolean =
+        other is CryptoExchangeAccount && other.asset == asset
+
     override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
 
@@ -233,6 +236,9 @@ abstract class CryptoNonCustodialAccount(
 
     open val xpubAddress: String
         get() = throw UnsupportedOperationException("$asset doesn't support xpub")
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is CryptoNonCustodialAccount && other.asset == asset
 }
 
 // Currently only one custodial account is supported for each asset,

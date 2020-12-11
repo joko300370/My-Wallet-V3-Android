@@ -63,17 +63,14 @@ class Coincore internal constructor(
                 it.accountGroup().map { grp -> grp.accounts }
             }
         ).reduce { a, l -> a + l }
-//            .map { list -> list.filter { a -> (a is CryptoAccount && (a.is) }
-            .map { list ->
-                AllWalletsAccount(list, defaultLabels) as AccountGroup
-            }.toSingle()
+        .map { list ->
+            AllWalletsAccount(list, defaultLabels) as AccountGroup
+        }.toSingle()
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,
         action: AssetAction
     ): Single<SingleAccountList> {
-        // We only support transfers between similar assets and (soon; to - but not from - fiat)
-        // at this time. If and when, say, swap is supported this will need revisiting
         val sameCurrencyTransactionTargets =
             get(sourceAccount.asset).transactionTargets(sourceAccount)
 
