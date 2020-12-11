@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.settings
 
+import android.content.Context
 import androidx.annotation.StringRes
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
@@ -33,6 +34,10 @@ interface SettingsView : View {
     fun setSmsSummary(summary: String)
 
     fun setFiatSummary(summary: String)
+
+    fun showEmailDialog(
+        currentEmail: String, emailVerified: Boolean
+    )
 
     fun showDialogTwoFA(authType: Int, smsVerified: Boolean)
 

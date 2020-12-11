@@ -325,6 +325,7 @@ class SettingsPresenter(
                         updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false)
                     }
                 }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = {
                         updateUi(it)
@@ -351,7 +352,9 @@ class SettingsPresenter(
                     syncPhoneNumberWithNabu().thenSingle {
                         updateNotification(Settings.NOTIFICATION_TYPE_SMS, false)
                     }
-                }.subscribeBy(
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
                     onSuccess = {
                         updateUi(it)
                         view?.showDialogVerifySms()
@@ -591,6 +594,12 @@ class SettingsPresenter(
     fun onVerifySmsRequested() {
         compositeDisposable += cachedSettings.subscribeBy {
             view?.showDialogMobile(it.authType, it.isSmsVerified, it.smsNumber ?: "")
+        }
+    }
+
+    fun onEmailShowRequested() {
+        compositeDisposable += cachedSettings.subscribeBy {
+            view?.showEmailDialog(it.email, it.isEmailVerified)
         }
     }
 

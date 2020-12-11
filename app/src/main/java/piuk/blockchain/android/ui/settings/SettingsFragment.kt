@@ -279,7 +279,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 settingsPresenter.onTwoStepVerificationRequested()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
-                showUpdateEmailDialog(settingsActivity, settingsPresenter, "", false)
+                settingsPresenter.onEmailShowRequested()
+
         }
     }
 
@@ -289,6 +290,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             setMessage(message)
             show()
         }
+    }
+
+    override fun showEmailDialog(currentEmail: String, emailVerified: Boolean) {
+        showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified)
     }
 
     override fun hideProgressDialog() {
@@ -580,8 +585,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun onUpdateEmailClicked() {
-        //todo
-        showUpdateEmailDialog(requireActivity(), settingsPresenter, "", false)
+        settingsPresenter.onEmailShowRequested()
     }
 
     private fun onAboutClicked() {
