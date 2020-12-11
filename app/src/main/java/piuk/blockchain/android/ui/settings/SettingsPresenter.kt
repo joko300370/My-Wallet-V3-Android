@@ -38,7 +38,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -122,10 +121,9 @@ class SettingsPresenter(
             .flatMap { isGold: Boolean ->
                 supportedCurrencies(fiatUnit, isGold).doOnSuccess {
                     view?.banksEnabled(it.isNotEmpty())
+                }.zipWith(custodialWalletManager.getLinkedBeneficiaries()) { supportedCurrencies, linkedBeneficiaries ->
+                    LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
                 }
-                    .zipWith(custodialWalletManager.getLinkedBeneficiaries()) { supportedCurrencies, linkedBeneficiaries ->
-                        LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
-                    }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -156,7 +154,6 @@ class SettingsPresenter(
         }
     }
 
-
     private fun supportedCurrencies(fiat: String, isGold: Boolean): Single<List<String>> =
         custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
 
@@ -172,27 +169,35 @@ class SettingsPresenter(
 
     private fun updateUi(settings: Settings) {
         // GUID
-        view?.setGuidSummary(settings.guid ?: "")
+        view?.setGuidSummary(settings.guid)
 
         // Email
         var emailAndStatus = settings.email
-        if (emailAndStatus == null || emailAndStatus.isEmpty()) {
-            emailAndStatus = stringUtils.getString(R.string.not_specified)
-        } else if (settings.isEmailVerified) {
-            emailAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
-        } else {
-            emailAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
+        when {
+            emailAndStatus.isEmpty() -> {
+                emailAndStatus = stringUtils.getString(R.string.not_specified)
+            }
+            settings.isEmailVerified -> {
+                emailAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
+            }
+            else -> {
+                emailAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
+            }
         }
         view?.setEmailSummary(emailAndStatus)
 
         // Phone
         var smsAndStatus = settings.smsNumber
-        if (smsAndStatus == null || smsAndStatus.isEmpty()) {
-            smsAndStatus = stringUtils.getString(R.string.not_specified)
-        } else if (settings.isSmsVerified) {
-            smsAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
-        } else {
-            smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
+        when {
+            smsAndStatus.isEmpty() -> {
+                smsAndStatus = stringUtils.getString(R.string.not_specified)
+            }
+            settings.isSmsVerified -> {
+                smsAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
+            }
+            else -> {
+                smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
+            }
         }
         view?.setSmsSummary(smsAndStatus)
 
@@ -236,7 +241,6 @@ class SettingsPresenter(
      */
     private val ifFingerprintHardwareAvailable: Boolean
         get() = fingerprintHelper.isHardwareDetected()
-
 
     /**
      * @return true if the user has previously enabled fingerprint login
@@ -297,11 +301,10 @@ class SettingsPresenter(
     private val isSmsVerified: Single<Boolean>
         get() = cachedSettings.map { it.isSmsVerified }
 
-
     /**
      * Write key/value to [android.content.SharedPreferences]
      *
-     * @param key   The key under which to store the data
+     * @param key The key under which to store the data
      * @param value The value to be stored as a boolean
      */
     fun updatePreferences(key: String, value: Boolean) {
@@ -363,7 +366,6 @@ class SettingsPresenter(
                 )
     }
 
-
     /**
      * Verifies a user's number, shows verified dialog after success
      *
@@ -412,7 +414,6 @@ class SettingsPresenter(
                 )
     }
 
-
     /**
      * Sets the auth type used for 2FA. Pass in [Settings.AUTH_TYPE_OFF] to disable 2FA
      *
@@ -431,7 +432,7 @@ class SettingsPresenter(
     /**
      * Updates the user's notification preferences. Will not make any web requests if not necessary.
      *
-     * @param type   The notification type to be updated
+     * @param type The notification type to be updated
      * @param enable Whether or not to enable the notification type
      * @see Settings
      */
@@ -461,15 +462,14 @@ class SettingsPresenter(
     }
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
-        return (isNotificationsOn
-                && (notificationsType.contains(type)
-                || notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)))
+        return isNotificationsOn && (notificationsType.contains(type) ||
+                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
-        return (notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE)
-                || (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL)
-                && !notificationsType.contains(type)))
+        return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
+                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                        !notificationsType.contains(type))
     }
 
     /**
@@ -481,11 +481,10 @@ class SettingsPresenter(
         view?.goToPinEntryPage()
     }
 
-
     /**
      * Updates the user's password
      *
-     * @param password         The requested new password as a String
+     * @param password The requested new password as a String
      * @param fallbackPassword The user's current password as a fallback
      */
     @SuppressLint("CheckResult")

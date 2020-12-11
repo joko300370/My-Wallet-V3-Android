@@ -13,27 +13,25 @@ import com.fasterxml.jackson.annotation.JsonProperty
     setterVisibility = JsonAutoDetect.Visibility.NONE,
     creatorVisibility = JsonAutoDetect.Visibility.NONE,
     isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-data class SettingsKt(
+data class Settings(
 
     @JsonProperty("btc_currency")
     private val btcCurrency: String = "",
     @JsonProperty("notifications_type")
-    private val notificationsType: List<Int> = emptyList(),
+    val notificationsType: List<Int> = emptyList(),
     @JsonProperty("language")
     private val language: String = "",
     @JsonProperty("notifications_on")
     private val notificationsOn: Int = 0,
-
     @JsonProperty("ip_lock_on")
     private val ipLockOn: Int = 0,
-
     @JsonProperty("dial_code")
     private val dialCode: String = "",
 
     @JsonProperty("block_tor_ips")
     private val blockTorIps: Int = 0,
     @JsonProperty("currency")
-    private val currency: String = "",
+    val currency: String = "",
 
     @JsonProperty("notifications_confirmations")
     private val notificationsConfirmations: Int = 0,
@@ -44,10 +42,10 @@ data class SettingsKt(
     private val neverSaveAuthType: Int = 0,
 
     @JsonProperty("email")
-    private val email: String = "",
+    val email: String = "",
 
     @JsonProperty("sms_number")
-    private val smsNumber: String? = null,
+    private val _smsNumber: String? = null,
 
     @JsonProperty("sms_verified")
     private val smsVerified: String = "",
@@ -56,7 +54,7 @@ data class SettingsKt(
     private val isApiAccessEnabled: Int = 0,
 
     @JsonProperty("auth_type")
-    private val authType: Int = 0,
+    val authType: Int = 0,
 
     @JsonProperty("my_ip")
     private val myIp: String = "",
@@ -68,7 +66,7 @@ data class SettingsKt(
     private val passwordHint1: String = "",
 
     @JsonProperty("country_code")
-    private val countryCode: String = "",
+    val countryCode: String = "",
 
     @JsonProperty("state")
     private val state: String = "",
@@ -77,13 +75,31 @@ data class SettingsKt(
     private val loggingLevel: Int = 0,
 
     @JsonProperty("guid")
-    private val guid: String = "",
+    val guid: String = "",
 
     @JsonProperty("invited")
     private val invited: HashMap<String, Boolean>? = null
 
 ) {
 
+    val isEmailVerified: Boolean
+        get() = emailVerified.toBoolean()
+
+    val isSmsVerified: Boolean
+        get() = smsVerified.toBoolean()
+
+    val isNotificationsOn: Boolean
+        get() = notificationsOn.toBoolean()
+
+    val isBlockTorIps: Boolean
+        get() = blockTorIps.toBoolean()
+
+    private fun Int.toBoolean(): Boolean {
+        return this != 0
+    }
+
+    val smsNumber: String
+        get() = _smsNumber ?: ""
 
     companion object {
         @JsonIgnore

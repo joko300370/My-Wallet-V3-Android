@@ -9,7 +9,7 @@ import com.blockchain.notifications.analytics.CurrencySelected
 import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.trackProgress
-import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy

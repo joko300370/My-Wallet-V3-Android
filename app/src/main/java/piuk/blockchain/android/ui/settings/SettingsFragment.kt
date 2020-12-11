@@ -280,7 +280,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 settingsPresenter.onTwoStepVerificationRequested()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
                 settingsPresenter.onEmailShowRequested()
-
         }
     }
 
