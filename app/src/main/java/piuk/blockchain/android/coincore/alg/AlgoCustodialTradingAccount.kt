@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.alg
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions

@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 

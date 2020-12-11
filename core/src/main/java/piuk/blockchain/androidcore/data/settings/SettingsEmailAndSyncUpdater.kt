@@ -1,6 +1,6 @@
 package piuk.blockchain.androidcore.data.settings
 
-import com.blockchain.swap.nabu.NabuUserSync
+import com.blockchain.nabu.NabuUserSync
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Observable
 import io.reactivex.Single

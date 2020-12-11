@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions

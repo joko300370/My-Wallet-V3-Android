@@ -9,7 +9,7 @@ import com.blockchain.extensions.px
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
+import com.blockchain.nabu.models.responses.nabu.KycTierState
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction

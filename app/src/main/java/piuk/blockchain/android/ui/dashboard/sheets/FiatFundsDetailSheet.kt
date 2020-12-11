@@ -6,8 +6,8 @@ import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

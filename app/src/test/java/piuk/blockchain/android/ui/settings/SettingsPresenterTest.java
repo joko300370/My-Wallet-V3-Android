@@ -7,9 +7,9 @@ import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.preferences.SimpleBuyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierState;
-import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException;
+import com.blockchain.nabu.datamanagers.CustodialWalletManager;
+import com.blockchain.nabu.models.responses.nabu.KycTierState;
+import com.blockchain.nabu.models.responses.nabu.NabuApiException;
 
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.payload.PayloadManager;

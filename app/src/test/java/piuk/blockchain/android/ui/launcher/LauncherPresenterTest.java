@@ -28,7 +28,7 @@ import com.blockchain.notifications.NotificationTokenManager;
 import com.blockchain.notifications.analytics.Analytics;
 import com.blockchain.preferences.CurrencyPrefs;
 import com.blockchain.remoteconfig.FeatureFlag;
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager;
+import com.blockchain.nabu.datamanagers.CustodialWalletManager;
 
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig;
 import piuk.blockchain.androidcore.data.metadata.MetadataManager;

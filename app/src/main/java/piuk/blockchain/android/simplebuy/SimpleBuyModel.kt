@@ -2,13 +2,13 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuySellOrder
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.data.LinkedBankErrorState
-import com.blockchain.swap.nabu.models.data.LinkedBankState
-import com.blockchain.swap.nabu.models.responses.simplebuy.EverypayPaymentAttrs
+import com.blockchain.nabu.datamanagers.BuySellOrder
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkedBankErrorState
+import com.blockchain.nabu.models.data.LinkedBankState
+import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Scheduler

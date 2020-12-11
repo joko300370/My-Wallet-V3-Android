@@ -2,8 +2,8 @@ package piuk.blockchain.android.cards
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.Partner
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.datamanagers.Partner
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.google.gson.Gson
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable

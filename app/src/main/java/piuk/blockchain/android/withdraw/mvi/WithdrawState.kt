@@ -1,6 +1,6 @@
 package piuk.blockchain.android.withdraw.mvi
 
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.Beneficiary
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.simplebuy.ErrorState

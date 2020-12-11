@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.layout_linked_bank.view.*
 import kotlinx.android.synthetic.main.simple_buy_crypto_currency_chooser.view.*
 import piuk.blockchain.android.R

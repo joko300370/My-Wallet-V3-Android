@@ -1,10 +1,10 @@
 package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
 import io.reactivex.Maybe

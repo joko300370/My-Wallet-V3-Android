@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.swap
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.CustodialOrder
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.swap_pending_item_layout.view.*

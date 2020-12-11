@@ -6,8 +6,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.TransactionState
-import com.blockchain.swap.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.TransactionState
+import com.blockchain.nabu.datamanagers.TransactionType
 import kotlinx.android.synthetic.main.dialog_sheet_activity_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem

@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.BillingAddress
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.NabuUser
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.datamanagers.BillingAddress
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign

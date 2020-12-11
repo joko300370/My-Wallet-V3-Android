@@ -1,6 +1,6 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.swap.nabu.models.responses.interest.DisabledReason
+import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates

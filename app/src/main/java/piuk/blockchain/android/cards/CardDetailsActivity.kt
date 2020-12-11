@@ -3,7 +3,7 @@ package piuk.blockchain.android.cards
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.PaymentMethod
 import kotlinx.android.synthetic.main.activity_card_details.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import org.koin.android.ext.android.inject

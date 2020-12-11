@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
-import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
-import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.featureflags.Feature
+import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single

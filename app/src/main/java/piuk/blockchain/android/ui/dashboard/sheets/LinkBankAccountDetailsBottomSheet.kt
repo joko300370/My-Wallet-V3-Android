@@ -9,7 +9,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
 import piuk.blockchain.android.simplebuy.linkBankFieldCopied
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

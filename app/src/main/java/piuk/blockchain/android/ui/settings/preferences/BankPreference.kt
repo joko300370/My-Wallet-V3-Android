@@ -6,7 +6,7 @@ import android.text.TextUtils
 import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.loadInterMedium

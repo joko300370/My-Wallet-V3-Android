@@ -1,8 +1,8 @@
 package piuk.blockchain.android.cards
 
-import com.blockchain.swap.nabu.datamanagers.BillingAddress
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.datamanagers.BillingAddress
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.braintreepayments.cardform.utils.CardType
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviState

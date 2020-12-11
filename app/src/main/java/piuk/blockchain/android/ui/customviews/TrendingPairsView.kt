@@ -8,7 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles

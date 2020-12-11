@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.annotation.StringRes
 import androidx.navigation.NavDirections
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.models.responses.nabu.KycTiers
 
 interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 

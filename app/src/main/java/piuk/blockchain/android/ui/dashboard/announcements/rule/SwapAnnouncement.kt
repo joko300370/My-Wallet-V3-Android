@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.EligibilityProvider
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType

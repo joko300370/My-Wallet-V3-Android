@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.kyc.reentry
 
-import com.blockchain.swap.nabu.models.responses.nabu.Address
-import com.blockchain.swap.nabu.models.responses.nabu.KycState
-import com.blockchain.swap.nabu.models.responses.nabu.NabuUser
-import com.blockchain.swap.nabu.models.responses.nabu.TierLevels
-import com.blockchain.swap.nabu.models.responses.nabu.UserState
+import com.blockchain.nabu.models.responses.nabu.Address
+import com.blockchain.nabu.models.responses.nabu.KycState
+import com.blockchain.nabu.models.responses.nabu.NabuUser
+import com.blockchain.nabu.models.responses.nabu.TierLevels
+import com.blockchain.nabu.models.responses.nabu.UserState
 import org.amshove.kluent.`should be`
 import org.junit.Test
 

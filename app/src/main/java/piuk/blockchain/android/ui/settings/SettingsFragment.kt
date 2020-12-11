@@ -31,11 +31,9 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
-import com.blockchain.swap.nabu.datamanagers.Beneficiary
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.mukesh.countrypicker.fragments.CountryPicker
@@ -53,6 +51,8 @@ import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.RemoveCardBottomSheet
 import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN

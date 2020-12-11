@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.datamanagers.NabuDataManager
 import org.koin.android.ext.android.inject
 import org.koin.core.qualifier.StringQualifier
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService

@@ -1,14 +1,14 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.datamanagers.BuySellOrder
-import com.blockchain.swap.nabu.datamanagers.BuySellPairs
-import com.blockchain.swap.nabu.datamanagers.CustodialQuote
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Partner
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.data.LinkBankTransfer
-import com.blockchain.swap.nabu.models.data.LinkedBank
+import com.blockchain.nabu.datamanagers.BuySellOrder
+import com.blockchain.nabu.datamanagers.BuySellPairs
+import com.blockchain.nabu.datamanagers.CustodialQuote
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.Partner
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue

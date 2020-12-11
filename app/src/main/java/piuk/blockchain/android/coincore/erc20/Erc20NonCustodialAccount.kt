@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.erc20
 
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money

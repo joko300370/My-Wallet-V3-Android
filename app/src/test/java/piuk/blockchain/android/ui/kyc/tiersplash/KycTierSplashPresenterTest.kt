@@ -2,12 +2,12 @@ package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.navigation.NavDirections
 import com.blockchain.android.testutils.rxInit
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
-import com.blockchain.swap.nabu.models.responses.nabu.LimitsJson
-import com.blockchain.swap.nabu.models.responses.nabu.TierResponse
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
-import com.blockchain.swap.nabu.service.TierUpdater
+import com.blockchain.nabu.models.responses.nabu.KycTierState
+import com.blockchain.nabu.models.responses.nabu.LimitsJson
+import com.blockchain.nabu.models.responses.nabu.TierResponse
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
+import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.testutils.usd
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock

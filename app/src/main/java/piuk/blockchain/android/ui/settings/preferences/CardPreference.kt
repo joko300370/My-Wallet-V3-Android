@@ -6,8 +6,8 @@ import android.text.TextUtils
 import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import kotlinx.android.synthetic.main.preference_cards_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.icon
