@@ -552,12 +552,13 @@ class SettingsPresenter(
         prefs.backupEnabled = newValue
     }
 
-    fun arePushNotificationEnabled(): Boolean {
+    private fun arePushNotificationEnabled(): Boolean {
         return prefs.arePushNotificationsEnabled
     }
 
     fun enablePushNotifications() {
         compositeDisposable += notificationTokenManager.enableNotifications()
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { view?.setPushNotificationPref(true) },
                 onError = { Timber.e(it) }
@@ -566,6 +567,7 @@ class SettingsPresenter(
 
     fun disablePushNotifications() {
         compositeDisposable += notificationTokenManager.disableNotifications()
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { view?.setPushNotificationPref(false) },
                 onError = { Timber.e(it) }
