@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency

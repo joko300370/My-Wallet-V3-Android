@@ -9,7 +9,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CustodialBalanceClicked
+import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis

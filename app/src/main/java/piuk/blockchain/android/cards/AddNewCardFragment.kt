@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod

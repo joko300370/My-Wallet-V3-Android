@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.withdrawEventWithCurrency
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.withdrawEventWithCurrency
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_withdraw_complete.*
 import piuk.blockchain.android.R

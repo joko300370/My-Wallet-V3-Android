@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.eventWithPaymentMethod
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue

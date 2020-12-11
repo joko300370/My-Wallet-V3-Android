@@ -3,7 +3,7 @@ package piuk.blockchain.android.cards
 import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import io.reactivex.android.schedulers.AndroidSchedulers

@@ -131,6 +131,8 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     }
 
     override fun goToCheckOutScreen(addToBackStack: Boolean) {
+        ViewUtils.hideKeyboard(this)
+
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, SimpleBuyCheckoutFragment(), SimpleBuyCheckoutFragment::class.simpleName)
             .apply {

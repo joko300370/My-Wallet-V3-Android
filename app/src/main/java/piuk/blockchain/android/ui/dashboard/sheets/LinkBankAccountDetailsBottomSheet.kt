@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.linkBankEventWithCurrency
-import com.blockchain.notifications.analytics.linkBankFieldCopied
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.linkBankFieldCopied
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS

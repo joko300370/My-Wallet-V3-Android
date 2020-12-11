@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.DashboardPrefs
 import kotlinx.android.synthetic.main.dialog_custodial_intro.view.*
 import piuk.blockchain.android.R

@@ -12,10 +12,13 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
+import com.blockchain.notifications.analytics.Analytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
 import org.json.JSONException
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
@@ -28,6 +31,8 @@ import java.net.URLEncoder
 
 class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
     YodleeWebClient.YodleeWebClientInterface, SimpleBuyScreen {
+
+    private val analytics: Analytics by inject()
 
     private val fastLinkUrl: String by lazy {
         arguments?.getString(FAST_LINK_URL) ?: ""
@@ -94,14 +99,15 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     }
 
     override fun flowSuccess(providerAccountId: String) {
+        analytics.logEvent(SimpleBuyAnalytics.ACH_SUCCESS)
         navigator().launchBankLinking(providerAccountId)
     }
 
     override fun flowError(error: FastLinkInterfaceHandler.FastLinkFlowError, reason: String?) {
-        // TODO edge case for token expiration TBD - AND-4072
         requireActivity().runOnUiThread {
             when (error) {
                 FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER -> {
+                    analytics.logEvent(SimpleBuyAnalytics.ACH_CLOSE)
                     yodlee_webview.gone()
                     yodlee_status_label.gone()
                     yodlee_subtitle.gone()
@@ -109,9 +115,11 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
                     navigator().pop()
                 }
                 FastLinkInterfaceHandler.FastLinkFlowError.JSON_PARSING -> {
+                    analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
                     showError(getString(R.string.yodlee_parsing_error))
                 }
                 FastLinkInterfaceHandler.FastLinkFlowError.OTHER -> {
+                    analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
                     showError(getString(R.string.yodlee_unexpected_error))
                 }
             }

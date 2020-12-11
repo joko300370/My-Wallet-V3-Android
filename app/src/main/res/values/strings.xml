@@ -1779,7 +1779,6 @@
     <!-- Yodlee splash -->
     <string name="yodlee_splash_title">Secure Connection</string>
     <string name="yodlee_splash_blurb">Yodlee securely stores your credentials adhering to leading industry practices for data security, regulatory compliance and privacy.\n <annotation link="yodlee_learn_more">Learn more</annotation></string>
-    <string name="yodlee_splash_tos_pp">By tapping continue, you Agree to Yodlee’s <annotation link="yodlee_tos">Terms and Conditions</annotation> and <annotation link="yodlee_pp">Privacy Policy</annotation>.</string>
     <string name="yodlee_connection_title">Taking you to Yodlee…</string>
     <string name="yodlee_connection_subtitle">This could take up to 30 seconds.</string>
     <string name="yodlee_linking_title">Taking you back to your Wallet…</string>

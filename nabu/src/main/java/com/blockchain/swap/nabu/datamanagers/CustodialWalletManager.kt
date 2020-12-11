@@ -6,6 +6,7 @@ import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.swap.nabu.datamanagers.repositories.interest.InterestLimits
+import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.swap.nabu.models.data.LinkBankTransfer
 import com.blockchain.swap.nabu.models.data.LinkedBank
 import com.blockchain.swap.nabu.models.responses.interest.InterestActivityItemResponse
@@ -13,7 +14,6 @@ import com.blockchain.swap.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.swap.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.swap.nabu.models.responses.simplebuy.CardPaymentAttributes
 import com.blockchain.swap.nabu.models.responses.simplebuy.CustodialWalletOrder
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue

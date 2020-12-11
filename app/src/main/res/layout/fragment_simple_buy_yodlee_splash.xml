@@ -78,25 +78,11 @@
         android:layout_marginEnd="@dimen/standard_margin"
         android:gravity="center"
         android:text="@string/yodlee_splash_blurb"
-        app:layout_constraintBottom_toTopOf="@id/yodlee_splash_tos_pp"
+        app:layout_constraintBottom_toTopOf="@id/yodlee_splash_cta"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/yodlee_splash_title"
         app:layout_constraintVertical_bias="0" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/yodlee_splash_tos_pp"
-        style="@style/Text.Light.14"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:gravity="center"
-        android:text="@string/yodlee_splash_tos_pp"
-        app:layout_constraintBottom_toTopOf="@id/yodlee_splash_cta"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/yodlee_splash_cta"

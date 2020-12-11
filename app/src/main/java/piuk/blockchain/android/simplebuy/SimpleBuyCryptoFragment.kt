@@ -10,10 +10,6 @@ import android.view.WindowManager
 import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
-import com.blockchain.notifications.analytics.PaymentMethodSelected
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.buyConfirmClicked
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
@@ -407,11 +403,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             else -> {
                 model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
                 analytics.logEvent(PaymentMethodSelected(
-                    when (paymentMethod) {
-                        is PaymentMethod.Card -> PaymentMethodType.PAYMENT_CARD.toAnalyticsString()
-                        is PaymentMethod.Funds -> PaymentMethodType.FUNDS.toAnalyticsString()
-                        else -> ""
-                    }
+                    paymentMethod.toAnalyticsString()
                 ))
             }
         }

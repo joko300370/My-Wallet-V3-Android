@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.swap.nabu.datamanagers.OrderState
 import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType

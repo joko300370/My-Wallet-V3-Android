@@ -5,8 +5,6 @@ import android.os.Parcelable
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CurrencySelected
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.trackProgress
 import info.blockchain.wallet.api.data.Settings.UNIT_FIAT

@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import io.reactivex.android.schedulers.AndroidSchedulers

@@ -1,5 +1,8 @@
-package com.blockchain.notifications.analytics
+package piuk.blockchain.android.simplebuy
 
+import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 
 enum class SimpleBuyAnalytics(override val event: String, override val params: Map<String, String> = emptyMap()) :
@@ -51,7 +54,6 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     CARD_INFO_SET("sb_card_info_set"),
     CARD_BILLING_ADDRESS_SET("sb_billing_address_set"),
     CARD_3DS_COMPLETED("sb_three_d_secure_complete"),
-    PAYMENT_METHODS_SHOWN("sb_payment_method_shown"),
     REMOVE_CARD("sb_remove_card"),
 
     SETTINGS_ADD_CARD("sb_settings_add_card_clicked"),
@@ -62,6 +64,10 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     LINK_BANK_LOADING_ERROR("sb_link_bank_loading_error"),
     LINK_BANK_SCREEN_SHOWN("sb_link_bank_screen_shown"),
 
+    ACH_SUCCESS("sb_ach_success"),
+    ACH_CLOSE("sb_ach_close"),
+    ACH_ERROR("sb_ach_error "),
+
     WITHDRAWAL_FORM_SHOWN("cash_withdraw_form_shown"),
     WITHDRAWAL_CONFIRM_AMOUNT("cash_witdraw_form_confirm_click"),
     WITHDRAWAL_CHECKOUT_SHOWN("cash_withdraw_form_shown"),
@@ -70,6 +76,134 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     WITHDRAWAL_SUCCESS("cash_withdraw_success"),
     WITHDRAWAL_ERROR("cash_withdraw_error"),
 }
+
+enum class BankPartnerTypes {
+    ACH,
+    OB
+}
+
+fun PaymentMethod.toAnalyticsString(): String =
+    when (this) {
+        is PaymentMethod.Card,
+        is PaymentMethod.UndefinedCard -> "CARD"
+        is PaymentMethod.Funds,
+        is PaymentMethod.UndefinedFunds -> "FUNDS"
+        is PaymentMethod.Bank,
+        is PaymentMethod.UndefinedBankTransfer -> "LINK_BANK"
+        else -> ""
+    }
+
+fun PaymentMethodType.toAnalyticsString() =
+    when (this) {
+        PaymentMethodType.PAYMENT_CARD -> "CARD"
+        PaymentMethodType.FUNDS -> "FUNDS"
+        PaymentMethodType.BANK_TRANSFER -> "LINK_BANK"
+        else -> ""
+    }
+
+fun bankLinkingGenericError(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_gen_error"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingGenericErrorCtaRetry(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_gen_error_try"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingGenericErrorCtaCancel(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_gen_error_cancel"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingAlreadyLinked(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_already_linkd_error"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingAlreadyCtaRetry(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_already_linkd_error_try"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingAlreadyCtaCancel(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_already_linkd_error_cancel"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingSuccess(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_success"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingIncorrectAccount(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_incorrect_acc_error"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingIncorrectCtaRetry(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_incorrect_acc_error_try"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingIncorrectCtaCancel(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_incorrect_acc_error_cancel"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingSplashShown(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_splash_seen"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun bankLinkingSplashCta(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_bank_link_splash_cont"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun paymentMethodsShown(paymentMethods: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_payment_method_shown"
+        override val params: Map<String, String> = mapOf(
+            "options" to paymentMethods
+        )
+    }
 
 fun buyConfirmClicked(amount: String, fiatCurrency: String, paymentMethod: String): AnalyticsEvent =
     object : AnalyticsEvent {

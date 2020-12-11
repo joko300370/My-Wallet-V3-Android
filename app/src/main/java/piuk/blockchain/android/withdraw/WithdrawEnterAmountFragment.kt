@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.withdrawEventWithCurrency
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.withdrawEventWithCurrency
 import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable

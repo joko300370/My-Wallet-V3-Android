@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.datamanagers.BillingAddress
 import com.blockchain.swap.nabu.datamanagers.NabuDataManager

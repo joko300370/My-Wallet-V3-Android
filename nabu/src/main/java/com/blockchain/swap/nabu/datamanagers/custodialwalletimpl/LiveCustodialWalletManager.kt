@@ -987,14 +987,7 @@ enum class PaymentMethodType {
     BANK_TRANSFER,
     PAYMENT_CARD,
     FUNDS,
-    UNKNOWN;
-
-    fun toAnalyticsString() =
-        when (this) {
-            PAYMENT_CARD -> "CARD"
-            FUNDS -> "FUNDS"
-            else -> ""
-        }
+    UNKNOWN
 }
 
 private fun String.toLocalState(): OrderState =

@@ -31,8 +31,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
 import com.blockchain.swap.nabu.datamanagers.Beneficiary
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import com.blockchain.swap.nabu.models.responses.nabu.KycTiers

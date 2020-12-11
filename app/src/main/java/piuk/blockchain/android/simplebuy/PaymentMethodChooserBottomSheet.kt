@@ -3,7 +3,6 @@ package piuk.blockchain.android.simplebuy
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.swap.nabu.datamanagers.PaymentMethod
 import kotlinx.android.synthetic.main.simple_buy_crypto_currency_chooser.view.recycler
 import kotlinx.android.synthetic.main.simple_buy_payment_method_chooser.view.*
@@ -43,7 +42,7 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
             dismiss()
         }
 
-        analytics.logEvent(SimpleBuyAnalytics.PAYMENT_METHODS_SHOWN)
+        analytics.logEvent(paymentMethodsShown(paymentMethods.map { it.toAnalyticsString() }.joinToString { "," }))
     }
 
     private fun PaymentMethod.toPaymentMethodItem(): PaymentMethodItem {
