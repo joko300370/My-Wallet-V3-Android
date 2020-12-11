@@ -33,6 +33,8 @@ class KycStatusHelper(
             } else {
                 Single.just(KycTiers.default())
             }
+        }.onErrorReturn {
+            KycTiers.default()
         }
 
     fun shouldDisplayKyc(): Single<Boolean> = Singles.zip(

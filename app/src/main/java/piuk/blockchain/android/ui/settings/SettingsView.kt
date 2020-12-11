@@ -34,6 +34,8 @@ interface SettingsView : View {
 
     fun setFiatSummary(summary: String)
 
+    fun showDialogTwoFA(authType: Int, smsVerified: Boolean)
+
     fun setEmailNotificationsVisibility(visible: Boolean)
 
     fun setEmailNotificationPref(enabled: Boolean)
@@ -60,7 +62,9 @@ interface SettingsView : View {
 
     fun showDialogEmailVerification()
 
-    fun showDialogVerifySms(sms:String)
+    fun showDialogVerifySms()
+
+    fun showDialogMobile(authType: Int, isSmsVerified: Boolean, smsNumber: String)
 
     fun showDialogSmsVerified()
 

@@ -38,6 +38,8 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.utils.extensions.then
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.AndroidUtils
@@ -64,12 +66,19 @@ class SettingsPresenter(
     private val simpleBuyPrefs: SimpleBuyPrefs
 ) : BasePresenter<SettingsView>() {
 
+    private val fiatUnit: String
+        get() = currencyPrefs.selectedFiatCurrency
+
     override fun onViewReady() {
         view?.showProgressDialog(R.string.please_wait)
-        compositeDisposable += settingsDataManager.fetchSettings()
-            .doOnNext { loadKyc2TierState() }
+        compositeDisposable += settingsDataManager.fetchSettings().singleOrError()
+            .zipWith(kycStatusHelper.getSettingsKycStateTier())
+            .subscribeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { handleUpdate(it) },
+                onSuccess = { (settings, tiers) ->
+                    handleUpdate(settings)
+                    view?.setKycState(tiers)
+                },
                 onError = {
                     handleUpdate(Settings())
                     view?.showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR)
@@ -106,9 +115,6 @@ class SettingsPresenter(
             }
             .subscribe { cards -> onCardsUpdated(cards) }
     }
-
-    private val fiatUnit: String
-        get() = currencyPrefs.selectedFiatCurrency
 
     private fun updateBanks() {
         compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
@@ -153,16 +159,6 @@ class SettingsPresenter(
 
     private fun supportedCurrencies(fiat: String, isGold: Boolean): Single<List<String>> =
         custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
-
-    private fun loadKyc2TierState() {
-        compositeDisposable +=
-            kycStatusHelper.getSettingsKycStateTier()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { view?.setKycState(it) },
-                    onError = { Timber.e(it) }
-                )
-    }
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()
@@ -284,62 +280,23 @@ class SettingsPresenter(
         return this == null || this.isEmpty() || this.length >= 256
     }
 
+    private val cachedSettings = settingsDataManager.getSettings().first(Settings())
+
     /**
      * @return the temporary password from the Payload Manager
      */
     val tempPassword: String
         get() = payloadManager.tempPassword
 
-    /**
-     * @return the user's email or an empty string if not set
-     */
-    /*  val email: String
-          get() = settings?.email ?: ""*/
-
-    /**
-     * @return the user's phone number or an empty string if not set
-     */
-    /* val sms: String
-         get() = settings?.smsNumber ?: ""*/
-
+    private val authType: Single<Int>
+        get() = cachedSettings.map { it.authType }
 
     /**
      * @return is the user's phone number is verified
      */
-    /*  val isSmsVerified: Boolean
-          get() = settings?.isSmsVerified ?: false*/
+    private val isSmsVerified: Single<Boolean>
+        get() = cachedSettings.map { it.isSmsVerified }
 
-    /* val isEmailVerified: Boolean
-         get() = settings?.isEmailVerified ?: false*/
-
-    /**
-     * @return the current auth type
-     * @see Settings
-     */
-    /* val authType: Int?
-         get() = settings?.authType*/
-
-    /**
-     * Write key/value to [android.content.SharedPreferences]
-     *
-     * @param key   The key under which to store the data
-     * @param value The value to be stored as a String
-     */
-    fun updatePreferences(key: String, value: String) {
-        prefs.setValue(key, value)
-        //   updateUi()
-    }
-
-    /**
-     * Write key/value to [android.content.SharedPreferences]
-     *
-     * @param key   The key under which to store the data
-     * @param value The value to be stored as an int
-     */
-    fun updatePreferences(key: String, value: Int) {
-        prefs.setValue(key, value)
-        //  updateUi()
-    }
 
     /**
      * Write key/value to [android.content.SharedPreferences]
@@ -349,7 +306,6 @@ class SettingsPresenter(
      */
     fun updatePreferences(key: String, value: Boolean) {
         prefs.setValue(key, value)
-        //   updateUi()
     }
 
     /**
@@ -360,20 +316,22 @@ class SettingsPresenter(
     fun updateEmail(email: String) {
         if (email.isInvalid()) {
             view?.setEmailSummary(stringUtils.getString(R.string.not_specified))
-        } else {
-            compositeDisposable +=
-                emailUpdater.updateEmailAndSync(email)
-                    .flatMap { settingsDataManager.fetchSettings().singleOrError() }
-                    .subscribeBy(
-                        onSuccess = {
-                            updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false, it)
-                            view?.showDialogEmailVerification()
-                        },
-                        onError = {
-                            view?.showToast(R.string.update_failed,
-                                ToastCustom.TYPE_ERROR)
-                        })
+            return
         }
+        compositeDisposable +=
+            emailUpdater.updateEmailAndSync(email)
+                .flatMap {
+                    settingsDataManager.fetchSettings().singleOrError().flatMap {
+                        updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false)
+                    }
+                }
+                .subscribeBy(
+                    onSuccess = {
+                        updateUi(it)
+                        view?.showDialogEmailVerification()
+                    },
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                )
     }
 
     /**
@@ -383,20 +341,23 @@ class SettingsPresenter(
      */
     fun updateSms(sms: String) {
         if (sms.isInvalid()) {
-            view?.setSmsSummary(stringUtils.getString(R.string.not_specified))
-        } else {
-            compositeDisposable +=
-                settingsDataManager.updateSms(sms)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext { updateNotification(Settings.NOTIFICATION_TYPE_SMS, false, it) }
-                    .flatMapCompletable { syncPhoneNumberWithNabu() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onComplete = {
-                            view?.showDialogVerifySms()
-                        },
-                        onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+            view?.setEmailSummary(stringUtils.getString(R.string.not_specified))
+            return
         }
+        compositeDisposable +=
+            settingsDataManager.updateSms(sms)
+                .firstOrError()
+                .flatMap {
+                    syncPhoneNumberWithNabu().thenSingle {
+                        updateNotification(Settings.NOTIFICATION_TYPE_SMS, false)
+                    }
+                }.subscribeBy(
+                    onSuccess = {
+                        updateUi(it)
+                        view?.showDialogVerifySms()
+                    },
+                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                )
     }
 
 
@@ -406,11 +367,11 @@ class SettingsPresenter(
      * @param code The verification code which has been sent to the user
      */
     fun verifySms(code: String) {
-        view?.showProgressDialog(R.string.please_wait)
         compositeDisposable +=
             settingsDataManager.verifySms(code)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { updateUi(it) }
+                .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
                 .flatMapCompletable { syncPhoneNumberWithNabu() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate {
@@ -458,7 +419,6 @@ class SettingsPresenter(
     fun updateTwoFa(type: Int) {
         compositeDisposable +=
             settingsDataManager.updateTwoFactor(type)
-                .doAfterTerminate { }
                 .subscribeBy(
                     onNext = { updateUi(it) },
                     onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
@@ -472,33 +432,29 @@ class SettingsPresenter(
      * @param enable Whether or not to enable the notification type
      * @see Settings
      */
-    fun updateNotification(type: Int, enable: Boolean, settings: Settings) {
-        if (enable && settings.isNotificationTypeEnabled(type)) {
-            // No need to change
-            updateUi(settings)
-            return
-        } else if (!enable && settings.isNotificationTypeDisabled(type)) {
-            // No need to change
-            updateUi(settings)
-            return
-        }
-        val notificationsUpdate = if (enable) settingsDataManager.enableNotification(type, settings.notificationsType)
-        else settingsDataManager.disableNotification(type, settings.notificationsType)
 
-        compositeDisposable +=
-            notificationsUpdate
-                .doOnNext { updateUi(it) }
-                .flatMapCompletable {
-                    if (enable) {
-                        payloadDataManager.syncPayloadAndPublicKeys()
-                    } else {
-                        payloadDataManager.syncPayloadWithServer()
-                    }
+    fun updateNotification(type: Int, enable: Boolean): Single<Settings> {
+        return cachedSettings.flatMap {
+            if (enable && it.isNotificationTypeEnabled(type)) {
+                // No need to change
+                return@flatMap Single.just(it)
+            } else if (!enable && it.isNotificationTypeDisabled(type)) {
+                // No need to change
+                return@flatMap Single.just(it)
+            }
+            val notificationsUpdate =
+                if (enable) settingsDataManager.enableNotification(type, it.notificationsType)
+                else settingsDataManager.disableNotification(type, it.notificationsType)
+            notificationsUpdate.flatMapCompletable {
+                if (enable) {
+                    payloadDataManager.syncPayloadAndPublicKeys()
+                } else {
+                    payloadDataManager.syncPayloadWithServer()
                 }
-                .subscribeBy(
-                    onComplete = {},
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
-                )
+            }.thenSingle {
+                cachedSettings
+            }
+        }
     }
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
@@ -618,6 +574,24 @@ class SettingsPresenter(
 
     fun onThePitClicked() {
         pitClickedListener()
+    }
+
+    fun onTwoStepVerificationRequested() {
+        compositeDisposable += authType.zipWith(isSmsVerified).subscribe { (auth, smsVerified) ->
+            view?.showDialogTwoFA(auth, smsVerified)
+        }
+    }
+
+    fun resendSms() {
+        compositeDisposable += cachedSettings.subscribeBy {
+            updateSms(it.smsNumber)
+        }
+    }
+
+    fun onVerifySmsRequested() {
+        compositeDisposable += cachedSettings.subscribeBy {
+            view?.showDialogMobile(it.authType, it.isSmsVerified, it.smsNumber ?: "")
+        }
     }
 
     private var pitClickedListener = {}

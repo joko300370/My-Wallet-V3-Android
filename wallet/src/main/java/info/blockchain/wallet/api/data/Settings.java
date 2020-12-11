@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +16,10 @@ import java.util.HashMap;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(fieldVisibility = Visibility.NONE,
-    getterVisibility = Visibility.NONE,
-    setterVisibility = Visibility.NONE,
-    creatorVisibility = Visibility.NONE,
-    isGetterVisibility = Visibility.NONE)
+        getterVisibility = Visibility.NONE,
+        setterVisibility = Visibility.NONE,
+        creatorVisibility = Visibility.NONE,
+        isGetterVisibility = Visibility.NONE)
 public class Settings {
 
     @JsonIgnore
@@ -55,8 +56,8 @@ public class Settings {
 
     @JsonIgnore
     public static String[] UNIT_FIAT = {
-        "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "DKK", "EUR", "GBP", "HKD",
-        "ISK", "JPY", "KRW", "NZD", "PLN", "RUB", "SEK", "SGD", "THB", "TWD", "USD"
+            "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "DKK", "EUR", "GBP", "HKD",
+            "ISK", "JPY", "KRW", "NZD", "PLN", "RUB", "SEK", "SGD", "THB", "TWD", "USD"
     };
 
     @JsonProperty("btc_currency")
@@ -219,7 +220,9 @@ public class Settings {
         return loggingLevel;
     }
 
-    public String getGuid() { return guid != null ? guid : ""; }
+    public String getGuid() {
+        return guid != null ? guid : "";
+    }
 
     @JsonIgnore
     public static Settings fromJson(String json) throws IOException {

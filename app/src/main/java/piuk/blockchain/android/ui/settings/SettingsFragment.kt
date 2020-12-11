@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.settings
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -80,6 +81,7 @@ import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost {
@@ -175,7 +177,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             analytics.logEvent(SettingsAnalyticsEvents.EmailClicked)
         }
         smsPref.onClick {
-            showDialogMobile()
+            settingsPresenter.onVerifySmsRequested()
             analytics.logEvent(SettingsAnalyticsEvents.PhoneClicked)
         }
 
@@ -200,7 +202,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             analytics.logEvent(SettingsAnalyticsEvents.ChangePinClicked)
         }
         twoStepVerificationPref.onClick {
-            showDialogTwoFA()
+            settingsPresenter.onTwoStepVerificationRequested()
             analytics.logEvent(SettingsAnalyticsEvents.TwoFactorAuthClicked)
         }
 
@@ -224,7 +226,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         launcherShortcutPrefs?.setOnPreferenceChangeListener { _, newValue ->
             if (!(newValue as Boolean) && AndroidUtils.is25orHigher()) {
-                activity!!.getSystemService(
+                settingsActivity.getSystemService(
                     ShortcutManager::class.java
                 )!!.removeAllDynamicShortcuts()
             }
@@ -235,7 +237,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             if (!(newValue as Boolean)) {
                 settingsPresenter.clearSwipeToReceiveData()
             } else {
-                AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+                AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                     .setTitle(R.string.swipe_receive_hint)
                     .setMessage(R.string.swipe_receive_address_info)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -275,9 +277,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             intent == null -> {
             }
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
-                showDialogTwoFA()
+                settingsPresenter.onTwoStepVerificationRequested()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
-                showUpdateEmailDialog(activity!!, settingsPresenter, "", false)
+                showUpdateEmailDialog(settingsActivity, settingsPresenter, "", false)
         }
     }
 
@@ -299,14 +301,16 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun showWarningDialog(@StringRes message: Int) {
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
-            .setTitle(R.string.app_name)
-            .setMessage(message)
-            .setCancelable(true)
-            .setPositiveButton(android.R.string.ok, null)
-            .setOnDismissListener { showDialogVerifySms() }
-            .create()
-            .show()
+        activity?.let {
+            AlertDialog.Builder(it, R.style.AlertDialogStyle)
+                .setTitle(R.string.app_name)
+                .setMessage(message)
+                .setCancelable(true)
+                .setPositiveButton(android.R.string.ok, null)
+                .setOnDismissListener { showDialogVerifySms() }
+                .create()
+                .show()
+        }
     }
 
     private val compositeDisposable = CompositeDisposable()
@@ -500,7 +504,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun showDisableFingerprintDialog() {
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_disable_message)
             .setCancelable(true)
@@ -517,7 +521,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun showNoFingerprintsAddedDialog() {
         updateFingerprintPreferenceStatus()
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.fingerprint_no_fingerprints_added)
             .setCancelable(true)
@@ -553,10 +557,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun showDialogSmsVerified() {
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(success)
             .setMessage(R.string.sms_verified)
-            .setPositiveButton(R.string.dialog_continue) { _, _ -> showDialogTwoFA() }
+            .setPositiveButton(R.string.dialog_continue) { _, _ -> settingsPresenter.onTwoStepVerificationRequested() }
             .show()
     }
 
@@ -576,6 +580,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun onUpdateEmailClicked() {
+        //todo
         showUpdateEmailDialog(requireActivity(), settingsPresenter, "", false)
     }
 
@@ -597,7 +602,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val handler = Handler()
         handler.postDelayed({
             if (activity != null) {
-                AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+                AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                     .setTitle(R.string.verify)
                     .setMessage(R.string.verify_email_notice)
                     .setCancelable(true)
@@ -607,16 +612,16 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }, 300)
     }
 
-    private fun showDialogMobile(authType: Int, sms: String, isSmsVerified: Boolean) {
+    override fun showDialogMobile(authType: Int, isSmsVerified: Boolean, smsNumber: String) {
         if (authType != Settings.AUTH_TYPE_OFF) {
-            AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                 .setTitle(R.string.warning)
                 .setMessage(R.string.disable_2fa_first)
                 .setPositiveButton(android.R.string.ok, null)
                 .create()
                 .show()
         } else {
-            val inflater = activity!!.layoutInflater
+            val inflater = settingsActivity.layoutInflater
             val smsPickerView = inflater.inflate(R.layout.include_sms_update, null)
             val mobileNumber = smsPickerView.findViewById<EditText>(R.id.etSms)
             val countryTextView = smsPickerView.findViewById<TextView>(R.id.tvCountry)
@@ -638,12 +643,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 }
             }
 
-            if (sms.isNotEmpty()) {
-                mobileNumberTextView.text = sms
+            if (smsNumber.isNotEmpty()) {
+                mobileNumberTextView.text = smsNumber
                 mobileNumberTextView.visibility = View.VISIBLE
             }
 
-            val alertDialogSmsBuilder = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+            val alertDialogSmsBuilder = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                 .setTitle(R.string.mobile)
                 .setMessage(getString(R.string.mobile_description))
                 .setView(smsPickerView)
@@ -651,10 +656,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 .setPositiveButton(R.string.update, null)
                 .setNegativeButton(android.R.string.cancel, null)
 
-            if (!isSmsVerified && sms.isNotEmpty()) {
+            if (isSmsVerified && smsNumber.isNotEmpty()) {
                 alertDialogSmsBuilder.setNeutralButton(R.string.verify) { dialogInterface, i ->
                     settingsPresenter.updateSms(
-                        sms
+                        smsNumber
                     )
                 }
             }
@@ -679,13 +684,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogGuid() {
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.guid_to_clipboard)
             .setCancelable(false)
             .setPositiveButton(R.string.common_yes) { _, _ ->
                 val clipboard =
-                    activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    settingsActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
                 clipboard.primaryClip = clip
                 showCustomToast(R.string.copied_to_clipboard)
@@ -706,7 +711,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             }
         }
 
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.select_currency)
             .setSingleChoiceItems(currencies, selected) { dialog, which ->
                 val fiatUnit = currencies[which].substring(currencies[which].length - 3)
@@ -716,11 +721,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .show()
     }
 
-    override fun showDialogVerifySms(sms: String) {
-        val editText = AppCompatEditText(activity)
+    private val settingsActivity: Activity
+        get() = activity ?: throw IllegalStateException("Activity not found")
+
+    override fun showDialogVerifySms() {
+        val editText = AppCompatEditText(settingsActivity)
         editText.setSingleLine(true)
 
-        val dialog = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)
             .setMessage(R.string.verify_sms_summary)
             .setView(ViewUtils.getAlertDialogPaddedView(activity, editText))
@@ -728,9 +736,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setPositiveButton(R.string.verify, null)
             .setNegativeButton(android.R.string.cancel, null)
             .setNeutralButton(R.string.resend) { _, _ ->
-                settingsPresenter.updateSms(
-                    sms
-                )
+                settingsPresenter.resendSms()
             }
             .create()
 
@@ -741,11 +747,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 if (codeS.isNotEmpty()) {
                     settingsPresenter.verifySms(codeS)
                     dialog.dismiss()
-                    ViewUtils.hideKeyboard(activity!!)
+                    ViewUtils.hideKeyboard(settingsActivity)
                 }
             }
         }
-
         dialog.show()
     }
 
@@ -768,7 +773,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogEmailNotifications() {
-        val dialog = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.email_notifications)
             .setMessage(R.string.email_notifications_summary)
             .setPositiveButton(R.string.enable) { dialogInterface, i ->
@@ -792,7 +797,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogPushNotifications() {
-        val dialog = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.push_notifications)
             .setMessage(R.string.push_notifications_summary)
             .setPositiveButton(R.string.enable) { _, _ -> settingsPresenter.enablePushNotifications() }
@@ -806,7 +811,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogChangePasswordWarning() {
-        AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.warning)
             .setMessage(R.string.change_password_summary)
             .setPositiveButton(R.string.dialog_continue) { _, _ -> showDialogChangePassword() }
@@ -814,7 +819,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogChangePassword() {
-        val inflater = activity!!.layoutInflater
+        val inflater = settingsActivity.layoutInflater
         val pwLayout = inflater.inflate(R.layout.modal_change_password2, null) as LinearLayout
 
         val currentPassword = pwLayout.findViewById<AppCompatEditText>(R.id.current_password)
@@ -825,7 +830,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
             override fun afterTextChanged(editable: Editable) {
                 newPassword.postDelayed({
-                    if (activity != null && !activity!!.isFinishing) {
+                    if (activity != null && !settingsActivity.isFinishing) {
                         passwordStrength.visibility = View.VISIBLE
                         setPasswordStrength(editable.toString(), passwordStrength)
                     }
@@ -833,7 +838,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             }
         })
 
-        val alertDialog = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+        val alertDialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.change_password)
             .setCancelable(false)
             .setView(pwLayout)
@@ -861,7 +866,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                                     ToastCustom.TYPE_ERROR
                                 )
                             } else if (pwStrength < 50) {
-                                AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+                                AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                                     .setTitle(R.string.app_name)
                                     .setMessage(R.string.weak_password)
                                     .setCancelable(false)
@@ -913,36 +918,36 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         )
     }
 
-    private fun showDialogTwoFA() {
-        if (settingsPresenter.authType == Settings.AUTH_TYPE_GOOGLE_AUTHENTICATOR ||
-            settingsPresenter.authType == Settings.AUTH_TYPE_YUBI_KEY
+    override fun showDialogTwoFA(authType: Int, smsVerified: Boolean) {
+        if (authType == Settings.AUTH_TYPE_GOOGLE_AUTHENTICATOR ||
+            authType == Settings.AUTH_TYPE_YUBI_KEY
         ) {
             twoStepVerificationPref?.isChecked = true
-            AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                 .setTitle(R.string.warning)
                 .setCancelable(false)
                 .setMessage(R.string.disable_online_only)
                 .setPositiveButton(android.R.string.ok, null)
                 .create()
                 .show()
-        } else if (!settingsPresenter.isSmsVerified) {
+        } else if (!smsVerified) {
             twoStepVerificationPref?.isChecked = false
-            showDialogMobile()
+            settingsPresenter.onVerifySmsRequested()
         } else {
             val message = Html.fromHtml(getString(R.string.two_fa_description, URL_LOGIN))
             val spannable = SpannableString(message)
             Linkify.addLinks(spannable, Linkify.WEB_URLS)
 
-            val alertDialogBuilder = AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+            val alertDialogBuilder = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                 .setTitle(R.string.two_fa)
                 .setCancelable(false)
                 .setMessage(spannable)
                 .setNeutralButton(android.R.string.cancel) { _, _ ->
                     twoStepVerificationPref?.isChecked =
-                        settingsPresenter.authType != Settings.AUTH_TYPE_OFF
+                        authType != Settings.AUTH_TYPE_OFF
                 }
 
-            if (settingsPresenter.authType != Settings.AUTH_TYPE_OFF) {
+            if (authType != Settings.AUTH_TYPE_OFF) {
                 alertDialogBuilder.setNegativeButton(R.string.disable) { _, _ ->
                     settingsPresenter.updateTwoFa(
                         Settings.AUTH_TYPE_OFF
@@ -966,10 +971,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         pw: String,
         passwordStrengthView: PasswordStrengthView
     ) {
-        if (activity != null && !activity!!.isFinishing) {
+        if (activity != null && !settingsActivity.isFinishing) {
             pwStrength = PasswordUtil.getStrength(pw).roundToInt()
-
-            if (pw == settingsPresenter.email) pwStrength = 0
 
             // red
             var pwStrengthLevel = 0
@@ -995,7 +998,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun setCountryFlag(tvCountry: TextView, dialCode: String, flagResourceId: Int) {
         tvCountry.text = dialCode
-        val drawable = ContextCompat.getDrawable(activity!!, flagResourceId)
+        val drawable = ContextCompat.getDrawable(settingsActivity, flagResourceId)
         drawable!!.alpha = 30
         tvCountry.background = drawable
     }
