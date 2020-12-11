@@ -72,7 +72,7 @@ class SettingsPresenter(
         view?.showProgressDialog(R.string.please_wait)
         compositeDisposable += settingsDataManager.fetchSettings().singleOrError()
             .zipWith(kycStatusHelper.getSettingsKycStateTier())
-            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { (settings, tiers) ->
                     handleUpdate(settings)
@@ -85,6 +85,7 @@ class SettingsPresenter(
             )
 
         compositeDisposable += pitLinking.state
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { state -> onPitStateUpdated(state) },
                 onError = { Timber.e(it) }
