@@ -38,6 +38,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -102,8 +103,9 @@ class SettingsPresenter(
             }
             .flatMap { isGold ->
                 if (isGold) {
-                    custodialWalletManager.updateSupportedCardTypes(fiatUnit).andThen(
-                        custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)))
+                    custodialWalletManager.updateSupportedCardTypes(fiatUnit).thenSingle {
+                        custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.ACTIVE, CardStatus.EXPIRED))
+                    }
                 } else {
                     Single.just(emptyList())
                 }
@@ -113,7 +115,14 @@ class SettingsPresenter(
                 view?.cardsEnabled(false)
                 onCardsUpdated(emptyList())
             }
-            .subscribe { cards -> onCardsUpdated(cards) }
+            .subscribeBy(
+                onSuccess = { cards ->
+                    onCardsUpdated(cards)
+                },
+                onError = {
+                    Timber.i(it)
+                }
+            )
     }
 
     private fun updateBanks() {
@@ -129,16 +138,16 @@ class SettingsPresenter(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 view?.banksEnabled(false)
-                onBanksUpdated(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
                 view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
             }
-            .subscribe { linkedAndSupportedCurrencies ->
-                onBanksUpdated(linkedAndSupportedCurrencies)
-            }
-    }
-
-    private fun onBanksUpdated(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
-        view?.updateBanks(linkedAndSupportedCurrencies)
+            .subscribeBy(
+                onSuccess = { linkedAndSupportedCurrencies ->
+                    view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
+                },
+                onError = {
+                    Timber.i(it)
+                }
+            )
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {
@@ -240,7 +249,7 @@ class SettingsPresenter(
     /**
      * @return true if the device has usable fingerprint hardware
      */
-    private val ifFingerprintHardwareAvailable: Boolean
+    val ifFingerprintHardwareAvailable: Boolean
         get() = fingerprintHelper.isHardwareDetected()
 
     /**
@@ -285,7 +294,8 @@ class SettingsPresenter(
         return this == null || this.isEmpty() || this.length >= 256
     }
 
-    private val cachedSettings = settingsDataManager.getSettings().first(Settings())
+    private val cachedSettings: Single<Settings>
+        get() = settingsDataManager.getSettings().first(Settings())
 
     /**
      * @return the temporary password from the Payload Manager

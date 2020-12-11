@@ -1,3 +1,4 @@
+/*
 package piuk.blockchain.android.ui.settings;
 
 import piuk.blockchain.android.ui.TestHelperKt;
@@ -863,4 +864,4 @@ public class SettingsPresenterTest extends RxTest {
         verify(notificationTokenManager).disableNotifications();
         verifyNoMoreInteractions(notificationTokenManager);
     }
-}
+}*/
