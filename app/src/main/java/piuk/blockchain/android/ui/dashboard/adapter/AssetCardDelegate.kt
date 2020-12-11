@@ -14,7 +14,7 @@ import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.getColor
+import piuk.blockchain.android.util.chartLineColour
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -98,7 +98,7 @@ private class AssetCardViewHolder(
             price_delta_interval.text = context.getString(R.string.asset_card_rate_period)
 
             if (state.priceTrend.isNotEmpty()) {
-                sparkview.lineColor = state.currency.getColor(context)
+                sparkview.lineColor = state.currency.chartLineColour(context)
                 sparkview.adapter = PriceAdapter(state.priceTrend.toFloatArray())
                 sparkview.visible()
             } else {
