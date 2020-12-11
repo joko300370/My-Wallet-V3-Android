@@ -10,6 +10,7 @@ import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import java.math.BigInteger
 
+@Deprecated("This need to go before we can merge the ERC20 modules")
 interface Erc20Account {
 
     val cryptoCurrency: CryptoCurrency

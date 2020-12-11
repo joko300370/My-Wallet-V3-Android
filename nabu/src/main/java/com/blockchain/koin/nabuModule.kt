@@ -5,8 +5,6 @@ import com.blockchain.swap.nabu.CreateNabuToken
 import com.blockchain.swap.nabu.NabuToken
 import com.blockchain.swap.nabu.NabuUserSync
 import com.blockchain.swap.nabu.api.nabu.Nabu
-import com.blockchain.swap.nabu.api.nabu.NabuMarkets
-import com.blockchain.swap.nabu.api.trade.TransactionStateAdapter
 import com.blockchain.swap.nabu.datamanagers.AnalyticsNabuUserReporterImpl
 import com.blockchain.swap.nabu.datamanagers.AnalyticsWalletReporter
 import com.blockchain.swap.nabu.datamanagers.BalanceProviderImpl
@@ -58,13 +56,11 @@ import com.blockchain.swap.nabu.models.responses.nabu.KycStateAdapter
 import com.blockchain.swap.nabu.models.responses.nabu.KycTierStateAdapter
 import com.blockchain.swap.nabu.models.responses.nabu.UserCampaignStateMoshiAdapter
 import com.blockchain.swap.nabu.models.responses.nabu.UserStateAdapter
-import com.blockchain.swap.nabu.service.NabuMarketsService
 import com.blockchain.swap.nabu.service.NabuService
 import com.blockchain.swap.nabu.service.NabuTierService
 import com.blockchain.swap.nabu.service.RetailWalletTokenService
 import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.swap.nabu.service.TierUpdater
-import com.blockchain.swap.nabu.service.TradeLimitService
 import com.blockchain.swap.nabu.status.KycTiersQueries
 import com.blockchain.swap.nabu.stores.NabuSessionTokenStore
 import org.koin.dsl.bind
@@ -73,12 +69,7 @@ import retrofit2.Retrofit
 
 val nabuModule = module {
 
-    single { get<Retrofit>(nabu).create(NabuMarkets::class.java) }
-
     scope(payloadScopeQualifier) {
-
-        factory { NabuMarketsService(get(), get()) }
-            .bind(TradeLimitService::class)
 
         factory {
             MetadataRepositoryNabuTokenAdapter(
@@ -263,10 +254,6 @@ val nabuModule = module {
         }
     }
 
-    moshiInterceptor(nabu) { builder ->
-        builder.add(TransactionStateAdapter())
-    }
-
     moshiInterceptor(interestLimits) { builder ->
         builder.add(InterestLimitsMapAdapter())
     }
@@ -277,7 +264,9 @@ val nabuModule = module {
 
     single { NabuSessionTokenStore() }
 
-    single { NabuService(get(nabu)) }
+    single {
+        NabuService(get(nabu))
+    }
 
     single {
         RetailWalletTokenService(

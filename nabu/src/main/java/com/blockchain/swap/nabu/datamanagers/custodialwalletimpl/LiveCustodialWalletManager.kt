@@ -682,7 +682,7 @@ class LiveCustodialWalletManager(
         }.map { methods ->
             methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
-                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency)
+                        SUPPORTED_FUNDS_CURRENCIES.contains(it.currency) && it.eligible
             }.mapNotNull {
                 it.currency
             }

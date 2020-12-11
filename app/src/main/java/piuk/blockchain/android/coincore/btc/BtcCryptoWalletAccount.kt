@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -223,6 +224,9 @@ internal class BtcCryptoWalletAccount(
             payloadDataManager.incrementReceiveAddress(account)
         }
     }
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is BtcCryptoWalletAccount && other.xpubAddress == xpubAddress
 
     companion object {
         fun createHdAccount(

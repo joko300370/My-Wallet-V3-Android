@@ -12,6 +12,7 @@ import org.bitcoinj.core.Address
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -145,6 +146,9 @@ internal class BchCryptoWalletAccount private constructor(
 
     override val xpubAddress: String
         get() = internalAccount.xpub
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is BchCryptoWalletAccount && other.xpubAddress == xpubAddress
 
     companion object {
         fun createBchAccount(

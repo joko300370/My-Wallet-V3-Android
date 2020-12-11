@@ -106,7 +106,7 @@ internal class BchAsset(
 
     fun createAccount(xpub: String): Completable {
         bchDataManager.createAccount(xpub)
-        return bchDataManager.syncWithServer()
+        return bchDataManager.syncWithServer().doOnComplete { forceAccountRefresh() }
     }
 }
 

@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
@@ -44,7 +45,6 @@ open class CustodialTradingAccount(
     private val eligibilityProvider: EligibilityProvider
 ) : CryptoAccountBase(), TradingAccount {
 
-    private val nabuAccountExists = AtomicBoolean(false)
     private val isEligibleForSimpleBuy = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
@@ -79,10 +79,11 @@ open class CustodialTradingAccount(
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
 
+    override fun matches(other: CryptoAccount): Boolean =
+        other is CustodialTradingAccount && other.asset == asset
+
     override val accountBalance: Single<Money>
         get() = custodialWalletManager.getTotalBalanceForAsset(asset)
-            .doOnComplete { nabuAccountExists.set(false) }
-            .doOnSuccess { nabuAccountExists.set(true) }
             .toSingle(CryptoValue.zero(asset))
             .zipWith(eligibilityProvider.isEligibleForSimpleBuy().doOnSuccess {
                 isEligibleForSimpleBuy.set(it)
@@ -98,8 +99,6 @@ open class CustodialTradingAccount(
 
     override val actionableBalance: Single<Money>
         get() = custodialWalletManager.getActionableBalanceForAsset(asset)
-            .doOnComplete { nabuAccountExists.set(false) }
-            .doOnSuccess { nabuAccountExists.set(true) }
             .toSingle(CryptoValue.zero(asset))
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading actionable balance: $it")
@@ -122,9 +121,6 @@ open class CustodialTradingAccount(
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
-
-    val isConfigured: Boolean
-        get() = nabuAccountExists.get()
 
     override val isFunded: Boolean
         get() = hasFunds.get()
