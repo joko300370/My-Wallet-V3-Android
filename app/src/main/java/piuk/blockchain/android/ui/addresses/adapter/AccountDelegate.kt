@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.item_accounts_row.view.*
-import kotlinx.android.synthetic.main.status_line_info.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -51,6 +50,8 @@ class AccountDelegate(
                 itemView.account_details_archived.updateAccount(
                     item.account
                 ) { listener.onAccountClicked(it) }
+                itemView.account_details.contentDescription = ""
+                itemView.account_details_archived.contentDescription = item.account.label
             } else {
                 // Show the normal item
                 itemView.account_details_archived.gone()
@@ -60,6 +61,8 @@ class AccountDelegate(
                     { listener.onAccountClicked(it) },
                     DefaultAccountCellDecorator(item.account)
                 )
+                itemView.account_details_archived.contentDescription = ""
+                itemView.account_details.contentDescription = item.account.label
             }
         }
     }
