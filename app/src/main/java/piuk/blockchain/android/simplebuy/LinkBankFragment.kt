@@ -114,7 +114,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         }
 
         link_bank_icon.setImageResource(
-            if (state == ErrorState.LinkedBankAlreadyLinked) R.drawable.ic_bank_user
+            if (state == ErrorState.LinkedBankNamesMissMatched) R.drawable.ic_bank_user
             else R.drawable.ic_bank_details_big
         )
         link_bank_progress.gone()
