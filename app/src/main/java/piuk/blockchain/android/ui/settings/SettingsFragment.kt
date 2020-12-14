@@ -779,15 +779,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.email_notifications)
             .setMessage(R.string.email_notifications_summary)
-            .setPositiveButton(R.string.enable) { dialogInterface, i ->
-                settingsPresenter.updateNotification(
-                    Settings.NOTIFICATION_TYPE_EMAIL,
+            .setPositiveButton(R.string.enable) { _, _ ->
+                settingsPresenter.updateEmailNotification(
                     true
                 )
             }
             .setNegativeButton(R.string.disable) { _, _ ->
-                settingsPresenter.updateNotification(
-                    Settings.NOTIFICATION_TYPE_EMAIL,
+                settingsPresenter.updateEmailNotification(
                     false
                 )
             }

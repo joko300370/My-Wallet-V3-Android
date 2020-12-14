@@ -38,7 +38,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcore.utils.extensions.then
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -249,7 +248,7 @@ class SettingsPresenter(
     /**
      * @return true if the device has usable fingerprint hardware
      */
-    val ifFingerprintHardwareAvailable: Boolean
+    private val ifFingerprintHardwareAvailable: Boolean
         get() = fingerprintHelper.isHardwareDetected()
 
     /**
@@ -345,7 +344,9 @@ class SettingsPresenter(
                         updateUi(it)
                         view?.showDialogEmailVerification()
                     },
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                    onError = {
+                        view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+                    }
                 )
     }
 
@@ -356,7 +357,7 @@ class SettingsPresenter(
      */
     fun updateSms(sms: String) {
         if (sms.isInvalid()) {
-            view?.setEmailSummary(stringUtils.getString(R.string.not_specified))
+            view?.setSmsSummary(stringUtils.getString(R.string.not_specified))
             return
         }
         compositeDisposable +=
@@ -373,7 +374,9 @@ class SettingsPresenter(
                         updateUi(it)
                         view?.showDialogVerifySms()
                     },
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
+                    onError = {
+                        view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+                    }
                 )
     }
 
@@ -440,6 +443,15 @@ class SettingsPresenter(
                 )
     }
 
+    fun updateEmailNotification(enabled: Boolean) {
+        compositeDisposable += updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, enabled)
+            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(onSuccess = {
+                view?.setEmailNotificationPref(enabled)
+            }, onError = {
+                view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+            })
+    }
+
     /**
      * Updates the user's notification preferences. Will not make any web requests if not necessary.
      *
@@ -448,7 +460,7 @@ class SettingsPresenter(
      * @see Settings
      */
 
-    fun updateNotification(type: Int, enable: Boolean): Single<Settings> {
+    private fun updateNotification(type: Int, enable: Boolean): Single<Settings> {
         return cachedSettings.flatMap {
             if (enable && it.isNotificationTypeEnabled(type)) {
                 // No need to change
