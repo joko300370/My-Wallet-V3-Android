@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
+import com.blockchain.ui.urllinks.URL_YODLEE_SUPPORT_LEARN_MORE
 import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_link_a_bank.*
 import org.koin.android.ext.android.inject
@@ -81,16 +82,16 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
                 link_bank_title.text = getString(R.string.yodlee_linking_is_this_your_bank)
 
                 val linksMap = mapOf<String, Uri>(
-                    "yodlee_names_dont_match_learn_more" to Uri.parse(YODLEE_LEARN_MORE)
+                    "yodlee_names_dont_match_learn_more" to Uri.parse(URL_YODLEE_SUPPORT_LEARN_MORE)
                 )
 
-                val tosText = stringUtils.getStringWithMappedAnnotations(
+                val text = stringUtils.getStringWithMappedAnnotations(
                     R.string.yodlee_linking_already_linked_error_subtitle,
                     linksMap,
                     activity
                 )
 
-                link_bank_subtitle.text = tosText
+                link_bank_subtitle.text = text
                 link_bank_subtitle.movementMethod = LinkMovementMethod.getInstance()
             }
             ErrorState.LinkedBankAccountUnsupported -> {
