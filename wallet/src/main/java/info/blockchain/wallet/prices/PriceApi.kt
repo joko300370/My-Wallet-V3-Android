@@ -15,17 +15,19 @@ class PriceApi(private val endpoints: PriceEndpoints, private val apiCode: ApiCo
      * Returns a [List] of [PriceDatum] objects, containing a timestamp and a price for
      * that given time.
      *
-     * @param cryptoCurrency  The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
+     * @param cryptoCurrency The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
      * @param fiat The fiat currency in which to return the prices, eg "usd"
      * @param start The start time, in epoch seconds, from which to gather historic data
      * @param scale The scale which you want to use between price data, eg [TimeInterval.ONE_DAY]
      * @return An [Observable] wrapping a [List] of [PriceDatum] objects
      * @see TimeInterval
      */
-    fun getHistoricPriceSeries(cryptoCurrency: String,
-                               fiat: String,
-                               start: Long,
-                               scale: Int): Single<List<PriceDatum>> {
+    fun getHistoricPriceSeries(
+        cryptoCurrency: String,
+        fiat: String,
+        start: Long,
+        scale: Int
+    ): Single<List<PriceDatum>> {
         return endpoints.getHistoricPriceSeries(cryptoCurrency,
             fiat,
             start,
@@ -38,7 +40,7 @@ class PriceApi(private val endpoints: PriceEndpoints, private val apiCode: ApiCo
      * Provides the exchange rate between a cryptocurrency and a fiat currency for this moment in
      * time. Returns a single [PriceDatum] object.
      *
-     * @param cryptoCurrency  The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
+     * @param cryptoCurrency The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
      * @param fiat The fiat currency in which to return the price, eg "usd"
      * @return An [Observable] wrapping a [PriceDatum] object
      */
@@ -59,9 +61,9 @@ class PriceApi(private val endpoints: PriceEndpoints, private val apiCode: ApiCo
      * Provides the exchange rate between a cryptocurrency and a fiat currency for a given moment in
      * epochTime, supplied in seconds since epoch. Returns a single [PriceDatum] object.
      *
-     * @param cryptoCurrency  The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
+     * @param cryptoCurrency The cryptoCurrency cryptocurrency for which to gather prices, eg "eth", "btc" or "bcc"
      * @param fiat The fiat currency in which to return the price, eg "usd"
-     * @param epochTime  The epochTime in seconds since epoch for which you want to return a price
+     * @param epochTime The epochTime in seconds since epoch for which you want to return a price
      * @return An [Observable] wrapping a [PriceDatum] object
      */
     fun getHistoricPrice(cryptoCurrency: String, fiat: String, epochTime: Long): Single<Double> {
