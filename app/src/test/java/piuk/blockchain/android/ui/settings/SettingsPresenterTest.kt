@@ -1,13 +1,12 @@
 package piuk.blockchain.android.ui.settings
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
-import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException.Companion.fromResponseBody
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.times
@@ -27,6 +26,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.api.bitpay.models.exceptions.BitPayApiException.Companion.fromResponseBody
 import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
