@@ -33,6 +33,7 @@ data class LinkedBank(
 
 enum class LinkedBankErrorState {
     ACCOUNT_ALREADY_LINKED,
+    NAMES_MISS_MATCHED,
     ACCOUNT_TYPE_UNSUPPORTED,
     UNKNOWN,
     NONE

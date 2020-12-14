@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.URL_YODLEE_SUPPORT_LEARN_MORE
-import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_link_a_bank.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -78,6 +77,18 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
             ErrorState.LinkedBankAlreadyLinked -> {
                 analytics.logEvent(
                     bankLinkingAlreadyLinked(BankPartnerTypes.ACH.name))
+                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_account)
+                link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_already_linked_error_subtitle)
+            }
+            ErrorState.LinkedBankAccountUnsupported -> {
+                analytics.logEvent(
+                    bankLinkingIncorrectAccount(BankPartnerTypes.ACH.name))
+                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
+                link_bank_title.text = getString(R.string.yodlee_linking_checking_error_title)
+                link_bank_subtitle.text = getString(R.string.yodlee_linking_checking_error_subtitle)
+            }
+            ErrorState.LinkedBankNamesMissMatched -> {
                 link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
                 link_bank_title.text = getString(R.string.yodlee_linking_is_this_your_bank)
 
@@ -94,13 +105,6 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
                 link_bank_subtitle.text = text
                 link_bank_subtitle.movementMethod = LinkMovementMethod.getInstance()
             }
-            ErrorState.LinkedBankAccountUnsupported -> {
-                analytics.logEvent(
-                    bankLinkingIncorrectAccount(BankPartnerTypes.ACH.name))
-                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
-                link_bank_title.text = getString(R.string.yodlee_linking_checking_error_title)
-                link_bank_subtitle.text = getString(R.string.yodlee_linking_checking_error_subtitle)
-            }
             else -> {
                 analytics.logEvent(bankLinkingGenericError(BankPartnerTypes.ACH.name))
                 link_bank_btn.text = getString(R.string.common_try_again)
@@ -109,7 +113,10 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
             }
         }
 
-        link_bank_icon.setImageResource(R.drawable.ic_bank_details_big)
+        link_bank_icon.setImageResource(
+            if (state == ErrorState.LinkedBankAlreadyLinked) R.drawable.ic_bank_user
+            else R.drawable.ic_bank_details_big
+        )
         link_bank_progress.gone()
         link_bank_state_indicator.setImageResource(R.drawable.ic_alert_white_bkgd)
         link_bank_state_indicator.visible()
