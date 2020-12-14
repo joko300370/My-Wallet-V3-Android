@@ -7,9 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity

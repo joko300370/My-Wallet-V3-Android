@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
-import com.blockchain.swap.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.InterestState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money

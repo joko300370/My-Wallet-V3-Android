@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.activity.detail.adapter
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.extensions.LayoutContainer

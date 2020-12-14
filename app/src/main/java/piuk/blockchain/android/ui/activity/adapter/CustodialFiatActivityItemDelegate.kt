@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.TransactionType
 import kotlinx.android.synthetic.main.layout_fiat_activity_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem

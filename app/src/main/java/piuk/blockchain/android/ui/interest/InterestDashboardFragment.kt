@@ -8,10 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

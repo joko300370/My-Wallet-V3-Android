@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.service.TierService
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable

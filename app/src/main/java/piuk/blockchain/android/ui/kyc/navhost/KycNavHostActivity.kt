@@ -14,7 +14,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.StartKyc
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -31,6 +30,10 @@ import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostF
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_kyc as progressIndicator
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading_user as progressLoadingUser
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
+
+interface StartKyc {
+    fun startKycActivity(context: Any)
+}
 
 internal class KycStarter : StartKyc {
     override fun startKycActivity(context: Any) {

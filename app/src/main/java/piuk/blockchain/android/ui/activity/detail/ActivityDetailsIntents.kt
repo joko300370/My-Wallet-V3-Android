@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.activity.detail
 
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem

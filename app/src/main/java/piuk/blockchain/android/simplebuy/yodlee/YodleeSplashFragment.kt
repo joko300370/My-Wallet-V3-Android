@@ -4,9 +4,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.blockchain.notifications.analytics.Analytics
+import piuk.blockchain.android.simplebuy.BankPartnerTypes
+import piuk.blockchain.android.simplebuy.bankLinkingSplashCta
+import piuk.blockchain.android.simplebuy.bankLinkingSplashShown
 import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
-import com.blockchain.ui.urllinks.YODLEE_PP
-import com.blockchain.ui.urllinks.YODLEE_TOS
 import kotlinx.android.synthetic.main.fragment_simple_buy_yodlee_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -18,6 +20,7 @@ import piuk.blockchain.android.util.StringUtils
 class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash), SimpleBuyScreen {
 
     private val stringUtils: StringUtils by inject()
+    private val analytics: Analytics by inject()
 
     private val fastLinkUrl: String by lazy {
         arguments?.getString(FAST_LINK_URL) ?: ""
@@ -33,19 +36,15 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
 
         val learnMoreMap = mapOf<String, Uri>("yodlee_learn_more" to Uri.parse(YODLEE_LEARN_MORE))
 
-        val tosAndPPMap = mapOf<String, Uri>(
-            "yodlee_tos" to Uri.parse(YODLEE_TOS),
-            "yodlee_pp" to Uri.parse(YODLEE_PP)
-        )
-
         yodlee_splash_blurb.text =
             stringUtils.getStringWithMappedLinks(R.string.yodlee_splash_blurb, learnMoreMap, requireActivity())
-        yodlee_splash_tos_pp.text =
-            stringUtils.getStringWithMappedLinks(R.string.yodlee_splash_tos_pp, tosAndPPMap, requireActivity())
 
         yodlee_splash_cta.setOnClickListener {
+            analytics.logEvent(bankLinkingSplashCta(BankPartnerTypes.ACH.name))
             navigator().launchYodleeWebview(fastLinkUrl, accessToken)
         }
+
+        analytics.logEvent(bankLinkingSplashShown(BankPartnerTypes.ACH.name))
     }
 
     companion object {

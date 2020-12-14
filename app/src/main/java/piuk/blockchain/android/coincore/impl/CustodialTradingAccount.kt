@@ -1,14 +1,14 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.datamanagers.BuySellOrder
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.BuySellOrder
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue

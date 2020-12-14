@@ -2,12 +2,12 @@ package piuk.blockchain.android.ui.kyc.address
 
 import com.blockchain.android.testutils.rxInit
 import piuk.blockchain.android.ui.getBlankNabuUser
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.responses.nabu.Address
-import com.blockchain.swap.nabu.models.responses.nabu.NabuCountryResponse
-import com.blockchain.swap.nabu.models.responses.nabu.Scope
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.Address
+import com.blockchain.nabu.models.responses.nabu.NabuCountryResponse
+import com.blockchain.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.validOfflineToken
-import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.nabu.NabuToken
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never

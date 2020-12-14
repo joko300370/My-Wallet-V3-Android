@@ -1,19 +1,19 @@
 package piuk.blockchain.android.ui.settings
 
 import android.annotation.SuppressLint
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
-import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.responses.nabu.NabuErrorStatusCodes
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager

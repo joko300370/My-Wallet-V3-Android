@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.BuySellPairs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.BuySellPairs
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate

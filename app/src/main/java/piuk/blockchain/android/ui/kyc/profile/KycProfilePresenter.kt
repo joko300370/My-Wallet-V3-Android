@@ -1,18 +1,18 @@
 package piuk.blockchain.android.ui.kyc.profile
 
 import piuk.blockchain.android.ui.kyc.BaseKycPresenter
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.responses.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.responses.nabu.NabuErrorStatusCodes
-import com.blockchain.swap.nabu.util.toISO8601DateString
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
+import com.blockchain.nabu.util.toISO8601DateString
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import com.blockchain.metadata.MetadataRepository
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.metadata.NabuCredentialsMetadata
-import com.blockchain.swap.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.swap.nabu.models.responses.tokenresponse.mapFromMetadata
-import com.blockchain.swap.nabu.models.responses.tokenresponse.mapToMetadata
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.metadata.NabuCredentialsMetadata
+import com.blockchain.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.nabu.models.responses.tokenresponse.mapFromMetadata
+import com.blockchain.nabu.models.responses.tokenresponse.mapToMetadata
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single

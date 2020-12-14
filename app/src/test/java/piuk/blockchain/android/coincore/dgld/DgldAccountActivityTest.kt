@@ -3,11 +3,11 @@ package piuk.blockchain.android.coincore.dgld
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.CustodialOrderState
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify

@@ -1,15 +1,15 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentLimits
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.data.LinkedBank
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.PaymentLimits
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money

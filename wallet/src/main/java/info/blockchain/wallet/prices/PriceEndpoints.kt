@@ -7,11 +7,13 @@ import retrofit2.http.Query
 
 interface PriceEndpoints {
     @GET(PriceUrls.PRICE_SERIES)
-    fun getHistoricPriceSeries(@Query("base") base: String,
-                               @Query("quote") quote: String,
-                               @Query("start") start: Long,
-                               @Query("scale") scale: Int,
-                               @Query("api_key") apiKey: String): Single<List<PriceDatum>>
+    fun getHistoricPriceSeries(
+        @Query("base") base: String,
+        @Query("quote") quote: String,
+        @Query("start") start: Long,
+        @Query("scale") scale: Int,
+        @Query("api_key") apiKey: String
+    ): Single<List<PriceDatum>>
 
     @GET(PriceUrls.SINGLE_PRICE)
     fun getCurrentPrice(

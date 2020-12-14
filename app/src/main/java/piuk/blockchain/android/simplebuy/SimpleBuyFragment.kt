@@ -1,6 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.base.FlowFragment
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog

@@ -1,8 +1,8 @@
 package piuk.blockchain.android.repositories
 
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.TransactionType
-import com.blockchain.swap.nabu.datamanagers.repositories.ExpiringRepository
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.repositories.ExpiringRepository
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Observable

@@ -1,11 +1,11 @@
 package piuk.blockchain.android.ui.kyc.tiersplash
 
 import androidx.navigation.NavDirections
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierState
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTierState
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
-import com.blockchain.swap.nabu.service.TierService
-import com.blockchain.swap.nabu.service.TierUpdater
+import com.blockchain.nabu.service.TierService
+import com.blockchain.nabu.service.TierUpdater
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign

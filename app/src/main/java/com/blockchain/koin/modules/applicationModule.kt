@@ -23,7 +23,7 @@ import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
 import com.blockchain.remoteconfig.CoinSelectionRemoteConfig
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder

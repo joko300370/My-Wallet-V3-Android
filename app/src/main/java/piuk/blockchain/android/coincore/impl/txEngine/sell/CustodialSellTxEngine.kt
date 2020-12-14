@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money

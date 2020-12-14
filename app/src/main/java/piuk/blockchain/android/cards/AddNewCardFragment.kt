@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy

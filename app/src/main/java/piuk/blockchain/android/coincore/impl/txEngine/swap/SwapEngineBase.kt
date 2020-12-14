@@ -1,13 +1,13 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.TransferLimits
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.CustodialOrder
-import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import com.blockchain.swap.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.responses.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferLimits
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money

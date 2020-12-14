@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.swap.nabu.models.data.BankPartner
-import com.blockchain.swap.nabu.models.data.LinkBankTransfer
-import com.blockchain.swap.nabu.models.data.YodleeAttributes
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.BankPartner
+import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.YodleeAttributes
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -131,6 +131,8 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     }
 
     override fun goToCheckOutScreen(addToBackStack: Boolean) {
+        ViewUtils.hideKeyboard(this)
+
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, SimpleBuyCheckoutFragment(), SimpleBuyCheckoutFragment::class.simpleName)
             .apply {

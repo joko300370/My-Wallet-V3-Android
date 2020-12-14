@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.PriceTier
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.PriceTier
 import info.blockchain.balance.Money
 import java.math.BigDecimal
 import java.math.BigInteger

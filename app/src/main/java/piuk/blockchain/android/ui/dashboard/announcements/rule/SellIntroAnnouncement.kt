@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.EligibilityProvider
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R

@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.erc20.usdt
 
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ReceiveAddress

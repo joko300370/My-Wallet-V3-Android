@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
-import com.blockchain.swap.nabu.datamanagers.TransferQuote
-import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.TransferQuote
+import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.Observables

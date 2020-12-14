@@ -1,11 +1,11 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
-import com.blockchain.swap.nabu.datamanagers.InterestState
-import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.models.responses.interest.DisabledReason
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.InterestActivityItem
+import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.models.responses.interest.DisabledReason
+import com.blockchain.nabu.datamanagers.TransferDirection
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money

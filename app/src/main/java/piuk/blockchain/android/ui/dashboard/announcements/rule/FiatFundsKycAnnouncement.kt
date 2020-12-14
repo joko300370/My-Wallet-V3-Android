@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.featureflags.Feature
-import com.blockchain.swap.nabu.datamanagers.featureflags.KycFeatureEligibility
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.featureflags.Feature
+import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R

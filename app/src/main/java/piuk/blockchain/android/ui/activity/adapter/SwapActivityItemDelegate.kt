@@ -7,7 +7,7 @@ import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CurrencyPair
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R

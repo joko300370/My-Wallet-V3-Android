@@ -2,10 +2,10 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.TransferDirection
-import com.blockchain.swap.nabu.datamanagers.repositories.QuotesProvider
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.service.TierService
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount

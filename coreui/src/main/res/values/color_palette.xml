@@ -98,6 +98,7 @@
     <color name="xrp">#000000</color>
     <color name="algo">#000000</color>
     <color name="dgld">#FFE738</color>
+    <color name="dgld_chart">#000000</color>
 
 </resources>
 
