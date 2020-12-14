@@ -37,7 +37,7 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
         val learnMoreMap = mapOf<String, Uri>("yodlee_learn_more" to Uri.parse(YODLEE_LEARN_MORE))
 
         yodlee_splash_blurb.text =
-            stringUtils.getStringWithMappedLinks(R.string.yodlee_splash_blurb, learnMoreMap, requireActivity())
+            stringUtils.getStringWithMappedAnnotations(R.string.yodlee_splash_blurb, learnMoreMap, requireActivity())
 
         yodlee_splash_cta.setOnClickListener {
             analytics.logEvent(bankLinkingSplashCta(BankPartnerTypes.ACH.name))

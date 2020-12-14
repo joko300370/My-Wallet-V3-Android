@@ -105,7 +105,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             "privacy" to Uri.parse(URL_PRIVACY_POLICY)
         )
 
-        val tosText = stringUtils.getStringWithMappedLinks(
+        val tosText = stringUtils.getStringWithMappedAnnotations(
             R.string.you_agree_terms_of_service,
             linksMap,
             this

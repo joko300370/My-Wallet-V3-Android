@@ -107,7 +107,7 @@ class KycMobileValidationFragment :
         )
 
         text_view_resend_prompt.text =
-            stringUtils.getStringWithMappedLinks(
+            stringUtils.getStringWithMappedAnnotations(
                 R.string.kyc_phone_send_again,
                 linksMap,
                 requireActivity()

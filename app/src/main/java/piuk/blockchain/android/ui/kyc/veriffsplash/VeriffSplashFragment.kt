@@ -93,7 +93,7 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
         )
 
         // On the content view:
-        val countriesText = stringUtils.getStringWithMappedLinks(
+        val countriesText = stringUtils.getStringWithMappedAnnotations(
             R.string.kyc_veriff_splash_country_supported_subheader,
             linksMap,
             requireActivity()
@@ -103,7 +103,7 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
         text_supported_countries.movementMethod = LinkMovementMethod.getInstance()
 
         // On the error view:
-        val supportText = stringUtils.getStringWithMappedLinks(
+        val supportText = stringUtils.getStringWithMappedAnnotations(
             R.string.kyc_gold_unavailable_text_support,
             linksMap,
             requireActivity()
