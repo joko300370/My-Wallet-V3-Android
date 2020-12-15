@@ -182,7 +182,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
         val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
 
-        val learnLink = stringUtils.getStringWithMappedLinks(
+        val learnLink = stringUtils.getStringWithMappedAnnotations(
             R.string.common_linked_learn_more,
             map,
             activity)

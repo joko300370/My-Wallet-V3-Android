@@ -3,11 +3,13 @@ package piuk.blockchain.android.util
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannedString
 import android.text.style.ClickableSpan
+import android.text.style.StyleSpan
 import android.view.View
 import androidx.annotation.StringRes
 
@@ -18,7 +20,7 @@ class StringUtils(private val context: Context) {
         return context.getString(stringId)
     }
 
-    fun getStringWithMappedLinks(
+    fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
         launchActivity: Activity,
@@ -44,6 +46,15 @@ class StringUtils(private val context: Context) {
                     rawText.getSpanStart(annotation),
                     rawText.getSpanEnd(annotation),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            if (annotation.key == "font") {
+                val fontName = annotation.value
+                if (fontName == "bold") {
+                    out.setSpan(StyleSpan(Typeface.BOLD),
+                        rawText.getSpanStart(annotation),
+                        rawText.getSpanEnd(annotation),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
             }
         }
         return out

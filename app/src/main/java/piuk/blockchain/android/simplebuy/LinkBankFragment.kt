@@ -1,14 +1,19 @@
 package piuk.blockchain.android.simplebuy
 
+import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
+import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_link_a_bank.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
@@ -17,6 +22,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
 
     override val model: SimpleBuyModel by scopedInject()
+    private val stringUtils: StringUtils by inject()
 
     private val accountProviderId: String by lazy {
         arguments?.getString(ACCOUNT_PROVIDER_ID) ?: ""
@@ -71,9 +77,21 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
             ErrorState.LinkedBankAlreadyLinked -> {
                 analytics.logEvent(
                     bankLinkingAlreadyLinked(BankPartnerTypes.ACH.name))
-                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_account)
-                link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
-                link_bank_subtitle.text = getString(R.string.yodlee_linking_already_linked_error_subtitle)
+                link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
+                link_bank_title.text = getString(R.string.yodlee_linking_is_this_your_bank)
+
+                val linksMap = mapOf<String, Uri>(
+                    "yodlee_names_dont_match_learn_more" to Uri.parse(YODLEE_LEARN_MORE)
+                )
+
+                val tosText = stringUtils.getStringWithMappedAnnotations(
+                    R.string.yodlee_linking_already_linked_error_subtitle,
+                    linksMap,
+                    activity
+                )
+
+                link_bank_subtitle.text = tosText
+                link_bank_subtitle.movementMethod = LinkMovementMethod.getInstance()
             }
             ErrorState.LinkedBankAccountUnsupported -> {
                 analytics.logEvent(

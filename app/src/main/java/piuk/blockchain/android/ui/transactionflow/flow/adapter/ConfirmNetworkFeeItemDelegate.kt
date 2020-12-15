@@ -84,7 +84,7 @@ private class NetworkFeeItemViewHolder(
     private fun getFreeFeesText(context: Context, linksMap: Map<String, Uri>): SpannableStringBuilder {
         val introText = context.getString(R.string.tx_confirmation_free_fee_learn_more_1)
         val boldText = context.getString(R.string.tx_confirmation_free_fee_learn_more_2)
-        val linkedText = stringUtils.getStringWithMappedLinks(
+        val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_free_fee_learn_more_3,
             linksMap,
             activityContext
@@ -107,7 +107,7 @@ private class NetworkFeeItemViewHolder(
     ): SpannableStringBuilder {
         val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)
         val networkText = context.getString(R.string.tx_confirmation_fee_learn_more_2, context.getString(assetName))
-        val linkedText = stringUtils.getStringWithMappedLinks(
+        val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_fee_learn_more_3,
             linksMap,
             activityContext

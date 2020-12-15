@@ -234,7 +234,7 @@ private class XlmMemoItemViewHolder(
         val blurb = context.getString(R.string.send_to_exchange_xlm_blurb)
 
         val map = mapOf("send_memo_link" to Uri.parse(URL_XLM_MIN_BALANCE))
-        val link = stringUtils.getStringWithMappedLinks(
+        val link = stringUtils.getStringWithMappedAnnotations(
             R.string.send_to_exchange_xlm_link,
             map,
             activity)

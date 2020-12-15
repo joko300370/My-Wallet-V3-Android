@@ -76,7 +76,7 @@ class KycEmailValidationFragment :
         )
 
         textViewResend.text =
-            stringUtils.getStringWithMappedLinks(
+            stringUtils.getStringWithMappedAnnotations(
                 R.string.kyc_email_did_not_see_email,
                 linksMap,
                 requireActivity()
