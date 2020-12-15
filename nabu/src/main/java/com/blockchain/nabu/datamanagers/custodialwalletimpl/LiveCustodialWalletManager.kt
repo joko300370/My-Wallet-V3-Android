@@ -405,7 +405,7 @@ class LiveCustodialWalletManager(
     override fun updateAccountProviderId(linkingId: String, providerAccountId: String) =
         authenticator.authenticateCompletable {
             nabuService.updateAccountProviderId(it, linkingId, UpdateProviderAccountBody(
-                ProviderAccountAttrs(providerAccountId, extraAttributesProvider.getBankUpdateOverride())
+                ProviderAccountAttrs(providerAccountId)
             ))
         }
 
