@@ -186,7 +186,7 @@ sealed class ErrorState : Serializable {
     object BankLinkingTimeout : ErrorState()
     object LinkedBankAlreadyLinked : ErrorState()
     object LinkedBankAccountUnsupported : ErrorState()
-    object LinkedBankNamesMissMatched : ErrorState()
+    object LinkedBankNamesMismatched : ErrorState()
     object LinkedBankNotSupported : ErrorState()
 }
 

@@ -101,6 +101,30 @@ fun PaymentMethodType.toAnalyticsString() =
         else -> ""
     }
 
+fun accountMismatchError(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_acc_name_mis_error"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun accountMismatchErrorCtaRetry(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_acc_name_mis_error_try"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
+fun accountMismatchErrorCtaCancel(partner: String): AnalyticsEvent =
+    object : AnalyticsEvent {
+        override val event: String = "sb_acc_name_mis_error_cancel"
+        override val params: Map<String, String> = mapOf(
+            "partner" to partner
+        )
+    }
+
 fun bankLinkingGenericError(partner: String): AnalyticsEvent =
     object : AnalyticsEvent {
         override val event: String = "sb_bank_link_gen_error"

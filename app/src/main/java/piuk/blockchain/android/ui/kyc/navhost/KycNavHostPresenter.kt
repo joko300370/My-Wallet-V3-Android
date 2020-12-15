@@ -93,25 +93,32 @@ class KycNavHostPresenter(
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
-            view.navigateToResubmissionSplash()
-        } else if (view.campaignType == CampaignType.Blockstack ||
-            view.campaignType == CampaignType.SimpleBuy || view.campaignType == CampaignType.Interest) {
-            compositeDisposable += kycNavigator.findNextStep()
-                .subscribeBy(
-                    onError = { Timber.e(it) },
-                    onSuccess = { view.navigate(it) }
-                )
-        } else if (user.state != UserState.None && user.kycState == KycState.None && !view.showTiersLimitsSplash) {
-            val current = user.tiers?.current
-            if (current == null || current == 0) {
-                val reentryPoint = reentryDecision.findReentryPoint(user)
-                val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
-                view.navigate(directions)
-                Logging.logEvent(kycResumedEvent(reentryPoint))
+        when {
+            view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission -> {
+                view.navigateToResubmissionSplash()
             }
-        } else if (view.campaignType == CampaignType.Sunriver) {
-            view.navigateToKycSplash()
+            view.campaignType == CampaignType.Blockstack ||
+                view.campaignType == CampaignType.SimpleBuy ||
+                view.campaignType == CampaignType.Interest ||
+                (view.campaignType == CampaignType.Swap && !view.showTiersLimitsSplash) -> {
+                compositeDisposable += kycNavigator.findNextStep()
+                    .subscribeBy(
+                        onError = { Timber.e(it) },
+                        onSuccess = { view.navigate(it) }
+                    )
+            }
+            user.state != UserState.None && user.kycState == KycState.None && !view.showTiersLimitsSplash -> {
+                val current = user.tiers?.current
+                if (current == null || current == 0) {
+                    val reentryPoint = reentryDecision.findReentryPoint(user)
+                    val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
+                    view.navigate(directions)
+                    Logging.logEvent(kycResumedEvent(reentryPoint))
+                }
+            }
+            view.campaignType == CampaignType.Sunriver -> {
+                view.navigateToKycSplash()
+            }
         }
 
         // If no other methods are triggered, this will start KYC from scratch. If others have been called,

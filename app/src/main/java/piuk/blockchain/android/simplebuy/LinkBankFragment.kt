@@ -88,7 +88,10 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
                 link_bank_title.text = getString(R.string.yodlee_linking_checking_error_title)
                 link_bank_subtitle.text = getString(R.string.yodlee_linking_checking_error_subtitle)
             }
-            ErrorState.LinkedBankNamesMissMatched -> {
+            ErrorState.LinkedBankNamesMismatched -> {
+                analytics.logEvent(
+                    accountMismatchError(BankPartnerTypes.ACH.name))
+
                 link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
                 link_bank_title.text = getString(R.string.yodlee_linking_is_this_your_bank)
 
@@ -114,8 +117,11 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         }
 
         link_bank_icon.setImageResource(
-            if (state == ErrorState.LinkedBankNamesMissMatched) R.drawable.ic_bank_user
-            else R.drawable.ic_bank_details_big
+            if (state == ErrorState.LinkedBankNamesMismatched) {
+                R.drawable.ic_bank_user
+            } else {
+                R.drawable.ic_bank_details_big
+            }
         )
         link_bank_progress.gone()
         link_bank_state_indicator.setImageResource(R.drawable.ic_alert_white_bkgd)
@@ -138,6 +144,8 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
                 bankLinkingAlreadyCtaRetry(BankPartnerTypes.ACH.name))
             ErrorState.LinkedBankAccountUnsupported -> analytics.logEvent(
                 bankLinkingIncorrectCtaRetry(BankPartnerTypes.ACH.name))
+            ErrorState.LinkedBankNamesMismatched -> analytics.logEvent(
+                accountMismatchErrorCtaRetry(BankPartnerTypes.ACH.name))
             else -> analytics.logEvent(bankLinkingGenericErrorCtaRetry(BankPartnerTypes.ACH.name))
         }
     }
@@ -148,6 +156,8 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
                 bankLinkingAlreadyCtaCancel(BankPartnerTypes.ACH.name))
             ErrorState.LinkedBankAccountUnsupported -> analytics.logEvent(
                 bankLinkingIncorrectCtaCancel(BankPartnerTypes.ACH.name))
+            ErrorState.LinkedBankNamesMismatched -> analytics.logEvent(
+                accountMismatchErrorCtaCancel(BankPartnerTypes.ACH.name))
             else -> analytics.logEvent(bankLinkingGenericErrorCtaCancel(BankPartnerTypes.ACH.name))
         }
     }
