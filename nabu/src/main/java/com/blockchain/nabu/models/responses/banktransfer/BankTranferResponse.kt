@@ -11,9 +11,7 @@ data class CreateLinkBankResponse(
 }
 
 data class CreateLinkBankRequestBody(
-    val currency: String,
-    val userId: String,
-    val attributes: LinkBankAttributes?
+    private val currency: String
 )
 
 data class LinkBankAttributes(
@@ -51,6 +49,7 @@ data class ProviderAccountAttrs(
     val providerAccountId: String,
     val userOverride: String?
 )
+
 data class LinkedBankDetailsResponse(
     val accountNumber: String,
     val accountName: String,
