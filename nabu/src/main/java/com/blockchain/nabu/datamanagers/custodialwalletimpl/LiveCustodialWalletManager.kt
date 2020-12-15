@@ -937,6 +937,7 @@ private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
     when (this) {
         LinkedBankTransferResponse.ERROR_ALREADY_LINKED -> LinkedBankErrorState.ACCOUNT_ALREADY_LINKED
         LinkedBankTransferResponse.ERROR_UNSUPPORTED_ACCOUNT -> LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED
+        LinkedBankTransferResponse.ERROR_NAMES_MISS_MATCHED -> LinkedBankErrorState.NAMES_MISS_MATCHED
         else -> LinkedBankErrorState.UNKNOWN
     }
 
