@@ -37,8 +37,7 @@ class StringUtils(private val context: Context) {
                     object : ClickableSpan() {
                         override fun onClick(widget: View?) {
                             linksMap[annotation.value]?.let {
-                                launchActivity.startActivity(Intent(Intent.ACTION_VIEW,
-                                    it))
+                                launchActivity.startActivity(Intent(Intent.ACTION_VIEW, it))
                             }
                             onClick()
                         }

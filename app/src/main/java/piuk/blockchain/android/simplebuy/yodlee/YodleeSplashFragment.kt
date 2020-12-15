@@ -2,18 +2,19 @@ package piuk.blockchain.android.simplebuy.yodlee
 
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.simplebuy.BankPartnerTypes
-import piuk.blockchain.android.simplebuy.bankLinkingSplashCta
-import piuk.blockchain.android.simplebuy.bankLinkingSplashShown
 import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_simple_buy_yodlee_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.BankPartnerTypes
 import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
 import piuk.blockchain.android.simplebuy.SimpleBuyScreen
+import piuk.blockchain.android.simplebuy.bankLinkingSplashCta
+import piuk.blockchain.android.simplebuy.bankLinkingSplashShown
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.StringUtils
 
@@ -36,6 +37,7 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
 
         val learnMoreMap = mapOf<String, Uri>("yodlee_learn_more" to Uri.parse(YODLEE_LEARN_MORE))
 
+        yodlee_splash_blurb.movementMethod = LinkMovementMethod.getInstance()
         yodlee_splash_blurb.text =
             stringUtils.getStringWithMappedAnnotations(R.string.yodlee_splash_blurb, learnMoreMap, requireActivity())
 
