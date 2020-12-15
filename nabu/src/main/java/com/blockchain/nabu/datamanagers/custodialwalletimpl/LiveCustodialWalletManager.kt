@@ -386,7 +386,7 @@ class LiveCustodialWalletManager(
 
     override fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer> {
         return authenticator.authenticate {
-            nabuService.linkToABank(it, fiatCurrency, it.userId, extraAttributesProvider.getBankLinkingAttributes())
+            nabuService.linkToABank(it, fiatCurrency)
                 .zipWith(bankLinkingEnabledProvider.supportedBankPartners())
         }.flatMap { (response, supportedPartners) ->
             response.partner.toLinkBankedPartner(supportedPartners)?.let {
