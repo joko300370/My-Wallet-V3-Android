@@ -320,24 +320,10 @@ class LiveCustodialWalletManager(
         }
 
     override fun getTotalBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
-        kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
-            .flatMapMaybe { eligible ->
-                if (eligible) {
-                    assetBalancesRepository.getTotalBalanceForAsset(crypto)
-                } else {
-                    Maybe.empty()
-                }
-            }
+        assetBalancesRepository.getTotalBalanceForAsset(crypto)
 
     override fun getActionableBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
-        kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
-            .flatMapMaybe { eligible ->
-                if (eligible) {
-                    assetBalancesRepository.getActionableBalanceForAsset(crypto)
-                } else {
-                    Maybe.empty()
-                }
-            }
+        assetBalancesRepository.getActionableBalanceForAsset(crypto)
 
     override fun getPendingBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
         assetBalancesRepository.getPendingBalanceForAsset(crypto)
