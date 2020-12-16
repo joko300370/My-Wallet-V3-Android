@@ -16,11 +16,14 @@ import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
+import info.blockchain.balance.percentageDelta
+import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.buy_intro_fragment.*
 import org.koin.android.ext.android.inject
@@ -56,6 +59,8 @@ class BuyIntroFragment : Fragment() {
     }
 
     private fun loadBuyDetails() {
+        val oneDayAgo = (System.currentTimeMillis() / 1000) - TimeInterval.ONE_DAY.intervalSeconds
+
         compositeDisposable +=
             custodialWalletManager.getSupportedBuySellCryptoCurrencies(
                 currencyPrefs.selectedFiatCurrency)
@@ -64,10 +69,17 @@ class BuyIntroFragment : Fragment() {
                         coinCore[it.cryptoCurrency].isEnabled
                     }
                     Single.zip(enabledPairs.map {
-                        coinCore[it.cryptoCurrency].exchangeRate()
+                        coinCore[it.cryptoCurrency].exchangeRate().zipWith(
+                            coinCore[it.cryptoCurrency].historicRate(oneDayAgo)
+                        ).map { (currentPrice, price24h) ->
+                            PriceHistory(
+                                currentExchangeRate = currentPrice as ExchangeRate.CryptoToFiat,
+                                exchangeRate24h = price24h as ExchangeRate.CryptoToFiat
+                            )
+                        }
                     }) { t: Array<Any> ->
                         t.map {
-                            it as ExchangeRate.CryptoToFiat
+                            it as PriceHistory
                         } to pairs.copy(pairs = enabledPairs)
                     }
                 }
@@ -89,7 +101,7 @@ class BuyIntroFragment : Fragment() {
 
     private fun renderBuyIntro(
         buyPairs: BuySellPairs,
-        exchangeRates: List<ExchangeRate.CryptoToFiat>
+        pricesHistory: List<PriceHistory>
     ) {
         rv_cryptos.visible()
         buy_empty.gone()
@@ -110,8 +122,10 @@ class BuyIntroFragment : Fragment() {
 
         rv_cryptos.layoutManager = LinearLayoutManager(activity)
         rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(buyPairs.pairs.map { pair ->
-            BuyCryptoItem(pair.cryptoCurrency,
-                exchangeRates.first { it.from == pair.cryptoCurrency }.price()
+            BuyCryptoItem(
+                cryptoCurrency = pair.cryptoCurrency,
+                price = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }.currentExchangeRate.price(),
+                percentageDelta = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }.percentageDelta
             ) {
                 simpleBuyPrefs.clearState()
                 startActivity(SimpleBuyActivity.newInstance(
@@ -142,4 +156,19 @@ class BuyIntroFragment : Fragment() {
     }
 }
 
-data class BuyCryptoItem(val cryptoCurrency: CryptoCurrency, val price: Money, val click: () -> Unit)
+data class PriceHistory(
+    val currentExchangeRate: ExchangeRate.CryptoToFiat,
+    val exchangeRate24h: ExchangeRate.CryptoToFiat
+) {
+    val cryptoCurrency: CryptoCurrency
+        get() = currentExchangeRate.from
+    val percentageDelta: Double
+        get() = currentExchangeRate.percentageDelta(exchangeRate24h)
+}
+
+data class BuyCryptoItem(
+    val cryptoCurrency: CryptoCurrency,
+    val price: Money,
+    val percentageDelta: Double,
+    val click: () -> Unit
+)
