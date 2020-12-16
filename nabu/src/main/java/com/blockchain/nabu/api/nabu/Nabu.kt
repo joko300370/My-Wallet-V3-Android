@@ -356,7 +356,8 @@ internal interface Nabu {
     @GET(NABU_ELIGIBLE_PAYMENT_METHODS)
     fun getPaymentMethodsForSimpleBuy(
         @Header("authorization") authorization: String,
-        @Query("currency") currency: String
+        @Query("currency") currency: String,
+        @Query("eligibleOnly") eligibleOnly: Boolean
     ): Single<List<PaymentMethodResponse>>
 
     @GET(NABU_BENEFICIARIES)

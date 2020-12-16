@@ -499,10 +499,12 @@ class NabuService(retrofit: Retrofit) {
 
     fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
+        currency: String,
+        eligibleOnly: Boolean
     ) = service.getPaymentMethodsForSimpleBuy(
         authorization = sessionToken.authHeader,
-        currency = currency
+        currency = currency,
+        eligibleOnly = eligibleOnly
     ).wrapErrorMessage()
 
     fun getBeneficiaries(sessionToken: NabuSessionTokenResponse) =
