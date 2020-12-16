@@ -62,7 +62,7 @@ class PayloadDataManager(
         get() = wallet?.hdWallets?.get(0)?.accounts?.size ?: 0
 
     var legacyAddresses: List<LegacyAddress>
-        get() = wallet?.legacyAddressList ?: emptyList()
+        get() = wallet?.legacyAddressList?.filter { !it.isWatchOnly() } ?: emptyList()
         set(addresses) {
             wallet!!.legacyAddressList = addresses
         }
@@ -650,3 +650,5 @@ class PayloadDataManager(
         payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
     }
 }
+
+private fun LegacyAddress.isWatchOnly() = privateKey == null
