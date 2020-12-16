@@ -100,8 +100,8 @@ class KycNavHostPresenterTest {
     fun `onViewReady, should redirect to country selection`() {
         // Arrange
         givenReentryDecision(ReentryPoint.CountrySelection)
-        whenever(view.campaignType).thenReturn(CampaignType.FiatFunds)
-        whenever(view.showTiersLimitsSplash).thenReturn(false)
+        whenever(view.campaignType).thenReturn(CampaignType.Swap)
+        whenever(view.showTiersLimitsSplash).thenReturn(true).thenReturn(false)
         whenever(nabuToken.fetchNabuToken()).thenReturn(Single.just(validOfflineToken))
         whenever(nabuDataManager.getUser(validOfflineToken))
             .thenReturn(
