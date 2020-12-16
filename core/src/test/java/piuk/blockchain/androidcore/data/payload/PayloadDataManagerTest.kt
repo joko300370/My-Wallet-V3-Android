@@ -30,6 +30,7 @@ import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import org.amshove.kluent.itReturns
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import java.math.BigInteger
@@ -500,7 +501,9 @@ class PayloadDataManagerTest {
     @Test
     fun `getLegacyAddresses returns list of legacy addresses`() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock()
+        val mockLegacyAddress: LegacyAddress = mock {
+            on { privateKey } itReturns("SomeRandomKeyString")
+        }
         val addresses = listOf(mockLegacyAddress)
         whenever(payloadManager.payload?.legacyAddressList).thenReturn(addresses)
         // Act
@@ -508,6 +511,25 @@ class PayloadDataManagerTest {
         // Assert
         verify(payloadManager, atLeastOnce()).payload
         result shouldEqual addresses
+    }
+
+    @Test
+    fun `getLegacyAddresses returns list of legacy addresses with filters out watch only`() {
+        // Arrange
+        val mockLegacyAddress1: LegacyAddress = mock {
+            on { privateKey } itReturns(null)
+        }
+        val mockLegacyAddress2: LegacyAddress = mock {
+            on { privateKey } itReturns("SomeRandomKeyString")
+        }
+        val addresses = listOf(mockLegacyAddress1, mockLegacyAddress2)
+        whenever(payloadManager.payload?.legacyAddressList).thenReturn(addresses)
+        // Act
+        val result = subject.legacyAddresses
+        // Assert
+        verify(payloadManager, atLeastOnce()).payload
+        result.count() shouldEqual 1
+        result[0] shouldEqual mockLegacyAddress2
     }
 
     @Test
