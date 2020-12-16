@@ -20,7 +20,12 @@ data class LinkBankAttributes(
 
 data class LinkBankAttrsResponse(
     val token: String?,
-    val fastlinkUrl: String?
+    val fastlinkUrl: String?,
+    val fastlinkParams: FastlinkParamsResponse?
+)
+
+data class FastlinkParamsResponse(
+    val configName: String
 )
 
 data class LinkedBankTransferResponse(

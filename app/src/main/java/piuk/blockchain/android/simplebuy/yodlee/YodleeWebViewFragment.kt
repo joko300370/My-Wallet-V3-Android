@@ -13,7 +13,6 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
@@ -21,6 +20,7 @@ import org.json.JSONException
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
 import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
@@ -42,18 +42,23 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         arguments?.getString(ACCESS_TOKEN) ?: ""
     }
 
-    private val yodleeQuery: String by lazy {
-        Uri.Builder()
-            .appendQueryParameter(accessTokenKey, bearerParam)
-            .appendQueryParameter(extraParamsKey, URLEncoder.encode(extraParam1, extraParam2))
-            .build().query ?: ""
+    private val configName: String by lazy {
+        arguments?.getString(CONFIG_NAME) ?: ""
     }
 
     private val accessTokenKey = "accessToken"
     private val bearerParam: String by lazy { "Bearer $accessToken" }
     private val extraParamsKey = "extraParams"
-    private val extraParam1 = "configName=Aggregation"
-    private val extraParam2 = "UTF-8"
+    private val extraParamConfigName: String
+        get() = "configName=$configName"
+    private val extraParamEncoding = "UTF-8"
+
+    private val yodleeQuery: String by lazy {
+        Uri.Builder()
+            .appendQueryParameter(accessTokenKey, bearerParam)
+            .appendQueryParameter(extraParamsKey, URLEncoder.encode(extraParamConfigName, extraParamEncoding))
+            .build().query ?: ""
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -153,14 +158,17 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"
         private const val ACCESS_TOKEN: String = "ACCESS_TOKEN"
+        private const val CONFIG_NAME: String = "CONFIG_NAME"
 
         fun newInstance(
             fastLinkUrl: String,
-            accessToken: String
+            accessToken: String,
+            configName: String
         ): YodleeWebViewFragment = YodleeWebViewFragment().apply {
             arguments = Bundle().apply {
                 putString(FAST_LINK_URL, fastLinkUrl)
                 putString(ACCESS_TOKEN, accessToken)
+                putString(CONFIG_NAME, configName)
             }
         }
     }
@@ -206,7 +214,6 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
 
     @JavascriptInterface
     fun postMessage(data: String?) {
-        Timber.e("----post message $data")
         try {
             val message = gson.fromJson(data, FastLinkMessage::class.java)
 
