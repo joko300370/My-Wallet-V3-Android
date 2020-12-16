@@ -17,7 +17,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import info.blockchain.balance.percentageDelta
-import info.blockchain.wallet.prices.TimeInterval
+import info.blockchain.wallet.prices.TimeAgo
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -59,7 +59,6 @@ class BuyIntroFragment : Fragment() {
     }
 
     private fun loadBuyDetails() {
-        val oneDayAgo = (System.currentTimeMillis() / 1000) - TimeInterval.ONE_DAY.intervalSeconds
 
         compositeDisposable +=
             custodialWalletManager.getSupportedBuySellCryptoCurrencies(
@@ -70,7 +69,7 @@ class BuyIntroFragment : Fragment() {
                     }
                     Single.zip(enabledPairs.map {
                         coinCore[it.cryptoCurrency].exchangeRate().zipWith(
-                            coinCore[it.cryptoCurrency].historicRate(oneDayAgo)
+                            coinCore[it.cryptoCurrency].historicRate(TimeAgo.ONE_DAY.epoch)
                         ).map { (currentPrice, price24h) ->
                             PriceHistory(
                                 currentExchangeRate = currentPrice as ExchangeRate.CryptoToFiat,
