@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.bch
 
-import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -78,7 +78,6 @@ internal class BchCryptoWalletAccount private constructor(
             }
 
     override val activity: Single<ActivitySummaryList>
-
         get() = bchManager.getAddressTransactions(
             xpubAddress,
             transactionFetchCount,
