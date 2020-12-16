@@ -19,9 +19,11 @@
         android:layout_width="0dp"
         android:layout_height="2dp"
         android:background="@color/blue_600"
+        android:layout_marginStart="@dimen/very_small_margin"
+        android:layout_marginEnd="@dimen/very_small_margin"
         app:layout_constraintBottom_toBottomOf="@id/yodlee_icon"
-        app:layout_constraintEnd_toStartOf="@id/yodlee_bank_icon"
-        app:layout_constraintStart_toEndOf="@id/yodlee_app_icon"
+        app:layout_constraintEnd_toEndOf="@id/yodlee_bank_icon"
+        app:layout_constraintStart_toStartOf="@id/yodlee_app_icon"
         app:layout_constraintTop_toTopOf="@id/yodlee_icon" />
 
     <androidx.appcompat.widget.AppCompatImageView
