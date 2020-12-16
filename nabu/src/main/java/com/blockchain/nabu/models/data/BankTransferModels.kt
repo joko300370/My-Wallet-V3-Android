@@ -12,14 +12,16 @@ enum class BankPartner {
             YODLEE -> {
                 require(attrsResponse.fastlinkUrl != null)
                 require(attrsResponse.token != null)
-                YodleeAttributes(attrsResponse.fastlinkUrl, attrsResponse.token)
+                require(attrsResponse.fastlinkParams != null)
+                YodleeAttributes(attrsResponse.fastlinkUrl, attrsResponse.token,
+                    attrsResponse.fastlinkParams.configName)
             }
         }
 }
 
 interface LinkBankAttributes
 
-class YodleeAttributes(val fastlinkUrl: String, val token: String) : LinkBankAttributes
+class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes
 
 data class LinkedBank(
     val id: String,
@@ -40,5 +42,8 @@ enum class LinkedBankErrorState {
 }
 
 enum class LinkedBankState {
-    PENDING, BLOCKED, ACTIVE, UNKNOWN
+    PENDING,
+    BLOCKED,
+    ACTIVE,
+    UNKNOWN
 }

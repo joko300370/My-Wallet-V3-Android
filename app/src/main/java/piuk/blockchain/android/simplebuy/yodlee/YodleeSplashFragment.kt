@@ -31,6 +31,10 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
         arguments?.getString(ACCESS_TOKEN) ?: ""
     }
 
+    private val configName: String by lazy {
+        arguments?.getString(CONFIG_NAME) ?: ""
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setupToolbar(R.string.link_a_bank)
@@ -43,7 +47,7 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
 
         yodlee_splash_cta.setOnClickListener {
             analytics.logEvent(bankLinkingSplashCta(BankPartnerTypes.ACH.name))
-            navigator().launchYodleeWebview(fastLinkUrl, accessToken)
+            navigator().launchYodleeWebview(fastLinkUrl, accessToken, configName)
         }
 
         analytics.logEvent(bankLinkingSplashShown(BankPartnerTypes.ACH.name))
@@ -52,12 +56,14 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"
         private const val ACCESS_TOKEN: String = "ACCESS_TOKEN"
+        private const val CONFIG_NAME: String = "CONFIG_NAME"
 
-        fun newInstance(fastLinkUrl: String, accessToken: String): YodleeSplashFragment =
+        fun newInstance(fastLinkUrl: String, accessToken: String, configName: String): YodleeSplashFragment =
             YodleeSplashFragment().apply {
                 arguments = Bundle().apply {
                     putString(FAST_LINK_URL, fastLinkUrl)
                     putString(ACCESS_TOKEN, accessToken)
+                    putString(CONFIG_NAME, configName)
                 }
             }
     }
