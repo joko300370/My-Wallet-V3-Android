@@ -4,7 +4,6 @@ import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
 import info.blockchain.wallet.exceptions.ApiException
-import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -115,11 +114,6 @@ class AuthService(private val walletApi: WalletApi, rxBus: RxBus) {
     fun validateAccess(key: String, pin: String): Observable<Response<Status>> =
         rxPinning.call<Response<Status>> {
             walletApi.validateAccess(key, pin)
-                .doOnError {
-                    if (it.message?.contains("Incorrect PIN") == true) {
-                        throw InvalidCredentialsException("Incorrect PIN")
-                    }
-                }
         }
 
     /**

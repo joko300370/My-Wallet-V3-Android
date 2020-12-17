@@ -89,7 +89,6 @@ class PinEntryPresenter(
             }
         }
 
-        checkPinFails()
         checkFingerprintStatus()
         doTestnetCheck()
         setupCommitHash()
@@ -392,15 +391,13 @@ class PinEntryPresenter(
 
     private fun handleValidateFailure() {
         if (isForValidatingPinForResult) {
-            incrementFailureCount()
+            resetPinScreen()
         } else {
-            incrementFailureCountAndRestart()
+            restart()
         }
     }
 
-    private fun incrementFailureCount() {
-        var fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
-        prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, ++fails)
+    private fun resetPinScreen() {
         showErrorToast(R.string.invalid_pin)
         userEnteredPin = ""
         for (textView in view.pinBoxList) {
@@ -410,20 +407,9 @@ class PinEntryPresenter(
         view.setTitleString(R.string.pin_entry)
     }
 
-    fun incrementFailureCountAndRestart() {
-        var fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
-        prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, ++fails)
+    fun restart() {
         showErrorToast(R.string.invalid_pin)
         view.restartPageAndClearTop()
-    }
-
-    // Check user's password if PIN fails >= 4
-    private fun checkPinFails() {
-        val fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
-        if (fails >= MAX_ATTEMPTS) {
-            showErrorToast(R.string.pin_4_strikes)
-            view.showMaxAttemptsDialog()
-        }
     }
 
     private fun setAccountLabelIfNecessary() {
