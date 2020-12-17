@@ -1662,6 +1662,9 @@
     <string name="sell_info_blurb_2">&#160;Trading Wallets.&#160;</string>
     <string name="sell_info_blurb_3">Once that send completes, sell that crypto for cash.</string>
     <string name="sell_info_action">Send Now →</string>
+    <string name="sell_intro_empty_title">No Wallets to Sell from</string>
+    <string name="sell_intro_empty_label">Looks like you have no Wallets with a balance you can Sell, try funding some Wallets first.</string>
+
 
     <string name="scan_mismatch_transaction_target">The scanned code is not a %1$s QR code.</string>
     <string name="scan_failed">QR code not recognised, please try again.</string>
