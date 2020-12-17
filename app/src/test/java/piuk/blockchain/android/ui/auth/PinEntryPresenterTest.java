@@ -141,24 +141,6 @@ public class PinEntryPresenterTest {
     }
 
     @Test
-    public void onViewReadyMaxAttemptsExceeded() {
-        // Arrange
-        when(environmentSettings.getEnvironment()).thenReturn(Environment.PRODUCTION);
-        when(activity.getPageIntent()).thenReturn(new Intent());
-        when(prefsUtil.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)).thenReturn(4);
-        when(payloadManager.getWallet()).thenReturn(mock(Wallet.class));
-        when(prefsUtil.getPinId()).thenReturn("");
-        when(fingerprintHelper.getEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)).thenReturn("");
-        // Act
-        subject.onViewReady();
-        // Assert
-        assertTrue(subject.allowExit());
-        //noinspection WrongConstant
-        verify(activity).showToast(anyInt(), anyString());
-        verify(activity).showMaxAttemptsDialog();
-    }
-
-    @Test
     public void checkFingerprintStatusShouldShowDialog() {
         // Arrange
         subject.setForValidatingPinForResult(false);
@@ -347,8 +329,6 @@ public class PinEntryPresenterTest {
         verify(activity).setTitleVisibility(View.INVISIBLE);
         verify(activity).showProgressDialog(anyInt(), isNull());
         verify(authDataManager).validatePin(anyString());
-        verify(prefsUtil).setValue(anyString(), anyInt());
-        verify(prefsUtil).getValue(anyString(), anyInt());
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).restartPageAndClearTop();
@@ -815,9 +795,6 @@ public class PinEntryPresenterTest {
 
         // Act
         subject.restart();
-        // Assert
-        verify(prefsUtil).getValue(anyString(), anyInt());
-        verify(prefsUtil).setValue(anyString(), anyInt());
         //noinspection WrongConstant
         verify(activity).showToast(anyInt(), anyString());
         verify(activity).restartPageAndClearTop();
