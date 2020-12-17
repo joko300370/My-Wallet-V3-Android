@@ -357,7 +357,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                     if (pw.isNotEmpty()) {
                         presenter.validatePassword(pw)
                     } else {
-                        presenter.incrementFailureCountAndRestart()
+                        presenter.restart()
                     }
                 }.show()
         }

@@ -814,7 +814,7 @@ public class PinEntryPresenterTest {
         // Arrange
 
         // Act
-        subject.incrementFailureCountAndRestart();
+        subject.restart();
         // Assert
         verify(prefsUtil).getValue(anyString(), anyInt());
         verify(prefsUtil).setValue(anyString(), anyInt());
