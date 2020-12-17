@@ -20,6 +20,9 @@ class TradingToTradingSwapTxEngine(
     environmentConfig: EnvironmentConfig
 ) : SwapEngineBase(quotesProvider, walletManager, kycTierService, environmentConfig) {
 
+    override val availableBalance: Single<Money>
+        get() = sourceAccount.accountBalance
+
     override fun assertInputsValid() {
         require(txTarget is CustodialTradingAccount)
         require(sourceAccount is CustodialTradingAccount)
@@ -28,7 +31,7 @@ class TradingToTradingSwapTxEngine(
 
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError().flatMap { pricedQuote ->
-            sourceAccount.actionableBalance.flatMap { balance ->
+            availableBalance.flatMap { balance ->
                 Single.just(PendingTx(
                     amount = CryptoValue.zero(sourceAccount.asset),
                     available = balance,
@@ -56,7 +59,7 @@ class TradingToTradingSwapTxEngine(
         }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
-        sourceAccount.actionableBalance.map { balance -> balance as CryptoValue }.map { available ->
+        availableBalance.map { balance -> balance as CryptoValue }.map { available ->
             pendingTx.copy(
                 amount = amount,
                 available = available

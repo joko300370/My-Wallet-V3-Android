@@ -45,6 +45,8 @@ abstract class QuotedEngine(
     protected lateinit var quotesEngine: TransferQuotesEngine
     protected abstract val direction: TransferDirection
 
+    protected abstract val availableBalance: Single<Money>
+
     protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),

@@ -27,6 +27,9 @@ class NonCustodialSellEngine(
     override val direction: TransferDirection
         get() = TransferDirection.FROM_USERKEY
 
+    override val availableBalance: Single<Money>
+        get() = sourceAccount.accountBalance
+
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError().doOnSuccess { pricedQuote ->
             engine.startFromQuote(pricedQuote)
