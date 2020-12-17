@@ -24,6 +24,9 @@ class CustodialSellTxEngine(
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
 
+    override val availableBalance: Single<Money>
+        get() = sourceAccount.accountBalance
+
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError()
             .zipWith(sourceAccount.accountBalance).flatMap { (quote, balance) ->
