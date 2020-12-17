@@ -12,12 +12,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
@@ -50,6 +50,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     interface SellIntroHost {
         fun onSellFinished()
         fun onSellInfoClicked()
+        fun onSellListEmptyCta()
     }
 
     private val host: SellIntroHost by lazy {
@@ -108,6 +109,18 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
         accounts_list.gone()
         sell_empty.setDetails {
             loadSellDetails()
+        }
+        sell_empty.visible()
+    }
+
+    private fun renderSellEmpty() {
+        accounts_list.gone()
+        sell_empty.setDetails(
+            R.string.sell_intro_empty_title,
+            R.string.sell_intro_empty_label,
+            ctaText = R.string.buy_now
+        ) {
+            host.onSellListEmptyCta()
         }
         sell_empty.visible()
     }
@@ -203,6 +216,10 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     (account as? CryptoAccount)?.let {
                         startSellFlow(it)
                     }
+                }
+
+                accounts_list.onEmptyList = {
+                    renderSellEmpty()
                 }
             }, onError = {
                 renderSellError()
