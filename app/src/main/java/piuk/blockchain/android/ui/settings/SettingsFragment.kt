@@ -34,8 +34,12 @@ import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
+import com.google.android.play.core.review.ReviewInfo
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.mukesh.countrypicker.fragments.CountryPicker
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.util.FormatsUtil
@@ -79,9 +83,10 @@ import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import java.util.Locale
 import kotlin.math.roundToInt
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost {
+class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, ReviewHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -147,6 +152,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
 
+    private val reviewManager: ReviewManager by lazy {
+        ReviewManagerFactory.create(activity)
+    }
+
+    private var reviewInfo: ReviewInfo? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsPresenter.initView(this)
@@ -154,6 +165,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         analytics.logEvent(AnalyticsEvents.Settings)
         Logging.logContentView(javaClass.simpleName)
+
+        initReviews()
+    }
+
+    private fun initReviews() {
+        reviewManager.requestReviewFlow().addOnCompleteListener { request ->
+            if (request.isSuccessful) {
+                analytics.logEvent(ReviewAnalytics.REQUEST_REVIEW_SUCCESS)
+                reviewInfo = request.result
+            } else {
+                analytics.logEvent(ReviewAnalytics.REQUEST_REVIEW_FAILURE)
+            }
+        }
     }
 
     override fun setUpUi() {
@@ -270,7 +294,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         // Check if referred from Security Centre dialog
         val intent = activity?.intent
         when {
-            intent == null -> {}
+            intent == null -> {
+            }
             intent.hasExtra(EXTRA_SHOW_TWO_FA_DIALOG) ->
                 showDialogTwoFA()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
@@ -293,6 +318,16 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
         ToastCustom.makeText(activity, getString(message), ToastCustom.LENGTH_SHORT, toastType)
+    }
+
+    override fun showReviewDialog() {
+        reviewInfo?.let {
+            reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
+                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
+            }.addOnCompleteListener { _ ->
+                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
+            }
+        }
     }
 
     override fun showWarningDialog(@StringRes message: Int) {
@@ -582,8 +617,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun onAboutClicked() {
-        val aboutDialog = AboutDialog()
-        aboutDialog.show(fragmentManager!!, "ABOUT_DIALOG")
+        AboutDialog().show(childFragmentManager, "ABOUT_DIALOG")
     }
 
     private fun onTosClicked() {
@@ -1045,4 +1079,20 @@ fun Preference?.onClick(onClick: () -> Unit) {
         onClick()
         true
     }
+}
+
+interface ReviewHost {
+    fun showReviewDialog()
+}
+
+enum class ReviewAnalytics : AnalyticsEvent {
+    REQUEST_REVIEW_SUCCESS,
+    REQUEST_REVIEW_FAILURE,
+    LAUNCH_REVIEW_SUCCESS,
+    LAUNCH_REVIEW_FAILURE;
+
+    override val event: String
+        get() = name.toLowerCase(Locale.ENGLISH)
+    override val params: Map<String, String>
+        get() = emptyMap()
 }
