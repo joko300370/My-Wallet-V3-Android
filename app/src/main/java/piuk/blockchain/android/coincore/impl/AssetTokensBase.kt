@@ -121,7 +121,9 @@ internal abstract class CryptoAssetBase(
 
     final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
         accounts.flatMapMaybe {
-            Maybe.just(it.makeAccountGroup(asset, labels, filter))
+            Maybe.fromCallable {
+                it.makeAccountGroup(asset, labels, filter)
+            }
         }
 
     final override fun defaultAccount(): Single<SingleAccount> =
