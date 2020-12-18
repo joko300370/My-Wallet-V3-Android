@@ -25,10 +25,10 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.account.ActionedStatusDecorator
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
-import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
 import piuk.blockchain.android.util.assetFilter
@@ -91,9 +91,9 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         dispose()
     }
 
-    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
+    private fun statusDecorator(account: BlockchainAccount, action: AssetAction): CellDecorator =
         if (account is CryptoAccount) {
-            CryptoAssetActionCellDecorator(account)
+            CryptoAssetActionCellDecorator(account, action)
         } else {
             DefaultCellDecorator()
         }
@@ -135,44 +135,45 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
             AssetAction.ViewActivity ->
                 AssetActionItem(getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
-                    getString(R.string.fiat_funds_detail_activity_details), asset) {
+                    getString(R.string.fiat_funds_detail_activity_details), asset,
+                    action) {
                     processAction(AssetAction.ViewActivity)
                 }
             AssetAction.Send ->
                 AssetActionItem(account, getString(R.string.common_send), R.drawable.ic_tx_sent,
                     getString(R.string.dashboard_asset_actions_send_dsc,
-                        asset.displayTicker), asset) {
+                        asset.displayTicker), asset, action) {
                     processAction(AssetAction.Send)
                 }
             AssetAction.Receive ->
                 AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
                     getString(R.string.dashboard_asset_actions_receive_dsc,
-                        asset.displayTicker), asset) {
+                        asset.displayTicker), asset, action) {
                     processAction(AssetAction.Receive)
                 }
             AssetAction.Swap -> AssetActionItem(account, getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
-                asset) {
+                asset, action) {
                 processAction(AssetAction.Swap)
             }
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
                 R.drawable.ic_tx_interest,
                 getString(R.string.dashboard_asset_actions_summary_dsc, asset.displayTicker),
-                asset) {
+                asset, action) {
                 goToSummary()
             }
             AssetAction.Deposit -> AssetActionItem(getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
-                asset) {
+                asset, action) {
                 goToDeposit()
             }
             AssetAction.Sell -> AssetActionItem(getString(R.string.common_sell),
                 R.drawable.ic_tx_sell,
                 getString(R.string.convert_your_crypto_to_cash),
-                asset) {
+                asset, action) {
                 processAction(AssetAction.Sell)
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
@@ -218,7 +219,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
 private class AssetActionAdapter(
     val disposable: CompositeDisposable,
-    val statusDecorator: StatusDecorator
+    val statusDecorator: ActionedStatusDecorator
 ) : RecyclerView.Adapter<AssetActionAdapter.ActionItemViewHolder>() {
     var itemList: List<AssetActionItem> = emptyList()
         set(value) {
@@ -245,7 +246,7 @@ private class AssetActionAdapter(
         RecyclerView.ViewHolder(view) {
         fun bind(
             item: AssetActionItem,
-            statusDecorator: StatusDecorator
+            statusDecorator: ActionedStatusDecorator
         ) {
             addDecorator(item, statusDecorator)
 
@@ -259,10 +260,10 @@ private class AssetActionAdapter(
 
         private fun addDecorator(
             item: AssetActionItem,
-            statusDecorator: StatusDecorator
+            statusDecorator: ActionedStatusDecorator
         ) {
             item.account?.let { account ->
-                compositeDisposable += statusDecorator(account).isEnabled()
+                compositeDisposable += statusDecorator(account, item.action).isEnabled()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = { enabled ->
@@ -282,7 +283,7 @@ private class AssetActionAdapter(
                     )
 
                 view.item_action_holder.removePossibleBottomView()
-                compositeDisposable += statusDecorator(account).view(view.context)
+                compositeDisposable += statusDecorator(account, item.action).view(view.context)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         view.item_action_holder.addViewToBottomWithConstraints(
@@ -314,6 +315,7 @@ private data class AssetActionItem(
     val icon: Int,
     val description: String,
     val asset: CryptoCurrency,
+    val action: AssetAction,
     val actionCta: () -> Unit
 ) {
     constructor(
@@ -321,6 +323,7 @@ private data class AssetActionItem(
         icon: Int,
         description: String,
         asset: CryptoCurrency,
+        action: AssetAction,
         actionCta: () -> Unit
     ) : this(
         null,
@@ -328,6 +331,7 @@ private data class AssetActionItem(
         icon,
         description,
         asset,
+        action,
         actionCta
     )
 }
