@@ -607,23 +607,24 @@ val applicationModule = module {
 
         factory {
             SettingsPresenter(
-                /* fingerprintHelper = */ get(),
-                /* authDataManager = */ get(),
-                /* settingsDataManager = */ get(),
-                /* emailUpdater = */ get(),
-                /* payloadManager = */ get(),
-                /* payloadDataManager = */ get(),
-                /* stringUtils = */ get(),
-                /* prefs = */ get(),
-                /* accessState = */ get(),
-                /* custodialWalletManager = */ get(),
-                /* swipeToReceiveHelper = */ get(),
-                /* notificationTokenManager = */ get(),
-                /* exchangeRateDataManager = */ get(),
-                /* kycStatusHelper = */ get(),
-                /* pitLinking = */ get(),
-                /* analytics = */ get(),
-                /* simpleBuyPrefs = */get()
+                fingerprintHelper = get(),
+                authDataManager = get(),
+                settingsDataManager = get(),
+                emailUpdater = get(),
+                payloadManager = get(),
+                payloadDataManager = get(),
+                stringUtils = get(),
+                prefs = get(),
+                accessState = get(),
+                custodialWalletManager = get(),
+                swipeToReceiveHelper = get(),
+                notificationTokenManager = get(),
+                exchangeRateDataManager = get(),
+                kycStatusHelper = get(),
+                pitLinking = get(),
+                analytics = get(),
+                currencyPrefs = get(),
+                simpleBuyPrefs = get()
             )
         }
 

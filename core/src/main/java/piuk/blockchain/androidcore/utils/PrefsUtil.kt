@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
 import piuk.blockchain.androidcore.BuildConfig
 import java.util.Currency

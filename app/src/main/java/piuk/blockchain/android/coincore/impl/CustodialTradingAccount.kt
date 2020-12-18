@@ -32,7 +32,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.util.concurrent.atomic.AtomicBoolean
 
 open class CustodialTradingAccount(
@@ -132,10 +131,10 @@ open class CustodialTradingAccount(
         get() = Singles.zip(
             accountBalance,
             actionableBalance
-        ) { total, available ->
+        ) { total, actionable ->
             when {
                 total <= CryptoValue.zero(asset) -> TxSourceState.NO_FUNDS
-                available <= CryptoValue.zero(asset) -> TxSourceState.FUNDS_LOCKED
+                actionable <= CryptoValue.zero(asset) -> TxSourceState.FUNDS_LOCKED
                 else -> TxSourceState.CAN_TRANSACT
             }
         }
