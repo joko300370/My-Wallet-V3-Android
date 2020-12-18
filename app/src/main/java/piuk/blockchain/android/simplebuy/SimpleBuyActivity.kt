@@ -194,7 +194,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         when (bankTransfer.partner) {
             BankPartner.YODLEE -> {
                 val attributes = bankTransfer.attributes as YodleeAttributes
-                launchYodleeSplash(attributes.fastlinkUrl, attributes.token)
+                launchYodleeSplash(attributes.fastlinkUrl, attributes.token, attributes.configName)
             }
         }
     }
@@ -236,18 +236,18 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         progress.gone()
     }
 
-    override fun launchYodleeSplash(fastLinkUrl: String, accessToken: String) {
+    override fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
         ViewUtils.hideKeyboard(this)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastLinkUrl, accessToken))
+            .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastLinkUrl, accessToken, configName))
             .addToBackStack(YodleeSplashFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 
-    override fun launchYodleeWebview(fastLinkUrl: String, accessToken: String) {
+    override fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, YodleeWebViewFragment.newInstance(fastLinkUrl, accessToken))
+            .replace(R.id.content_frame, YodleeWebViewFragment.newInstance(fastLinkUrl, accessToken, configName))
             .addToBackStack(YodleeWebViewFragment::class.simpleName)
             .commitAllowingStateLoss()
     }

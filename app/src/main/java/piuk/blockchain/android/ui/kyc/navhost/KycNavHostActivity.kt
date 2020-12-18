@@ -71,8 +71,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         }
         setupToolbar(toolBar, title)
 
-        navController
-            .setGraph(R.navigation.kyc_nav, intent.extras)
+        navController.setGraph(R.navigation.kyc_nav, intent.extras)
 
         onViewReady()
     }

@@ -60,12 +60,16 @@ class Coincore internal constructor(
     fun allWallets(includeArchived: Boolean = false): Single<AccountGroup> =
         Maybe.concat(
             allAssets.map {
-                it.accountGroup().map { grp -> grp.accounts }
+                it.accountGroup().map { grp -> grp.accounts }.map { list ->
+                    list.filter { account ->
+                        (includeArchived || account !is CryptoAccount) || !account.isArchived
+                    }
+                }
             }
         ).reduce { a, l -> a + l }
-        .map { list ->
-            AllWalletsAccount(list, defaultLabels) as AccountGroup
-        }.toSingle()
+            .map { list ->
+                AllWalletsAccount(list, defaultLabels) as AccountGroup
+            }.toSingle()
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,
@@ -103,12 +107,12 @@ class Coincore internal constructor(
             AssetAction.Swap -> {
                 {
                     it is CryptoAccount &&
-                            it.asset != sourceAccount.asset &&
-                            it !is FiatAccount &&
-                            it !is InterestAccount &&
-                            // fixme special case we should remove once receive is implemented
-                            it !is AlgoCryptoWalletAccount &&
-                            if (sourceAccount.isCustodial()) it.isCustodial() else true
+                        it.asset != sourceAccount.asset &&
+                        it !is FiatAccount &&
+                        it !is InterestAccount &&
+                        // fixme special case we should remove once receive is implemented
+                        it !is AlgoCryptoWalletAccount &&
+                        if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
             AssetAction.Send -> {

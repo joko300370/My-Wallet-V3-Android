@@ -22,8 +22,8 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
     fun hasMoreThanOneFragmentInTheStack(): Boolean
     fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()
-    fun launchYodleeSplash(fastLinkUrl: String, accessToken: String)
-    fun launchYodleeWebview(fastLinkUrl: String, accessToken: String)
+    fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String)
+    fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String)
     fun linkBankWithPartner(bankTransfer: LinkBankTransfer)
     fun launchBankLinking(accountProviderId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)

@@ -26,6 +26,9 @@ class OnChainSwapEngine(
     quotesProvider, walletManager, tiersService, environmentConfig
 ) {
 
+    override val availableBalance: Single<Money>
+        get() = sourceAccount.accountBalance
+
     override fun doInitialiseTx(): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().doOnSuccess { pricedQuote ->
             engine.startFromQuote(pricedQuote)

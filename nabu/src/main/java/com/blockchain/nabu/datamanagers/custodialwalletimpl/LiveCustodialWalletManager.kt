@@ -320,24 +320,10 @@ class LiveCustodialWalletManager(
         }
 
     override fun getTotalBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
-        kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
-            .flatMapMaybe { eligible ->
-                if (eligible) {
-                    assetBalancesRepository.getTotalBalanceForAsset(crypto)
-                } else {
-                    Maybe.empty()
-                }
-            }
+        assetBalancesRepository.getTotalBalanceForAsset(crypto)
 
     override fun getActionableBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
-        kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE)
-            .flatMapMaybe { eligible ->
-                if (eligible) {
-                    assetBalancesRepository.getActionableBalanceForAsset(crypto)
-                } else {
-                    Maybe.empty()
-                }
-            }
+        assetBalancesRepository.getActionableBalanceForAsset(crypto)
 
     override fun getPendingBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
         assetBalancesRepository.getPendingBalanceForAsset(crypto)
@@ -364,7 +350,7 @@ class LiveCustodialWalletManager(
         fiatCurrency: String
     ): Completable =
         authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency).doOnSuccess { paymentMethods ->
+            nabuService.paymentMethods(it, fiatCurrency, true).doOnSuccess { paymentMethods ->
                 updateSupportedCards(paymentMethods)
             }
         }.ignoreElement()
@@ -386,7 +372,7 @@ class LiveCustodialWalletManager(
 
     override fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer> {
         return authenticator.authenticate {
-            nabuService.linkToABank(it, fiatCurrency, it.userId, extraAttributesProvider.getBankLinkingAttributes())
+            nabuService.linkToABank(it, fiatCurrency)
                 .zipWith(bankLinkingEnabledProvider.supportedBankPartners())
         }.flatMap { (response, supportedPartners) ->
             response.partner.toLinkBankedPartner(supportedPartners)?.let {
@@ -405,7 +391,7 @@ class LiveCustodialWalletManager(
     override fun updateAccountProviderId(linkingId: String, providerAccountId: String) =
         authenticator.authenticateCompletable {
             nabuService.updateAccountProviderId(it, linkingId, UpdateProviderAccountBody(
-                ProviderAccountAttrs(providerAccountId, extraAttributesProvider.getBankUpdateOverride())
+                ProviderAccountAttrs(providerAccountId)
             ))
         }
 
@@ -428,7 +414,7 @@ class LiveCustodialWalletManager(
         sessionTokenResponse: NabuSessionTokenResponse,
         fiatCurrency: String,
         onlyEligible: Boolean
-    ) = nabuService.paymentMethods(sessionTokenResponse, fiatCurrency).map { methods ->
+    ) = nabuService.paymentMethods(sessionTokenResponse, fiatCurrency, onlyEligible).map { methods ->
         methods.filter { method -> method.eligible || !onlyEligible }
     }.doOnSuccess {
         updateSupportedCards(it)
@@ -678,7 +664,7 @@ class LiveCustodialWalletManager(
     ): Single<List<String>> {
 
         return authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency)
+            nabuService.paymentMethods(it, fiatCurrency, true)
         }.map { methods ->
             methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
@@ -937,6 +923,7 @@ private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
     when (this) {
         LinkedBankTransferResponse.ERROR_ALREADY_LINKED -> LinkedBankErrorState.ACCOUNT_ALREADY_LINKED
         LinkedBankTransferResponse.ERROR_UNSUPPORTED_ACCOUNT -> LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED
+        LinkedBankTransferResponse.ERROR_NAMES_MISS_MATCHED -> LinkedBankErrorState.NAMES_MISS_MATCHED
         else -> LinkedBankErrorState.UNKNOWN
     }
 

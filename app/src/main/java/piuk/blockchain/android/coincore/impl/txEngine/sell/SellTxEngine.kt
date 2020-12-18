@@ -62,7 +62,7 @@ abstract class SellTxEngine(
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
     private fun validateAmount(pendingTx: PendingTx): Completable {
-        return sourceAccount.actionableBalance.flatMapCompletable { balance ->
+        return availableBalance.flatMapCompletable { balance ->
             if (pendingTx.amount <= balance) {
                 if (pendingTx.maxLimit != null && pendingTx.minLimit != null) {
                     when {

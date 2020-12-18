@@ -11,9 +11,7 @@ data class CreateLinkBankResponse(
 }
 
 data class CreateLinkBankRequestBody(
-    val currency: String,
-    val userId: String,
-    val attributes: LinkBankAttributes?
+    private val currency: String
 )
 
 data class LinkBankAttributes(
@@ -22,7 +20,12 @@ data class LinkBankAttributes(
 
 data class LinkBankAttrsResponse(
     val token: String?,
-    val fastlinkUrl: String?
+    val fastlinkUrl: String?,
+    val fastlinkParams: FastlinkParamsResponse?
+)
+
+data class FastlinkParamsResponse(
+    val configName: String
 )
 
 data class LinkedBankTransferResponse(
@@ -40,6 +43,7 @@ data class LinkedBankTransferResponse(
 
         const val ERROR_ALREADY_LINKED = "BANK_TRANSFER_ACCOUNT_ALREADY_LINKED"
         const val ERROR_UNSUPPORTED_ACCOUNT = "BANK_TRANSFER_ACCOUNT_INFO_NOT_FOUND"
+        const val ERROR_NAMES_MISS_MATCHED = "BANK_TRANSFER_ACCOUNT_NAME_MISMATCH"
     }
 }
 
@@ -48,9 +52,9 @@ data class UpdateProviderAccountBody(
 )
 
 data class ProviderAccountAttrs(
-    val providerAccountId: String,
-    val userOverride: String?
+    val providerAccountId: String
 )
+
 data class LinkedBankDetailsResponse(
     val accountNumber: String,
     val accountName: String,

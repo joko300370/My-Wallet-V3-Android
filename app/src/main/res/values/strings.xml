@@ -1662,6 +1662,9 @@
     <string name="sell_info_blurb_2">&#160;Trading Wallets.&#160;</string>
     <string name="sell_info_blurb_3">Once that send completes, sell that crypto for cash.</string>
     <string name="sell_info_action">Send Now →</string>
+    <string name="sell_intro_empty_title">No Wallets to Sell from</string>
+    <string name="sell_intro_empty_label">Looks like you have no Wallets with a balance you can Sell, try funding some Wallets first.</string>
+
 
     <string name="scan_mismatch_transaction_target">The scanned code is not a %1$s QR code.</string>
     <string name="scan_failed">QR code not recognised, please try again.</string>
@@ -1745,7 +1748,7 @@
 
     <string name="security_locked_card_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
     <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. For your security, buy orders with a bank account are subject up to a %1$s day holding period. You can Swap or Sell during this time. We will notify you once the funds are fully available.</string>
-    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days. Learn more</string>
+    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days.\n</string>
 
     <!-- content descriptor IDs -->
     <string name="content_desc_enter_amount">Enter Amount</string>
@@ -1787,7 +1790,7 @@
     <string name="yodlee_linking_is_this_your_bank">Is this your bank?</string>
     <string name="yodlee_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
     <string name="yodlee_linking_timeout_error_subtitle">It’s taking too long to link your bank, please try again.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account.<annotation link="yodlee_names_dont_match_learn_more">Learn more -></annotation></string>
+    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more \u2192</annotation></string>
     <string name="yodlee_linking_checking_error_title">Please link a Checking Account.</string>
     <string name="yodlee_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
     <string name="yodlee_linking_success_title">Bank Linked!</string>

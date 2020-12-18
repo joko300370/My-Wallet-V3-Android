@@ -5,7 +5,6 @@ import com.blockchain.nabu.datamanagers.SimpleBuyError
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.extensions.wrapErrorMessage
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
-import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttributes
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
@@ -500,10 +499,12 @@ class NabuService(retrofit: Retrofit) {
 
     fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
+        currency: String,
+        eligibleOnly: Boolean
     ) = service.getPaymentMethodsForSimpleBuy(
         authorization = sessionToken.authHeader,
-        currency = currency
+        currency = currency,
+        eligibleOnly = eligibleOnly
     ).wrapErrorMessage()
 
     fun getBeneficiaries(sessionToken: NabuSessionTokenResponse) =
@@ -511,15 +512,11 @@ class NabuService(retrofit: Retrofit) {
 
     fun linkToABank(
         sessionToken: NabuSessionTokenResponse,
-        fiatCurrency: String,
-        userId: String,
-        attributes: LinkBankAttributes?
+        fiatCurrency: String
     ) = service.linkABank(
         sessionToken.authHeader,
         CreateLinkBankRequestBody(
-            fiatCurrency,
-            userId,
-            attributes
+            fiatCurrency
         )
     ).wrapErrorMessage()
 

@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.models.responses.interest.DisabledReason
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import java.lang.UnsupportedOperationException
 import java.math.BigInteger
 
 internal const val transactionFetchCount = 50
@@ -170,13 +169,16 @@ abstract class CryptoNonCustodialAccount(
 
     override val actions: AvailableActions
         get() = mutableSetOf(
-            AssetAction.ViewActivity,
-            AssetAction.Receive
+            AssetAction.ViewActivity
         ).apply {
-            if (isFunded && !isArchived) {
-                add(AssetAction.Send)
-                add(AssetAction.Sell)
-                add(AssetAction.Swap)
+            if (!isArchived) {
+                add(AssetAction.Receive)
+
+                if (isFunded) {
+                    add(AssetAction.Send)
+                    add(AssetAction.Sell)
+                    add(AssetAction.Swap)
+                }
             }
         }
 

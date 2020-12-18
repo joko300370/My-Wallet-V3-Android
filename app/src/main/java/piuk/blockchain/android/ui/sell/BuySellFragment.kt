@@ -177,6 +177,10 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         navigator().goToTransfer()
     }
 
+    override fun onSellListEmptyCta() {
+        pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
+    }
+
     override fun onResume() {
         super.onResume()
         subscribeForNavigation()

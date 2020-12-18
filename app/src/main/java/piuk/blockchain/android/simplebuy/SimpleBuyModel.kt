@@ -160,6 +160,9 @@ class SimpleBuyModel(
                                         LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
                                             process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
                                         }
+                                        LinkedBankErrorState.NAMES_MISS_MATCHED -> {
+                                            process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
+                                        }
                                         LinkedBankErrorState.NONE -> {
                                             // do nothing
                                         }
@@ -268,7 +271,7 @@ class SimpleBuyModel(
 
     private fun shouldShowAppRating(orderCreatedSuccessFully: Boolean): Boolean =
         ratingPrefs.preRatingActionCompletedTimes >= COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING &&
-            !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
+                !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
 
     private fun pollForOrderStatus() {
         process(SimpleBuyIntent.CheckOrderStatus)
