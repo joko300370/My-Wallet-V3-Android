@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.settings
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -85,6 +86,7 @@ import piuk.blockchain.androidcoreui.utils.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import timber.log.Timber
 import java.util.Locale
 import java.lang.IllegalStateException
 import kotlin.math.roundToInt
@@ -332,9 +334,27 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         reviewInfo?.let {
             reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
                 analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
-            }.addOnCompleteListener { _ ->
+                goToPlayStore()
+            }.addOnCompleteListener {
                 analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
             }
+        } ?: goToPlayStore()
+    }
+
+    private fun goToPlayStore() {
+        val flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
+        try {
+            val appPackageName = requireActivity().packageName
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=$appPackageName")
+            ).let {
+                it.addFlags(flags)
+                startActivity(it)
+            }
+        } catch (e: ActivityNotFoundException) {
+            Timber.e(e, "Google Play Store not found")
         }
     }
 
@@ -1097,6 +1117,7 @@ enum class ReviewAnalytics : AnalyticsEvent {
     override val params: Map<String, String>
         get() = emptyMap()
 }
+
 data class LinkedBanksAndSupportedCurrencies(
     val beneficiaries: List<Beneficiary>,
     val supportedCurrencies: List<String>
