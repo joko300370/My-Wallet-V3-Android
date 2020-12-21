@@ -46,6 +46,7 @@ open class CustodialTradingAccount(
 
     private val isEligibleForSimpleBuy = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
+    private val _hasActionableFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = custodialWalletManager.getCustodialAccountAddress(asset).map {
@@ -103,6 +104,7 @@ open class CustodialTradingAccount(
                 Timber.d("Unable to get custodial trading actionable balance: $it")
                 CryptoValue.zero(asset)
             }
+            .doOnSuccess { _hasActionableFunds.set(it.isPositive) }
             .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it as Money }
 
@@ -124,6 +126,9 @@ open class CustodialTradingAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
+    private val hasActionableFunds: Boolean
+        get() = _hasActionableFunds.get()
+
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
@@ -144,9 +149,11 @@ open class CustodialTradingAccount(
             mutableSetOf(
                 AssetAction.ViewActivity
             ).apply {
-                if (isFunded && !isArchived) {
-                    add(AssetAction.Send)
-                    if (isEligibleForSimpleBuy.get()) {
+                if (!isArchived) {
+                    if (hasActionableFunds) {
+                        add(AssetAction.Send)
+                    }
+                    if (isFunded && isEligibleForSimpleBuy.get()) {
                         add(AssetAction.Sell)
                         add(AssetAction.Swap)
                     }
@@ -196,7 +203,7 @@ open class CustodialTradingAccount(
         return flattenAsObservable { list ->
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)) or
-                        (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
+                    (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
             }
         }.toList()
     }

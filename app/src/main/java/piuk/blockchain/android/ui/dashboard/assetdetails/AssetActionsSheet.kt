@@ -25,10 +25,10 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.ui.customviews.account.ActionedStatusDecorator
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
+import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
 import piuk.blockchain.android.util.assetFilter
@@ -91,9 +91,9 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         dispose()
     }
 
-    private fun statusDecorator(account: BlockchainAccount, action: AssetAction): CellDecorator =
+    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
         if (account is CryptoAccount) {
-            CryptoAssetActionCellDecorator(account, action)
+            AssetActionsDecorator(account)
         } else {
             DefaultCellDecorator()
         }
@@ -219,7 +219,7 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
 private class AssetActionAdapter(
     val disposable: CompositeDisposable,
-    val statusDecorator: ActionedStatusDecorator
+    val statusDecorator: StatusDecorator
 ) : RecyclerView.Adapter<AssetActionAdapter.ActionItemViewHolder>() {
     var itemList: List<AssetActionItem> = emptyList()
         set(value) {
@@ -246,7 +246,7 @@ private class AssetActionAdapter(
         RecyclerView.ViewHolder(view) {
         fun bind(
             item: AssetActionItem,
-            statusDecorator: ActionedStatusDecorator
+            statusDecorator: StatusDecorator
         ) {
             addDecorator(item, statusDecorator)
 
@@ -260,10 +260,10 @@ private class AssetActionAdapter(
 
         private fun addDecorator(
             item: AssetActionItem,
-            statusDecorator: ActionedStatusDecorator
+            statusDecorator: StatusDecorator
         ) {
             item.account?.let { account ->
-                compositeDisposable += statusDecorator(account, item.action).isEnabled()
+                compositeDisposable += statusDecorator(account).isEnabled()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = { enabled ->
@@ -283,7 +283,7 @@ private class AssetActionAdapter(
                     )
 
                 view.item_action_holder.removePossibleBottomView()
-                compositeDisposable += statusDecorator(account, item.action).view(view.context)
+                compositeDisposable += statusDecorator(account).view(view.context)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         view.item_action_holder.addViewToBottomWithConstraints(
