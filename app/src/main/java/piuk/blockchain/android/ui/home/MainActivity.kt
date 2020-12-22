@@ -38,7 +38,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -109,8 +108,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         get() = _refreshAnnouncements
 
     private var activityResultAction: () -> Unit = {}
-
-    private var backPressed: Long = 0
 
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
@@ -303,17 +300,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 drawer_layout.closeDrawers()
                 true
             }
-            f is ActivitiesFragment -> f.onBackPressed()
-            f is TransferFragment -> {
-                setCurrentTabItem(ITEM_HOME)
-                startDashboardFragment()
-                true
-            }
+
             f is DashboardFragment -> f.onBackPressed()
-            f is BuySellFragment -> f.onBackPressed()
+
             else -> {
-                // Switch to dashboard fragment - it's not clear, though,
-                // how we can ever wind up here...
+                // Switch to dashboard fragment
                 setCurrentTabItem(ITEM_HOME)
                 startDashboardFragment()
                 true
@@ -321,12 +312,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
 
         if (!backHandled) {
-            if (backPressed + BuildConfig.EXIT_APP_COOLDOWN_MILLIS > System.currentTimeMillis()) {
-                presenter.clearLoginState()
-            } else {
-                showExitConfirmToast()
-                backPressed = System.currentTimeMillis()
-            }
+            presenter.clearLoginState()
         }
     }
 
@@ -340,13 +326,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             val menuView = out[0]
             tour_guide.setDeferredTriggerView(menuView, offsetX = -menuView.width / 3)
         }
-    }
-
-    private fun showExitConfirmToast() {
-        ToastCustom.makeText(this,
-            getString(R.string.exit_confirm),
-            ToastCustom.LENGTH_SHORT,
-            ToastCustom.TYPE_GENERAL)
     }
 
     private fun selectDrawerItem(menuItem: MenuItem) {
