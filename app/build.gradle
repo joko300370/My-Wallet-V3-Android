@@ -43,7 +43,6 @@ android {
         // Flag to hide or show the Contacts feature
         buildConfigBoolean "LOG_KOIN_STARTUP", false
         buildConfigBoolean "SKIP_VERIFF_KYC", false
-        buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
 

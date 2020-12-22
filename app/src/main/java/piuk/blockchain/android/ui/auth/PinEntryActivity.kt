@@ -28,7 +28,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragmentInteractionListener,
     ViewPager.OnPageChangeListener {
 
-    private val osUtil: OSUtil by inject()
     private val coinsWebSocketService: CoinsWebSocketService by inject()
     private val overlayDetection: OverlayDetection by inject()
     private val loginState: AccessState by inject()
@@ -100,17 +99,7 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
                 finishWithResultCanceled()
             }
             pinEntryFragment.allowExit() -> {
-                if (backPressed + BuildConfig.EXIT_APP_COOLDOWN_MILLIS > System.currentTimeMillis()) {
-                    loginState.logout()
-                    return
-                } else {
-                    ToastCustom.makeText(this,
-                        getString(R.string.exit_confirm),
-                        ToastCustom.LENGTH_SHORT,
-                        ToastCustom.TYPE_GENERAL)
-                }
-
-                backPressed = System.currentTimeMillis()
+                loginState.logout()
             }
         }
     }
