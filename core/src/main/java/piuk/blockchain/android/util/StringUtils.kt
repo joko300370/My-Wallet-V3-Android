@@ -8,6 +8,7 @@ import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannedString
+import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.text.style.StyleSpan
 import android.view.View
@@ -34,13 +35,11 @@ class StringUtils(private val context: Context) {
         for (annotation in rawText.getSpans(0, rawText.length, android.text.Annotation::class.java)) {
             if (annotation.key == "link") {
                 out.setSpan(
-                    object : ClickableSpan() {
-                        override fun onClick(widget: View?) {
-                            linksMap[annotation.value]?.let {
-                                launchActivity.startActivity(Intent(Intent.ACTION_VIEW, it))
-                            }
-                            onClick()
+                    ClickableSpanWithoutUnderline {
+                        linksMap[annotation.value]?.let {
+                            launchActivity.startActivity(Intent(Intent.ACTION_VIEW, it))
                         }
+                        onClick()
                     },
                     rawText.getSpanStart(annotation),
                     rawText.getSpanEnd(annotation),
@@ -57,5 +56,16 @@ class StringUtils(private val context: Context) {
             }
         }
         return out
+    }
+}
+
+private class ClickableSpanWithoutUnderline(val onClick: () -> Unit) : ClickableSpan() {
+    override fun onClick(widget: View) {
+        onClick.invoke()
+    }
+
+    override fun updateDrawState(ds: TextPaint) {
+        super.updateDrawState(ds)
+        ds.isUnderlineText = false
     }
 }
