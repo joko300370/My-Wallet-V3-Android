@@ -13,11 +13,15 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import org.bitcoinj.core.Address
+import piuk.blockchain.android.coincore.CachedAddress
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -45,6 +49,7 @@ internal class BchAsset(
     crashLogger: CrashLogger,
     tiersService: TierService,
     private val walletPreferences: WalletStatus,
+    offlineAccounts: OfflineAccountUpdater,
     eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
@@ -57,7 +62,8 @@ internal class BchAsset(
     crashLogger,
     tiersService,
     environmentSettings,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -70,11 +76,11 @@ internal class BchAsset(
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
             with(bchDataManager) {
-                getAccountMetadataList()
-                    .mapIndexed { i, a ->
-                        BchCryptoWalletAccount.createBchAccount(
+                mutableListOf<CryptoAccount>().apply {
+                    getAccountMetadataList().forEachIndexed { i, account ->
+                        val bchAccount = BchCryptoWalletAccount.createBchAccount(
                             payloadManager = payloadManager,
-                            jsonAccount = a,
+                            jsonAccount = account,
                             bchManager = bchDataManager,
                             addressIndex = i,
                             exchangeRates = exchangeRates,
@@ -82,11 +88,44 @@ internal class BchAsset(
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager
+                            custodialWalletManager = custodialManager,
+                            refreshTrigger = this@BchAsset
                         )
+                        if (bchAccount.isDefault) {
+                            updateOfflineCache(bchAccount)
+                        }
+                        add(bchAccount)
                     }
+                }
             }
         }
+
+    private fun updateOfflineCache(account: BchCryptoWalletAccount) {
+        require(account.isDefault)
+        require(!account.isArchived)
+
+        return offlineAccounts.updateOfflineAddresses(
+            Single.fromCallable {
+                val result = mutableListOf<CachedAddress>()
+
+                for (i in 0 until OFFLINE_CACHE_ITEM_COUNT) {
+                    account.getReceiveAddressAtPosition(i)?.let {
+                        val address = Address.fromBase58(environmentSettings.bitcoinCashNetworkParameters, it)
+                        val bech32 = address.toCashAddress()
+
+                        result += CachedAddress(
+                            address = it,
+                            addressUri = bech32
+                        )
+                    }
+                }
+                BchOfflineAccountItem(
+                    accountLabel = account.label,
+                    addressList = result
+                )
+            }
+        )
+    }
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
@@ -106,7 +145,11 @@ internal class BchAsset(
 
     fun createAccount(xpub: String): Completable {
         bchDataManager.createAccount(xpub)
-        return bchDataManager.syncWithServer().doOnComplete { forceAccountRefresh() }
+        return bchDataManager.syncWithServer().doOnComplete { forceAccountsRefresh() }
+    }
+
+    companion object {
+        private const val OFFLINE_CACHE_ITEM_COUNT = 5
     }
 }
 

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.erc20.dgld
 
-import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
@@ -10,16 +9,10 @@ import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.Single
-import piuk.blockchain.android.coincore.AddressParseError
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SingleAccountList
-import piuk.blockchain.android.coincore.erc20.Erc20Address
+import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccount
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -43,6 +36,7 @@ internal class DgldAsset(
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     eligibilityProvider: EligibilityProvider,
+    offlineAccounts: OfflineAccountUpdater,
     private val walletPreferences: WalletStatus,
     private val wDgldFeatureFlag: FeatureFlag
 ) : Erc20TokensBase(
@@ -58,7 +52,8 @@ internal class DgldAsset(
     crashLogger,
     tiersService,
     environmentConfig,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
 
     private val isDgldFeatureFlagEnabled = AtomicBoolean(false)
@@ -76,16 +71,13 @@ internal class DgldAsset(
 
     override val asset = CryptoCurrency.DGLD
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.just(listOf(getNonCustodialDgldAccount()))
-
-    private fun getNonCustodialDgldAccount(): CryptoAccount {
+    override fun getNonCustodialAccount(): Erc20NonCustodialAccount {
         val dgldAddress = erc20Account.ethDataManager.getEthWallet()?.account?.address
             ?: throw Exception("No ether wallet found")
 
         return DgldCryptoWalletAccount(
             payloadManager,
-            labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.DGLD),
+            labels.getDefaultNonCustodialWalletLabel(asset),
             dgldAddress,
             erc20Account,
             feeDataManager,
@@ -94,28 +86,4 @@ internal class DgldAsset(
             custodialManager
         )
     }
-
-    @CommonCode("Exists in EthAsset and UsdtAsset")
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
-        Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
-            if (isValid) {
-                erc20Account.ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
-                    if (isContract) {
-                        throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
-                    } else {
-                        Maybe.just(DgldAddress(address))
-                    }
-                }
-            } else {
-                Maybe.empty<ReceiveAddress>()
-            }
-        }
-
-    override fun isValidAddress(address: String): Boolean =
-        FormatsUtil.isValidEthereumAddress(address)
 }
-
-internal class DgldAddress(
-    address: String,
-    label: String = address
-) : Erc20Address(CryptoCurrency.DGLD, address, label)

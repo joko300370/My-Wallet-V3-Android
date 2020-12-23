@@ -1,27 +1,8 @@
 package piuk.blockchain.androidcoreui.utils.helperfunctions
 
 import android.text.TextWatcher
-import android.view.View
-import android.widget.AdapterView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
-
-/**
- * Allow us to use a functional interface in place of implementing members that we might not need to.
- */
-inline fun onItemSelectedListener(
-    crossinline function: (position: Int) -> Unit
-): AdapterView.OnItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        // Pass the object position to the supplied function
-        function.invoke(position)
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        // No-op
-    }
-}
 
 inline fun ViewPager.setOnPageChangeListener(func: OnPageChangeListener.() -> Unit) {
     val listener = OnPageChangeListener()
@@ -66,7 +47,6 @@ class OnPageChangeListener : ViewPager.OnPageChangeListener {
  * having to implement all methods and returns the only thing we're interested in, which in this
  * case is the actual position.
  */
-@Suppress("unused")
 fun TabLayout.setOnTabSelectedListener(function: (position: Int) -> Unit) {
     addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
         override fun onTabReselected(p0: TabLayout.Tab?) {

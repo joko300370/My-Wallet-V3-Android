@@ -109,6 +109,8 @@ class EthDataManager(
      */
     fun getEthWallet(): EthereumWallet? = ethDataStore.ethWallet
 
+    fun getEthWalletAddress(): String? = ethDataStore.ethWallet?.account?.address
+
     fun getDefaultEthAddress(): Single<String?> =
         Single.just(getEthWallet()?.account?.address)
 
@@ -324,7 +326,6 @@ class EthDataManager(
         setLastTxHashObservable(txHash, System.currentTimeMillis())
             .singleOrError()
 
-    @Throws(Exception::class)
     private fun setLastTxHash(txHash: String, timestamp: Long): Observable<String> {
         ethDataStore.ethWallet!!.lastTransactionHash = txHash
         ethDataStore.ethWallet!!.lastTransactionTimestamp = timestamp
@@ -332,7 +333,6 @@ class EthDataManager(
         return save().andThen(Observable.just(txHash))
     }
 
-    @Throws(Exception::class)
     private fun fetchOrCreateEthereumWallet(
         labelsMap: Map<CryptoCurrency, String>
     ):

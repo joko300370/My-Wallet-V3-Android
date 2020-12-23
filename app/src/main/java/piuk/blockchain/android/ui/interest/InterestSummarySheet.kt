@@ -26,7 +26,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.android.util.extensions.secondsToDays
+import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 import java.text.SimpleDateFormat

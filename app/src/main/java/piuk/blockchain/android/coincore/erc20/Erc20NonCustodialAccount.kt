@@ -11,6 +11,7 @@ import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 abstract class Erc20NonCustodialAccount(
     payloadManager: PayloadDataManager,
     asset: CryptoCurrency,
+    internal val address: String,
     private val fees: FeeDataManager,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
@@ -45,6 +47,11 @@ abstract class Erc20NonCustodialAccount(
         get() = erc20Account.ethDataManager
 
     override val isDefault: Boolean = true // Only one account, so always default
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            Erc20Address(asset, address, label)
+        )
 
     override val accountBalance: Single<Money>
         get() = erc20Account.getBalance()

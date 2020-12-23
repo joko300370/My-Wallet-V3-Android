@@ -1,4 +1,4 @@
-package piuk.blockchain.android.util.extensions
+package piuk.blockchain.android.util
 
 import java.math.BigInteger
 import java.text.DateFormat

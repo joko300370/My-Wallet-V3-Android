@@ -17,6 +17,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.amshove.kluent.`it returns`
+import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
@@ -24,7 +25,6 @@ import org.junit.Test
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.erc20.Erc20Account
@@ -43,9 +43,6 @@ class CoinsWebSocketStrategyTest {
     }
 
     private val messagesSocketHandler: MessagesSocketHandler = mock()
-    private val swipeToReceiveHelper: SwipeToReceiveHelper = mock {
-        on { getEthReceiveAddress() } `it returns` "0x4058a004dd718babab47e14dd0d744742e5b9903"
-    }
 
     val wallet = mock<EthereumWallet> {
         on { getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME) } `it returns`
@@ -57,13 +54,10 @@ class CoinsWebSocketStrategyTest {
 
     private val ethDataManager: EthDataManager = mock {
         on { getEthWallet() } `it returns` wallet
-        on { getErc20TokenData(CryptoCurrency.PAX) } `it returns`
-            Erc20TokenData.createPaxTokenData("")
-
-        on { getErc20TokenData(CryptoCurrency.USDT) } `it returns`
-            Erc20TokenData.createUsdtTokenData("")
-
+        on { getErc20TokenData(CryptoCurrency.PAX) } `it returns` Erc20TokenData.createPaxTokenData("")
+        on { getErc20TokenData(CryptoCurrency.USDT) } `it returns` Erc20TokenData.createUsdtTokenData("")
         on { fetchEthAddress() } `it returns` Observable.just(CombinedEthModel(EthAddressResponseMap()))
+        on { getEthWalletAddress() } `it returns` "0x4058a004dd718babab47e14dd0d744742e5b9903"
     }
 
     private val stringUtils: StringUtils = mock {
@@ -95,6 +89,8 @@ class CoinsWebSocketStrategyTest {
         on { payloadChecksum } `it returns` "741cd20c1f076c6393a07a2dc7b072188cd4e3ecea3184a1e6a5ed387daadb193245"
         on { tempPassword } `it returns` "2333"
         on { wallet } `it returns` Wallet()
+        on { sharedKey } itReturns("")
+        on { guid } itReturns("")
         on {
             initializeAndDecrypt(
                 any(),
@@ -119,7 +115,6 @@ class CoinsWebSocketStrategyTest {
     private val strategy = CoinsWebSocketStrategy(
         coinsWebSocket = webSocket,
         ethDataManager = ethDataManager,
-        swipeToReceiveHelper = swipeToReceiveHelper,
         stringUtils = stringUtils,
         gson = Gson(),
         paxAccount = paxAccount,

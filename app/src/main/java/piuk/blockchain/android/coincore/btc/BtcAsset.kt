@@ -21,12 +21,14 @@ import org.bitcoinj.core.Coin
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.uri.BitcoinURI
+import piuk.blockchain.android.coincore.CachedAddress
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -53,6 +55,7 @@ internal class BtcAsset(
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
+    offlineAccounts: OfflineAccountUpdater,
     eligibilityProvider: EligibilityProvider
 ) : CryptoAssetBase(
     payloadManager,
@@ -65,7 +68,8 @@ internal class BtcAsset(
     crashLogger,
     tiersService,
     environmentConfig,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
 
     override val asset: CryptoCurrency
@@ -79,7 +83,11 @@ internal class BtcAsset(
             with(payloadManager) {
                 val result = mutableListOf<CryptoAccount>()
                 accounts.forEachIndexed { i, account ->
-                    result.add(btcAccountFromPayloadAccount(i, account))
+                    val btcAccount = btcAccountFromPayloadAccount(i, account)
+                    if (btcAccount.isDefault) {
+                        updateOfflineCache(btcAccount)
+                    }
+                    result.add(btcAccount)
                 }
 
                 legacyAddresses.forEach { account ->
@@ -88,6 +96,30 @@ internal class BtcAsset(
                 result
             }
         }
+
+    private fun updateOfflineCache(account: BtcCryptoWalletAccount) {
+        require(account.isDefault)
+        require(!account.isArchived)
+
+        return offlineAccounts.updateOfflineAddresses(
+            Single.fromCallable {
+                val result = mutableListOf<CachedAddress>()
+
+                for (i in 0 until OFFLINE_CACHE_ITEM_COUNT) {
+                    account.getReceiveAddressAtPosition(i)?.let {
+                        result += CachedAddress(
+                            address = it,
+                            addressUri = "$BTC_URL_PREFIX$it"
+                        )
+                    }
+                }
+                BtcOfflineAccountItem(
+                    accountLabel = account.label,
+                    addressList = result
+                )
+            }
+        )
+    }
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
@@ -112,7 +144,7 @@ internal class BtcAsset(
         payloadManager.createNewAccount(label, secondPassword)
             .singleOrError()
             .map { btcAccountFromPayloadAccount(payloadManager.accountCount - 1, it) }
-            .doOnSuccess { forceAccountRefresh() }
+            .doOnSuccess { forceAccountsRefresh() }
             .doOnSuccess { coinsWebsocket.subscribeToXpubBtc(it.xpubAddress) }
 
     fun importLegacyAddressFromKey(
@@ -136,7 +168,7 @@ internal class BtcAsset(
         }.map { legacyAddress ->
             btcAccountFromLegacyAccount(legacyAddress)
         }.doOnSuccess {
-            forceAccountRefresh()
+            forceAccountsRefresh()
         }.doOnSuccess { btcAccount ->
             coinsWebsocket.subscribeToExtraBtcAddress(btcAccount.xpubAddress)
         }
@@ -158,7 +190,8 @@ internal class BtcAsset(
             exchangeRates = exchangeRates,
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialManager
+            custodialWalletManager = custodialManager,
+            refreshTrigger = this
         )
 
     private fun btcAccountFromLegacyAccount(payloadAccount: LegacyAddress): BtcCryptoWalletAccount =
@@ -170,8 +203,13 @@ internal class BtcAsset(
             exchangeRates = exchangeRates,
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialManager
+            custodialWalletManager = custodialManager,
+            refreshTrigger = this
         )
+
+    companion object {
+        private const val OFFLINE_CACHE_ITEM_COUNT = 5
+    }
 }
 
 internal class BtcAddress(

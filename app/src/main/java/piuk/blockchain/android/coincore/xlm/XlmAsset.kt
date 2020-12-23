@@ -17,6 +17,7 @@ import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CachedAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
@@ -27,6 +28,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
+import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 
 internal class XlmAsset(
     payloadManager: PayloadDataManager,
@@ -43,7 +46,8 @@ internal class XlmAsset(
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
-    eligibilityProvider: EligibilityProvider
+    eligibilityProvider: EligibilityProvider,
+    offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -55,7 +59,8 @@ internal class XlmAsset(
     crashLogger,
     tiersService,
     environmentConfig,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
 
     override val asset: CryptoCurrency
@@ -67,19 +72,36 @@ internal class XlmAsset(
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         xlmDataManager.defaultAccount()
             .map {
-                listOf(
-                    XlmCryptoWalletAccount(
-                        payloadManager = payloadManager,
-                        account = it,
-                        xlmManager = xlmDataManager,
-                        exchangeRates = exchangeRates,
-                        xlmFeesFetcher = xlmFeesFetcher,
-                        walletOptionsDataManager = walletOptionsDataManager,
-                        walletPreferences = walletPreferences,
-                        custodialWalletManager = custodialManager
+                XlmCryptoWalletAccount(
+                    payloadManager = payloadManager,
+                    account = it,
+                    xlmManager = xlmDataManager,
+                    exchangeRates = exchangeRates,
+                    xlmFeesFetcher = xlmFeesFetcher,
+                    walletOptionsDataManager = walletOptionsDataManager,
+                    walletPreferences = walletPreferences,
+                    custodialWalletManager = custodialManager
+                )
+            }.doOnSuccess {
+                updateOfflineCache(it)
+            }.map {
+                listOf(it)
+            }
+
+    private fun updateOfflineCache(account: XlmCryptoWalletAccount) {
+        offlineAccounts.updateOfflineAddresses(
+            Single.just(
+                SimpleOfflineCacheItem(
+                    networkTicker = CryptoCurrency.XLM.networkTicker,
+                    accountLabel = account.label,
+                    address = CachedAddress(
+                        account.address,
+                        xlmAddressToUri(account.address)
                     )
                 )
-            }
+            )
+        )
+    }
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
@@ -135,3 +157,5 @@ internal class XlmAddress(
         return result
     }
 }
+
+fun xlmAddressToUri(accountId: String): String = "web+stellar:pay?destination=" + accountId

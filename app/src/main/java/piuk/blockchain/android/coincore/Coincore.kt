@@ -60,16 +60,17 @@ class Coincore internal constructor(
     fun allWallets(includeArchived: Boolean = false): Single<AccountGroup> =
         Maybe.concat(
             allAssets.map {
-                it.accountGroup().map { grp -> grp.accounts }.map { list ->
-                    list.filter { account ->
-                        (includeArchived || account !is CryptoAccount) || !account.isArchived
+                it.accountGroup().map { grp -> grp.accounts }
+                    .map { list ->
+                        list.filter { account ->
+                            (includeArchived || account !is CryptoAccount) || !account.isArchived
+                        }
                     }
-                }
             }
         ).reduce { a, l -> a + l }
-            .map { list ->
-                AllWalletsAccount(list, defaultLabels) as AccountGroup
-            }.toSingle()
+        .map { list ->
+            AllWalletsAccount(list, defaultLabels) as AccountGroup
+        }.toSingle()
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,

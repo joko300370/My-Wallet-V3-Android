@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
@@ -37,7 +38,8 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                offlineAccounts = get()
             )
         }
 
@@ -57,6 +59,7 @@ val coincoreModule = module {
                 tiersService = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get(),
+                offlineAccounts = get(),
                 coinsWebsocket = get()
             )
         }
@@ -77,6 +80,7 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 walletPreferences = get(),
+                offlineAccounts = get(),
                 eligibilityProvider = get()
             )
         }
@@ -97,6 +101,7 @@ val coincoreModule = module {
                 tiersService = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
+                offlineAccounts = get(),
                 eligibilityProvider = get()
             )
         }
@@ -115,6 +120,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 eligibilityProvider = get()
             )
@@ -133,6 +139,7 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
@@ -151,7 +158,8 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                offlineAccounts = get()
             )
         }
 
@@ -179,6 +187,7 @@ val coincoreModule = module {
                 labels = get(),
                 pitLinking = get(),
                 tierService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
@@ -200,6 +209,7 @@ val coincoreModule = module {
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get(),
+                offlineAccounts = get(),
                 tiersService = get(),
                 wDgldFeatureFlag = get(dgldFeatureFlag)
             )
@@ -251,5 +261,13 @@ val coincoreModule = module {
                 coincore = get()
             )
         }.bind(AddressFactory::class)
+
+        scoped {
+            OfflineAccountUpdater(
+                localCache = get(),
+                payloadManager = get(),
+                walletApi = get()
+            )
+        }
     }
 }

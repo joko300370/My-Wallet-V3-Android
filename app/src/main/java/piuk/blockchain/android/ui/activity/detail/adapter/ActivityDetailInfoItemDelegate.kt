@@ -32,7 +32,7 @@ import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.extensions.toFormattedString
+import piuk.blockchain.android.util.toFormattedString
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {

@@ -17,7 +17,6 @@ import piuk.blockchain.android.databinding.ActivityPinEntryBinding
 import piuk.blockchain.android.ui.customviews.dialogs.OverlayDetection
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
@@ -76,7 +75,7 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     private fun shouldHideSwipeToReceive(): Boolean {
         return (intent.hasExtra(KEY_VALIDATING_PIN_FOR_RESULT) ||
                 isCreatingNewPin ||
-                !prefs.getValue(PersistentPrefs.KEY_SWIPE_TO_RECEIVE_ENABLED, true))
+                !prefs.offlineCacheEnabled)
     }
 
     private fun lockViewpager() {

@@ -1,6 +1,5 @@
 package com.blockchain.koin
 
-import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.accounts.AccountList
 import com.blockchain.accounts.XlmAsyncAccountListAdapter
 import com.blockchain.sunriver.HorizonProxy
@@ -28,7 +27,7 @@ val sunriverModule = module {
             eventLogger = get(),
             xlmHorizonUrlFetcher = get(),
             xlmHorizonDefUrl = getProperty("HorizonURL"))
-        }.bind(DefaultAccountDataManager::class)
+        }
 
         factory { HorizonProxy() }
 

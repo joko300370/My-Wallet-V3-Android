@@ -104,7 +104,7 @@ class ReceivePresenter(
         compositeDisposable += qrCodeDataManager.generateQrCode(uri, DIMENSION_QR_CODE)
             .doOnSubscribe { view?.showQrLoading() }
             .subscribeBy(
-                onNext = { view?.showQrCode(it) },
+                onSuccess = { view?.showQrCode(it) },
                 onError = { view?.showQrCode(null) }
             )
     }

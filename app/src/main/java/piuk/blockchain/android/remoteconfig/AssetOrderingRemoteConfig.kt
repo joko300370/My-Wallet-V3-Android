@@ -1,16 +1,16 @@
-package piuk.blockchain.android.ui.dashboard
+package piuk.blockchain.android.remoteconfig
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.remoteconfig.RemoteConfig
 import com.google.gson.Gson
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AssetOrdering
 
-interface AssetOrderingConfig {
-    fun getAssetOrdering(): Single<List<CryptoCurrency>>
-}
-
-class AssetOrderingConfigImpl(val config: RemoteConfig, val crashLogger: CrashLogger) : AssetOrderingConfig {
+class AssetOrderingRemoteConfig(
+    val config: RemoteConfig,
+    val crashLogger: CrashLogger
+) : AssetOrdering {
     private val gson = Gson()
 
     override fun getAssetOrdering(): Single<List<CryptoCurrency>> =

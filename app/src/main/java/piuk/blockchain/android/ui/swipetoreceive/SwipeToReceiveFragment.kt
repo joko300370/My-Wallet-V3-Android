@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.util.drawableResFilled
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
@@ -39,7 +38,7 @@ import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnPageChangeListen
 class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePresenter>(),
     SwipeToReceiveView {
 
-    private val presenter: SwipeToReceivePresenter by scopedInject()
+    private val presenter: SwipeToReceivePresenter by inject()
     private val rxBus: RxBus by inject()
 
     override fun onCreateView(
@@ -62,15 +61,14 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
             viewpager_icons.currentItem = viewpager_icons.currentItem + 1
         }
 
+        onViewReady()
+    }
+
+    override fun initPager(assetList: List<CryptoCurrency>) {
+        val assetImageList = assetList.map { it.drawableResFilled() }
         val adapter = ImageAdapter(
-            context!!,
-            listOf(
-                CryptoCurrency.BTC.drawableResFilled(),
-                CryptoCurrency.ETHER.drawableResFilled(),
-                CryptoCurrency.BCH.drawableResFilled(),
-                CryptoCurrency.XLM.drawableResFilled(),
-                CryptoCurrency.PAX.drawableResFilled()
-            )
+            requireContext(),
+            assetImageList
         )
 
         viewpager_icons.run {
@@ -78,22 +76,20 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
             setAdapter(adapter)
             indicator.setViewPager(this)
             setOnPageChangeListener {
-                onPageSelected {
-                    presenter.currencyPosition = it
+                onPageSelected { index ->
+                    presenter.onCurrencySelected(assetList[index])
 
-                    when (it) {
+                    when (index) {
                         0 -> imageview_left_arrow.invisible()
-                        1, 2, 3 -> listOf(
-                            imageview_left_arrow,
-                            imageview_right_arrow
-                        ).forEach { it.visible() }
-                        4 -> imageview_right_arrow.invisible()
+                        adapter.count - 1 -> imageview_right_arrow.invisible()
+                        else -> listOf(imageview_left_arrow, imageview_right_arrow).forEach { it.visible() }
                     }
                 }
             }
         }
-
-        onViewReady()
+        assetList.firstOrNull()?.let {
+            presenter.onCurrencySelected(it)
+        }
     }
 
     override fun displayReceiveAddress(address: String) {
@@ -104,9 +100,9 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         textview_account.text = accountName
     }
 
-    override fun displayCoinType(cryptoCurrency: CryptoCurrency) {
-        val assetName = resources.getString(cryptoCurrency.assetName())
-        val requestString = resources.getString(R.string.swipe_to_receive_request, assetName)
+    override fun displayAsset(cryptoCurrency: CryptoCurrency) {
+        val assetName = getString(cryptoCurrency.assetName())
+        val requestString = getString(R.string.swipe_to_receive_request, assetName)
         textview_request_currency.text = requestString
         textview_request_currency.contentDescription = requestString
     }
@@ -140,7 +136,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         super.onStart()
         compositeDisposable += event.subscribe {
             // Update UI with new Address + QR
-            presenter.currencyPosition = presenter.currencyPosition
+            presenter.refresh()
         }
     }
 
@@ -188,8 +184,6 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
     }
 
     companion object {
-
-        @JvmStatic
         fun newInstance(): SwipeToReceiveFragment = SwipeToReceiveFragment()
     }
 

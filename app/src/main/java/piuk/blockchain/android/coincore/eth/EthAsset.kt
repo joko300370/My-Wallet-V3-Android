@@ -16,6 +16,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.CachedAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
@@ -27,6 +28,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 
 internal class EthAsset(
     payloadManager: PayloadDataManager,
@@ -42,7 +45,8 @@ internal class EthAsset(
     crashLogger: CrashLogger,
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider
+    eligibilityProvider: EligibilityProvider,
+    offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -54,7 +58,8 @@ internal class EthAsset(
     crashLogger,
     tiersService,
     environmentConfig,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
 
     private val labelList = mapOf(
@@ -71,19 +76,37 @@ internal class EthAsset(
         ethDataManager.initEthereumWallet(labelList)
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.just(
-            listOf(
+        Single.just(ethDataManager.getEthWallet() ?: throw Exception("No ether wallet found"))
+            .map {
                 EthCryptoWalletAccount(
                     payloadManager,
                     ethDataManager,
                     feeDataManager,
-                    ethDataManager.getEthWallet()?.account ?: throw Exception("No ether wallet found"),
+                    it.account,
                     walletPrefs,
                     exchangeRates,
                     custodialManager
                 )
+            }.doOnSuccess {
+                updateOfflineCache(it)
+            }.map {
+                listOf(it)
+            }
+
+    private fun updateOfflineCache(account: EthCryptoWalletAccount) {
+        offlineAccounts.updateOfflineAddresses(
+            Single.just(
+                SimpleOfflineCacheItem(
+                    networkTicker = CryptoCurrency.ETHER.networkTicker,
+                    accountLabel = account.label,
+                    address = CachedAddress(
+                        account.address,
+                        account.address
+                    )
+                )
             )
         )
+    }
 
     @CommonCode("Exists in UsdtAsset and PaxAsset")
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =

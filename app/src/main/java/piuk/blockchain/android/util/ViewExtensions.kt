@@ -3,7 +3,6 @@ package piuk.blockchain.android.util
 import android.graphics.Rect
 import android.view.View
 import android.widget.CheckBox
-import kotlinx.android.synthetic.main.activity_scan.*
 
 fun CheckBox.setThrottledCheckedChange(interval: Long = 500L, action: (Boolean) -> Unit) {
     var lastClickTime = 0L

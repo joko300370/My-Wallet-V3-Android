@@ -1,7 +1,5 @@
 package com.blockchain.sunriver
 
-import com.blockchain.account.BalanceAndMin
-import com.blockchain.account.DefaultAccountDataManager
 import com.blockchain.fees.FeeType
 import com.blockchain.logging.CustomEventBuilder
 import com.blockchain.logging.EventLogger
@@ -13,12 +11,18 @@ import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.utils.toHex
 import info.blockchain.balance.AccountReference
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import org.stellar.sdk.KeyPair
+
+data class BalanceAndMin(
+    val balance: CryptoValue,
+    val minimumBalance: CryptoValue
+)
 
 class XlmDataManager internal constructor(
     private val horizonProxy: HorizonProxy,
@@ -31,8 +35,7 @@ class XlmDataManager internal constructor(
     private val eventLogger: EventLogger,
     xlmHorizonUrlFetcher: XlmHorizonUrlFetcher,
     xlmHorizonDefUrl: String
-) : DefaultAccountDataManager {
-
+) {
     private val xlmProxyUrl = xlmHorizonUrlFetcher.xlmHorizonUrl(xlmHorizonDefUrl).doOnSuccess {
         horizonProxy.update(it)
     }.cache()
@@ -120,7 +123,7 @@ class XlmDataManager internal constructor(
     /**
      * Balance - minimum - fees
      */
-    override fun getMaxSpendableAfterFees(feeType: FeeType): Single<CryptoValue> =
+    fun getMaxSpendableAfterFees(feeType: FeeType): Single<CryptoValue> =
         Maybe.concat(
             maybeDefaultAccount()
                 .flatMapSingle { accountRef ->
@@ -134,7 +137,7 @@ class XlmDataManager internal constructor(
             Maybe.just(CryptoValue.ZeroXlm)
         ).firstOrError()
 
-    override fun getBalanceAndMin(): Single<BalanceAndMin> =
+    fun getBalanceAndMin(): Single<BalanceAndMin> =
         Maybe.concat(
             maybeDefaultAccount().flatMap {
                 getBalanceAndMin(it).toMaybe()
@@ -146,7 +149,7 @@ class XlmDataManager internal constructor(
         defaultXlmAccount()
             .map(XlmAccount::toReference)
 
-    override fun defaultAccountReference(): Single<AccountReference> = defaultAccount().map { it }
+    fun defaultAccountReference(): Single<AccountReference> = defaultAccount().map { it }
 
     fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
         maybeDefaultXlmAccount().map(XlmAccount::toReference)
@@ -195,7 +198,7 @@ internal fun HorizonProxy.SendResult.mapToSendFundsResult(sendDetails: SendDetai
             errorCode = 0,
             confirmationDetails = SendConfirmationDetails(
                 sendDetails = sendDetails,
-                fees = CryptoValue.lumensFromStroop(transaction!!.fee.toBigInteger())
+                fees = CryptoValue.fromMinor(CryptoCurrency.XLM, transaction!!.fee.toBigInteger())
             ),
             hash = transaction.hash().toHex()
         )

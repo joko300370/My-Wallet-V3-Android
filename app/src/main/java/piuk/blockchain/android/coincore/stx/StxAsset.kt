@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -34,7 +35,8 @@ internal class StxAsset(
     crashLogger: CrashLogger,
     tiersService: TierService,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider
+    eligibilityProvider: EligibilityProvider,
+    offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -46,7 +48,8 @@ internal class StxAsset(
     crashLogger,
     tiersService,
     environmentConfig,
-    eligibilityProvider
+    eligibilityProvider,
+    offlineAccounts
 ) {
 
     override val asset: CryptoCurrency

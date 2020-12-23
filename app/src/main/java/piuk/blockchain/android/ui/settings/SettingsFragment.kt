@@ -141,7 +141,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         findPreference<SwitchPreferenceCompat>("receive_shortcuts_enabled")
     }
     private val swipeToReceivePrefs by lazy {
-        findPreference<SwitchPreferenceCompat>("swipe_to_receive_enabled")
+        findPreference<SwitchPreferenceCompat>(PersistentPrefs.KEY_SWIPE_TO_RECEIVE_ENABLED)
     }
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
@@ -261,14 +261,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         swipeToReceivePrefs?.setOnPreferenceChangeListener { _, newValue ->
             if (!(newValue as Boolean)) {
-                settingsPresenter.clearSwipeToReceiveData()
+                settingsPresenter.clearOfflineAddressCache()
             } else {
                 AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                     .setTitle(R.string.swipe_receive_hint)
                     .setMessage(R.string.swipe_receive_address_info)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        settingsPresenter.storeSwipeToReceiveAddresses()
-                    }
+                    .setPositiveButton(android.R.string.ok) { _, _ -> }
                     .setCancelable(false)
                     .show()
             }
@@ -309,10 +307,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
     }
 
-    override fun showProgressDialog(@StringRes message: Int) {
+    override fun showProgress() {
         progressDialog = MaterialProgressDialog(requireContext()).apply {
             setCancelable(false)
-            setMessage(message)
+            setMessage(R.string.please_wait)
             show()
         }
     }
@@ -321,13 +319,18 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified)
     }
 
-    override fun hideProgressDialog() {
+    override fun hideProgress() {
         progressDialog?.dismiss()
         progressDialog = null
     }
 
-    override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
-        ToastCustom.makeText(activity, getString(message), ToastCustom.LENGTH_SHORT, toastType)
+    override fun showError(@StringRes message: Int) {
+        ToastCustom.makeText(
+            activity,
+            getString(message),
+            ToastCustom.LENGTH_SHORT,
+            ToastCustom.TYPE_ERROR
+        )
     }
 
     override fun showReviewDialog() {
@@ -405,12 +408,28 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         guidPref?.summary = summary
     }
 
-    override fun setEmailSummary(summary: String) {
-        emailPref?.summary = summary
+    override fun setEmailSummary(email: String, isVerified: Boolean) {
+        emailPref?.summary = when {
+            email.isEmpty() -> getString(R.string.not_specified)
+            isVerified -> "$email  (${getString(R.string.verified)})"
+            else -> "$email  (${getString(R.string.unverified)})"
+        }
     }
 
-    override fun setSmsSummary(summary: String) {
-        smsPref?.summary = summary
+    override fun setEmailUnknown() {
+        emailPref?.summary = getString(R.string.not_specified)
+    }
+
+    override fun setSmsSummary(smsNumber: String, isVerified: Boolean) {
+        smsPref?.summary = when {
+            smsNumber.isEmpty() -> getString(R.string.not_specified)
+            isVerified -> "$smsNumber (${getString(R.string.verified)})"
+            else -> "$smsNumber (${getString(R.string.unverified)})"
+        }
+    }
+
+    override fun setSmsUnknown() {
+        emailPref?.summary = getString(R.string.not_specified)
     }
 
     override fun setFiatSummary(summary: String) {
@@ -594,7 +613,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun updateFingerprintPreferenceStatus() {
-        fingerprintPref.isChecked = settingsPresenter.ifFingerprintUnlockEnabled
+        fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
     }
 
     override fun showFingerprintDialog(pincode: String) {
@@ -608,7 +627,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             override fun onCanceled() {
                 dialog.dismissAllowingStateLoss()
                 settingsPresenter.setFingerprintUnlockEnabled(false)
-                fingerprintPref.isChecked = settingsPresenter.ifFingerprintUnlockEnabled
+                fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
             }
         })
         dialog.show(fragmentManager!!, FingerprintDialog.TAG)
@@ -1059,7 +1078,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun onDestroy() {
         super.onDestroy()
-        hideProgressDialog()
+        hideProgress()
         settingsPresenter.onViewDestroyed()
     }
 
