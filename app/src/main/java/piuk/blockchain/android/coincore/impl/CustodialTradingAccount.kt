@@ -144,21 +144,20 @@ open class CustodialTradingAccount(
             }
         }
 
-    override val actions: AvailableActions
-        get() =
-            mutableSetOf(
-                AssetAction.ViewActivity
-            ).apply {
-                if (!isArchived) {
-                    if (hasActionableFunds) {
-                        add(AssetAction.Send)
-                    }
-                    if (isFunded && isEligibleForSimpleBuy.get()) {
-                        add(AssetAction.Sell)
-                        add(AssetAction.Swap)
-                    }
+    override val actions: Single<AvailableActions>
+        get() = Single.just(mutableSetOf(
+            AssetAction.ViewActivity
+        ).apply {
+            if (!isArchived) {
+                if (hasActionableFunds) {
+                    add(AssetAction.Send)
                 }
-            }.toSet()
+                if (isFunded && isEligibleForSimpleBuy.get()) {
+                    add(AssetAction.Sell)
+                    add(AssetAction.Swap)
+                }
+            }
+        }.toSet())
 
     private fun orderToSummary(order: BuySellOrder): ActivitySummaryItem =
         if (order.type == OrderType.BUY) {
@@ -203,7 +202,7 @@ open class CustodialTradingAccount(
         return flattenAsObservable { list ->
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)) or
-                    (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
+                        (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
             }
         }.toList()
     }

@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.alg
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
@@ -24,8 +25,8 @@ class AlgoCustodialTradingAccount(
     environmentConfig = environmentConfig,
     eligibilityProvider = eligibilityProvider
 ) {
-    override val actions: AvailableActions
-        get() = super.actions.toMutableSet().apply {
+    override val actions: Single<AvailableActions>
+        get() = super.actions/*.toMutableSet().apply {
                 remove(AssetAction.Send)
-            }.toSet()
+            }.toSet()*/
 }

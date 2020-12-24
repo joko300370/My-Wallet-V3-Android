@@ -71,16 +71,17 @@ class AssetDetailsInteractor(
             Singles.zip(
                 grp.accountBalance,
                 grp.pendingBalance,
-                grp.isEnabled
-            ).toMaybe().map { (accBalance, pendingBalance, enabled) ->
+                grp.isEnabled,
+                grp.actions
+            ) { accBalance, pendingBalance, enable, actions ->
                 Details.DetailsItem(
-                    isEnabled = enabled,
+                    isEnabled = enable,
                     account = grp,
                     balance = accBalance,
                     pendingBalance = pendingBalance,
-                    actions = grp.actions
+                    actions = actions
                 ) as Details
-            }
+            }.toMaybe()
         }.toSingle(Details.NoDetails)
 
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {

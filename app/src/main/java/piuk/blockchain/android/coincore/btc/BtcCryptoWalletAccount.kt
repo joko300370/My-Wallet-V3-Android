@@ -121,14 +121,14 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    override val actions: AvailableActions
-        get() = super.actions.run {
+    override val actions: Single<AvailableActions>
+        get() = super.actions/*.run {
             if (!isHDAccount) {
                 toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
             } else {
                 this
             }
-        }
+        }*/
 
     override fun updateLabel(newLabel: String): Completable {
         require(newLabel.isNotEmpty())
