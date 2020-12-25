@@ -134,17 +134,15 @@ class TransactionInteractor(
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWallets()
+        return coincore.allWalletsWithActions(setOf(action))
             .zipWith(
                 custodialRepository.getSwapAvailablePairs()
-            ).map { (accountGroup, pairs) ->
-                accountGroup.accounts.filter { account ->
+            ).map { (accounts, pairs) ->
+                accounts.filter { account ->
                     (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
                 }
             }.map {
-                it.map { account -> account as CryptoAccount }.filter { account ->
-                    account.actions.contains(AssetAction.Swap)
-                }
+                it.map { account -> account as CryptoAccount }
             }
     }
 

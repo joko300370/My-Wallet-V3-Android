@@ -200,10 +200,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 )
 
                 accounts_list.initialise(
-                    coincore.allWallets().map {
-                        it.accounts.filterIsInstance<CryptoAccount>().filter { account ->
-                            account.actions.contains(AssetAction.Sell) &&
-                                    supportedCryptos.contains(account.asset)
+                    coincore.allWalletsWithActions(setOf(AssetAction.Sell)).map {
+                        it.filterIsInstance<CryptoAccount>().filter { account ->
+                            supportedCryptos.contains(account.asset)
                         }
                     },
                     status = ::statusDecorator,
