@@ -11,13 +11,10 @@ import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetOrdering
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom

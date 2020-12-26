@@ -11,7 +11,6 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
-import kotlin.test.assertEquals
 
 class CryptoAccountCompoundGroupTest {
 

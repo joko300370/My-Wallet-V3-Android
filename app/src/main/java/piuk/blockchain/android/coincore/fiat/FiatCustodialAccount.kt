@@ -137,8 +137,9 @@ class FiatAccountGroup(
         get() = if (accounts.isEmpty()) {
             Single.just(emptySet())
         } else {
-            Single.just(emptySet())
-          /*  accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }*/
+            Single.zip(accounts.map { it.actions }) { t: Array<Any> ->
+                t.filterIsInstance<AvailableActions>().flatten().toSet()
+            }
         }
 
     // if _any_ of the accounts have transactions

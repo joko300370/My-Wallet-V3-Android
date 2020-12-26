@@ -123,7 +123,7 @@ internal class BtcCryptoWalletAccount(
 
     override val actions: Single<AvailableActions>
         get() = super.actions.map {
-           if (!isHDAccount) {
+            if (!isHDAccount) {
                 it.toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
             } else it
         }

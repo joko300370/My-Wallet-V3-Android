@@ -13,7 +13,6 @@ import info.blockchain.balance.total
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -327,9 +326,7 @@ class CryptoAccountNonCustodialGroup(
             Single.just(emptySet())
         } else {
             Single.zip(accounts.map { it.actions }) { t: Array<Any> ->
-                t.map { it as Set<AssetAction> }
-            }.map {
-                it.flatten().toSet()
+                t.filterIsInstance<AvailableActions>().flatten().toSet()
             }
         }
 

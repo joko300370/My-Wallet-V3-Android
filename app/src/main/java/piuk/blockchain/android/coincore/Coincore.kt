@@ -97,7 +97,6 @@ class Coincore internal constructor(
                 }
         }
 
-
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,
         action: AssetAction
