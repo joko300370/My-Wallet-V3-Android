@@ -23,6 +23,7 @@ class Coincore internal constructor(
     private val txProcessorFactory: TxProcessorFactory,
     private val defaultLabels: DefaultLabels,
     private val fiatAsset: Asset,
+    private val ordering: AssetOrdering,
     private val crashLogger: CrashLogger
 ) {
 
@@ -73,15 +74,29 @@ class Coincore internal constructor(
             }.toSingle()
 
     fun allWalletsWithActions(actions: Set<AssetAction>): Single<SingleAccountList> =
-        allWallets()
-            .flattenAsObservable { it.accounts }
-            .flatMapSingle { account ->
-                account.actions.map { availableActions ->
-                    if (availableActions.containsAll(actions)) account else NullCryptoAccount()
+        ordering.getAssetOrdering().flatMap { orderedAssets ->
+            allWallets()
+                .flattenAsObservable { it.accounts }
+                .flatMapSingle { account ->
+                    account.actions.map { availableActions ->
+                        if (availableActions.containsAll(actions)) account else NullCryptoAccount()
+                    }
                 }
-            }
-            .filter { it !is NullCryptoAccount }
-            .toList()
+                .filter { it !is NullCryptoAccount }
+                .toList()
+                .map { list ->
+                    val sortedList = list.sortedWith(compareBy({
+                        (it as? CryptoAccount)?.let { cryptoAccount ->
+                            orderedAssets.indexOf(cryptoAccount.asset)
+                        } ?: 0
+                    },
+                        { it !is NonCustodialAccount },
+                        { !it.isDefault }
+                    ))
+                    sortedList
+                }
+        }
+
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,

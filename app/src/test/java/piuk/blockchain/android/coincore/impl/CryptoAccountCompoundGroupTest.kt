@@ -70,7 +70,7 @@ class CryptoAccountCompoundGroupTest {
         val accountActions = setOf(AssetAction.Send, AssetAction.Receive)
 
         val account: CryptoAccount = mock {
-            on { actions } itReturns accountActions
+            on { actions } itReturns Single.just(accountActions)
         }
 
         val subject = CryptoAccountNonCustodialGroup(
@@ -80,29 +80,29 @@ class CryptoAccountCompoundGroupTest {
         )
 
         // Act
-        val r = subject.actions
+        val r = subject.actions.test()
 
         // Assert
-        assertEquals(r, accountActions)
+        r.assertValue(setOf(AssetAction.Send, AssetAction.Receive))
     }
 
     @Test
     fun `group with three accounts returns the union of possible actions`() {
         // Arrange
-        val accountActions1 = setOf(
+        val accountActions1 = Single.just(setOf(
             AssetAction.Send,
             AssetAction.Receive
-        )
+        ))
 
-        val accountActions2 = setOf(
+        val accountActions2 = Single.just(setOf(
             AssetAction.Send,
             AssetAction.Swap
-        )
+        ))
 
-        val accountActions3 = setOf(
+        val accountActions3 = Single.just(setOf(
             AssetAction.Send,
             AssetAction.Receive
-        )
+        ))
 
         val expectedResult = setOf(
             AssetAction.Send,
@@ -129,9 +129,9 @@ class CryptoAccountCompoundGroupTest {
         )
 
         // Act
-        val r = subject.actions
+        val r = subject.actions.test()
 
         // Assert
-        assertEquals(r, expectedResult)
+        r.assertValue(expectedResult)
     }
 }

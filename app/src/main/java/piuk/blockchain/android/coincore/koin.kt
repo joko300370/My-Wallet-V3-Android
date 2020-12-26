@@ -232,7 +232,8 @@ val coincoreModule = module {
                 ),
                 txProcessorFactory = get(),
                 defaultLabels = get(),
-                crashLogger = get()
+                crashLogger = get(),
+                ordering = get()
             )
         }
 

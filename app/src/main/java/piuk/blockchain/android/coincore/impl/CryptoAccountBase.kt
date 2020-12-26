@@ -169,19 +169,19 @@ abstract class CryptoNonCustodialAccount(
     override val isFunded: Boolean = true
 
     override val actions: Single<AvailableActions>
-        get() = Single.just(mutableSetOf(
-            AssetAction.ViewActivity
-        ).apply {
-            if (!isArchived) {
-                add(AssetAction.Receive)
-
-                if (isFunded) {
+        get() = accountBalance.map { it.isPositive }.map {
+            val actions = mutableSetOf(AssetAction.ViewActivity)
+            if (isArchived) return@map actions.toSet()
+            actions.add(AssetAction.Receive)
+            if (it) {
+                actions.apply {
                     add(AssetAction.Send)
                     add(AssetAction.Sell)
                     add(AssetAction.Swap)
                 }
             }
-        })
+            actions.toSet()
+        }
 
     override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
 
@@ -327,7 +327,9 @@ class CryptoAccountNonCustodialGroup(
             Single.just(emptySet())
         } else {
             Single.zip(accounts.map { it.actions }) { t: Array<Any> ->
-                t.map { it as AssetAction }.toSet()
+                t.map { it as Set<AssetAction> }
+            }.map {
+                it.flatten().toSet()
             }
         }
 

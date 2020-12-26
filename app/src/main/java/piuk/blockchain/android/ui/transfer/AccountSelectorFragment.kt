@@ -11,8 +11,10 @@ import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetOrdering
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -65,17 +67,9 @@ abstract class AccountSelectorFragment : Fragment() {
     }
 
     private fun accounts(): Single<List<BlockchainAccount>> =
-        coincore.allWallets()
-            .map { it.accounts }
-            .flattenAsObservable { it }
-            .flatMapSingle { account ->
-                account.actions.map {
-                    if (it.contains(fragmentAction)) account else NullCryptoAccount()
-                }
-            }
-            .filter { it !is NullCryptoAccount }
-            .map { it as BlockchainAccount }
-            .toList()
+        coincore.allWalletsWithActions(setOf(fragmentAction)).map {
+            it.map { account -> account }
+        }
 
     protected abstract val fragmentAction: AssetAction
 
