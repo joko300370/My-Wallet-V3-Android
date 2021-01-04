@@ -193,7 +193,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         )
     }
 
-    class UpdateAccountProvider(val accountProviderId: String) : SimpleBuyIntent() {
+    class UpdateAccountProvider(val accountProviderId: String, val accountId: String) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
             isLoading = true
         )
