@@ -14,6 +14,7 @@ import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.blockchain.nabu.models.data.Bank
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -138,6 +139,10 @@ interface CustodialWalletManager {
         fiatCurrency: String,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
+
+    fun getEligiblePaymentMethodTypes(
+        fiatCurrency: String
+    ): Single<List<EligiblePaymentMethodType>>
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated>
 
@@ -291,11 +296,11 @@ data class OrderInput(private val symbol: String, private val amount: String? = 
 data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
 data class Beneficiary(
-    val id: String,
-    val title: String,
-    val account: String,
-    val currency: String
-) : Serializable {
+    override val id: String,
+    override val title: String,
+    override val account: String,
+    override val currency: String
+) : Serializable, Bank {
 
     val accountDotted: String by unsafeLazy {
         "•••• $account"
@@ -596,4 +601,9 @@ data class CustodialOrder(
     val createdAt: Date,
     val inputMoney: Money,
     val outputMoney: Money
+)
+
+data class EligiblePaymentMethodType(
+    val paymentMethodType: PaymentMethodType,
+    val currency: String
 )

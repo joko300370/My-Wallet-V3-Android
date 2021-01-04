@@ -16,6 +16,7 @@ import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.CustodialQuote
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.nabu.datamanagers.ExtraAttributesProvider
 import com.blockchain.nabu.datamanagers.FiatTransaction
@@ -52,6 +53,7 @@ import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferRespo
 import com.blockchain.nabu.models.responses.banktransfer.ProviderAccountAttrs
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.cards.CardResponse
+import com.blockchain.nabu.models.responses.cards.Limits
 import com.blockchain.nabu.models.responses.cards.PaymentMethodResponse
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
@@ -522,6 +524,27 @@ class LiveCustodialWalletManager(
                     AddAddressRequest.fromBillingAddress(billingAddress)))
         }.map {
             CardToBeActivated(cardId = it.id, partner = it.partner)
+        }
+
+    override fun getEligiblePaymentMethodTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
+        authenticator.authenticate {
+            nabuService.paymentMethods(
+                sessionToken = it,
+                currency = fiatCurrency,
+                eligibleOnly = true
+            ).map { methodsResponse ->
+                methodsResponse.mapNotNull { method ->
+                    when (method.type.toPaymentMethodType()) {
+                        PaymentMethodType.PAYMENT_CARD -> EligiblePaymentMethodType(PaymentMethodType.PAYMENT_CARD,
+                            method.currency ?: return@mapNotNull null)
+                        PaymentMethodType.BANK_TRANSFER -> EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER,
+                            method.currency ?: return@mapNotNull null)
+                        PaymentMethodType.FUNDS -> EligiblePaymentMethodType(PaymentMethodType.FUNDS,
+                            method.currency ?: return@mapNotNull null)
+                        else -> null
+                    }
+                }
+            }
         }
 
     override fun activateCard(

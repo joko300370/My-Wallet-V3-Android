@@ -486,6 +486,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         )
     }
 
+    override fun updateBanks(linkableBanks: Set<LinkableBank>) {
+
+    }
+
     private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
         if (currencies.isEmpty()) {
             banksPref?.isVisible = false

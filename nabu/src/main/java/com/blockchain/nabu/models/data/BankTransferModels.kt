@@ -24,14 +24,19 @@ interface LinkBankAttributes
 class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes
 
 data class LinkedBank(
-    val id: String,
-    val currency: String,
+    override val id: String,
+    override val currency: String,
     val partner: BankPartner,
     val name: String,
     val accountNumber: String,
     val state: LinkedBankState,
     val errorStatus: LinkedBankErrorState
-)
+) : Bank {
+    override val account: String
+        get() = name
+    override val title: String
+        get() = name
+}
 
 enum class LinkedBankErrorState {
     ACCOUNT_ALREADY_LINKED,
@@ -46,4 +51,11 @@ enum class LinkedBankState {
     BLOCKED,
     ACTIVE,
     UNKNOWN
+}
+
+interface Bank {
+    val currency: String
+    val account: String
+    val title: String
+    val id: String
 }
