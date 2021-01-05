@@ -11,6 +11,7 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
+import piuk.blockchain.android.ui.transfer.AccountsSorter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
@@ -23,7 +24,6 @@ class Coincore internal constructor(
     private val txProcessorFactory: TxProcessorFactory,
     private val defaultLabels: DefaultLabels,
     private val fiatAsset: Asset,
-    private val ordering: AssetOrdering,
     private val crashLogger: CrashLogger
 ) {
 
@@ -73,28 +73,21 @@ class Coincore internal constructor(
                 AllWalletsAccount(list, defaultLabels) as AccountGroup
             }.toSingle()
 
-    fun allWalletsWithActions(actions: Set<AssetAction>): Single<SingleAccountList> =
-        ordering.getAssetOrdering().flatMap { orderedAssets ->
-            allWallets()
-                .flattenAsObservable { it.accounts }
-                .flatMapMaybe { account ->
-                    account.actions.flatMapMaybe { availableActions ->
-                        if (availableActions.containsAll(actions)) Maybe.just(account) else Maybe.empty()
-                    }
+    fun allWalletsWithActions(
+        actions: Set<AssetAction>,
+        sorter: AccountsSorter
+    ): Single<SingleAccountList> =
+        allWallets()
+            .flattenAsObservable { it.accounts }
+            .flatMapMaybe { account ->
+                account.actions.flatMapMaybe { availableActions ->
+                    if (availableActions.containsAll(actions)) Maybe.just(account) else Maybe.empty()
                 }
-                .toList()
-                .map { list ->
-                    val sortedList = list.sortedWith(compareBy({
-                        (it as? CryptoAccount)?.let { cryptoAccount ->
-                            orderedAssets.indexOf(cryptoAccount.asset)
-                        } ?: 0
-                    },
-                        { it !is NonCustodialAccount },
-                        { !it.isDefault }
-                    ))
-                    sortedList
-                }
-        }
+            }
+            .toList()
+            .flatMap { list ->
+                sorter(list)
+            }
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,

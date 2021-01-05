@@ -108,6 +108,8 @@ import piuk.blockchain.android.ui.swipetoreceive.LocalOfflineAccountCache
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceivePresenter
 import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
+import piuk.blockchain.android.ui.transfer.AccountsSorting
+import piuk.blockchain.android.ui.transfer.DefaultAccountsSorting
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
@@ -787,6 +789,8 @@ val applicationModule = module {
     }
 
     factory { ResourceDefaultLabels(get()) }.bind(DefaultLabels::class)
+
+    factory { DefaultAccountsSorting(get()) }.bind(AccountsSorting::class)
 
     factory {
         AssetOrderingRemoteConfig(

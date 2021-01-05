@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.ui.transfer.AccountsSorting
 import timber.log.Timber
 
 class TransactionInteractor(
@@ -37,7 +38,8 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider
+    private val eligibilityProvider: EligibilityProvider,
+    private val accountsSorting: AccountsSorting
 ) {
     private var transactionProcessor: TransactionProcessor? = null
 
@@ -134,7 +136,7 @@ class TransactionInteractor(
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWalletsWithActions(setOf(action))
+        return coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
             .zipWith(
                 custodialRepository.getSwapAvailablePairs()
             ).map { (accounts, pairs) ->

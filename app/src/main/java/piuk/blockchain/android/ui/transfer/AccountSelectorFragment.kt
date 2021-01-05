@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -24,6 +25,7 @@ import piuk.blockchain.androidcoreui.utils.extensions.visible
 abstract class AccountSelectorFragment : Fragment() {
 
     private val coincore: Coincore by scopedInject()
+    private val accountsSorting: AccountsSorting by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +66,7 @@ abstract class AccountSelectorFragment : Fragment() {
     }
 
     private fun accounts(): Single<List<BlockchainAccount>> =
-        coincore.allWalletsWithActions(setOf(fragmentAction)).map {
+        coincore.allWalletsWithActions(setOf(fragmentAction), accountsSorting.sorter()).map {
             it.map { account -> account }
         }
 

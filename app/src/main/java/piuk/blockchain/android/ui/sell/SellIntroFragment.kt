@@ -42,6 +42,7 @@ import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -64,6 +65,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private val eligibilityProvider: EligibilityProvider by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
+    private val accountsSorting: AccountsSorting by inject()
     private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
@@ -200,7 +202,10 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 )
 
                 accounts_list.initialise(
-                    coincore.allWalletsWithActions(setOf(AssetAction.Sell)).map {
+                    coincore.allWalletsWithActions(
+                        setOf(AssetAction.Sell),
+                        accountsSorting.sorter()
+                    ).map {
                         it.filterIsInstance<CryptoAccount>().filter { account ->
                             supportedCryptos.contains(account.asset)
                         }
