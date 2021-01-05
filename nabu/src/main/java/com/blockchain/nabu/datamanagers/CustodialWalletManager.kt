@@ -305,6 +305,8 @@ data class Beneficiary(
     val accountDotted: String by unsafeLazy {
         "•••• $account"
     }
+    override val paymentMethod: PaymentMethodType
+        get() = PaymentMethodType.FUNDS
 }
 
 data class FiatTransaction(

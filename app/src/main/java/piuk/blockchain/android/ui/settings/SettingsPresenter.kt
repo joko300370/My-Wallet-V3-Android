@@ -124,9 +124,9 @@ class SettingsPresenter(
 
     private fun updateBanks() {
         compositeDisposable +=
-            linkableBanks(fiatUnit).subscribeBy(
-                onSuccess = {
-                    view?.updateBanks(it)
+            linkableBanks(fiatUnit).zipWith(linkedBanks()).subscribeBy(
+                onSuccess = { (linkableBanks, _) ->
+                    view?.updateBanks(linkableBanks)
                 },
                 onError = {
                     Timber.i(it)
@@ -172,7 +172,8 @@ class SettingsPresenter(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                        it.paymentMethodType == PaymentMethodType.FUNDS
+                        // Bank linking through deposit has not been implemented for USD
+                        (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
             }
 
             bankPaymentMethods.map { method ->
@@ -181,8 +182,13 @@ class SettingsPresenter(
                     bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.toSet()
                 )
             }.toSet()
-
         }
+
+    private fun linkedBanks(): Single<Set<Bank>> =
+        custodialWalletManager.getLinkedBeneficiaries().zipWith(custodialWalletManager.getLinkedBanks())
+            .map { (beneficiaries, linkedBanks) ->
+                beneficiaries.toSet() + linkedBanks
+            }
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()

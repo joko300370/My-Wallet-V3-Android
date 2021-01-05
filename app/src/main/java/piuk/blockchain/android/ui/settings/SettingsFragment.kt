@@ -487,7 +487,22 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun updateBanks(linkableBanks: Set<LinkableBank>) {
-
+        if (linkableBanks.isEmpty()) {
+            banksPref?.isVisible = false
+        } else {
+            linkableBanks.forEach { linkableBank ->
+                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
+                    it.order = it.order + 0 + linkableBanks.indexOf(linkableBank)
+                } ?: banksPref?.addPreference(
+                    BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
+                        onClick {
+                            linkBank(linkableBank)
+                        }
+                        key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+                    }
+                )
+            }
+        }
     }
 
     private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
@@ -516,6 +531,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     private fun linkBankWithCurrency(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+    }
+
+    private fun linkBank(linkableBank: LinkableBank) {
+        println("bank ${linkableBank.currency} ${linkableBank.linkMethods}")
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {

@@ -1,5 +1,6 @@
 package com.blockchain.nabu.models.data
 
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
 
 data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes)
@@ -36,6 +37,8 @@ data class LinkedBank(
         get() = name
     override val title: String
         get() = name
+    override val paymentMethod: PaymentMethodType
+        get() = PaymentMethodType.BANK_TRANSFER
 }
 
 enum class LinkedBankErrorState {
@@ -58,4 +61,5 @@ interface Bank {
     val account: String
     val title: String
     val id: String
+    val paymentMethod: PaymentMethodType
 }
