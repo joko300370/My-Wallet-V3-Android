@@ -77,12 +77,11 @@ class Coincore internal constructor(
         ordering.getAssetOrdering().flatMap { orderedAssets ->
             allWallets()
                 .flattenAsObservable { it.accounts }
-                .flatMapSingle { account ->
-                    account.actions.map { availableActions ->
-                        if (availableActions.containsAll(actions)) account else NullCryptoAccount()
+                .flatMapMaybe { account ->
+                    account.actions.flatMapMaybe { availableActions ->
+                        if (availableActions.containsAll(actions)) Maybe.just(account) else Maybe.empty()
                     }
                 }
-                .filter { it !is NullCryptoAccount }
                 .toList()
                 .map { list ->
                     val sortedList = list.sortedWith(compareBy({

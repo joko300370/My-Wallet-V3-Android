@@ -21,7 +21,6 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.NonCustodialAccount
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
@@ -210,13 +209,13 @@ internal abstract class CryptoAssetBase(
                 ll.filter { a -> a !== exclude }
             }.flattenAsObservable {
                 it
-            }.flatMapSingle { account ->
-                account.actions.map {
+            }.flatMapMaybe { account ->
+                account.actions.flatMapMaybe {
                     if (it.contains(AssetAction.Receive)) {
-                        account
-                    } else NullCryptoAccount()
+                        Maybe.just(account)
+                    } else Maybe.empty()
                 }
-            }.filter { it !is NullCryptoAccount }.toList().toMaybe()
+            }.toList().toMaybe()
 
     final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
