@@ -140,11 +140,12 @@ open class CustodialTradingAccount(
                 eligibilityProvider.isEligibleForSimpleBuy()
             ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy ->
                 val actions = mutableSetOf(AssetAction.ViewActivity)
-                if (isArchived) return@zip actions.toSet()
-                if (hasActionableBalance) actions.add(AssetAction.Send)
-                if (hasFunds && isEligibleForSimpleBuy) {
-                    actions.add(AssetAction.Sell)
-                    actions.add(AssetAction.Swap)
+                if (isArchived.not()) {
+                    if (hasActionableBalance) actions.add(AssetAction.Send)
+                    if (hasFunds && isEligibleForSimpleBuy) {
+                        actions.add(AssetAction.Sell)
+                        actions.add(AssetAction.Swap)
+                    }
                 }
                 actions.toSet()
             }
