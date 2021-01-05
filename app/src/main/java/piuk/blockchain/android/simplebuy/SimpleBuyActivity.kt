@@ -252,9 +252,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             .commitAllowingStateLoss()
     }
 
-    override fun launchBankLinking(accountProviderId: String) {
+    override fun launchBankLinking(accountProviderId: String, accountId: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, LinkBankFragment.newInstance(accountProviderId))
+            .replace(R.id.content_frame,
+                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId))
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
@@ -280,9 +281,9 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             launchFromNavigationBar: Boolean = false,
             launchKycResume: Boolean = false
         ) = Intent(context, SimpleBuyActivity::class.java).apply {
-                putExtra(STARTED_FROM_NAVIGATION_KEY, launchFromNavigationBar)
-                putExtra(CRYPTOCURRENCY_KEY, cryptoCurrency)
-                putExtra(STARTED_FROM_KYC_RESUME, launchKycResume)
-            }
+            putExtra(STARTED_FROM_NAVIGATION_KEY, launchFromNavigationBar)
+            putExtra(CRYPTOCURRENCY_KEY, cryptoCurrency)
+            putExtra(STARTED_FROM_KYC_RESUME, launchKycResume)
+        }
     }
 }

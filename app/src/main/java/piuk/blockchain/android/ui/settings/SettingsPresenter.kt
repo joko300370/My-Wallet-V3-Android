@@ -140,8 +140,8 @@ class SettingsPresenter(
                 view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
             }
             .subscribeBy(
-                onSuccess = { linkedAndSupportedCurrencies ->
-                    view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
+                onSuccess = {
+                    view?.updateBanks(it)
                 },
                 onError = {
                     Timber.i(it)

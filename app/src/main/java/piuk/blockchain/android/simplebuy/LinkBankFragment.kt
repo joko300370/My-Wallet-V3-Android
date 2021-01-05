@@ -28,6 +28,10 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         arguments?.getString(ACCOUNT_PROVIDER_ID) ?: ""
     }
 
+    private val accountId: String by lazy {
+        arguments?.getString(ACCOUNT_ID) ?: ""
+    }
+
     private val errorState: ErrorState? by unsafeLazy {
         arguments?.getSerializable(ERROR_STATE) as? ErrorState
     }
@@ -40,8 +44,8 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null && accountProviderId.isNotEmpty()) {
-            model.process(SimpleBuyIntent.UpdateAccountProvider(accountProviderId))
+        if (savedInstanceState == null && accountProviderId.isNotEmpty() && accountId.isNotEmpty()) {
+            model.process(SimpleBuyIntent.UpdateAccountProvider(accountProviderId, accountId))
         }
         activity.setupToolbar(R.string.link_a_bank, false)
     }
@@ -194,11 +198,13 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
 
     companion object {
         private const val ACCOUNT_PROVIDER_ID = "ACCOUNT_PROVIDER_ID"
+        private const val ACCOUNT_ID = "ACCOUNT_ID"
         private const val ERROR_STATE = "ERROR_STATE"
 
-        fun newInstance(accountProviderId: String) = LinkBankFragment().apply {
+        fun newInstance(accountProviderId: String, accountId: String) = LinkBankFragment().apply {
             arguments = Bundle().apply {
                 putString(ACCOUNT_PROVIDER_ID, accountProviderId)
+                putString(ACCOUNT_ID, accountId)
             }
         }
 

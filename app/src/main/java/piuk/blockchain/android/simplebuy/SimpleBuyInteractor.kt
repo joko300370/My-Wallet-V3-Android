@@ -42,7 +42,7 @@ class SimpleBuyInteractor(
 ) {
 
     fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String):
-        Single<BuySellPairs> =
+            Single<BuySellPairs> =
         custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
             .trackProgress(appUtil.activityIndicator)
 
@@ -127,8 +127,12 @@ class SimpleBuyInteractor(
                 }
             }
 
-    fun updateAccountProviderId(linkingId: String, providerAccountId: String): Completable =
-        custodialWalletManager.updateAccountProviderId(linkingId, providerAccountId)
+    fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String): Completable =
+        custodialWalletManager.updateAccountProviderId(
+            linkingId = linkingId,
+            providerAccountId = providerAccountId,
+            accountId = accountId
+        )
 
     fun pollForLinkedBankState(id: String): Single<LinkedBank> = custodialWalletManager.getLinkedBank(id)
         .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 12)) }
