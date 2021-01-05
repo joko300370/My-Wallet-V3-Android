@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.dgld
+package piuk.blockchain.android.coincore.erc20
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
@@ -23,15 +23,12 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
-import piuk.blockchain.android.coincore.erc20.dgld.DgldCryptoWalletAccount
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
-class DgldAccountActivityTest {
+class Erc20AccountActivityTest {
 
     private val payloadManager: PayloadDataManager = mock()
     private val ethDataManager: EthDataManager = mock()
@@ -40,19 +37,17 @@ class DgldAccountActivityTest {
     private val walletPreferences: WalletStatus = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
 
-    private val dgldAccount: Erc20Account = mock()
-
-    private val subject =
-        DgldCryptoWalletAccount(
-            payloadManager = payloadManager,
-            label = "Text Dgld Account",
-            address = "Test Dgld Address",
-            fees = mock(),
-            erc20Account = dgldAccount,
-            exchangeRates = exchangeRates,
-            walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
-        )
+    private val subject = Erc20NonCustodialAccount(
+        asset = CryptoCurrency.DGLD,
+        payloadManager = payloadManager,
+        label = "Text Dgld Account",
+        address = "Test Dgld Address",
+        fees = mock(),
+        ethDataManager = ethDataManager,
+        exchangeRates = exchangeRates,
+        walletPreferences = walletPreferences,
+        custodialWalletManager = custodialWalletManager
+    )
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -64,7 +59,6 @@ class DgldAccountActivityTest {
     @Before
     fun setup() {
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(dgldAccount.ethDataManager).thenReturn(ethDataManager)
     }
 
     @Test
@@ -96,7 +90,8 @@ class DgldAccountActivityTest {
 
         val summaryList = listOf(swapSummary)
 
-        whenever(dgldAccount.getTransactions()).thenReturn(Observable.just(listOf(erc20Transfer)))
+        whenever(ethDataManager.getErc20Transactions(CryptoCurrency.DGLD))
+            .thenReturn(Observable.just(listOf(erc20Transfer)))
 
         whenever(ethDataManager
             .getTransaction("0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff"))
@@ -107,9 +102,10 @@ class DgldAccountActivityTest {
             )
         ))
 
-        whenever(dgldAccount.fetchErc20Address()).thenReturn(Observable.just(mock()))
+        whenever(ethDataManager.fetchErc20DataModel(CryptoCurrency.DGLD))
+            .thenReturn(Observable.just(mock()))
 
-        whenever(dgldAccount.getAccountHash())
+        whenever(ethDataManager.getErc20AccountHash(CryptoCurrency.DGLD))
             .thenReturn(Single.just("0x4058a004dd718babab47e14dd0d744742e5b9903"))
 
         whenever(ethDataManager.getLatestBlockNumber())
@@ -147,6 +143,6 @@ class DgldAccountActivityTest {
                 }
             }
 
-        verify(dgldAccount).getTransactions()
+        verify(ethDataManager).getErc20Transactions(CryptoCurrency.DGLD)
     }
 }

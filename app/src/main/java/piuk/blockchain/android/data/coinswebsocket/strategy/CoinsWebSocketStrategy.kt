@@ -30,10 +30,11 @@ import piuk.blockchain.android.data.coinswebsocket.models.TransactionState
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.events.TransactionsUpdatedEvent
@@ -67,11 +68,9 @@ class CoinsWebSocketStrategy(
     private val prefs: PersistentPrefs,
     private val accessState: AccessState,
     private val appUtil: AppUtil,
-    private val paxAccount: Erc20Account,
-    private val usdtAccount: Erc20Account,
-    private val dgldAccount: Erc20Account,
     private val payloadDataManager: PayloadDataManager,
-    private val bchDataManager: BchDataManager
+    private val bchDataManager: BchDataManager,
+    private val assetResources: AssetResourceFactory
 ) {
 
     private var coinWebSocketInput: CoinWebSocketInput? = null
@@ -282,67 +281,45 @@ class CoinsWebSocketStrategy(
             ethResponse.tokenTransfer.to.equals(ethAddress(), true)
         ) {
             val tokenTransaction = ethResponse.tokenTransfer
-            when (ethResponse.getTokenType()) {
-                CryptoCurrency.PAX -> triggerPaxNotificationAndUpdate(tokenTransaction, title)
-                CryptoCurrency.USDT -> triggerUsdtNotificationAndUpdate(tokenTransaction, title)
-                CryptoCurrency.DGLD -> triggerDgldNotificationAndUpdate(tokenTransaction, title)
-                else -> throw IllegalStateException("Unsupported ERC-20 token, have we added a new asset?")
+            val asset = ethResponse.getTokenType()
+            if (asset.hasFeature(CryptoCurrency.IS_ERC20)) {
+                triggerErc20NotificationAndUpdate(asset, tokenTransaction, title)
             }
         }
     }
 
-    private fun triggerUsdtNotificationAndUpdate(
+    private fun triggerErc20NotificationAndUpdate(
+        asset: CryptoCurrency,
         tokenTransaction: TokenTransfer,
         title: String
     ) {
-        val marquee = stringUtils.getString(R.string.received_usdt) + " " +
-            CryptoValue.fromMinor(CryptoCurrency.USDT, tokenTransaction.value)
-                .toStringWithSymbol()
-        val text =
-            marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) +
-                " " + tokenTransaction.from
-
-        messagesSocketHandler?.triggerNotification(
-            title, marquee, text
+        val amountString = CryptoValue.fromMinor(asset, tokenTransaction.value).toStringWithSymbol()
+        val formatMarquee = stringUtils.getString(R.string.received_erc20_marquee)
+        val marquee = formatMarquee.format(
+            assetResources.assetName(asset),
+            amountString
+        )
+        val formatText = stringUtils.getString(R.string.received_erc20_text)
+        val text = formatText.format(
+            assetResources.assetName(asset),
+            amountString,
+            tokenTransaction.from
         )
 
-        updateUsdtTransactions()
+        messagesSocketHandler?.triggerNotification(title, marquee, text)
+        updateErc20Transactions(asset)
     }
 
-    private fun triggerDgldNotificationAndUpdate(
-        tokenTransaction: TokenTransfer,
-        title: String
-    ) {
-        val marquee = stringUtils.getString(R.string.received_dgld) + " " +
-            CryptoValue.fromMinor(CryptoCurrency.USDT, tokenTransaction.value)
-                .toStringWithSymbol()
-        val text =
-            marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) +
-                " " + tokenTransaction.from
-
-        messagesSocketHandler?.triggerNotification(
-            title, marquee, text
-        )
-
-        updateDgldTransactions()
-    }
-
-    private fun triggerPaxNotificationAndUpdate(
-        tokenTransaction: TokenTransfer,
-        title: String
-    ) {
-        val marquee = stringUtils.getString(R.string.received_usd_pax_1) + " " +
-            CryptoValue.fromMinor(CryptoCurrency.PAX, tokenTransaction.value)
-                .toStringWithSymbol()
-        val text =
-            marquee + " " + stringUtils.getString(R.string.common_from).toLowerCase(Locale.US) +
-                " " + tokenTransaction.from
-
-        messagesSocketHandler?.triggerNotification(
-            title, marquee, text
-        )
-
-        updatePaxTransactions()
+    private fun updateErc20Transactions(asset: CryptoCurrency) {
+        compositeDisposable += ethDataManager.refreshErc20Model(asset)
+            .subscribeBy(
+                onComplete = {
+                    messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent())
+                },
+                onError = { throwable ->
+                    Timber.e(throwable, "update transaction (${asset.networkTicker} failed")
+                }
+            )
     }
 
     private fun updateEthTransactions() {
@@ -376,27 +353,6 @@ class CoinsWebSocketStrategy(
                 )
             )
         }
-
-    private fun updatePaxTransactions() {
-        compositeDisposable += paxAccount.fetchAddressCompletable()
-            .subscribe(
-                { messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent()) },
-                { throwable -> Timber.e(throwable, "downloadPaxTransactions failed") })
-    }
-
-    private fun updateUsdtTransactions() {
-        compositeDisposable += usdtAccount.fetchAddressCompletable()
-            .subscribe(
-                { messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent()) },
-                { throwable -> Timber.e(throwable, "downloadUsdtTransactions failed") })
-    }
-
-    private fun updateDgldTransactions() {
-        compositeDisposable += dgldAccount.fetchAddressCompletable()
-            .subscribe(
-                { messagesSocketHandler?.sendBroadcast(TransactionsUpdatedEvent()) },
-                { throwable -> Timber.e(throwable, "downloadDgldTransactions failed") })
-    }
 
     fun close() {
         unsubscribeFromAddresses()
