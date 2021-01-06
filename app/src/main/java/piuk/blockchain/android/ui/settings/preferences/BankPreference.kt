@@ -7,15 +7,18 @@ import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.blockchain.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.models.data.Bank
+import com.blockchain.nabu.models.data.LinkedBank
 import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.loadInterMedium
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class BankPreference(
     fiatCurrency: String,
-    private val bank: Beneficiary? = null,
+    private val bank: Bank? = null,
     context: Context
 ) : Preference(context, null, R.attr.preferenceStyle, 0) {
     private val typeface: Typeface = context.loadInterMedium()
@@ -46,7 +49,7 @@ class BankPreference(
         bank?.let {
             addBank.gone()
             endDigits.visible()
-            endDigits.text = it.accountDotted
+            endDigits.text = holder.itemView.resources.getString(R.string.dotted_suffixed_string, it.account)
         } ?: kotlin.run {
             endDigits.gone()
             addBank.visible()

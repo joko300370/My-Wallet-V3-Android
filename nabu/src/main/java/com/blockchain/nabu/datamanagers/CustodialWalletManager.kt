@@ -302,9 +302,6 @@ data class Beneficiary(
     override val currency: String
 ) : Serializable, Bank {
 
-    val accountDotted: String by unsafeLazy {
-        "•••• $account"
-    }
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.FUNDS
 }

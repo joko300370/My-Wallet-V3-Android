@@ -1806,4 +1806,5 @@
     <string name="available_to_trade">Available to Trade</string>
     <string name="instantly">Instantly</string>
     <string name="instantly_available">Instantly Available</string>
+    <string name="dotted_suffixed_string" translatable="false">•••• %1s</string>
 </resources>

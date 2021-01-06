@@ -14,8 +14,10 @@ enum class BankPartner {
                 require(attrsResponse.fastlinkUrl != null)
                 require(attrsResponse.token != null)
                 require(attrsResponse.fastlinkParams != null)
-                YodleeAttributes(attrsResponse.fastlinkUrl, attrsResponse.token,
-                    attrsResponse.fastlinkParams.configName)
+                YodleeAttributes(
+                    attrsResponse.fastlinkUrl, attrsResponse.token,
+                    attrsResponse.fastlinkParams.configName
+                )
             }
         }
 }
@@ -34,7 +36,7 @@ data class LinkedBank(
     val errorStatus: LinkedBankErrorState
 ) : Bank {
     override val account: String
-        get() = name
+        get() = accountNumber
     override val title: String
         get() = name
     override val paymentMethod: PaymentMethodType

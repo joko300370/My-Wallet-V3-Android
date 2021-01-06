@@ -6,6 +6,7 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
+import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
@@ -124,14 +125,17 @@ class SettingsPresenter(
 
     private fun updateBanks() {
         compositeDisposable +=
-            linkableBanks(fiatUnit).zipWith(linkedBanks()).subscribeBy(
-                onSuccess = { (linkableBanks, _) ->
-                    view?.updateBanks(linkableBanks)
-                },
-                onError = {
-                    Timber.i(it)
-                }
-            )
+            linkableBanks(fiatUnit).zipWith(linkedBanks())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { (linkableBanks, linkedBanks) ->
+                        view?.updateLinkedBanks(linkedBanks)
+                        view?.updateLinkableBanks(linkableBanks, linkedBanks.size)
+                    },
+                    onError = {
+                        Timber.i(it)
+                    }
+                )
         /*           .doOnSuccess {
                        view?.banksEnabled(it.isNotEmpty())
                    }.zipWith(
@@ -172,8 +176,8 @@ class SettingsPresenter(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                        // Bank linking through deposit has not been implemented for USD
-                        (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+                // Bank linking through deposit has not been implemented for USD
+                (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
             }
 
             bankPaymentMethods.map { method ->
@@ -185,7 +189,10 @@ class SettingsPresenter(
         }
 
     private fun linkedBanks(): Single<Set<Bank>> =
-        custodialWalletManager.getLinkedBeneficiaries().zipWith(custodialWalletManager.getLinkedBanks())
+        custodialWalletManager.getLinkedBeneficiaries()
+            .zipWith(custodialWalletManager.getLinkedBanks().map { linkedBanks ->
+                linkedBanks.filter { it.state == LinkedBankState.ACTIVE }
+            })
             .map { (beneficiaries, linkedBanks) ->
                 beneficiaries.toSet() + linkedBanks
             }
@@ -466,13 +473,13 @@ class SettingsPresenter(
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
         return isNotificationsOn && (notificationsType.contains(type) ||
-                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+                                     notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                        !notificationsType.contains(type))
+               (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                !notificationsType.contains(type))
     }
 
     /**
@@ -595,7 +602,6 @@ class SettingsPresenter(
         }
     }
 }
-
 
 data class SettingsBanks(
     val linkableBanks: List<LinkableBank>,

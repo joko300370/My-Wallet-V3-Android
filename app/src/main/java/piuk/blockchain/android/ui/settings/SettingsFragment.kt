@@ -36,6 +36,7 @@ import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
@@ -346,7 +347,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun goToPlayStore() {
         val flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
-                Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
+            Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
         try {
             val appPackageName = requireActivity().packageName
             Intent(
@@ -486,13 +487,13 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         )
     }
 
-    override fun updateBanks(linkableBanks: Set<LinkableBank>) {
+    override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
         if (linkableBanks.isEmpty()) {
             banksPref?.isVisible = false
         } else {
             linkableBanks.forEach { linkableBank ->
                 banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
-                    it.order = it.order + 0 + linkableBanks.indexOf(linkableBank)
+                    it.order = it.order + linkedBanksCount + linkableBanks.indexOf(linkableBank)
                 } ?: banksPref?.addPreference(
                     BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
                         onClick {
@@ -502,6 +503,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                     }
                 )
             }
+        }
+    }
+
+    override fun updateLinkedBanks(banks: Set<Bank>) {
+        val existingBanks = prefsExistingBanks()
+
+        val newBanks = banks.filterNot { existingBanks.contains(it.id) }
+
+        newBanks.forEach { bank ->
+            banksPref?.addPreference(
+                BankPreference(context = requireContext(), bank = bank, fiatCurrency = bank.currency).apply {
+                    onClick {
+                        removeBank(bank)
+                    }
+                    key = bank.id
+                }
+            )
         }
     }
 
@@ -524,8 +542,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
     }
 
-    private fun removeBank(bank: Beneficiary) {
-        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
+    private fun removeBank(bank: Bank) {
+        //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     private fun linkBankWithCurrency(currency: String) {
@@ -590,7 +608,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
             existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
-                ?: continue)
+                              ?: continue)
         }
         return existingBanks
     }
@@ -864,9 +882,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             if (requestCode == REQUEST_CODE_VALIDATE_PIN) {
                 settingsPresenter.pinCodeValidatedForChange()
             } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
-                updateCards(listOf(
-                    (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
-                ))
+                updateCards(
+                    listOf(
+                        (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
+                    )
+                )
             }
     }
 

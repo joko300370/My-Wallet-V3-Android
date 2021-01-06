@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 
@@ -57,7 +58,9 @@ interface SettingsView : View {
 
     fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies)
 
-    fun updateBanks(linkableBanks: Set<LinkableBank>)
+    fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int)
+
+    fun updateLinkedBanks(banks: Set<Bank>)
 
     fun cardsEnabled(enabled: Boolean)
 
