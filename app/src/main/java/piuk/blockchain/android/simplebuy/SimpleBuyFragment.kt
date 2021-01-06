@@ -25,6 +25,6 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
     fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String)
     fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String)
     fun linkBankWithPartner(bankTransfer: LinkBankTransfer)
-    fun launchBankLinking(accountProviderId: String)
+    fun launchBankLinking(accountProviderId: String, accountId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)
 }

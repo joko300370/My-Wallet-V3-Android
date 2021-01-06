@@ -1136,7 +1136,6 @@ enum class ReviewAnalytics : AnalyticsEvent {
     override val params: Map<String, String>
         get() = emptyMap()
 }
-
 data class LinkedBanksAndSupportedCurrencies(
     val beneficiaries: List<Beneficiary>,
     val supportedCurrencies: List<String>

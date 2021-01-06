@@ -52,7 +52,8 @@ data class UpdateProviderAccountBody(
 )
 
 data class ProviderAccountAttrs(
-    val providerAccountId: String
+    val providerAccountId: String,
+    val accountId: String
 )
 
 data class LinkedBankDetailsResponse(
