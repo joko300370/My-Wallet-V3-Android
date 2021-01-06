@@ -22,14 +22,12 @@ import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.crypto.DeterministicKey
-import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.metadata.MetadataCredentials
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.utils.RefreshUpdater
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.LinkedHashMap
 
@@ -415,9 +413,6 @@ class PayloadDataManager(
      * @param legacyAddress The [LegacyAddress] to generate an Elliptic Curve Key for
      * @param secondPassword An optional second password, necessary if the private key is ebcrypted
      * @return An Elliptic Curve Key object [ECKey]
-     * @throws UnsupportedEncodingException Thrown if the private key is formatted incorrectly
-     * @throws DecryptionException Thrown if the supplied password is wrong
-     * @throws InvalidCipherTextException Thrown if there's an issue decrypting the private key
      * @see LegacyAddress.isPrivateKeyEncrypted
      */
     fun getAddressECKey(legacyAddress: LegacyAddress, secondPassword: String?): ECKey? =

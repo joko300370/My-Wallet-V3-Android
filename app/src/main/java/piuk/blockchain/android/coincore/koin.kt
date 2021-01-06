@@ -1,9 +1,6 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.koin.dgldAccount
-import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.dgldFeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
@@ -129,7 +126,7 @@ val coincoreModule = module {
         scoped {
             PaxAsset(
                 payloadManager = get(),
-                paxAccount = get(paxAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -177,7 +174,7 @@ val coincoreModule = module {
         scoped {
             UsdtAsset(
                 payloadManager = get(),
-                usdtAccount = get(usdtAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -197,7 +194,7 @@ val coincoreModule = module {
         scoped {
             DgldAsset(
                 payloadManager = get(),
-                dgldAccount = get(dgldAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
