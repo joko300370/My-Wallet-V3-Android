@@ -236,9 +236,8 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         progress.gone()
     }
 
-    override fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
+    private fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
         ViewUtils.hideKeyboard(this)
-
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastLinkUrl, accessToken, configName))
             .addToBackStack(YodleeSplashFragment::class.simpleName)

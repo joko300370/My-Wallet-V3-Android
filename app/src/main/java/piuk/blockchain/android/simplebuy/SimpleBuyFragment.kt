@@ -11,7 +11,7 @@ interface SimpleBuyScreen : SlidingModalBottomDialog.Host, FlowFragment {
     override fun onSheetClosed() {}
 }
 
-interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
+interface SimpleBuyNavigator : SlidingModalBottomDialog.Host, YodleeWebviewHost {
     fun exitSimpleBuyFlow()
     fun goToBuyCryptoScreen(addToBackStack: Boolean = true, preselectedCrypto: CryptoCurrency)
     fun goToCheckOutScreen(addToBackStack: Boolean = true)
@@ -22,9 +22,12 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
     fun hasMoreThanOneFragmentInTheStack(): Boolean
     fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()
-    fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String)
-    fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String)
     fun linkBankWithPartner(bankTransfer: LinkBankTransfer)
     fun launchBankLinking(accountProviderId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)
+}
+
+
+interface YodleeWebviewHost {
+    fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String)
 }

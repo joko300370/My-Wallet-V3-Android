@@ -38,6 +38,9 @@ import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
+import com.blockchain.nabu.models.data.BankPartner
+import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
@@ -61,6 +64,7 @@ import piuk.blockchain.android.cards.RemoveCardBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
@@ -465,7 +469,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
+/*    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
         val existingBanks = prefsExistingBanks()
 
         val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
@@ -485,7 +489,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             linkedAndSupportedCurrencies.beneficiaries.size + 1,
             linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
         )
-    }
+    }*/
 
     override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
         if (linkableBanks.isEmpty()) {
@@ -522,7 +526,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             )
         }
     }
-
+/*
     private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
         if (currencies.isEmpty()) {
             banksPref?.isVisible = false
@@ -540,7 +544,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 )
             }
         }
-    }
+    }*/
 
     private fun removeBank(bank: Bank) {
         //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
@@ -565,11 +569,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun linkableBankWithBankTransfer(currency: String) {
-        TODO("Not yet implemented")
+        settingsPresenter.linkBank(currency)
     }
 
     private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
-        TODO("Not yet implemented")
+        
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -1171,6 +1175,23 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun banksEnabled(enabled: Boolean) {
         banksPref?.isVisible = enabled
+    }
+
+    override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
+        when (linkBankTransfer.partner) {
+            BankPartner.YODLEE -> {
+                val attributes = linkBankTransfer.attributes as YodleeAttributes
+                launchYodleeSplash(attributes.fastlinkUrl, attributes.token, attributes.configName)
+            }
+        }
+    }
+
+    private fun launchYodleeSplash(fastlinkUrl: String, accessToken: String, configName: String) {
+        fragmentManager?.let {
+            it.beginTransaction()
+                .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastlinkUrl, accessToken, configName))
+                .addToBackStack(YodleeSplashFragment::class.simpleName).commitAllowingStateLoss()
+        }
     }
 }
 

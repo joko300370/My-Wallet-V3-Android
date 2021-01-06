@@ -14,6 +14,7 @@ import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.ui.trackProgress
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager
@@ -25,6 +26,7 @@ import piuk.blockchain.android.R
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.simplebuy.SimpleBuyIntent
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
@@ -176,8 +178,8 @@ class SettingsPresenter(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                // Bank linking through deposit has not been implemented for USD
-                (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+                        // Bank linking through deposit has not been implemented for USD
+                        (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
             }
 
             bankPaymentMethods.map { method ->
@@ -473,13 +475,13 @@ class SettingsPresenter(
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
         return isNotificationsOn && (notificationsType.contains(type) ||
-                                     notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-               (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                !notificationsType.contains(type))
+                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                        !notificationsType.contains(type))
     }
 
     /**
@@ -600,6 +602,15 @@ class SettingsPresenter(
         compositeDisposable += cachedSettings.subscribeBy {
             view?.showEmailDialog(it.email, it.isEmailVerified)
         }
+    }
+
+    fun linkBank(currency: String) {
+        compositeDisposable += custodialWalletManager.linkToABank(currency)
+            .subscribeBy(onSuccess = {
+                view?.linkBankWithPartner(it)
+            }, onError = {
+                view?.showError(R.string.failed_to_link_bank)
+            })
     }
 }
 
