@@ -36,6 +36,7 @@ import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.AnalyticsEvent
@@ -57,7 +58,6 @@ import piuk.blockchain.android.R.string.success
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.RemoveCardBottomSheet
-import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
@@ -347,7 +347,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun goToPlayStore() {
         val flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
-            Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
         try {
             val appPackageName = requireActivity().packageName
             Intent(
@@ -546,13 +546,30 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
-    private fun linkBankWithCurrency(currency: String) {
+    private fun linkFundsBankWithCurrency(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
     private fun linkBank(linkableBank: LinkableBank) {
-        println("bank ${linkableBank.currency} ${linkableBank.linkMethods}")
+        require(linkableBank.linkMethods.isNotEmpty())
+        if (linkableBank.linkMethods.size > 1) {
+            showDialogForLinkBankMethodChooser(linkableBank)
+        } else {
+            when (linkableBank.linkMethods[0]) {
+                PaymentMethodType.FUNDS -> linkFundsBankWithCurrency(linkableBank.currency)
+                PaymentMethodType.BANK_TRANSFER -> linkableBankWithBankTransfer(linkableBank.currency)
+                else -> throw IllegalStateException("Not valid linkable bank type")
+            }
+        }
+    }
+
+    private fun linkableBankWithBankTransfer(currency: String) {
+        TODO("Not yet implemented")
+    }
+
+    private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
+        TODO("Not yet implemented")
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -608,7 +625,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
             existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
-                              ?: continue)
+                ?: continue)
         }
         return existingBanks
     }

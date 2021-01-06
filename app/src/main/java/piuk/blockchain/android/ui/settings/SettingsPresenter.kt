@@ -183,7 +183,7 @@ class SettingsPresenter(
             bankPaymentMethods.map { method ->
                 LinkableBank(
                     method.currency,
-                    bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.toSet()
+                    bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.distinct()
                 )
             }.toSet()
         }
@@ -603,12 +603,7 @@ class SettingsPresenter(
     }
 }
 
-data class SettingsBanks(
-    val linkableBanks: List<LinkableBank>,
-    val linkedBank: List<Bank>
-)
-
 data class LinkableBank(
     val currency: String,
-    val linkMethods: Set<PaymentMethodType>
+    val linkMethods: List<PaymentMethodType>
 )
