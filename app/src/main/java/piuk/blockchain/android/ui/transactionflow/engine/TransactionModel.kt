@@ -319,7 +319,7 @@ class TransactionModel(
                 }
             )
 
-    private fun processModifyTxOptionRequest(newConfirmation: TxConfirmationValue): Disposable? =
+    private fun processModifyTxOptionRequest(newConfirmation: TxConfirmationValue): Disposable =
         interactor.modifyOptionValue(
             newConfirmation
         ).subscribeBy(

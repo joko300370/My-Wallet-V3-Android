@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.dialog_asset_actions_sheet.view.*
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
@@ -57,12 +58,10 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
     override fun render(newState: AssetDetailsState) {
         if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
 
-            require(newState.selectedAccount != null)
-
-            showAssetBalances(newState)
-
-            val actionItems = mapActions(newState.selectedAccount)
-            itemAdapter.itemList = actionItems
+            newState.selectedAccount?.let {
+                showAssetBalances(newState)
+                itemAdapter.itemList = mapActions(it, newState.actions)
+            }
 
             if (newState.errorState != AssetDetailsError.NONE) {
                 showError(newState.errorState)
@@ -117,10 +116,11 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
     }
 
     private fun mapActions(
-        account: BlockchainAccount
+        account: BlockchainAccount,
+        actions: AvailableActions
     ): List<AssetActionItem> {
         val firstAccount = account.selectFirstAccount()
-        return account.actions.map {
+        return actions.map {
             mapAction(it, firstAccount.asset, firstAccount)
         }
     }

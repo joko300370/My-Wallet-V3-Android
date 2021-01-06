@@ -6,6 +6,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
@@ -16,6 +17,7 @@ import timber.log.Timber
 data class AssetDetailsState(
     val asset: CryptoAsset? = null,
     val selectedAccount: BlockchainAccount? = null,
+    val actions: AvailableActions = emptySet(),
     val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
     val assetDisplayMap: AssetDisplayMap? = null,
     val assetFiatPrice: String = "",
@@ -76,8 +78,9 @@ class AssetDetailsModel(
                     onSuccess = {
                         process(AssetExchangeRateLoaded(it))
                     }, onError = {
-                    process(AssetExchangeRateFailed)
-                })
+                        process(AssetExchangeRateFailed)
+                    })
+            is ShowAssetActionsIntent -> accountActions(intent.account)
             is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
             is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
             is HandleActionIntent,
@@ -90,7 +93,6 @@ class AssetDetailsModel(
             is AssetExchangeRateLoaded,
             is AssetExchangeRateFailed,
             is ShowAssetDetailsIntent,
-            is ShowAssetActionsIntent,
             is ShowCustodyIntroSheetIntent,
             is SelectAccount,
             is ReturnToPreviousStep,
@@ -99,6 +101,7 @@ class AssetDetailsModel(
             is TransactionInFlight,
             is ShowInterestDashboard,
             is ClearActionStates -> null
+            is AccountActionsLoaded -> null
         }
     }
 
@@ -112,6 +115,14 @@ class AssetDetailsModel(
             onError = {
                 process(ChartDataLoadFailed)
             }
+        )
+
+    private fun accountActions(account: BlockchainAccount): Disposable =
+        account.actions.subscribeBy(
+            onSuccess = {
+                process(AccountActionsLoaded(account, it))
+            },
+            onError = { Timber.e("***> Error Loading account actions: $it") }
         )
 
     override fun onScanLoopError(t: Throwable) {

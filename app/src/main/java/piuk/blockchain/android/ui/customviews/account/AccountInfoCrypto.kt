@@ -125,6 +125,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
                 condition = accountsAreTheSame
             )
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                wallet_balance_crypto.text = ""
+                wallet_balance_fiat.text = ""
+            }
             .subscribeBy(
                 onNext = { accountBalance ->
                     wallet_balance_crypto.text = accountBalance.toStringWithSymbol()
@@ -178,9 +182,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
     fun dispose() {
         compositeDisposable.clear()
     }
-
-    private fun <T> T.initialValue(accountsAreTheSame: Boolean): T? =
-        if (accountsAreTheSame) this else null
 }
 
 private fun <T> Single<T>.startWithValueIfCondition(

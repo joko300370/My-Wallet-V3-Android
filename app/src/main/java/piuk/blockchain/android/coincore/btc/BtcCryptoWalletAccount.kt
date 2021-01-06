@@ -121,13 +121,11 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    override val actions: AvailableActions
-        get() = super.actions.run {
+    override val actions: Single<AvailableActions>
+        get() = super.actions.map {
             if (!isHDAccount) {
-                toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
-            } else {
-                this
-            }
+                it.toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
+            } else it
         }
 
     override fun updateLabel(newLabel: String): Completable {
@@ -208,7 +206,7 @@ internal class BtcCryptoWalletAccount(
                         legacyAddress = internalAccount as LegacyAddress,
                         secondPassword = password
                     ) ?: throw IllegalStateException("Private key not found for legacy BTC address"))
-                )
+            )
         }
     }
 
